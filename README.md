@@ -1,8 +1,8 @@
-# README #
+# Ziva Vfx Utils #
 
 These are utility scripts for the Ziva Vfx maya plugin.
 
-#test
+Put the zBuilder folder and all of it's contents in a maya scripts directory
 
 ### Who do I talk to? ###
 
