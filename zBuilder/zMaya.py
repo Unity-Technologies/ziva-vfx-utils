@@ -99,13 +99,7 @@ def get_zTets(bodies):
     else:
         return []
 
-def get_zGeos(bodies):
-    mc.select(bodies,r=True)
-    zGeo = mm.eval('zQuery-t "zGeo"')
-    if zGeo:
-        return zGeo
-    else:
-        return []
+
 
 def get_zTissues(bodies):
     mc.select(bodies,r=True)
@@ -134,13 +128,7 @@ def get_zFibers(bodies):
     else:
         return []
 
-def get_zEmbedder(bodies):
-    mc.select(bodies,r=True)
-    embedder = mm.eval('zQuery -t "zEmbedder"')
-    if embedder:
-        return embedder[0]
-    else:
-        return None
+
 
 def get_zTet_user_mesh(zNode):
     mesh = mc.listConnections(zNode+'.iTet')
@@ -149,38 +137,7 @@ def get_zTet_user_mesh(zNode):
     else:
         return mesh
 
-def get_embedded_association(bodies):
-    
-    tmp={}
-    embedder = get_zEmbedder(bodies)
-    
-    for body in bodies:
-        if body not in tmp:
-            tmp[body] = {}
-            tmp[body]['collision'] = []
-            tmp[body]['embedded'] = []
 
-
-        zGeo = get_zGeos(body)
-        if zGeo:
-            zGeo = zGeo[0]
-            zEmbedders = mc.listConnections(zGeo+'.oGeo',c=True,t='zEmbedder',p=True)
-            if zEmbedders:
-                if len(zEmbedders) > 2:
-                    for item in zEmbedders[3::2]:
-                        i = item.split('iGeo')[1]
-                        embedded = mc.listConnections(embedder+'.outputGeometry'+i)[0]
-
-                        shape = mc.listRelatives(embedded,c=True)[0]
-                        message_to_tissue = mc.listConnections(shape+'.message',type='zTissue')
-                        if message_to_tissue:
-                            tmp[body]['collision'].append(True)
-                        else:
-                            tmp[body]['collision'].append(False)
-
-                        tmp[body]['embedded'].append(embedded)
-
-    return tmp
 
 def get_association(zNode):
     #sel = mc.ls(sl=True)

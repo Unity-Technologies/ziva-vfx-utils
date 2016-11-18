@@ -3,12 +3,9 @@ import zBuilder.zMaya as mz
 import zBuilder.nodes.base as base
 import zBuilder.nodes.zEmbedder as embedderNode
 import zBuilder.nodes.zTet as tetNode
-
 import zBuilder.nodes.mesh as msh
 
 import zBuilder.nodeCollection as nc
-reload(nc)
-reload(mz)
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -110,7 +107,8 @@ class ZivaSetup(nc.NodeCollection):
                         self.add_mesh(associations[1])
 
             #selecting tissues
-            self.retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue"'))
+
+            self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
 
             self.stats()
             end = time.time()
@@ -126,13 +124,13 @@ class ZivaSetup(nc.NodeCollection):
         print '\ngetting ziva......'
         start = time.time()
 
-        self.retrieve_solver_from_selection(selection)
-        self.retrieve_bones_from_selection(selection)
-        self.retrieve_tissues_from_selection(selection)
-        self.retrieve_attachments_from_selection(selection)
-        self.retrieve_materials_from_selection(selection)
-        self.retrieve_fibers_from_selection(selection)
-        self.retrieve_embedded_from_selection(selection)
+        self.__retrieve_solver_from_selection(selection)
+        self.__retrieve_bones_from_selection(selection)
+        self.__retrieve_tissues_from_selection(selection)
+        self.__retrieve_attachments_from_selection(selection)
+        self.__retrieve_materials_from_selection(selection)
+        self.__retrieve_fibers_from_selection(selection)
+        self.__retrieve_embedded_from_selection(selection)
 
         end = time.time()
         print 'finished at ',str((end - start))
@@ -160,7 +158,7 @@ class ZivaSetup(nc.NodeCollection):
         self.add_node(node)
 
 
-    def retrieve_solver_from_selection(self,selection):
+    def __retrieve_solver_from_selection(self,selection):
 
         solver = mz.get_zSolver(selection[0])
         if solver:
@@ -174,15 +172,15 @@ class ZivaSetup(nc.NodeCollection):
             print 'no solver found'
 
 
-    def retrieve_bones_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
+    def __retrieve_bones_from_selection(self,selection):
+        longnames = mc.ls(selection,l=True)
         
         for bone in mz.get_zBones(longnames):
             self.__add_ziva_node(bone,association=mz.get_association(bone))
         mc.select(selection)
 
-    def retrieve_tissues_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
+    def __retrieve_tissues_from_selection(self,selection):
+        longnames = mc.ls(selection,l=True)
         for tissue in mz.get_zTissues(longnames):
             self.__add_ziva_node(tissue,association=mz.get_association(tissue))
 
@@ -201,8 +199,8 @@ class ZivaSetup(nc.NodeCollection):
                 self.add_mesh(associations[0])
         mc.select(longnames)
 
-    def retrieve_attachments_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
+    def __retrieve_attachments_from_selection(self,selection):
+        longnames = mc.ls(selection,l=True)
         attachments = mz.get_zAttachments(longnames)
 
         for attachment in attachments:
@@ -220,8 +218,8 @@ class ZivaSetup(nc.NodeCollection):
             if not self.get_mesh(associations[1]):
                 self.add_mesh(associations[1])
 
-    def retrieve_materials_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
+    def __retrieve_materials_from_selection(self,selection):
+        longnames = mc.ls(selection,l=True)
         materials = mz.get_zMaterials(longnames)
 
         for material in materials:
@@ -237,8 +235,8 @@ class ZivaSetup(nc.NodeCollection):
                 self.add_mesh(associations[0])
 
 
-    def retrieve_fibers_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
+    def __retrieve_fibers_from_selection(self,selection):
+        longnames = mc.ls(selection,l=True)
         fibers = mz.get_zFibers(longnames)
 
         for fiber in fibers:
@@ -254,13 +252,14 @@ class ZivaSetup(nc.NodeCollection):
             if not self.get_mesh(associations[0]):
                 self.add_mesh(associations[0])
 
-    def retrieve_embedded_from_selection(self,selection):
-        longnames = mc.ls(sl=True,l=True)
-        embedder = mz.get_zEmbedder(longnames)
+    def __retrieve_embedded_from_selection(self,selection):
+        
+        longnames = mc.ls(selection,l=True)
+        embedder = embedderNode.get_zEmbedder(longnames)
         #print 'OMG',embedder,selection
         if embedder:
             if longnames:
-                associations = mz.get_embedded_association(longnames)
+                associations = embedderNode.get_embedded_association(longnames)
                 _type = mz.get_type(embedder)
 
                 # get attributes/values
@@ -276,7 +275,7 @@ class ZivaSetup(nc.NodeCollection):
                 self.add_node(node)
 
 
-    def apply(self,interp_maps='auto'):
+    def apply(self,_filter=None,interp_maps='auto'):
         start = time.time()
         sel = mc.ls(sl=True)
         self.apply_solver()
@@ -287,11 +286,11 @@ class ZivaSetup(nc.NodeCollection):
         solver_value = zSolverTransform.get_attr_value('enable')
         mc.setAttr(sn+'.enable',0)
 
-        self.apply_bones()
-        self.apply_tissues(interp_maps=interp_maps)
-        self.apply_attachments(interp_maps=interp_maps)
-        self.apply_materials(interp_maps=interp_maps)
-        self.apply_fibers(interp_maps=interp_maps)
+        self.apply_bones(_filter=_filter)
+        self.apply_tissues(interp_maps=interp_maps,_filter=_filter)
+        self.apply_attachments(interp_maps=interp_maps,_filter=_filter)
+        self.apply_materials(interp_maps=interp_maps,_filter=_filter)
+        self.apply_fibers(interp_maps=interp_maps,_filter=_filter)
         self.apply_embedded()
 
         # set solver back to whatever it was in data
@@ -580,7 +579,7 @@ class ZivaSetup(nc.NodeCollection):
         try:
             for mesh in association.keys():
                 for (col,embed) in zip(association[mesh]['collision'],association[mesh]['embedded']):
-                    if not mz.get_zEmbedder(embed):
+                    if not embedderNode.get_zEmbedder(embed):
                         if mc.objExists(mesh):
                             if col:
                                 mc.select(mesh,embed,r=True)
