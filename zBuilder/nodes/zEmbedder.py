@@ -7,7 +7,6 @@ import zBuilder.zMaya as mz
 class EmbedderNode(BaseNode):
     def __init__(self):
         BaseNode.__init__(self)
-        #self._association = {}
 
         self.__embedded_meshes = None
         self.__collision_meshes = None
@@ -102,39 +101,5 @@ def get_embedded_meshes(bodies):
         if colMesh:
             collision_meshes[body] = colMesh
 
-
-    #print embedded_meshes,'em'
-    #print collision_meshes,'col'
-
     return embedded_meshes,collision_meshes
     
-    # tmp={}
-    # embedder = get_zEmbedder(bodies)
-    
-    # for body in bodies:
-    #     if body not in tmp:
-    #         tmp[body] = {}
-    #         tmp[body]['collision'] = []
-    #         tmp[body]['embedded'] = []
-
-
-    #     zGeo = get_zGeos(body)
-    #     if zGeo:
-    #         zGeo = zGeo[0]
-    #         zEmbedders = mc.listConnections(zGeo+'.oGeo',c=True,t='zEmbedder',p=True)
-    #         if zEmbedders:
-    #             if len(zEmbedders) > 2:
-    #                 for item in zEmbedders[3::2]:
-    #                     i = item.split('iGeo')[1]
-    #                     embedded = mc.listConnections(embedder+'.outputGeometry'+i)[0]
-
-    #                     shape = mc.listRelatives(embedded,c=True)[0]
-    #                     message_to_tissue = mc.listConnections(shape+'.message',type='zTissue')
-    #                     if message_to_tissue:
-    #                         tmp[body]['collision'].append(True)
-    #                     else:
-    #                         tmp[body]['collision'].append(False)
-
-    #                     tmp[body]['embedded'].append(embedded)
-
-    # return tmp
