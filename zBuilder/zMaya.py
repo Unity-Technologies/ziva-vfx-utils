@@ -155,8 +155,14 @@ def get_association(zNode):
 
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type,zNode)
-        mesh = mm.eval(cmd)
-        return mesh
+
+        nope = ['zSolverTransform','zSolver']
+        if _type in nope:
+            return None
+        else:
+            mesh = mm.eval(cmd)
+            return mesh
+
 
 
 #-------------------------------------------------------------------------------

@@ -107,7 +107,7 @@ def set_weights(nodes,meshes,interp_maps=False):
                     
                     cur_conn = get_mesh_connectivity(mnameShort)
  
-                    if cur_conn['polygonConnects'] != mesh.polygonConnects():
+                    if cur_conn['polygonConnects'] != mesh.get_polygon_connects():
                         interp_maps=True
 
                 if interp_maps == True:

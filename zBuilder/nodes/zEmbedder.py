@@ -15,8 +15,7 @@ class EmbedderNode(BaseNode):
         super(EmbedderNode, self).string_replace(search,replace)
         print 'zEmbedder:string_replace'
 
-        pass
-
+   
     def set_collision_meshes(self,meshes):
         self.__collision_meshes = meshes
 
@@ -49,8 +48,10 @@ class EmbedderNode(BaseNode):
 
     def _print(self):
         super(EmbedderNode, self)._print()
-        print 'Collision Meshes: ',self.get_collision_meshes(longName=True)
-        print 'Embedded Meshes: ',self.get_embedded_meshes(longName=True)
+        if self.get_collision_meshes(longName=True):
+            print 'Collision Meshes: ',self.get_collision_meshes(longName=True)
+        if self.get_embedded_meshes(longName=True):
+            print 'Embedded Meshes: ',self.get_embedded_meshes(longName=True)
 
 
 

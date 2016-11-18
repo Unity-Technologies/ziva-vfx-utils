@@ -63,15 +63,15 @@ class NodeCollection(object):
         args:
             node -- the node to append
         '''
+        if not self.get_mesh(name):
+            connectivity = mesh.get_mesh_connectivity(name)
+            m = mesh.Mesh()
+            m.set_name(name)
+            m.set_polygon_counts(connectivity['polygonCounts'])
+            m.set_polygon_connects(connectivity['polygonConnects'])
+            m.set_point_list(connectivity['points'])
 
-        connectivity = mesh.get_mesh_connectivity(name)
-        m = mesh.Mesh()
-        m.set_name(name)
-        m.set_polygon_counts(connectivity['polygonCounts'])
-        m.set_polygon_connects(connectivity['polygonConnects'])
-        m.set_point_list(connectivity['points'])
-
-        self.meshes[name] = m
+            self.meshes[name] = m
 
     def get_mesh(self,mesh_name):
         return self.meshes.get(mesh_name,None)
