@@ -591,22 +591,6 @@ class ZivaSetup(nc.NodeCollection):
                     except:
                         pass
 
-        # for mesh in association.keys():
-        #     for (col,embed) in zip(association[mesh]['collision'],association[mesh]['embedded']):
-        #         if not embedderNode.get_zEmbedder(embed):
-        #             if mc.objExists(mesh):
-        #                 if col:
-        #                     mc.select(mesh,embed,r=True)
-        #                     mm.eval('ziva -tcm')
-        #                 else:
-        #                     mc.select(mesh,embed,r=True)
-        #                     mm.eval('ziva -e')
-        #             else:
-        #                 print mesh, 'does not exist in scene, skipping embedding'
-        #         else:
-        #             print embed + ' is currently embedded.  Skipping...'
-
-
     def mirror(search,replace):
         self.string_replace(search,replace)
 
