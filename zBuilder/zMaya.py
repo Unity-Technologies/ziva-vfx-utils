@@ -28,7 +28,10 @@ ZNODES = [
 
 
 def get_type(body):
-    return mc.objectType(body)
+    try:
+        return mc.objectType(body)
+    except:
+        pass
     
 def clean_scene():
     for node in ZNODES:

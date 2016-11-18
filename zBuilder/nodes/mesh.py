@@ -99,10 +99,12 @@ def set_weights(nodes,meshes,interp_maps=False):
             mname= maps[attr]['mesh']
             wList = maps[attr]['value']
             mnameShort = mname.split('|')[-1]
+
             if mc.objExists(mnameShort):
                 mesh = meshes[mname]
 
                 if interp_maps == 'auto':
+                    
                     cur_conn = get_mesh_connectivity(mnameShort)
  
                     if cur_conn['polygonConnects'] != mesh.polygonConnects():

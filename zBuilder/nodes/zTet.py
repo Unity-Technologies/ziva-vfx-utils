@@ -22,7 +22,8 @@ class TetNode(BaseNode):
 
     def _print(self):
         super(TetNode, self)._print()
-        print 'User_Tet_Mesh: ',self.get_user_tet_mesh(longName=True)
+        if self.get_user_tet_mesh(longName=True):
+            print 'User_Tet_Mesh: ',self.get_user_tet_mesh(longName=True)
 
     def string_replace(self,search,replace):
         super(TetNode, self).string_replace(search,replace)

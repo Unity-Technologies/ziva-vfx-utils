@@ -259,7 +259,7 @@ class ZivaSetup(nc.NodeCollection):
         #print 'OMG',embedder,selection
         if embedder:
             if longnames:
-                associations = embedderNode.get_embedded_association(longnames)
+                associations = embedderNode.get_embedded_meshes(longnames)
                 _type = mz.get_type(embedder)
 
                 # get attributes/values
@@ -270,7 +270,8 @@ class ZivaSetup(nc.NodeCollection):
                 node.set_name(embedder)
                 node.set_type(_type)
                 node.set_attrs(attrs)
-                node.set_association(associations)
+                node.set_embedded_meshes(associations[0])
+                node.set_collision_meshes(associations[1])
 
                 self.add_node(node)
 
@@ -430,10 +431,8 @@ class ZivaSetup(nc.NodeCollection):
                 mc.rename(new,i)
 
         # set tet maps if so desired--------------------------------------------
-        if interp_maps:
-            msh.set_weights(zTets,self.get_meshes(),interp_maps=interp_maps)
-        else:
-            msh.set_weights(zTets,None,interp_maps=interp_maps)
+        msh.set_weights(zTets,self.get_meshes(),interp_maps=interp_maps)
+
 
         ## apply user tet meshes if needed
         for zTet in zTets:
@@ -494,10 +493,9 @@ class ZivaSetup(nc.NodeCollection):
                     print 'skipping...',name
 
                 
-        if interp_maps:
-            msh.set_weights(attachments,self.get_meshes(),interp_maps=interp_maps)
-        else:
-            msh.set_weights(attachments,None,interp_maps=interp_maps)
+
+        msh.set_weights(attachments,self.get_meshes(),interp_maps=interp_maps)
+
         mz.set_attrs(attachments)
 
         mc.setAttr(sol+'.enable',sval)
@@ -533,10 +531,9 @@ class ZivaSetup(nc.NodeCollection):
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
                             mc.rename(tmpmat[0],name)
-        if interp_maps:
-            msh.set_weights(materials,self.get_meshes(),interp_maps=interp_maps)
-        else:
-            msh.set_weights(materials,None,interp_maps=interp_maps)
+
+        msh.set_weights(materials,self.get_meshes(),interp_maps=interp_maps)
+
         mz.set_attrs(materials)
 
         mc.setAttr(sol+'.enable',sval)
@@ -559,10 +556,9 @@ class ZivaSetup(nc.NodeCollection):
                     mc.rename(tmp[0],name)
             else:
                 print association[0], ' mesh does not exists in scene, skippings fiber'
-        if interp_maps:
-            msh.set_weights(fibers,self.get_meshes(),interp_maps=interp_maps)
-        else:
-            msh.set_weights(fibers,None,interp_maps=interp_maps)
+
+        msh.set_weights(fibers,self.get_meshes(),interp_maps=interp_maps)
+
         mz.set_attrs(fibers)
         mc.setAttr(sol+'.enable',sval)
 
@@ -574,25 +570,42 @@ class ZivaSetup(nc.NodeCollection):
         embeddedNode = self.get_nodes(_type='zEmbedder')[0]
     
         name = embeddedNode.get_name()
-        association = embeddedNode.get_association()
-        #print association
-        try:
-            for mesh in association.keys():
-                for (col,embed) in zip(association[mesh]['collision'],association[mesh]['embedded']):
-                    if not embedderNode.get_zEmbedder(embed):
-                        if mc.objExists(mesh):
-                            if col:
-                                mc.select(mesh,embed,r=True)
-                                mm.eval('ziva -tcm')
-                            else:
-                                mc.select(mesh,embed,r=True)
-                                mm.eval('ziva -e')
-                        else:
-                            print mesh, 'does not exist in scene, skipping embedding'
-                    else:
-                        print embed + ' is currently embedded.  Skipping...'
-        except:
-            pass
+        collision_meshes = embeddedNode.get_collision_meshes()
+        embedded_meshes = embeddedNode.get_embedded_meshes()
+
+        if collision_meshes:
+            for mesh in collision_meshes:
+                for item in collision_meshes[mesh]:
+                    try:
+                        mc.select(mesh,item,r=True)
+                        mm.eval('ziva -tcm')
+                    except:
+                        pass
+
+        if embedded_meshes:
+            for mesh in embedded_meshes:
+                for item in embedded_meshes[mesh]:
+                    try:
+                        mc.select(mesh,item,r=True)
+                        mm.eval('ziva -e')
+                    except:
+                        pass
+
+        # for mesh in association.keys():
+        #     for (col,embed) in zip(association[mesh]['collision'],association[mesh]['embedded']):
+        #         if not embedderNode.get_zEmbedder(embed):
+        #             if mc.objExists(mesh):
+        #                 if col:
+        #                     mc.select(mesh,embed,r=True)
+        #                     mm.eval('ziva -tcm')
+        #                 else:
+        #                     mc.select(mesh,embed,r=True)
+        #                     mm.eval('ziva -e')
+        #             else:
+        #                 print mesh, 'does not exist in scene, skipping embedding'
+        #         else:
+        #             print embed + ' is currently embedded.  Skipping...'
+
 
     def mirror(search,replace):
         self.string_replace(search,replace)
