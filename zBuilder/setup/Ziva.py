@@ -69,28 +69,6 @@ class ZivaSetup(nc.NodeCollection):
                         self.__add_ziva_node(zNode)
 
 
-            # #attachment---------------------------------------------------------
-            # attachments =  mm.eval('zQuery -t "zAttachment"')
-            # if attachments:
-            #     for attachment in attachments:
-
-            #         associations = mz.get_association(attachment)
-
-            #         attachmentMapList = maplist.get('zAttachment')
-
-            #         attachmentMaps = msh.get_weights(attachment,associations,attachmentMapList)
-
-            #         self.__add_ziva_node(attachment,
-            #             association=associations,maps=attachmentMaps)
-
-
-            #         if not self.get_mesh(associations[0]):
-            #             self.add_mesh(associations[0])
-
-            #         if not self.get_mesh(associations[1]):
-            #             self.add_mesh(associations[1])
-
-            #selecting tissues
 
             self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
 
@@ -154,7 +132,14 @@ class ZivaSetup(nc.NodeCollection):
     def __retrieve_node_selection(self,selection):
         longnames = mc.ls(selection,l=True)
         for s in longnames:
-            print s
+            if mc.objectType(s) == 'transform' or mc.objectType(s) == 'mesh':
+                nodes = []
+                nodes.append(mm.eval('zQuery -t zTet'))
+                nodes.append(mm.eval('zQuery -t zTissue'))
+                nodes.append(mm.eval('zQuery -t zBone'))
+                for n in nodes:
+                    if n:
+                        self.__add_ziva_node(n[0])
             if mz.get_type(s) in zNodes:
                 self.__add_ziva_node(s)
 
