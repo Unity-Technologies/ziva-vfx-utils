@@ -30,6 +30,9 @@ zNodes = [
         'zMaterial',
         'zFiber',
         ]
+
+
+
 class ZivaSetup(nc.NodeCollection):
     '''
     To capture a ziva setup
@@ -45,8 +48,7 @@ class ZivaSetup(nc.NodeCollection):
         #self.info['plugin_name'] = plug
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
 
-
-
+    @nc.time_this
     def retrieve_from_scene(self,solver):
         sel = mc.ls(sl=True,l=True)
         
@@ -54,7 +56,6 @@ class ZivaSetup(nc.NodeCollection):
         
         if _type == 'zSolverTransform':
             print '\ngetting ziva......'
-            start = time.time()
             mc.select(solver,r=True)
             solShape = mm.eval('zQuery -t "zSolver" -l')[0]
             self.__add_ziva_node(solver)
@@ -73,18 +74,16 @@ class ZivaSetup(nc.NodeCollection):
             self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
 
             self.stats()
-            end = time.time()
-            print 'finished at ',str((end - start))
+
         else:
             print 'select a solver'
 
         mc.select(sel,r=True)
         
 
-
+    @nc.time_this
     def retrieve_from_scene_selection(self,selection,connections=False):
         print '\ngetting ziva......'
-        start = time.time()
 
         if connections:
             self.__retrieve_solver_from_selection(selection)
@@ -97,8 +96,8 @@ class ZivaSetup(nc.NodeCollection):
         else:
             self.__retrieve_node_selection(selection)
 
-        end = time.time()
-        print 'finished at ',str((end - start))
+        self.stats()
+
 
     def __add_ziva_node(self,zNode):
         _type = mz.get_type(zNode)
@@ -208,31 +207,30 @@ class ZivaSetup(nc.NodeCollection):
 
 
     def __retrieve_embedded_from_selection(self,selection,connections=False):
-        if connections:
-            longnames = mc.ls(selection,l=True)
-            embedder = embedderNode.get_zEmbedder(longnames)
-            #print 'OMG',embedder,selection
-            if embedder:
-                if longnames:
-                    associations = embedderNode.get_embedded_meshes(longnames)
-                    _type = mz.get_type(embedder)
+        #if connections:
+        longnames = mc.ls(selection,l=True)
+        embedder = embedderNode.get_zEmbedder(longnames)
+        #print 'OMG',embedder,selection
+        if embedder:
+            if longnames:
+                associations = embedderNode.get_embedded_meshes(longnames)
+                _type = mz.get_type(embedder)
 
-                    # get attributes/values
-                    attrList = mz.build_attr_list(embedder)
-                    attrs = mz.build_attr_key_values(embedder,attrList)
+                # get attributes/values
+                attrList = mz.build_attr_list(embedder)
+                attrs = mz.build_attr_key_values(embedder,attrList)
 
-                    node = embedderNode.EmbedderNode()
-                    node.set_name(embedder)
-                    node.set_type(_type)
-                    node.set_attrs(attrs)
-                    node.set_embedded_meshes(associations[0])
-                    node.set_collision_meshes(associations[1])
+                node = embedderNode.EmbedderNode()
+                node.set_name(embedder)
+                node.set_type(_type)
+                node.set_attrs(attrs)
+                node.set_embedded_meshes(associations[0])
+                node.set_collision_meshes(associations[1])
 
-                    self.add_node(node)
+                self.add_node(node)
 
-
+    @nc.time_this
     def apply(self,_filter=None,interp_maps='auto'):
-        start = time.time()
         sel = mc.ls(sl=True)
         self.apply_solver()
 
@@ -253,21 +251,22 @@ class ZivaSetup(nc.NodeCollection):
         # set solver back to whatever it was in data
         mc.setAttr(sn+'.enable',solver_value)
         mc.select(sel,r=True)
-        end = time.time()
-        print 'finished at ',str((end - start))
+
 
     def apply_solver(self):
-        zSolver = self.get_nodes(_type='zSolver')[0]
-        zSolverTransform = self.get_nodes(_type='zSolverTransform')[0]
+        zSolver = self.get_nodes(_type='zSolver')
+        if zSolver:
+            zSolver = zSolver[0]
+            zSolverTransform = self.get_nodes(_type='zSolverTransform')[0]
 
-        solverName = zSolver.get_name()
-        solverTransformName = zSolverTransform.get_name()
+            solverName = zSolver.get_name()
+            solverTransformName = zSolverTransform.get_name()
 
-        if not mc.objExists(solverName):
-            print 'building solver: ',solverName
-            sol = mm.eval('ziva -s')
+            if not mc.objExists(solverName):
+                print 'building solver: ',solverName
+                sol = mm.eval('ziva -s')
 
-        mz.set_attrs([zSolver,zSolverTransform])
+            mz.set_attrs([zSolver,zSolverTransform])
 
     def apply_bones(self,_filter=None):
         sol = mc.ls(type='zSolverTransform')[0]
@@ -523,29 +522,30 @@ class ZivaSetup(nc.NodeCollection):
         # differently then other nodes as there is 1 embedder and we care
         # about associations in this case
         
-        embeddedNode = self.get_nodes(_type='zEmbedder')[0]
-    
-        name = embeddedNode.get_name()
-        collision_meshes = embeddedNode.get_collision_meshes()
-        embedded_meshes = embeddedNode.get_embedded_meshes()
+        embeddedNode = self.get_nodes(_type='zEmbedder')
+        if embeddedNode:
+        
+            name = embeddedNode.get_name()
+            collision_meshes = embeddedNode.get_collision_meshes()
+            embedded_meshes = embeddedNode.get_embedded_meshes()
 
-        if collision_meshes:
-            for mesh in collision_meshes:
-                for item in collision_meshes[mesh]:
-                    try:
-                        mc.select(mesh,item,r=True)
-                        mm.eval('ziva -tcm')
-                    except:
-                        pass
+            if collision_meshes:
+                for mesh in collision_meshes:
+                    for item in collision_meshes[mesh]:
+                        try:
+                            mc.select(mesh,item,r=True)
+                            mm.eval('ziva -tcm')
+                        except:
+                            pass
 
-        if embedded_meshes:
-            for mesh in embedded_meshes:
-                for item in embedded_meshes[mesh]:
-                    try:
-                        mc.select(mesh,item,r=True)
-                        mm.eval('ziva -e')
-                    except:
-                        pass
+            if embedded_meshes:
+                for mesh in embedded_meshes:
+                    for item in embedded_meshes[mesh]:
+                        try:
+                            mc.select(mesh,item,r=True)
+                            mm.eval('ziva -e')
+                        except:
+                            pass
 
     def mirror(search,replace):
         self.string_replace(search,replace)

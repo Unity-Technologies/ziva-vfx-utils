@@ -8,7 +8,7 @@ import re
 import sys
 import os.path
 import importlib
-
+import time
 
 #TODO delete a node
 
@@ -22,7 +22,7 @@ class NodeCollection(object):
         self.meshes = {}
         self.info = {}
         self.info['data_version'] = .1
-        #self.info['current_time'] = mc.about(cti=True)
+        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
@@ -194,6 +194,15 @@ class NodeCollection(object):
         print 'read-> ',filepath
 
 
+def time_this(original_function):      
+    def new_function(*args,**kwargs):
+        import datetime                 
+        before = datetime.datetime.now()                     
+        x = original_function(*args,**kwargs)                
+        after = datetime.datetime.now()                      
+        print "Finished: ---Elapsed Time = {0}".format(after-before)      
+        return x                                             
+    return new_function  
 
 
 
