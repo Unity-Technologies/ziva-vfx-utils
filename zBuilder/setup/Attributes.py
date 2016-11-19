@@ -10,8 +10,8 @@ class AttributesSetup(nc.NodeCollection):
     def retrieve_from_scene(self,selection):
     
         for sel in selection:
-            nodeAttrList = mz.build_attr_list(sel)
-            nodeAttrs = mz.build_attr_key_values(sel,nodeAttrList)
+            nodeAttrList = base.build_attr_list(sel)
+            nodeAttrs = base.build_attr_key_values(sel,nodeAttrList)
 
 
             node = base.BaseNode()
@@ -23,7 +23,7 @@ class AttributesSetup(nc.NodeCollection):
 
     def apply(self):
         nodes = self.get_nodes()
-        mz.set_attrs(nodes)
+        base.set_attrs(nodes)
 
   
 

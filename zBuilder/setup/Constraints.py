@@ -29,8 +29,8 @@ class ConstraintsSetup(nc.NodeCollection):
 
             for c in con:
 
-                nodeAttrList = mz.build_attr_list(c)
-                nodeAttrs = mz.build_attr_key_values(c,nodeAttrList)
+                nodeAttrList = base.build_attr_list(c)
+                nodeAttrs = base.build_attr_key_values(c,nodeAttrList)
 
                 node = base.BaseNode()
                 node.set_name(c)
@@ -66,4 +66,4 @@ class ConstraintsSetup(nc.NodeCollection):
                     ass = n.get_association()
                     mc.orientConstraint(ass[0],ass[1],mo=True)
 
-        mz.set_attrs(nodes)
+        base.set_attrs(nodes)
