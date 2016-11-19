@@ -200,54 +200,7 @@ def select_tissue_meshes():
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-def build_attr_list(selection):
-    exclude = ['controlPoints','uvSet','colorSet','weightList','pnts',
-        'vertexColor','target']
-    tmps = mc.listAttr(selection,k=True)
-    cb = mc.listAttr(selection,cb=True)
-    if cb:
-        tmps.extend(mc.listAttr(selection,cb=True))
-    attrs = []
-    for attr in tmps:
-        if not attr.split('.')[0] in exclude:
-            attrs.append(attr)
-    return attrs
 
-
-def build_attr_key_values(selection,attrList):
-    tmp = {}
-    for attr in attrList:
-        tmp[attr] = {}
-        tmp[attr]['type'] = mc.getAttr(selection+'.'+attr,type=True)
-        tmp[attr]['value'] = mc.getAttr(selection+'.'+attr)
-        tmp[attr]['locked'] = mc.getAttr(selection+'.'+attr,l=True)
-
-    return tmp
-
-def set_attrs(nodes):
-    #TODO break down setting of attrs to not use base.node
-    for node in nodes:
-        name = node.get_name()
-        nodeAttrs = node.get_attr_list()
-        for attr in nodeAttrs:
-
-            if node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
-                        mc.setAttr(name+'.'+attr,node.get_attr_value(attr),
-                            type='doubleArray')
-                else:
-                    print name+'.'+attr + ' not found, skipping'
-            else:
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
-                        try:
-                            mc.setAttr(name+'.'+attr,node.get_attr_value(attr))
-                        except:
-                            #print 'tried...',attr
-                            pass
-                else:
-                    print name+'.'+attr + ' not found, skipping'
 
 
 

@@ -102,8 +102,8 @@ class ZivaSetup(nc.NodeCollection):
     def __add_ziva_node(self,zNode):
         _type = mz.get_type(zNode)
 
-        attrList = mz.build_attr_list(zNode)
-        attrs = mz.build_attr_key_values(zNode,attrList)
+        attrList = base.build_attr_list(zNode)
+        attrs = base.build_attr_key_values(zNode,attrList)
         if _type == 'zTet':
             node = tetNode.TetNode()
             node.set_user_tet_mesh(mz.get_zTet_user_mesh(zNode))
@@ -217,8 +217,8 @@ class ZivaSetup(nc.NodeCollection):
                 _type = mz.get_type(embedder)
 
                 # get attributes/values
-                attrList = mz.build_attr_list(embedder)
-                attrs = mz.build_attr_key_values(embedder,attrList)
+                attrList = base.build_attr_list(embedder)
+                attrs = base.build_attr_key_values(embedder,attrList)
 
                 node = embedderNode.EmbedderNode()
                 node.set_name(embedder)
@@ -266,7 +266,7 @@ class ZivaSetup(nc.NodeCollection):
                 print 'building solver: ',solverName
                 sol = mm.eval('ziva -s')
 
-            mz.set_attrs([zSolver,zSolverTransform])
+            base.set_attrs([zSolver,zSolverTransform])
 
     def apply_bones(self,_filter=None):
         sol = mc.ls(type='zSolverTransform')[0]
@@ -319,7 +319,7 @@ class ZivaSetup(nc.NodeCollection):
             for new,i in zip(results[1::2],bone_names):
                 mc.rename(new,i)
 
-        mz.set_attrs(zBones)
+        base.set_attrs(zBones)
         mc.setAttr(sol+'.enable',sval)
 
     def apply_tissues(self,interp_maps=False,_filter=None):
@@ -393,16 +393,16 @@ class ZivaSetup(nc.NodeCollection):
         for zTet in zTets:
             if zTet.get_user_tet_mesh():
                 try: 
-                  mc.connectAttr( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet' )
+                    mc.connectAttr( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet',f=True )
                 except:
-                  print 'could not connect %s to %s' % ( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet' )
+                    print 'could not connect %s to %s' % ( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet' )
                 # mc.select(zTet.get_association())
                 # mc.select(zTet.get_user_tet_mesh(),add=True)
                 # mm.eval('ziva -cut')
 
         # set zTissue and zTet attributes---------------------------------------
-        mz.set_attrs(zTets)
-        mz.set_attrs(zTissues)
+        base.set_attrs(zTets)
+        base.set_attrs(zTissues)
 
         mc.setAttr(sol+'.enable',sval)
 
@@ -451,7 +451,7 @@ class ZivaSetup(nc.NodeCollection):
 
         msh.set_weights(attachments,self.get_meshes(),interp_maps=interp_maps)
 
-        mz.set_attrs(attachments)
+        base.set_attrs(attachments)
 
         mc.setAttr(sol+'.enable',sval)
 
@@ -489,7 +489,7 @@ class ZivaSetup(nc.NodeCollection):
 
         msh.set_weights(materials,self.get_meshes(),interp_maps=interp_maps)
 
-        mz.set_attrs(materials)
+        base.set_attrs(materials)
 
         mc.setAttr(sol+'.enable',sval)
 
@@ -514,7 +514,7 @@ class ZivaSetup(nc.NodeCollection):
 
         msh.set_weights(fibers,self.get_meshes(),interp_maps=interp_maps)
 
-        mz.set_attrs(fibers)
+        base.set_attrs(fibers)
         mc.setAttr(sol+'.enable',sval)
 
     def apply_embedded(self,interp_maps=False,_filter=None):
@@ -522,9 +522,9 @@ class ZivaSetup(nc.NodeCollection):
         # differently then other nodes as there is 1 embedder and we care
         # about associations in this case
         
-        embeddedNode = self.get_nodes(_type='zEmbedder')
+        embeddedNode = self.get_nodes(_type='zEmbedder')[0]
         if embeddedNode:
-        
+            
             name = embeddedNode.get_name()
             collision_meshes = embeddedNode.get_collision_meshes()
             embedded_meshes = embeddedNode.get_embedded_meshes()

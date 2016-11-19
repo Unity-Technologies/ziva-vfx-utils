@@ -9,7 +9,7 @@ import sys
 import os.path
 import importlib
 import time
-
+import datetime 
 #TODO delete a node
 
 class NodeCollection(object):
@@ -196,7 +196,7 @@ class NodeCollection(object):
 
 def time_this(original_function):      
     def new_function(*args,**kwargs):
-        import datetime                 
+                        
         before = datetime.datetime.now()                     
         x = original_function(*args,**kwargs)                
         after = datetime.datetime.now()                      
