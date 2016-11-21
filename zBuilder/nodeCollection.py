@@ -158,10 +158,31 @@ class NodeCollection(object):
 
         '''
         data = self.get_json_data()
-        with open(filepath, 'w') as outfile:
-            json.dump(data, outfile, cls=BaseNodeEncoder,
-                sort_keys=True, indent=4, separators=(',', ': '))
+        try:
+            with open(filepath, 'w') as outfile:
+                json.dump(data, outfile, cls=BaseNodeEncoder,
+                    sort_keys=True, indent=4, separators=(',', ': '))
+        except IOError:
+            print "Error: can\'t find file or write data"
+        else:
             print 'wrote-> ',filepath
+
+    def retrieve_from_file(self,filepath):
+        '''
+        reads data from a file
+
+        args:
+            filepath -- filepath to read
+        '''
+        try:
+            with open(filepath, 'rb') as handle:
+                data = json.load(handle, object_hook=load_base_node)
+                #print len(data),'fffff'
+                self.from_json_data(data)
+        except IOError:
+            print "Error: can\'t find file or read data"   
+        else:
+            print 'read-> ',filepath
 
     def get_json_data(self):
         ''''''
@@ -186,18 +207,7 @@ class NodeCollection(object):
     def retrieve_from_scene(self,selection):
         pass
 
-    def retrieve_from_file(self,filepath):
-        '''
-        reads data from a file
 
-        args:
-            filepath -- filepath to read
-        '''
-        with open(filepath, 'rb') as handle:
-            data = json.load(handle, object_hook=load_base_node)
-            #print len(data),'fffff'
-            self.from_json_data(data)
-        print 'read-> ',filepath
 
 
 def time_this(original_function):      
