@@ -27,17 +27,20 @@ class NodeCollection(object):
 
 
 
-    def _print(self,_type='all',_filter=None):
+    def print_(self,type_='all',filter_=None,print_data=False):
         '''
         print info on each node
 
         keyword arguments:
             _type -- filter by node type (default: 'all')
         '''
-        for node in self.get_nodes(_type=_type,_filter=_filter):
-            node._print()
+        for node in self.get_nodes(type_=type_,filter_=filter_):
+            node.print_()
 
-    def stats(self,_type='all'):
+        if print_data:
+            print self.data['mesh'].keys()
+
+    def stats(self,type_='all'):
         '''
         prints out basic stats on data
 
@@ -47,7 +50,7 @@ class NodeCollection(object):
         tmp = {}
         for i,d in enumerate(self.collection):
             t = d.get_type()
-            if t==_type or _type == 'all':
+            if t==type_ or type_ == 'all':
                 if t not in tmp:
                     tmp[t] = []
                 tmp[t].append(d)
@@ -91,26 +94,26 @@ class NodeCollection(object):
         '''
         self.collection.append(node)
 
-    def get_nodes(self,_type='all',_filter=None):
+    def get_nodes(self,type_='all',filter_=None):
         '''
         get nodes in data object
 
         keywords:
-            _type   -- filter by node type (default: 'all')
-            _filter -- filter by node name (default: None)
+            type_   -- filter by node type (default: 'all')
+            filter_ -- filter by node name (default: None)
         returns:
             [] of nodes
         '''
         items = []
-        if _type == 'all':
+        if type_ == 'all':
             return self.collection
         else:
             for i,node in enumerate(self.collection):
-                if node.get_type() == _type:
-                    if _filter:
-                        if not isinstance(_filter, (list, tuple)):
-                            _filter = _filter.split(' ')
-                        if not set(_filter).isdisjoint(node.get_association()):
+                if node.get_type() == type_:
+                    if filter_:
+                        if not isinstance(filter_, (list, tuple)):
+                            filter_ = filter_.split(' ')
+                        if not set(filter_).isdisjoint(node.get_association()):
                             items.append(node)
                     else:
                         items.append(node)
@@ -133,18 +136,10 @@ class NodeCollection(object):
             node.string_replace(search,replace)
 
         # deal with the mesh search and replacing
-
-        pop = []
-        changed = {}
-        for mesh in self.data:
-            new = replace_longname(search,replace,mesh)
-            if new != mesh:
-                changed[new] = self.data[mesh]
-                pop.append(mesh)
-
-        for p,c in zip(pop,changed):
-            self.data.pop(p)
-            self.data[c] = changed[c]
+        for key in self.data:
+            self.data[key] = replace_dict_keys(search,replace,self.data[key])
+            for item in self.data[key]:
+                self.data[key][item].string_replace(search,replace)
 
 
 
@@ -208,7 +203,14 @@ class NodeCollection(object):
         pass
 
 
+def replace_dict_keys(search,replace,dictionary):
 
+    tmp = {}
+    for key in dictionary:
+        new = replace_longname(search,replace,key)
+        tmp[new] = dictionary[key]
+
+    return tmp
 
 def time_this(original_function):      
     def new_function(*args,**kwargs):

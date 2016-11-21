@@ -19,7 +19,7 @@ class BaseNode(object):
     def __repr__(self):
         return self.__str__()
 
-    def _print(self):
+    def print_(self):
         print '----------------------------------------------------'
         #print 'index: \t',i
         print 'python node: \t',self
@@ -52,10 +52,11 @@ class BaseNode(object):
         # association replace---------------------------------------------------
         assNames = self.get_association(longName=True)
         newNames = []
-        for name in assNames:
-            newName = replace_longname(search,replace,name)
-            newNames.append(newName)
-        self.set_association(newNames)
+        if assNames:
+            for name in assNames:
+                newName = replace_longname(search,replace,name)
+                newNames.append(newName)
+            self.set_association(newNames)
 
 
 

@@ -25,6 +25,12 @@ class Mesh(object):
     def set_name(self,name):
         self._name = name   
 
+    def string_replace(self,search,replace):
+        # name replace----------------------------------------------------------
+        name = self.get_name(longName=True)
+        newName = replace_longname(search,replace,name)
+        self.set_name(newName)
+
 
     def set_polygon_counts(self,pCountList): 
         self._pCountList = pCountList
@@ -52,6 +58,16 @@ class Mesh(object):
 
     # def __repr__(self):
     #     return self.__str__()
+
+def replace_longname(search,replace,longName):
+    items = longName.split('|')
+    newName = ''
+    for i in items:
+        if i:
+            i = re.sub(search, replace,i)
+            newName+='|'+i
+
+    return newName
 
 def buildMesh( name,polygonCounts,polygonConnects,vertexArray ): 
     
