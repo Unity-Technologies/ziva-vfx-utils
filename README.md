@@ -10,7 +10,7 @@ https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads
 
 or clone it
 
-https://LonnieK@bitbucket.org/zivadynamics/ziva-vfx-utils-private.git
+https://LonnieK@bitbucket.org/zivadynamics/ziva-vfx-utils.git
 
 
 Put the zBuilder folder and all of it's contents in a maya scripts directory
