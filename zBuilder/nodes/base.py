@@ -141,9 +141,11 @@ def replace_longname(search,replace,longName):
     return newName
 
 
-def build_attr_list(selection):
+def build_attr_list(selection,attr_filter=None):
+
     exclude = ['controlPoints','uvSet','colorSet','weightList','pnts',
         'vertexColor','target']
+
     tmps = mc.listAttr(selection,k=True)
     cb = mc.listAttr(selection,cb=True)
     if cb:
@@ -152,6 +154,11 @@ def build_attr_list(selection):
     for attr in tmps:
         if not attr.split('.')[0] in exclude:
             attrs.append(attr)
+
+    if attr_filter:
+        #attrs = list(set(attrs).intersection(attr_filter))
+        attrs = attr_filter
+        
     return attrs
 
 
