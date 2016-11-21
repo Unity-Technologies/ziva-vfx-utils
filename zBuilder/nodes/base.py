@@ -95,8 +95,8 @@ class BaseNode(object):
     def get_type(self):
         return self._type
 
-    def set_type(self,_type):
-        self._type = _type
+    def set_type(self,type_):
+        self._type = type_
 
     def get_maps(self):
         return self._maps

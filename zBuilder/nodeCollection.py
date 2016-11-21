@@ -1,7 +1,6 @@
 import json
 from nodes.base import BaseNode
-#from nodes.mesh import Mesh
-import zBuilder.nodes.mesh as mesh
+import zBuilder.data.mesh as mesh
 import maya.cmds as mc
 import abc
 import re
@@ -174,6 +173,10 @@ class NodeCollection(object):
 
     @abc.abstractmethod
     def apply(self):
+        '''
+        must create a method to inherit this class
+
+        '''
         pass
 
     @abc.abstractmethod
