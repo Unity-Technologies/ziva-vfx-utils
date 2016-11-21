@@ -164,7 +164,7 @@ class ZivaSetup(nc.NodeCollection):
         for bone in mz.get_zBones(longnames):
             self.__add_ziva_node(bone)
             
-        mc.select(selection)     
+        mc.select(longnames)     
 
     def __retrieve_tissues_from_selection(self,selection,connections=False):
         longnames = mc.ls(selection,l=True)
@@ -231,7 +231,7 @@ class ZivaSetup(nc.NodeCollection):
                 self.add_node(node)
 
     @nc.time_this
-    def apply(self,filter_=None,attr_filter=None,interp_maps='auto',
+    def apply(self,node_filter=None,attr_filter=None,interp_maps='auto',
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
             fibers=True,embedder=True):
         '''
@@ -247,18 +247,18 @@ class ZivaSetup(nc.NodeCollection):
         mc.setAttr(sn+'.enable',0)
 
         if bones:
-            self.__apply_bones(filter_=filter_)
+            self.__apply_bones(node_filter=node_filter)
         if tissues:
-            self.__apply_tissues(interp_maps=interp_maps,filter_=filter_,
+            self.__apply_tissues(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
         if attachments:
-            self.__apply_attachments(interp_maps=interp_maps,filter_=filter_,
+            self.__apply_attachments(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
         if materials:
-            self.__apply_materials(interp_maps=interp_maps,filter_=filter_,
+            self.__apply_materials(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
         if fibers:
-            self.__apply_fibers(interp_maps=interp_maps,filter_=filter_,
+            self.__apply_fibers(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
         if embedder:
             self.__apply_embedded()
@@ -283,7 +283,7 @@ class ZivaSetup(nc.NodeCollection):
 
             base.set_attrs([zSolver,zSolverTransform],attr_filter=attr_filter)
 
-    def __apply_bones(self,filter_=None,attr_filter=None):
+    def __apply_bones(self,node_filter=None,attr_filter=None):
         #TODO: check if bone got created properly, if not gracefully error
         # check if existing solver, if there is not lets create one at default 
         # values
@@ -292,7 +292,7 @@ class ZivaSetup(nc.NodeCollection):
             mm.eval('ziva -s')
             
 
-        zBones = self.get_nodes(type_='zBone',filter_=filter_)
+        zBones = self.get_nodes(type_='zBone',node_filter=node_filter)
         bone_meshes = []
         bone_names = []
 
@@ -334,7 +334,7 @@ class ZivaSetup(nc.NodeCollection):
         base.set_attrs(zBones,attr_filter=attr_filter)
 
 
-    def __apply_tissues(self,interp_maps=False,filter_=None,attr_filter=None):
+    def __apply_tissues(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO: check if tissue got created properly, if not gracefully error
         # check if existing solver, if there is not lets create one at default 
         # values
@@ -343,8 +343,8 @@ class ZivaSetup(nc.NodeCollection):
             mm.eval('ziva -s')
 
         # get zTets and zTissues in data----------------------------------------
-        zTets = self.get_nodes(type_='zTet',filter_=filter_)
-        zTissues = self.get_nodes(type_='zTissue',filter_=filter_)
+        zTets = self.get_nodes(type_='zTet',node_filter=node_filter)
+        zTissues = self.get_nodes(type_='zTissue',node_filter=node_filter)
 
         # build a list of tissues to build all  at once (faster this way)-------
         tissue_meshes = []
@@ -416,9 +416,9 @@ class ZivaSetup(nc.NodeCollection):
 
 
 
-    def __apply_attachments(self,interp_maps=False,filter_=None,attr_filter=None):
+    def __apply_attachments(self,interp_maps=False,node_filter=None,attr_filter=None):
 
-        attachments = self.get_nodes(type_='zAttachment',filter_=filter_)
+        attachments = self.get_nodes(type_='zAttachment',node_filter=node_filter)
         for att in attachments:
             name = att.get_name()
             # check if attachment exists, if it does just update it
@@ -459,9 +459,9 @@ class ZivaSetup(nc.NodeCollection):
 
   
 
-    def __apply_materials(self,interp_maps=False,filter_=None,attr_filter=None):
+    def __apply_materials(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO one more loop for order sanity check
-        materials = self.get_nodes(type_='zMaterial',filter_=filter_)
+        materials = self.get_nodes(type_='zMaterial',node_filter=node_filter)
 
         tmp = {}
         for material in materials:
@@ -492,9 +492,9 @@ class ZivaSetup(nc.NodeCollection):
         base.set_attrs(materials,attr_filter=attr_filter)
 
 
-    def __apply_fibers(self,interp_maps=False,filter_=None,attr_filter=None):
+    def __apply_fibers(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO build them all at once
-        fibers = self.get_nodes(type_='zFiber',filter_=filter_)
+        fibers = self.get_nodes(type_='zFiber',node_filter=node_filter)
 
         for fiber in fibers:
             name = fiber.get_name()
@@ -512,8 +512,8 @@ class ZivaSetup(nc.NodeCollection):
         base.set_attrs(fibers,attr_filter=attr_filter)
 
 
-    def __apply_embedded(self,interp_maps=False,filter_=None,attr_filter=None):
-        # TODO get maps working and filter_.  Will need to filter slightly
+    def __apply_embedded(self,interp_maps=False,node_filter=None,attr_filter=None):
+        # TODO get maps working and node_filter.  Will need to filter slightly
         # differently then other nodes as there is 1 embedder and we care
         # about associations in this case
         
