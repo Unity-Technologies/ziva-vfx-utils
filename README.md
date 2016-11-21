@@ -4,11 +4,14 @@ These are utility scripts for the Ziva Vfx maya plugin.
 
 
 ### Installation ###
-Either clone or download repository
+Either download a zip of the repository
 
 https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads
 
-clone https://LonnieK@bitbucket.org/zivadynamics/ziva-vfx-utils-private.git
+or clone it
+
+https://LonnieK@bitbucket.org/zivadynamics/ziva-vfx-utils-private.git
+
 
 Put the zBuilder folder and all of it's contents in a maya scripts directory
 
