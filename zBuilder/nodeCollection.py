@@ -26,14 +26,14 @@ class NodeCollection(object):
 
 
 
-    def print_(self,type_='all',filter_=None,print_data=False):
+    def print_(self,type_='all',node_filter=None,print_data=False):
         '''
         print info on each node
 
         keyword arguments:
             _type -- filter by node type (default: 'all')
         '''
-        for node in self.get_nodes(type_=type_,filter_=filter_):
+        for node in self.get_nodes(type_=type_,node_filter=node_filter):
             node.print_()
 
         if print_data:
@@ -93,13 +93,13 @@ class NodeCollection(object):
         '''
         self.collection.append(node)
 
-    def get_nodes(self,type_='all',filter_=None):
+    def get_nodes(self,type_='all',node_filter=None):
         '''
         get nodes in data object
 
         keywords:
             type_   -- filter by node type (default: 'all')
-            filter_ -- filter by node name (default: None)
+            node_filter -- filter by node name (default: None)
         returns:
             [] of nodes
         '''
@@ -109,10 +109,10 @@ class NodeCollection(object):
         else:
             for i,node in enumerate(self.collection):
                 if node.get_type() == type_:
-                    if filter_:
-                        if not isinstance(filter_, (list, tuple)):
-                            filter_ = filter_.split(' ')
-                        if not set(filter_).isdisjoint(node.get_association()):
+                    if node_filter:
+                        if not isinstance(node_filter, (list, tuple)):
+                            node_filter = node_filter.split(' ')
+                        if not set(node_filter).isdisjoint(node.get_association()):
                             items.append(node)
                     else:
                         items.append(node)
