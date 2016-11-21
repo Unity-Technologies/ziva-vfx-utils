@@ -388,7 +388,7 @@ class ZivaSetup(nc.NodeCollection):
                 mc.rename(new,i)
 
         # set tet maps if so desired--------------------------------------------\
-        msh.set_weights(zTets,self.get_meshes(),interp_maps=interp_maps)
+        msh.set_weights(zTets,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
 
         ## apply user tet meshes if needed
@@ -451,7 +451,7 @@ class ZivaSetup(nc.NodeCollection):
 
                 
 
-        msh.set_weights(attachments,self.get_meshes(),interp_maps=interp_maps)
+        msh.set_weights(attachments,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
         base.set_attrs(attachments)
 
@@ -482,14 +482,14 @@ class ZivaSetup(nc.NodeCollection):
 
                     if not mc.objExists(name):
                         if i == 0:
-                            print 'rename: ',current_material,name
+                            #print 'rename: ',current_material,name
                             mc.rename(current_material,name)
                         else:
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
                             mc.rename(tmpmat[0],name)
 
-        msh.set_weights(materials,self.get_meshes(),interp_maps=interp_maps)
+        msh.set_weights(materials,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
         base.set_attrs(materials)
 
@@ -514,7 +514,7 @@ class ZivaSetup(nc.NodeCollection):
             else:
                 print association[0], ' mesh does not exists in scene, skippings fiber'
 
-        msh.set_weights(fibers,self.get_meshes(),interp_maps=interp_maps)
+        msh.set_weights(fibers,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
         base.set_attrs(fibers)
         mc.setAttr(sol+'.enable',sval)
