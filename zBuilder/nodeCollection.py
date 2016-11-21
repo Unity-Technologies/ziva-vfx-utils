@@ -9,7 +9,6 @@ import os.path
 import importlib
 import time
 import datetime 
-#TODO delete a node
 
 class NodeCollection(object):
     __metaclass__ = abc.ABCMeta
