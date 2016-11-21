@@ -122,7 +122,7 @@ class ZivaSetup(nc.NodeCollection):
             maps = msh.get_weights(zNode,associations,ml)
             node.set_maps(maps)
             for ass in associations:
-                self.add_mesh(ass)
+                self.add_data('mesh',ass)
 
         self.add_node(node)
 

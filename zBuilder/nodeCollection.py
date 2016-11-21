@@ -18,7 +18,7 @@ class NodeCollection(object):
     '''
     def __init__(self):
         self.collection = []
-        self.meshes = {}
+        self.data = {}
         self.info = {}
         self.info['data_version'] = .1
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -55,29 +55,32 @@ class NodeCollection(object):
         for key in tmp:
             print key, len(tmp[key])
 
-    def add_mesh(self,name):
+    def add_data(self,key,name):
         '''
         appends a mesh to the mesh list
 
         args:
             node -- the node to append
         '''
-        if not self.get_mesh(name):
-            connectivity = mesh.get_mesh_connectivity(name)
-            m = mesh.Mesh()
-            m.set_name(name)
-            m.set_polygon_counts(connectivity['polygonCounts'])
-            m.set_polygon_connects(connectivity['polygonConnects'])
-            m.set_point_list(connectivity['points'])
+        if key == 'mesh':
+            if not key in self.data:
+                self.data[key] = {}
+            if not self.get_data(key,name):
+                connectivity = mesh.get_mesh_connectivity(name)
+                m = mesh.Mesh()
+                m.set_name(name)
+                m.set_polygon_counts(connectivity['polygonCounts'])
+                m.set_polygon_connects(connectivity['polygonConnects'])
+                m.set_point_list(connectivity['points'])
 
-            self.meshes[name] = m
+                self.data[key][name] = m
 
-    def get_mesh(self,mesh_name):
-        return self.meshes.get(mesh_name,None)
+    def get_data(self,key,name):
+        return self.data[key].get(name,None)
 
 
-    def get_meshes(self):
-        return self.meshes
+    def get_data_by_key(self,key):
+        return self.data[key]
 
     def add_node(self,node):
         '''
@@ -133,15 +136,15 @@ class NodeCollection(object):
 
         pop = []
         changed = {}
-        for mesh in self.meshes:
+        for mesh in self.data:
             new = replace_longname(search,replace,mesh)
             if new != mesh:
-                changed[new] = self.meshes[mesh]
+                changed[new] = self.data[mesh]
                 pop.append(mesh)
 
         for p,c in zip(pop,changed):
-            self.meshes.pop(p)
-            self.meshes[c] = changed[c]
+            self.data.pop(p)
+            self.data[c] = changed[c]
 
 
 
@@ -162,12 +165,12 @@ class NodeCollection(object):
 
     def get_json_data(self):
         ''''''
-        return [self.collection,self.meshes,self.info]
+        return [self.collection,self.data,self.info]
 
     def from_json_data(self, data):
         ''''''
         self.collection = data[0]
-        self.meshes = data[1]
+        self.data = data[1]
         if len(data) == 3:
             self.info = data[2]
 
