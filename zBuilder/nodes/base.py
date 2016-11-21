@@ -165,13 +165,17 @@ def build_attr_key_values(selection,attrList):
 
     return tmp
 
-def set_attrs(nodes):
-    #TODO break down setting of attrs to not use base.node
+def set_attrs(nodes,attr_filter=None):
     for node in nodes:
         name = node.get_name()
+        type_ = node.get_type()
         nodeAttrs = node.get_attr_list()
-        for attr in nodeAttrs:
+        if attr_filter:
+            if attr_filter.get(type_,None):
+                nodeAttrs = list(set(nodeAttrs).intersection(attr_filter[type_]))
 
+
+        for attr in nodeAttrs:
             if node.get_attr_key('type') == 'doubleArray':
                 if mc.objExists(name+'.'+attr):
                     if not mc.getAttr(name+'.'+attr,l=True):
