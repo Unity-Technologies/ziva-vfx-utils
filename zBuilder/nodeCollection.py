@@ -26,20 +26,23 @@ class NodeCollection(object):
 
 
 
-    def print_(self,type_='all',node_filter=None,print_data=False):
+    def print_(self,type_filter=None,node_filter=None,print_data=False):
         '''
         print info on each node
 
         keyword arguments:
-            _type -- filter by node type (default: 'all')
+            type_filter -- filter by node type (default: None)
+            node_filter -- filter by node name (default: None)
+            print_data -- prints name of data stored (ie meshes) (default: False)
+
         '''
-        for node in self.get_nodes(type_=type_,node_filter=node_filter):
+        for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
             node.print_()
 
         if print_data:
             print self.data['mesh'].keys()
 
-    def stats(self,type_='all'):
+    def stats(self,type_filter=None):
         '''
         prints out basic stats on data
 
@@ -49,8 +52,15 @@ class NodeCollection(object):
         tmp = {}
         for i,d in enumerate(self.collection):
             t = d.get_type()
-            if t==type_ or type_ == 'all':
-                if t not in tmp:
+            if type_filter:
+                if type_filter==t:
+                    if not t in tmp:
+                        tmp[t] = []
+                    if type_filter not in tmp:
+                        tmp[type_filter] = []
+                    tmp[type_filter].append(d)
+            else:
+                if not t in tmp:
                     tmp[t] = []
                 tmp[t].append(d)
 
@@ -93,22 +103,22 @@ class NodeCollection(object):
         '''
         self.collection.append(node)
 
-    def get_nodes(self,type_='all',node_filter=None):
+    def get_nodes(self,type_filter=None,node_filter=None):
         '''
         get nodes in data object
 
         keywords:
-            type_   -- filter by node type (default: 'all')
+            type_filter -- filter by node type (default: None)
             node_filter -- filter by node name (default: None)
         returns:
             [] of nodes
         '''
         items = []
-        if type_ == 'all':
+        if not type_filter:
             return self.collection
         else:
             for i,node in enumerate(self.collection):
-                if node.get_type() == type_:
+                if node.get_type() == type_filter:
                     if node_filter:
                         if not isinstance(node_filter, (list, tuple)):
                             node_filter = node_filter.split(' ')
