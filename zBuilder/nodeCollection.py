@@ -17,7 +17,7 @@ class NodeCollection(object):
     '''
     def __init__(self):
         self.collection = []
-        self.data = {}
+        self.data = {} #: DATTTTA
         self.info = {}
         self.info['data_version'] = .1
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -32,10 +32,10 @@ class NodeCollection(object):
         '''
         print info on each node
 
-        keyword arguments:
-            type_filter -- filter by node type (default: None)
-            node_filter -- filter by node name (default: None)
-            print_data -- prints name of data stored (ie meshes) (default: False)
+        Args:
+            type_filter (str): filter by node type.  Defaults to None
+            node_filter (str): filter by node name. Defaults to None
+            print_data (bool): prints name of data stored.  Defaults to False
 
         '''
 
@@ -43,15 +43,15 @@ class NodeCollection(object):
 
             node.print_()
 
-        if print_data:
+        if print_data: 
             print self.data['mesh'].keys()
 
     def stats(self,type_filter=None):
         '''
         prints out basic stats on data
 
-        keywords:
-            _type -- filter by node type (default: 'all')
+        Args:
+            type_filter (str): filter by node type.  Defaults to None
         '''
         tmp = {}
         for i,d in enumerate(self.collection):
@@ -75,8 +75,9 @@ class NodeCollection(object):
         '''
         appends a mesh to the mesh list
 
-        args:
-            node -- the node to append
+        Args:
+            key (str): places data in this key in dict.
+            name (str): name of data to place.
         '''
         if key == 'mesh':
             if not key in self.data:
@@ -92,18 +93,43 @@ class NodeCollection(object):
                 self.data[key][name] = m
 
     def get_data(self,key,name):
+        '''
+        Gets data given 'key'
+
+        Args:
+            key (str): the key to get data from.
+            name (str): name of the data.
+
+        Returns:
+            obj: of data
+
+        Example:
+            get_data('mesh','l_bicepMuscle')
+        '''
         return self.data[key].get(name,None)
 
 
     def get_data_by_key(self,key):
+        '''
+        Gets all data for given 'key'
+
+        args:
+            key (str): the key to get data from
+
+        returns:
+            list: of data objs
+
+        Example:
+            get_data('mesh')
+        '''
         return self.data[key]
 
     def add_node(self,node):
         '''
         appends a node to the node list
 
-        args:
-            node -- the node to append
+        Args:
+            node (obj): the node obj to append to collection list.
         '''
         self.collection.append(node)
 
@@ -114,8 +140,8 @@ class NodeCollection(object):
         get nodes in data object
 
         keywords:
-            type_filter -- filter by node type (default: None)
-            node_filter -- filter by node name (default: None)
+            type_filter (str): filter by node type.  Defaults to None
+            node_filter (str): filter by node name.  Defaults to None
         returns:
             [] of nodes
         '''
@@ -140,13 +166,16 @@ class NodeCollection(object):
         '''
         searches and replaces with regular expressions items in data
 
-        args:
-            search -- what to search for
-            replace -- what to replace it with
+        Args:
+            search (str): what to search for
+            replace (str): what to replace it with
 
-        keywords:
-            name -- to search and replace name of node (default: True)
-            association -- to search and replace associations (default: True)
+        Examples:
+            # replace r_ at front of item with l_
+            z.string_replace('^r_','l_')
+
+            # replace _r at end of line with _l
+            z.string_replace('_r$','_l')
         '''
         for node in self.get_nodes():
             node.string_replace(search,replace)
@@ -162,10 +191,13 @@ class NodeCollection(object):
 
     def write(self,filepath):
         '''
-        writes data to disk
+        writes data to disk in json format
 
-        args:
-            filepath -- filepath to write
+        Args:
+            filepath (str): filepath to write to disk
+
+        Raises:
+            IOError: If not able to write file
 
         '''
         data = self.get_json_data()
@@ -182,8 +214,11 @@ class NodeCollection(object):
         '''
         reads data from a file
 
-        args:
-            filepath -- filepath to read
+        Args:
+            filepath (str): filepath to read from disk
+
+        Raises:
+            IOError: If not able to read file
         '''
         try:
             with open(filepath, 'rb') as handle:
@@ -196,11 +231,15 @@ class NodeCollection(object):
             print 'read-> ',filepath
 
     def get_json_data(self):
-        ''''''
+        '''
+        Utility function to define data stored in json
+        '''
         return [self.collection,self.data,self.info]
 
     def from_json_data(self, data):
-        ''''''
+        '''
+        Gets data out of json serilization
+        '''
         self.collection = data[0]
         self.data = data[1]
         if len(data) == 3:
@@ -210,17 +249,29 @@ class NodeCollection(object):
     def apply(self):
         '''
         must create a method to inherit this class
-
         '''
         pass
 
     @abc.abstractmethod
     def retrieve_from_scene(self,selection):
+        '''
+        must create a method to inherit this class
+        '''
         pass
 
 
 def replace_dict_keys(search,replace,dictionary):
+    '''
+    Does a search and replace on dictionary kes
 
+    Args:
+        search (str): search term
+        replace (str): replace term
+        dictionary (dict): the dictionary to do search on
+
+    Returns:
+        dict: result of search and replace
+    '''
     tmp = {}
     for key in dictionary:
         new = replace_longname(search,replace,key)
@@ -241,8 +292,8 @@ def time_this(original_function):
 
 
 class BaseNodeEncoder(json.JSONEncoder):
+    
     def default(self, obj):
-        #if isinstance(obj, BaseNode):
         if hasattr(obj, '_class'):
             return obj.__dict__
         else:
@@ -252,7 +303,15 @@ class BaseNodeEncoder(json.JSONEncoder):
 
 
 def load_base_node(json_object):
-    #print json_object
+    '''
+    Loads json objects into proper classes
+
+    Args:
+        json_object (obj): json obj to perform action on
+
+    Returns:
+        obj:  Result of operation
+    '''
     if '_class' in json_object:
         module = json_object['_class'][0]
         name = json_object['_class'][1]
@@ -264,6 +323,18 @@ def load_base_node(json_object):
         return json_object
 
 def replace_longname(search,replace,longName):
+    '''
+    does a search and replace on a long name.  It splits it up by ('|') then
+    performs it on each piece
+
+    Args:
+        search (str): search term
+        replace (str): replace term
+        longName (str): the long name to perform action on
+
+    returns:
+        str: result of search and replace
+    '''
     items = longName.split('|')
     newName = ''
     for i in items:
@@ -274,7 +345,16 @@ def replace_longname(search,replace,longName):
     return newName
 
 def str_to_class(module,name):
+    '''
+    Given module and name instantiantes a class
 
+    Args:
+        module (str): module
+        name (str): the class name
+
+    returns:
+        obj: class object
+    '''
     i = importlib.import_module( module )
     MyClass = getattr(i, name)
     instance = MyClass()

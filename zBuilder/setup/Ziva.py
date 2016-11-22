@@ -50,6 +50,18 @@ class ZivaSetup(nc.NodeCollection):
 
     @nc.time_this
     def retrieve_from_scene(self,solver,attr_filter=None):
+        '''
+        Retreives data from scene given any node in ziva connection:
+
+        Args:
+            solver (str): a ziva node to find solver network
+            attr_filter (dict):  Attribute filter on what attributes to get. 
+                dictionary is key value where key is node type and value is 
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+
+        '''
         sel = mc.ls(sl=True,l=True)
         type_ = mz.get_type(solver)
         
@@ -88,17 +100,28 @@ class ZivaSetup(nc.NodeCollection):
         
 
     @nc.time_this
-    def retrieve_from_scene_selection(self,selection,connections=True,attr_filter={}):
+    def retrieve_from_scene_selection(self,selection,connections=True,attr_filter={},
+        solver=True,bones=True,tissues=True,attachments=True,materials=True,
+        fibers=True,embedder=True):
+
+
         print '\ngetting ziva......'
 
         if connections:
-            self.__retrieve_solver_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_bones_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_tissues_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_attachments_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_materials_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_fibers_from_selection(selection,attr_filter=attr_filter)
-            self.__retrieve_embedded_from_selection(selection,attr_filter=attr_filter)
+            if solver:
+                self.__retrieve_solver_from_selection(selection,attr_filter=attr_filter)
+            if bones:
+                self.__retrieve_bones_from_selection(selection,attr_filter=attr_filter)
+            if tissues:
+                self.__retrieve_tissues_from_selection(selection,attr_filter=attr_filter)
+            if attachments:
+                self.__retrieve_attachments_from_selection(selection,attr_filter=attr_filter)
+            if materials:
+                self.__retrieve_materials_from_selection(selection,attr_filter=attr_filter)
+            if fibers:
+                self.__retrieve_fibers_from_selection(selection,attr_filter=attr_filter)
+            if embedder:
+                self.__retrieve_embedded_from_selection(selection,attr_filter=attr_filter)
         else:
             self.__retrieve_node_selection(selection,attr_filter=attr_filter)
 
