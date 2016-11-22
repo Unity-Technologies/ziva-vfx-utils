@@ -275,7 +275,9 @@ class ZivaSetup(nc.NodeCollection):
 
 
     def __apply_solver(self,attr_filter=None):
+
         zSolver = self.get_nodes(type_filter='zSolver')
+
         if zSolver:
             zSolver = zSolver[0]
             zSolverTransform = self.get_nodes(type_filter='zSolverTransform')[0]
@@ -298,7 +300,10 @@ class ZivaSetup(nc.NodeCollection):
             mm.eval('ziva -s')
             
 
+
         zBones = self.get_nodes(type_filter='zBone',node_filter=node_filter)
+
+
         bone_meshes = []
         bone_names = []
 
@@ -339,7 +344,6 @@ class ZivaSetup(nc.NodeCollection):
 
         base.set_attrs(zBones,attr_filter=attr_filter)
 
-
     def __apply_tissues(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO: check if tissue got created properly, if not gracefully error
         # check if existing solver, if there is not lets create one at default 
@@ -349,8 +353,10 @@ class ZivaSetup(nc.NodeCollection):
             mm.eval('ziva -s')
 
         # get zTets and zTissues in data----------------------------------------
+
         zTets = self.get_nodes(type_filter='zTet',node_filter=node_filter)
         zTissues = self.get_nodes(type_filter='zTissue',node_filter=node_filter)
+
 
         # build a list of tissues to build all  at once (faster this way)-------
         tissue_meshes = []
@@ -425,6 +431,7 @@ class ZivaSetup(nc.NodeCollection):
     def __apply_attachments(self,interp_maps=False,node_filter=None,attr_filter=None):
 
         attachments = self.get_nodes(type_filter='zAttachment',node_filter=node_filter)
+
         for att in attachments:
             name = att.get_name()
             # check if attachment exists, if it does just update it
@@ -466,8 +473,9 @@ class ZivaSetup(nc.NodeCollection):
   
 
     def __apply_materials(self,interp_maps=False,node_filter=None,attr_filter=None):
-        #TODO one more loop for order sanity check
+
         materials = self.get_nodes(type_filter='zMaterial',node_filter=node_filter)
+
 
         tmp = {}
         for material in materials:
@@ -500,7 +508,9 @@ class ZivaSetup(nc.NodeCollection):
 
     def __apply_fibers(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO build them all at once
+
         fibers = self.get_nodes(type_filter='zFiber',node_filter=node_filter)
+
 
         for fiber in fibers:
             name = fiber.get_name()

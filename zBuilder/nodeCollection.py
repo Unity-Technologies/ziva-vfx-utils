@@ -26,7 +26,9 @@ class NodeCollection(object):
 
 
 
+
     def print_(self,type_filter=None,node_filter=None,print_data=False):
+
         '''
         print info on each node
 
@@ -36,7 +38,9 @@ class NodeCollection(object):
             print_data -- prints name of data stored (ie meshes) (default: False)
 
         '''
+
         for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
+
             node.print_()
 
         if print_data:
@@ -103,7 +107,9 @@ class NodeCollection(object):
         '''
         self.collection.append(node)
 
+
     def get_nodes(self,type_filter=None,node_filter=None):
+
         '''
         get nodes in data object
 
@@ -119,6 +125,7 @@ class NodeCollection(object):
         else:
             for i,node in enumerate(self.collection):
                 if node.get_type() == type_filter:
+
                     if node_filter:
                         if not isinstance(node_filter, (list, tuple)):
                             node_filter = node_filter.split(' ')
