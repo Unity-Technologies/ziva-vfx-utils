@@ -88,7 +88,7 @@ class ZivaSetup(nc.NodeCollection):
         
 
     @nc.time_this
-    def retrieve_from_scene_selection(self,selection,connections=False,attr_filter={}):
+    def retrieve_from_scene_selection(self,selection,connections=True,attr_filter={}):
         print '\ngetting ziva......'
 
         if connections:
