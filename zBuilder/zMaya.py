@@ -148,6 +148,7 @@ def get_association(zNode):
         tmp.extend(mm.eval('zQuery -as -l "'+zNode+'"'))
         tmp.extend(mm.eval('zQuery -at -l "'+zNode+'"'))
         #mc.select(sel,r=True)
+
         return tmp
 
     else:

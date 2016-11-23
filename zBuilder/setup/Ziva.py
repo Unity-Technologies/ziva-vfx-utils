@@ -49,7 +49,7 @@ class ZivaSetup(nc.NodeCollection):
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
 
     @nc.time_this
-    def retrieve_from_scene(self,solver,attr_filter=None):
+    def retrieve_from_scene(self,solver,attr_filter={},get_mesh=True):
         '''
         Retreives data from scene given any node in ziva connection:
 
@@ -70,11 +70,13 @@ class ZivaSetup(nc.NodeCollection):
             mc.select(solver,r=True)
             solShape = mm.eval('zQuery -t "zSolver" -l')[0]
             if attr_filter:
-                self.__add_ziva_node(solver,attr_filter=attr_filter.get('zSolverTransform',None))
-                self.__add_ziva_node(solShape,attr_filter=attr_filter.get('zSolver',None))
+                self.__add_ziva_node(solver,get_mesh=get_mesh,
+                    attr_filter=attr_filter.get('zSolverTransform',None))
+                self.__add_ziva_node(solShape,get_mesh=get_mesh,
+                    attr_filter=attr_filter.get('zSolver',None))
             else:
-                self.__add_ziva_node(solver)
-                self.__add_ziva_node(solShape)
+                self.__add_ziva_node(solver,get_mesh=get_mesh)
+                self.__add_ziva_node(solShape,get_mesh=get_mesh)
 
             type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
 
@@ -82,10 +84,7 @@ class ZivaSetup(nc.NodeCollection):
                 zNodes = mm.eval('zQuery -t "'+t+'" -l')
                 if zNodes:
                     for zNode in zNodes:
-                        if attr_filter:
-                            self.__add_ziva_node(zNode,attr_filter=attr_filter.get(t,None))
-                        else:
-                            self.__add_ziva_node(zNode)
+                        self.__add_ziva_node(zNode,get_mesh=get_mesh,attr_filter=attr_filter.get(t,None))
 
 
 
@@ -104,6 +103,7 @@ class ZivaSetup(nc.NodeCollection):
         solver=True,bones=True,tissues=True,attachments=True,materials=True,
         fibers=True,embedder=True):
 
+        
 
         print '\ngetting ziva......'
 
@@ -128,7 +128,7 @@ class ZivaSetup(nc.NodeCollection):
         self.stats()
 
 
-    def __add_ziva_node(self,zNode,attr_filter=None):
+    def __add_ziva_node(self,zNode,attr_filter=None,get_mesh=True):
         type_ = mz.get_type(zNode)
 
         attrList = base.build_attr_list(zNode,attr_filter=attr_filter)
@@ -151,8 +151,9 @@ class ZivaSetup(nc.NodeCollection):
             associations = mz.get_association(zNode)
             maps = msh.get_weights(zNode,associations,ml)
             node.set_maps(maps)
-            for ass in associations:
-                self.add_data('mesh',ass)
+            if get_mesh:
+                for ass in associations:
+                    self.add_data('mesh',ass)
 
         self.add_node(node)
 
