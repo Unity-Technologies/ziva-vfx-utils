@@ -73,7 +73,7 @@ z.string_replace('_r_','_l_')
 #ADDITIONAL ITEMS---------------------------------------------------------------
 
 #if you do a:
-z.print_(type_='zTissue')
+z.print_(type_filter='zTissue')
 
 # you can see what is inside the object.
 
