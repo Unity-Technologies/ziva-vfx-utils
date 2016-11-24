@@ -112,6 +112,7 @@ def set_weights(nodes,meshes,interp_maps=False):
         name = node.get_name()
 
         for attr in maps:
+            #print 'OOOMMMGGG',attr
             mname= maps[attr]['mesh']
             wList = maps[attr]['value']
             mnameShort = mname.split('|')[-1]
@@ -123,7 +124,7 @@ def set_weights(nodes,meshes,interp_maps=False):
                     
                     cur_conn = get_mesh_connectivity(mnameShort)
  
-                    if cur_conn['polygonConnects'] != mesh.get_polygon_connects():
+                    if len(cur_conn['polygonConnects']) != len(mesh.get_polygon_connects()):
                         interp_maps=True
 
                 if interp_maps == True:
@@ -144,10 +145,12 @@ def set_weights(nodes,meshes,interp_maps=False):
                             tmp.append(str(w))
                         val = ' '.join(tmp)
                         cmd = "setAttr "+'%s.%s[0:%d] ' % (name,attr, len(wList)-1)+val
+                        #print 'setting',name,attr
                         mm.eval(cmd)
 
                 else:
                     try:
+                        #print 'here we go',name,attr,wList
                         mc.setAttr('%s.%s' % (name,attr),wList,type='doubleArray')
                     except:
                         pass
