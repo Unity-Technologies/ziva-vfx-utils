@@ -58,7 +58,12 @@ class BaseNode(object):
                 newNames.append(newName)
             self.set_association(newNames)
 
+        #maps-------------------------------------------------------------------
 
+        maps = self.get_maps()
+        for key in maps:
+            if maps[key].get('mesh',None):
+                maps[key]['mesh'] = replace_longname(search,replace,maps[key]['mesh'])
 
 
     def get_attr_value(self,attr):
