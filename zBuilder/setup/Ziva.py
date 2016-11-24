@@ -11,6 +11,7 @@ import maya.cmds as mc
 import maya.mel as mm
 
 import time
+import datetime 
 
 maplist = {}
 maplist['zTet'] = ['weightList[0].weights']
@@ -49,7 +50,7 @@ class ZivaSetup(nc.NodeCollection):
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
 
     @nc.time_this
-    def retrieve_from_scene(self,solver,attr_filter={},get_mesh=True):
+    def retrieve_from_scene(self,solver,attr_filter=None,get_mesh=True):
         '''
         Retreives data from scene given any node in ziva connection:
 
@@ -84,7 +85,10 @@ class ZivaSetup(nc.NodeCollection):
                 zNodes = mm.eval('zQuery -t "'+t+'" -l')
                 if zNodes:
                     for zNode in zNodes:
-                        self.__add_ziva_node(zNode,get_mesh=get_mesh,attr_filter=attr_filter.get(t,None))
+                        if not attr_filter:
+                            attr_filter = {}
+                        self.__add_ziva_node(zNode,get_mesh=get_mesh,
+                                attr_filter=attr_filter.get(t,None))
 
 
 
@@ -99,31 +103,53 @@ class ZivaSetup(nc.NodeCollection):
         
 
     @nc.time_this
-    def retrieve_from_scene_selection(self,selection,connections=True,attr_filter={},
+    def retrieve_from_scene_selection(self,selection,connections=True,attr_filter=None,
         solver=True,bones=True,tissues=True,attachments=True,materials=True,
-        fibers=True,embedder=True):
+        fibers=True,embedder=True,get_mesh=True):
 
         
+        longnames = mc.ls(selection,l=True)
 
         print '\ngetting ziva......'
 
+        if not attr_filter:
+            attr_filter = {}
         if connections:
             if solver:
-                self.__retrieve_solver_from_selection(selection,attr_filter=attr_filter)
+                sol = mz.get_zSolver(selection[0])
+                if sol:
+                    self.__add_ziva_node(sol[0],attr_filter=attr_filter.get('zSolver',None))
+                    solverTransform = mz.get_zSolverTransform(selection[0])[0]
+                    self.__add_ziva_node(solverTransform,attr_filter=attr_filter.get('zSolverTransform',None))
+                    #mc.select(selection,r=True)
+
             if bones:
-                self.__retrieve_bones_from_selection(selection,attr_filter=attr_filter)
+                for bone in mz.get_zBones(longnames):
+                    self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None))
+
             if tissues:
-                self.__retrieve_tissues_from_selection(selection,attr_filter=attr_filter)
+                for tissue in mz.get_zTissues(longnames):
+                    self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None))
+
+                for tet in mz.get_zTets(longnames):
+                    self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None))
+
             if attachments:
-                self.__retrieve_attachments_from_selection(selection,attr_filter=attr_filter)
+                for attachment in mz.get_zAttachments(longnames):
+                    self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None))
+
             if materials:
-                self.__retrieve_materials_from_selection(selection,attr_filter=attr_filter)
+                for material in mz.get_zMaterials(longnames):
+                    self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None))
+
             if fibers:
-                self.__retrieve_fibers_from_selection(selection,attr_filter=attr_filter)
+                for fiber in mz.get_zFibers(longnames):
+                    self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None))
+
             if embedder:
                 self.__retrieve_embedded_from_selection(selection,attr_filter=attr_filter)
         else:
-            self.__retrieve_node_selection(selection,attr_filter=attr_filter)
+            self.__retrieve_node_selection(selection,attr_filter=attr_filter,get_mesh=get_mesh)
 
         self.stats()
 
@@ -159,7 +185,7 @@ class ZivaSetup(nc.NodeCollection):
 
 
 
-    def __retrieve_node_selection(self,selection,attr_filter={}):
+    def __retrieve_node_selection(self,selection,attr_filter=None):
         longnames = mc.ls(selection,l=True)
         for s in longnames:
             if mc.objectType(s) == 'transform' or mc.objectType(s) == 'mesh':
@@ -173,71 +199,11 @@ class ZivaSetup(nc.NodeCollection):
             if mz.get_type(s) in zNodes:
                 self.__add_ziva_node(s,attr_filter=attr_filter.get(mz.get_type(s),None))
 
-    def __retrieve_solver_from_selection(self,selection,connections=False,attr_filter={}):
-
-        solver = mz.get_zSolver(selection[0])
-        if solver:
-            solver = solver[0]
-            self.__add_ziva_node(solver,attr_filter=attr_filter.get('zSolver',None))
-
-            solverTransform = mz.get_zSolverTransform(selection[0])[0]
-            self.__add_ziva_node(solverTransform,attr_filter=attr_filter.get('zSolverTransform',None))
-            mc.select(selection,r=True)
-        else:
-            print 'no solver found'
 
 
-
-
-    def __retrieve_bones_from_selection(self,selection,connections=False,attr_filter={}):
-        longnames = mc.ls(selection,l=True)
-        for bone in mz.get_zBones(longnames):
-            self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None))
-            
-        mc.select(longnames)     
-
-    def __retrieve_tissues_from_selection(self,selection,connections=False,attr_filter={}):
-        longnames = mc.ls(selection,l=True)
-
-        for tissue in mz.get_zTissues(longnames):
-            self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None))
-
-        for tet in mz.get_zTets(longnames):
-            self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None))
-
-
-        mc.select(longnames)
-
-
-    def __retrieve_attachments_from_selection(self,selection,connections=False,attr_filter={}):
-
-        longnames = mc.ls(selection,l=True)
-        attachments = mz.get_zAttachments(longnames)
-
-        for attachment in attachments:
-            self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None))
-
-
-
-    def __retrieve_materials_from_selection(self,selection,connections=False,attr_filter={}):
-        if connections:
-            longnames = mc.ls(selection,l=True)
-            materials = mz.get_zMaterials(longnames)
-
-            for material in materials:
-                self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None))
-
-
-    def __retrieve_fibers_from_selection(self,selection,connections=False,attr_filter={}):
-        if connections:
-            longnames = mc.ls(selection,l=True)
-            fibers = mz.get_zFibers(longnames)
-
-            for fiber in fibers:
-                self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None))
-
-
-    def __retrieve_embedded_from_selection(self,selection,connections=False,attr_filter={}):
+    def __retrieve_embedded_from_selection(self,selection,connections=False,attr_filter=None):
+        if not attr_filter:
+            attr_filter = {}
         #if connections:
         longnames = mc.ls(selection,l=True)
         embedder = embedderNode.get_zEmbedder(longnames)
