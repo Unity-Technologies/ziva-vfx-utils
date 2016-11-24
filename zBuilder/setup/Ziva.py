@@ -114,6 +114,7 @@ class ZivaSetup(nc.NodeCollection):
 
         if not attr_filter:
             attr_filter = {}
+            
         if connections:
             if solver:
                 sol = mz.get_zSolver(selection[0])
@@ -125,26 +126,26 @@ class ZivaSetup(nc.NodeCollection):
 
             if bones:
                 for bone in mz.get_zBones(longnames):
-                    self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None))
+                    self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None),get_mesh=get_mesh)
 
             if tissues:
                 for tissue in mz.get_zTissues(longnames):
-                    self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None))
+                    self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None),get_mesh=get_mesh)
 
                 for tet in mz.get_zTets(longnames):
-                    self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None))
+                    self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None),get_mesh=get_mesh)
 
             if attachments:
                 for attachment in mz.get_zAttachments(longnames):
-                    self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None))
+                    self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None),get_mesh=get_mesh)
 
             if materials:
                 for material in mz.get_zMaterials(longnames):
-                    self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None))
+                    self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None),get_mesh=get_mesh)
 
             if fibers:
                 for fiber in mz.get_zFibers(longnames):
-                    self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None))
+                    self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None),get_mesh=get_mesh)
 
             if embedder:
                 self.__retrieve_embedded_from_selection(selection,attr_filter=attr_filter)
