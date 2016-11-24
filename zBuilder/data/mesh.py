@@ -193,7 +193,7 @@ def get_mesh_connectivity(mesh_name):
     while not meshToRebuild_vertIter.isDone(): 
         numVertices += 1
         pos_mPoint = meshToRebuild_vertIter.position()
-        pos_mFloatPoint = om.MFloatPoint( pos_mPoint )
+        pos_mFloatPoint = om.MFloatPoint( pos_mPoint.x,pos_mPoint.y,pos_mPoint.z )
 
         pointList.append( [ pos_mFloatPoint[0], pos_mFloatPoint[1], pos_mFloatPoint[2]] )
         meshToRebuild_vertIter.next()
