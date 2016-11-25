@@ -174,9 +174,14 @@ class ZivaSetup(nc.NodeCollection):
         node.set_association(mz.get_association(zNode))
 
         ml = maplist.get(type_,None)
+        #print ml
         if ml:
             associations = mz.get_association(zNode)
-            maps = msh.get_weights(zNode,associations,ml)
+            if type_ == 'zFiber':
+                maps = msh.get_weights(zNode,[associations[0],associations[0]],ml)
+            else:
+                maps = msh.get_weights(zNode,associations,ml)
+            #print maps
             node.set_maps(maps)
             if get_mesh:
                 for ass in associations:
@@ -230,7 +235,7 @@ class ZivaSetup(nc.NodeCollection):
     @nc.time_this
     def apply(self,node_filter=None,attr_filter=None,interp_maps='auto',
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
-            fibers=True,embedder=True):
+            fibers=True,embedder=True,permisive=True):
         '''
         '''
         sel = mc.ls(sl=True)
@@ -294,7 +299,6 @@ class ZivaSetup(nc.NodeCollection):
 
         zBones = self.get_nodes(type_filter='zBone',node_filter=node_filter)
 
-
         bone_meshes = []
         bone_names = []
 
@@ -306,16 +310,29 @@ class ZivaSetup(nc.NodeCollection):
 
         #-----------------------------------------------------------------------
         # check meshes for existing zTissue
+        bone_meshes_tmp = []
+        bone_names_tmp = []
         for mesh in bone_meshes:
-            mc.select(mesh)
-            if mm.eval('zQuery -t "zBone"'):
-                bone_meshes.remove(mesh)
-            if mm.eval('zQuery -t "zTissue"'):
-                #logging.error('cannot create tissue, %s is a zBone' % mesh)
-                raise StandardError, 'cannot create bone, %s is already a zTissue' % mesh
-        
+
+            if mc.objExists(mesh):
+                index = bone_meshes.index(mesh)
+                bone_meshes_tmp.append(bone_meshes[index])
+                bone_names_tmp.append(bone_names[index])
+                mc.select(mesh)
+                if mm.eval('zQuery -t "zBone"'):
+                    bone_meshes.remove(mesh)
+                if mm.eval('zQuery -t "zTissue"'):
+                    #logging.error('cannot create tissue, %s is a zBone' % mesh)
+                    raise StandardError, 'cannot create bone, %s is already a zTissue' % mesh
+            else:
+                mc.warning( mesh +' does not exist in scene, skipping bone creation')
+
+        bone_meshes = bone_meshes_tmp
+        bone_names = bone_names_tmp
+
+
         # check mesh quality----------------------------------------------------
-        mc.select(bone_meshes)
+        mc.select(bone_meshes,add=True)
         mesh_quality = mm.eval('ziva -mq')
 
         #TODO command return something useful
@@ -372,8 +389,12 @@ class ZivaSetup(nc.NodeCollection):
                     #logging.error('cannot create tissue, %s is a zBone' % mesh)
                     raise StandardError, 'cannot create tissue, %s is already a zBone' % mesh
             else:
-                tissue_meshes.remove(mesh)
-                print mesh, 'does not exist in scene, skipping'
+                index = tissue_meshes.index(mesh)
+                del tissue_meshes[index]
+                del tissue_names[index]
+                del tet_names[index]
+                mc.warning( mesh +' does not exist in scene, skipping tissue creation')
+
         # check mesh quality----------------------------------------------------
         mc.select(tissue_meshes)
         mesh_quality = mm.eval('ziva -mq')
@@ -397,6 +418,9 @@ class ZivaSetup(nc.NodeCollection):
             for new,i in zip(results[2::4],tet_names):
                 mc.rename(new,i)
 
+        # print 'meshes', tissue_meshes
+        # print 'names',tissue_names
+        # print 'results', results
         # set tet maps if so desired--------------------------------------------\
         msh.set_weights(zTets,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
@@ -505,6 +529,7 @@ class ZivaSetup(nc.NodeCollection):
 
         for fiber in fibers:
             name = fiber.get_name()
+            #print 'ww',fiber.get_maps()
             association = fiber.get_association()
             if mc.objExists(association[0]):
                 if not mc.objExists(name):

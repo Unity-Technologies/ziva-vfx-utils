@@ -123,13 +123,13 @@ def set_weights(nodes,meshes,interp_maps=False):
                 if interp_maps == 'auto':
                     
                     cur_conn = get_mesh_connectivity(mnameShort)
- 
-                    if len(cur_conn['polygonConnects']) != len(mesh.get_polygon_connects()):
+
+                    #print len(cur_conn['points']),len(mesh.get_point_list())
+                    if len(cur_conn['points']) != len(mesh.get_point_list()):
                         interp_maps=True
 
                 if interp_maps == True:
-                    #print 'interpolating maps...',mnameShort
-                    
+                    print 'interpolating maps...',mnameShort
                     polygonCounts = mesh.get_polygon_counts()
                     polygonConnects = mesh.get_polygon_connects()
                     vertexArray = mesh.get_point_list()

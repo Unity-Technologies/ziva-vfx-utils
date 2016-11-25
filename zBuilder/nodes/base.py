@@ -64,6 +64,7 @@ class BaseNode(object):
         for key in maps:
             if maps[key].get('mesh',None):
                 maps[key]['mesh'] = replace_longname(search,replace,maps[key]['mesh'])
+                #print 'hmm',self.get_name(),maps[key]
 
 
     def get_attr_value(self,attr):
