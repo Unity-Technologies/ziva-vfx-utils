@@ -120,9 +120,10 @@ class NodeCollection(object):
             list: of data objs
 
         Example:
-            get_data('mesh')
+           get_data('mesh')
         '''
-        return self.data[key]
+        return self.data.get(key,None)
+        #return self.data[key]
 
     def add_node(self,node):
         '''
