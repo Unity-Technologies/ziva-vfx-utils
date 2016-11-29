@@ -109,7 +109,7 @@ class ZivaSetup(nc.NodeCollection):
     @nc.time_this
     def retrieve_from_scene_selection(self,selection,connections=True,attr_filter=None,
         solver=True,bones=True,tissues=True,attachments=True,materials=True,
-        fibers=True,embedder=True,get_mesh=True):
+        fibers=True,embedder=True,get_mesh=True,get_maps=False):
 
         
         longnames = mc.ls(selection,l=True)
@@ -130,31 +130,38 @@ class ZivaSetup(nc.NodeCollection):
 
             if bones:
                 for bone in mz.get_zBones(longnames):
-                    self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(bone,attr_filter=attr_filter.get('zBone',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
             if tissues:
                 for tissue in mz.get_zTissues(longnames):
-                    self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(tissue,attr_filter=attr_filter.get('zTissue',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
                 for tet in mz.get_zTets(longnames):
-                    self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(tet,attr_filter=attr_filter.get('zTet',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
             if attachments:
                 for attachment in mz.get_zAttachments(longnames):
-                    self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(attachment,attr_filter=attr_filter.get('zAttachment',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
             if materials:
                 for material in mz.get_zMaterials(longnames):
-                    self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(material,attr_filter=attr_filter.get('zMaterial',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
             if fibers:
                 for fiber in mz.get_zFibers(longnames):
-                    self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None),get_mesh=get_mesh)
+                    self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
 
             if embedder:
                 self.__retrieve_embedded_from_selection(selection,attr_filter=attr_filter)
         else:
-            self.__retrieve_node_selection(selection,attr_filter=attr_filter,get_mesh=get_mesh)
+            self.__retrieve_node_selection(selection,attr_filter=attr_filter,
+                get_mesh=get_mesh,get_maps=get_maps)
 
         self.stats()
 
@@ -196,7 +203,7 @@ class ZivaSetup(nc.NodeCollection):
 
 
 
-    def __retrieve_node_selection(self,selection,attr_filter=None):
+    def __retrieve_node_selection(self,selection,attr_filter=None,get_mesh=True,get_maps=True):
         longnames = mc.ls(selection,l=True)
         for s in longnames:
             if mc.objectType(s) == 'transform' or mc.objectType(s) == 'mesh':
@@ -206,9 +213,13 @@ class ZivaSetup(nc.NodeCollection):
                 nodes.append(mm.eval('zQuery -t zBone'))
                 for n in nodes:
                     if n:
-                        self.__add_ziva_node(n[0],attr_filter.get(mz.get_type(n),None))
+                        self.__add_ziva_node(n[0],
+                            attr_filter=attr_filter.get(mz.get_type(n),None),
+                            get_mesh=get_mesh,get_maps=get_maps)
             if mz.get_type(s) in zNodes:
-                self.__add_ziva_node(s,attr_filter=attr_filter.get(mz.get_type(s),None))
+                self.__add_ziva_node(s,
+                    attr_filter=attr_filter.get(mz.get_type(s),None),
+                    get_mesh=get_mesh,get_maps=get_maps)
 
 
 
