@@ -46,6 +46,22 @@ class NodeCollection(object):
         if print_data: 
             print self.data['mesh'].keys()
 
+    def compare(self,type_filter=None,node_filter=None):
+
+        '''
+        print info on each node
+
+        Args:
+            type_filter (str): filter by node type.  Defaults to None
+            node_filter (str): filter by node name. Defaults to None
+            print_data (bool): prints name of data stored.  Defaults to False
+
+        '''
+
+        for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
+            node.compare()
+
+
     def stats(self,type_filter=None):
         '''
         prints out basic stats on data
