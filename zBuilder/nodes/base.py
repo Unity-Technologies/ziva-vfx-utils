@@ -135,6 +135,19 @@ class BaseNode(object):
         else:
             self._association =association
 
+    def compare(self):
+        name = self.get_name(longName=False)
+        
+        attrList =  self.get_attr_list()
+        if mc.objExists(name):
+            if attrList:
+                for attr in attrList:
+                    sceneVal = mc.getAttr(name+'.'+attr)
+                    objVal = self.get_attr_key_value(attr,'value')
+                    if sceneVal != objVal:
+                        print 'DIFF:',name+'.'+attr, '\tobject value:',objVal, '\tscene value:',sceneVal
+
+
     
 def replace_longname(search,replace,longName):
     items = longName.split('|')
