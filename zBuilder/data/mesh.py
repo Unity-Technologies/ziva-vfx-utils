@@ -50,6 +50,14 @@ class Mesh(object):
     def get_point_list(self): 
         return self._pointList
 
+    def build(self):
+        buildMesh(
+            self.get_name(),
+            self.get_polygon_counts(),
+            self.get_polygon_connects(),
+            self.get_point_list(),
+            )
+
 
     # def __str__(self):
     #     if self.get_name():
@@ -178,7 +186,8 @@ def get_weights(node,meshes,attrs):
     return tmp
 
 def get_mesh_connectivity(mesh_name):
-
+    
+    space = om.MSpace.kWorld
     meshToRebuild_mDagPath = getMDagPathFromMeshName( mesh_name )
     meshToRebuild_mDagPath.extendToShape()
     
@@ -195,10 +204,14 @@ def get_mesh_connectivity(mesh_name):
     
     while not meshToRebuild_vertIter.isDone(): 
         numVertices += 1
-        pos_mPoint = meshToRebuild_vertIter.position()
+        pos_mPoint = meshToRebuild_vertIter.position(space)
         pos_mFloatPoint = om.MFloatPoint( pos_mPoint.x,pos_mPoint.y,pos_mPoint.z )
 
-        pointList.append( [ pos_mFloatPoint[0], pos_mFloatPoint[1], pos_mFloatPoint[2]] )
+        pointList.append( [ 
+                pos_mFloatPoint[0], 
+                pos_mFloatPoint[1], 
+                pos_mFloatPoint[2]
+                ] )
         meshToRebuild_vertIter.next()
       
     while not meshToRebuild_polyIter.isDone(): 
