@@ -109,7 +109,7 @@ class ZivaSetup(nc.NodeCollection):
     @nc.time_this
     def retrieve_from_scene_selection(self,selection,connections=True,attr_filter=None,
         solver=True,bones=True,tissues=True,attachments=True,materials=True,
-        fibers=True,embedder=True,get_mesh=True,get_maps=False):
+        fibers=True,embedder=True,get_mesh=True,get_maps=True):
 
         
         longnames = mc.ls(selection,l=True)
