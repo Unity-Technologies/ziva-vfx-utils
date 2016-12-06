@@ -253,7 +253,10 @@ class ZivaSetup(nc.NodeCollection):
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
             fibers=True,embedder=True,permisive=True):
         '''
+
         '''
+
+
         sel = mc.ls(sl=True)
         if solver:
             self.__apply_solver(attr_filter=attr_filter)
@@ -334,20 +337,22 @@ class ZivaSetup(nc.NodeCollection):
         # check meshes for existing zTissue
         bone_meshes_tmp = []
         bone_names_tmp = []
-        for mesh in bone_meshes:
+        for mname,bname in zip(bone_meshes,bone_names):
 
-            if mc.objExists(mesh):
-                index = bone_meshes.index(mesh)
+            if mc.objExists(mname):
+                index = bone_meshes.index(mname)
                 bone_meshes_tmp.append(bone_meshes[index])
                 bone_names_tmp.append(bone_names[index])
-                mc.select(mesh)
+                mc.select(mname)
                 if mm.eval('zQuery -t "zBone"'):
-                    bone_meshes.remove(mesh)
+                    # rename bone as it is in DATA
+                    mc.rename(mm.eval('zQuery -t "zBone"')[0],bname)
+                    bone_meshes.remove(mname)
                 if mm.eval('zQuery -t "zTissue"'):
                     #logging.error('cannot create tissue, %s is a zBone' % mesh)
-                    raise StandardError, 'cannot create bone, %s is already a zTissue' % mesh
+                    raise StandardError, 'cannot create bone, %s is already a zTissue' % mname
             else:
-                mc.warning( mesh +' does not exist in scene, skipping bone creation')
+                mc.warning( mname +' does not exist in scene, skipping bone creation')
 
         bone_meshes = bone_meshes_tmp
         bone_names = bone_names_tmp
@@ -392,30 +397,50 @@ class ZivaSetup(nc.NodeCollection):
         tissue_meshes = []
         tissue_names = []
         tet_names = []
-
-        for zTissue,zTet in zip(zTissues,zTets):
+        for zTissue in zTissues:
             tmp = zTissue.get_association()
+            #sync up tissues with mesh in data:
+            if mc.objExists(tmp[0]):
+                mc.select(tmp,r=True)
+                tisMe = mm.eval('zQuery -t zTissue')
+                if tisMe:
+                    mc.rename(tisMe[0],zTissue.get_name())
             if not mc.objExists(zTissue.get_name()):
                 tissue_meshes.append(tmp[0])
                 tissue_names.append(zTissue.get_name())
+
+        for zTet in zTets:
+            tmp = zTet.get_association()[0]
+            #sync up tissues with mesh in data:
+            if mc.objExists(tmp):
+                mc.select(tmp,r=True)
+                tisMe = mm.eval('zQuery -t zTissue')
+                if tisMe:
+                    mc.rename(tisMe[0],zTissue.get_name())
+            if not mc.objExists(zTissue.get_name()):
                 tet_names.append(zTet.get_name())
+
+
 
         #-----------------------------------------------------------------------
         # check meshes for existing zTissue
-        for mesh in tissue_meshes:
-            if mc.objExists(mesh):
-                mc.select(mesh)
+        for mname,tname in zip(tissue_meshes,tissue_names):
+            if mc.objExists(mname):
+                mc.select(mname)
+                print 'name: ',mname
                 if mm.eval('zQuery -t "zTissue"'):
-                    tissue_meshes.remove(mesh)
+                    # rename tissue as it is in DATA
+                    mc.rename(mm.eval('zQuery -t "zTissue"')[0],tname)
+                    tissue_meshes.remove(mname)
                 if mm.eval('zQuery -t "zBone"'):
                     #logging.error('cannot create tissue, %s is a zBone' % mesh)
-                    raise StandardError, 'cannot create tissue, %s is already a zBone' % mesh
+                    raise StandardError, 'cannot create tissue, %s is already a zBone' % mname
             else:
-                index = tissue_meshes.index(mesh)
+                index = tissue_meshes.index(mname)
                 del tissue_meshes[index]
                 del tissue_names[index]
                 del tet_names[index]
-                mc.warning( mesh +' does not exist in scene, skipping tissue creation')
+                mc.warning( mname +' does not exist in scene, skipping tissue creation')
 
         # check mesh quality----------------------------------------------------
         mc.select(tissue_meshes)
@@ -531,8 +556,8 @@ class ZivaSetup(nc.NodeCollection):
 
                     if not mc.objExists(name):
                         if i == 0:
-                            #print 'rename: ',current_material,name
-                            mc.rename(current_material,name)
+                            print 'rename: ',current_material,name
+                            mc.rename(current_material[0],name)
                         else:
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
