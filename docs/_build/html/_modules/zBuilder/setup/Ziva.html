@@ -84,7 +84,7 @@
 
 
 
-<div class="viewcode-block" id="ZivaSetup"><a class="viewcode-back" href="../../../code.html#zBuilder.setup.Ziva.ZivaSetup">[docs]</a><span class="k">class</span> <span class="nc">ZivaSetup</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="p">):</span>
+<div class="viewcode-block" id="ZivaSetup"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Ziva.ZivaSetup">[docs]</a><span class="k">class</span> <span class="nc">ZivaSetup</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    To capture a ziva setup</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -310,14 +310,13 @@
     <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
             <span class="n">solver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">bones</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">tissues</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">attachments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">materials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">fibers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">embedder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">permisive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        print info on each node</span>
+<span class="sd">        appends a mesh to the mesh list</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
-<span class="sd">            node_filter (str): filter by node name. Defaults to None</span>
-<span class="sd">            print_data (bool): prints name of data stored.  Defaults to False</span>
-
+<span class="sd">            node_filter (str): places data in this key in dict.</span>
+<span class="sd">            attr_filter (str): name of data to place.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -684,8 +683,9 @@
                         <span class="k">except</span><span class="p">:</span>
                             <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ZivaSetup.mirror"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Ziva.ZivaSetup.mirror">[docs]</a>    <span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span></div></div>
 
 
 

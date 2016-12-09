@@ -51,9 +51,9 @@ class NodeCollection(object):
         print info on each node
 
         Args:
-            type_filter (str): filter by node type.  Defaults to None
-            node_filter (str): filter by node name. Defaults to None
-            print_data (bool): prints name of data stored.  Defaults to False
+            type_filter (str): filter by node type.  Defaults to **None**
+            node_filter (str): filter by node name. Defaults to **None**
+            print_data (bool): prints name of data stored.  Defaults to **False**
 
         '''
 
@@ -116,10 +116,11 @@ class NodeCollection(object):
             name (str): name of the data.
 
         Returns:
-            obj: of data
+            obj: Object of data.
 
         Example:
-            get_data('mesh','l_bicepMuscle')
+            
+            >>> get_data('mesh','l_bicepMuscle')
         '''
         return self.data[key].get(name,None)
 
@@ -155,10 +156,11 @@ class NodeCollection(object):
         '''
         get nodes in data object
 
-        keywords:
-            type_filter (str): filter by node type.  Defaults to None
-            node_filter (str): filter by node name.  Defaults to None
-        returns:
+        Args:
+            type_filter (str): filter by node type.  Defaults to **None**
+            node_filter (str): filter by node name.  Defaults to **None**
+
+        Returns:
             [] of nodes
         '''
         items = []
@@ -186,12 +188,14 @@ class NodeCollection(object):
             search (str): what to search for
             replace (str): what to replace it with
 
-        Examples:
-            # replace r_ at front of item with l_
-            z.string_replace('^r_','l_')
+        Example:
+            replace `r_` at front of item with `l_`:
 
-            # replace _r at end of line with _l
-            z.string_replace('_r$','_l')
+            >>> z.string_replace('^r_','l_')
+
+            replace `_r` at end of line with `_l`:
+
+            >>> z.string_replace('_r$','_l')
         '''
         for node in self.get_nodes():
             node.string_replace(search,replace)
@@ -278,7 +282,7 @@ class NodeCollection(object):
 
 def replace_dict_keys(search,replace,dictionary):
     '''
-    Does a search and replace on dictionary kes
+    Does a search and replace on dictionary keys
 
     Args:
         search (str): search term

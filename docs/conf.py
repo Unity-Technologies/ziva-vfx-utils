@@ -30,7 +30,7 @@ sys.path.insert(0, 'Z:\\workRelated\\git\\ziva-vfx-utils-private')
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode','sphinxcontrib.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -176,3 +176,4 @@ epub_exclude_files = ['search.html']
 
 
 autodoc_mock_imports = ['maya.cmds','maya.mel','maya.OpenMaya']
+

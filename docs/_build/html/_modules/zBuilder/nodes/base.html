@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>zBuilder.nodes.base &#8212; zBuilder 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for zBuilder.nodes.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+
+<div class="viewcode-block" id="BaseNode"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode">[docs]</a><span class="k">class</span> <span class="nc">BaseNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maps</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_association</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_class</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="c1">#print self._class</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1"> &quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BaseNode.print_"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="s1">&#39;----------------------------------------------------&#39;</span>
+        <span class="c1">#print &#39;index: \t&#39;,i</span>
+        <span class="nb">print</span> <span class="s1">&#39;python node: </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span>
+        <span class="nb">print</span> <span class="s1">&#39;name: </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="s1">&#39;type: </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+        
+        <span class="n">attrList</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">get_attr_list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">attrList</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;attrs: &#39;</span><span class="p">,</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrList</span><span class="p">:</span>   
+                <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_attr_key_value</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span><span class="s1">&#39;type&#39;</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">get_attr_key_value</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        
+        <span class="n">maps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maps</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">maps</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;maps: &#39;</span><span class="p">,</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mesh&#39;</span><span class="p">],</span><span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">associations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_association</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">associations</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;association: &#39;</span><span class="p">,</span><span class="n">associations</span></div>
+
+<div class="viewcode-block" id="BaseNode.string_replace"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
+        <span class="c1"># name replace----------------------------------------------------------</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span>
+
+
+
+        <span class="c1"># association replace---------------------------------------------------</span>
+        <span class="n">assNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_association</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">newNames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">assNames</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">assNames</span><span class="p">:</span>
+                <span class="n">newName</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">newNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_association</span><span class="p">(</span><span class="n">newNames</span><span class="p">)</span>
+
+        <span class="c1">#maps-------------------------------------------------------------------</span>
+
+        <span class="n">maps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maps</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mesh&#39;</span><span class="p">])</span></div>
+                <span class="c1">#print &#39;hmm&#39;,self.get_name(),maps[key]</span>
+
+
+<div class="viewcode-block" id="BaseNode.get_attr_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BaseNode.set_attr_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_attr_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_attr_list"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_attr_key"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_attr_key_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_key_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_key_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BaseNode.set_attr_key_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_attr_key_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr_key_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_name"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">longName</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+        
+
+<div class="viewcode-block" id="BaseNode.set_name"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>   </div>
+
+<div class="viewcode-block" id="BaseNode.get_type"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span></div>
+
+<div class="viewcode-block" id="BaseNode.set_type"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_type">[docs]</a>    <span class="k">def</span> <span class="nf">set_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">type_</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_maps"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_maps">[docs]</a>    <span class="k">def</span> <span class="nf">get_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maps</span></div>
+
+<div class="viewcode-block" id="BaseNode.set_maps"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_maps">[docs]</a>    <span class="k">def</span> <span class="nf">set_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">maps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maps</span> <span class="o">=</span> <span class="n">maps</span></div>
+
+
+
+    <span class="c1"># def get_attrs(self):</span>
+    <span class="c1">#     return self._attrs</span>
+
+<div class="viewcode-block" id="BaseNode.set_attrs"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_attrs">[docs]</a>    <span class="k">def</span> <span class="nf">set_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attrs</span><span class="p">):</span>
+        <span class="c1"># TODO explicit set and gets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="n">attrs</span></div>
+
+<div class="viewcode-block" id="BaseNode.get_association"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_association">[docs]</a>    <span class="k">def</span> <span class="nf">get_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">longName</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_association</span><span class="p">:</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_association</span></div>
+
+<div class="viewcode-block" id="BaseNode.set_association"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_association">[docs]</a>    <span class="k">def</span> <span class="nf">set_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">association</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">association</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_association</span> <span class="o">=</span><span class="p">[</span><span class="n">association</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_association</span> <span class="o">=</span><span class="n">association</span></div>
+
+<div class="viewcode-block" id="BaseNode.compare"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="n">attrList</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">get_attr_list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">attrList</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrList</span><span class="p">:</span>
+                    <span class="n">sceneVal</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">)</span>
+                    <span class="n">objVal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_attr_key_value</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">sceneVal</span> <span class="o">!=</span> <span class="n">objVal</span><span class="p">:</span>
+                        <span class="nb">print</span> <span class="s1">&#39;DIFF:&#39;</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">object value:&#39;</span><span class="p">,</span><span class="n">objVal</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">scene value:&#39;</span><span class="p">,</span><span class="n">sceneVal</span></div></div>
+
+
+    
+<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">longName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+    <span class="n">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">replace</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">newName</span></div>
+
+
+<div class="viewcode-block" id="build_attr_list"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.build_attr_list">[docs]</a><span class="k">def</span> <span class="nf">build_attr_list</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;controlPoints&#39;</span><span class="p">,</span><span class="s1">&#39;uvSet&#39;</span><span class="p">,</span><span class="s1">&#39;colorSet&#39;</span><span class="p">,</span><span class="s1">&#39;weightList&#39;</span><span class="p">,</span><span class="s1">&#39;pnts&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;vertexColor&#39;</span><span class="p">,</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+
+    <span class="n">tmps</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listAttr</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cb</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listAttr</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">cb</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cb</span><span class="p">:</span>
+        <span class="n">tmps</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">listAttr</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">cb</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">tmps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+        <span class="c1">#attrs = list(set(attrs).intersection(attr_filter))</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">attr_filter</span>
+        
+    <span class="k">return</span> <span class="n">attrs</span></div>
+
+
+<div class="viewcode-block" id="build_attr_key_values"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.build_attr_key_values">[docs]</a><span class="k">def</span> <span class="nf">build_attr_key_values</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">attrList</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrList</span><span class="p">:</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">selection</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">selection</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">)</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;locked&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">selection</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tmp</span></div>
+
+<div class="viewcode-block" id="set_attrs"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.set_attrs">[docs]</a><span class="k">def</span> <span class="nf">set_attrs</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+        <span class="n">nodeAttrs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_attr_list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">nodeAttrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">nodeAttrs</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">attr_filter</span><span class="p">[</span><span class="n">type_</span><span class="p">]))</span>
+
+
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">nodeAttrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">get_attr_key</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;doubleArray&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="n">node</span><span class="o">.</span><span class="n">get_attr_value</span><span class="p">(</span><span class="n">attr</span><span class="p">),</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;doubleArray&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39; not found, skipping&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span><span class="n">node</span><span class="o">.</span><span class="n">get_attr_value</span><span class="p">(</span><span class="n">attr</span><span class="p">))</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="c1">#print &#39;tried...&#39;,attr</span>
+                            <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39; not found, skipping&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+    </div>
+  </body>
+</html>

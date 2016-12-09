@@ -1,0 +1,582 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>zBuilder.nodeCollection &#8212; zBuilder 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="zBuilder.setup" href="zBuilder.setup.html" />
+    <link rel="prev" title="zBuilder" href="modules.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="zBuilder.setup.html" title="zBuilder.setup"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="zBuilder"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">zBuilder</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-zBuilder.nodeCollection">
+<span id="zbuilder-nodecollection"></span><h1>zBuilder.nodeCollection<a class="headerlink" href="#module-zBuilder.nodeCollection" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="zBuilder.nodeCollection.BaseNodeEncoder">
+<em class="property">class </em><code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">BaseNodeEncoder</code><span class="sig-paren">(</span><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#BaseNodeEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.BaseNodeEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="method">
+<dt id="zBuilder.nodeCollection.BaseNodeEncoder.default">
+<code class="descname">default</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#BaseNodeEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.BaseNodeEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="zBuilder.nodeCollection.NodeCollection">
+<em class="property">class </em><code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">NodeCollection</code><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>key</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.add_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>appends a mesh to the mesh list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>str</em>) &#8211; places data in this key in dict.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; name of data to place.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.add_node">
+<code class="descname">add_node</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>appends a node to the node list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> (<em>obj</em>) &#8211; the node obj to append to collection list.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.apply">
+<code class="descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>must create a method to inherit this class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>print info on each node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to <strong>None</strong></li>
+<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to <strong>None</strong></li>
+<li><strong>print_data</strong> (<em>bool</em>) &#8211; prints name of data stored.  Defaults to <strong>False</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zBuilder.nodeCollection.NodeCollection.data">
+<code class="descname">data</code><em class="property"> = None</em><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>DATTTTA</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.from_json_data">
+<code class="descname">from_json_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.from_json_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.from_json_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets data out of json serilization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets data given &#8216;key&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<em>str</em>) &#8211; the key to get data from.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; name of the data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Object of data.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="s1">&#39;l_bicepMuscle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.get_data_by_key">
+<code class="descname">get_data_by_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data_by_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data_by_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all data for given &#8216;key&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str</em>) &#8211; the key to get data from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of data objs</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>get_data(&#8216;mesh&#8217;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.get_json_data">
+<code class="descname">get_json_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_json_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_json_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function to define data stored in json</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.get_nodes">
+<code class="descname">get_nodes</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>get nodes in data object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to <strong>None</strong></li>
+<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name.  Defaults to <strong>None</strong></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">[] of nodes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.print_">
+<code class="descname">print_</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em>, <em>print_data=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.print_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.print_" title="Permalink to this definition">¶</a></dt>
+<dd><p>print info on each node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to None</li>
+<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to None</li>
+<li><strong>print_data</strong> (<em>bool</em>) &#8211; prints name of data stored.  Defaults to False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.retrieve_from_file">
+<code class="descname">retrieve_from_file</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.retrieve_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.retrieve_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads data from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filepath</strong> (<em>str</em>) &#8211; filepath to read from disk</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">IOError</span></code> &#8211; If not able to read file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.retrieve_from_scene">
+<code class="descname">retrieve_from_scene</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.retrieve_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.retrieve_from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>must create a method to inherit this class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.stats">
+<code class="descname">stats</code><span class="sig-paren">(</span><em>type_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>prints out basic stats on data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.string_replace">
+<code class="descname">string_replace</code><span class="sig-paren">(</span><em>search</em>, <em>replace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.string_replace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.string_replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>searches and replaces with regular expressions items in data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>search</strong> (<em>str</em>) &#8211; what to search for</li>
+<li><strong>replace</strong> (<em>str</em>) &#8211; what to replace it with</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>replace <cite>r_</cite> at front of item with <cite>l_</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>replace <cite>_r</cite> at end of line with <cite>_l</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;_r$&#39;</span><span class="p">,</span><span class="s1">&#39;_l&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes data to disk in json format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filepath</strong> (<em>str</em>) &#8211; filepath to write to disk</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">IOError</span></code> &#8211; If not able to write file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.nodeCollection.load_base_node">
+<code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">load_base_node</code><span class="sig-paren">(</span><em>json_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#load_base_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.load_base_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads json objects into proper classes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_object</strong> (<em>obj</em>) &#8211; json obj to perform action on</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of operation</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.nodeCollection.replace_dict_keys">
+<code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">replace_dict_keys</code><span class="sig-paren">(</span><em>search</em>, <em>replace</em>, <em>dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#replace_dict_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.replace_dict_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does a search and replace on dictionary keys</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>search</strong> (<em>str</em>) &#8211; search term</li>
+<li><strong>replace</strong> (<em>str</em>) &#8211; replace term</li>
+<li><strong>dictionary</strong> (<em>dict</em>) &#8211; the dictionary to do search on</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">result of search and replace</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.nodeCollection.replace_longname">
+<code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">replace_longname</code><span class="sig-paren">(</span><em>search</em>, <em>replace</em>, <em>longName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#replace_longname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.replace_longname" title="Permalink to this definition">¶</a></dt>
+<dd><p>does a search and replace on a long name.  It splits it up by (&#8216;|&#8217;) then
+performs it on each piece</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>search</strong> (<em>str</em>) &#8211; search term</li>
+<li><strong>replace</strong> (<em>str</em>) &#8211; replace term</li>
+<li><strong>longName</strong> (<em>str</em>) &#8211; the long name to perform action on</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">result of search and replace</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.nodeCollection.str_to_class">
+<code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">str_to_class</code><span class="sig-paren">(</span><em>module</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#str_to_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.str_to_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given module and name instantiantes a class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>module</strong> (<em>str</em>) &#8211; module</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; the class name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">class object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.nodeCollection.time_this">
+<code class="descclassname">zBuilder.nodeCollection.</code><code class="descname">time_this</code><span class="sig-paren">(</span><em>original_function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#time_this"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.time_this" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zBuilder.setup.html">zBuilder.setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.setup.html#module-zBuilder.setup.Attributes">zBuilder.setup.Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.setup.html#module-zBuilder.setup.Constraints">zBuilder.setup.Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.setup.html#module-zBuilder.setup.Selection">zBuilder.setup.Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.setup.html#module-zBuilder.setup.Ziva">zBuilder.setup.Ziva</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zBuilder.data.html">zBuilder.data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.mesh">zBuilder.data.mesh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zBuilder.nodes.html">zBuilder.nodes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.nodes.html#module-zBuilder.nodes.base">zBuilder.nodes.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.nodes.html#module-zBuilder.nodes.zEmbedder">zBuilder.nodes.zEmbedder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.nodes.html#module-zBuilder.nodes.zTet">zBuilder.nodes.zTet</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-zBuilder.zMaya">
+<span id="zbuilder-zmaya"></span><h1>zBuilder.zMaya<a class="headerlink" href="#module-zBuilder.zMaya" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="zBuilder.zMaya.clean_scene">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">clean_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#clean_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.clean_scene" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_association">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_association</code><span class="sig-paren">(</span><em>zNode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_association"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_association" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_type">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_type</code><span class="sig-paren">(</span><em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zAttachments">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zAttachments</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zAttachments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zAttachments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zBones">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zBones</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zBones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zBones" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zFibers">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zFibers</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zFibers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zFibers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zMaterials">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zMaterials</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zMaterials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zMaterials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets zMaterial nodes given a mesh</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zSolver">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zSolver</code><span class="sig-paren">(</span><em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zSolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zSolver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zSolverTransform">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zSolverTransform</code><span class="sig-paren">(</span><em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zSolverTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zSolverTransform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zTet_user_mesh">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zTet_user_mesh</code><span class="sig-paren">(</span><em>zNode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zTet_user_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zTet_user_mesh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zTets">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zTets</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zTets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zTets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.get_zTissues">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">get_zTissues</code><span class="sig-paren">(</span><em>bodies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#get_zTissues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.get_zTissues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.isSolver">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">isSolver</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#isSolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.isSolver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.rename_ziva_nodes">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">rename_ziva_nodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#rename_ziva_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.rename_ziva_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="zBuilder.zMaya.select_tissue_meshes">
+<code class="descclassname">zBuilder.zMaya.</code><code class="descname">select_tissue_meshes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/zMaya.html#select_tissue_meshes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.zMaya.select_tissue_meshes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">zBuilder.nodeCollection</a></li>
+<li><a class="reference internal" href="#module-zBuilder.zMaya">zBuilder.zMaya</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="previous chapter">zBuilder</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zBuilder.setup.html"
+                        title="next chapter">zBuilder.setup</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/zBuilder.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="zBuilder.setup.html" title="zBuilder.setup"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="zBuilder"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+    </div>
+  </body>
+</html>

@@ -260,14 +260,13 @@ class ZivaSetup(nc.NodeCollection):
     def apply(self,node_filter=None,attr_filter=None,interp_maps='auto',
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
             fibers=True,embedder=True,permisive=True):
+
         '''
-        print info on each node
+        appends a mesh to the mesh list
 
         Args:
-            type_filter (str): filter by node type.  Defaults to None
-            node_filter (str): filter by node name. Defaults to None
-            print_data (bool): prints name of data stored.  Defaults to False
-
+            node_filter (str): places data in this key in dict.
+            attr_filter (str): name of data to place.
         '''
 
         sel = mc.ls(sl=True)
@@ -635,6 +634,7 @@ class ZivaSetup(nc.NodeCollection):
                             pass
 
     def mirror(search,replace):
+
         self.string_replace(search,replace)
 
 

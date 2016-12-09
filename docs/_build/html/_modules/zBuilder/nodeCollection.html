@@ -60,7 +60,7 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span> 
 
-<div class="viewcode-block" id="NodeCollection"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection">[docs]</a><span class="k">class</span> <span class="nc">NodeCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection">[docs]</a><span class="k">class</span> <span class="nc">NodeCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This is an object that holds the node data in a list</span>
@@ -77,7 +77,7 @@
 
 
 
-<div class="viewcode-block" id="NodeCollection.print_"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">print_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.print_"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">print_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;print info on each node</span>
 
@@ -95,15 +95,15 @@
         <span class="k">if</span> <span class="n">print_data</span><span class="p">:</span> 
             <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="NodeCollection.compare"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.compare"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        print info on each node</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
-<span class="sd">            node_filter (str): filter by node name. Defaults to None</span>
-<span class="sd">            print_data (bool): prints name of data stored.  Defaults to False</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to **None**</span>
+<span class="sd">            node_filter (str): filter by node name. Defaults to **None**</span>
+<span class="sd">            print_data (bool): prints name of data stored.  Defaults to **False**</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -111,11 +111,12 @@
             <span class="n">node</span><span class="o">.</span><span class="n">compare</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="NodeCollection.stats"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.stats"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        :param type_filter: Filter by node type</span>
-<span class="sd">        :type type_filter: str or None</span>
+<span class="sd">        prints out basic stats on data</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">):</span>
@@ -135,7 +136,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
             <span class="nb">print</span> <span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="NodeCollection.add_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.add_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        appends a mesh to the mesh list</span>
 
@@ -156,7 +157,7 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span></div>
 
-<div class="viewcode-block" id="NodeCollection.get_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.get_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Gets data given &#39;key&#39;</span>
 
@@ -165,15 +166,16 @@
 <span class="sd">            name (str): name of the data.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            obj: of data</span>
+<span class="sd">            obj: Object of data.</span>
 
 <span class="sd">        Example:</span>
-<span class="sd">            get_data(&#39;mesh&#39;,&#39;l_bicepMuscle&#39;)</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; get_data(&#39;mesh&#39;,&#39;l_bicepMuscle&#39;)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="NodeCollection.get_data_by_key"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_data_by_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.get_data_by_key"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_data_by_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Gets all data for given &#39;key&#39;</span>
 
@@ -189,7 +191,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
         <span class="c1">#return self.data[key]</span>
 
-<div class="viewcode-block" id="NodeCollection.add_node"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.add_node"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        appends a node to the node list</span>
 
@@ -199,15 +201,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="NodeCollection.get_nodes"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.get_nodes"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        get nodes in data object</span>
 
-<span class="sd">        keywords:</span>
-<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
-<span class="sd">            node_filter (str): filter by node name.  Defaults to None</span>
-<span class="sd">        returns:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to **None**</span>
+<span class="sd">            node_filter (str): filter by node name.  Defaults to **None**</span>
+
+<span class="sd">        Returns:</span>
 <span class="sd">            [] of nodes</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
@@ -227,7 +230,7 @@
         <span class="k">return</span> <span class="n">items</span></div>
 
 
-<div class="viewcode-block" id="NodeCollection.string_replace"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.string_replace"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        searches and replaces with regular expressions items in data</span>
 
@@ -235,12 +238,14 @@
 <span class="sd">            search (str): what to search for</span>
 <span class="sd">            replace (str): what to replace it with</span>
 
-<span class="sd">        Examples:</span>
-<span class="sd">            # replace r_ at front of item with l_</span>
-<span class="sd">            z.string_replace(&#39;^r_&#39;,&#39;l_&#39;)</span>
+<span class="sd">        Example:</span>
+<span class="sd">            replace `r_` at front of item with `l_`:</span>
 
-<span class="sd">            # replace _r at end of line with _l</span>
-<span class="sd">            z.string_replace(&#39;_r$&#39;,&#39;_l&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; z.string_replace(&#39;^r_&#39;,&#39;l_&#39;)</span>
+
+<span class="sd">            replace `_r` at end of line with `_l`:</span>
+
+<span class="sd">            &gt;&gt;&gt; z.string_replace(&#39;_r$&#39;,&#39;_l&#39;)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
             <span class="n">node</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
@@ -254,7 +259,7 @@
 
 
 
-<div class="viewcode-block" id="NodeCollection.write"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.write"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        writes data to disk in json format</span>
 
@@ -275,7 +280,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s1">&#39;wrote-&gt; &#39;</span><span class="p">,</span><span class="n">filepath</span></div>
 
-<div class="viewcode-block" id="NodeCollection.retrieve_from_file"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.retrieve_from_file"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        reads data from a file</span>
 
@@ -295,13 +300,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s1">&#39;read-&gt; &#39;</span><span class="p">,</span><span class="n">filepath</span></div>
 
-<div class="viewcode-block" id="NodeCollection.get_json_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.get_json_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Utility function to define data stored in json</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="NodeCollection.from_json_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.from_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.from_json_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.from_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Gets data out of json serilization</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -311,23 +316,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-<div class="viewcode-block" id="NodeCollection.apply"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.apply"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        must create a method to inherit this class</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">pass</span></div>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-<div class="viewcode-block" id="NodeCollection.retrieve_from_scene"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.retrieve_from_scene"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selection</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        must create a method to inherit this class</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="replace_dict_keys"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.replace_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">replace_dict_keys</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">dictionary</span><span class="p">):</span>
+<div class="viewcode-block" id="replace_dict_keys"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.replace_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">replace_dict_keys</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">dictionary</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Does a search and replace on dictionary kes</span>
+<span class="sd">    Does a search and replace on dictionary keys</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        search (str): search term</span>
@@ -344,7 +349,7 @@
 
     <span class="k">return</span> <span class="n">tmp</span></div>
 
-<span class="k">def</span> <span class="nf">time_this</span><span class="p">(</span><span class="n">original_function</span><span class="p">):</span>      
+<div class="viewcode-block" id="time_this"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.time_this">[docs]</a><span class="k">def</span> <span class="nf">time_this</span><span class="p">(</span><span class="n">original_function</span><span class="p">):</span>      
     <span class="k">def</span> <span class="nf">new_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                         
         <span class="n">before</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                     
@@ -352,22 +357,22 @@
         <span class="n">after</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                      
         <span class="nb">print</span> <span class="s2">&quot;Finished: ---Elapsed Time = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">after</span><span class="o">-</span><span class="n">before</span><span class="p">)</span>      
         <span class="k">return</span> <span class="n">x</span>                                             
-    <span class="k">return</span> <span class="n">new_function</span>  
+    <span class="k">return</span> <span class="n">new_function</span>  </div>
 
 
 
-<span class="k">class</span> <span class="nc">BaseNodeEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseNodeEncoder"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.BaseNodeEncoder">[docs]</a><span class="k">class</span> <span class="nc">BaseNodeEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseNodeEncoder.default"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.BaseNodeEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;_class&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BaseNodeEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BaseNodeEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div></div>
 
 
 
 
-<div class="viewcode-block" id="load_base_node"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.load_base_node">[docs]</a><span class="k">def</span> <span class="nf">load_base_node</span><span class="p">(</span><span class="n">json_object</span><span class="p">):</span>
+<div class="viewcode-block" id="load_base_node"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.load_base_node">[docs]</a><span class="k">def</span> <span class="nf">load_base_node</span><span class="p">(</span><span class="n">json_object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Loads json objects into proper classes</span>
 
@@ -387,7 +392,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">json_object</span></div>
 
-<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
+<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    does a search and replace on a long name.  It splits it up by (&#39;|&#39;) then</span>
 <span class="sd">    performs it on each piece</span>
@@ -409,7 +414,7 @@
 
     <span class="k">return</span> <span class="n">newName</span></div>
 
-<div class="viewcode-block" id="str_to_class"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.str_to_class">[docs]</a><span class="k">def</span> <span class="nf">str_to_class</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="str_to_class"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.str_to_class">[docs]</a><span class="k">def</span> <span class="nf">str_to_class</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Given module and name instantiantes a class</span>
 

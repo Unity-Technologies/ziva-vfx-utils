@@ -6,12 +6,11 @@
 Welcome to zBuilder's documentation!
 ====================================
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
    tutorial
-   project
-   code
+   modules
 
 Indices and tables
 ==================
