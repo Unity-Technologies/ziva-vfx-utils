@@ -4,6 +4,7 @@ import maya.mel as mm
 import maya.OpenMaya as om
 
 
+
 class Mesh(object):
     def __init__(self):
         self._class = (self.__class__.__module__,self.__class__.__name__)

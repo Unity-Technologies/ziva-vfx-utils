@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tutorials &#8212; zBuilder 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Project Summeary" href="project.html" />
+    <link rel="prev" title="Welcome to zBuilder’s documentation!" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="project.html" title="Project Summeary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to zBuilder’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<p>zBuilder saves the current state of the ziva setup and allows you to re-build
+scene amoung other things.  For example searching and replacing and using that
+to mirror setups.  The basic idea is to build a ziva setup by hand and use these
+scripts to save it.</p>
+<div class="section" id="saving-and-loading-setup">
+<h2>Saving and Loading Setup<a class="headerlink" href="#saving-and-loading-setup" title="Permalink to this headline">¶</a></h2>
+<p>To build we need to instantiate a <a class="reference internal" href="code.html#zBuilder.setup.Ziva.ZivaSetup" title="zBuilder.setup.Ziva.ZivaSetup"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.setup.Ziva.ZivaSetup</span></code></a> object and we do it like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>once we have that we need to fill it with what is in maya scene like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">(</span><span class="s1">&#39;zSolver1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once we have that we can do a few things.  One thing is to save on disk:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>all at once:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">(</span><span class="s1">&#39;zSolver1&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to load it from disk we retrieve it from file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-setup">
+<h2>Building Setup<a class="headerlink" href="#building-setup" title="Permalink to this headline">¶</a></h2>
+<p>Assuming we have the &#8216;z&#8217; object loaded with setup we want, to build we do a:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>note that this works on a clean scene with only the geo or an existing setup.
+with an exisitng setup if it finds the same node it updates properties and maps.</p>
+</div>
+<div class="section" id="maps">
+<h2>Maps<a class="headerlink" href="#maps" title="Permalink to this headline">¶</a></h2>
+<p>this stores the mesh information so if you updated geo with different topology it
+will interpolate maps in world space.  By default, it checks if it needs to
+and if it doesn&#8217;t it ignores this step.  To force it or turn it off use this flag:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">interp_maps</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>&#8216;&#8217;True&#8217;&#8217; = always interp maps
+&#8216;&#8217;False&#8217;&#8217; = Never interp maps
+&#8216;&#8217;auto&#8217;&#8217; = checks if needed</p>
+</div>
+<div class="section" id="search-and-replace">
+<h2>Search and replace<a class="headerlink" href="#search-and-replace" title="Permalink to this headline">¶</a></h2>
+<p>to search and replace you can do a:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;r_bicep_muscle22&#39;</span><span class="p">,</span><span class="s1">&#39;r_bicep_muscle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That will replace all instances of <cite>r_bicep_muscle22</cite> with <cite>r_bicep_muscle</cite>
+you can feed it regular expressions so this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will replace <cite>r_</cite> with <cite>l_</cite> IF it is at begining of line.</p>
+</div>
+<div class="section" id="mirroring-setup">
+<h2>Mirroring Setup<a class="headerlink" href="#mirroring-setup" title="Permalink to this headline">¶</a></h2>
+<p>mirroring is just using search and replace.  It for now, assumes that the geo
+is topologically mirrored.  Sometimes you need to do a couple seach and replaces
+and you do that like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;_r_&#39;</span><span class="p">,</span><span class="s1">&#39;_l_&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>that will again replace <cite>r_</cite> with <cite>l_</cite> if at beinging of line AND replace <cite>_r_</cite>
+with <cite>_l_</cite> andwhere it finds it.</p>
+<p>currently for mirroring to work the zNodes need to be named with some naming
+convention that can be search and replacable so it can identify opposite side.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorials</a><ul>
+<li><a class="reference internal" href="#saving-and-loading-setup">Saving and Loading Setup</a></li>
+<li><a class="reference internal" href="#building-setup">Building Setup</a></li>
+<li><a class="reference internal" href="#maps">Maps</a></li>
+<li><a class="reference internal" href="#search-and-replace">Search and replace</a></li>
+<li><a class="reference internal" href="#mirroring-setup">Mirroring Setup</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to zBuilder&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="project.html"
+                        title="next chapter">Project Summeary</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="project.html" title="Project Summeary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to zBuilder’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+    </div>
+  </body>
+</html>

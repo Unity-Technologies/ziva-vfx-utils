@@ -111,7 +111,15 @@ class ZivaSetup(nc.NodeCollection):
         solver=True,bones=True,tissues=True,attachments=True,materials=True,
         fibers=True,embedder=True,get_mesh=True,get_maps=True):
 
-        
+        '''
+        print info on each node
+
+        Args:
+            type_filter (str): filter by node type.  Defaults to None
+            node_filter (str): filter by node name. Defaults to None
+            print_data (bool): prints name of data stored.  Defaults to False
+
+        '''
         longnames = mc.ls(selection,l=True)
 
         print '\ngetting ziva......'
@@ -253,9 +261,14 @@ class ZivaSetup(nc.NodeCollection):
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
             fibers=True,embedder=True,permisive=True):
         '''
+        print info on each node
+
+        Args:
+            type_filter (str): filter by node type.  Defaults to None
+            node_filter (str): filter by node name. Defaults to None
+            print_data (bool): prints name of data stored.  Defaults to False
 
         '''
-
 
         sel = mc.ls(sl=True)
         if solver:

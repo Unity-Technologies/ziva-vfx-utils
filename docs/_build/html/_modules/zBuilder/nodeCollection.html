@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>zBuilder.nodeCollection &#8212; zBuilder 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for zBuilder.nodeCollection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">nodes.base</span> <span class="k">import</span> <span class="n">BaseNode</span>
+<span class="kn">import</span> <span class="nn">zBuilder.data.mesh</span> <span class="k">as</span> <span class="nn">mesh</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span> 
+
+<div class="viewcode-block" id="NodeCollection"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection">[docs]</a><span class="k">class</span> <span class="nc">NodeCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is an object that holds the node data in a list</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1">#: DATTTTA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;data_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;current_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y  %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;maya_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">about</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;operating_system&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">about</span><span class="p">(</span><span class="n">os</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+
+
+<div class="viewcode-block" id="NodeCollection.print_"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">print_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;print info on each node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
+<span class="sd">            node_filter (str): filter by node name. Defaults to None</span>
+<span class="sd">            print_data (bool): prints name of data stored.  Defaults to False</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="n">type_filter</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="n">node_filter</span><span class="p">):</span>
+
+            <span class="n">node</span><span class="o">.</span><span class="n">print_</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">print_data</span><span class="p">:</span> 
+            <span class="nb">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NodeCollection.compare"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        print info on each node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
+<span class="sd">            node_filter (str): filter by node name. Defaults to None</span>
+<span class="sd">            print_data (bool): prints name of data stored.  Defaults to False</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="n">type_filter</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="n">node_filter</span><span class="p">):</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">compare</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="NodeCollection.stats"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.stats">[docs]</a>    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param type_filter: Filter by node type</span>
+<span class="sd">        :type type_filter: str or None</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">type_filter</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">type_filter</span><span class="o">==</span><span class="n">t</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                        <span class="n">tmp</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">if</span> <span class="n">type_filter</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                        <span class="n">tmp</span><span class="p">[</span><span class="n">type_filter</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">tmp</span><span class="p">[</span><span class="n">type_filter</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                    <span class="n">tmp</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">tmp</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="NodeCollection.add_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        appends a mesh to the mesh list</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): places data in this key in dict.</span>
+<span class="sd">            name (str): name of data to place.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;mesh&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+                <span class="n">connectivity</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_mesh_connectivity</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">()</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">set_polygon_counts</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;polygonCounts&#39;</span><span class="p">])</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">set_polygon_connects</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;polygonConnects&#39;</span><span class="p">])</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">set_point_list</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">])</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span></div>
+
+<div class="viewcode-block" id="NodeCollection.get_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets data given &#39;key&#39;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): the key to get data from.</span>
+<span class="sd">            name (str): name of the data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: of data</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            get_data(&#39;mesh&#39;,&#39;l_bicepMuscle&#39;)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NodeCollection.get_data_by_key"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_data_by_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets all data for given &#39;key&#39;</span>
+
+<span class="sd">        args:</span>
+<span class="sd">            key (str): the key to get data from</span>
+
+<span class="sd">        returns:</span>
+<span class="sd">            list: of data objs</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">           get_data(&#39;mesh&#39;)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
+        <span class="c1">#return self.data[key]</span>
+
+<div class="viewcode-block" id="NodeCollection.add_node"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        appends a node to the node list</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            node (obj): the node obj to append to collection list.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NodeCollection.get_nodes"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get nodes in data object</span>
+
+<span class="sd">        keywords:</span>
+<span class="sd">            type_filter (str): filter by node type.  Defaults to None</span>
+<span class="sd">            node_filter (str): filter by node name.  Defaults to None</span>
+<span class="sd">        returns:</span>
+<span class="sd">            [] of nodes</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">type_filter</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">type_filter</span><span class="p">:</span>
+
+                    <span class="k">if</span> <span class="n">node_filter</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_filter</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                            <span class="n">node_filter</span> <span class="o">=</span> <span class="n">node_filter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">node_filter</span><span class="p">)</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get_association</span><span class="p">()):</span>
+                            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">items</span></div>
+
+
+<div class="viewcode-block" id="NodeCollection.string_replace"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        searches and replaces with regular expressions items in data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            search (str): what to search for</span>
+<span class="sd">            replace (str): what to replace it with</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            # replace r_ at front of item with l_</span>
+<span class="sd">            z.string_replace(&#39;^r_&#39;,&#39;l_&#39;)</span>
+
+<span class="sd">            # replace _r at end of line with _l</span>
+<span class="sd">            z.string_replace(&#39;_r$&#39;,&#39;_l&#39;)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
+
+        <span class="c1"># deal with the mesh search and replacing</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">replace_dict_keys</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="NodeCollection.write"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        writes data to disk in json format</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath (str): filepath to write to disk</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IOError: If not able to write file</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_json_data</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">BaseNodeEncoder</span><span class="p">,</span>
+                    <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s2">&quot;Error: can</span><span class="se">\&#39;</span><span class="s2">t find file or write data&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;wrote-&gt; &#39;</span><span class="p">,</span><span class="n">filepath</span></div>
+
+<div class="viewcode-block" id="NodeCollection.retrieve_from_file"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reads data from a file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath (str): filepath to read from disk</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IOError: If not able to read file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">load_base_node</span><span class="p">)</span>
+                <span class="c1">#print len(data),&#39;fffff&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">from_json_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s2">&quot;Error: can</span><span class="se">\&#39;</span><span class="s2">t find file or read data&quot;</span>   
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;read-&gt; &#39;</span><span class="p">,</span><span class="n">filepath</span></div>
+
+<div class="viewcode-block" id="NodeCollection.get_json_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.get_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Utility function to define data stored in json</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="NodeCollection.from_json_data"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.from_json_data">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets data out of json serilization</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="NodeCollection.apply"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        must create a method to inherit this class</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+<div class="viewcode-block" id="NodeCollection.retrieve_from_scene"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.NodeCollection.retrieve_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        must create a method to inherit this class</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="replace_dict_keys"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.replace_dict_keys">[docs]</a><span class="k">def</span> <span class="nf">replace_dict_keys</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">dictionary</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Does a search and replace on dictionary kes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        search (str): search term</span>
+<span class="sd">        replace (str): replace term</span>
+<span class="sd">        dictionary (dict): the dictionary to do search on</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: result of search and replace</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="p">:</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">new</span><span class="p">]</span> <span class="o">=</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tmp</span></div>
+
+<span class="k">def</span> <span class="nf">time_this</span><span class="p">(</span><span class="n">original_function</span><span class="p">):</span>      
+    <span class="k">def</span> <span class="nf">new_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                        
+        <span class="n">before</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                     
+        <span class="n">x</span> <span class="o">=</span> <span class="n">original_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>                
+        <span class="n">after</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                      
+        <span class="nb">print</span> <span class="s2">&quot;Finished: ---Elapsed Time = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">after</span><span class="o">-</span><span class="n">before</span><span class="p">)</span>      
+        <span class="k">return</span> <span class="n">x</span>                                             
+    <span class="k">return</span> <span class="n">new_function</span>  
+
+
+
+<span class="k">class</span> <span class="nc">BaseNodeEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;_class&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BaseNodeEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+
+
+
+<div class="viewcode-block" id="load_base_node"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.load_base_node">[docs]</a><span class="k">def</span> <span class="nf">load_base_node</span><span class="p">(</span><span class="n">json_object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Loads json objects into proper classes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        json_object (obj): json obj to perform action on</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        obj:  Result of operation</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="s1">&#39;_class&#39;</span> <span class="ow">in</span> <span class="n">json_object</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">json_object</span><span class="p">[</span><span class="s1">&#39;_class&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">json_object</span><span class="p">[</span><span class="s1">&#39;_class&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">str_to_class</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">=</span> <span class="n">json_object</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json_object</span></div>
+
+<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    does a search and replace on a long name.  It splits it up by (&#39;|&#39;) then</span>
+<span class="sd">    performs it on each piece</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        search (str): search term</span>
+<span class="sd">        replace (str): replace term</span>
+<span class="sd">        longName (str): the long name to perform action on</span>
+
+<span class="sd">    returns:</span>
+<span class="sd">        str: result of search and replace</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">longName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+    <span class="n">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">replace</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">newName</span></div>
+
+<div class="viewcode-block" id="str_to_class"><a class="viewcode-back" href="../../code.html#zBuilder.nodeCollection.str_to_class">[docs]</a><span class="k">def</span> <span class="nf">str_to_class</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Given module and name instantiantes a class</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        module (str): module</span>
+<span class="sd">        name (str): the class name</span>
+
+<span class="sd">    returns:</span>
+<span class="sd">        obj: class object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span> <span class="n">module</span> <span class="p">)</span>
+    <span class="n">MyClass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">instance</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+    </div>
+  </body>
+</html>

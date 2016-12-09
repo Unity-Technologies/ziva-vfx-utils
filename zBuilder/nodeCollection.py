@@ -29,8 +29,7 @@ class NodeCollection(object):
 
     def print_(self,type_filter=None,node_filter=None,print_data=False):
 
-        '''
-        print info on each node
+        '''print info on each node
 
         Args:
             type_filter (str): filter by node type.  Defaults to None

@@ -1,6 +1,6 @@
-import maya.cmds as mc
-import maya.mel as mm
-import maya.OpenMaya as om
+#import maya.cmds as mc
+#import maya.mel as mm
+#import maya.OpenMaya as om
 
 
 
