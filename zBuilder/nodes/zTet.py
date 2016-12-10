@@ -20,8 +20,8 @@ class TetNode(BaseNode):
         else:
             return None
 
-    def _print(self):
-        super(TetNode, self)._print()
+    def print_(self):
+        super(TetNode, self).print_()
         if self.get_user_tet_mesh(longName=True):
             print 'User_Tet_Mesh: ',self.get_user_tet_mesh(longName=True)
 
