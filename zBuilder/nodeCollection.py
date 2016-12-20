@@ -152,7 +152,6 @@ class NodeCollection(object):
 
 
     def get_nodes(self,type_filter=None,node_filter=None):
-
         '''
         get nodes in data object
 

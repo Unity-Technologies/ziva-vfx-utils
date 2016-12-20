@@ -68,12 +68,34 @@ class BaseNode(object):
 
 
     def get_attr_value(self,attr):
+                '''
+        gets value of an attribute in node
+
+        Args:
+            attr (str): The attribute to get value of
+
+        Returns:
+            value of attribute
+        '''
         return self._attrs[attr]['value']
 
     def set_attr_value(self,attr,value):
+                '''
+        sets value of an attribute in node
+
+        Args:
+            attr (str): The attribute to get value of
+            value : the value to set
+        '''
         self._attrs[attr]['value'] = value
 
     def get_attr_list(self):
+        '''
+        gets list of attribute names stored with node
+
+        Returns:
+            [] of attribute names
+        '''
         return self._attrs.keys()
 
     def get_attr_key(self,key):
@@ -86,6 +108,15 @@ class BaseNode(object):
         self._attrs[attr][key] = value
 
     def get_name(self,longName=False):
+        '''
+        get name of node
+
+        Args:
+            longName (bool): If True returns the long name of node.  Defaults to **False**
+
+        Returns:
+            (str) of node name
+        '''
         if self._name:
             if longName:
                 return self._name
@@ -96,13 +127,30 @@ class BaseNode(object):
         
 
     def set_name(self,name):
+        '''
+        Sets name of node
 
+        Args:
+            name (str): the name of node.
+        '''
         self._name = name   
 
     def get_type(self):
+        '''
+        get type of node
+
+        Returns:
+            (str) of node name
+        '''
         return self._type
 
     def set_type(self,type_):
+        '''
+        Sets type of node
+
+        Args:
+            type_ (str): the type of node.
+        '''
         self._type = type_
 
     def get_maps(self):
@@ -112,12 +160,8 @@ class BaseNode(object):
         self._maps = maps
 
 
-
-    # def get_attrs(self):
-    #     return self._attrs
-
     def set_attrs(self,attrs):
-        # TODO explicit set and gets
+        # TODO explicit set 
         self._attrs = attrs
 
     def get_association(self,longName=False):
@@ -130,6 +174,7 @@ class BaseNode(object):
             return self._association
 
     def set_association(self,association):
+
         if isinstance(association, str):
             self._association =[association]
         else:
