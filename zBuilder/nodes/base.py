@@ -68,7 +68,7 @@ class BaseNode(object):
 
 
     def get_attr_value(self,attr):
-                '''
+        '''
         gets value of an attribute in node
 
         Args:
@@ -80,7 +80,7 @@ class BaseNode(object):
         return self._attrs[attr]['value']
 
     def set_attr_value(self,attr,value):
-                '''
+        '''
         sets value of an attribute in node
 
         Args:
