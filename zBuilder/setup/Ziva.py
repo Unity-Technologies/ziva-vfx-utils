@@ -12,6 +12,12 @@ import maya.mel as mm
 
 import time
 import datetime 
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
 
 maplist = {}
 maplist['zTet'] = ['weightList[0].weights']
@@ -67,7 +73,7 @@ class ZivaSetup(nc.NodeCollection):
         type_ = mz.get_type(solver)
         
         if type_ == 'zSolverTransform':
-            print '\ngetting ziva......'
+            logger.info('          getting ziva......')  
             mc.select(solver,r=True)
             solShape = mm.eval('zQuery -t "zSolver" -l')[0]
             if attr_filter:
@@ -426,10 +432,10 @@ class ZivaSetup(nc.NodeCollection):
             #sync up tissues with mesh in data:
             if mc.objExists(tmp):
                 mc.select(tmp,r=True)
-                tisMe = mm.eval('zQuery -t zTissue')
+                tisMe = mm.eval('zQuery -t zTet')
                 if tisMe:
-                    mc.rename(tisMe[0],zTissue.get_name())
-            if not mc.objExists(zTissue.get_name()):
+                    mc.rename(tisMe[0],zTet.get_name())
+            if not mc.objExists(zTet.get_name()):
                 tet_names.append(zTet.get_name())
 
 
@@ -477,9 +483,7 @@ class ZivaSetup(nc.NodeCollection):
             for new,i in zip(results[2::4],tet_names):
                 mc.rename(new,i)
 
-        # print 'meshes', tissue_meshes
-        # print 'names',tissue_names
-        # print 'results', results
+
         # set tet maps if so desired--------------------------------------------\
         msh.set_weights(zTets,self.get_data_by_key('mesh'),interp_maps=interp_maps)
 
@@ -568,8 +572,9 @@ class ZivaSetup(nc.NodeCollection):
 
                     if not mc.objExists(name):
                         if i == 0:
-                            print 'rename: ',current_material,name
+                            logger.debug('rename-- {} {}'.format(current_material[0],name))
                             mc.rename(current_material[0],name)
+                            
                         else:
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
