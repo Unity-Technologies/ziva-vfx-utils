@@ -11,7 +11,7 @@ https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads
 or clone it
 
 
-https://YourUsernameHere@bitbucket.org/zivadynamics/ziva-vfx-utils.git
+https://bitbucket.org/zivadynamics/ziva-vfx-utils.git
 
 
 
