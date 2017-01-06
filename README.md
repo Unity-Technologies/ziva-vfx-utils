@@ -27,7 +27,7 @@ sys.path.append('/path/to/download')
 
 ```
 
-Documents can be found in the docs directory of repo.  Specifically the /docs/html/index.html
+Documents can be found in the docs directory of repo.  Specifically the /docs/_build/html/index.html
 
 ### Who do I talk to? ###
 
