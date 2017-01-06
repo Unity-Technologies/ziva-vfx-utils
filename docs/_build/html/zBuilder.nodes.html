@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="zBuilder.data" href="zBuilder.data.html" /> 
+    <link rel="prev" title="zBuilder.data package" href="zBuilder.data.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +39,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="zBuilder.data.html" title="zBuilder.data"
+          <a href="zBuilder.data.html" title="zBuilder.data package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &#187;</li>
@@ -83,12 +83,32 @@
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.get_attr_list">
 <code class="descname">get_attr_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.get_attr_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.get_attr_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>gets list of attribute names stored with node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">[] of attribute names</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.get_attr_value">
 <code class="descname">get_attr_value</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.get_attr_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.get_attr_value" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>gets value of an attribute in node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>attr</strong> (<em>str</em>) &#8211; The attribute to get value of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">value of attribute</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.get_maps">
@@ -98,12 +118,32 @@
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.get_name">
 <code class="descname">get_name</code><span class="sig-paren">(</span><em>longName=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.get_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get name of node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>longName</strong> (<em>bool</em>) &#8211; If True returns the long name of node.  Defaults to <strong>False</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(str) of node name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.get_type">
 <code class="descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.get_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get type of node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(str) of node name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.print_">
@@ -123,7 +163,20 @@
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.set_attr_value">
 <code class="descname">set_attr_value</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.set_attr_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.set_attr_value" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>sets value of an attribute in node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>attr</strong> (<em>str</em>) &#8211; The attribute to get value of</li>
+<li><strong>value</strong> &#8211; the value to set</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.set_attrs">
@@ -138,12 +191,30 @@
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.set_name">
 <code class="descname">set_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.set_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.set_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets name of node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; the name of node.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.set_type">
 <code class="descname">set_type</code><span class="sig-paren">(</span><em>type_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/base.html#BaseNode.set_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.base.BaseNode.set_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets type of node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<em>str</em>) &#8211; the type of node.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodes.base.BaseNode.string_replace">
@@ -239,6 +310,11 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="zBuilder.nodes.zTet.TetNode.print_">
+<code class="descname">print_</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/zTet.html#TetNode.print_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.zTet.TetNode.print_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="zBuilder.nodes.zTet.TetNode.set_user_tet_mesh">
 <code class="descname">set_user_tet_mesh</code><span class="sig-paren">(</span><em>mesh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodes/zTet.html#TetNode.set_user_tet_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodes.zTet.TetNode.set_user_tet_mesh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -276,7 +352,7 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="zBuilder.data.html"
-                        title="previous chapter">zBuilder.data</a></p>
+                        title="previous chapter">zBuilder.data package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -308,7 +384,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="zBuilder.data.html" title="zBuilder.data"
+          <a href="zBuilder.data.html" title="zBuilder.data package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &#187;</li>

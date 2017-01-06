@@ -74,7 +74,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.add_data">
-<code class="descname">add_data</code><span class="sig-paren">(</span><em>key</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.add_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.add_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>key</em>, <em>name</em>, <em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.add_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.add_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>appends a mesh to the mesh list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -142,8 +142,28 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="zBuilder.nodeCollection.NodeCollection.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data" title="Permalink to this definition">¶</a></dt>
+<dt id="zBuilder.nodeCollection.NodeCollection.get_data_by_key">
+<code class="descname">get_data_by_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data_by_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data_by_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all data for given &#8216;key&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str</em>) &#8211; the key to get data from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of data objs</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>get_data_by_key(&#8216;mesh&#8217;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.nodeCollection.NodeCollection.get_data_by_key_name">
+<code class="descname">get_data_by_key_name</code><span class="sig-paren">(</span><em>key</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data_by_key_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data_by_key_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets data given &#8216;key&#8217;</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -164,29 +184,9 @@
 </tbody>
 </table>
 <p class="rubric">Example</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="s1">&#39;l_bicepMuscle&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="s1">&#39;l_bicepMuscle&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="zBuilder.nodeCollection.NodeCollection.get_data_by_key">
-<code class="descname">get_data_by_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_data_by_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_data_by_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets all data for given &#8216;key&#8217;</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str</em>) &#8211; the key to get data from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of data objs</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Example</p>
-<p>get_data(&#8216;mesh&#8217;)</p>
 </dd></dl>
 
 <dl class="method">
@@ -423,8 +423,11 @@ performs it on each piece</p>
 <li class="toctree-l2"><a class="reference internal" href="zBuilder.setup.html#module-zBuilder.setup.Ziva">zBuilder.setup.Ziva</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="zBuilder.data.html">zBuilder.data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.mesh">zBuilder.data.mesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zBuilder.data.html">zBuilder.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.map">zBuilder.data.map module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.mesh">zBuilder.data.mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="zBuilder.nodes.html">zBuilder.nodes</a><ul>

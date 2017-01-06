@@ -50,6 +50,12 @@
   <h1>Source code for zBuilder.nodes.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="BaseNode"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode">[docs]</a><span class="k">class</span> <span class="nc">BaseNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -70,6 +76,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="BaseNode.print_"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#logger.info(&#39;{}&#39;.format(current_material[0],name))</span>
         <span class="nb">print</span> <span class="s1">&#39;----------------------------------------------------&#39;</span>
         <span class="c1">#print &#39;index: \t&#39;,i</span>
         <span class="nb">print</span> <span class="s1">&#39;python node: </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span>
@@ -84,9 +91,9 @@
         
         <span class="n">maps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maps</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">maps</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s1">&#39;maps: &#39;</span><span class="p">,</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
-                <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mesh&#39;</span><span class="p">],</span><span class="n">maps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="nb">print</span> <span class="s1">&#39;maps: &#39;</span><span class="p">,</span><span class="n">maps</span>
+            <span class="c1">#for key in maps:</span>
+            <span class="c1">#    print &#39;\t\t&#39;,key,maps[key][&#39;mesh&#39;],maps[key][&#39;value&#39;]</span>
         <span class="n">associations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_association</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">associations</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s1">&#39;association: &#39;</span><span class="p">,</span><span class="n">associations</span></div>
@@ -118,12 +125,34 @@
 
 
 <div class="viewcode-block" id="BaseNode.get_attr_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets value of an attribute in node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): The attribute to get value of</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value of attribute</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="BaseNode.set_attr_value"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_attr_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets value of an attribute in node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): The attribute to get value of</span>
+<span class="sd">            value : the value to set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="BaseNode.get_attr_list"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets list of attribute names stored with node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [] of attribute names</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BaseNode.get_attr_key"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_attr_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
@@ -136,6 +165,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="BaseNode.get_name"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get name of node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            longName (bool): If True returns the long name of node.  Defaults to **False**</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str) of node name</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">longName</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
@@ -146,13 +184,30 @@
         
 
 <div class="viewcode-block" id="BaseNode.set_name"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets name of node</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): the name of node.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>   </div>
 
 <div class="viewcode-block" id="BaseNode.get_type"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get type of node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str) of node name</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span></div>
 
 <div class="viewcode-block" id="BaseNode.set_type"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_type">[docs]</a>    <span class="k">def</span> <span class="nf">set_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets type of node</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_ (str): the type of node.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">type_</span></div>
 
 <div class="viewcode-block" id="BaseNode.get_maps"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_maps">[docs]</a>    <span class="k">def</span> <span class="nf">get_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -162,12 +217,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_maps</span> <span class="o">=</span> <span class="n">maps</span></div>
 
 
-
-    <span class="c1"># def get_attrs(self):</span>
-    <span class="c1">#     return self._attrs</span>
-
 <div class="viewcode-block" id="BaseNode.set_attrs"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_attrs">[docs]</a>    <span class="k">def</span> <span class="nf">set_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attrs</span><span class="p">):</span>
-        <span class="c1"># TODO explicit set and gets</span>
+        <span class="c1"># TODO explicit set </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="n">attrs</span></div>
 
 <div class="viewcode-block" id="BaseNode.get_association"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.get_association">[docs]</a>    <span class="k">def</span> <span class="nf">get_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -180,6 +231,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_association</span></div>
 
 <div class="viewcode-block" id="BaseNode.set_association"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.base.BaseNode.set_association">[docs]</a>    <span class="k">def</span> <span class="nf">set_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">association</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">association</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_association</span> <span class="o">=</span><span class="p">[</span><span class="n">association</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>

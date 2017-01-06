@@ -59,6 +59,13 @@
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span> 
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
 
 <div class="viewcode-block" id="NodeCollection"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection">[docs]</a><span class="k">class</span> <span class="nc">NodeCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
@@ -134,9 +141,9 @@
                 <span class="n">tmp</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">])))</span></div>
 
-<div class="viewcode-block" id="NodeCollection.add_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeCollection.add_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        appends a mesh to the mesh list</span>
 
@@ -144,20 +151,16 @@
 <span class="sd">            key (str): places data in this key in dict.</span>
 <span class="sd">            name (str): name of data to place.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;mesh&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
-                <span class="n">connectivity</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_mesh_connectivity</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">m</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">()</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">set_polygon_counts</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;polygonCounts&#39;</span><span class="p">])</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">set_polygon_connects</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;polygonConnects&#39;</span><span class="p">])</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">set_point_list</span><span class="p">(</span><span class="n">connectivity</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+            <span class="c1">#logger.debug(&quot;adding data type: {}  name: {}&quot;.format(key,name) ) </span>
 
-<div class="viewcode-block" id="NodeCollection.get_data"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+
+
+<div class="viewcode-block" id="NodeCollection.get_data_by_key_name"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_data_by_key_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_key_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Gets data given &#39;key&#39;</span>
 
@@ -170,9 +173,13 @@
 
 <span class="sd">        Example:</span>
 <span class="sd">            </span>
-<span class="sd">            &gt;&gt;&gt; get_data(&#39;mesh&#39;,&#39;l_bicepMuscle&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; get_data_by_key_name(&#39;mesh&#39;,&#39;l_bicepMuscle&#39;)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
 
 
 <div class="viewcode-block" id="NodeCollection.get_data_by_key"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_data_by_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
@@ -186,10 +193,10 @@
 <span class="sd">            list: of data objs</span>
 
 <span class="sd">        Example:</span>
-<span class="sd">           get_data(&#39;mesh&#39;)</span>
+<span class="sd">           get_data_by_key(&#39;mesh&#39;)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span></div>
-        <span class="c1">#return self.data[key]</span>
+
 
 <div class="viewcode-block" id="NodeCollection.add_node"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -202,7 +209,6 @@
 
 
 <div class="viewcode-block" id="NodeCollection.get_nodes"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.nodeCollection.NodeCollection.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">type_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        get nodes in data object</span>
 
@@ -250,9 +256,13 @@
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
             <span class="n">node</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
 
-        <span class="c1"># deal with the mesh search and replacing</span>
+        <span class="c1"># deal with the data search and replacing</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+
+            <span class="c1"># replace the key names in data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">replace_dict_keys</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+            <span class="c1"># run search and replace on individual items</span>
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span></div>
 
@@ -354,8 +364,8 @@
                         
         <span class="n">before</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                     
         <span class="n">x</span> <span class="o">=</span> <span class="n">original_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>                
-        <span class="n">after</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>                      
-        <span class="nb">print</span> <span class="s2">&quot;Finished: ---Elapsed Time = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">after</span><span class="o">-</span><span class="n">before</span><span class="p">)</span>      
+        <span class="n">after</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>      
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished: ---Elapsed Time = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">after</span><span class="o">-</span><span class="n">before</span><span class="p">)</span> <span class="p">)</span>              
         <span class="k">return</span> <span class="n">x</span>                                             
     <span class="k">return</span> <span class="n">new_function</span>  </div>
 

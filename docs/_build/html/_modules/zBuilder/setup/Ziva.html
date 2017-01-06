@@ -53,7 +53,9 @@
 <span class="kn">import</span> <span class="nn">zBuilder.nodes.base</span> <span class="k">as</span> <span class="nn">base</span>
 <span class="kn">import</span> <span class="nn">zBuilder.nodes.zEmbedder</span> <span class="k">as</span> <span class="nn">embedderNode</span>
 <span class="kn">import</span> <span class="nn">zBuilder.nodes.zTet</span> <span class="k">as</span> <span class="nn">tetNode</span>
+
 <span class="kn">import</span> <span class="nn">zBuilder.data.mesh</span> <span class="k">as</span> <span class="nn">msh</span>
+<span class="kn">import</span> <span class="nn">zBuilder.data.map</span> <span class="k">as</span> <span class="nn">mps</span>
 
 <span class="kn">import</span> <span class="nn">zBuilder.nodeCollection</span> <span class="k">as</span> <span class="nn">nc</span>
 
@@ -62,14 +64,20 @@
 
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span> 
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">maplist</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">maplist</span><span class="p">[</span><span class="s1">&#39;zTet&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">]</span>
-<span class="n">maplist</span><span class="p">[</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">]</span>
-<span class="n">maplist</span><span class="p">[</span><span class="s1">&#39;zFiber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">,</span><span class="s1">&#39;endPoints&#39;</span><span class="p">]</span>
-<span class="n">maplist</span><span class="p">[</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">,</span><span class="s1">&#39;weightList[1].weights&#39;</span><span class="p">]</span>
 
-<span class="n">zNodes</span> <span class="o">=</span> <span class="p">[</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="n">MAPLIST</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">MAPLIST</span><span class="p">[</span><span class="s1">&#39;zTet&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">]</span>
+<span class="n">MAPLIST</span><span class="p">[</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">]</span>
+<span class="n">MAPLIST</span><span class="p">[</span><span class="s1">&#39;zFiber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">,</span><span class="s1">&#39;endPoints&#39;</span><span class="p">]</span>
+<span class="n">MAPLIST</span><span class="p">[</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;weightList[0].weights&#39;</span><span class="p">,</span><span class="s1">&#39;weightList[1].weights&#39;</span><span class="p">]</span>
+
+<span class="n">ZNODES</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;zSolver&#39;</span><span class="p">,</span>
         <span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span>
         <span class="s1">&#39;zTet&#39;</span><span class="p">,</span>
@@ -81,6 +89,7 @@
         <span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span>
         <span class="s1">&#39;zFiber&#39;</span><span class="p">,</span>
         <span class="p">]</span>
+
 
 
 
@@ -100,12 +109,11 @@
         <span class="c1">#self.info[&#39;plugin_version&#39;] = mc.pluginInfo(plug,q=True,v=True)     </span>
 
     <span class="nd">@nc</span><span class="o">.</span><span class="n">time_this</span>
-    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">solver</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retreives data from scene given any node in ziva connection:</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            solver (str): a ziva node to find solver network</span>
 <span class="sd">            attr_filter (dict):  Attribute filter on what attributes to get. </span>
 <span class="sd">                dictionary is key value where key is node type and value is </span>
 <span class="sd">                list of attributes to use.</span>
@@ -113,51 +121,52 @@
 <span class="sd">                tmp = {&#39;zSolver&#39;:[&#39;substeps&#39;]}</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">solShape</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolver&quot; -l&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;No Ziva nodes found in scene. Has a solver been created for the scene yet?&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">StandardError</span><span class="p">,</span> <span class="s1">&#39;No Ziva nodes found in scene. Has a solver been created for the scene yet?&#39;</span>
+
         <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">type_</span> <span class="o">=</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">solver</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="s1">&#39;zSolverTransform&#39;</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">getting ziva......&#39;</span>
-            <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">solShape</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolver&quot; -l&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
-                        <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
-                        <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolver&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+        <span class="n">solShape</span> <span class="o">=</span> <span class="n">solShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="n">type_s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zBone&#39;</span><span class="p">,</span><span class="s1">&#39;zTissue&#39;</span><span class="p">,</span><span class="s1">&#39;zTet&#39;</span><span class="p">,</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;          getting ziva for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solShape</span><span class="p">))</span> 
 
-            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">type_s</span><span class="p">:</span>
-                <span class="n">zNodes</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;&quot; -l&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">zNodes</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">zNode</span> <span class="ow">in</span> <span class="n">zNodes</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
-                                        <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
-                                    <span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-
-
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_embedded_from_selection</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">))</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
-
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolverTransform&quot; -l&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
+                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
+                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolver&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="s1">&#39;select a solver&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
+        <span class="n">type_s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zBone&#39;</span><span class="p">,</span><span class="s1">&#39;zTissue&#39;</span><span class="p">,</span><span class="s1">&#39;zTet&#39;</span><span class="p">,</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">type_s</span><span class="p">:</span>
+            <span class="n">ZNODES</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;&quot; -l&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ZNODES</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">zNode</span> <span class="ow">in</span> <span class="n">ZNODES</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
+                                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
+                                <span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_embedded_from_selection</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
         <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         
 
     <span class="nd">@nc</span><span class="o">.</span><span class="n">time_this</span>
-    <span class="k">def</span> <span class="nf">retrieve_from_scene_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selection</span><span class="p">,</span><span class="n">connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">retrieve_from_scene_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">solver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">bones</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">tissues</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">attachments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">materials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">fibers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">embedder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
@@ -170,7 +179,7 @@
 <span class="sd">            print_data (bool): prints name of data stored.  Defaults to False</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">longnames</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">getting ziva......&#39;</span>
 
@@ -179,6 +188,7 @@
             
         <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">solver</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting solver&#39;</span><span class="p">)</span> 
                 <span class="n">sol</span> <span class="o">=</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zSolver</span><span class="p">(</span><span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">sol</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">sol</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolver&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
@@ -187,35 +197,41 @@
                     <span class="c1">#mc.select(selection,r=True)</span>
 
             <span class="k">if</span> <span class="n">bones</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zBones</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting bones&#39;</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">bone</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zBones</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">bone</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zBone&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">tissues</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">tissue</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zTissues</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting tissues&#39;</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">tissue</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zTissues</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">tissue</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zTissue&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">tet</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zTets</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">tet</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zTets</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zTet&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">attachments</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zAttachments</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting attachments&#39;</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zAttachments</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">attachment</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">materials</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zMaterials</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting materials&#39;</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zMaterials</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">material</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">fibers</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">fiber</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zFibers</span><span class="p">(</span><span class="n">longnames</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting fibers&#39;</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">fiber</span> <span class="ow">in</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_zFibers</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">fiber</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">),</span>
                         <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">embedder</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getting embedder&#39;</span><span class="p">)</span> 
                 <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_embedded_from_selection</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_node_selection</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="p">,</span>
@@ -239,23 +255,29 @@
         <span class="n">node</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">zNode</span><span class="p">)</span>
         <span class="n">node</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
         <span class="n">node</span><span class="o">.</span><span class="n">set_attrs</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
-
         <span class="n">node</span><span class="o">.</span><span class="n">set_association</span><span class="p">(</span><span class="n">mz</span><span class="o">.</span><span class="n">get_association</span><span class="p">(</span><span class="n">zNode</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">get_maps</span><span class="p">:</span>
-            <span class="n">ml</span> <span class="o">=</span> <span class="n">maplist</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
-            <span class="c1">#print ml</span>
+            <span class="n">ml</span> <span class="o">=</span> <span class="n">MAPLIST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
                 <span class="n">associations</span> <span class="o">=</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_association</span><span class="p">(</span><span class="n">zNode</span><span class="p">)</span>
+
+                <span class="c1"># If it is a zFiber, the same mesh is used for both maps</span>
                 <span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="s1">&#39;zFiber&#39;</span><span class="p">:</span>
-                    <span class="n">maps</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">get_weights</span><span class="p">(</span><span class="n">zNode</span><span class="p">,[</span><span class="n">associations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">associations</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">ml</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">maps</span> <span class="o">=</span> <span class="n">msh</span><span class="o">.</span><span class="n">get_weights</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">associations</span><span class="p">,</span><span class="n">ml</span><span class="p">)</span>
-                <span class="c1">#print maps</span>
+                    <span class="n">associations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">associations</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">maps</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">mp</span><span class="p">,</span><span class="n">ms</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ml</span><span class="p">,</span><span class="n">associations</span><span class="p">):</span>
+                    <span class="n">mapName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">mp</span><span class="p">)</span>
+                    <span class="n">mapData</span> <span class="o">=</span> <span class="n">mps</span><span class="o">.</span><span class="n">get_map_data</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">mp</span><span class="p">,</span><span class="n">ms</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="s1">&#39;map&#39;</span><span class="p">,</span><span class="n">mapName</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">mapData</span><span class="p">)</span>
+                    <span class="n">maps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapName</span><span class="p">)</span>
+
                 <span class="n">node</span><span class="o">.</span><span class="n">set_maps</span><span class="p">(</span><span class="n">maps</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">get_mesh</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">ass</span> <span class="ow">in</span> <span class="n">associations</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="n">ass</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="n">ass</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="n">ass</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">msh</span><span class="o">.</span><span class="n">get_mesh_data</span><span class="p">(</span><span class="n">ass</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
@@ -274,7 +296,7 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                             <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="kc">None</span><span class="p">),</span>
                             <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">zNodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ZNODES</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">s</span><span class="p">,</span>
                     <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="kc">None</span><span class="p">),</span>
                     <span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
@@ -358,7 +380,7 @@
 
 
     <span class="k">def</span> <span class="nf">__apply_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying solver&#39;</span><span class="p">)</span>  
         <span class="n">zSolver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zSolver&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">zSolver</span><span class="p">:</span>
@@ -378,6 +400,7 @@
         <span class="c1">#TODO: check if bone got created properly, if not gracefully error</span>
         <span class="c1"># check if existing solver, if there is not lets create one at default </span>
         <span class="c1"># values</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying bones&#39;</span><span class="p">)</span> 
         <span class="n">solver</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;zSolver&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">solver</span><span class="p">:</span>
             <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;ziva -s&#39;</span><span class="p">)</span>
@@ -445,6 +468,7 @@
         <span class="c1">#TODO: check if tissue got created properly, if not gracefully error</span>
         <span class="c1"># check if existing solver, if there is not lets create one at default </span>
         <span class="c1"># values</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying tissues&#39;</span><span class="p">)</span> 
         <span class="n">solver</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;zSolver&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">solver</span><span class="p">:</span>
             <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;ziva -s&#39;</span><span class="p">)</span>
@@ -476,10 +500,10 @@
             <span class="c1">#sync up tissues with mesh in data:</span>
             <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">tmp</span><span class="p">):</span>
                 <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">tisMe</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t zTissue&#39;</span><span class="p">)</span>
+                <span class="n">tisMe</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t zTet&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">tisMe</span><span class="p">:</span>
-                    <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tisMe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">zTissue</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">zTissue</span><span class="o">.</span><span class="n">get_name</span><span class="p">()):</span>
+                    <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tisMe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">zTet</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">zTet</span><span class="o">.</span><span class="n">get_name</span><span class="p">()):</span>
                 <span class="n">tet_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zTet</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
 
 
@@ -527,11 +551,9 @@
             <span class="k">for</span> <span class="n">new</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">2</span><span class="p">::</span><span class="mi">4</span><span class="p">],</span><span class="n">tet_names</span><span class="p">):</span>
                 <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">new</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="c1"># print &#39;meshes&#39;, tissue_meshes</span>
-        <span class="c1"># print &#39;names&#39;,tissue_names</span>
-        <span class="c1"># print &#39;results&#39;, results</span>
-        <span class="c1"># set tet maps if so desired--------------------------------------------\</span>
-        <span class="n">msh</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">zTets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">),</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
+
+        <span class="c1"># set tet maps if so desired--------------------------------------------</span>
+        <span class="n">mps</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">zTets</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
 
 
         <span class="c1">## apply user tet meshes if needed</span>
@@ -553,7 +575,7 @@
 
 
     <span class="k">def</span> <span class="nf">__apply_attachments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying attachments&#39;</span><span class="p">)</span> 
         <span class="n">attachments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="n">node_filter</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">:</span>
@@ -590,14 +612,14 @@
 
                 
 
-        <span class="n">msh</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">attachments</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">),</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
+        <span class="n">mps</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">attachments</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
 
         <span class="n">base</span><span class="o">.</span><span class="n">set_attrs</span><span class="p">(</span><span class="n">attachments</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="p">)</span>
 
   
 
     <span class="k">def</span> <span class="nf">__apply_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying materials&#39;</span><span class="p">)</span> 
         <span class="n">materials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="n">node_filter</span><span class="p">)</span>
 
 
@@ -618,21 +640,22 @@
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="nb">print</span> <span class="s1">&#39;rename: &#39;</span><span class="p">,</span><span class="n">current_material</span><span class="p">,</span><span class="n">name</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;rename-- </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">current_material</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">name</span><span class="p">))</span>
                             <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">current_material</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">name</span><span class="p">)</span>
+                            
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
                             <span class="n">tmpmat</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;ziva -m&#39;</span><span class="p">)</span>
                             <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tmpmat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="n">msh</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">materials</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">),</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
+        <span class="n">mps</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">materials</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
 
         <span class="n">base</span><span class="o">.</span><span class="n">set_attrs</span><span class="p">(</span><span class="n">materials</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">__apply_fibers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1">#TODO build them all at once</span>
-
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying fibers&#39;</span><span class="p">)</span> 
         <span class="n">fibers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="n">node_filter</span><span class="o">=</span><span class="n">node_filter</span><span class="p">)</span>
 
 
@@ -648,7 +671,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mc</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="n">association</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="s1">&#39; mesh does not exists in scene, skippings fiber&#39;</span><span class="p">)</span>
 
-        <span class="n">msh</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">fibers</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data_by_key</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">),</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
+        <span class="n">mps</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">fibers</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="n">interp_maps</span><span class="p">)</span>
 
         <span class="n">base</span><span class="o">.</span><span class="n">set_attrs</span><span class="p">(</span><span class="n">fibers</span><span class="p">,</span><span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="p">)</span>
 
@@ -657,6 +680,8 @@
         <span class="c1"># TODO get maps working and node_filter.  Will need to filter slightly</span>
         <span class="c1"># differently then other nodes as there is 1 embedder and we care</span>
         <span class="c1"># about associations in this case</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying embedder&#39;</span><span class="p">)</span> 
         
         <span class="n">embeddedNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zEmbedder&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">embeddedNode</span><span class="p">:</span>

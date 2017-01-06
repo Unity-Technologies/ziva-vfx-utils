@@ -68,9 +68,10 @@ scripts to save it.</p>
 </pre></div>
 </div>
 <p>once we have that we need to fill it with what is in maya scene like so:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">(</span><span class="s1">&#39;zSolver1&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>This command works on selection.  It gets the setup from any ziva node selected including tissue or bone geo.  If nothing is selected it grabs a solver in the scene.</p>
 <p>Once we have that we can do a few things.  One thing is to save on disk:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
@@ -78,7 +79,7 @@ scripts to save it.</p>
 <p>all at once:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
-<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">(</span><span class="s1">&#39;zSolver1&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -125,15 +126,29 @@ you can feed it regular expressions so this:</p>
 </div>
 <div class="section" id="mirroring-setup">
 <h2>Mirroring Setup<a class="headerlink" href="#mirroring-setup" title="Permalink to this headline">¶</a></h2>
-<p>mirroring is just using search and replace.  It for now, assumes that the geo
-is topologically mirrored.  Sometimes you need to do a couple seach and replaces
-and you do that like so:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
-<span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;_r_&#39;</span><span class="p">,</span><span class="s1">&#39;_l_&#39;</span><span class="p">)</span>
+<p>Earlier I showed you about retrieve_from_scene.  For mirroring it is best to use:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>that will again replace <cite>r_</cite> with <cite>l_</cite> if at beinging of line AND replace <cite>_r_</cite>
-with <cite>_l_</cite> andwhere it finds it.</p>
+<p>That method will use selection to fill the data.  Use case is to select your left muscles for example and mirror them.  So lets try it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># select left muscles in scene</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^l_&#39;</span><span class="p">,</span><span class="s1">&#39;r_&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>What that does is put the left muscles in object and does searches for <cite>l_</cite> at begining of name and replaces with <cite>r_</cite>.  Sometimes you need to do a couple seach and replaces
+and you do that like so:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^l_&#39;</span><span class="p">,</span><span class="s1">&#39;r_&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;_l_&#39;</span><span class="p">,</span><span class="s1">&#39;_r_&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>that will again replace <cite>l_</cite> with <cite>r_</cite> if at beinging of line AND replace <cite>_l_</cite>
+with <cite>_r_</cite> andwhere it finds it.</p>
 <p>currently for mirroring to work the zNodes need to be named with some naming
 convention that can be search and replacable so it can identify opposite side.</p>
 </div>

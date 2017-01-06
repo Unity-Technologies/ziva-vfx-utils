@@ -15,7 +15,9 @@ To build we need to instantiate a :class:`zBuilder.setup.Ziva.ZivaSetup` object 
 
 once we have that we need to fill it with what is in maya scene like so::
 
-    z.retrieve_from_scene('zSolver1')
+    z.retrieve_from_scene()
+
+This command works on selection.  It gets the setup from any ziva node selected including tissue or bone geo.  If nothing is selected it grabs a solver in the scene.  
 
 Once we have that we can do a few things.  One thing is to save on disk::
 
@@ -25,7 +27,7 @@ all at once::
 
     import zBuilder.setup.Ziva as zva
     z = zva.ZivaSetup()
-    z.retrieve_from_scene('zSolver1')
+    z.retrieve_from_scene()
     z.write('C:\\Temp\\test.ziva')
 
 to load it from disk we retrieve it from file::
@@ -75,15 +77,29 @@ will replace `r_` with `l_` IF it is at begining of line.
 
 Mirroring Setup
 ---------------
-mirroring is just using search and replace.  It for now, assumes that the geo 
-is topologically mirrored.  Sometimes you need to do a couple seach and replaces
+Earlier I showed you about retrieve_from_scene.  For mirroring it is best to use::
+
+    z.retrieve_from_scene_selection()
+
+That method will use selection to fill the data.  Use case is to select your left muscles for example and mirror them.  So lets try it::
+
+    # select left muscles in scene
+    z = zva.ZivaSetup()
+    z.retrieve_from_scene_selection()
+    z.string_replace('^l_','r_')
+    z.apply()
+
+What that does is put the left muscles in object and does searches for `l_` at begining of name and replaces with `r_`.  Sometimes you need to do a couple seach and replaces
 and you do that like so::
 
-    z.string_replace('^r_','l_')
-    z.string_replace('_r_','_l_')
+    z = zva.ZivaSetup()
+    z.retrieve_from_scene_selection()
+    z.string_replace('^l_','r_')
+    z.string_replace('_l_','_r_')
+    z.apply()
 
-that will again replace `r_` with `l_` if at beinging of line AND replace `_r_`
-with `_l_` andwhere it finds it.  
+that will again replace `l_` with `r_` if at beinging of line AND replace `_l_`
+with `_r_` andwhere it finds it.  
 
 currently for mirroring to work the zNodes need to be named with some naming 
 convention that can be search and replacable so it can identify opposite side.

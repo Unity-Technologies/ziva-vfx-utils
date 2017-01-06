@@ -211,6 +211,8 @@ class ZivaSetup(nc.NodeCollection):
             ml = MAPLIST.get(type_,None)
             if ml:
                 associations = mz.get_association(zNode)
+
+                # If it is a zFiber, the same mesh is used for both maps
                 if type_ == 'zFiber':
                     associations.append(associations[0])
 
