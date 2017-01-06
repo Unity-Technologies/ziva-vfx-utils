@@ -91,9 +91,9 @@ class NodeCollection(object):
                 tmp[t].append(d)
 
         for key in tmp:
-            print key, len(tmp[key])
+            logger.info('{} {}'.format(key, len(tmp[key])))
 
-    def add_data(self,key,name):
+    def add_data(self,key,name,data=None):
         '''
         appends a mesh to the mesh list
 
@@ -101,20 +101,16 @@ class NodeCollection(object):
             key (str): places data in this key in dict.
             name (str): name of data to place.
         '''
-        if key == 'mesh':
-            if not key in self.data:
-                self.data[key] = {}
-            if not self.get_data(key,name):
-                connectivity = mesh.get_mesh_connectivity(name)
-                m = mesh.Mesh()
-                m.set_name(name)
-                m.set_polygon_counts(connectivity['polygonCounts'])
-                m.set_polygon_connects(connectivity['polygonConnects'])
-                m.set_point_list(connectivity['points'])
+        if not key in self.data:
+            self.data[key] = {}
 
-                self.data[key][name] = m
+        if not self.get_data_by_key_name(key,name):
+            self.data[key][name] = data
+            #logger.debug("adding data type: {}  name: {}".format(key,name) ) 
 
-    def get_data(self,key,name):
+
+
+    def get_data_by_key_name(self,key,name):
         '''
         Gets data given 'key'
 
@@ -127,9 +123,13 @@ class NodeCollection(object):
 
         Example:
             
-            >>> get_data('mesh','l_bicepMuscle')
+            >>> get_data_by_key_name('mesh','l_bicepMuscle')
         '''
-        return self.data[key].get(name,None)
+        if self.data.get(key):
+            return self.data[key].get(name,None)
+        else:
+            return None
+
 
 
     def get_data_by_key(self,key):
@@ -143,10 +143,10 @@ class NodeCollection(object):
             list: of data objs
 
         Example:
-           get_data('mesh')
+           get_data_by_key('mesh')
         '''
         return self.data.get(key,None)
-        #return self.data[key]
+
 
     def add_node(self,node):
         '''
@@ -206,9 +206,13 @@ class NodeCollection(object):
         for node in self.get_nodes():
             node.string_replace(search,replace)
 
-        # deal with the mesh search and replacing
+        # deal with the data search and replacing
         for key in self.data:
+
+            # replace the key names in data
             self.data[key] = replace_dict_keys(search,replace,self.data[key])
+
+            # run search and replace on individual items
             for item in self.data[key]:
                 self.data[key][item].string_replace(search,replace)
 

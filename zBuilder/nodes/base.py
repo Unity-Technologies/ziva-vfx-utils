@@ -1,5 +1,11 @@
 import re
 import maya.cmds as mc
+import logging
+
+
+
+logger = logging.getLogger(__name__)
+
 
 class BaseNode(object):
     def __init__(self):
@@ -20,6 +26,7 @@ class BaseNode(object):
         return self.__str__()
 
     def print_(self):
+        #logger.info('{}'.format(current_material[0],name))
         print '----------------------------------------------------'
         #print 'index: \t',i
         print 'python node: \t',self
@@ -34,9 +41,9 @@ class BaseNode(object):
         
         maps = self.get_maps()
         if maps:
-            print 'maps: ',
-            for key in maps:
-                print '\t\t',key,maps[key]['mesh'],maps[key]['value']
+            print 'maps: ',maps
+            #for key in maps:
+            #    print '\t\t',key,maps[key]['mesh'],maps[key]['value']
         associations = self.get_association(longName=True)
         if associations:
             print 'association: ',associations

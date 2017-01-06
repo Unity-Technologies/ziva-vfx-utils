@@ -3,7 +3,9 @@ import zBuilder.zMaya as mz
 import zBuilder.nodes.base as base
 import zBuilder.nodes.zEmbedder as embedderNode
 import zBuilder.nodes.zTet as tetNode
+
 import zBuilder.data.mesh as msh
+import zBuilder.data.map as mps
 
 import zBuilder.nodeCollection as nc
 
@@ -56,12 +58,11 @@ class ZivaSetup(nc.NodeCollection):
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
 
     @nc.time_this
-    def retrieve_from_scene(self,solver,attr_filter=None,get_mesh=True,get_maps=True):
+    def retrieve_from_scene(self,attr_filter=None,get_mesh=True,get_maps=True):
         '''
         Retreives data from scene given any node in ziva connection:
 
         Args:
-            solver (str): a ziva node to find solver network
             attr_filter (dict):  Attribute filter on what attributes to get. 
                 dictionary is key value where key is node type and value is 
                 list of attributes to use.
@@ -69,46 +70,46 @@ class ZivaSetup(nc.NodeCollection):
                 tmp = {'zSolver':['substeps']}
 
         '''
+        try:
+            solShape = mm.eval('zQuery -t "zSolver" -l')
+        except RuntimeError, e:
+            logger.exception('No Ziva nodes found in scene. Has a solver been created for the scene yet?')
+            raise StandardError, 'No Ziva nodes found in scene. Has a solver been created for the scene yet?'
+
         sel = mc.ls(sl=True,l=True)
-        type_ = mz.get_type(solver)
-        
-        if type_ == 'zSolverTransform':
-            logger.info('          getting ziva......')  
-            mc.select(solver,r=True)
-            solShape = mm.eval('zQuery -t "zSolver" -l')[0]
-            if attr_filter:
-                if type_ in attr_filter:
-                    self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
-                        attr_filter=attr_filter.get('zSolverTransform',None))
-                    self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
-                        attr_filter=attr_filter.get('zSolver',None))
-            else:
-                self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
-                self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
+        solShape = solShape[0]
 
-            type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
-
-            for t in type_s:
-                zNodes = mm.eval('zQuery -t "'+t+'" -l')
-                if zNodes:
-                    for zNode in zNodes:
-                        if attr_filter:
-                            if t in attr_filter:
-                                self.__add_ziva_node(zNode,get_mesh=get_mesh,
-                                        attr_filter=attr_filter.get(t,None),get_maps=get_maps)
-                        else:
-                            self.__add_ziva_node(zNode,get_mesh=get_mesh,
-                                    attr_filter=None,get_maps=get_maps)
-
-
-
-            self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
-
-            self.stats()
-
+        logger.info('          getting ziva for {}'.format(solShape))  
+        mc.select(solShape,r=True)
+        solver = mm.eval('zQuery -t "zSolverTransform" -l')[0]
+        if attr_filter:
+            if type_ in attr_filter:
+                self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
+                    attr_filter=attr_filter.get('zSolverTransform',None))
+                self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
+                    attr_filter=attr_filter.get('zSolver',None))
         else:
-            print 'select a solver'
+            self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
+            self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
 
+        type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
+
+        for t in type_s:
+            zNodes = mm.eval('zQuery -t "'+t+'" -l')
+            if zNodes:
+                for zNode in zNodes:
+                    if attr_filter:
+                        if t in attr_filter:
+                            self.__add_ziva_node(zNode,get_mesh=get_mesh,
+                                    attr_filter=attr_filter.get(t,None),get_maps=get_maps)
+                    else:
+                        self.__add_ziva_node(zNode,get_mesh=get_mesh,
+                                attr_filter=None,get_maps=get_maps)
+
+
+
+        self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
+        self.stats()
         mc.select(sel,r=True)
         
 
@@ -195,23 +196,27 @@ class ZivaSetup(nc.NodeCollection):
         node.set_name(zNode)
         node.set_type(type_)
         node.set_attrs(attrs)
-
         node.set_association(mz.get_association(zNode))
 
         if get_maps:
             ml = maplist.get(type_,None)
-            #print ml
             if ml:
                 associations = mz.get_association(zNode)
                 if type_ == 'zFiber':
-                    maps = msh.get_weights(zNode,[associations[0],associations[0]],ml)
-                else:
-                    maps = msh.get_weights(zNode,associations,ml)
-                #print maps
+                    associations.append(associations[0])
+
+                maps = []
+                for mp,ms in zip(ml,associations):
+                    mapName = '{}.{}'.format(zNode,mp)
+                    mapData = mps.get_map_data(zNode,mp,ms)
+                    self.add_data('map',mapName,data=mapData)
+                    maps.append(mapName)
+
                 node.set_maps(maps)
                 if get_mesh:
                     for ass in associations:
-                        self.add_data('mesh',ass)
+                        if not self.get_data_by_key_name('mesh',ass):
+                            self.add_data('mesh',ass,data=msh.get_mesh_data(ass))
 
         self.add_node(node)
 
@@ -314,7 +319,7 @@ class ZivaSetup(nc.NodeCollection):
 
 
     def __apply_solver(self,attr_filter=None):
-
+        logger.info('applying solver')  
         zSolver = self.get_nodes(type_filter='zSolver')
 
         if zSolver:
@@ -334,6 +339,7 @@ class ZivaSetup(nc.NodeCollection):
         #TODO: check if bone got created properly, if not gracefully error
         # check if existing solver, if there is not lets create one at default 
         # values
+        logger.info('applying bones') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
@@ -401,6 +407,7 @@ class ZivaSetup(nc.NodeCollection):
         #TODO: check if tissue got created properly, if not gracefully error
         # check if existing solver, if there is not lets create one at default 
         # values
+        logger.info('applying tissues') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
@@ -484,8 +491,8 @@ class ZivaSetup(nc.NodeCollection):
                 mc.rename(new,i)
 
 
-        # set tet maps if so desired--------------------------------------------\
-        msh.set_weights(zTets,self.get_data_by_key('mesh'),interp_maps=interp_maps)
+        # set tet maps if so desired--------------------------------------------
+        mps.set_weights(zTets,self,interp_maps=interp_maps)
 
 
         ## apply user tet meshes if needed
@@ -507,7 +514,7 @@ class ZivaSetup(nc.NodeCollection):
 
 
     def __apply_attachments(self,interp_maps=False,node_filter=None,attr_filter=None):
-
+        logger.info('applying attachments') 
         attachments = self.get_nodes(type_filter='zAttachment',node_filter=node_filter)
 
         for att in attachments:
@@ -544,14 +551,14 @@ class ZivaSetup(nc.NodeCollection):
 
                 
 
-        msh.set_weights(attachments,self.get_data_by_key('mesh'),interp_maps=interp_maps)
+        mps.set_weights(attachments,self,interp_maps=interp_maps)
 
         base.set_attrs(attachments,attr_filter=attr_filter)
 
   
 
     def __apply_materials(self,interp_maps=False,node_filter=None,attr_filter=None):
-
+        logger.info('applying materials') 
         materials = self.get_nodes(type_filter='zMaterial',node_filter=node_filter)
 
 
@@ -580,14 +587,14 @@ class ZivaSetup(nc.NodeCollection):
                             tmpmat = mm.eval('ziva -m')
                             mc.rename(tmpmat[0],name)
 
-        msh.set_weights(materials,self.get_data_by_key('mesh'),interp_maps=interp_maps)
+        mps.set_weights(materials,self,interp_maps=interp_maps)
 
         base.set_attrs(materials,attr_filter=attr_filter)
 
 
     def __apply_fibers(self,interp_maps=False,node_filter=None,attr_filter=None):
         #TODO build them all at once
-
+        logger.info('applying fibers') 
         fibers = self.get_nodes(type_filter='zFiber',node_filter=node_filter)
 
 
@@ -603,7 +610,7 @@ class ZivaSetup(nc.NodeCollection):
             else:
                 mc.warning( association[0] +' mesh does not exists in scene, skippings fiber')
 
-        msh.set_weights(fibers,self.get_data_by_key('mesh'),interp_maps=interp_maps)
+        mps.set_weights(fibers,self,interp_maps=interp_maps)
 
         base.set_attrs(fibers,attr_filter=attr_filter)
 
@@ -612,6 +619,8 @@ class ZivaSetup(nc.NodeCollection):
         # TODO get maps working and node_filter.  Will need to filter slightly
         # differently then other nodes as there is 1 embedder and we care
         # about associations in this case
+
+        logger.info('applying embedder') 
         
         embeddedNode = self.get_nodes(type_filter='zEmbedder')[0]
         if embeddedNode:
