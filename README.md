@@ -1,4 +1,4 @@
-# Ziva Vfx Utils #
+# Ziva Vfx Utils 0.9.0 #
 
 These are utility scripts for the Ziva Vfx maya plugin.
 
