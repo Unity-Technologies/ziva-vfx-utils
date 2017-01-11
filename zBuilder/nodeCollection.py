@@ -238,7 +238,7 @@ class NodeCollection(object):
         except IOError:
             print "Error: can\'t find file or write data"
         else:
-            print 'wrote-> ',filepath
+            logger.info('Wrote File: {}'.format(filepath) ) 
 
     def retrieve_from_file(self,filepath):
         '''
@@ -258,7 +258,8 @@ class NodeCollection(object):
         except IOError:
             print "Error: can\'t find file or read data"   
         else:
-            print 'read-> ',filepath
+            logger.info('Read File: {}'.format(filepath) ) 
+
 
     def get_json_data(self):
         '''
@@ -275,6 +276,7 @@ class NodeCollection(object):
         if len(data) == 3:
             self.info = data[2]
 
+    #
     @abc.abstractmethod
     def apply(self):
         '''
