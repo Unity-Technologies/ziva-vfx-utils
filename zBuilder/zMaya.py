@@ -24,6 +24,15 @@ ZNODES = [
         'zCacheTransform']
 
 
+def create_zBone(bodies):
+    mc.select(bodies)
+    tmp = mm.eval('ziva -b')
+    mobjs = []
+    for t in tmp:
+        mobjs.append(getDependNode(t))
+    return mobjs
+
+
 def get_type(body):
     try:
         return mc.objectType(body)
@@ -194,7 +203,22 @@ def select_tissue_meshes():
     
 
 
+def getDependNode(nodeName):
+    """Get an MObject (depend node) for the associated node name
 
+    :Parameters:
+        nodeName
+            String representing the node
+    
+    :Return: depend node (MObject)
+
+    """
+    dependNode = om.MObject()
+    selList = om.MSelectionList()
+    selList.add(nodeName)
+    if selList.length() > 0: 
+        selList.getDependNode(0, dependNode)
+    return dependNode
 
 
 

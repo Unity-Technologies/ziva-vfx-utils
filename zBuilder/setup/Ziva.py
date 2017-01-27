@@ -85,11 +85,10 @@ class ZivaSetup(nc.NodeCollection):
         mc.select(solShape,r=True)
         solver = mm.eval('zQuery -t "zSolverTransform" -l')[0]
         if attr_filter:
-            if type_ in attr_filter:
-                self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
-                    attr_filter=attr_filter.get('zSolverTransform',None))
-                self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
-                    attr_filter=attr_filter.get('zSolver',None))
+            self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
+                attr_filter=attr_filter.get('zSolverTransform',None))
+            self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
+                attr_filter=attr_filter.get('zSolver',None))
         else:
             self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
             self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
@@ -387,7 +386,7 @@ class ZivaSetup(nc.NodeCollection):
                     #logging.error('cannot create tissue, %s is a zBone' % mesh)
                     raise StandardError, 'cannot create bone, %s is already a zTissue' % mname
             else:
-                mc.warning( mname +' does not exist in scene, skipping bone creation')
+                logger.warning( mname +' does not exist in scene, skipping bone creation')
 
         bone_meshes = bone_meshes_tmp
         bone_names = bone_names_tmp
@@ -404,13 +403,22 @@ class ZivaSetup(nc.NodeCollection):
                 raise StandardError, mesh_quality
 
         #build tissues all at once----------------------------------------------
+
         if bone_meshes:
             mc.select(bone_meshes,r=True)
             results = mm.eval('ziva -b')
 
-            # rename zTissues and zTets-----------------------------------------
+            # ok, going to rename to a temp name then to name in data
+            # rename zBones-----------------------------------------------------
             for new,i in zip(results[1::2],bone_names):
-                mc.rename(new,i)
+                #logger.debug( 'rename: {} {}_'.format(new,new))
+                mc.rename(new,new+'_')
+
+
+            # rename zBones-----------------------------------------------------
+            for new,i in zip(results[1::2],bone_names):
+                logger.debug( 'rename: {}_ {}'.format(new,i))
+                mc.rename(new+'_',i)
 
         base.set_attrs(zBones,attr_filter=attr_filter)
 
