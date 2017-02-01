@@ -6,23 +6,18 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 
 
-_types = ['parentConstraint','orientConstraint']
+TYPES = ['parentConstraint','orientConstraint']
 
 
 class ConstraintsSetup(nc.NodeCollection):
     def __init__(self):
         super(ConstraintsSetup,self).__init__()
 
-    def retrieve_from_scene(self,selection,hi=True):
-        sel = mc.ls(sl=True)
-        mc.select(selection,r=True)
+    def retrieve_from_scene(self):
+        sel = mc.ls(sl=True,l=True)
 
-        if hi:
-            mc.select(hi=True)
-            selection = mc.ls(sl=True)
-
-        for _type in _types:
-            constraints = mc.listConnections(selection,type=_type,s=True,d=False)
+        for type_ in TYPES:
+            constraints = mc.listConnections(sel,type=type_,s=True,d=False)
             con = []
             if constraints:
                 con = list(set(constraints))
