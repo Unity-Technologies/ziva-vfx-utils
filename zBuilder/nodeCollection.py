@@ -50,7 +50,7 @@ class NodeCollection(object):
             node.print_()
 
         if print_data: 
-            print self.data['mesh'].keys()
+            print 'data - mesh: ',self.data['mesh'].keys()
 
     def compare(self,type_filter=None,node_filter=None):
 

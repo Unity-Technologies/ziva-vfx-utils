@@ -105,10 +105,8 @@ def set_weights(nodes,data,interp_maps=False):
         name = node.get_name()
 
         for mp in maps:
-            #print attr
-            
             mapData = data.get_data_by_key_name('map',mp)
-            meshData = data.get_data_by_key_name('mesh',mapData.get_mesh())
+            meshData = data.get_data_by_key_name('mesh',mapData.get_mesh(longName=True))
             
             mname= meshData.get_name(longName=True)
             mnameShort = meshData.get_name(longName=False)
