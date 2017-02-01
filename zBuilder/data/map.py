@@ -31,8 +31,16 @@ class Map(object):
     def set_mesh(self,mesh):
         self._mesh = mesh   
 
-    def get_mesh(self):
-        return self._mesh
+    def get_mesh(self,longName=False):
+        if self._mesh:
+            if longName:
+                return self._mesh
+            else:
+                return self._mesh.split('|')[-1]
+        else:
+            return None
+
+
 
     def set_value(self,value):
         #print value
@@ -60,14 +68,33 @@ class Map(object):
     #     return self.__str__()
 
 def replace_longname(search,replace,longName):
+    '''
+    does a search and replace on a long name.  It splits it up by ('|') then
+    performs it on each piece
+
+    Args:
+        search (str): search term
+        replace (str): replace term
+        longName (str): the long name to perform action on
+
+    returns:
+        str: result of search and replace
+    '''
     items = longName.split('|')
     newName = ''
     for i in items:
         if i:
             i = re.sub(search, replace,i)
-            newName+='|'+i
+            if '|' in longName:
+                newName+='|'+i
+            else:
+                newName += i
+
+    if newName != longName:
+        logger.info('replacing name: {}  {}'.format(longName,newName))
 
     return newName
+
 
 
 

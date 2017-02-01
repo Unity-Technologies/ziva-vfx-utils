@@ -372,7 +372,13 @@ def replace_longname(search,replace,longName):
     for i in items:
         if i:
             i = re.sub(search, replace,i)
-            newName+='|'+i
+            if '|' in longName:
+                newName+='|'+i
+            else:
+                newName += i
+
+    if newName != longName:
+        logger.info('replacing name: {}  {}'.format(longName,newName))
 
     return newName
 

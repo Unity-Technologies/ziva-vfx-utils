@@ -173,27 +173,52 @@ def get_association(zNode):
 
 def rename_ziva_nodes():
     sel = mc.ls(sl=True)
-    select_tissue_meshes()
-    bodies = mc.ls(sl=True)
-    for body in bodies:
-        tissue = get_zTissues(body)[0]
-        mc.rename(tissue,body+'_zTissue')
+    solver = mm.eval('zQuery -t "zSolver"')
 
-        tet = get_zTets(body)[0]
-        mc.rename(tet,body+'_zTet')
+    tissues = mm.eval('zQuery -t "zTissue" {}'.format(solver[0]))
+    tets = mm.eval('zQuery -t "zTet" {}'.format(solver[0]))
+    materials = mm.eval('zQuery -t "zMaterial" {}'.format(solver[0]))
+    fibers = mm.eval('zQuery -t "zFiber" {}'.format(solver[0]))
+    attachments = mm.eval('zQuery -t "zAttachment" {}'.format(solver[0]))
 
-        for material in get_zMaterials(body):
-            mc.rename(material,body+'_zMaterial')
+    for tissue in tissues:
+        mc.select(tissue,r=True)
+        mesh = mm.eval('zQuery -t "zTissue" -m')[0]
+        if tissue != '{}_zTissue'.format(mesh):
+            mc.rename(tissue,'{}_zTissue'.format(mesh))
+            print 'rename: ',tissue,'{}_zTissue'.format(mesh)
 
-        for fiber in get_zFibers(body):
-            mc.rename(fiber,body+'_zFiber')
+    for tet in tets:
+        mc.select(tet,r=True)
+        mesh = mm.eval('zQuery -t "zTet" -m')[0]
+        if tet != '{}_zTet'.format(mesh):
+            mc.rename(tet,'{}_zTet'.format(mesh))
+            print 'rename: ',tet,'{}_zTet'.format(mesh)
 
-        for attachment in get_zAttachments(body):
-            s = mm.eval('zQuery -as ' +attachment)
-            t = mm.eval('zQuery -at ' +attachment)
-            mc.rename(attachment,s+'_'+t+'_zAttachment')
+    for material in materials:
+        mc.select(material,r=True)
+        mesh = mm.eval('zQuery -t "zMaterial" -m')[0]
+        if material != '{}_zMaterial'.format(mesh):
+            mc.rename(material,'{}_zMaterial'.format(mesh))
+            print 'rename: ',material,'{}_zMaterial'.format(mesh)
 
+    for fiber in fibers:
+        mc.select(fiber,r=True)
+        mesh = mm.eval('zQuery -t "zFiber" -m')[0]
+        if fiber != '{}_zFiber'.format(mesh):
+            mc.rename(fiber,'{}_zFiber'.format(mesh))
+            print 'rename: ',fiber,'{}_zFiber'.format(mesh)
+
+    for attachment in attachments:
+        s = mm.eval('zQuery -as ' +attachment)[0]
+        t = mm.eval('zQuery -at ' +attachment)[0]
+        if attachment != s+'__'+t+'_zAttachment':
+            mc.rename(attachment,s+'__'+t+'_zAttachment')
+
+
+    print 'finished renaming.... '
     mc.select(sel,r=True)
+
 
 
 def select_tissue_meshes():

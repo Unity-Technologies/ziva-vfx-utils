@@ -68,10 +68,16 @@ class BaseNode(object):
         #maps-------------------------------------------------------------------
 
         maps = self.get_maps()
-        for key in maps:
-            if maps[key].get('mesh',None):
-                maps[key]['mesh'] = replace_longname(search,replace,maps[key]['mesh'])
-                #print 'hmm',self.get_name(),maps[key]
+        tmp = []
+        if maps:
+            for item in maps:
+                tmp.append(replace_longname(search,replace,item))
+            self.set_maps(tmp)
+
+        #for key in maps:
+        #    if maps[key].get('mesh',None):
+        #        maps[key]['mesh'] = replace_longname(search,replace,maps[key]['mesh'])
+        #        #print 'hmm',self.get_name(),maps[key]
 
 
     def get_attr_value(self,attr):
@@ -208,7 +214,8 @@ def replace_longname(search,replace,longName):
         if i:
             i = re.sub(search, replace,i)
             newName+='|'+i
-
+    if newName != longName:
+        logger.info('replacing name: {}  {}'.format(longName,newName))
     return newName
 
 
