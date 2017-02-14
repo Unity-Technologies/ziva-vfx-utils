@@ -2,8 +2,9 @@ import re
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
+import logging
 
-
+logger = logging.getLogger(__name__)
 
 class Mesh(object):
     def __init__(self):

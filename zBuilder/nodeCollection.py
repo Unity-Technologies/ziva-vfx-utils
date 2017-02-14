@@ -48,9 +48,11 @@ class NodeCollection(object):
         for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
 
             node.print_()
-
+        print '-----------------------------------------------------------------'
         if print_data: 
-            print 'data - mesh: ',self.data['mesh'].keys()
+            for key in self.data:
+                print 'data - {}: {}'.format(key,self.data[key].keys())
+            #print 'data - mesh: ',self.data['mesh'].keys()
 
     def compare(self,type_filter=None,node_filter=None):
 
@@ -106,7 +108,7 @@ class NodeCollection(object):
 
         if not self.get_data_by_key_name(key,name):
             self.data[key][name] = data
-            #logger.debug("adding data type: {}  name: {}".format(key,name) ) 
+            logger.info("adding data type: {}  name: {}".format(key,name) ) 
 
 
 

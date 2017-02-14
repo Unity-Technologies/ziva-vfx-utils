@@ -2,7 +2,9 @@ from base import BaseNode
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
+import logging
 
+logger = logging.getLogger(__name__)
 
 class EmbedderNode(BaseNode):
     def __init__(self):
@@ -55,13 +57,32 @@ class EmbedderNode(BaseNode):
 
 
 
+
 def replace_longname(search,replace,longName):
+    '''
+    does a search and replace on a long name.  It splits it up by ('|') then
+    performs it on each piece
+
+    Args:
+        search (str): search term
+        replace (str): replace term
+        longName (str): the long name to perform action on
+
+    returns:
+        str: result of search and replace
+    '''
     items = longName.split('|')
     newName = ''
     for i in items:
         if i:
             i = re.sub(search, replace,i)
-            newName+='|'+i
+            if '|' in longName:
+                newName+='|'+i
+            else:
+                newName += i
+
+    if newName != longName:
+        logger.info('replacing name: {}  {}'.format(longName,newName))
 
     return newName
 

@@ -220,6 +220,7 @@ class ZivaSetup(nc.NodeCollection):
                     mapName = '{}.{}'.format(zNode,mp)
                     mapData = mps.get_map_data(zNode,mp,ms)
                     self.add_data('map',mapName,data=mapData)
+
                     maps.append(mapName)
 
                 node.set_maps(maps)

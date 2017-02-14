@@ -5,8 +5,6 @@ import maya.OpenMaya as om
 
 import logging
 
-
-
 logger = logging.getLogger(__name__)
 
 class Map(object):
@@ -32,6 +30,7 @@ class Map(object):
         self._mesh = mesh   
 
     def get_mesh(self,longName=False):
+
         if self._mesh:
             if longName:
                 return self._mesh
@@ -57,7 +56,7 @@ class Map(object):
 
         mesh = self.get_mesh(longName=True)
         newMesh = replace_longname(search,replace,mesh)
-        self.set_mesh(newName)
+        self.set_mesh(newMesh)
 
     # def __str__(self):
     #     if self.get_name():
@@ -80,6 +79,7 @@ def replace_longname(search,replace,longName):
     returns:
         str: result of search and replace
     '''
+
     items = longName.split('|')
     newName = ''
     for i in items:
@@ -107,7 +107,6 @@ def set_weights(nodes,data,interp_maps=False):
         for mp in maps:
             mapData = data.get_data_by_key_name('map',mp)
             meshData = data.get_data_by_key_name('mesh',mapData.get_mesh(longName=True))
-            
             mname= meshData.get_name(longName=True)
             mnameShort = meshData.get_name(longName=False)
             wList = mapData.get_value()
