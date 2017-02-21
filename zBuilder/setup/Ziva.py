@@ -642,9 +642,9 @@ class ZivaSetup(nc.NodeCollection):
 
         logger.info('applying embedder') 
         
-        embeddedNode = self.get_nodes(type_filter='zEmbedder')[0]
+        embeddedNode = self.get_nodes(type_filter='zEmbedder')
         if embeddedNode:
-            
+            embeddedNode = get_embedded[0]
             name = embeddedNode.get_name()
             collision_meshes = embeddedNode.get_collision_meshes()
             embedded_meshes = embeddedNode.get_embedded_meshes()
@@ -670,6 +670,5 @@ class ZivaSetup(nc.NodeCollection):
     def mirror(search,replace):
 
         self.string_replace(search,replace)
-
 
 
