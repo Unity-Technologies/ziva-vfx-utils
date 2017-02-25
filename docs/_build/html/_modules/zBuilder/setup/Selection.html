@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zBuilder.setup.Selection &#8212; zBuilder 1.0.0 documentation</title>
+    <title>zBuilder.setup.Selection &mdash; zBuilder 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,18 +14,17 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.0',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="top" title="zBuilder 0.9.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,8 +36,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -48,38 +47,37 @@
           <div class="body" role="main">
             
   <h1>Source code for zBuilder.setup.Selection</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">zBuilder.nodes.base</span> <span class="k">as</span> <span class="nn">base</span>
-<span class="kn">import</span> <span class="nn">zBuilder.nodeCollection</span> <span class="k">as</span> <span class="nn">nc</span>
-<span class="kn">import</span> <span class="nn">zBuilder.zMaya</span> <span class="k">as</span> <span class="nn">mz</span>
+<span></span><span class="kn">import</span> <span class="nn">zBuilder.nodes.base</span> <span class="kn">as</span> <span class="nn">base</span>
+<span class="kn">import</span> <span class="nn">zBuilder.nodeCollection</span> <span class="kn">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">zBuilder.zMaya</span> <span class="kn">as</span> <span class="nn">mz</span>
 
-<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="kn">as</span> <span class="nn">mc</span>
 
 <div class="viewcode-block" id="SelectionSetup"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup">[docs]</a><span class="k">class</span> <span class="nc">SelectionSetup</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SelectionSetup.retrieve_from_scene"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.retrieve_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selection</span><span class="p">):</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sel</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
             <span class="n">node</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">BaseNode</span><span class="p">()</span>
             <span class="n">node</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span>
             <span class="n">node</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">sel</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
-
+</div>
 <div class="viewcode-block" id="SelectionSetup.return_selection"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.return_selection">[docs]</a>    <span class="k">def</span> <span class="nf">return_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="n">tmp</span></div>
-
+        <span class="k">return</span> <span class="n">tmp</span>
+</div>
 <div class="viewcode-block" id="SelectionSetup.apply"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">return_selection</span><span class="p">())</span></div></div>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">return_selection</span><span class="p">())</span>
 
   
-
-</pre></div>
+</pre></div></div></div>
 
           </div>
         </div>
@@ -89,11 +87,14 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -109,13 +110,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+        &copy; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

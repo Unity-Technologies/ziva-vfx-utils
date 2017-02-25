@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zBuilder.data.map &#8212; zBuilder 1.0.0 documentation</title>
+    <title>zBuilder.data.map &mdash; zBuilder 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,18 +14,17 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.0',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="top" title="zBuilder 0.9.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,8 +36,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,13 +48,11 @@
             
   <h1>Source code for zBuilder.data.map</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
-<span class="kn">import</span> <span class="nn">maya.mel</span> <span class="k">as</span> <span class="nn">mm</span>
-<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="kn">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.mel</span> <span class="kn">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="kn">as</span> <span class="nn">om</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-
-
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
@@ -63,43 +60,52 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_class</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="bp">None</span>
 
 
-<div class="viewcode-block" id="Map.get_name"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Map.get_name"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">longName</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
-        
+            <span class="k">return</span> <span class="bp">None</span>
+        </div>
 <div class="viewcode-block" id="Map.set_name"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.set_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>   </div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>   
+</div>
 <div class="viewcode-block" id="Map.set_mesh"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.set_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">set_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mesh</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="n">mesh</span>   </div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="n">mesh</span>   
+</div>
+<div class="viewcode-block" id="Map.get_mesh"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.get_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Map.get_mesh"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.get_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">longName</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
 
+
+</div>
 <div class="viewcode-block" id="Map.set_value"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
         <span class="c1">#print value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+</div>
 <div class="viewcode-block" id="Map.get_value"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div>
-
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+</div>
 <div class="viewcode-block" id="Map.string_replace"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.Map.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
         <span class="c1"># name replace----------------------------------------------------------</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">newName</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span>
 
-        <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">newMesh</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_mesh</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_mesh</span><span class="p">(</span><span class="n">newMesh</span><span class="p">)</span>
 
     <span class="c1"># def __str__(self):</span>
     <span class="c1">#     if self.get_name():</span>
@@ -108,33 +114,50 @@
 
     <span class="c1"># def __repr__(self):</span>
     <span class="c1">#     return self.__str__()</span>
-
+</div></div>
 <div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    does a search and replace on a long name.  It splits it up by (&#39;|&#39;) then</span>
+<span class="sd">    performs it on each piece</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        search (str): search term</span>
+<span class="sd">        replace (str): replace term</span>
+<span class="sd">        longName (str): the long name to perform action on</span>
+
+<span class="sd">    returns:</span>
+<span class="sd">        str: result of search and replace</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">items</span> <span class="o">=</span> <span class="n">longName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
     <span class="n">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">replace</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+            <span class="k">if</span> <span class="s1">&#39;|&#39;</span> <span class="ow">in</span> <span class="n">longName</span><span class="p">:</span>
+                <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newName</span> <span class="o">+=</span> <span class="n">i</span>
 
-    <span class="k">return</span> <span class="n">newName</span></div>
+    <span class="k">if</span> <span class="n">newName</span> <span class="o">!=</span> <span class="n">longName</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;replacing name: {}  {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">longName</span><span class="p">,</span><span class="n">newName</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">newName</span>
 
 
 
-<div class="viewcode-block" id="set_weights"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.set_weights">[docs]</a><span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="set_weights"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.set_weights">[docs]</a><span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">interp_maps</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="c1">#TODO break down setting of weights to not use base.node</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
         <span class="n">maps</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_maps</span><span class="p">()</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
-            <span class="c1">#print attr</span>
-            
             <span class="n">mapData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="s1">&#39;map&#39;</span><span class="p">,</span><span class="n">mp</span><span class="p">)</span>
-            <span class="n">meshData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="n">mapData</span><span class="o">.</span><span class="n">get_mesh</span><span class="p">())</span>
-            
-            <span class="n">mname</span><span class="o">=</span> <span class="n">meshData</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">mnameShort</span> <span class="o">=</span> <span class="n">meshData</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">meshData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_data_by_key_name</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span><span class="n">mapData</span><span class="o">.</span><span class="n">get_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+            <span class="n">mname</span><span class="o">=</span> <span class="n">meshData</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">mnameShort</span> <span class="o">=</span> <span class="n">meshData</span><span class="o">.</span><span class="n">get_name</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="n">wList</span> <span class="o">=</span> <span class="n">mapData</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
 
@@ -151,15 +174,15 @@
 
                     <span class="c1">#print len(cur_conn[&#39;points&#39;]),len(mesh.get_point_list())</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_conn</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">meshData</span><span class="o">.</span><span class="n">get_point_list</span><span class="p">()):</span>
-                        <span class="n">interp_maps</span><span class="o">=</span><span class="kc">True</span>
+                        <span class="n">interp_maps</span><span class="o">=</span><span class="bp">True</span>
 
-                <span class="k">if</span> <span class="n">interp_maps</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;interpolating maps...</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mp</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">interp_maps</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;interpolating maps...{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mp</span><span class="p">))</span>
                     <span class="n">origMesh</span> <span class="o">=</span> <span class="n">meshData</span><span class="o">.</span><span class="n">build</span><span class="p">(</span> <span class="p">)</span>
                     <span class="n">wList</span> <span class="o">=</span> <span class="n">interpolateValues</span><span class="p">(</span><span class="n">origMesh</span><span class="p">,</span><span class="n">mnameShort</span><span class="p">,</span><span class="n">wList</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[0]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mp</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[0]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mp</span><span class="p">),</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[0]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mp</span><span class="p">),</span><span class="n">l</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
                         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
                         <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">wList</span><span class="p">:</span>
                             <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
@@ -174,12 +197,12 @@
                         <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span><span class="n">wList</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;doubleArray&#39;</span><span class="p">)</span>
                     <span class="k">except</span><span class="p">:</span>
                         <span class="k">pass</span>
-                <span class="k">if</span> <span class="n">interp_maps</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">origMesh</span><span class="p">)</span></div>
+                <span class="k">if</span> <span class="n">interp_maps</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">origMesh</span><span class="p">)</span>
 
 
 
-
+</div>
 <div class="viewcode-block" id="get_mesh_connectivity"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.get_mesh_connectivity">[docs]</a><span class="k">def</span> <span class="nf">get_mesh_connectivity</span><span class="p">(</span><span class="n">mesh_name</span><span class="p">):</span>
     
     <span class="n">space</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSpace</span><span class="o">.</span><span class="n">kWorld</span>
@@ -224,23 +247,23 @@
     <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;polygonConnects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">polygonConnectsList</span>
     <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pointList</span>
 
-    <span class="k">return</span> <span class="n">tmp</span></div>
+    <span class="k">return</span> <span class="n">tmp</span>
 
-
+</div>
 <div class="viewcode-block" id="get_weights"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.get_weights">[docs]</a><span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">mesh</span><span class="p">,</span><span class="n">attr</span><span class="p">):</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">vc</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">polyEvaluate</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vc</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">polyEvaluate</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="n">v</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">[0:</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span> <span class="n">vc</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">attr</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">value</span></div>
+    <span class="k">return</span> <span class="n">value</span>
 
 
-
+</div>
 <div class="viewcode-block" id="interpolateValues"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.interpolateValues">[docs]</a><span class="k">def</span> <span class="nf">interpolateValues</span><span class="p">(</span> <span class="n">sourceMeshName</span><span class="p">,</span> <span class="n">destinationMeshName</span><span class="p">,</span><span class="n">wList</span> <span class="p">):</span> 
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Description: </span>
@@ -305,7 +328,7 @@
 
         <span class="c1">#-----  COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP --------------- #</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span> <span class="mi">3</span> <span class="p">):</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span> <span class="mi">3</span> <span class="p">):</span> 
             <span class="n">vertexId_int</span> <span class="o">=</span> <span class="n">triangle_mIntArray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">wList</span><span class="p">[</span><span class="n">vertexId_int</span><span class="p">]</span> <span class="p">)</span>
         <span class="c1">#--------- COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP ------------ #</span>
@@ -324,18 +347,18 @@
         <span class="n">destinationMesh_mItMeshVertex</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
     
     
-    <span class="k">return</span> <span class="n">interpolatedWeights</span>  </div>
-
+    <span class="k">return</span> <span class="n">interpolatedWeights</span>  
+</div>
 <div class="viewcode-block" id="getMDagPathFromMeshName"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.getMDagPathFromMeshName">[docs]</a><span class="k">def</span> <span class="nf">getMDagPathFromMeshName</span><span class="p">(</span> <span class="n">meshName</span> <span class="p">):</span> 
     <span class="n">mesh_mDagPath</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
     <span class="n">selList</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
     <span class="n">selList</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">meshName</span> <span class="p">)</span>
     <span class="n">selList</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mesh_mDagPath</span> <span class="p">)</span>
     
-    <span class="k">return</span> <span class="n">mesh_mDagPath</span></div>
-
+    <span class="k">return</span> <span class="n">mesh_mDagPath</span>
+</div>
 <div class="viewcode-block" id="get_map_data"><a class="viewcode-back" href="../../../zBuilder.data.html#zBuilder.data.map.get_map_data">[docs]</a><span class="k">def</span> <span class="nf">get_map_data</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span><span class="n">attr</span><span class="p">,</span><span class="n">mesh</span> <span class="p">):</span>
-    <span class="n">mapName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
+    <span class="n">mapName</span> <span class="o">=</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">get_weights</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">mesh</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">Map</span><span class="p">()</span>
     <span class="n">m</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">mapName</span><span class="p">)</span>
@@ -352,11 +375,14 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -372,13 +398,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+        &copy; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

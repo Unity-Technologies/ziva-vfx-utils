@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zBuilder.zMaya &#8212; zBuilder 1.0.0 documentation</title>
+    <title>zBuilder.zMaya &mdash; zBuilder 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,18 +14,17 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.0.0',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="top" title="zBuilder 0.9.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,8 +36,8 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -48,9 +47,9 @@
           <div class="body" role="main">
             
   <h1>Source code for zBuilder.zMaya</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
-<span class="kn">import</span> <span class="nn">maya.mel</span> <span class="k">as</span> <span class="nn">mm</span>
-<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
+<span></span><span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="kn">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.mel</span> <span class="kn">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="kn">as</span> <span class="nn">om</span>
 
 
 
@@ -74,47 +73,56 @@
         <span class="s1">&#39;zCacheTransform&#39;</span><span class="p">]</span>
 
 
+<div class="viewcode-block" id="create_zBone"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.create_zBone">[docs]</a><span class="k">def</span> <span class="nf">create_zBone</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;ziva -b&#39;</span><span class="p">)</span>
+    <span class="n">mobjs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="n">mobjs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getDependNode</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">mobjs</span>
+
+</div>
 <div class="viewcode-block" id="get_type"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_type">[docs]</a><span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">objectType</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">pass</span></div>
-    
+        <span class="k">pass</span>
+    </div>
 <div class="viewcode-block" id="clean_scene"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.clean_scene">[docs]</a><span class="k">def</span> <span class="nf">clean_scene</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ZNODES</span><span class="p">:</span>
         <span class="n">in_scene</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_scene</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">in_scene</span><span class="p">)</span></div>
-
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">in_scene</span><span class="p">)</span>
+</div>
 <div class="viewcode-block" id="get_zSolver"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zSolver">[docs]</a><span class="k">def</span> <span class="nf">get_zSolver</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolver&quot; -l&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">solver</span></div>
-
+    <span class="k">return</span> <span class="n">solver</span>
+</div>
 <div class="viewcode-block" id="get_zSolverTransform"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zSolverTransform">[docs]</a><span class="k">def</span> <span class="nf">get_zSolverTransform</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolverTransform&quot; -l&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">solver</span></div>
-
+    <span class="k">return</span> <span class="n">solver</span>
+</div>
 <div class="viewcode-block" id="get_zAttachments"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zAttachments">[docs]</a><span class="k">def</span> <span class="nf">get_zAttachments</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">attachments</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t zAttachment&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">attachments</span><span class="p">:</span>
         <span class="c1">#todo remove duplicates while mainiting order</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">attachments</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
-
+        <span class="k">return</span> <span class="p">[]</span>
+</div>
 <div class="viewcode-block" id="isSolver"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.isSolver">[docs]</a><span class="k">def</span> <span class="nf">isSolver</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
-    <span class="n">isSolver</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">isSolver</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objectType</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;zSolver&#39;</span> <span class="ow">or</span> <span class="n">mc</span><span class="o">.</span><span class="n">objectType</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;zSolverTransform&#39;</span><span class="p">:</span>
-            <span class="n">isSolver</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">isSolver</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">continue</span>
-    <span class="k">return</span> <span class="n">isSolver</span></div>
-
+    <span class="k">return</span> <span class="n">isSolver</span>
+</div>
 <div class="viewcode-block" id="get_zBones"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zBones">[docs]</a><span class="k">def</span> <span class="nf">get_zBones</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
-    <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">isSolver</span><span class="p">(</span><span class="n">sel</span><span class="p">):</span>
         <span class="n">bones</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t zBone&#39;</span><span class="p">)</span>
@@ -129,66 +137,66 @@
             <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">:</span>
                 <span class="n">mesh1</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -as -l &quot;&#39;</span><span class="o">+</span><span class="n">attachment</span><span class="o">+</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
                 <span class="n">mesh2</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -at -l &quot;&#39;</span><span class="o">+</span><span class="n">attachment</span><span class="o">+</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
-                <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">mesh1</span><span class="p">,</span><span class="n">mesh2</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">mesh1</span><span class="p">,</span><span class="n">mesh2</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zBone&quot;&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">tmp</span><span class="p">:</span>
                     <span class="n">bones</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 
         <span class="c1">#mc.select(bodies,r=True)</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bones</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">bones</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span></div>
-
+            <span class="k">return</span> <span class="p">[]</span>
+</div>
 <div class="viewcode-block" id="get_zTets"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zTets">[docs]</a><span class="k">def</span> <span class="nf">get_zTets</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">zTets</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTet&quot;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zTets</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">zTets</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
+        <span class="k">return</span> <span class="p">[]</span>
 
 
-
+</div>
 <div class="viewcode-block" id="get_zTissues"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zTissues">[docs]</a><span class="k">def</span> <span class="nf">get_zTissues</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">zTissues</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zTissues</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">zTissues</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
-
+        <span class="k">return</span> <span class="p">[]</span>
+</div>
 <div class="viewcode-block" id="get_zMaterials"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zMaterials">[docs]</a><span class="k">def</span> <span class="nf">get_zMaterials</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Gets zMaterial nodes given a mesh</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">zMaterial</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zMaterial&quot;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zMaterial</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">zMaterial</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
-
+        <span class="k">return</span> <span class="p">[]</span>
+</div>
 <div class="viewcode-block" id="get_zFibers"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zFibers">[docs]</a><span class="k">def</span> <span class="nf">get_zFibers</span><span class="p">(</span><span class="n">bodies</span><span class="p">):</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">bodies</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">zFibers</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zFiber&quot;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zFibers</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">zFibers</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
+        <span class="k">return</span> <span class="p">[]</span>
 
 
-
+</div>
 <div class="viewcode-block" id="get_zTet_user_mesh"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_zTet_user_mesh">[docs]</a><span class="k">def</span> <span class="nf">get_zTet_user_mesh</span><span class="p">(</span><span class="n">zNode</span><span class="p">):</span>
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="n">zNode</span><span class="o">+</span><span class="s1">&#39;.iTet&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mesh</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">l</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">mesh</span></div>
+        <span class="k">return</span> <span class="n">mesh</span>
 
 
-
+</div>
 <div class="viewcode-block" id="get_association"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.get_association">[docs]</a><span class="k">def</span> <span class="nf">get_association</span><span class="p">(</span><span class="n">zNode</span><span class="p">):</span>
     <span class="c1">#sel = mc.ls(sl=True)</span>
     <span class="n">_type</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">objectType</span><span class="p">(</span><span class="n">zNode</span><span class="p">)</span>
@@ -206,50 +214,86 @@
 
         <span class="n">nope</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span><span class="s1">&#39;zSolver&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">_type</span> <span class="ow">in</span> <span class="n">nope</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">mesh</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">mesh</span></div>
+            <span class="k">return</span> <span class="n">mesh</span>
 
-
+</div>
 <div class="viewcode-block" id="rename_ziva_nodes"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.rename_ziva_nodes">[docs]</a><span class="k">def</span> <span class="nf">rename_ziva_nodes</span><span class="p">():</span>
-    <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">select_tissue_meshes</span><span class="p">()</span>
-    <span class="n">bodies</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">body</span> <span class="ow">in</span> <span class="n">bodies</span><span class="p">:</span>
-        <span class="n">tissue</span> <span class="o">=</span> <span class="n">get_zTissues</span><span class="p">(</span><span class="n">body</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tissue</span><span class="p">,</span><span class="n">body</span><span class="o">+</span><span class="s1">&#39;_zTissue&#39;</span><span class="p">)</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolver&quot;&#39;</span><span class="p">)</span>
 
-        <span class="n">tet</span> <span class="o">=</span> <span class="n">get_zTets</span><span class="p">(</span><span class="n">body</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span><span class="n">body</span><span class="o">+</span><span class="s1">&#39;_zTet&#39;</span><span class="p">)</span>
+    <span class="n">tissues</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solver</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">tets</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTet&quot; {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solver</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">materials</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zMaterial&quot; {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solver</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">fibers</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zFiber&quot; {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solver</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">attachments</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zAttachment&quot; {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solver</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-        <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">get_zMaterials</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
-            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">material</span><span class="p">,</span><span class="n">body</span><span class="o">+</span><span class="s1">&#39;_zMaterial&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tissue</span> <span class="ow">in</span> <span class="n">tissues</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">tissue</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tissue</span> <span class="o">!=</span> <span class="s1">&#39;{}_zTissue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tissue</span><span class="p">,</span><span class="s1">&#39;{}_zTissue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s1">&#39;rename: &#39;</span><span class="p">,</span><span class="n">tissue</span><span class="p">,</span><span class="s1">&#39;{}_zTissue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">fiber</span> <span class="ow">in</span> <span class="n">get_zFibers</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
-            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">fiber</span><span class="p">,</span><span class="n">body</span><span class="o">+</span><span class="s1">&#39;_zFiber&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tet</span> <span class="ow">in</span> <span class="n">tets</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTet&quot; -m&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tet</span> <span class="o">!=</span> <span class="s1">&#39;{}_zTet&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tet</span><span class="p">,</span><span class="s1">&#39;{}_zTet&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s1">&#39;rename: &#39;</span><span class="p">,</span><span class="n">tet</span><span class="p">,</span><span class="s1">&#39;{}_zTet&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">get_zAttachments</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -as &#39;</span> <span class="o">+</span><span class="n">attachment</span><span class="p">)</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -at &#39;</span> <span class="o">+</span><span class="n">attachment</span><span class="p">)</span>
-            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">attachment</span><span class="p">,</span><span class="n">s</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;_zAttachment&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">materials</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">material</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zMaterial&quot; -m&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">material</span> <span class="o">!=</span> <span class="s1">&#39;{}_zMaterial&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">material</span><span class="p">,</span><span class="s1">&#39;{}_zMaterial&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s1">&#39;rename: &#39;</span><span class="p">,</span><span class="n">material</span><span class="p">,</span><span class="s1">&#39;{}_zMaterial&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
 
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">for</span> <span class="n">fiber</span> <span class="ow">in</span> <span class="n">fibers</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fiber</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zFiber&quot; -m&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">fiber</span> <span class="o">!=</span> <span class="s1">&#39;{}_zFiber&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">fiber</span><span class="p">,</span><span class="s1">&#39;{}_zFiber&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s1">&#39;rename: &#39;</span><span class="p">,</span><span class="n">fiber</span><span class="p">,</span><span class="s1">&#39;{}_zFiber&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -as &#39;</span> <span class="o">+</span><span class="n">attachment</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -at &#39;</span> <span class="o">+</span><span class="n">attachment</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">attachment</span> <span class="o">!=</span> <span class="n">s</span><span class="o">+</span><span class="s1">&#39;__&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;_zAttachment&#39;</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">attachment</span><span class="p">,</span><span class="n">s</span><span class="o">+</span><span class="s1">&#39;__&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;_zAttachment&#39;</span><span class="p">)</span>
 
 
+    <span class="k">print</span> <span class="s1">&#39;finished renaming.... &#39;</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+</div>
 <div class="viewcode-block" id="select_tissue_meshes"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.select_tissue_meshes">[docs]</a><span class="k">def</span> <span class="nf">select_tissue_meshes</span><span class="p">():</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">meshes</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">)</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">meshes</span><span class="p">)</span></div>
+    <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">meshes</span><span class="p">)</span>
     
 
+</div>
+<div class="viewcode-block" id="getDependNode"><a class="viewcode-back" href="../../zBuilder.html#zBuilder.zMaya.getDependNode">[docs]</a><span class="k">def</span> <span class="nf">getDependNode</span><span class="p">(</span><span class="n">nodeName</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get an MObject (depend node) for the associated node name</span>
 
+<span class="sd">    :Parameters:</span>
+<span class="sd">        nodeName</span>
+<span class="sd">            String representing the node</span>
+<span class="sd">    </span>
+<span class="sd">    :Return: depend node (MObject)</span>
 
-
-
-
-
-</pre></div>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dependNode</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+    <span class="n">selList</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">selList</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">nodeName</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">selList</span><span class="o">.</span><span class="n">length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="n">selList</span><span class="o">.</span><span class="n">getDependNode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dependNode</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dependNode</span>
+</pre></div></div>
 
           </div>
         </div>
@@ -259,11 +303,14 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -279,13 +326,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+        &copy; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

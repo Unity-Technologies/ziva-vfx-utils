@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zBuilder.setup &#8212; zBuilder 1.0.0 documentation</title>
+    <title>zBuilder.setup &mdash; zBuilder 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,18 +14,17 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0.0',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="zBuilder 0.9.1 documentation" href="index.html" />
+    <link rel="up" title="zBuilder.nodeCollection" href="zBuilder.html" />
     <link rel="next" title="zBuilder.data package" href="zBuilder.data.html" />
     <link rel="prev" title="zBuilder.nodeCollection" href="zBuilder.html" /> 
   </head>
@@ -45,9 +44,9 @@
         <li class="right" >
           <a href="zBuilder.html" title="zBuilder.nodeCollection"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="zBuilder.html" accesskey="U">zBuilder.nodeCollection</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="zBuilder.html" accesskey="U">zBuilder.nodeCollection</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -66,12 +65,12 @@
 <dd><p>Bases: <a class="reference internal" href="zBuilder.html#zBuilder.nodeCollection.NodeCollection" title="zBuilder.nodeCollection.NodeCollection"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.nodeCollection.NodeCollection</span></code></a></p>
 <dl class="method">
 <dt id="zBuilder.setup.Attributes.AttributesSetup.apply">
-<code class="descname">apply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/Attributes.html#AttributesSetup.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Attributes.AttributesSetup.apply" title="Permalink to this definition">¶</a></dt>
+<code class="descname">apply</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#zBuilder.setup.Attributes.AttributesSetup.apply" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.setup.Attributes.AttributesSetup.retrieve_from_scene">
-<code class="descname">retrieve_from_scene</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/Attributes.html#AttributesSetup.retrieve_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Attributes.AttributesSetup.retrieve_from_scene" title="Permalink to this definition">¶</a></dt>
+<code class="descname">retrieve_from_scene</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#zBuilder.setup.Attributes.AttributesSetup.retrieve_from_scene" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -100,7 +99,7 @@
 
 <dl class="method">
 <dt id="zBuilder.setup.Constraints.ConstraintsSetup.retrieve_from_scene">
-<code class="descname">retrieve_from_scene</code><span class="sig-paren">(</span><em>selection</em>, <em>hi=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/Constraints.html#ConstraintsSetup.retrieve_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Constraints.ConstraintsSetup.retrieve_from_scene" title="Permalink to this definition">¶</a></dt>
+<code class="descname">retrieve_from_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/Constraints.html#ConstraintsSetup.retrieve_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Constraints.ConstraintsSetup.retrieve_from_scene" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -188,18 +187,21 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/zBuilder.setup.rst.txt"
+      <li><a href="_sources/zBuilder.setup.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -221,14 +223,14 @@
         <li class="right" >
           <a href="zBuilder.html" title="zBuilder.nodeCollection"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="zBuilder.html" >zBuilder.nodeCollection</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >zBuilder</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="zBuilder.html" >zBuilder.nodeCollection</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+        &copy; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

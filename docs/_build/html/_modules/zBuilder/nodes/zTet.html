@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>zBuilder.nodes.zTet &#8212; zBuilder 1.0.0 documentation</title>
+    <title>zBuilder.nodes.zTet &mdash; zBuilder 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,18 +14,17 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.0',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="top" title="zBuilder 0.9.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,8 +36,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -48,56 +47,77 @@
           <div class="body" role="main">
             
   <h1>Source code for zBuilder.nodes.zTet</h1><div class="highlight"><pre>
-<span></span>
-<span class="kn">from</span> <span class="nn">base</span> <span class="k">import</span> <span class="n">BaseNode</span>
+<span></span><span class="kn">from</span> <span class="nn">base</span> <span class="kn">import</span> <span class="n">BaseNode</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<div class="viewcode-block" id="TetNode"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode">[docs]</a><span class="k">class</span> <span class="nc">TetNode</span><span class="p">(</span><span class="n">BaseNode</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">TetNode</span><span class="p">(</span><span class="n">BaseNode</span><span class="p">):</span>
+<div class="viewcode-block" id="TetNode"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">BaseNode</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="TetNode.set_user_tet_mesh"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.set_user_tet_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">set_user_tet_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mesh</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span> <span class="o">=</span> <span class="n">mesh</span></div>
+    <span class="k">def</span> <span class="nf">set_user_tet_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mesh</span><span class="p">):</span>
+<div class="viewcode-block" id="TetNode.set_user_tet_mesh"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.set_user_tet_mesh">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span> <span class="o">=</span> <span class="n">mesh</span>
 
-<div class="viewcode-block" id="TetNode.get_user_tet_mesh"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.get_user_tet_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_user_tet_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_user_tet_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">longName</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span></div>
+<div class="viewcode-block" id="TetNode.get_user_tet_mesh"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.get_user_tet_mesh">[docs]</a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">longName</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_tet_mesh</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
+            <span class="k">return</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="TetNode.print_"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TetNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">print_</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="nb">print</span> <span class="s1">&#39;User_Tet_Mesh: &#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="TetNode.print_"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.print_">[docs]</a>        <span class="nb">super</span><span class="p">(</span><span class="n">TetNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">print_</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s1">&#39;User_Tet_Mesh: &#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TetNode.string_replace"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.string_replace">[docs]</a>    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TetNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">string_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">):</span></div>
+<div class="viewcode-block" id="TetNode.string_replace"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.TetNode.string_replace">[docs]</a>        <span class="nb">super</span><span class="p">(</span><span class="n">TetNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
 
         <span class="c1"># name replace----------------------------------------------------------</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_tet_mesh</span><span class="p">(</span><span class="n">longName</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
             <span class="n">newName</span> <span class="o">=</span> <span class="n">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_user_tet_mesh</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_user_tet_mesh</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span>
 
 
 
 
 
-<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.replace_longname">[docs]</a><span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">replace_longname</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">,</span><span class="n">longName</span><span class="p">):</span></div></div>
+<div class="viewcode-block" id="replace_longname"><a class="viewcode-back" href="../../../zBuilder.nodes.html#zBuilder.nodes.zTet.replace_longname">[docs]</a>    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    does a search and replace on a long name.  It splits it up by (&#39;|&#39;) then</span>
+<span class="sd">    performs it on each piece</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        search (str): search term</span>
+<span class="sd">        replace (str): replace term</span>
+<span class="sd">        longName (str): the long name to perform action on</span>
+
+<span class="sd">    returns:</span>
+<span class="sd">        str: result of search and replace</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">longName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
     <span class="n">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">replace</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+            <span class="k">if</span> <span class="s1">&#39;|&#39;</span> <span class="ow">in</span> <span class="n">longName</span><span class="p">:</span>
+                <span class="n">newName</span><span class="o">+=</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newName</span> <span class="o">+=</span> <span class="n">i</span>
 
-    <span class="k">return</span> <span class="n">newName</span></div>
-</pre></div>
+    <span class="k">if</span> <span class="n">newName</span> <span class="o">!=</span> <span class="n">longName</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;replacing name: {}  {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">longName</span><span class="p">,</span><span class="n">newName</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">newName</span>
+</pre></div></div>
 
           </div>
         </div>
@@ -107,11 +127,14 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -127,13 +150,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.
+        &copy; Copyright 2016, Ziva Dynamics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>
