@@ -22,15 +22,20 @@ class NodeCollection(object):
     '''
     This is an object that holds the node data in a list
     '''
+
+    
     def __init__(self):
+        #__version__ = '0.9.1'
+        import zBuilder
+        
         self.collection = []
         self.data = {} #: DATTTTA
         self.info = {}
-        self.info['data_version'] = .1
+        self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
-
+        
 
 
 
