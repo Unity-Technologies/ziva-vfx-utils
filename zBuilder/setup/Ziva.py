@@ -284,11 +284,14 @@ class ZivaSetup(nc.NodeCollection):
             fibers=True,embedder=True,permisive=True):
 
         '''
-        appends a mesh to the mesh list
 
         Args:
-            node_filter (str): places data in this key in dict.
-            attr_filter (str): name of data to place.
+            attr_filter (dict):  Attribute filter on what attributes to get. 
+                dictionary is key value where key is node type and value is 
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            node_filter (str): filter by node name.  Defaults to **None**
         '''
 
         sel = mc.ls(sl=True)
