@@ -6,6 +6,12 @@ import maya.cmds as mc
 import maya.mel as mm
 from maya import OpenMaya as om
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+
 icons = {}
 icons['zBone'] =            'icons\\zBone.xpm'
 icons['close'] =            'icons\\Fileclose.xpm'
@@ -27,11 +33,12 @@ class MCallbackIdWrapper(object):
     def __init__(self, callbackId):
         super(MCallbackIdWrapper, self).__init__()
         self.callbackId = callbackId
-        #print 'creating ',self.callbackId
+        #logger.info( 'creating callback: {}'.format(self.callbackId) )   
 
     def __del__(self):
+        #logger.info( 'deleting callback: {}'.format(self.callbackId) )  
         om.MMessage.removeCallback(self.callbackId)
-        #print 'deleting ',self.callbackId
+        
 
     def __repr__(self):
         return 'MCallbackIdWrapper(%r)'%self.callbackId
@@ -40,6 +47,7 @@ class MCallbackIdWrapper(object):
 class Properties(QtGui.QTableWidget):
     def __init__(self, parent=None):
         super(Properties, self).__init__(parent)
+        logger.info( 'instantiated: {}'.format(self) )    
         self.parent = parent
 
         self.nodeCallbacks = {}            # Node callbacks for handling attr value changes
@@ -88,6 +96,8 @@ class Properties(QtGui.QTableWidget):
         #self.ignore_updates(True)
 
         self.blockSignals(True)
+        self.__block = True
+
         self.setUpdatesEnabled(False)
         self.nodeCallbacks.clear()
         self.attrWidgets.clear()
@@ -198,6 +208,8 @@ class Properties(QtGui.QTableWidget):
                 cb = om.MNodeMessage.addNodeDirtyPlugCallback(nodeObj, self.onDirtyPlug, None)
                 self.nodeCallbacks[name] = MCallbackIdWrapper(cb)
         self.blockSignals(False)
+        self.__block = False
+
         self.setUpdatesEnabled(True)
         #self.ignore_updates(False)
         #print 'prop:set_properties-finished'
@@ -237,26 +249,33 @@ class Properties(QtGui.QTableWidget):
 
         #print 'prop:_set_widget_value-started'
         self.setUpdatesEnabled(False)
-        self.blockSignals(True)
+        #self.blockSignals(True)
+        #self.__block = True
         #self.disconnect()
 
         if _type == 'bool':
             if value == True:
                 widget.setCheckState(QtCore.Qt.Checked)
+                logger.info( 'setting widget {} {}'.format(widget,value) ) 
             else:
                 widget.setCheckState(QtCore.Qt.Unchecked)
+                logger.info( 'setting widget {} {}'.format(widget,value) ) 
         elif _type == 'enum':
             value = mc.getAttr(nodeAttr,asString=True)
             widget.setText(str(value))
+            logger.info( 'setting widget {} {}'.format(widget,value) ) 
             #print 'setting widget enum: ',value
         elif _type == 'weight':
             print 'passing weight'
             pass
         else:
             widget.setText(str(value))
+            logger.info( 'setting widget {} {}'.format(widget,value) ) 
 
-        self.blockSignals(False)
+        #self.blockSignals(False)
+        #self.__block = False
         self.setUpdatesEnabled(True)
+
         #print nodeAttr
         #print 'prop:_set_widget_value-finished'
         #self.cellChanged.connect( self.onSetAttr )
@@ -305,56 +324,59 @@ class Properties(QtGui.QTableWidget):
         '''Handle setting the attribute when the UI widget edits the value for it.
         If it fails to set the value, then restore the original value to the UI widget
         '''
-        self.blockSignals(True)
-        
 
+        if not self.__block:
+            #-NAME CHANGE-----------------------------------------------------------
+            # if args[1] is 0 it is first column and therefore a name change
+            if args[1] == 0:
+                item = self.item(args[0],args[1])
+                lname = self._get_name_from_item_data(item,fullPath=True)
 
-        #-NAME CHANGE-----------------------------------------------------------
-        # if args[1] is 0 it is first column and therefore a name change
-        if args[1] == 0:
-            item = self.item(args[0],args[1])
-            lname = self._get_name_from_item_data(item,fullPath=True)
+                if lname:
+                    mc.rename(lname,item.text())
 
-            if lname:
-                mc.rename(lname,item.text())
+            # ATTRIBUTE VALUE CHANGE------------------------------------------------
+            # if args[1] is 1 it is second column and therefore a value change
+            if args[1] == 1:
+                item = self.item(args[0],args[1])
 
-        # ATTRIBUTE VALUE CHANGE------------------------------------------------
-        # if args[1] is 1 it is second column and therefore a value change
-        if args[1] == 1:
-            item = self.item(args[0],args[1])
-
-            attrType = item.attr_type
-            attrName = item.attr_name
-            nodeName = item.node_name
-            nodeAttr = ('%s.%s' % (nodeName,attrName))
+                attrType = item.attr_type
+                attrName = item.attr_name
+                nodeName = item.node_name
+                nodeAttr = ('%s.%s' % (nodeName,attrName))
 
 
 
-            try:
-                if attrType == 'string':
-                    mc.setAttr('%s.%s'%(nodeName, attrName), item.text(), type=attrType)
-                elif attrType == 'bool':
-                    checkState = item.checkState()
-                    if checkState == 0:
-                        mc.setAttr('%s.%s'%(nodeName, attrName), 0)
-                    if checkState == 2:
-                        mc.setAttr('%s.%s'%(nodeName, attrName), 1)
-                elif attrType == 'enum':
-                    #print nodeName,attrName,'----------------------------------
-                    
-                    val = str(item.text()).strip()
-                    enum_list = self._get_enum_list(nodeName,attrName)
-                    newval = enum_list.index(val)
-                    #print 'setting maya enum: ',newval
-                    mc.setAttr('%s.%s'%(nodeName, attrName), newval)
-                elif attrType == 'weight':
-                    print 'assing weight'
-                    pass
-                else:
-                    mc.setAttr('%s.%s'%(nodeName, attrName), eval(item.text()))
-            except Exception, e:
-                curVal = mc.getAttr('%s.%s'%(nodeName, attrName))
-                self._set_widget_value(item,attrType,nodeAttr,curVal)
+                try:
+                    if attrType == 'string':
+                        mc.setAttr('%s.%s'%(nodeName, attrName), item.text(), type=attrType)
+                        logger.info( 'setting string attr {}.{}'.format(nodeName,attrName) )  
+                    elif attrType == 'bool':
+                        checkState = item.checkState()
+                        if checkState == 0:
+                            mc.setAttr('%s.%s'%(nodeName, attrName), 0)
+                        if checkState == 2:
+                            mc.setAttr('%s.%s'%(nodeName, attrName), 1)
+                        logger.info( 'setting bool attr {}.{}'.format(nodeName,attrName) )  
+                    elif attrType == 'enum':
+                        #print nodeName,attrName,'----------------------------------
+                        
+                        val = str(item.text()).strip()
+                        enum_list = self._get_enum_list(nodeName,attrName)
+                        newval = enum_list.index(val)
+                        #print 'setting maya enum: ',newval
+                        mc.setAttr('%s.%s'%(nodeName, attrName), newval)
+                        logger.info( 'setting enum attr {}.{}'.format(nodeName,attrName) ) 
+                    elif attrType == 'weight':
+                        print 'assing weight'
+                        pass
+                    else:
+                        mc.setAttr('%s.%s'%(nodeName, attrName), eval(item.text()))
+                        logger.info( 'setting attr {}.{}'.format(nodeName,attrName) ) 
+                except Exception, e:
+                    logger.info( 'Cannot set weight.  reverting {}.{}'.format(nodeName,attrName) )  
+                    curVal = mc.getAttr('%s.%s'%(nodeName, attrName))
+                    self._set_widget_value(item,attrType,nodeAttr,curVal)
 
 
             #import sys, traceback
@@ -363,7 +385,8 @@ class Properties(QtGui.QTableWidget):
             #print 'attrs before:'
             #item.attr_widget.attrs = attrs
             #print 'attrs after:'
-        self.blockSignals(False)
+        #self.blockSignals(False)
+
         #print 'prop:onSetAttr-finished'
 
     def _get_enum_list(self,node,attr):

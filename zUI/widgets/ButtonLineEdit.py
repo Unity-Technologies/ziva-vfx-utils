@@ -1,4 +1,8 @@
 from PySide import QtGui, QtCore
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ButtonLineEdit(QtGui.QLineEdit):
     #buttonClicked = QtCore.pyqtSignal(bool)
@@ -6,6 +10,7 @@ class ButtonLineEdit(QtGui.QLineEdit):
     def __init__(self, icon_file, parent=None):
         super(ButtonLineEdit, self).__init__(parent)
 
+        logger.debug( 'instantiated: {}'.format(self) )     
         self.button = QtGui.QToolButton(self)
         self.button.setIcon(QtGui.QIcon(icon_file))
         self.button.setStyleSheet('border: 0px; padding: 0px;')

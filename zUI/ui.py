@@ -18,6 +18,11 @@ import zConstants as con
 
 import zBuilder.nodes.base as bse
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 '''
 to run in maya:
 
@@ -230,6 +235,8 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.splitter1.restoreState(self.settings.value('splitter:state',self.splitter1.saveState()))
         # connect treewidget
         self.treeWidget.itemSelectionChanged.connect(self.tree_changed)
+
+        
         #self.treeWidget.itemSelectionChanged.connect(self.update_properties)
         self.line_edit.textChanged.connect(self.search_tree)
 
@@ -694,6 +701,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                 iterator += 1
 
     def _populate(self):
+        logger.info( 'populate: {}'.format(self) ) 
         nodes_to_cb = []  # storing nodes to add a delete callback
         sel = mc.ls(sl=True)
         mc.select(cl=True)
@@ -885,7 +893,8 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
     def _refresh_ui(self,*args,**kwargs):
-        print 'refresh',args,kwargs
+        logger.info( 'refresh: {} {}'.format(args,kwargs) ) 
+
         #TODO do a more selective refresh rather then brute force
         sel = mc.ls(sl=True)
         self.treeWidget.clear()
@@ -967,7 +976,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
     def _selection_changed(self,*args, **kwargs):
-        #print 'ui:_selection_changed'
+        logger.info( 'SJ: refresh deferred: ' ) 
         self.treeWidget.blockSignals(True)
         self.treeWidget.clearSelection()
 
@@ -1100,12 +1109,13 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.jobNum.append(mc.scriptJob( event= ["SceneOpened",self._refresh_ui_deferred], protected=True))
 
     def _refresh_ui_deferred(self,*args,**kwargs):
-        print 'refresh',args,kwargs
+        logger.info( 'SJ: refresh deferred: ' ) 
         mc.evalDeferred(self._refresh_ui, low=True)
 
 
 
     def _name_changed(self,*args, **kwargs):
+        logger.info( 'SJ: name changed: ' ) 
         #print 'ui:_name_changed'
         self.treeWidget.blockSignals(True)
         #iterate through all items in tree
