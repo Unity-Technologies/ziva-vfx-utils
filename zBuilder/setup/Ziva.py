@@ -644,7 +644,7 @@ class ZivaSetup(nc.NodeCollection):
         
         embeddedNode = self.get_nodes(type_filter='zEmbedder')
         if embeddedNode:
-            embeddedNode = get_embedded[0]
+            embeddedNode = embeddedNode[0]
             name = embeddedNode.get_name()
             collision_meshes = embeddedNode.get_collision_meshes()
             embedded_meshes = embeddedNode.get_embedded_meshes()
