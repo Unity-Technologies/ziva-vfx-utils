@@ -48,8 +48,8 @@ class EmbedderNode(BaseNode):
                 tmp[name.split('|')[-1]] = msh
             return tmp
 
-    def _print(self):
-        super(EmbedderNode, self)._print()
+    def print_(self):
+        super(EmbedderNode, self).print_()
         if self.get_collision_meshes(longName=True):
             print 'Collision Meshes: ',self.get_collision_meshes(longName=True)
         if self.get_embedded_meshes(longName=True):
