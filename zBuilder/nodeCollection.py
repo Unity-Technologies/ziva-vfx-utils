@@ -177,21 +177,22 @@ class NodeCollection(object):
             [] of nodes
         '''
         items = []
-        for i,node in enumerate(self.collection):
-            if type_filter:
+        if not type_filter:
+            return self.collection
+        else:
+            for i,node in enumerate(self.collection):
                 if node.get_type() == type_filter:
+
                     if node_filter:
-                        if node.get_name() == node_filter:
+                        if not isinstance(node_filter, (list, tuple)):
+                            node_filter = node_filter.split(' ')
+                        if not set(node_filter).isdisjoint(node.get_association()):
                             items.append(node)
                     else:
                         items.append(node)
-            else:
-                if node_filter:
-                    if node.get_name() == node_filter:
-                        items.append(node)
-                else:
-                    items.append(node)
         return items
+
+
 
 
     def string_replace(self,search,replace):
