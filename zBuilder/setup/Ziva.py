@@ -78,39 +78,42 @@ class ZivaSetup(nc.NodeCollection):
             raise StandardError, 'No Ziva nodes found in scene. Has a solver been created for the scene yet?'
 
         sel = mc.ls(sl=True,l=True)
-        solShape = solShape[0]
+        if solShape:
+            solShape = solShape[0]
 
-        logger.info('          getting ziva for {}'.format(solShape)) 
+            logger.info('          getting ziva for {}'.format(solShape)) 
 
-        mc.select(solShape,r=True)
-        solver = mm.eval('zQuery -t "zSolverTransform" -l')[0]
-        if attr_filter:
-            self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
-                attr_filter=attr_filter.get('zSolverTransform',None))
-            self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
-                attr_filter=attr_filter.get('zSolver',None))
-        else:
-            self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
-            self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
+            mc.select(solShape,r=True)
+            solver = mm.eval('zQuery -t "zSolverTransform" -l')[0]
+            if attr_filter:
+                self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps,
+                    attr_filter=attr_filter.get('zSolverTransform',None))
+                self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps,
+                    attr_filter=attr_filter.get('zSolver',None))
+            else:
+                self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
+                self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
 
-        type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
+            type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
 
-        for t in type_s:
-            ZNODES = mm.eval('zQuery -t "'+t+'" -l')
-            if ZNODES:
-                for zNode in ZNODES:
-                    if attr_filter:
-                        if t in attr_filter:
+            for t in type_s:
+                ZNODES = mm.eval('zQuery -t "'+t+'" -l')
+                if ZNODES:
+                    for zNode in ZNODES:
+                        if attr_filter:
+                            if t in attr_filter:
+                                self.__add_ziva_node(zNode,get_mesh=get_mesh,
+                                        attr_filter=attr_filter.get(t,None),get_maps=get_maps)
+                        else:
                             self.__add_ziva_node(zNode,get_mesh=get_mesh,
-                                    attr_filter=attr_filter.get(t,None),get_maps=get_maps)
-                    else:
-                        self.__add_ziva_node(zNode,get_mesh=get_mesh,
-                                attr_filter=None,get_maps=get_maps)
+                                    attr_filter=None,get_maps=get_maps)
 
 
 
-        self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
-        self.stats()
+            self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
+            self.stats()
+        else:
+            print 'no solver found in scene'
         mc.select(sel,r=True)
         
 
@@ -336,7 +339,7 @@ class ZivaSetup(nc.NodeCollection):
         logger.info('applying solver')  
         zSolver = self.get_nodes(type_filter='zSolver')
 
-        if zSolver:
+        if len(zSolver) > 0:
             zSolver = zSolver[0]
             zSolverTransform = self.get_nodes(type_filter='zSolverTransform')[0]
 

@@ -24,6 +24,8 @@ class AttributesSetup(nc.NodeCollection):
             node.set_attrs(nodeAttrs)
             self.add_node(node)
 
+        self.stats()
+
     @nc.time_this
     def apply(self):
         nodes = self.get_nodes()
