@@ -5,8 +5,17 @@
 
 Welcome to zBuilder's documentation!
 ====================================
+
+.. note::
+
+   This is a note!!
+
+.. warning::
+   This is a Warning!!
+
+
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
    :caption: Contents:
 
    tutorial
@@ -18,3 +27,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+

@@ -1,50 +1,132 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>zBuilder.setup.Ziva &mdash; zBuilder 0.9.1 documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '0.9.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="zBuilder 0.9.1 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zBuilder.setup.Ziva &mdash; zBuilder 0.9.3 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="zBuilder 0.9.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> zBuilder
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">zBuilder</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">zBuilder</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>zBuilder.setup.Ziva</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for zBuilder.setup.Ziva</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">zBuilder.zMaya</span> <span class="kn">as</span> <span class="nn">mz</span>
@@ -127,39 +209,42 @@
             <span class="k">raise</span> <span class="ne">StandardError</span><span class="p">,</span> <span class="s1">&#39;No Ziva nodes found in scene. Has a solver been created for the scene yet?&#39;</span>
 
         <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">solShape</span> <span class="o">=</span> <span class="n">solShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">solShape</span><span class="p">:</span>
+            <span class="n">solShape</span> <span class="o">=</span> <span class="n">solShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;          getting ziva for {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solShape</span><span class="p">))</span> 
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;          getting ziva for {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">solShape</span><span class="p">))</span> 
 
-        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolverTransform&quot; -l&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
-                <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
-                <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolver&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zSolverTransform&quot; -l&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
+                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">,</span>
+                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zSolver&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">solShape</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
-        <span class="n">type_s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zBone&#39;</span><span class="p">,</span><span class="s1">&#39;zTissue&#39;</span><span class="p">,</span><span class="s1">&#39;zTet&#39;</span><span class="p">,</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span>
+            <span class="n">type_s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zBone&#39;</span><span class="p">,</span><span class="s1">&#39;zTissue&#39;</span><span class="p">,</span><span class="s1">&#39;zTet&#39;</span><span class="p">,</span><span class="s1">&#39;zMaterial&#39;</span><span class="p">,</span><span class="s1">&#39;zFiber&#39;</span><span class="p">,</span><span class="s1">&#39;zAttachment&#39;</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">type_s</span><span class="p">:</span>
-            <span class="n">ZNODES</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;&quot; -l&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ZNODES</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">zNode</span> <span class="ow">in</span> <span class="n">ZNODES</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">type_s</span><span class="p">:</span>
+                <span class="n">ZNODES</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;&#39;</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="s1">&#39;&quot; -l&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ZNODES</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">zNode</span> <span class="ow">in</span> <span class="n">ZNODES</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">attr_filter</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">attr_filter</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
+                                        <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="bp">None</span><span class="p">),</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
-                                    <span class="n">attr_filter</span><span class="o">=</span><span class="n">attr_filter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="bp">None</span><span class="p">),</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">__add_ziva_node</span><span class="p">(</span><span class="n">zNode</span><span class="p">,</span><span class="n">get_mesh</span><span class="o">=</span><span class="n">get_mesh</span><span class="p">,</span>
-                                <span class="n">attr_filter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
+                                    <span class="n">attr_filter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">get_maps</span><span class="o">=</span><span class="n">get_maps</span><span class="p">)</span>
 
 
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_embedded_from_selection</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__retrieve_embedded_from_selection</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;zQuery -t &quot;zTissue&quot; -m&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;no solver found in scene&#39;</span>
         <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">sel</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         
 
@@ -333,11 +418,14 @@
             <span class="n">fibers</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">embedder</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">permisive</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        appends a mesh to the mesh list</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            node_filter (str): places data in this key in dict.</span>
-<span class="sd">            attr_filter (str): name of data to place.</span>
+<span class="sd">            attr_filter (dict):  Attribute filter on what attributes to get. </span>
+<span class="sd">                dictionary is key value where key is node type and value is </span>
+<span class="sd">                list of attributes to use.</span>
+
+<span class="sd">                tmp = {&#39;zSolver&#39;:[&#39;substeps&#39;]}</span>
+<span class="sd">            node_filter (str): filter by node name.  Defaults to **None**</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">sel</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -382,7 +470,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;applying solver&#39;</span><span class="p">)</span>  
         <span class="n">zSolver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zSolver&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">zSolver</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zSolver</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">zSolver</span> <span class="o">=</span> <span class="n">zSolver</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">zSolverTransform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zSolverTransform&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -693,7 +781,7 @@
         
         <span class="n">embeddedNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">(</span><span class="n">type_filter</span><span class="o">=</span><span class="s1">&#39;zEmbedder&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">embeddedNode</span><span class="p">:</span>
-            <span class="n">embeddedNode</span> <span class="o">=</span> <span class="n">get_embedded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">embeddedNode</span> <span class="o">=</span> <span class="n">embeddedNode</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">embeddedNode</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
             <span class="n">collision_meshes</span> <span class="o">=</span> <span class="n">embeddedNode</span><span class="o">.</span><span class="n">get_collision_meshes</span><span class="p">()</span>
             <span class="n">embedded_meshes</span> <span class="o">=</span> <span class="n">embeddedNode</span><span class="o">.</span><span class="n">get_embedded_meshes</span><span class="p">()</span>
@@ -721,44 +809,62 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="n">search</span><span class="p">,</span><span class="n">replace</span><span class="p">)</span>
 </pre></div></div></div>
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">zBuilder 0.9.1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
         &copy; Copyright 2016, Ziva Dynamics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
-    </div>
-  </body>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.9.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
