@@ -8,8 +8,8 @@ class SelectionSetup(nc.NodeCollection):
     def __init__(self):
         nc.NodeCollection.__init__(self)
 
-    def retrieve_from_scene(self,selection):
-        selection = mc.ls(selection,l=True)
+    def retrieve_from_scene(self):
+        selection = mc.ls(sl=True,l=True)
         for sel in selection:
             node = base.BaseNode()
             node.set_name(sel)
