@@ -59,24 +59,43 @@ class ZivaSetup(nc.NodeCollection):
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
 
     @nc.time_this
-    def retrieve_from_scene(self,attr_filter=None,get_mesh=True,get_maps=True):
+    def retrieve_from_scene(self,*args,**kwargs):
         '''
-        Retreives data from scene given any node in ziva connection:
+        Retreives data from scene given any node in ziva connection.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get. 
                 dictionary is key value where key is node type and value is 
                 list of attributes to use.
 
-                tmp = {'zSolver':['substeps']}
-
+                af = {'zSolver':['substeps']}
+            get_mesh (bool): get mesh info. Defaults to True
+            get_maps (bool): get map info. Defaults to True
         '''
+        # args
+        selection = None
+        if args:
+            if isinstance(args[0], (list, tuple)):
+                selection = args[0]
+            else:
+                selection = [args[0]]
+
+        # kwargs
+        attr_filter = kwargs.get('attr_filter',None)
+        get_mesh = kwargs.get('get_mesh',True)
+        get_maps = kwargs.get('get_maps',True)
+
         try:
-            solShape = mm.eval('zQuery -t "zSolver" -l')
+            if selection:
+                solShape = mm.eval('zQuery -t "zSolver" -l {"'+selection[0]+'"}')
+            else:
+                solShape = mm.eval('zQuery -t "zSolver" -l ')
+
         except RuntimeError, e:
             logger.exception('No Ziva nodes found in scene. Has a solver been created for the scene yet?')
             raise StandardError, 'No Ziva nodes found in scene. Has a solver been created for the scene yet?'
 
+        # get selection to re-apply it
         sel = mc.ls(sl=True,l=True)
         if solShape:
             solShape = solShape[0]
@@ -118,20 +137,53 @@ class ZivaSetup(nc.NodeCollection):
         
 
     @nc.time_this
-    def retrieve_from_scene_selection(self,connections=True,attr_filter=None,
-        solver=True,bones=True,tissues=True,attachments=True,materials=True,
-        fibers=True,embedder=True,get_mesh=True,get_maps=True):
+    def retrieve_from_scene_selection(self,*args,**kwargs):
 
         '''
-        print info on each node
+        Gets data based on selection
 
         Args:
-            type_filter (str): filter by node type.  Defaults to None
-            node_filter (str): filter by node name. Defaults to None
-            print_data (bool): prints name of data stored.  Defaults to False
+            attr_filter (dict):  Attribute filter on what attributes to get. 
+                dictionary is key value where key is node type and value is 
+                list of attributes to use.
+
+                af = {'zSolver':['substeps']}
+            connections (bool): Gets the ziva nodes connected to selection as well. Defaults to True
+            solver (bool): Gets solver data.  Defaults to True
+            bones (bool): Gets bone data.  Defaults to True
+            tissue (bool): Gets tissue data.  Defaults to True
+            attachments (bool): Gets attachments data.  Defaults to True
+            materials (bool): Gets materials data.  Defaults to True
+            fibers (bool): Gets fibers data.  Defaults to True
+            embedder (bool): Gets embedder data.  Defaults to True
+            get_mesh (bool): get mesh info. Defaults to True
+            get_maps (bool): get map info. Defaults to True
 
         '''
-        selection = mc.ls(sl=True,l=True)
+
+        # get current selection to re-apply
+        sel = mc.ls(sl=True)
+
+        # args
+        selection = None
+        if args:
+            selection = mc.ls(args[0],l=True)
+        else:
+            selection = mc.ls(sl=True,l=True)
+
+        # kwargs
+        connections = kwargs.get('connections',True)
+        attr_filter = kwargs.get('attr_filter',None)
+        solver = kwargs.get('solver',True)
+        bones = kwargs.get('bones',True)
+        tissues = kwargs.get('tissues',True)
+        attachments = kwargs.get('attachments',True)
+        materials = kwargs.get('materials',True)
+        fibers = kwargs.get('fibers',True)
+        embedder = kwargs.get('embedder',True)
+        get_mesh = kwargs.get('get_mesh',True)
+        get_maps = kwargs.get('get_maps',True)
+
 
         print '\ngetting ziva......'
 
@@ -189,6 +241,7 @@ class ZivaSetup(nc.NodeCollection):
             self.__retrieve_node_selection(selection,attr_filter=attr_filter,
                 get_mesh=get_mesh,get_maps=get_maps)
 
+        mc.select(sel,r=True)
         self.stats()
 
 
@@ -673,8 +726,8 @@ class ZivaSetup(nc.NodeCollection):
                         except:
                             pass
 
-    def mirror(search,replace):
+    # def mirror(search,replace):
 
-        self.string_replace(search,replace)
+    #     self.string_replace(search,replace)
 
 

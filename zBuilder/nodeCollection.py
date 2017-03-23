@@ -287,14 +287,14 @@ class NodeCollection(object):
 
     #
     @abc.abstractmethod
-    def apply(self):
+    def apply(self,*args,**kwargs):
         '''
         must create a method to inherit this class
         '''
         pass
 
     @abc.abstractmethod
-    def retrieve_from_scene(self,selection):
+    def retrieve_from_scene(self,*args,**kwargs):
         '''
         must create a method to inherit this class
         '''
