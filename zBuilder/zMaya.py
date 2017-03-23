@@ -25,11 +25,14 @@ ZNODES = [
 
 
 def create_zBone(bodies):
+    sel = mc.ls(sl=True)
     mc.select(bodies)
     tmp = mm.eval('ziva -b')
     mobjs = []
     for t in tmp:
         mobjs.append(getDependNode(t))
+
+    mc.select(sel,r=True)
     return mobjs
 
 
@@ -46,18 +49,24 @@ def clean_scene():
             mc.delete(in_scene)
 
 def get_zSolver(body):
+    sel = mc.ls(sl=True)
     mc.select(body,r=True)
     solver = mm.eval('zQuery -t "zSolver" -l')
+    mc.select(sel,r=True)
     return solver
 
 def get_zSolverTransform(body):
+    sel = mc.ls(sl=True)
     mc.select(body,r=True)
     solver = mm.eval('zQuery -t "zSolverTransform" -l')
+    mc.select(sel,r=True)
     return solver
 
 def get_zAttachments(bodies):
+    sel = mc.ls(sl=True)
     mc.select(bodies,r=True)
     attachments = mm.eval('zQuery -t zAttachment')
+    mc.select(sel,r=True)
     if attachments:
         #todo remove duplicates while mainiting order
         return list(set(attachments))
@@ -101,8 +110,10 @@ def get_zBones(bodies):
             return []
 
 def get_zTets(bodies):
+    sel = mc.ls(sl=True)
     mc.select(bodies,r=True)
     zTets = mm.eval('zQuery -t "zTet"')
+    mc.select(sel,r=True)
     if zTets:
         return zTets
     else:
@@ -111,8 +122,10 @@ def get_zTets(bodies):
 
 
 def get_zTissues(bodies):
+    sel = mc.ls(sl=True)
     mc.select(bodies,r=True)
     zTissues = mm.eval('zQuery -t "zTissue"')
+    mc.select(sel,r=True)
     if zTissues:
         return zTissues
     else:
@@ -122,16 +135,20 @@ def get_zMaterials(bodies):
     '''
     Gets zMaterial nodes given a mesh
     '''
+    sel = mc.ls(sl=True)
     mc.select(bodies,r=True)
     zMaterial = mm.eval('zQuery -t "zMaterial"')
+    mc.select(sel,r=True)
     if zMaterial:
         return zMaterial
     else:
         return []
 
 def get_zFibers(bodies):
+    sel = mc.ls(sl=True)
     mc.select(bodies,r=True)
     zFibers = mm.eval('zQuery -t "zFiber"')
+    mc.select(sel,r=True)
     if zFibers:
         return zFibers
     else:
