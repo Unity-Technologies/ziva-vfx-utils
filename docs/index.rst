@@ -6,12 +6,6 @@
 Welcome to zBuilder's documentation!
 ====================================
 
-.. note::
-
-   This is a note!!
-
-.. warning::
-   This is a Warning!!
 
 
 .. toctree::
@@ -19,7 +13,10 @@ Welcome to zBuilder's documentation!
    :caption: Contents:
 
    tutorial
+   installation
+   release
    modules
+
 
 Indices and tables
 ==================

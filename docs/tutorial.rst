@@ -17,6 +17,14 @@ once we have that we need to fill it with what is in maya scene like so::
 
     z.retrieve_from_scene()
 
+.. note::
+
+   You can pass nodes here and if you do it no longer works on selection, mimicknig Maya
+   functionality.  Can pass a list or string.
+
+   z.retrieve_from_scene('your_muscle')
+
+
 This command works on selection.  It gets the setup from any ziva node selected including tissue or bone geo.  If nothing is selected it grabs a solver in the scene.  
 
 Once we have that we can do a few things.  One thing is to save on disk::
@@ -80,6 +88,12 @@ Mirroring Setup
 Earlier I showed you about retrieve_from_scene.  For mirroring it is best to use::
 
     z.retrieve_from_scene_selection()
+
+.. note::
+
+   The same selection works here as in retrieve_from_scene().  You can pass it a list or string.
+
+   z.retrieve_from_scene_selection(['l_muscleA','l_muscleB'])
 
 That method will use selection to fill the data.  Use case is to select your left muscles for example and mirror them.  So lets try it::
 

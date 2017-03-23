@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorials &mdash; zBuilder 0.9.3 documentation</title>
+  <title>Tutorials &mdash; zBuilder 0.9.4 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="zBuilder 0.9.3 documentation" href="index.html"/>
-        <link rel="next" title="zBuilder" href="modules.html"/>
+    <link rel="top" title="zBuilder 0.9.4 documentation" href="index.html"/>
+        <link rel="next" title="Installation" href="installation.html"/>
         <link rel="prev" title="Welcome to zBuilder’s documentation!" href="index.html"/> 
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.9.3
+                0.9.4
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#mirroring-setup">Mirroring Setup</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">zBuilder</a></li>
 </ul>
 
@@ -153,6 +155,12 @@ scripts to save it.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can pass nodes here and if you do it no longer works on selection, mimicknig Maya
+functionality.  Can pass a list or string.</p>
+<p class="last">z.retrieve_from_scene(&#8216;your_muscle&#8217;)</p>
+</div>
 <p>This command works on selection.  It gets the setup from any ziva node selected including tissue or bone geo.  If nothing is selected it grabs a solver in the scene.</p>
 <p>Once we have that we can do a few things.  One thing is to save on disk:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
@@ -212,6 +220,11 @@ you can feed it regular expressions so this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The same selection works here as in retrieve_from_scene().  You can pass it a list or string.</p>
+<p class="last">z.retrieve_from_scene_selection([&#8216;l_muscleA&#8217;,&#8217;l_muscleB&#8217;])</p>
+</div>
 <p>That method will use selection to fill the data.  Use case is to select your left muscles for example and mirror them.  So lets try it:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># select left muscles in scene</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
@@ -243,7 +256,7 @@ convention that can be search and replacable so it can identify opposite side.</
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="modules.html" class="btn btn-neutral float-right" title="zBuilder" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="Welcome to zBuilder’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -277,7 +290,7 @@ convention that can be search and replacable so it can identify opposite side.</
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.9.3',
+            VERSION:'0.9.4',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
