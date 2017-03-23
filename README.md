@@ -10,4 +10,4 @@ http://ziva-vfx.readthedocs.io/en/latest/
 ### Who do I talk to? ###
 
 * support@zivadynamics.com OR
-* lonniek@zivadyn
+* lonniek@zivadynamics.com
