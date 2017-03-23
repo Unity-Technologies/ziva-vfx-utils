@@ -14,7 +14,7 @@ ZNODES = [
         'zTet',
         'zTissue',
         'zBone',
-        #'zShell',
+        'zCloth',
         'zSolver',
         'zCache',
         'zEmbedder',
@@ -154,7 +154,15 @@ def get_zFibers(bodies):
     else:
         return []
 
-
+def get_zCloth(bodies):
+    sel = mc.ls(sl=True)
+    mc.select(bodies,r=True)
+    zCloth = mm.eval('zQuery -t "zCloth"')
+    mc.select(sel,r=True)
+    if zCloth:
+        return zCloth
+    else:
+        return []
 
 def get_zTet_user_mesh(zNode):
     mesh = mc.listConnections(zNode+'.iTet')

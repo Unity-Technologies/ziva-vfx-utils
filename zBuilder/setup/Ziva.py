@@ -33,6 +33,7 @@ ZNODES = [
         'zTet',
         'zTissue',
         'zBone',
+        'zCloth',
         'zSolver',
         'zEmbedder',
         'zAttachment',
@@ -113,7 +114,7 @@ class ZivaSetup(nc.NodeCollection):
                 self.__add_ziva_node(solver,get_mesh=get_mesh,get_maps=get_maps)
                 self.__add_ziva_node(solShape,get_mesh=get_mesh,get_maps=get_maps)
 
-            type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment']
+            type_s = ['zBone','zTissue','zTet','zMaterial','zFiber','zAttachment','zCloth']
 
             for t in type_s:
                 ZNODES = mm.eval('zQuery -t "'+t+'" -l')
@@ -155,6 +156,7 @@ class ZivaSetup(nc.NodeCollection):
             attachments (bool): Gets attachments data.  Defaults to True
             materials (bool): Gets materials data.  Defaults to True
             fibers (bool): Gets fibers data.  Defaults to True
+            cloth (bool): Gets cloth data.  Defaults to True
             embedder (bool): Gets embedder data.  Defaults to True
             get_mesh (bool): get mesh info. Defaults to True
             get_maps (bool): get map info. Defaults to True
@@ -180,6 +182,7 @@ class ZivaSetup(nc.NodeCollection):
         attachments = kwargs.get('attachments',True)
         materials = kwargs.get('materials',True)
         fibers = kwargs.get('fibers',True)
+        cloth = kwargs.get('cloth',True)
         embedder = kwargs.get('embedder',True)
         get_mesh = kwargs.get('get_mesh',True)
         get_maps = kwargs.get('get_maps',True)
@@ -232,6 +235,12 @@ class ZivaSetup(nc.NodeCollection):
                 logger.info('getting fibers') 
                 for fiber in mz.get_zFibers(selection):
                     self.__add_ziva_node(fiber,attr_filter=attr_filter.get('zFiber',None),
+                        get_mesh=get_mesh,get_maps=get_maps)
+
+            if cloth:
+                logger.info('getting cloth') 
+                for cloth in mz.get_zCloth(selection):
+                    self.__add_ziva_node(cloth,attr_filter=attr_filter.get('zCloth',None),
                         get_mesh=get_mesh,get_maps=get_maps)
 
             if embedder:
@@ -337,7 +346,7 @@ class ZivaSetup(nc.NodeCollection):
     @nc.time_this
     def apply(self,node_filter=None,attr_filter=None,interp_maps='auto',
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
-            fibers=True,embedder=True,permisive=True):
+            fibers=True,embedder=True,permisive=True,cloth=True):
 
         '''
 
@@ -376,6 +385,9 @@ class ZivaSetup(nc.NodeCollection):
                 attr_filter=attr_filter)
         if fibers:
             self.__apply_fibers(interp_maps=interp_maps,node_filter=node_filter,
+                attr_filter=attr_filter)
+        if cloth:
+            self.__apply_cloth(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
         if embedder:
             self.__apply_embedded()
@@ -693,6 +705,26 @@ class ZivaSetup(nc.NodeCollection):
 
         base.set_attrs(fibers,attr_filter=attr_filter)
 
+    def __apply_cloth(self,interp_maps=False,node_filter=None,attr_filter=None):
+        #TODO build them all at once
+        logger.info('applying cloth') 
+        cloth = self.get_nodes(type_filter='zCloth',node_filter=node_filter)
+
+
+        for item in cloth:
+            name = item.get_name()
+            #print 'ww',fiber.get_maps()
+            association = item.get_association()
+            if mc.objExists(association[0]):
+                if not mc.objExists(name):
+                    mc.select(association)
+                    tmp = mm.eval('ziva -c')
+                    mc.rename(tmp[0],name)
+            else:
+                mc.warning( association[0] +' mesh does not exists in scene, skippings cloth')
+
+
+        base.set_attrs(cloth,attr_filter=attr_filter)
 
     def __apply_embedded(self,interp_maps=False,node_filter=None,attr_filter=None):
         # TODO get maps working and node_filter.  Will need to filter slightly
