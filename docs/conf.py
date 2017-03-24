@@ -47,7 +47,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'zBuilder'
 copyright = u'2016, Ziva Dynamics'
-author = u'Lonnie Kraatz'
+author = u'Ziva Dynamics'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

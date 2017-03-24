@@ -1,6 +1,9 @@
 Release Notes
 =============
 
+0.9.5
+-----
+* changed order of cloth application when applying
 
 0.9.4
 -----

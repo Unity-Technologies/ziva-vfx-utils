@@ -377,6 +377,9 @@ class ZivaSetup(nc.NodeCollection):
         if tissues:
             self.__apply_tissues(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
+        if cloth:
+            self.__apply_cloth(interp_maps=interp_maps,node_filter=node_filter,
+                attr_filter=attr_filter)
         if attachments:
             self.__apply_attachments(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
@@ -386,9 +389,7 @@ class ZivaSetup(nc.NodeCollection):
         if fibers:
             self.__apply_fibers(interp_maps=interp_maps,node_filter=node_filter,
                 attr_filter=attr_filter)
-        if cloth:
-            self.__apply_cloth(interp_maps=interp_maps,node_filter=node_filter,
-                attr_filter=attr_filter)
+
         if embedder:
             self.__apply_embedded()
 
