@@ -4,10 +4,10 @@ zBuilder.data package
 Submodules
 ----------
 
-zBuilder.data.map module
+zBuilder.data.maps module
 ------------------------
 
-.. automodule:: zBuilder.data.map
+.. automodule:: zBuilder.data.maps
     :members:
     :undoc-members:
     :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorials &mdash; zBuilder 0.9.5 documentation</title>
+  <title>Tutorials &mdash; zBuilder 0.10.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="zBuilder 0.9.5 documentation" href="index.html"/>
+    <link rel="top" title="zBuilder 0.10.0 documentation" href="index.html"/>
         <link rel="next" title="Installation" href="installation.html"/>
         <link rel="prev" title="Welcome to zBuilder’s documentation!" href="index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.9.5
+                0.10.0
               </div>
             
           
@@ -85,6 +85,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#saving-and-loading-setup">Saving and Loading Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#node-data-and-component-data">Node data and Component data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#building-setup">Building Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#maps">Maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#search-and-replace">Search and replace</a></li>
@@ -141,7 +142,7 @@
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
 <p>zBuilder saves the current state of the ziva setup and allows you to re-build
-scene amoung other things.  For example searching and replacing and using that
+scene among other things.  For example searching and replacing and using that
 to mirror setups.  The basic idea is to build a ziva setup by hand and use these
 scripts to save it.</p>
 <div class="section" id="saving-and-loading-setup">
@@ -178,6 +179,41 @@ functionality.  Can pass a list or string.</p>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="node-data-and-component-data">
+<h2>Node data and Component data<a class="headerlink" href="#node-data-and-component-data" title="Permalink to this headline">¶</a></h2>
+<p>There are two types of data in the zBuilder object.  Node and component.  Node data is the Ziva nodes and attributes and component data is the heavier data, the meshes and maps.  By default when you write out a file it saves both in one file.  If you wanted to seperate them out you can do that as well.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will write out the node_data only.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">zBuilder does not do anything with file extensions.  If you want to seperate them out to two files make sure you either make filename different or file extension.</p>
+</div>
+<p>To save out the component data.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.z_comp&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here I turned off node_data and now I am exporting the component data.  Feel free to use your own extension.</p>
+<p>To retrieve these files it is same as above, though you can retrieve them into same object.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.z_comp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The retrieve knows where to put them so they wont clash.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Retrieving two sets of of the same data type will collide currently.</p>
 </div>
 </div>
 <div class="section" id="building-setup">
@@ -290,7 +326,7 @@ convention that can be search and replacable so it can identify opposite side.</
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.9.5',
+            VERSION:'0.10.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

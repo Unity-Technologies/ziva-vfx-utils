@@ -1,7 +1,7 @@
 Tutorials
 =========
 zBuilder saves the current state of the ziva setup and allows you to re-build
-scene amoung other things.  For example searching and replacing and using that
+scene among other things.  For example searching and replacing and using that
 to mirror setups.  The basic idea is to build a ziva setup by hand and use these 
 scripts to save it.
 
@@ -44,9 +44,39 @@ to load it from disk we retrieve it from file::
     z = zva.ZivaSetup()
     z.retrieve_from_file('C:\\Temp\\test.ziva')
 
+Node data and Component data
+----------------------------
 
+There are two types of data in the zBuilder object.  Node and component.  Node data is the Ziva nodes and attributes and component data is the heavier data, the meshes and maps.  By default when you write out a file it saves both in one file.  If you wanted to seperate them out you can do that as well.::
 
+    import zBuilder.setup.Ziva as zva
+    z = zva.ZivaSetup()
+    z.retrieve_from_scene()
+    z.write('C:\\Temp\\test.ziva',node_data=True,component_data=False)
 
+This will write out the node_data only.
+
+.. note:: zBuilder does not do anything with file extensions.  If you want to seperate them out to two files make sure you either make filename different or file extension.
+
+To save out the component data.::
+
+    import zBuilder.setup.Ziva as zva
+    z = zva.ZivaSetup()
+    z.retrieve_from_scene()
+    z.write('C:\\Temp\\test.z_comp',node_data=False,component_data=True)
+
+Here I turned off node_data and now I am exporting the component data.  Feel free to use your own extension.
+
+To retrieve these files it is same as above, though you can retrieve them into same object.::
+
+    import zBuilder.setup.Ziva as zva
+    z = zva.ZivaSetup()
+    z.retrieve_from_file('C:\\Temp\\test.ziva')
+    z.retrieve_from_file('C:\\Temp\\test.z_comp')
+
+The retrieve knows where to put them so they wont clash.  
+
+.. note:: Retrieving two sets of of the same data type will collide currently.
 
 
 Building Setup

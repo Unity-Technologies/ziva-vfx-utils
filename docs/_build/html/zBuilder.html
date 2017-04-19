@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>zBuilder.nodeCollection &mdash; zBuilder 0.9.5 documentation</title>
+  <title>zBuilder.nodeCollection &mdash; zBuilder 0.10.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="zBuilder 0.9.5 documentation" href="index.html"/>
+    <link rel="top" title="zBuilder 0.10.0 documentation" href="index.html"/>
         <link rel="up" title="zBuilder" href="modules.html"/>
         <link rel="next" title="zBuilder.setup" href="zBuilder.setup.html"/>
         <link rel="prev" title="zBuilder" href="modules.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.5
+                0.10.0
               </div>
             
           
@@ -200,7 +200,7 @@
 
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.compare">
-<code class="descname">compare</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.compare" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compare</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>name_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>print info on each node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -208,7 +208,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to <strong>None</strong></li>
-<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to <strong>None</strong></li>
+<li><strong>name_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to <strong>None</strong></li>
 <li><strong>print_data</strong> (<em>bool</em>) &#8211; prints name of data stored.  Defaults to <strong>False</strong></li>
 </ul>
 </td>
@@ -279,13 +279,13 @@
 
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.get_json_data">
-<code class="descname">get_json_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_json_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_json_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_json_data</code><span class="sig-paren">(</span><em>node_data=True</em>, <em>component_data=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_json_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_json_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility function to define data stored in json</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.get_nodes">
-<code class="descname">get_nodes</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_nodes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_nodes</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>name_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.get_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.get_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>get nodes in data object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -293,7 +293,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to <strong>None</strong></li>
-<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name.  Defaults to <strong>None</strong></li>
+<li><strong>name_filter</strong> (<em>str</em>) &#8211; filter by node name.  Defaults to <strong>None</strong></li>
 </ul>
 </td>
 </tr>
@@ -306,7 +306,7 @@
 
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.print_">
-<code class="descname">print_</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>node_filter=None</em>, <em>print_data=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.print_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.print_" title="Permalink to this definition">¶</a></dt>
+<code class="descname">print_</code><span class="sig-paren">(</span><em>type_filter=None</em>, <em>name_filter=None</em>, <em>component_data=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.print_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.print_" title="Permalink to this definition">¶</a></dt>
 <dd><p>print info on each node</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -314,7 +314,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>type_filter</strong> (<em>str</em>) &#8211; filter by node type.  Defaults to None</li>
-<li><strong>node_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to None</li>
+<li><strong>name_filter</strong> (<em>str</em>) &#8211; filter by node name. Defaults to None</li>
 <li><strong>print_data</strong> (<em>bool</em>) &#8211; prints name of data stored.  Defaults to False</li>
 </ul>
 </td>
@@ -389,7 +389,7 @@ If not able to read file</td>
 
 <dl class="method">
 <dt id="zBuilder.nodeCollection.NodeCollection.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>filepath</em>, <em>component_data=True</em>, <em>node_data=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/nodeCollection.html#NodeCollection.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.nodeCollection.NodeCollection.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes data to disk in json format</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -515,7 +515,7 @@ performs it on each piece</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="zBuilder.data.html">zBuilder.data package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.map">zBuilder.data.map module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#zbuilder-data-maps-module">zBuilder.data.maps module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data.mesh">zBuilder.data.mesh module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="zBuilder.data.html#module-zBuilder.data">Module contents</a></li>
 </ul>
@@ -676,7 +676,7 @@ performs it on each piece</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.9.5',
+            VERSION:'0.10.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

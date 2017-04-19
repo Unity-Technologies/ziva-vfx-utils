@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+0.10.0
+-----
+* save out component data and node data seperatly
+* changed map.py to maps.py
+* fixed bug in cloth creation
+
+
 0.9.5
 -----
 * changed order of cloth application when applying
