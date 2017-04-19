@@ -1,6 +1,4 @@
 import json
-from nodes.base import BaseNode
-import zBuilder.data.mesh as mesh
 import maya.cmds as mc
 import abc
 import re
@@ -39,39 +37,38 @@ class NodeCollection(object):
 
 
 
-    def print_(self,type_filter=None,node_filter=None,print_data=False):
+    def print_(self,type_filter=None,name_filter=None,component_data=True):
 
         '''print info on each node
 
         Args:
             type_filter (str): filter by node type.  Defaults to None
-            node_filter (str): filter by node name. Defaults to None
+            name_filter (str): filter by node name. Defaults to None
             print_data (bool): prints name of data stored.  Defaults to False
 
         '''
 
-        for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
+        for node in self.get_nodes(type_filter=type_filter,name_filter=name_filter):
 
             node.print_()
         print '-----------------------------------------------------------------'
         if print_data: 
             for key in self.data:
-                print 'data - {}: {}'.format(key,self.data[key].keys())
-            #print 'data - mesh: ',self.data['mesh'].keys()
+                print 'Component Data - {}: {}'.format(key,self.data[key].keys())
 
-    def compare(self,type_filter=None,node_filter=None):
+    def compare(self,type_filter=None,name_filter=None):
 
         '''
         print info on each node
 
         Args:
             type_filter (str): filter by node type.  Defaults to **None**
-            node_filter (str): filter by node name. Defaults to **None**
+            name_filter (str): filter by node name. Defaults to **None**
             print_data (bool): prints name of data stored.  Defaults to **False**
 
         '''
 
-        for node in self.get_nodes(type_filter=type_filter,node_filter=node_filter):
+        for node in self.get_nodes(type_filter=type_filter,name_filter=name_filter):
             node.compare()
 
 
@@ -165,13 +162,13 @@ class NodeCollection(object):
         self.collection.append(node)
 
 
-    def get_nodes(self,type_filter=None,node_filter=None):
+    def get_nodes(self,type_filter=None,name_filter=None):
         '''
         get nodes in data object
 
         Args:
             type_filter (str): filter by node type.  Defaults to **None**
-            node_filter (str): filter by node name.  Defaults to **None**
+            name_filter (str): filter by node name.  Defaults to **None**
 
         Returns:
             [] of nodes
@@ -183,10 +180,10 @@ class NodeCollection(object):
             for i,node in enumerate(self.collection):
                 if node.get_type() == type_filter:
 
-                    if node_filter:
-                        if not isinstance(node_filter, (list, tuple)):
-                            node_filter = node_filter.split(' ')
-                        if not set(node_filter).isdisjoint(node.get_association()):
+                    if name_filter:
+                        if not isinstance(name_filter, (list, tuple)):
+                            name_filter = name_filter.split(' ')
+                        if not set(name_filter).isdisjoint(node.get_association()):
                             items.append(node)
                     else:
                         items.append(node)
@@ -226,9 +223,9 @@ class NodeCollection(object):
                 self.data[key][item].string_replace(search,replace)
 
 
-
-
-    def write(self,filepath):
+    def write(self,filepath,
+            component_data=True,
+            node_data=True):
         '''
         writes data to disk in json format
 
@@ -239,7 +236,10 @@ class NodeCollection(object):
             IOError: If not able to write file
 
         '''
-        data = self.get_json_data()
+        data = self.get_json_data(
+                component_data=component_data,
+                node_data=node_data
+                )
         try:
             with open(filepath, 'w') as outfile:
                 json.dump(data, outfile, cls=BaseNodeEncoder,
@@ -248,6 +248,7 @@ class NodeCollection(object):
             print "Error: can\'t find file or write data"
         else:
             logger.info('Wrote File: {}'.format(filepath) ) 
+
 
     def retrieve_from_file(self,filepath):
         '''
@@ -262,7 +263,6 @@ class NodeCollection(object):
         try:
             with open(filepath, 'rb') as handle:
                 data = json.load(handle, object_hook=load_base_node)
-                #print len(data),'fffff'
                 self.from_json_data(data)
         except IOError:
             print "Error: can\'t find file or read data"   
@@ -270,22 +270,66 @@ class NodeCollection(object):
             logger.info('Read File: {}'.format(filepath) ) 
 
 
-    def get_json_data(self):
+    def get_json_data(self,node_data=True,component_data=True):
         '''
         Utility function to define data stored in json
         '''
-        return [self.collection,self.data,self.info]
+        tmp = []
+
+        if node_data:
+            logger.info("writing node_data")
+            tmp.append(self.__wrap_data(self.collection,'node_data'))
+        if component_data:
+            logger.info("writing component_data")
+            tmp.append(self.__wrap_data(self.data,'component_data'))
+        logger.info("writing info")
+        tmp.append(self.__wrap_data(self.info,'info'))
+
+        return tmp
+
 
     def from_json_data(self, data):
         '''
         Gets data out of json serilization
         '''
-        self.collection = data[0]
-        self.data = data[1]
-        if len(data) == 3:
-            self.info = data[2]
+        data = self.__check_data(data)
 
-    #
+        for d in data:
+            if d['d_type'] == 'node_data':
+                logger.info("reading node_data")
+                self.collection = d['data']
+            if d['d_type'] == 'component_data':
+                logger.info("reading component_data")
+                self.data = d['data']
+            if d['d_type'] == 'info':
+                logger.info("reading info")
+                self.info = d['data']
+
+    def __check_data(self,data):
+        '''
+        Utility to check data format.
+        '''
+        if 'd_type' in data[0]:
+            return data
+        else:
+            tmp = []
+            tmp.append(self.__wrap_data(data[0],'node_data'))
+            tmp.append(self.__wrap_data(data[1],'component_data'))
+            if len(data) == 3:
+                tmp.append(self.__wrap_data(data[2],'info'))
+            return tmp
+
+
+    def __wrap_data(self,data,type_):
+        '''
+        Utility wrapper to identify data.
+        '''
+        wrapper = {}
+        wrapper['d_type'] = type_
+        wrapper['data'] = data
+        return wrapper
+
+
     @abc.abstractmethod
     def apply(self,*args,**kwargs):
         '''
