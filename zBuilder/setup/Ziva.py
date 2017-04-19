@@ -707,7 +707,6 @@ class ZivaSetup(nc.NodeCollection):
         base.set_attrs(fibers,attr_filter=attr_filter)
 
     def __apply_cloth(self,interp_maps=False,name_filter=None,attr_filter=None):
-        #TODO build them all at once
         logger.info('applying cloth') 
         cloth = self.get_nodes(type_filter='zCloth',name_filter=name_filter)
 
@@ -720,7 +719,8 @@ class ZivaSetup(nc.NodeCollection):
                 if not mc.objExists(name):
                     mc.select(association)
                     tmp = mm.eval('ziva -c')
-                    mc.rename(tmp[0],name)
+                    clt = mc.ls(tmp,type='zCloth')[0]
+                    mc.rename(clt,name)
             else:
                 mc.warning( association[0] +' mesh does not exists in scene, skippings cloth')
 
