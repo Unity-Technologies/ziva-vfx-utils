@@ -5,7 +5,7 @@ import zBuilder.nodes.zEmbedder as embedderNode
 import zBuilder.nodes.zTet as tetNode
 
 import zBuilder.data.mesh as msh
-import zBuilder.data.map as mps
+import zBuilder.data.maps as mps
 
 import zBuilder.nodeCollection as nc
 
