@@ -6,7 +6,7 @@ Release Notes
 * save out component data and node data seperatly
 * changed map.py to maps.py
 * fixed bug in cloth creation
-
+* changed node_filter to name_filter.  Better representation on what it is.
 
 0.9.5
 -----
