@@ -52,9 +52,8 @@ class NodeCollection(object):
 
             node.print_()
         print '-----------------------------------------------------------------'
-        if print_data: 
-            for key in self.data:
-                print 'Component Data - {}: {}'.format(key,self.data[key].keys())
+        for key in self.data:
+            print 'Component Data - {}: {}'.format(key,self.data[key].keys())
 
     def compare(self,type_filter=None,name_filter=None):
 
@@ -400,6 +399,8 @@ def load_base_node(json_object):
     if '_class' in json_object:
         module = json_object['_class'][0]
         name = json_object['_class'][1]
+
+
         node = str_to_class(module,name)
         node.__dict__ = json_object
         return node
@@ -446,6 +447,10 @@ def str_to_class(module,name):
     returns:
         obj: class object
     '''
+
+    if module == 'zBuilder.data.map':
+        module = 'zBuilder.data.maps'
+        
     i = importlib.import_module( module )
     MyClass = getattr(i, name)
     instance = MyClass()
