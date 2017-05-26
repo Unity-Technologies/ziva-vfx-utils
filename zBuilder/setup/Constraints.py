@@ -56,9 +56,11 @@ class ConstraintsSetup(nc.NodeCollection):
             if not mc.objExists(name):
                 if _type == 'parentConstraint':
                     ass = n.get_association()
-                    mc.parentConstraint(ass[0],ass[1],mo=True)
+                    if mc.objExists(ass[0]) and mc.objExists(ass[1]):
+                        mc.parentConstraint(ass[0],ass[1],mo=True)
                 if _type == 'orientConstraint':
                     ass = n.get_association()
-                    mc.orientConstraint(ass[0],ass[1],mo=True)
+                    if mc.objExists(ass[0]) and mc.objExists(ass[1]):
+                        mc.orientConstraint(ass[0],ass[1],mo=True)
 
         base.set_attrs(nodes)
