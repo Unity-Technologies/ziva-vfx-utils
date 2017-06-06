@@ -406,6 +406,13 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
 
 
     def __cull_creation_nodes(self,nodes):
+        '''
+        To help speed up the build of a Ziva setup we are creating the bones and
+        the tissues with one command.  Given a list of zBuilder nodes this checks
+        if a given node needs to be created in scene.  Checks to see if it 
+        already exists or if associated mesh is missing.  Either case it culls 
+        it from list.
+        '''
 
         results = {}
         results['meshes'] = []
@@ -419,20 +426,7 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
             mesh = node.get_association()[0]
             name = node.get_name()
 
-            #if type_ == 'zBone':
-            #    secondary = 'zTissue'
-            #if type_ == 'zTissue':
-            #    secondary = 'zBone'
-            #if type_ == 'zTet':
-            #    secondary = None
             if mc.objExists(mesh):
-
-                #if secondary:
-                #    print 'SEC',secondary,mm.eval('zQuery -t "{}"'.format(secondary))
-
-                #   if mm.eval('zQuery -t "{}"'.format(secondary)):
-                #        raise StandardError, 'cannot create bone, {} is already a {}'.format(mesh,secondary)
- 
                 exsisting = mm.eval('zQuery -t "{}" {}'.format(type_,mesh))
                 if exsisting:
                     out = mc.rename(exsisting,name)
