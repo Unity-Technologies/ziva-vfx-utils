@@ -419,16 +419,19 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
             mesh = node.get_association()[0]
             name = node.get_name()
 
-            if type_ == 'zBone':
-                secondary = 'zTissue'
-            if type_ == 'zTissue':
-                secondary = 'zBone'
-            if type_ == 'zTet':
-                secondary = None
+            #if type_ == 'zBone':
+            #    secondary = 'zTissue'
+            #if type_ == 'zTissue':
+            #    secondary = 'zBone'
+            #if type_ == 'zTet':
+            #    secondary = None
             if mc.objExists(mesh):
-                if secondary:
-                    if mm.eval('zQuery -t "{}"'.format(secondary)):
-                        raise StandardError, 'cannot create bone, {} is already a {}'.format(mesh,secondary)
+
+                #if secondary:
+                #    print 'SEC',secondary,mm.eval('zQuery -t "{}"'.format(secondary))
+
+                #   if mm.eval('zQuery -t "{}"'.format(secondary)):
+                #        raise StandardError, 'cannot create bone, {} is already a {}'.format(mesh,secondary)
  
                 exsisting = mm.eval('zQuery -t "{}" {}'.format(type_,mesh))
                 if exsisting:
@@ -612,13 +615,13 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
                     if not mc.objExists(name):
                         if i == 0:
                             #logger.debug('rename-- {} {}'.format(current_material[0],name))
-                            mc.rename(current_material[0],name)
                             self.add_mObject(current_material[0],tmp[mesh][i])
+                            mc.rename(current_material[0],name)
                         else:
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
-                            mc.rename(tmpmat[0],name)
                             self.add_mObject(tmpmat[0],tmp[mesh][i])
+                            mc.rename(tmpmat[0],name)
                     else:
                         self.add_mObject(name,tmp[mesh][i])
 
@@ -645,8 +648,9 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
                 else:
                     mc.select(association)
                     tmp = mm.eval('ziva -f')
-                    mc.rename(tmp[0],name)
                     self.add_mObject(tmp[0],fiber)
+                    mc.rename(tmp[0],name)
+                    
             else:
                 mc.warning( association[0] +' mesh does not exists in scene, skippings fiber')
             

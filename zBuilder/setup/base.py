@@ -27,7 +27,7 @@ class BaseSetup(object):
             selectionList.getDependNode( 0, mObject )
              
             self.__mObjects[index] = mObject
-            logger.info(mObject) 
+            #logger.info(mObject) 
         else:
             self.__mObjects[index] = None
 
@@ -61,7 +61,7 @@ class BaseSetup(object):
 
 
         for attr in nodeAttrs:
-            print name,attr
+            #print name,attr
             if node.get_attr_key('type') == 'doubleArray':
                 if mc.objExists(name+'.'+attr):
                     if not mc.getAttr(name+'.'+attr,l=True):
@@ -118,7 +118,6 @@ class BaseSetup(object):
                     wList = mps.interpolateValues(origMesh,mnameShort,wList)
 
                 mp = mp.replace(oname,name)
-                #print mp,'dddddddddddddddddddddddddddddddd'
 
                 if mc.objExists('%s[0]' % (mp)):
                     if not mc.getAttr('%s[0]' % (mp),l=True):
@@ -132,7 +131,6 @@ class BaseSetup(object):
 
                 else:
                     try:
-                        #print 'here we go',name,attr,wList
                         mc.setAttr(mp,wList,type='doubleArray')
                     except:
                         pass
