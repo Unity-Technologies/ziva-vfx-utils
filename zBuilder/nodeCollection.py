@@ -109,7 +109,7 @@ class NodeCollection(object):
 
         if not self.get_data_by_key_name(key,name):
             self.data[key][name] = data
-            logger.info("adding data type: {}  name: {}".format(key,name) ) 
+            #logger.info("adding data type: {}  name: {}".format(key,name) ) 
 
 
 
@@ -208,8 +208,8 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         '''
-        print 'SEARCh',search
-        print 'REPLACE',replace
+        #print 'SEARCh',search
+        #print 'REPLACE',replace
         for node in self.get_nodes():
             node.string_replace(search,replace)
 
