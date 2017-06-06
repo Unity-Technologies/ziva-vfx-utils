@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="zBuilder 0.10.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -40,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -80,7 +86,10 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
@@ -98,8 +107,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">zBuilder</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">zBuilder</a>
+        
       </nav>
 
 
@@ -112,57 +123,78 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-      
-    <li>zBuilder.setup.Selection</li>
+        
+      <li>zBuilder.setup.Selection</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
   <h1>Source code for zBuilder.setup.Selection</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">zBuilder.nodes.base</span> <span class="kn">as</span> <span class="nn">base</span>
-<span class="kn">import</span> <span class="nn">zBuilder.nodeCollection</span> <span class="kn">as</span> <span class="nn">nc</span>
-<span class="kn">import</span> <span class="nn">zBuilder.zMaya</span> <span class="kn">as</span> <span class="nn">mz</span>
+<span></span><span class="kn">import</span> <span class="nn">zBuilder.nodes.base</span> <span class="k">as</span> <span class="nn">base</span>
+<span class="kn">import</span> <span class="nn">zBuilder.nodeCollection</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">zBuilder.zMaya</span> <span class="k">as</span> <span class="nn">mz</span>
 
-<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="kn">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
 
 <div class="viewcode-block" id="SelectionSetup"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup">[docs]</a><span class="k">class</span> <span class="nc">SelectionSetup</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">nc</span><span class="o">.</span><span class="n">NodeCollection</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SelectionSetup.retrieve_from_scene"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.retrieve_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sel</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
             <span class="n">node</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">BaseNode</span><span class="p">()</span>
             <span class="n">node</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span>
             <span class="n">node</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">mz</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">sel</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="SelectionSetup.return_selection"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.return_selection">[docs]</a>    <span class="k">def</span> <span class="nf">return_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">():</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="n">tmp</span>
-</div>
+        <span class="k">return</span> <span class="n">tmp</span></div>
+
 <div class="viewcode-block" id="SelectionSetup.apply"><a class="viewcode-back" href="../../../zBuilder.setup.html#zBuilder.setup.Selection.SelectionSetup.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">return_selection</span><span class="p">())</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">return_selection</span><span class="p">())</span></div></div>
 
   
-</pre></div></div></div>
 
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -197,7 +229,8 @@
             VERSION:'0.10.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../../_static/jquery.js"></script>

@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="zBuilder 0.10.0 documentation" href="index.html"/>
         <link rel="next" title="Installation" href="installation.html"/>
         <link rel="prev" title="Welcome to zBuilder’s documentation!" href="index.html"/> 
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -81,9 +87,12 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Tutorials</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#saving-and-loading-setup">Saving and Loading Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#node-data-and-component-data">Node data and Component data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#building-setup">Building Setup</a></li>
@@ -107,8 +116,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">zBuilder</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">zBuilder</a>
+        
       </nav>
 
 
@@ -121,19 +132,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Tutorials</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorials</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/tutorial.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -148,12 +176,12 @@ scripts to save it.</p>
 <div class="section" id="saving-and-loading-setup">
 <h2>Saving and Loading Setup<a class="headerlink" href="#saving-and-loading-setup" title="Permalink to this headline">¶</a></h2>
 <p>To build we need to instantiate a <a class="reference internal" href="zBuilder.setup.html#zBuilder.setup.Ziva.ZivaSetup" title="zBuilder.setup.Ziva.ZivaSetup"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.setup.Ziva.ZivaSetup</span></code></a> object and we do it like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>once we have that we need to fill it with what is in maya scene like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -164,18 +192,18 @@ functionality.  Can pass a list or string.</p>
 </div>
 <p>This command works on selection.  It gets the setup from any ziva node selected including tissue or bone geo.  If nothing is selected it grabs a solver in the scene.</p>
 <p>Once we have that we can do a few things.  One thing is to save on disk:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>all at once:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>to load it from disk we retrieve it from file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 </pre></div>
@@ -184,10 +212,10 @@ functionality.  Can pass a list or string.</p>
 <div class="section" id="node-data-and-component-data">
 <h2>Node data and Component data<a class="headerlink" href="#node-data-and-component-data" title="Permalink to this headline">¶</a></h2>
 <p>There are two types of data in the zBuilder object.  Node and component.  Node data is the Ziva nodes and attributes and component data is the heavier data, the meshes and maps.  By default when you write out a file it saves both in one file.  If you wanted to seperate them out you can do that as well.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
-<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will write out the node_data only.</p>
@@ -196,15 +224,15 @@ functionality.  Can pass a list or string.</p>
 <p class="last">zBuilder does not do anything with file extensions.  If you want to seperate them out to two files make sure you either make filename different or file extension.</p>
 </div>
 <p>To save out the component data.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene</span><span class="p">()</span>
-<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.z_comp&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.z_comp&#39;</span><span class="p">,</span><span class="n">node_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">component_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Here I turned off node_data and now I am exporting the component data.  Feel free to use your own extension.</p>
 <p>To retrieve these files it is same as above, though you can retrieve them into same object.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="kn">as</span> <span class="nn">zva</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zBuilder.setup.Ziva</span> <span class="k">as</span> <span class="nn">zva</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.ziva&#39;</span><span class="p">)</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_file</span><span class="p">(</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Temp</span><span class="se">\\</span><span class="s1">test.z_comp&#39;</span><span class="p">)</span>
@@ -219,7 +247,7 @@ functionality.  Can pass a list or string.</p>
 <div class="section" id="building-setup">
 <h2>Building Setup<a class="headerlink" href="#building-setup" title="Permalink to this headline">¶</a></h2>
 <p>Assuming we have the &#8216;z&#8217; object loaded with setup we want, to build we do a:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>note that this works on a clean scene with only the geo or an existing setup.
@@ -230,7 +258,7 @@ with an exisitng setup if it finds the same node it updates properties and maps.
 <p>this stores the mesh information so if you updated geo with different topology it
 will interpolate maps in world space.  By default, it checks if it needs to
 and if it doesn&#8217;t it ignores this step.  To force it or turn it off use this flag:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">interp_maps</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">interp_maps</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>&#8216;&#8217;True&#8217;&#8217; = always interp maps
@@ -240,12 +268,12 @@ and if it doesn&#8217;t it ignores this step.  To force it or turn it off use th
 <div class="section" id="search-and-replace">
 <h2>Search and replace<a class="headerlink" href="#search-and-replace" title="Permalink to this headline">¶</a></h2>
 <p>to search and replace you can do a:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;r_bicep_muscle22&#39;</span><span class="p">,</span><span class="s1">&#39;r_bicep_muscle&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;r_bicep_muscle22&#39;</span><span class="p">,</span><span class="s1">&#39;r_bicep_muscle&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>That will replace all instances of <cite>r_bicep_muscle22</cite> with <cite>r_bicep_muscle</cite>
 you can feed it regular expressions so this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^r_&#39;</span><span class="p">,</span><span class="s1">&#39;l_&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>will replace <cite>r_</cite> with <cite>l_</cite> IF it is at begining of line.</p>
@@ -253,7 +281,7 @@ you can feed it regular expressions so this:</p>
 <div class="section" id="mirroring-setup">
 <h2>Mirroring Setup<a class="headerlink" href="#mirroring-setup" title="Permalink to this headline">¶</a></h2>
 <p>Earlier I showed you about retrieve_from_scene.  For mirroring it is best to use:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -262,7 +290,7 @@ you can feed it regular expressions so this:</p>
 <p class="last">z.retrieve_from_scene_selection([&#8216;l_muscleA&#8217;,&#8217;l_muscleB&#8217;])</p>
 </div>
 <p>That method will use selection to fill the data.  Use case is to select your left muscles for example and mirror them.  So lets try it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># select left muscles in scene</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># select left muscles in scene</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^l_&#39;</span><span class="p">,</span><span class="s1">&#39;r_&#39;</span><span class="p">)</span>
@@ -271,7 +299,7 @@ you can feed it regular expressions so this:</p>
 </div>
 <p>What that does is put the left muscles in object and does searches for <cite>l_</cite> at begining of name and replaces with <cite>r_</cite>.  Sometimes you need to do a couple seach and replaces
 and you do that like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">zva</span><span class="o">.</span><span class="n">ZivaSetup</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">retrieve_from_scene_selection</span><span class="p">()</span>
 <span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;^l_&#39;</span><span class="p">,</span><span class="s1">&#39;r_&#39;</span><span class="p">)</span>
 <span class="n">z</span><span class="o">.</span><span class="n">string_replace</span><span class="p">(</span><span class="s1">&#39;_l_&#39;</span><span class="p">,</span><span class="s1">&#39;_r_&#39;</span><span class="p">)</span>
@@ -287,15 +315,18 @@ convention that can be search and replacable so it can identify opposite side.</
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to zBuilder’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Welcome to zBuilder’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -329,7 +360,8 @@ convention that can be search and replacable so it can identify opposite side.</
             VERSION:'0.10.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

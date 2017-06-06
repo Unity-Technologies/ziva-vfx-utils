@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>zBuilder.setup &mdash; zBuilder 0.10.0 documentation</title>
+  <title>zBuilder.setup package &mdash; zBuilder 0.10.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,10 +32,12 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="zBuilder 0.10.0 documentation" href="index.html"/>
-        <link rel="up" title="zBuilder.nodeCollection" href="zBuilder.html"/>
-        <link rel="next" title="zBuilder.data package" href="zBuilder.data.html"/>
-        <link rel="prev" title="zBuilder.nodeCollection" href="zBuilder.html"/> 
+        <link rel="up" title="zBuilder package" href="zBuilder.html"/>
+        <link rel="prev" title="zBuilder.nodes" href="zBuilder.nodes.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -42,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -82,25 +87,29 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Notes</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">zBuilder</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="zBuilder.html">zBuilder.nodeCollection</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="">zBuilder.setup</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-zBuilder.setup.Attributes">zBuilder.setup.Attributes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-zBuilder.setup.Constraints">zBuilder.setup.Constraints</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-zBuilder.setup.Selection">zBuilder.setup.Selection</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-zBuilder.setup.Ziva">zBuilder.setup.Ziva</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="zBuilder.html">zBuilder package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="zBuilder.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="zBuilder.data.html">zBuilder.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="zBuilder.nodes.html">zBuilder.nodes</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">zBuilder.setup package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="zBuilder.data.html">zBuilder.data package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="zBuilder.nodes.html">zBuilder.nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zBuilder.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zBuilder.html#module-zBuilder.nodeCollection">zBuilder.nodeCollection module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zBuilder.html#module-zBuilder.util">zBuilder.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zBuilder.html#module-zBuilder.zMaya">zBuilder.zMaya module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zBuilder.html#module-zBuilder">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="zBuilder.html#module-zBuilder.zMaya">zBuilder.zMaya</a></li>
 </ul>
 </li>
 </ul>
@@ -115,8 +124,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">zBuilder</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">zBuilder</a>
+        
       </nav>
 
 
@@ -129,32 +140,52 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
           <li><a href="modules.html">zBuilder</a> &raquo;</li>
-      
-          <li><a href="zBuilder.html">zBuilder.nodeCollection</a> &raquo;</li>
-      
-    <li>zBuilder.setup</li>
+        
+          <li><a href="zBuilder.html">zBuilder package</a> &raquo;</li>
+        
+      <li>zBuilder.setup package</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/zBuilder.setup.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/zBuilder.setup.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="zbuilder-setup">
-<h1>zBuilder.setup<a class="headerlink" href="#zbuilder-setup" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="zbuilder-setup-package">
+<h1>zBuilder.setup package<a class="headerlink" href="#zbuilder-setup-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-zBuilder.setup.Attributes">
-<span id="zbuilder-setup-attributes"></span><h2>zBuilder.setup.Attributes<a class="headerlink" href="#module-zBuilder.setup.Attributes" title="Permalink to this headline">¶</a></h2>
+<span id="zbuilder-setup-attributes-module"></span><h2>zBuilder.setup.Attributes module<a class="headerlink" href="#module-zBuilder.setup.Attributes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="zBuilder.setup.Attributes.AttributesSetup">
 <em class="property">class </em><code class="descclassname">zBuilder.setup.Attributes.</code><code class="descname">AttributesSetup</code><a class="reference internal" href="_modules/zBuilder/setup/Attributes.html#AttributesSetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Attributes.AttributesSetup" title="Permalink to this definition">¶</a></dt>
@@ -173,7 +204,7 @@
 
 </div>
 <div class="section" id="module-zBuilder.setup.Constraints">
-<span id="zbuilder-setup-constraints"></span><h2>zBuilder.setup.Constraints<a class="headerlink" href="#module-zBuilder.setup.Constraints" title="Permalink to this headline">¶</a></h2>
+<span id="zbuilder-setup-constraints-module"></span><h2>zBuilder.setup.Constraints module<a class="headerlink" href="#module-zBuilder.setup.Constraints" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="zBuilder.setup.Constraints.ConstraintsSetup">
 <em class="property">class </em><code class="descclassname">zBuilder.setup.Constraints.</code><code class="descname">ConstraintsSetup</code><a class="reference internal" href="_modules/zBuilder/setup/Constraints.html#ConstraintsSetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Constraints.ConstraintsSetup" title="Permalink to this definition">¶</a></dt>
@@ -202,7 +233,7 @@
 
 </div>
 <div class="section" id="module-zBuilder.setup.Selection">
-<span id="zbuilder-setup-selection"></span><h2>zBuilder.setup.Selection<a class="headerlink" href="#module-zBuilder.setup.Selection" title="Permalink to this headline">¶</a></h2>
+<span id="zbuilder-setup-selection-module"></span><h2>zBuilder.setup.Selection module<a class="headerlink" href="#module-zBuilder.setup.Selection" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="zBuilder.setup.Selection.SelectionSetup">
 <em class="property">class </em><code class="descclassname">zBuilder.setup.Selection.</code><code class="descname">SelectionSetup</code><a class="reference internal" href="_modules/zBuilder/setup/Selection.html#SelectionSetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Selection.SelectionSetup" title="Permalink to this definition">¶</a></dt>
@@ -226,11 +257,11 @@
 
 </div>
 <div class="section" id="module-zBuilder.setup.Ziva">
-<span id="zbuilder-setup-ziva"></span><h2>zBuilder.setup.Ziva<a class="headerlink" href="#module-zBuilder.setup.Ziva" title="Permalink to this headline">¶</a></h2>
+<span id="zbuilder-setup-ziva-module"></span><h2>zBuilder.setup.Ziva module<a class="headerlink" href="#module-zBuilder.setup.Ziva" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="zBuilder.setup.Ziva.ZivaSetup">
 <em class="property">class </em><code class="descclassname">zBuilder.setup.Ziva.</code><code class="descname">ZivaSetup</code><a class="reference internal" href="_modules/zBuilder/setup/Ziva.html#ZivaSetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.Ziva.ZivaSetup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="zBuilder.html#zBuilder.nodeCollection.NodeCollection" title="zBuilder.nodeCollection.NodeCollection"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.nodeCollection.NodeCollection</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="zBuilder.html#zBuilder.nodeCollection.NodeCollection" title="zBuilder.nodeCollection.NodeCollection"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.nodeCollection.NodeCollection</span></code></a>, <a class="reference internal" href="#zBuilder.setup.base.BaseSetup" title="zBuilder.setup.base.BaseSetup"><code class="xref py py-class docutils literal"><span class="pre">zBuilder.setup.base.BaseSetup</span></code></a></p>
 <p>To capture a ziva setup</p>
 <dl class="method">
 <dt id="zBuilder.setup.Ziva.ZivaSetup.apply">
@@ -250,19 +281,52 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-zBuilder.setup.base">
+<span id="zbuilder-setup-base-module"></span><h2>zBuilder.setup.base module<a class="headerlink" href="#module-zBuilder.setup.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="zBuilder.setup.base.BaseSetup">
+<em class="property">class </em><code class="descclassname">zBuilder.setup.base.</code><code class="descname">BaseSetup</code><a class="reference internal" href="_modules/zBuilder/setup/base.html#BaseSetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.base.BaseSetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="zBuilder.setup.base.BaseSetup.add_mObject">
+<code class="descname">add_mObject</code><span class="sig-paren">(</span><em>maya_node</em>, <em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/base.html#BaseSetup.add_mObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.base.BaseSetup.add_mObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.setup.base.BaseSetup.clear_mObjects">
+<code class="descname">clear_mObjects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/base.html#BaseSetup.clear_mObjects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.base.BaseSetup.clear_mObjects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.setup.base.BaseSetup.set_maya_attrs_for_node">
+<code class="descname">set_maya_attrs_for_node</code><span class="sig-paren">(</span><em>node</em>, <em>attr_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/base.html#BaseSetup.set_maya_attrs_for_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.base.BaseSetup.set_maya_attrs_for_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="zBuilder.setup.base.BaseSetup.set_maya_weights_for_node">
+<code class="descname">set_maya_weights_for_node</code><span class="sig-paren">(</span><em>node</em>, <em>interp_maps=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/zBuilder/setup/base.html#BaseSetup.set_maya_weights_for_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zBuilder.setup.base.BaseSetup.set_maya_weights_for_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zBuilder.setup">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zBuilder.setup" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="zBuilder.data.html" class="btn btn-neutral float-right" title="zBuilder.data package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="zBuilder.html" class="btn btn-neutral" title="zBuilder.nodeCollection" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="zBuilder.nodes.html" class="btn btn-neutral" title="zBuilder.nodes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -296,7 +360,8 @@
             VERSION:'0.10.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

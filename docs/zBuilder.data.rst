@@ -5,7 +5,7 @@ Submodules
 ----------
 
 zBuilder.data.maps module
-------------------------
+-------------------------
 
 .. automodule:: zBuilder.data.maps
     :members:
