@@ -208,6 +208,8 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         '''
+        print 'SEARCh',search
+        print 'REPLACE',replace
         for node in self.get_nodes():
             node.string_replace(search,replace)
 
@@ -342,6 +344,10 @@ class NodeCollection(object):
         must create a method to inherit this class
         '''
         pass
+
+
+
+
 
 
 def replace_dict_keys(search,replace,dictionary):

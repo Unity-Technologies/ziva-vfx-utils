@@ -8,9 +8,11 @@ import zBuilder.data.mesh as msh
 import zBuilder.data.maps as mps
 
 import zBuilder.nodeCollection as nc
+import zBuilder.setup.base as sbse
 
 import maya.cmds as mc
 import maya.mel as mm
+import maya.OpenMaya as om
 
 import time
 import datetime 
@@ -44,7 +46,7 @@ ZNODES = [
 
 
 
-class ZivaSetup(nc.NodeCollection):
+class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
     '''
     To capture a ziva setup
     '''
@@ -58,6 +60,7 @@ class ZivaSetup(nc.NodeCollection):
                     continue
         #self.info['plugin_name'] = plug
         #self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)     
+
 
     @nc.time_this
     def retrieve_from_scene(self,*args,**kwargs):
@@ -324,7 +327,6 @@ class ZivaSetup(nc.NodeCollection):
         #if connections:
         longnames = mc.ls(selection,l=True)
         embedder = embedderNode.get_zEmbedder(longnames)
-        #print 'OMG',embedder,selection
         if embedder:
             if longnames:
                 associations = embedderNode.get_embedded_meshes(longnames)
@@ -359,6 +361,7 @@ class ZivaSetup(nc.NodeCollection):
             name_filter (str): filter by node name.  Defaults to **None**
         '''
 
+        self.clear_mObjects()
         sel = mc.ls(sl=True)
         if solver:
             self.__apply_solver(attr_filter=attr_filter)
@@ -401,6 +404,45 @@ class ZivaSetup(nc.NodeCollection):
             pass
 
 
+
+    def __cull_creation_nodes(self,nodes):
+
+        results = {}
+        results['meshes'] = []
+        results['names'] = []
+        results['nodes'] = []
+
+        #-----------------------------------------------------------------------
+        # check meshes for existing zBones or zTissue
+        for i,node in enumerate(nodes):
+            type_ = node.get_type()
+            mesh = node.get_association()[0]
+            name = node.get_name()
+
+            if type_ == 'zBone':
+                secondary = 'zTissue'
+            if type_ == 'zTissue':
+                secondary = 'zBone'
+            if type_ == 'zTet':
+                secondary = None
+            if mc.objExists(mesh):
+                if secondary:
+                    if mm.eval('zQuery -t "{}"'.format(secondary)):
+                        raise StandardError, 'cannot create bone, {} is already a {}'.format(mesh,secondary)
+ 
+                exsisting = mm.eval('zQuery -t "{}" {}'.format(type_,mesh))
+                if exsisting:
+                    out = mc.rename(exsisting,name)
+                    self.add_mObject(out,node)
+                else:
+                    results['meshes'].append(mesh)
+                    results['names'].append(name)
+                    results['nodes'].append(node)
+            else:
+                logger.warning( mesh +' does not exist in scene, skipping bone creation')
+
+        return results
+
     def __apply_solver(self,attr_filter=None):
         logger.info('applying solver')  
         zSolver = self.get_nodes(type_filter='zSolver')
@@ -415,194 +457,94 @@ class ZivaSetup(nc.NodeCollection):
             if not mc.objExists(solverName):
                 print 'building solver: ',solverName
                 sol = mm.eval('ziva -s')
+                self.add_mObject(mc.ls(sol,type='zSolver')[0],zSolver)
+                self.add_mObject(mc.ls(sol,type='zSolverTransform')[0],zSolverTransform)
+            else:
+                self.add_mObject(solverName,zSolver)
+                st = mm.eval('zQuery -t zSolverTransform '+solverName)[0]
+                self.add_mObject(st,zSolverTransform)
 
-            base.set_attrs([zSolver,zSolverTransform],attr_filter=attr_filter)
+            self.set_maya_attrs_for_node(zSolver,attr_filter=attr_filter)
+            self.set_maya_attrs_for_node(zSolverTransform,attr_filter=attr_filter)
+
+
+
+
 
     def __apply_bones(self,name_filter=None,attr_filter=None):
-        #TODO: check if bone got created properly, if not gracefully error
-        # check if existing solver, if there is not lets create one at default 
-        # values
+
         logger.info('applying bones') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
-            
-
-
+        
         zBones = self.get_nodes(type_filter='zBone',name_filter=name_filter)
-
-        bone_meshes = []
-        bone_names = []
-
-        for zBone in zBones:
-            association = zBone.get_association()
-            if not mc.objExists(zBone.get_name()):
-                bone_meshes.append(association[0])
-                bone_names.append(zBone.get_name())
-
-        #-----------------------------------------------------------------------
-        # check meshes for existing zTissue
-        bone_meshes_tmp = []
-        bone_names_tmp = []
-        for mname,bname in zip(bone_meshes,bone_names):
-
-            if mc.objExists(mname):
-                index = bone_meshes.index(mname)
-                bone_meshes_tmp.append(bone_meshes[index])
-                bone_names_tmp.append(bone_names[index])
-                mc.select(mname)
-                if mm.eval('zQuery -t "zBone"'):
-                    # rename bone as it is in DATA
-                    mc.rename(mm.eval('zQuery -t "zBone"')[0],bname)
-                    bone_meshes.remove(mname)
-                if mm.eval('zQuery -t "zTissue"'):
-                    #logging.error('cannot create tissue, %s is a zBone' % mesh)
-                    raise StandardError, 'cannot create bone, %s is already a zTissue' % mname
-            else:
-                logger.warning( mname +' does not exist in scene, skipping bone creation')
-
-        bone_meshes = bone_meshes_tmp
-        bone_names = bone_names_tmp
-
+        results = self.__cull_creation_nodes(zBones)
 
         # check mesh quality----------------------------------------------------
-        mc.select(bone_meshes,add=True)
-        mesh_quality = mm.eval('ziva -mq')
+        mz.check_mesh_quality(results['meshes'])
 
-        #TODO command return something useful
-        sel = mc.ls(sl=True)
-        if sel:
-            if 'vtx[' in sel[0]:
-                raise StandardError, mesh_quality
-
-        #build tissues all at once----------------------------------------------
-
-        if bone_meshes:
-            mc.select(bone_meshes,r=True)
-            results = mm.eval('ziva -b')
-
-            # ok, going to rename to a temp name then to name in data
-            # rename zBones-----------------------------------------------------
-            for new,i in zip(results[1::2],bone_names):
-                #logger.debug( 'rename: {} {}_'.format(new,new))
-                mc.rename(new,new+'_')
-
+        #build bones all at once----------------------------------------------
+        if results['meshes']:
+            mc.select(results['meshes'],r=True)
+            outs = mm.eval('ziva -b')
 
             # rename zBones-----------------------------------------------------
-            for new,i in zip(results[1::2],bone_names):
-                logger.debug( 'rename: {}_ {}'.format(new,i))
-                mc.rename(new+'_',i)
+            for new,name,node in zip(outs[1::2],results['names'],results['nodes']):
+                self.add_mObject(new,node)
+                mc.rename(new,name)
 
-        base.set_attrs(zBones,attr_filter=attr_filter)
+        for zBone in zBones:
+            self.set_maya_attrs_for_node(zBone,attr_filter=attr_filter)
 
     def __apply_tissues(self,interp_maps=False,name_filter=None,attr_filter=None):
-        #TODO: check if tissue got created properly, if not gracefully error
-        # check if existing solver, if there is not lets create one at default 
-        # values
         logger.info('applying tissues') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
 
         # get zTets and zTissues in data----------------------------------------
-
         zTets = self.get_nodes(type_filter='zTet',name_filter=name_filter)
         zTissues = self.get_nodes(type_filter='zTissue',name_filter=name_filter)
 
-
-        # build a list of tissues to build all  at once (faster this way)-------
-        tissue_meshes = []
-        tissue_names = []
-        tet_names = []
-        for zTissue in zTissues:
-            tmp = zTissue.get_association()
-            #sync up tissues with mesh in data:
-            if mc.objExists(tmp[0]):
-                mc.select(tmp,r=True)
-                tisMe = mm.eval('zQuery -t zTissue')
-                if tisMe:
-                    mc.rename(tisMe[0],zTissue.get_name())
-            if not mc.objExists(zTissue.get_name()):
-                tissue_meshes.append(tmp[0])
-                tissue_names.append(zTissue.get_name())
-
-        for zTet in zTets:
-            tmp = zTet.get_association()[0]
-            #sync up tissues with mesh in data:
-            if mc.objExists(tmp):
-                mc.select(tmp,r=True)
-                tisMe = mm.eval('zQuery -t zTet')
-                if tisMe:
-                    mc.rename(tisMe[0],zTet.get_name())
-            if not mc.objExists(zTet.get_name()):
-                tet_names.append(zTet.get_name())
-
-
-
-        #-----------------------------------------------------------------------
-        # check meshes for existing zTissue
-        for mname,tname in zip(tissue_meshes,tissue_names):
-            if mc.objExists(mname):
-                mc.select(mname)
-                print 'name: ',mname
-                if mm.eval('zQuery -t "zTissue"'):
-                    # rename tissue as it is in DATA
-                    mc.rename(mm.eval('zQuery -t "zTissue"')[0],tname)
-                    tissue_meshes.remove(mname)
-                if mm.eval('zQuery -t "zBone"'):
-                    #logging.error('cannot create tissue, %s is a zBone' % mesh)
-                    raise StandardError, 'cannot create tissue, %s is already a zBone' % mname
-            else:
-                index = tissue_meshes.index(mname)
-                del tissue_meshes[index]
-                del tissue_names[index]
-                del tet_names[index]
-                mc.warning( mname +' does not exist in scene, skipping tissue creation')
+        tet_results = self.__cull_creation_nodes(zTets)
+        tissue_results = self.__cull_creation_nodes(zTissues)
 
         # check mesh quality----------------------------------------------------
-        mc.select(tissue_meshes)
-        mesh_quality = mm.eval('ziva -mq')
-
-        #TODO command return something useful
-        sel = mc.ls(sl=True)
-        if sel:
-            if 'vtx[' in sel[0]:
-                raise StandardError, mesh_quality
-
+        mz.check_mesh_quality(tissue_results['meshes'])
 
         #build tissues all at once----------------------------------------------
-        if tissue_meshes:
-            mc.select(tissue_meshes,r=True)
-            results = mm.eval('ziva -t')
+        if tissue_results['meshes']:
+            mc.select(tissue_results['meshes'],r=True)
+            outs = mm.eval('ziva -t')
 
             # rename zTissues and zTets-----------------------------------------
-            for new,i in zip(results[1::4],tissue_names):
-                mc.rename(new,i)
+            for new,name,node in zip(outs[1::4],tissue_results['names'],tissue_results['nodes']):
+                self.add_mObject(new,node)
+                mc.rename(new,name)
 
-            for new,i in zip(results[2::4],tet_names):
-                mc.rename(new,i)
-
-
-        # set tet maps if so desired--------------------------------------------
-        mps.set_weights(zTets,self,interp_maps=interp_maps)
+            for new,name,node in zip(outs[2::4],tet_results['names'],tet_results['nodes']):
+                self.add_mObject(new,node)
+                mc.rename(new,name)
 
 
-        ## apply user tet meshes if needed
-        for zTet in zTets:
+        for zTet,zTissue in zip(zTets,zTissues):
+            # set the attributes in maya
+            self.set_maya_attrs_for_node(zTet,attr_filter=attr_filter)
+            self.set_maya_attrs_for_node(zTissue,attr_filter=attr_filter)
+            self.set_maya_weights_for_node(zTet,interp_maps=interp_maps)
+
+
+            # check and hookup any existing user tet meshes
             if zTet.get_user_tet_mesh():
                 try: 
                     mc.connectAttr( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet',f=True )
                 except:
                     print 'could not connect %s to %s' % ( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet' )
-                # mc.select(zTet.get_association())
-                # mc.select(zTet.get_user_tet_mesh(),add=True)
-                # mm.eval('ziva -cut')
-
-        # set zTissue and zTet attributes---------------------------------------
-        base.set_attrs(zTets,attr_filter=attr_filter)
-        base.set_attrs(zTissues,attr_filter=attr_filter)
 
 
+        # set tet maps if so desired--------------------------------------------
+        
 
 
     def __apply_attachments(self,interp_maps=False,name_filter=None,attr_filter=None):
@@ -615,17 +557,12 @@ class ZivaSetup(nc.NodeCollection):
 
             if mc.objExists(name):
                 new_att = name
+                self.add_mObject(new_att,att)
                 #print 'found existing attachment, updating....',new_att
             else:
                 associations = att.get_association()
                 ass0 = associations[0]
                 ass1 = associations[1]
-
-                # TODO a way to check and turn it off
-                # for s in associations:
-                #     mc.select(s,r=True)
-                #     if mm.eval('zQuery -t "zBone"') == None and mm.eval('zQuery -t "zTissue"') == None:
-                #         raise StandardError, 'cannot create attachment, %s is neither tissue or bone' % s
 
                 if mc.objExists(ass0) and mc.objExists(ass1):
                     mc.select(ass0,r=True)
@@ -634,6 +571,7 @@ class ZivaSetup(nc.NodeCollection):
                     try:
                         tmp = mm.eval('ziva -a')
                         new_att = mc.ls(tmp,type='zAttachment')[0]
+                        self.add_mObject(new_att,att)
                         #print 'creating attachment...',name
                     except:
                         continue
@@ -641,11 +579,13 @@ class ZivaSetup(nc.NodeCollection):
                 else:
                     print mc.warning('skipping attachment creation...'+name)
 
-                
 
-        mps.set_weights(attachments,self,interp_maps=interp_maps)
+            # set the attributes in maya
+            self.set_maya_attrs_for_node(att,attr_filter=attr_filter)
+            self.set_maya_weights_for_node(att,interp_maps=interp_maps)
 
-        base.set_attrs(attachments,attr_filter=attr_filter)
+
+        
 
   
 
@@ -671,17 +611,22 @@ class ZivaSetup(nc.NodeCollection):
 
                     if not mc.objExists(name):
                         if i == 0:
-                            logger.debug('rename-- {} {}'.format(current_material[0],name))
+                            #logger.debug('rename-- {} {}'.format(current_material[0],name))
                             mc.rename(current_material[0],name)
-                            
+                            self.add_mObject(current_material[0],tmp[mesh][i])
                         else:
                             mc.select(mesh)
                             tmpmat = mm.eval('ziva -m')
                             mc.rename(tmpmat[0],name)
+                            self.add_mObject(tmpmat[0],tmp[mesh][i])
+                    else:
+                        self.add_mObject(name,tmp[mesh][i])
 
-        mps.set_weights(materials,self,interp_maps=interp_maps)
 
-        base.set_attrs(materials,attr_filter=attr_filter)
+        # set maya attributes and weights
+        for material in materials:
+            self.set_maya_attrs_for_node(material,attr_filter=attr_filter)
+            self.set_maya_weights_for_node(material,interp_maps=interp_maps)
 
 
     def __apply_fibers(self,interp_maps=False,name_filter=None,attr_filter=None):
@@ -692,19 +637,23 @@ class ZivaSetup(nc.NodeCollection):
 
         for fiber in fibers:
             name = fiber.get_name()
-            #print 'ww',fiber.get_maps()
             association = fiber.get_association()
             if mc.objExists(association[0]):
-                if not mc.objExists(name):
+                if  mm.eval('zQuery -t zFiber ' + association[0]):
+                    if name in mm.eval('zQuery -t zFiber ' + association[0]):
+                        self.add_mObject(name,fiber)
+                else:
                     mc.select(association)
                     tmp = mm.eval('ziva -f')
                     mc.rename(tmp[0],name)
+                    self.add_mObject(tmp[0],fiber)
             else:
                 mc.warning( association[0] +' mesh does not exists in scene, skippings fiber')
-
-        mps.set_weights(fibers,self,interp_maps=interp_maps)
-
-        base.set_attrs(fibers,attr_filter=attr_filter)
+            
+            # set maya attributes and weights
+            self.set_maya_attrs_for_node(fiber,attr_filter=attr_filter)
+            self.set_maya_weights_for_node(fiber,interp_maps=interp_maps)
+        
 
     def __apply_cloth(self,interp_maps=False,name_filter=None,attr_filter=None):
         logger.info('applying cloth') 
@@ -713,7 +662,6 @@ class ZivaSetup(nc.NodeCollection):
 
         for item in cloth:
             name = item.get_name()
-            #print 'ww',fiber.get_maps()
             association = item.get_association()
             if mc.objExists(association[0]):
                 if not mc.objExists(name):
@@ -721,11 +669,14 @@ class ZivaSetup(nc.NodeCollection):
                     tmp = mm.eval('ziva -c')
                     clt = mc.ls(tmp,type='zCloth')[0]
                     mc.rename(clt,name)
+                    self.add_mObject(clt,item)
+                else:
+                    self.add_mObject(name,item)
             else:
                 mc.warning( association[0] +' mesh does not exists in scene, skippings cloth')
 
-
-        base.set_attrs(cloth,attr_filter=attr_filter)
+            # set maya attributes
+            self.set_maya_attrs_for_node(item,attr_filter=attr_filter)
 
     def __apply_embedded(self,interp_maps=False,name_filter=None,attr_filter=None):
         # TODO get maps working and name_filter.  Will need to filter slightly
@@ -738,6 +689,7 @@ class ZivaSetup(nc.NodeCollection):
         if embeddedNode:
             embeddedNode = embeddedNode[0]
             name = embeddedNode.get_name()
+            self.add_mObject(name,embeddedNode)
             collision_meshes = embeddedNode.get_collision_meshes()
             embedded_meshes = embeddedNode.get_embedded_meshes()
 
@@ -759,8 +711,6 @@ class ZivaSetup(nc.NodeCollection):
                         except:
                             pass
 
-    # def mirror(search,replace):
 
-    #     self.string_replace(search,replace)
 
 

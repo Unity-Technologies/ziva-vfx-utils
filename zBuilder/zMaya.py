@@ -270,5 +270,19 @@ def getDependNode(nodeName):
     return dependNode
 
 
+def check_mesh_quality(meshes):
+    '''
+    Light wrapper around checking mesh quality.
 
+    args:
+        meshes (list): A list of meshes you want to check
 
+    '''
+    mc.select(meshes,add=True)
+    mesh_quality = mm.eval('ziva -mq')
+
+    #TODO command return something useful
+    sel = mc.ls(sl=True)
+    if sel:
+        if 'vtx[' in sel[0]:
+            raise StandardError, mesh_quality
