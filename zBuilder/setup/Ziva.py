@@ -666,8 +666,9 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
                     mc.select(association)
                     tmp = mm.eval('ziva -c')
                     clt = mc.ls(tmp,type='zCloth')[0]
-                    mc.rename(clt,name)
                     self.add_mObject(clt,item)
+                    mc.rename(clt,name)
+                    
                 else:
                     self.add_mObject(name,item)
             else:

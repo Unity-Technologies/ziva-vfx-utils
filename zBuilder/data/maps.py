@@ -99,7 +99,7 @@ def replace_longname(search,replace,longName):
 
 
 def set_weights(nodes,data,interp_maps=False):
-    logger.info('DEPRICATED: Use .set_maya_weights_for_node'
+    logger.info('DEPRACATED: Use .set_maya_weights_for_node')
     for node in nodes:
         maps = node.get_maps()
         name = node.get_name()
