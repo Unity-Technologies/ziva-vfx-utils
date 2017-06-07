@@ -269,6 +269,8 @@ def build_attr_key_values(selection,attrList):
     return tmp
 
 def set_attrs(nodes,attr_filter=None):
+    logger.info('DEPRICATED: Use .set_maya_attrs_for_node')
+    
     for node in nodes:
         name = node.get_name()
         type_ = node.get_type()
