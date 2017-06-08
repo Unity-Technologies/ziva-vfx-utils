@@ -1,8 +1,6 @@
 zBuilder package
 ================
 
-Subpackages
------------
 
 .. toctree::
 
@@ -10,8 +8,6 @@ Subpackages
     zBuilder.nodes
     zBuilder.setup
 
-Submodules
-----------
 
 zBuilder\.nodeCollection module
 -------------------------------

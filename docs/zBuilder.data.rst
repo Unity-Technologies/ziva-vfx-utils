@@ -1,9 +1,6 @@
 zBuilder.data package
 =====================
 
-Submodules
-----------
-
 zBuilder.data.maps module
 -------------------------
 

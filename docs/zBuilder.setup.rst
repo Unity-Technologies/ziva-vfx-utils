@@ -1,8 +1,6 @@
 zBuilder\.setup package
 =======================
 
-Submodules
-----------
 
 zBuilder\.setup\.Attributes module
 ----------------------------------
