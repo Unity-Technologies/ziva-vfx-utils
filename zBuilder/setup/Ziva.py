@@ -46,12 +46,14 @@ ZNODES = [
 
 
 
-class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
+class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
     '''
     To capture a ziva setup
     '''
     def __init__(self):
         nc.NodeCollection.__init__(self)
+        sbse.MayaMixin.__init__(self)
+        
         for plugin in mc.pluginInfo( query=True, listPluginsPath=True ):
             cmds = mc.pluginInfo(plugin,q=True,c=True)
             if cmds:
@@ -452,7 +454,7 @@ class ZivaSetup(nc.NodeCollection,sbse.BaseSetup):
             solverTransformName = zSolverTransform.get_name()
 
             if not mc.objExists(solverName):
-                print 'building solver: ',solverName
+                # print 'building solver: ',solverName
                 sol = mm.eval('ziva -s')
                 self.add_mObject(mc.ls(sol,type='zSolver')[0],zSolver)
                 self.add_mObject(mc.ls(sol,type='zSolverTransform')[0],zSolverTransform)
