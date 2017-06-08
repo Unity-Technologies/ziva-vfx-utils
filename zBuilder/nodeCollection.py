@@ -1,6 +1,6 @@
 import json
 import maya.cmds as mc
-import abc
+#import abc
 import re
 import sys
 import os.path
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class NodeCollection(object):
-    __metaclass__ = abc.ABCMeta
+    #__metaclass__ = abc.ABCMeta
     '''
     This is an object that holds the node data in a list
     '''
@@ -331,14 +331,14 @@ class NodeCollection(object):
         return wrapper
 
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def apply(self,*args,**kwargs):
         '''
         must create a method to inherit this class
         '''
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def retrieve_from_scene(self,*args,**kwargs):
         '''
         must create a method to inherit this class
