@@ -3,12 +3,14 @@ import maya.cmds as mc
 
 
 
-
 def copy_paste(*args,**kwargs):
-    # get current selection to re-apply
+    '''
+    A utility wrapper for copying and pasting a tissue
+
+    '''
     sel = mc.ls(sl=True)
 
-    # args
+
     selection = None
     if args:
         selection = mc.ls(args[0],l=True)
