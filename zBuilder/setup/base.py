@@ -9,7 +9,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class BaseSetup(object):
+class MayaMixin(object):
+    """
+    A Mixin class to deal with Maya specific functionality
+
+
+
+    """
+    def __init__(self):
+        self.__mObjects = []
 
 
     def clear_mObjects(self):
