@@ -12,9 +12,6 @@ logger = logging.getLogger(__name__)
 class MayaMixin(object):
     """
     A Mixin class to deal with Maya specific functionality
-
-
-
     """
     def __init__(self):
         self.__mObjects = []
