@@ -18,8 +18,10 @@
 #
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
+# Prepare to import zBuilder by adding it to the path.
+# Prepend, so that other zBuilder installs are not seen.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
 # -- General configuration ------------------------------------------------
 
