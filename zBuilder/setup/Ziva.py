@@ -541,51 +541,62 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                     print 'could not connect %s to %s' % ( str(zTet.get_user_tet_mesh())+'.worldMesh', zTet.get_name()+'.iTet' )
 
 
-        # set tet maps if so desired--------------------------------------------
-        
-
 
     def __apply_attachments(self,interp_maps=False,name_filter=None,attr_filter=None):
         logger.info('applying attachments') 
         attachments = self.get_nodes(type_filter='zAttachment',name_filter=name_filter)
-
-        for att in attachments:
-            name = att.get_name()
-            # check if attachment exists, if it does just update it
-
-            if mc.objExists(name):
-                new_att = name
-                self.add_mObject(new_att,att)
-                #print 'found existing attachment, updating....',new_att
-            else:
-                associations = att.get_association()
-                ass0 = associations[0]
-                ass1 = associations[1]
-
-                if mc.objExists(ass0) and mc.objExists(ass1):
-                    mc.select(ass0,r=True)
-                    mc.select(ass1,add=True)
-
-                    try:
-                        tmp = mm.eval('ziva -a')
-                        new_att = mc.ls(tmp,type='zAttachment')[0]
-                        self.add_mObject(new_att,att)
-                        #print 'creating attachment...',name
-                    except:
-                        continue
-                    mc.rename(new_att,name)
-                else:
-                    print mc.warning('skipping attachment creation...'+name)
-
-
-            # set the attributes in maya
-            self.set_maya_attrs_for_node(att,attr_filter=attr_filter)
-            self.set_maya_weights_for_node(att,interp_maps=interp_maps)
-
-
         
 
-  
+        for attachment in attachments:
+            name = attachment.get_name()
+            s_mesh = attachment.get_association()[0]
+            t_mesh = attachment.get_association()[1]
+
+            if mc.objExists(s_mesh) and mc.objExists(t_mesh):
+                existing_attachments = mm.eval('zQuery -t zAttachment {}'.format(s_mesh))
+                existing = []
+                if existing_attachments:
+                    for existing_attachment in existing_attachments:
+                        att_s = mm.eval('zQuery -as '+existing_attachment)[0]
+                        att_t = mm.eval('zQuery -at '+existing_attachment)[0]
+                        if att_s == s_mesh and att_t == t_mesh:
+                            existing.append(existing_attachment)
+                data_attachments = self.get_nodes(type_filter='zAttachment',name_filter=s_mesh)
+                data = []
+                for data_attachment in data_attachments:
+                    data_s = data_attachment.get_association()[0]
+                    data_t = data_attachment.get_association()[1]
+                    if data_s == s_mesh and data_t == t_mesh:
+                        data.append(data_attachment)
+                print ':::', data,existing
+
+                d_index = data.index(attachment)
+                print d_index
+
+                if existing:
+                    if d_index < len(existing):
+                        self.add_mObject(existing[d_index],attachment)
+                        mc.rename(existing[d_index],name)
+                    else:
+                        mc.select(s_mesh,r=True)
+                        mc.select(t_mesh,add=True)
+                        new_att = mm.eval('ziva -a')
+                        self.add_mObject(new_att[0],attachment)
+                        mc.rename(new_att[0],name)
+                else:
+                    mc.select(s_mesh,r=True)
+                    mc.select(t_mesh,add=True)
+                    new_att = mm.eval('ziva -a')
+                    self.add_mObject(new_att[0],attachment)
+                    mc.rename(new_att[0],name)
+
+            else:
+                print mc.warning('skipping attachment creation...'+name)
+
+                    # set the attributes in maya
+            self.set_maya_attrs_for_node(attachment,attr_filter=attr_filter)
+            self.set_maya_weights_for_node(attachment,interp_maps=interp_maps)
+
 
     def __apply_materials(self,interp_maps=False,name_filter=None,attr_filter=None):
         logger.info('applying materials') 
@@ -667,30 +678,6 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             self.set_maya_weights_for_node(fiber,interp_maps=interp_maps)
 
 
-
-
-
-
-
-        # for fiber in fibers:
-        #     name = fiber.get_name()
-        #     association = fiber.get_association()
-        #     if mc.objExists(association[0]):
-        #         if  mm.eval('zQuery -t zFiber ' + association[0]):
-        #             if name in mm.eval('zQuery -t zFiber ' + association[0]):
-        #                 self.add_mObject(name,fiber)
-        #         else:
-        #             mc.select(association)
-        #             tmp = mm.eval('ziva -f')
-        #             self.add_mObject(tmp[0],fiber)
-        #             mc.rename(tmp[0],name)
-                    
-        #     else:
-        #         mc.warning( association[0] +' mesh does not exists in scene, skippings fiber')
-            
-        #     # set maya attributes and weights
-        #     self.set_maya_attrs_for_node(fiber,attr_filter=attr_filter)
-        #     self.set_maya_weights_for_node(fiber,interp_maps=interp_maps)
         
 
     def __apply_cloth(self,interp_maps=False,name_filter=None,attr_filter=None):
