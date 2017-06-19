@@ -353,7 +353,6 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             fibers=True,embedder=True,permisive=True,cloth=True):
 
         '''
-
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get. 
                 dictionary is key value where key is node type and value is 
@@ -438,7 +437,7 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                     results['names'].append(name)
                     results['nodes'].append(node)
             else:
-                logger.warning( mesh +' does not exist in scene, skipping bone creation')
+                logger.warning( mesh +' does not exist in scene, skipping '+type_+' creation')
 
         return results
 
@@ -592,40 +591,40 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
         logger.info('applying materials') 
         materials = self.get_nodes(type_filter='zMaterial',name_filter=name_filter)
 
+        # - loop through material nodes
+        # - check for existing materials on associated mesh for each material
+        # - check amount of materials on mesh in zBuilder data
+        # - name existing ones same as in data
+        # - build remaining
+        # - set attrs and weights
 
-        tmp = {}
         for material in materials:
+            # get mesh name and node name from data
+            name = material.get_name()
             mesh = material.get_association()[0]
-            if mc.objExists(mesh):
-                if not mesh in tmp:
-                    tmp[mesh] = []
-                tmp[mesh].append(material)
+
+            # get exsisting node names in scene on specific mesh and in data
+            existing_materials = mm.eval('zQuery -t zMaterial {}'.format(mesh))
+            data_materials = self.get_nodes(type_filter='zMaterial',name_filter=mesh)
+            
+
+            d_index = data_materials.index(material)
+
+            # if there are enough existing materials use those
+            # or else create a new material
+            if d_index < len(existing_materials):
+                self.add_mObject(existing_materials[d_index],material)
+                mc.rename(existing_materials[d_index],name)
             else:
-                mc.warning(mesh + ' does not exists in scene, skipping material')
-        for mesh in tmp:
-            current_material = mz.get_zMaterials([mesh])
-            if len(current_material) > 0:
-                for i in range(0,len(tmp[mesh])):
-                    name = tmp[mesh][i].get_name()
-
-                    if not mc.objExists(name):
-                        if i == 0:
-                            #logger.debug('rename-- {} {}'.format(current_material[0],name))
-                            self.add_mObject(current_material[0],tmp[mesh][i])
-                            mc.rename(current_material[0],name)
-                        else:
-                            mc.select(mesh)
-                            tmpmat = mm.eval('ziva -m')
-                            self.add_mObject(tmpmat[0],tmp[mesh][i])
-                            mc.rename(tmpmat[0],name)
-                    else:
-                        self.add_mObject(name,tmp[mesh][i])
+                mc.select(mesh,r=True)
+                tmpmat = mm.eval('ziva -m')
+                self.add_mObject(tmpmat[0],material)
+                mc.rename(tmpmat[0],name)
 
 
-        # set maya attributes and weights
-        for material in materials:
             self.set_maya_attrs_for_node(material,attr_filter=attr_filter)
             self.set_maya_weights_for_node(material,interp_maps=interp_maps)
+
 
 
     def __apply_fibers(self,interp_maps=False,name_filter=None,attr_filter=None):
