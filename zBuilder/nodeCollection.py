@@ -23,7 +23,6 @@ class NodeCollection(object):
 
     
     def __init__(self):
-        #__version__ = '0.9.1'
         import zBuilder
         
         self.collection = []
