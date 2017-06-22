@@ -224,10 +224,26 @@ def rename_ziva_nodes(replace=['_muscle','_bone']):
                 for r in replace:
                     mesh = mesh.replace(r,'')
                 if item != '{}_{}'.format(mesh,zNode):
+                    mc.rename(item,'{}_{}tmp'.format(mesh,zNode))
+        
+        # looping through this twice to get around how maya renames stuff
+        items = mm.eval('zQuery -t "{}" {}'.format(zNode,solver[0]))
+        if items:
+            for item in items:
+                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode,item))[0]
+                for r in replace:
+                    mesh = mesh.replace(r,'')
+                if item != '{}_{}'.format(mesh,zNode):
                     mc.rename(item,'{}_{}'.format(mesh,zNode))
                     print 'rename: ',item,'{}_{}'.format(mesh,zNode)
 
-
+    loas = mc.ls(type='zLineOfAction')
+    if loas:
+        for loa in loas:
+            print loa
+            crv = mc.listConnections(loa+'.oLineOfActionData')[0]
+            mc.rename(loa,crv.replace('_zFiber','_zLineOfAction'))
+            
     attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment',solver[0]))
     if attachments:
         for attachment in attachments:
