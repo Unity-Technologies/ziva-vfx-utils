@@ -3,6 +3,8 @@ import zBuilder.zMaya as mz
 import zBuilder.nodes.base as base
 import zBuilder.nodes.zEmbedder as embedderNode
 import zBuilder.nodes.zTet as tetNode
+import zBuilder.nodes.zLineOfAction as loaNode
+
 
 import zBuilder.data.mesh as msh
 import zBuilder.data.maps as mps
@@ -133,7 +135,21 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                             self.__add_ziva_node(zNode,get_mesh=get_mesh,
                                     attr_filter=None,get_maps=get_maps)
 
-
+            # zLineOfAction is not supported by zQuery.  Until then do it this way
+            # =-=-=-
+            # select all the fiber to find lineOfAction in scene (do not want orphaned ones)
+            fibers = mc.ls(type='zFiber')
+            if fibers:
+                hist = mc.listHistory(fibers)
+                loas = mc.ls(hist,type='zLineOfAction')
+                for loa in loas:
+                    if attr_filter:
+                        if 'zLineOfAction' in attr_filter:
+                            self.__add_ziva_node(loa,get_mesh=get_mesh,
+                                    attr_filter=attr_filter.get('zLineOfAction',None),get_maps=get_maps)
+                    else:
+                        self.__add_ziva_node(loa,get_mesh=get_mesh,
+                                attr_filter=None,get_maps=get_maps)
 
             self.__retrieve_embedded_from_selection(mm.eval('zQuery -t "zTissue" -m'))
             self.stats()
@@ -268,6 +284,9 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
         if type_ == 'zTet':
             node = tetNode.TetNode()
             node.set_user_tet_mesh(mz.get_zTet_user_mesh(zNode))
+        elif type_ == 'zLineOfAction':
+            node = loaNode.LineOfActionNode()
+            node.set_fiber(mz.get_lineOfAction_fiber(zNode))
         else:
             node = base.BaseNode()
 
@@ -568,10 +587,8 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                     data_t = data_attachment.get_association()[1]
                     if data_s == s_mesh and data_t == t_mesh:
                         data.append(data_attachment)
-                print ':::', data,existing
 
                 d_index = data.index(attachment)
-                print d_index
 
                 if existing:
                     if d_index < len(existing):
@@ -671,14 +688,41 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                     tmpmat = mm.eval('ziva -f')
                     self.add_mObject(tmpmat[0],fiber)
                     mc.rename(tmpmat[0],name)
+
             else:
                 logger.warning( mesh +' does not exist in scene, skipping zMaterial creation')
 
             self.set_maya_attrs_for_node(fiber,attr_filter=attr_filter)
             self.set_maya_weights_for_node(fiber,interp_maps=interp_maps)
 
+    def __apply_loa(self,interp_maps=False,name_filter=None,attr_filter=None):
+        logger.info('applying line of action') 
+        loas = self.get_nodes(type_filter='zLineOfAction',name_filter=name_filter)
+
+
+        for item in loas:
+            name = item.get_name()
+            association = item.get_association()
+            fiber = item.get_fiber()
+            if mc.objExists(association[0]) and mc.objExists(fiber) :
+                if not mc.objExists(name):
+                    mc.select(fiber,association[0])
+                    tmp = mm.eval('ziva -lineOfAction')
+                    
+                    clt = mc.ls(tmp,type='zLineOfAction')[0]
+                    self.add_mObject(clt,item)
+                    mc.rename(clt,name)
+                    
+                else:
+                    self.add_mObject(name,item)
+            else:
+                mc.warning( association[0] +' mesh does not exists in scene, skippings line of action')
+
+            # set maya attributes
+            self.set_maya_attrs_for_node(item,attr_filter=attr_filter)
 
         
+
 
     def __apply_cloth(self,interp_maps=False,name_filter=None,attr_filter=None):
         logger.info('applying cloth') 

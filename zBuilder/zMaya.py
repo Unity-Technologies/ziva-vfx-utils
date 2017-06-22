@@ -171,6 +171,12 @@ def get_zTet_user_mesh(zNode):
     else:
         return mesh
 
+def get_lineOfAction_fiber(zNode):
+    conn = mc.listConnections(zNode+'.oLineOfActionData')
+    if conn:
+        return conn
+    else:
+        return None
 
 
 def get_association(zNode):
@@ -184,6 +190,11 @@ def get_association(zNode):
         #mc.select(sel,r=True)
 
         return tmp
+
+    elif _type == 'zLineOfAction':
+        tmp = mc.listConnections(zNode+'.curves')
+        return tmp
+
 
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type,zNode)
