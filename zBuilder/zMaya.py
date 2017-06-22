@@ -237,13 +237,13 @@ def rename_ziva_nodes(replace=['_muscle','_bone']):
                     mc.rename(item,'{}_{}'.format(mesh,zNode))
                     print 'rename: ',item,'{}_{}'.format(mesh,zNode)
 
+    # for now doinng an ls type for lineOfActions until with have zQuery support
     loas = mc.ls(type='zLineOfAction')
     if loas:
         for loa in loas:
-            print loa
             crv = mc.listConnections(loa+'.oLineOfActionData')[0]
             mc.rename(loa,crv.replace('_zFiber','_zLineOfAction'))
-            
+
     attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment',solver[0]))
     if attachments:
         for attachment in attachments:
