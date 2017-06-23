@@ -1,7 +1,7 @@
-zBuilder
-========
+zBuilder Package
+================
 
 .. toctree::
    :maxdepth: 4
 
-   zBuilder
+   zBuilder_package

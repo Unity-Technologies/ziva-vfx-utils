@@ -59,6 +59,7 @@ class MayaMixin(object):
 
         name = self.__get_name_from_mObject(node)
         if not name:
+            # if we have a mObject stored for node use it.  Ir else use the name
             name = node.get_name()
             
         type_ = node.get_type()
@@ -95,6 +96,7 @@ class MayaMixin(object):
         maps = node.get_maps()
         name = self.__get_name_from_mObject(node)
         if not name:
+            # if we have a mObject stored for node use it.  Ir else use the name
             name = node.get_name()
         oname = node.get_name()
 

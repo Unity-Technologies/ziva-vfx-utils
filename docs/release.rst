@@ -8,7 +8,7 @@ Release Notes
 * zMaya.rename_ziva_nodes() handles zBones and zCloth
 
 0.10.0
------
+------
 * save out component data and node data seperatly
 * changed map.py to maps.py
 * fixed bug in cloth creation

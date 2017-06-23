@@ -1,43 +1,11 @@
-zBuilder package
-================
+zBuilder
+========
+
+zBuilder saves the current state of the ziva setup and allows you to re-build
+scene among other things.  For example searching and replacing and using that
+to mirror setups.  The basic idea is to build a ziva setup by hand and use these 
+scripts to save it.
 
 
-.. toctree::
 
-    zBuilder.data
-    zBuilder.nodes
-    zBuilder.setup
-
-
-zBuilder\.nodeCollection module
--------------------------------
-
-.. automodule:: zBuilder.nodeCollection
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-zBuilder\.util module
----------------------
-
-.. automodule:: zBuilder.util
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-zBuilder\.zMaya module
-----------------------
-
-.. automodule:: zBuilder.zMaya
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: zBuilder
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. include:: zBuilder_tutorials.include.rst
