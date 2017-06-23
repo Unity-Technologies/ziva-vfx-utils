@@ -354,7 +354,7 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
                 type_ = mz.get_type(embedder)
 
                 # get attributes/values
-                attrList = base.build_attr_list(embedder,attr_filter=attr_filter.get('zEmbedder',None))
+                attrList = base.build_attr_list(embedder)
                 attrs = base.build_attr_key_values(embedder,attrList)
 
                 node = embedderNode.EmbedderNode()
@@ -567,6 +567,9 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
 
+
+
+
     def __apply_attachments(self,interp_maps=False,name_filter=None,attr_filter=None):
          
         attachments = self.get_nodes(type_filter='zAttachment',name_filter=name_filter)
@@ -578,7 +581,9 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             s_mesh = attachment.get_association()[0]
             t_mesh = attachment.get_association()[1]
 
-            if mc.objExists(s_mesh) and mc.objExists(t_mesh):
+            # check if both meshes exist
+            if mz.check_body_type([s_mesh,t_mesh]):
+
                 existing_attachments = mm.eval('zQuery -t zAttachment {}'.format(s_mesh))
                 existing = []
                 if existing_attachments:
@@ -617,7 +622,7 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             else:
                 print mc.warning('skipping attachment creation...'+name)
 
-                    # set the attributes in maya
+            # set the attributes in maya
             self.set_maya_attrs_for_node(attachment,attr_filter=attr_filter)
             self.set_maya_weights_for_node(attachment,interp_maps=interp_maps)
 

@@ -35,6 +35,30 @@ def create_zBone(bodies):
     mc.select(sel,r=True)
     return mobjs
 
+def check_body_type(bodies):
+    '''
+    Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
+    used to see if we can create a zAttachment before we try.  Additionaly 
+    does a check if all objects exist in scene.
+
+    Args:
+        bodies (list):  List of bodies we want to check type of.  
+
+    Rerturns:
+        (bool): True if all bodies pass test, else False.
+    '''
+    sel = mc.ls(sl=True)
+    for body in bodies:
+        if not mc.objExists(body):
+            return False
+
+    mc.select(bodies)
+    bt = mm.eval('zQuery -bt')
+
+    if len(bt) == len(bodies):
+        return True
+    else:
+        return False
 
 def get_type(body):
     try:
@@ -304,11 +328,12 @@ def check_mesh_quality(meshes):
     args:
         meshes (list): A list of meshes you want to check
 
+     Raises:
+            StandardError: If any mesh does not pass mesh check
     '''
     mc.select(meshes,add=True)
     mesh_quality = mm.eval('ziva -mq')
 
-    #TODO command return something useful
     sel = mc.ls(sl=True)
     if sel:
         if 'vtx[' in sel[0]:

@@ -238,7 +238,16 @@ def replace_longname(search,replace,longName):
 
 
 def build_attr_list(selection,attr_filter=None):
+    '''
+    Builds a list of attributes to store values for.  It is looking at keyable
+    attributes and if they are in channelBox.  
 
+    Args:
+        selection (str): maya object to find attributes
+
+    returns:
+        list: list of attributes names
+    '''
     exclude = ['controlPoints','uvSet','colorSet','weightList','pnts',
         'vertexColor','target']
 
