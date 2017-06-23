@@ -1,14 +1,13 @@
-
-from base import BaseNode
+import zBuilder.nodes.base as base
 
 import re
 import logging
 
 logger = logging.getLogger(__name__)
 
-class LineOfActionNode(BaseNode):
+class LineOfActionNode(base.BaseNode):
     def __init__(self):
-        BaseNode.__init__(self)
+        base.BaseNode.__init__(self)
         self._zFiber = None
 
     def set_fiber(self,fiber):
@@ -29,38 +28,8 @@ class LineOfActionNode(BaseNode):
         # name replace----------------------------------------------------------
         name = self.get_fiber(longName=True)
         if name:
-           newName = replace_longname(search,replace,name)
+           newName = base.replace_longname(search,replace,name)
            self.set_fiber(newName)
 
 
 
-
-
-
-def replace_longname(search,replace,longName):
-    '''
-    does a search and replace on a long name.  It splits it up by ('|') then
-    performs it on each piece
-
-    Args:
-        search (str): search term
-        replace (str): replace term
-        longName (str): the long name to perform action on
-
-    returns:
-        str: result of search and replace
-    '''
-    items = longName.split('|')
-    newName = ''
-    for i in items:
-        if i:
-            i = re.sub(search, replace,i)
-            if '|' in longName:
-                newName+='|'+i
-            else:
-                newName += i
-
-    if newName != longName:
-        logger.info('replacing name: {}  {}'.format(longName,newName))
-
-    return newName
