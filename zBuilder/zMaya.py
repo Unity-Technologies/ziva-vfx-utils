@@ -174,7 +174,7 @@ def get_zTet_user_mesh(zNode):
 def get_lineOfAction_fiber(zNode):
     conn = mc.listConnections(zNode+'.oLineOfActionData')
     if conn:
-        return conn
+        return conn[0]
     else:
         return None
 

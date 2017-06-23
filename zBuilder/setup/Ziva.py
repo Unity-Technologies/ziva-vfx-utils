@@ -369,7 +369,7 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
     @nc.time_this
     def apply(self,name_filter=None,attr_filter=None,interp_maps='auto',
             solver=True,bones=True,tissues=True,attachments=True,materials=True,
-            fibers=True,embedder=True,permisive=True,cloth=True):
+            fibers=True,embedder=True,permisive=True,cloth=True,lineOfActions=True):
 
         '''
         Args:
@@ -412,7 +412,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
         if fibers:
             self.__apply_fibers(interp_maps=interp_maps,name_filter=name_filter,
                 attr_filter=attr_filter)
-
+        if lineOfActions:
+            self.__apply_loa(interp_maps=interp_maps,name_filter=name_filter,
+                attr_filter=attr_filter)
+            
         if embedder:
             self.__apply_embedded()
 
@@ -461,9 +464,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
         return results
 
     def __apply_solver(self,attr_filter=None):
-        logger.info('applying solver')  
+         
         zSolver = self.get_nodes(type_filter='zSolver')
-
+        if zSolver:
+            logger.info('applying solver') 
         if len(zSolver) > 0:
             zSolver = zSolver[0]
             zSolverTransform = self.get_nodes(type_filter='zSolverTransform')[0]
@@ -489,13 +493,13 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
     def __apply_bones(self,name_filter=None,attr_filter=None):
-
-        logger.info('applying bones') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
         
         zBones = self.get_nodes(type_filter='zBone',name_filter=name_filter)
+        if zBones:
+            logger.info('applying bones') 
         results = self.__cull_creation_nodes(zBones)
 
         # check mesh quality----------------------------------------------------
@@ -515,7 +519,6 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             self.set_maya_attrs_for_node(zBone,attr_filter=attr_filter)
 
     def __apply_tissues(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying tissues') 
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
@@ -523,6 +526,9 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
         # get zTets and zTissues in data----------------------------------------
         zTets = self.get_nodes(type_filter='zTet',name_filter=name_filter)
         zTissues = self.get_nodes(type_filter='zTissue',name_filter=name_filter)
+        if zTissues:
+            logger.info('applying tissues') 
+
 
         tet_results = self.__cull_creation_nodes(zTets)
         tissue_results = self.__cull_creation_nodes(zTissues)
@@ -562,9 +568,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
     def __apply_attachments(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying attachments') 
+         
         attachments = self.get_nodes(type_filter='zAttachment',name_filter=name_filter)
-        
+        if attachments:
+            logger.info('applying attachments')
 
         for attachment in attachments:
             name = attachment.get_name()
@@ -616,8 +623,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
     def __apply_materials(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying materials') 
+        
         materials = self.get_nodes(type_filter='zMaterial',name_filter=name_filter)
+        if materials:
+            logger.info('applying materials') 
 
         # - loop through material nodes
         # - check for existing materials on associated mesh for each material
@@ -658,9 +667,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
     def __apply_fibers(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying fibers') 
-        fibers = self.get_nodes(type_filter='zFiber',name_filter=name_filter)
 
+        fibers = self.get_nodes(type_filter='zFiber',name_filter=name_filter)
+        if fibers:
+            logger.info('applying fibers') 
 
         for fiber in fibers:
             # get mesh name and node name from data
@@ -696,9 +706,10 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
             self.set_maya_weights_for_node(fiber,interp_maps=interp_maps)
 
     def __apply_loa(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying line of action') 
+        
         loas = self.get_nodes(type_filter='zLineOfAction',name_filter=name_filter)
-
+        if loas:
+            logger.info('applying line of action')             
 
         for item in loas:
             name = item.get_name()
@@ -725,9 +736,9 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
 
     def __apply_cloth(self,interp_maps=False,name_filter=None,attr_filter=None):
-        logger.info('applying cloth') 
         cloth = self.get_nodes(type_filter='zCloth',name_filter=name_filter)
-
+        if cloth:
+            logger.info('applying cloth') 
 
         for item in cloth:
             name = item.get_name()
@@ -747,6 +758,8 @@ class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
 
             # set maya attributes
             self.set_maya_attrs_for_node(item,attr_filter=attr_filter)
+
+
 
     def __apply_embedded(self,interp_maps=False,name_filter=None,attr_filter=None):
         # TODO get maps working and name_filter.  Will need to filter slightly

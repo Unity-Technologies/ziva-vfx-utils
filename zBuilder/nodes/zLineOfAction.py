@@ -27,10 +27,10 @@ class LineOfActionNode(BaseNode):
         super(LineOfActionNode, self).string_replace(search,replace)
 
         # name replace----------------------------------------------------------
-        #name = self.get_user_tet_mesh(longName=True)
-        #if name:
-        #    newName = replace_longname(search,replace,name)
-        #    self.set_user_tet_mesh(newName)
+        name = self.get_fiber(longName=True)
+        if name:
+           newName = replace_longname(search,replace,name)
+           self.set_fiber(newName)
 
 
 
