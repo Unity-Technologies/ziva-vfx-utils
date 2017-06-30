@@ -1,5 +1,11 @@
 Release Notes
 =============
+0.11.1
+------
+* Material, Fiber and Attachment creation now more robust.  No longer name cascading problems.
+* lineOfAction node added 
+
+
 0.11.0
 ------
 * removed abstract methods from NodeCollection
