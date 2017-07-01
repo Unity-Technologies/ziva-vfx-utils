@@ -188,23 +188,45 @@ def get_zCloth(bodies):
     else:
         return []
 
-def get_zTet_user_mesh(zNode):
-    mesh = mc.listConnections(zNode+'.iTet')
-    if mesh:
-        return mc.ls(mesh[0],l=True)[0]
-    else:
-        return mesh
+def get_zTet_user_mesh(zTet):
+    '''
+    Gets the user tet mesh hooked up to a given zTet in any.
 
-def get_lineOfAction_fiber(zNode):
-    conn = mc.listConnections(zNode+'.oLineOfActionData')
-    if conn:
-        return conn[0]
+    args:
+        zTet (string): the zTet to query.
+    '''
+    if mc.objExists(zTet+'.iTet'):
+        mesh = mc.listConnections(zTet+'.iTet')
+        if mesh:
+            return mc.ls(mesh[0],l=True)[0]
+        else:
+            return mesh
+    return None
+
+def get_lineOfAction_fiber(zFiber):
+    '''
+    Gets the zLineOfAction node hooked up to a given zFiber in any.
+
+    args:
+        zFiber (string): the zFiber to query.
+    '''
+    if mc.objExists(zFiber+'.oLineOfActionData'):
+        conn = mc.listConnections(zFiber+'.oLineOfActionData')
+        if conn:
+            return conn[0]
+        else:
+            return None
     else:
         return None
 
 
 def get_association(zNode):
-    #sel = mc.ls(sl=True)
+    '''
+    Gets an association of given zNode
+
+    args:
+        zNode (string): the zNode to find association of.
+    '''
     _type = mc.objectType(zNode)
 
     if _type == 'zAttachment':
@@ -238,13 +260,13 @@ def rename_ziva_nodes(replace=['_muscle','_bone']):
     args:
         replace (list): subset of mesh name to replace with zNode name
 
-    zFiber: <meshName>_zFiber
-    zMaterial: <meshName>_zMaterial
-    zTet: <meshName>_zTet
-    zTissue: <meshName>_zTissue
-    zBone: <meshName>_zBone
-    zCloth: <meshName>_zCloth
-    zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
+    * zFiber: <meshName>_zFiber
+    * zMaterial: <meshName>_zMaterial
+    * zTet: <meshName>_zTet
+    * zTissue: <meshName>_zTissue
+    * zBone: <meshName>_zBone
+    * zCloth: <meshName>_zCloth
+    * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     '''
     sel = mc.ls(sl=True)
     solver = mm.eval('zQuery -t "zSolver"')
@@ -276,8 +298,9 @@ def rename_ziva_nodes(replace=['_muscle','_bone']):
     loas = mc.ls(type='zLineOfAction')
     if loas:
         for loa in loas:
-            crv = mc.listConnections(loa+'.oLineOfActionData')[0]
-            mc.rename(loa,crv.replace('_zFiber','_zLineOfAction'))
+            crv = mc.listConnections(loa+'.oLineOfActionData')
+            if crv:
+                mc.rename(loa,crv[0].replace('_zFiber','_zLineOfAction'))
 
     attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment',solver[0]))
     if attachments:
@@ -297,6 +320,9 @@ def rename_ziva_nodes(replace=['_muscle','_bone']):
 
 
 def select_tissue_meshes():
+    '''
+    Selects all zTissues in scene
+    '''
     mc.select(cl=True)
     meshes = mm.eval('zQuery -t "zTissue" -m')
     mc.select(meshes)
@@ -304,7 +330,8 @@ def select_tissue_meshes():
 
 
 def getDependNode(nodeName):
-    """Get an MObject (depend node) for the associated node name
+    '''
+    Get an MObject (depend node) for the associated node name
 
     :Parameters:
         nodeName
@@ -312,7 +339,7 @@ def getDependNode(nodeName):
     
     :Return: depend node (MObject)
 
-    """
+    '''
     dependNode = om.MObject()
     selList = om.MSelectionList()
     selList.add(nodeName)
