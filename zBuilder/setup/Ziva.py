@@ -5,12 +5,11 @@ import zBuilder.nodes.zEmbedder as embedderNode
 import zBuilder.nodes.zTet as tetNode
 import zBuilder.nodes.zLineOfAction as loaNode
 
-
 import zBuilder.data.mesh as msh
 import zBuilder.data.maps as mps
 
 import zBuilder.nodeCollection as nc
-import zBuilder.setup.base as sbse
+from zBuilder.main import Builder
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -48,13 +47,12 @@ ZNODES = [
 
 
 
-class ZivaSetup(nc.NodeCollection,sbse.MayaMixin):
+class ZivaSetup(Builder):
     '''
     To capture a ziva setup
     '''
     def __init__(self):
-        nc.NodeCollection.__init__(self)
-        sbse.MayaMixin.__init__(self)
+        Builder.__init__(self)
         
         for plugin in mc.pluginInfo( query=True, listPluginsPath=True ):
             cmds = mc.pluginInfo(plugin,q=True,c=True)
