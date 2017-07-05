@@ -642,10 +642,18 @@ def check_mesh_quality(meshes):
      Raises:
             StandardError: If any mesh does not pass mesh check
     '''
-    mc.select(meshes,add=True)
-    mesh_quality = mm.eval('ziva -mq')
 
-    sel = mc.ls(sl=True)
-    if sel:
-        if 'vtx[' in sel[0]:
-            raise StandardError, mesh_quality
+    tmp = []
+    for s in meshes:
+        mc.select(s,r=True)
+        mm.eval('ziva -mq')
+        sel2 = mc.ls(sl=True)
+        if sel2[0] != s:
+            tmp.extend(sel2)
+            
+    if tmp:
+        mc.select(tmp)
+        raise StandardError, 'check meshes!'
+    else:
+        mc.select(meshes)
+
