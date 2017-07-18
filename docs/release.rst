@@ -1,5 +1,11 @@
 Release Notes
 =============
+0.11.2
+------
+* Restructure of class hierarchy
+* packages can extend themselves
+* bug fixes
+
 0.11.1
 ------
 * Material, Fiber and Attachment creation now more robust.  No longer name cascading problems.
