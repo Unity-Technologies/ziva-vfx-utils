@@ -54,6 +54,9 @@ icons['zFiber']=            'icons\\zFiber.png'
 icons['zEmbedder']=            'icons\\out_zSolver.png'
 icons['zCache']=            'icons\\zFiber.png'
 icons['zCacheTransform']=            'icons\\zFiber.png'
+icons['zCloth']=            'icons\\zFiber.png'
+
+
 # todo share resource for zNodeCapture
 maplist = {}
 maplist['zTet'] = ['weightList[0].weights']
@@ -705,12 +708,12 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         nodes_to_cb = []  # storing nodes to add a delete callback
         sel = mc.ls(sl=True)
         mc.select(cl=True)
-        self.nodeCallbacks.clear()
+        #self.nodeCallbacks.clear()
         self.attrWidgets.clear()
-        self._deferredUpdateRequest.clear()
+        #self._deferredUpdateRequest.clear()
 
-        cb2 = om.MDGMessage.addNodeAddedCallback( self._node_created )
-        self.nodeCallbacks['__createCB'] =MCallbackIdWrapper(cb2)
+        #cb2 = om.MDGMessage.addNodeAddedCallback( self._node_created )
+        #self.nodeCallbacks['__createCB'] =MCallbackIdWrapper(cb2)
 
         solvers = None
         try:
@@ -750,7 +753,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                         st_item.attrs = attrs[0]
                         st_item.attr_order = attrs[1]
                         st_item.node_type = _type
-                        nodes_to_cb.append(zNode)
+                        #nodes_to_cb.append(zNode)
 
                 self.treeWidget.addTopLevelItem(s_item)
                 s_item.setExpanded(True)
@@ -782,11 +785,13 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                                     c_item.attrs = attrs[0]
                                     c_item.attr_order = attrs[1]
                                     c_item.node_type = zNode
-                                    nodes_to_cb.append(node)
+                                    #nodes_to_cb.append(node)
 
                         #self.treeWidget.addTopLevelItem(item)
 
-
+                #---------------------------------------------------------------
+                # BONES --------------------------------------------------------
+                #---------------------------------------------------------------
                 bone_meshes = self.get_bone_meshes(solver)
                 if bone_meshes:
                     for mesh in bone_meshes:
@@ -806,7 +811,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                         b_item.attrs = attrs[0]
                         b_item.attr_order = attrs[1]
                         b_item.node_type = 'zBone'
-                        nodes_to_cb.append(zBone)
+                        #nodes_to_cb.append(zBone)
 
                         zNodes = ['zAttachment']
                         for zNode in zNodes:
@@ -829,44 +834,74 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                                     c_item.attrs = attrs[0]
                                     c_item.attr_order = attrs[1]
                                     c_item.node_type = zNode
-                                    nodes_to_cb.append(node)
+                                    #nodes_to_cb.append(node)
+
+                #---------------------------------------------------------------
+                # BCLOTH --------------------------------------------------------
+                #---------------------------------------------------------------
+                cloth_meshes = self.get_cloth_meshes(solver)
+                cloth_items = []
+                if cloth_meshes:
+                    for mesh in cloth_meshes:
+                        item = QtGui.QTreeWidgetItem(s_item,0)
+                        item.setText(0,mesh)
+                        item.setIcon(0,QtGui.QIcon(icons['zTissue']))
+                        item.setData(0,QtCore.Qt.UserRole, util.getDependNode(mesh))
+                        item.attrs = []
+                        item.attr_order = []
+                        # tet---------------------------------------------------------------
+                        zNodes = ['zCloth','zAttachment','zMaterial','zFiber']
+                        for zNode in zNodes:
+                            nodes = mm.eval('zQuery -t %s %s' % (zNode,mesh))
+                            if nodes:
+                                for node in nodes:
+                                    c_item = QtGui.QTreeWidgetItem(item,1)
+                                    c_item.setText(0,node)
+                                    c_item.setIcon(0,QtGui.QIcon(icons[zNode]))
+                                    c_item.setData(0,QtCore.Qt.UserRole, util.getDependNode(node))
+                                    c_item.name = node
+                                    c_item.node_type = zNode
+                                    attrs = self.get_properties_wrapper(node)
+                                    c_item.attrs = attrs[0]
+                                    c_item.attr_order = attrs[1]
+                                    c_item.node_type = zNode
 
                         #self.treeWidget.addTopLevelItem(item3)
 
 
-            for node in nodes_to_cb:
-                #print node
-                nodeObj = util.getDependNode(node)
-                cb = om.MNodeMessage.addNodeAboutToDeleteCallback(nodeObj, self.onDirtyPlug, None)
+            # for node in nodes_to_cb:
+            #     #print node
+            #     nodeObj = util.getDependNode(node)
+            #     cb = om.MNodeMessage.addNodeAboutToDeleteCallback(nodeObj, self.onDirtyPlug, None)
 
                 
-                #cb.setRegisteringCallableScript()
-                self.nodeCallbacks[node] =MCallbackIdWrapper(cb)
+            #     #cb.setRegisteringCallableScript()
+            #     self.nodeCallbacks[node] =MCallbackIdWrapper(cb)
 
 
             self._foreground_item_enable_color()
 
 
 
-    def _node_created(self,*args,**kwargs):
-        #print 'node created: ',args,kwargs
-        #print mc.ls(sl=True),'what what'
-        mobject = args[0]
-        if mobject.hasFn(om.MFn.kDagNode):
-            dagpath = om.MDagPath()
-            om.MFnDagNode(mobject).getPath(dagpath)
-            name = dagpath.fullPathName()
-        else:
-            name = om.MFnDependencyNode(mobject).name()
-        print 'created:',name
-        if mc.objectType(name) in con.ZNODES:
-            #print 'found a match',mc.objectType(name)
-            mc.select(name)
+    # def _node_created(self,*args,**kwargs):
+    #     #print 'node created: ',args,kwargs
+    #     #print mc.ls(sl=True),'what what'
+    #     mobject = args[0]
+    #     if mobject.hasFn(om.MFn.kDagNode):
+    #         dagpath = om.MDagPath()
+    #         om.MFnDagNode(mobject).getPath(dagpath)
+    #         name = dagpath.fullPathName()
+    #     else:
+    #         name = om.MFnDependencyNode(mobject).name()
+    #     print 'created:',name
+    #     if mc.objectType(name) in con.ZNODES:
+    #         #print 'found a match',mc.objectType(name)
+    #         mc.select(name)
 
-            refreshFunc = functools.partial(
-                    self._refresh_ui,
-                    type='nodeCreated')
-            mc.evalDeferred(refreshFunc,low=True)
+    #         refreshFunc = functools.partial(
+    #                 self._refresh_ui,
+    #                 type='nodeCreated')
+    #         mc.evalDeferred(refreshFunc,low=True)
 
 
             
@@ -1074,26 +1109,16 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
 
-
+    def get_cloth_meshes(self,solver):
+        meshes = mm.eval('zQuery -t zCloth -m ' + solver)
+        return meshes
 
     def get_tissue_meshes(self,solver):
         meshes = mm.eval('zQuery -t zTissue -m '+ solver)
-
-        # meshes = []
-        # for zTissue in zTissues:
-        #     geo = mc.listConnections(zTissue+'.iGeo')[0]
-        #     meshes.append(mc.listConnections(geo+'.iNeutralMatrix')[0])
-            
         return meshes
 
     def get_bone_meshes(self,solver):
-        #zTissues = mc.ls(type='zBone')
         meshes = mm.eval('zQuery -t zBone -m ' + solver)
-        # meshes = []
-        # for zTissue in zTissues:
-        #     geo = mc.listConnections(zTissue+'.iGeo')[0]
-        #     meshes.append(mc.listConnections(geo+'.iNeutralMatrix')[0])
-            
         return meshes
 
 
