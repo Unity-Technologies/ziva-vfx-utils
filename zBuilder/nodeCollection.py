@@ -21,36 +21,33 @@ class NodeCollection(object):
     This is an object that holds the node data in a list
     '''
 
-    
     def __init__(self):
         import zBuilder
         
-        self.collection = []
-        self.data = {} #: DATTTTA
+        self.__collection = []
+        self.data = {}
         self.info = {}
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
-        
 
+    def print_(self, type_filter=None, name_filter=None, component_data=True):
 
-
-    def print_(self,type_filter=None,name_filter=None,component_data=True):
-
-        '''print info on each node
+        '''
+        print info on each node
 
         Args:
             type_filter (str): filter by node type.  Defaults to None
             name_filter (str): filter by node name. Defaults to None
-            print_data (bool): prints name of data stored.  Defaults to False
+            component_data (bool): prints name of data stored.  Defaults to False
 
         '''
 
         for node in self.get_nodes(type_filter=type_filter,name_filter=name_filter):
 
             node.print_()
-        print '-----------------------------------------------------------------'
+        print '----------------------------------------------------------------'
         for key in self.data:
             print 'Component Data - {}: {}'.format(key,self.data[key].keys())
 
@@ -78,7 +75,7 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         '''
         tmp = {}
-        for i,d in enumerate(self.collection):
+        for i,d in enumerate(self.get_nodes()):
             t = d.get_type()
             if type_filter:
                 if type_filter==t:
@@ -157,7 +154,7 @@ class NodeCollection(object):
         Args:
             node (obj): the node obj to append to collection list.
         '''
-        self.collection.append(node)
+        self.__collection.append(node)
 
 
     def get_nodes(self,type_filter=None,name_filter=None):
@@ -173,9 +170,9 @@ class NodeCollection(object):
         '''
         items = []
         if not type_filter:
-            return self.collection
+            return self.__collection
         else:
-            for i,node in enumerate(self.collection):
+            for i, node in enumerate(self.__collection):
                 if node.get_type() == type_filter:
 
                     if name_filter:
@@ -187,7 +184,26 @@ class NodeCollection(object):
                         items.append(node)
         return items
 
+    def get_node_by_name(self, name):
+        """
+        utility function to get node by name.
 
+        Args:
+            name (str): name of node.
+
+        Returns:
+            builder node (obj)
+        """
+        for node in self.__collection:
+            if node.get_name() == name:
+                return node
+
+    def set_nodes(self, nodes):
+        """
+        Args:
+            nodes (list): the nodes to replace the collection with
+        """
+        self.__collection = nodes
 
 
     def string_replace(self,search,replace):
@@ -278,7 +294,7 @@ class NodeCollection(object):
 
         if node_data:
             logger.info("writing node_data")
-            tmp.append(self.__wrap_data(self.collection,'node_data'))
+            tmp.append(self.__wrap_data(self.get_nodes(),'node_data'))
         if component_data:
             logger.info("writing component_data")
             tmp.append(self.__wrap_data(self.data,'component_data'))
@@ -290,14 +306,14 @@ class NodeCollection(object):
 
     def from_json_data(self, data):
         '''
-        Gets data out of json serilization
+        Gets data out of json serialization
         '''
         data = self.__check_data(data)
 
         for d in data:
             if d['d_type'] == 'node_data':
                 logger.info("reading node_data")
-                self.collection = d['data']
+                set_nodes(d['data'])
             if d['d_type'] == 'component_data':
                 logger.info("reading component_data")
                 self.data = d['data']
