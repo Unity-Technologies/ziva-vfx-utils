@@ -1,19 +1,18 @@
-import zBuilder.nodes.base as base
+from zBuilder.nodes.base import BaseNode
 
-import re
 import logging
 
 logger = logging.getLogger(__name__)
 
-class TetNode(base.BaseNode):
+class TetNode(BaseNode):
     def __init__(self):
-        base.BaseNode.__init__(self)
+        BaseNode.__init__(self)
         self._user_tet_mesh = None
 
     def set_user_tet_mesh(self,mesh):
         self._user_tet_mesh = mesh
 
-    def get_user_tet_mesh(self,longName=False):
+    def get_user_tet_mesh(self, longName=False):
         if self._user_tet_mesh:
             if longName:
                 return self._user_tet_mesh
@@ -33,7 +32,7 @@ class TetNode(base.BaseNode):
         # name replace----------------------------------------------------------
         name = self.get_user_tet_mesh(longName=True)
         if name:
-            newName = base.replace_longname(search,replace,name)
+            newName = self.replace_longname(search,replace,name)
             self.set_user_tet_mesh(newName)
 
 

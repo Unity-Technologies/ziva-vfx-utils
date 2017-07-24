@@ -51,7 +51,7 @@ class BaseNode(object):
     def string_replace(self,search,replace):
         # name replace----------------------------------------------------------
         name = self.get_name(longName=True)
-        newName = replace_longname(search,replace,name)
+        newName = self.replace_longname(search,replace,name)
         self.set_name(newName)
 
 
@@ -61,7 +61,7 @@ class BaseNode(object):
         newNames = []
         if assNames:
             for name in assNames:
-                newName = replace_longname(search,replace,name)
+                newName = self.replace_longname(search,replace,name)
                 newNames.append(newName)
             self.set_association(newNames)
 
@@ -71,12 +71,12 @@ class BaseNode(object):
         tmp = []
         if maps:
             for item in maps:
-                tmp.append(replace_longname(search,replace,item))
+                tmp.append(self.replace_longname(search,replace,item))
             self.set_maps(tmp)
 
         #for key in maps:
         #    if maps[key].get('mesh',None):
-        #        maps[key]['mesh'] = replace_longname(search,replace,maps[key]['mesh'])
+        #        maps[key]['mesh'] = self.replace_longname(search,replace,maps[key]['mesh'])
         #        #print 'hmm',self.get_name(),maps[key]
 
 
@@ -205,36 +205,33 @@ class BaseNode(object):
                     if sceneVal != objVal:
                         print 'DIFF:',name+'.'+attr, '\tobject value:',objVal, '\tscene value:',sceneVal
 
+    def replace_longname(self, search, replace, longName):
+        '''
+        does a search and replace on a long name.  It splits it up by ('|') then
+        performs it on each piece
 
-    
+        Args:
+            search (str): search term
+            replace (str): replace term
+            longName (str): the long name to perform action on
 
-def replace_longname(search,replace,longName):
-    '''
-    does a search and replace on a long name.  It splits it up by ('|') then
-    performs it on each piece
+        returns:
+            str: result of search and replace
+        '''
+        items = longName.split('|')
+        newName = ''
+        for i in items:
+            if i:
+                i = re.sub(search, replace,i)
+                if '|' in longName:
+                    newName+='|'+i
+                else:
+                    newName += i
 
-    Args:
-        search (str): search term
-        replace (str): replace term
-        longName (str): the long name to perform action on
+        if newName != longName:
+            logger.info('replacing name: {}  {}'.format(longName,newName))
 
-    returns:
-        str: result of search and replace
-    '''
-    items = longName.split('|')
-    newName = ''
-    for i in items:
-        if i:
-            i = re.sub(search, replace,i)
-            if '|' in longName:
-                newName+='|'+i
-            else:
-                newName += i
-
-    if newName != longName:
-        logger.info('replacing name: {}  {}'.format(longName,newName))
-
-    return newName
+        return newName
 
 
 def build_attr_list(selection,attr_filter=None):

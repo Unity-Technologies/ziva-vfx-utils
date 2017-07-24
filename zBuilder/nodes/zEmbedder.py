@@ -1,4 +1,4 @@
-import zBuilder.nodes.base as base
+from zBuilder.nodes.base import BaseNode
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -6,18 +6,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class EmbedderNode(base.BaseNode):
+class EmbedderNode(BaseNode):
     def __init__(self):
-        base.BaseNode.__init__(self)
+        BaseNode.__init__(self)
 
         self.__embedded_meshes = None
         self.__collision_meshes = None
 
-    def string_replace(self,search,replace,name=True,association=True):
-        super(EmbedderNode, self).string_replace(search,replace)
+    def string_replace(self, search, replace, name=True, association=True):
+        super(EmbedderNode, self).string_replace(search, replace)
         print 'zEmbedder:string_replace'
 
-   
     def set_collision_meshes(self,meshes):
         self.__collision_meshes = meshes
 

@@ -612,10 +612,11 @@ def get_tissue_children(ztissue):
         child_attr = '{}.oChildTissue'.format(ztissue)
         if mc.objExists(child_attr):
             children = mc.listConnections(child_attr)
+
             if children:
                 sel = mc.ls(sl=True)
                 mc.select(children)
-                tmp.extend(mm.eval('zQuery -t zTissue -m'))
+                tmp.extend(mm.eval('zQuery -t zTissue -m -l'))
                 mc.select(sel)
                 return tmp
     return None
@@ -631,6 +632,7 @@ def get_tissue_parent(ztissue):
         if mc.objExists(parent_attr):
             parent = mc.listConnections(parent_attr)
             if parent:
+                parent = mm.eval('zQuery -t zTissue -m -l')
                 return parent[0]
     return None
 
