@@ -4,34 +4,32 @@ import maya.OpenMaya as om
 
 import logging
 
-
 logger = logging.getLogger(__name__)
 
-
-
 ZNODES = [
-        'zGeo',
-        'zSolver',
-        'zSolverTransform',
-        'zIsoMesh',
-        'zDelaunayTetMesh',
-        'zTet',
-        'zTissue',
-        'zBone',
-        'zCloth',
-        'zSolver',
-        'zCache',
-        'zEmbedder',
-        'zAttachment',
-        'zMaterial',
-        'zFiber',
-        'zCacheTransform']
+    'zGeo',
+    'zSolver',
+    'zSolverTransform',
+    'zIsoMesh',
+    'zDelaunayTetMesh',
+    'zTet',
+    'zTissue',
+    'zBone',
+    'zCloth',
+    'zSolver',
+    'zCache',
+    'zEmbedder',
+    'zAttachment',
+    'zMaterial',
+    'zFiber',
+    'zCacheTransform']
 
 
 class MayaMixin(object):
     """
     A Mixin class to deal with Maya specific functionality
     """
+
     def __init__(self):
         self.__mobjects = list()
 
@@ -79,7 +77,7 @@ class MayaMixin(object):
 
         return name
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def set_maya_attrs_for_node(self, node, attr_filter=None):
 
         name = self.get_scene_name_for_node(node)
@@ -87,27 +85,29 @@ class MayaMixin(object):
         type_ = node.get_type()
         nodeAttrs = node.get_attr_list()
         if attr_filter:
-            if attr_filter.get(type_,None):
-                nodeAttrs = list(set(nodeAttrs).intersection(attr_filter[type_]))
+            if attr_filter.get(type_, None):
+                nodeAttrs = list(
+                    set(nodeAttrs).intersection(attr_filter[type_]))
 
         for attr in nodeAttrs:
             if node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
-                        mc.setAttr(name+'.'+attr, node.get_attr_value(attr),
-                            type='doubleArray')
+                if mc.objExists(name + '.' + attr):
+                    if not mc.getAttr(name + '.' + attr, l=True):
+                        mc.setAttr(name + '.' + attr, node.get_attr_value(attr),
+                                   type='doubleArray')
                 else:
-                    print name+'.'+attr + ' not found, skipping'
+                    print name + '.' + attr + ' not found, skipping'
             else:
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
+                if mc.objExists(name + '.' + attr):
+                    if not mc.getAttr(name + '.' + attr, l=True):
                         try:
-                            mc.setAttr(name+'.'+attr,node.get_attr_value(attr))
+                            mc.setAttr(name + '.' + attr,
+                                       node.get_attr_value(attr))
                         except:
-                            #print 'tried...',attr
+                            # print 'tried...',attr
                             pass
                 else:
-                    print name+'.'+attr + ' not found, skipping'
+                    print name + '.' + attr + ' not found, skipping'
 
     def set_maya_weights_for_node(self, node, interp_maps=False):
 
@@ -117,48 +117,50 @@ class MayaMixin(object):
 
         for mp in maps:
 
-            mapData = self.get_data_by_key_name('map',mp)
-            meshData = self.get_data_by_key_name('mesh',mapData.get_mesh(longName=True))
-            mname= meshData.get_name(longName=True)
+            mapData = self.get_data_by_key_name('map', mp)
+            meshData = self.get_data_by_key_name('mesh', mapData.get_mesh(
+                longName=True))
+            mname = meshData.get_name(longName=True)
             mnameShort = meshData.get_name(longName=False)
             wList = mapData.get_value()
 
-
-            #mname= maps[attr]['mesh']
-            #wList = maps[attr]['value']
-            #mnameShort = mname.split('|')[-1]
+            # mname= maps[attr]['mesh']
+            # wList = maps[attr]['value']
+            # mnameShort = mname.split('|')[-1]
 
             if mc.objExists(mnameShort):
-                #mesh = meshes[mname]
+                # mesh = meshes[mname]
 
                 if interp_maps == 'auto':
 
                     cur_conn = get_mesh_connectivity(mnameShort)
 
-                    #print len(cur_conn['points']),len(mesh.get_point_list())
-                    if len(cur_conn['points']) != len(meshData.get_point_list()):
-                        interp_maps=True
+                    # print len(cur_conn['points']),len(mesh.get_point_list())
+                    if len(cur_conn['points']) != len(
+                            meshData.get_point_list()):
+                        interp_maps = True
 
                 if interp_maps == True:
                     logger.info('interpolating maps...{}'.format(mp))
-                    origMesh = meshData.build( )
-                    wList = interpolateValues(origMesh,mnameShort,wList)
+                    origMesh = meshData.build()
+                    wList = interpolateValues(origMesh, mnameShort, wList)
 
                 mp = mp.replace(original_name, name)
 
                 if mc.objExists('%s[0]' % (mp)):
-                    if not mc.getAttr('%s[0]' % (mp),l=True):
+                    if not mc.getAttr('%s[0]' % (mp), l=True):
                         tmp = []
                         for w in wList:
                             tmp.append(str(w))
                         val = ' '.join(tmp)
-                        cmd = "setAttr "+'%s[0:%d] ' % (mp, len(wList)-1)+val
-                        #print 'setting',cmd
+                        cmd = "setAttr " + '%s[0:%d] ' % (
+                        mp, len(wList) - 1) + val
+                        # print 'setting',cmd
                         mm.eval(cmd)
 
                 else:
                     try:
-                        mc.setAttr(mp,wList,type='doubleArray')
+                        mc.setAttr(mp, wList, type='doubleArray')
                     except:
                         pass
                 if interp_maps == True:
@@ -166,18 +168,17 @@ class MayaMixin(object):
 
 
 def get_mesh_connectivity(mesh_name):
-
     space = om.MSpace.kWorld
-    meshToRebuild_mDagPath = getMDagPathFromMeshName( mesh_name )
+    meshToRebuild_mDagPath = getMDagPathFromMeshName(mesh_name)
     meshToRebuild_mDagPath.extendToShape()
 
-    meshToRebuild_polyIter = om.MItMeshPolygon( meshToRebuild_mDagPath )
-    meshToRebuild_vertIter = om.MItMeshVertex( meshToRebuild_mDagPath )
+    meshToRebuild_polyIter = om.MItMeshPolygon(meshToRebuild_mDagPath)
+    meshToRebuild_vertIter = om.MItMeshVertex(meshToRebuild_mDagPath)
 
     numPolygons = 0
     numVertices = 0
     # vertexArray_mFloatPointArray = om.MFloatPointArray()
-    #polygonCounts_mIntArray = om.MIntArray()
+    # polygonCounts_mIntArray = om.MIntArray()
     polygonCountsList = list()
     polygonConnectsList = list()
     pointList = list()
@@ -185,23 +186,24 @@ def get_mesh_connectivity(mesh_name):
     while not meshToRebuild_vertIter.isDone():
         numVertices += 1
         pos_mPoint = meshToRebuild_vertIter.position(space)
-        pos_mFloatPoint = om.MFloatPoint( pos_mPoint.x,pos_mPoint.y,pos_mPoint.z )
+        pos_mFloatPoint = om.MFloatPoint(pos_mPoint.x, pos_mPoint.y,
+                                         pos_mPoint.z)
 
-        pointList.append( [
-                pos_mFloatPoint[0],
-                pos_mFloatPoint[1],
-                pos_mFloatPoint[2]
-                ] )
+        pointList.append([
+            pos_mFloatPoint[0],
+            pos_mFloatPoint[1],
+            pos_mFloatPoint[2]
+        ])
         meshToRebuild_vertIter.next()
 
     while not meshToRebuild_polyIter.isDone():
         numPolygons += 1
         polygonVertices_mIntArray = om.MIntArray()
-        meshToRebuild_polyIter.getVertices( polygonVertices_mIntArray )
+        meshToRebuild_polyIter.getVertices(polygonVertices_mIntArray)
         for vertexIndex in polygonVertices_mIntArray:
-            polygonConnectsList.append( vertexIndex )
+            polygonConnectsList.append(vertexIndex)
 
-        polygonCountsList.append( polygonVertices_mIntArray.length() )
+        polygonCountsList.append(polygonVertices_mIntArray.length())
 
         meshToRebuild_polyIter.next()
     tmp = {}
@@ -211,7 +213,8 @@ def get_mesh_connectivity(mesh_name):
 
     return tmp
 
-def interpolateValues( sourceMeshName, destinationMeshName,wList ):
+
+def interpolateValues(sourceMeshName, destinationMeshName, wList):
     '''
     Description: 
         Will transfer values between similar meshes with differing topology. 
@@ -223,16 +226,16 @@ def interpolateValues( sourceMeshName, destinationMeshName,wList ):
     Returns: 
       
     '''
-    sourceMesh_mDagPath = getMDagPathFromMeshName( sourceMeshName )
-    destinationMesh_mDagPath = getMDagPathFromMeshName( destinationMeshName )
-    sourceMeshShape_mDagPath = om.MDagPath( sourceMesh_mDagPath )
+    sourceMesh_mDagPath = getMDagPathFromMeshName(sourceMeshName)
+    destinationMesh_mDagPath = getMDagPathFromMeshName(destinationMeshName)
+    sourceMeshShape_mDagPath = om.MDagPath(sourceMesh_mDagPath)
     sourceMeshShape_mDagPath.extendToShape()
 
     sourceMesh_mMeshIntersector = om.MMeshIntersector()
-    sourceMesh_mMeshIntersector.create( sourceMeshShape_mDagPath.node()  )
+    sourceMesh_mMeshIntersector.create(sourceMeshShape_mDagPath.node())
 
-    destinationMesh_mItMeshVertex = om.MItMeshVertex( destinationMesh_mDagPath )
-    sourceMesh_mItMeshPolygon = om.MItMeshPolygon( sourceMesh_mDagPath )
+    destinationMesh_mItMeshVertex = om.MItMeshVertex(destinationMesh_mDagPath)
+    sourceMesh_mItMeshPolygon = om.MItMeshPolygon(sourceMesh_mDagPath)
 
     u_util = om.MScriptUtil()
     v_util = om.MScriptUtil()
@@ -247,52 +250,49 @@ def interpolateValues( sourceMeshName, destinationMeshName,wList ):
 
         closest_mPointOnMesh = om.MPointOnMesh()
         sourceMesh_mMeshIntersector.getClosestPoint(
-                    destinationMesh_mItMeshVertex.position(om.MSpace.kWorld ),
-                    closest_mPointOnMesh
-                    )
+            destinationMesh_mItMeshVertex.position(om.MSpace.kWorld),
+            closest_mPointOnMesh
+        )
 
         sourceMesh_mItMeshPolygon.setIndex(
-                    closest_mPointOnMesh.faceIndex(),
-                    int_util.asIntPtr()
-                    )
+            closest_mPointOnMesh.faceIndex(),
+            int_util.asIntPtr()
+        )
         vertices_mIntArray = om.MIntArray()
 
         triangle_mPointArray = om.MPointArray()
         triangle_mIntArray = om.MIntArray()
 
         sourceMesh_mItMeshPolygon.getTriangle(
-                    closest_mPointOnMesh.triangleIndex(),
-                    triangle_mPointArray,
-                    triangle_mIntArray,
-                    om.MSpace.kWorld
-                    )
+            closest_mPointOnMesh.triangleIndex(),
+            triangle_mPointArray,
+            triangle_mIntArray,
+            om.MSpace.kWorld
+        )
 
         closest_mPointOnMesh.getBarycentricCoords(
-                    u_util_ptr,
-                    v_util_ptr
-                    )
+            u_util_ptr,
+            v_util_ptr
+        )
 
-
-        #-----  COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP --------------- #
+        # -----  COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP --------------- #
         weights = list()
-        for i in xrange( 3 ):
+        for i in xrange(3):
             vertexId_int = triangle_mIntArray[i]
-            weights.append( wList[vertexId_int] )
-        #--------- COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP ------------ #
-        #print 'weights',weights
+            weights.append(wList[vertexId_int])
+        # --------- COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP ------------ #
+        # print 'weights',weights
 
-        bary_u = u_util.getFloat( u_util_ptr )
-        bary_v = v_util.getFloat( v_util_ptr )
+        bary_u = u_util.getFloat(u_util_ptr)
+        bary_v = v_util.getFloat(v_util_ptr)
         bary_w = 1 - bary_u - bary_v
 
-        interp_weight = (bary_u*weights[0]) + (bary_v*weights[1]) + (bary_w*weights[2])
+        interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (
+        bary_w * weights[2])
 
-        interpolatedWeights.append( interp_weight )
-
-
+        interpolatedWeights.append(interp_weight)
 
         destinationMesh_mItMeshVertex.next()
-
 
     return interpolatedWeights
 
@@ -334,11 +334,13 @@ def check_body_type(bodies):
     else:
         return False
 
+
 def get_type(body):
     try:
         return mc.objectType(body)
     except:
         pass
+
 
 def clean_scene():
     for node in ZNODES:
@@ -346,38 +348,44 @@ def clean_scene():
         if len(in_scene) > 0:
             mc.delete(in_scene)
 
+
 def get_zSolver(body):
     sel = mc.ls(sl=True)
-    mc.select(body,r=True)
+    mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolver" -l')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     return solver
+
 
 def get_zSolverTransform(body):
     sel = mc.ls(sl=True)
-    mc.select(body,r=True)
+    mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolverTransform" -l')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     return solver
+
 
 def get_zAttachments(bodies):
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     attachments = mm.eval('zQuery -t zAttachment')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if attachments:
-        #todo remove duplicates while mainiting order
+        # todo remove duplicates while mainiting order
         return list(set(attachments))
     else:
         return []
 
+
 def isSolver(selection):
     isSolver = False
     for s in selection:
-        if mc.objectType(s) == 'zSolver' or mc.objectType(s) == 'zSolverTransform':
+        if mc.objectType(s) == 'zSolver' or mc.objectType(
+                s) == 'zSolverTransform':
             isSolver = True
             continue
     return isSolver
+
 
 def get_zBones(bodies):
     sel = mc.ls(sl=True)
@@ -393,74 +401,78 @@ def get_zBones(bodies):
         bones = []
         if attachments:
             for attachment in attachments:
-                mesh1 = mm.eval('zQuery -as -l "'+attachment+'"')
-                mesh2 = mm.eval('zQuery -at -l "'+attachment+'"')
-                mc.select(mesh1,mesh2,r=True)
+                mesh1 = mm.eval('zQuery -as -l "' + attachment + '"')
+                mesh2 = mm.eval('zQuery -at -l "' + attachment + '"')
+                mc.select(mesh1, mesh2, r=True)
                 tmp = mm.eval('zQuery -t "zBone"')
                 if tmp:
                     bones.extend(tmp)
 
-        #mc.select(bodies,r=True)
-        mc.select(sel,r=True)
+        # mc.select(bodies,r=True)
+        mc.select(sel, r=True)
         if len(bones) > 0:
             return list(set(bones))
         else:
             return []
 
+
 def get_zTets(bodies):
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     zTets = mm.eval('zQuery -t "zTet"')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if zTets:
         return zTets
     else:
         return []
 
 
-
 def get_zTissues(bodies):
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     zTissues = mm.eval('zQuery -t "zTissue"')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if zTissues:
         return zTissues
     else:
         return []
+
 
 def get_zMaterials(bodies):
     '''
     Gets zMaterial nodes given a mesh
     '''
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     zMaterial = mm.eval('zQuery -t "zMaterial"')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if zMaterial:
         return zMaterial
     else:
         return []
 
+
 def get_zFibers(bodies):
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     zFibers = mm.eval('zQuery -t "zFiber"')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if zFibers:
         return zFibers
     else:
         return []
 
+
 def get_zCloth(bodies):
     sel = mc.ls(sl=True)
-    mc.select(bodies,r=True)
+    mc.select(bodies, r=True)
     zCloth = mm.eval('zQuery -t "zCloth"')
-    mc.select(sel,r=True)
+    mc.select(sel, r=True)
     if zCloth:
         return zCloth
     else:
         return []
+
 
 def get_zTet_user_mesh(zTet):
     '''
@@ -469,13 +481,14 @@ def get_zTet_user_mesh(zTet):
     args:
         zTet (string): the zTet to query.
     '''
-    if mc.objExists(zTet+'.iTet'):
-        mesh = mc.listConnections(zTet+'.iTet')
+    if mc.objExists(zTet + '.iTet'):
+        mesh = mc.listConnections(zTet + '.iTet')
         if mesh:
-            return mc.ls(mesh[0],l=True)[0]
+            return mc.ls(mesh[0], l=True)[0]
         else:
             return mesh
     return None
+
 
 def get_lineOfAction_fiber(zFiber):
     '''
@@ -484,8 +497,8 @@ def get_lineOfAction_fiber(zFiber):
     args:
         zFiber (string): the zFiber to query.
     '''
-    if mc.objExists(zFiber+'.oLineOfActionData'):
-        conn = mc.listConnections(zFiber+'.oLineOfActionData')
+    if mc.objExists(zFiber + '.oLineOfActionData'):
+        conn = mc.listConnections(zFiber + '.oLineOfActionData')
         if conn:
             return conn[0]
         else:
@@ -504,22 +517,22 @@ def get_association(zNode):
     _type = mc.objectType(zNode)
 
     if _type == 'zAttachment':
-        tmp=[]
-        tmp.extend(mm.eval('zQuery -as -l "'+zNode+'"'))
-        tmp.extend(mm.eval('zQuery -at -l "'+zNode+'"'))
-        #mc.select(sel,r=True)
+        tmp = []
+        tmp.extend(mm.eval('zQuery -as -l "' + zNode + '"'))
+        tmp.extend(mm.eval('zQuery -at -l "' + zNode + '"'))
+        # mc.select(sel,r=True)
 
         return tmp
 
     elif _type == 'zLineOfAction':
-        tmp = mc.listConnections(zNode+'.curves')
+        tmp = mc.listConnections(zNode + '.curves')
         return tmp
 
 
     else:
-        cmd = 'zQuery -t "%s" -l -m "%s"' % (_type,zNode)
+        cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
 
-        nope = ['zSolverTransform','zSolver']
+        nope = ['zSolverTransform', 'zSolver']
         if _type in nope:
             return None
         else:
@@ -545,52 +558,52 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     sel = mc.ls(sl=True)
     solver = mm.eval('zQuery -t "zSolver"')
 
-    zNodes = ['zTissue','zTet','zMaterial','zFiber','zBone','zCloth']
+    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth']
 
     for zNode in zNodes:
-        items = mm.eval('zQuery -t "{}" {}'.format(zNode,solver[0]))
+        items = mm.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
         if items:
             for item in items:
-                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode,item))[0]
+                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
                 for r in replace:
-                    mesh = mesh.replace(r,'')
-                if item != '{}_{}'.format(mesh,zNode):
-                    mc.rename(item,'{}_{}tmp'.format(mesh,zNode))
+                    mesh = mesh.replace(r, '')
+                if item != '{}_{}'.format(mesh, zNode):
+                    mc.rename(item, '{}_{}tmp'.format(mesh, zNode))
 
         # looping through this twice to get around how maya renames stuff
-        items = mm.eval('zQuery -t "{}" {}'.format(zNode,solver[0]))
+        items = mm.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
         if items:
             for item in items:
-                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode,item))[0]
+                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
                 for r in replace:
-                    mesh = mesh.replace(r,'')
-                if item != '{}_{}'.format(mesh,zNode):
-                    mc.rename(item,'{}_{}'.format(mesh,zNode))
-                    print 'rename: ',item,'{}_{}'.format(mesh,zNode)
+                    mesh = mesh.replace(r, '')
+                if item != '{}_{}'.format(mesh, zNode):
+                    mc.rename(item, '{}_{}'.format(mesh, zNode))
+                    print 'rename: ', item, '{}_{}'.format(mesh, zNode)
 
     # for now doing an ls type for lineOfActions until with have zQuery support
     loas = mc.ls(type='zLineOfAction')
     if loas:
         for loa in loas:
-            crv = mc.listConnections(loa+'.oLineOfActionData')
+            crv = mc.listConnections(loa + '.oLineOfActionData')
             if crv:
-                mc.rename(loa,crv[0].replace('_zFiber','_zLineOfAction'))
+                mc.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
 
-    attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment',solver[0]))
+    attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
         for attachment in attachments:
             s = mm.eval('zQuery -as {}'.format(attachment))[0]
             for r in replace:
-                s = s.replace(r,'')
+                s = s.replace(r, '')
             t = mm.eval('zQuery -at {}'.format(attachment))[0]
             for r in replace:
-                t = t.replace(r,'')
-            if attachment != '{}__{}_{}'.format(s,t,'zAttachment'):
-                mc.rename(attachment,'{}__{}_{}'.format(s,t,'zAttachment'))
-                print 'rename: ',attachment,'{}__{}_{}'.format(s,t,'zAttachment')
+                t = t.replace(r, '')
+            if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
+                mc.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+                print 'rename: ', attachment, '{}__{}_{}'.format(s, t,
+                                                                 'zAttachment')
 
     print 'finished renaming.... '
-
 
 
 def select_tissue_meshes():
@@ -637,31 +650,13 @@ def get_tissue_parent(ztissue):
     return None
 
 
-def getMDagPathFromMeshName( meshName ):
+def getMDagPathFromMeshName(meshName):
     mesh_mDagPath = om.MDagPath()
     selList = om.MSelectionList()
-    selList.add( meshName )
-    selList.getDagPath( 0, mesh_mDagPath )
+    selList.add(meshName)
+    selList.getDagPath(0, mesh_mDagPath)
 
     return mesh_mDagPath
-
-# def getDependNode(nodeName):
-#     '''
-#     Get an MObject (depend node) for the associated node name
-#
-#     :Parameters:
-#         nodeName
-#             String representing the node
-#
-#     :Return: depend node (MObject)
-#
-#     '''
-#     dependNode = om.MObject()
-#     selList = om.MSelectionList()
-#     selList.add(nodeName)
-#     if selList.length() > 0:
-#         selList.getDependNode(0, dependNode)
-#     return dependNode
 
 
 def check_mesh_quality(meshes):
@@ -677,7 +672,7 @@ def check_mesh_quality(meshes):
 
     tmp = []
     for s in meshes:
-        mc.select(s,r=True)
+        mc.select(s, r=True)
         mm.eval('ziva -mq')
         sel2 = mc.ls(sl=True)
         if sel2[0] != s:
@@ -688,4 +683,3 @@ def check_mesh_quality(meshes):
         raise StandardError, 'check meshes!'
     else:
         mc.select(meshes)
-

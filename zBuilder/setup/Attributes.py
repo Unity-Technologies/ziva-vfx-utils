@@ -4,19 +4,18 @@ import zBuilder.zMaya as mz
 
 import maya.cmds as mc
 
+
 class AttributesSetup(nc.NodeCollection):
     def __init__(self):
-        super(AttributesSetup,self).__init__()
+        super(AttributesSetup, self).__init__()
 
     @nc.time_this
     def retrieve_from_scene(self):
+        selection = mc.ls(sl=True, l=True)
 
-        selection=mc.ls(sl=True,l=True)
-    
         for sel in selection:
             nodeAttrList = base.build_attr_list(sel)
-            nodeAttrs = base.build_attr_key_values(sel,nodeAttrList)
-
+            nodeAttrs = base.build_attr_key_values(sel, nodeAttrList)
 
             node = base.BaseNode()
             node.set_name(sel)
@@ -30,6 +29,3 @@ class AttributesSetup(nc.NodeCollection):
     def apply(self):
         nodes = self.get_nodes()
         base.set_attrs(nodes)
-
-  
-

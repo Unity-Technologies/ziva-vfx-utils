@@ -1,29 +1,24 @@
 import json
 import maya.cmds as mc
-#import abc
 import re
-import sys
-import os.path
+
 import importlib
 import time
-import datetime 
+import datetime
 import logging
-
-
 
 logger = logging.getLogger(__name__)
 
 
-
 class NodeCollection(object):
-    #__metaclass__ = abc.ABCMeta
+    # __metaclass__ = abc.ABCMeta
     '''
     This is an object that holds the node data in a list
     '''
 
     def __init__(self):
         import zBuilder
-        
+
         self.__collection = []
         self.data = {}
         self.info = {}
@@ -44,14 +39,14 @@ class NodeCollection(object):
 
         '''
 
-        for node in self.get_nodes(type_filter=type_filter,name_filter=name_filter):
-
+        for node in self.get_nodes(type_filter=type_filter,
+                                   name_filter=name_filter):
             node.print_()
         print '----------------------------------------------------------------'
         for key in self.data:
-            print 'Component Data - {}: {}'.format(key,self.data[key].keys())
+            print 'Component Data - {}: {}'.format(key, self.data[key].keys())
 
-    def compare(self,type_filter=None,name_filter=None):
+    def compare(self, type_filter=None, name_filter=None):
 
         '''
         print info on each node
@@ -63,11 +58,11 @@ class NodeCollection(object):
 
         '''
 
-        for node in self.get_nodes(type_filter=type_filter,name_filter=name_filter):
+        for node in self.get_nodes(type_filter=type_filter,
+                                   name_filter=name_filter):
             node.compare()
 
-
-    def stats(self,type_filter=None):
+    def stats(self, type_filter=None):
         '''
         prints out basic stats on data
 
@@ -75,10 +70,10 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         '''
         tmp = {}
-        for i,d in enumerate(self.get_nodes()):
+        for i, d in enumerate(self.get_nodes()):
             t = d.get_type()
             if type_filter:
-                if type_filter==t:
+                if type_filter == t:
                     if not t in tmp:
                         tmp[t] = []
                     if type_filter not in tmp:
@@ -92,7 +87,7 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-    def add_data(self,key,name,data=None):
+    def add_data(self, key, name, data=None):
         '''
         appends a mesh to the mesh list
 
@@ -103,13 +98,11 @@ class NodeCollection(object):
         if not key in self.data:
             self.data[key] = {}
 
-        if not self.get_data_by_key_name(key,name):
+        if not self.get_data_by_key_name(key, name):
             self.data[key][name] = data
-            #logger.info("adding data type: {}  name: {}".format(key,name) ) 
+            # logger.info("adding data type: {}  name: {}".format(key,name) )
 
-
-
-    def get_data_by_key_name(self,key,name):
+    def get_data_by_key_name(self, key, name):
         '''
         Gets data given 'key'
 
@@ -125,13 +118,11 @@ class NodeCollection(object):
             >>> get_data_by_key_name('mesh','l_bicepMuscle')
         '''
         if self.data.get(key):
-            return self.data[key].get(name,None)
+            return self.data[key].get(name, None)
         else:
             return None
 
-
-
-    def get_data_by_key(self,key):
+    def get_data_by_key(self, key):
         '''
         Gets all data for given 'key'
 
@@ -144,10 +135,9 @@ class NodeCollection(object):
         Example:
            get_data_by_key('mesh')
         '''
-        return self.data.get(key,None)
+        return self.data.get(key, None)
 
-
-    def add_node(self,node):
+    def add_node(self, node):
         '''
         appends a node to the node list
 
@@ -156,8 +146,7 @@ class NodeCollection(object):
         '''
         self.__collection.append(node)
 
-
-    def get_nodes(self,type_filter=None,name_filter=None):
+    def get_nodes(self, type_filter=None, name_filter=None):
         '''
         get nodes in data object
 
@@ -178,7 +167,8 @@ class NodeCollection(object):
                     if name_filter:
                         if not isinstance(name_filter, (list, tuple)):
                             name_filter = name_filter.split(' ')
-                        if not set(name_filter).isdisjoint(node.get_association()):
+                        if not set(name_filter).isdisjoint(
+                                node.get_association()):
                             items.append(node)
                     else:
                         items.append(node)
@@ -205,8 +195,7 @@ class NodeCollection(object):
         """
         self.__collection = nodes
 
-
-    def string_replace(self,search,replace):
+    def string_replace(self, search, replace):
         '''
         searches and replaces with regular expressions items in data
 
@@ -223,25 +212,24 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         '''
-        #print 'SEARCh',search
-        #print 'REPLACE',replace
+        # print 'SEARCh',search
+        # print 'REPLACE',replace
         for node in self.get_nodes():
-            node.string_replace(search,replace)
+            node.string_replace(search, replace)
 
         # deal with the data search and replacing
         for key in self.data:
 
             # replace the key names in data
-            self.data[key] = replace_dict_keys(search,replace,self.data[key])
+            self.data[key] = replace_dict_keys(search, replace, self.data[key])
 
             # run search and replace on individual items
             for item in self.data[key]:
-                self.data[key][item].string_replace(search,replace)
+                self.data[key][item].string_replace(search, replace)
 
-
-    def write(self,filepath,
-            component_data=True,
-            node_data=True):
+    def write(self, filepath,
+              component_data=True,
+              node_data=True):
         '''
         writes data to disk in json format
 
@@ -253,20 +241,19 @@ class NodeCollection(object):
 
         '''
         data = self.get_json_data(
-                component_data=component_data,
-                node_data=node_data
-                )
+            component_data=component_data,
+            node_data=node_data
+        )
         try:
             with open(filepath, 'w') as outfile:
                 json.dump(data, outfile, cls=BaseNodeEncoder,
-                    sort_keys=True, indent=4, separators=(',', ': '))
+                          sort_keys=True, indent=4, separators=(',', ': '))
         except IOError:
             print "Error: can\'t find file or write data"
         else:
-            logger.info('Wrote File: {}'.format(filepath) ) 
+            logger.info('Wrote File: {}'.format(filepath))
 
-
-    def retrieve_from_file(self,filepath):
+    def retrieve_from_file(self, filepath):
         '''
         reads data from a file
 
@@ -281,12 +268,11 @@ class NodeCollection(object):
                 data = json.load(handle, object_hook=load_base_node)
                 self.from_json_data(data)
         except IOError:
-            print "Error: can\'t find file or read data"   
+            print "Error: can\'t find file or read data"
         else:
-            logger.info('Read File: {}'.format(filepath) ) 
+            logger.info('Read File: {}'.format(filepath))
 
-
-    def get_json_data(self,node_data=True,component_data=True):
+    def get_json_data(self, node_data=True, component_data=True):
         '''
         Utility function to define data stored in json
         '''
@@ -294,15 +280,14 @@ class NodeCollection(object):
 
         if node_data:
             logger.info("writing node_data")
-            tmp.append(self.__wrap_data(self.get_nodes(),'node_data'))
+            tmp.append(self.__wrap_data(self.get_nodes(), 'node_data'))
         if component_data:
             logger.info("writing component_data")
-            tmp.append(self.__wrap_data(self.data,'component_data'))
+            tmp.append(self.__wrap_data(self.data, 'component_data'))
         logger.info("writing info")
-        tmp.append(self.__wrap_data(self.info,'info'))
+        tmp.append(self.__wrap_data(self.info, 'info'))
 
         return tmp
-
 
     def from_json_data(self, data):
         '''
@@ -321,7 +306,7 @@ class NodeCollection(object):
                 logger.info("reading info")
                 self.info = d['data']
 
-    def __check_data(self,data):
+    def __check_data(self, data):
         '''
         Utility to check data format.
         '''
@@ -329,14 +314,13 @@ class NodeCollection(object):
             return data
         else:
             tmp = []
-            tmp.append(self.__wrap_data(data[0],'node_data'))
-            tmp.append(self.__wrap_data(data[1],'component_data'))
+            tmp.append(self.__wrap_data(data[0], 'node_data'))
+            tmp.append(self.__wrap_data(data[1], 'component_data'))
             if len(data) == 3:
-                tmp.append(self.__wrap_data(data[2],'info'))
+                tmp.append(self.__wrap_data(data[2], 'info'))
             return tmp
 
-
-    def __wrap_data(self,data,type_):
+    def __wrap_data(self, data, type_):
         '''
         Utility wrapper to identify data.
         '''
@@ -345,27 +329,22 @@ class NodeCollection(object):
         wrapper['data'] = data
         return wrapper
 
-
-    #@abc.abstractmethod
-    def apply(self,*args,**kwargs):
+    # @abc.abstractmethod
+    def apply(self, *args, **kwargs):
         '''
         must create a method to inherit this class
         '''
         pass
 
-    #@abc.abstractmethod
-    def retrieve_from_scene(self,*args,**kwargs):
+    # @abc.abstractmethod
+    def retrieve_from_scene(self, *args, **kwargs):
         '''
         must create a method to inherit this class
         '''
         pass
 
 
-
-
-
-
-def replace_dict_keys(search,replace,dictionary):
+def replace_dict_keys(search, replace, dictionary):
     '''
     Does a search and replace on dictionary keys
 
@@ -379,32 +358,29 @@ def replace_dict_keys(search,replace,dictionary):
     '''
     tmp = {}
     for key in dictionary:
-        new = replace_longname(search,replace,key)
+        new = replace_longname(search, replace, key)
         tmp[new] = dictionary[key]
 
     return tmp
 
-def time_this(original_function):      
-    def new_function(*args,**kwargs):
-                        
-        before = datetime.datetime.now()                     
-        x = original_function(*args,**kwargs)                
-        after = datetime.datetime.now()      
-        logger.info("Finished: ---Elapsed Time = {0}".format(after-before) )              
-        return x                                             
-    return new_function  
 
+def time_this(original_function):
+    def new_function(*args, **kwargs):
+        before = datetime.datetime.now()
+        x = original_function(*args, **kwargs)
+        after = datetime.datetime.now()
+        logger.info("Finished: ---Elapsed Time = {0}".format(after - before))
+        return x
+
+    return new_function
 
 
 class BaseNodeEncoder(json.JSONEncoder):
-    
     def default(self, obj):
         if hasattr(obj, '_class'):
             return obj.__dict__
         else:
             return super(BaseNodeEncoder, self).default(obj)
-
-
 
 
 def load_base_node(json_object):
@@ -421,15 +397,15 @@ def load_base_node(json_object):
         module = json_object['_class'][0]
         name = json_object['_class'][1]
 
-
-        node = str_to_class(module,name)
+        node = str_to_class(module, name)
         node.__dict__ = json_object
         return node
 
     else:
         return json_object
 
-def replace_longname(search,replace,longName):
+
+def replace_longname(search, replace, longName):
     '''
     does a search and replace on a long name.  It splits it up by ('|') then
     performs it on each piece
@@ -446,18 +422,19 @@ def replace_longname(search,replace,longName):
     newName = ''
     for i in items:
         if i:
-            i = re.sub(search, replace,i)
+            i = re.sub(search, replace, i)
             if '|' in longName:
-                newName+='|'+i
+                newName += '|' + i
             else:
                 newName += i
 
     if newName != longName:
-        logger.info('replacing name: {}  {}'.format(longName,newName))
+        logger.info('replacing name: {}  {}'.format(longName, newName))
 
     return newName
 
-def str_to_class(module,name):
+
+def str_to_class(module, name):
     '''
     Given module and name instantiantes a class
 
@@ -471,10 +448,8 @@ def str_to_class(module,name):
 
     if module == 'zBuilder.data.map':
         module = 'zBuilder.data.maps'
-        
-    i = importlib.import_module( module )
+
+    i = importlib.import_module(module)
     MyClass = getattr(i, name)
     instance = MyClass()
     return instance
-
-
