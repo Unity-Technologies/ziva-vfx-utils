@@ -16,13 +16,12 @@ class SelectionSetup(nc.NodeCollection):
             node.set_name(sel)
             node.set_type(mz.get_type(sel))
             self.add_node(node)
-
-    def return_selection(self):
+            
+    def apply(self, select=True):
         tmp = []
         for node in self.get_nodes():
             tmp.append(node.get_name())
 
+        if select:
+            mc.select(tmp)
         return tmp
-
-    def apply(self):
-        mc.select(self.return_selection())
