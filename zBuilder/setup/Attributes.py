@@ -1,3 +1,4 @@
+from zBuilder.main import Builder
 import zBuilder.nodes.base as base
 import zBuilder.nodeCollection as nc
 import zBuilder.zMaya as mz
@@ -5,9 +6,13 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 
 
-class AttributesSetup(nc.NodeCollection):
+class AttributesSetup(Builder):
+    '''
+    Storing maya attributes
+    '''
+
     def __init__(self):
-        super(AttributesSetup, self).__init__()
+        Builder.__init__(self)
 
     @nc.time_this
     def retrieve_from_scene(self):
@@ -28,4 +33,5 @@ class AttributesSetup(nc.NodeCollection):
     @nc.time_this
     def apply(self):
         nodes = self.get_nodes()
-        base.set_attrs(nodes)
+        for node in nodes:
+            self.set_maya_attrs_for_node(node)
