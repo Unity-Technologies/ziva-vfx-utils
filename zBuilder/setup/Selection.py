@@ -1,13 +1,13 @@
 from zBuilder.nodes.base import BaseNode
-import zBuilder.nodeCollection as nc
+from zBuilder.main import Builder
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc
 
 
-class SelectionSetup(nc.NodeCollection):
+class SelectionSetup(Builder):
     def __init__(self):
-        nc.NodeCollection.__init__(self)
+        Builder.__init__(self)
 
     def retrieve_from_scene(self):
         selection = mc.ls(sl=True, l=True)
@@ -16,7 +16,7 @@ class SelectionSetup(nc.NodeCollection):
             node.set_name(sel)
             node.set_type(mz.get_type(sel))
             self.add_node(node)
-            
+
     def apply(self, select=True):
         tmp = []
         for node in self.get_nodes():
