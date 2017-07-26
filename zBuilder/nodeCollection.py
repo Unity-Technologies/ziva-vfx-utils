@@ -298,7 +298,7 @@ class NodeCollection(object):
         for d in data:
             if d['d_type'] == 'node_data':
                 logger.info("reading node_data")
-                set_nodes(d['data'])
+                self.set_nodes(d['data'])
             if d['d_type'] == 'component_data':
                 logger.info("reading component_data")
                 self.data = d['data']
