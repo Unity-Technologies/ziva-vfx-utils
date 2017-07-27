@@ -401,7 +401,7 @@ class ZivaSetup(Builder):
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True,
               fibers=True, embedder=True, permisive=True, cloth=True,
-              lineOfActions=True):
+              lineOfActions=True,mirror=False):
 
         '''
         Args:
@@ -417,6 +417,11 @@ class ZivaSetup(Builder):
         sel = mc.ls(sl=True)
         if solver:
             self.__apply_solver(attr_filter=attr_filter)
+
+        if mirror:
+            meshes = self.get_data_by_key('mesh')
+            for a in meshes:
+                meshes[a].mirror()
 
         # turn off solver to speed up build
         try:
@@ -610,6 +615,7 @@ class ZivaSetup(Builder):
             are using the children. 
             '''
 
+            '''
             children = ztissue.get_children_tissues()
             if children:
                 logger.info('applying sub-tissues.')
@@ -617,7 +623,8 @@ class ZivaSetup(Builder):
                 mc.select(children, add=True)
 
                 mm.eval('ziva -ast')
-
+            '''
+            
     def __apply_attachments(self, interp_maps=False, name_filter=None,
                             attr_filter=None):
 

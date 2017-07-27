@@ -61,6 +61,12 @@ class Mesh(object):
             )
         return mesh
 
+    def mirror(self):
+        pl = self.get_point_list()
+        tmp=[]
+        for item in pl:
+            tmp.append([-item[0],item[1],item[2]])
+        self.set_point_list(tmp)
 
     # def __str__(self):
     #     if self.get_name():
