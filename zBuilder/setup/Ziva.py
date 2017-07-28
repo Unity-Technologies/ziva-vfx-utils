@@ -615,15 +615,15 @@ class ZivaSetup(Builder):
             are using the children. 
             '''
 
-            '''
-            children = ztissue.get_children_tissues()
-            if children:
-                logger.info('applying sub-tissues.')
-                mc.select(ztissue.get_association(), r=True)
-                mc.select(children, add=True)
+            if "get_children_tissues" in dir(ztissue):
+                children = ztissue.get_children_tissues()
+                if children:
+                    logger.info('applying sub-tissues.')
+                    mc.select(ztissue.get_association(), r=True)
+                    mc.select(children, add=True)
 
-                mm.eval('ziva -ast')
-            '''
+                    mm.eval('ziva -ast')
+
             
     def __apply_attachments(self, interp_maps=False, name_filter=None,
                             attr_filter=None):
