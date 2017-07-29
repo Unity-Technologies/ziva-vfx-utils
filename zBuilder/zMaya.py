@@ -312,7 +312,7 @@ def interpolateValues(sourceMeshName, destinationMeshName, wList):
 def check_body_type(bodies):
     '''
     Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
-    used to see if we can create a zAttachment before we try.  Additionaly 
+    used to see if we can create a zAttachment before we try.  Additionaly
     does a check if all objects exist in scene.
 
     Args:
@@ -489,16 +489,32 @@ def get_zTet_user_mesh(zTet):
             return mesh
     return None
 
-
-def get_lineOfAction_fiber(zFiber):
+def get_fiber_lineofaction(zFiber):
     '''
     Gets the zLineOfAction node hooked up to a given zFiber in any.
 
     args:
         zFiber (string): the zFiber to query.
     '''
-    if mc.objExists(zFiber + '.oLineOfActionData'):
-        conn = mc.listConnections(zFiber + '.oLineOfActionData')
+    if mc.objExists(zFiber + '.iLineOfActionData'):
+        conn = mc.listConnections(zFiber + '.iLineOfActionData')
+        if conn:
+            return conn[0]
+        else:
+            return None
+    else:
+        return None
+
+
+def get_lineOfAction_fiber(zlineofaction):
+    '''
+    Gets the zFiber node hooked up to a given zLineOfAction in any.
+
+    args:
+        zlineofaction (string): the zLineOfAction to query.
+    '''
+    if mc.objExists(zlineofaction + '.oLineOfActionData'):
+        conn = mc.listConnections(zlineofaction + '.oLineOfActionData')
         if conn:
             return conn[0]
         else:

@@ -185,6 +185,7 @@ class ZivaSetup(Builder):
             materials (bool): Gets materials data.  Defaults to True
             fibers (bool): Gets fibers data.  Defaults to True
             cloth (bool): Gets cloth data.  Defaults to True
+            lineOfAction (bool): Gets line of action data.  Defaults to True
             embedder (bool): Gets embedder data.  Defaults to True
             get_mesh (bool): get mesh info. Defaults to True
             get_maps (bool): get map info. Defaults to True
@@ -211,6 +212,7 @@ class ZivaSetup(Builder):
         materials = kwargs.get('materials', True)
         fibers = kwargs.get('fibers', True)
         cloth = kwargs.get('cloth', True)
+        lineOfAction = kwargs.get('lineOfAction', True)
         embedder = kwargs.get('embedder', True)
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_maps', True)
@@ -286,7 +288,14 @@ class ZivaSetup(Builder):
                                          attr_filter=attr_filter.get('zCloth',
                                                                      None),
                                          get_mesh=get_mesh, get_maps=get_maps)
-
+            if lineOfAction:
+                logger.info('getting line of actions.')
+                for fiber in mz.get_zFibers(selection):
+                    loa = mz.get_fiber_lineofaction(fiber)
+                    self.__add_ziva_node(loa,
+                                             attr_filter=attr_filter.get('zLineOfAction',
+                                                                         None),
+                                             get_mesh=get_mesh, get_maps=get_maps)
             if embedder:
                 logger.info('getting embedder')
                 self.__retrieve_embedded_from_selection(selection,
@@ -399,9 +408,8 @@ class ZivaSetup(Builder):
     @nc.time_this
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
-              materials=True,
-              fibers=True, embedder=True, permisive=True, cloth=True,
-              lineOfActions=True,mirror=False):
+              materials=True, fibers=True, embedder=True, cloth=True,
+              lineOfActions=True, mirror=False, permisive=True):
 
         '''
         Args:
@@ -624,7 +632,6 @@ class ZivaSetup(Builder):
 
                     mm.eval('ziva -ast')
 
-            
     def __apply_attachments(self, interp_maps=False, name_filter=None,
                             attr_filter=None):
 
