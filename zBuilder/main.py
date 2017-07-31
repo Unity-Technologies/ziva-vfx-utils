@@ -1,6 +1,8 @@
 from zBuilder.nodeCollection import NodeCollection
 from zBuilder.zMaya import MayaMixin
 
+from functools import wraps
+
 import datetime
 
 import logging
@@ -18,6 +20,7 @@ class Builder(MayaMixin, NodeCollection):
         """
         A decorator to time functions.
         """
+        @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
             x = original_function(*args, **kwargs)
