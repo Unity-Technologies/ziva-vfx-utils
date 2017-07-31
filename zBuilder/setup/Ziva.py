@@ -10,7 +10,6 @@ from zBuilder.nodes.zTissue import TissueNode
 import zBuilder.data.mesh as msh
 import zBuilder.data.maps as mps
 
-import zBuilder.nodeCollection as nc
 from zBuilder.main import Builder
 
 import maya.cmds as mc
@@ -42,9 +41,9 @@ ZNODES = [
 
 
 class ZivaSetup(Builder):
-    '''
+    """
     To capture a ziva setup
-    '''
+    """
 
     def __init__(self):
         Builder.__init__(self)
@@ -60,7 +59,7 @@ class ZivaSetup(Builder):
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
-        '''
+        """
         Retreives data from scene given any node in ziva connection.
 
         Args:
@@ -71,7 +70,7 @@ class ZivaSetup(Builder):
                 af = {'zSolver':['substeps']}
             get_mesh (bool): get mesh info. Defaults to True
             get_maps (bool): get map info. Defaults to True
-        '''
+        """
         # args
         selection = None
         if args:
@@ -167,7 +166,7 @@ class ZivaSetup(Builder):
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
-        '''
+        """
         Gets data based on selection
 
         Args:
@@ -188,7 +187,7 @@ class ZivaSetup(Builder):
             embedder (bool): Gets embedder data.  Defaults to True
             get_mesh (bool): get mesh info. Defaults to True
             get_maps (bool): get map info. Defaults to True
-        '''
+        """
 
         # get current selection to re-apply
         sel = mc.ls(sl=True)
@@ -409,7 +408,7 @@ class ZivaSetup(Builder):
               materials=True, fibers=True, embedder=True, cloth=True,
               lineOfActions=True, mirror=False, permisive=True):
 
-        '''
+        """
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get. 
                 dictionary is key value where key is node type and value is 
@@ -417,7 +416,7 @@ class ZivaSetup(Builder):
 
                 tmp = {'zSolver':['substeps']}
             name_filter (str): filter by node name.  Defaults to **None**
-        '''
+        """
 
         self.clear_m_objects()
         sel = mc.ls(sl=True)
@@ -474,13 +473,13 @@ class ZivaSetup(Builder):
             pass
 
     def __cull_creation_nodes(self, nodes):
-        '''
+        """
         To help speed up the build of a Ziva setup we are creating the bones and
         the tissues with one command.  Given a list of zBuilder nodes this checks
         if a given node needs to be created in scene.  Checks to see if it 
         already exists or if associated mesh is missing.  Either case it culls 
         it from list.
-        '''
+        """
 
         results = {}
         results['meshes'] = []
@@ -615,11 +614,11 @@ class ZivaSetup(Builder):
 
                     print 'could not connect {}.worldMesh to {}.iTet'.format(
                         user_mesh, name)
-            '''
+            """
             sub-tissues---------------------------------------------------------
             We are storing the parents and children of the tissue.  As of now we
             are using the children. 
-            '''
+            """
 
             if "get_children_tissues" in dir(ztissue):
                 children = ztissue.get_children_tissues()
