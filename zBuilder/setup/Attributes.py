@@ -34,4 +34,4 @@ class AttributesSetup(Builder):
     def apply(self):
         nodes = self.get_nodes()
         for node in nodes:
-            self.set_maya_attrs_for_node(node)
+            self.set_maya_attrs_for_builder_node(node)

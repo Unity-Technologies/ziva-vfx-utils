@@ -58,7 +58,7 @@ class ZivaSetup(Builder):
                     # self.info['plugin_name'] = plug
                     # self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)
 
-    @nc.time_this
+    @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         '''
         Retreives data from scene given any node in ziva connection.
@@ -165,9 +165,8 @@ class ZivaSetup(Builder):
             print 'no solver found in scene'
         mc.select(sel, r=True)
 
-    @nc.time_this
+    @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
-
         '''
         Gets data based on selection
 
@@ -189,7 +188,6 @@ class ZivaSetup(Builder):
             embedder (bool): Gets embedder data.  Defaults to True
             get_mesh (bool): get mesh info. Defaults to True
             get_maps (bool): get map info. Defaults to True
-
         '''
 
         # get current selection to re-apply
@@ -405,7 +403,7 @@ class ZivaSetup(Builder):
 
                 self.add_node(node)
 
-    @nc.time_this
+    @Builder.time_this
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
@@ -421,7 +419,7 @@ class ZivaSetup(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         '''
 
-        self.clear_mObjects()
+        self.clear_m_objects()
         sel = mc.ls(sl=True)
         if solver:
             self.__apply_solver(attr_filter=attr_filter)
@@ -500,7 +498,7 @@ class ZivaSetup(Builder):
                 exsisting = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
                 if exsisting:
                     out = mc.rename(exsisting, name)
-                    self.add_mObject(out, node)
+                    self.track_m_object(out, node)
                 else:
                     results['meshes'].append(mesh)
                     results['names'].append(name)
@@ -526,17 +524,17 @@ class ZivaSetup(Builder):
             if not mc.objExists(solverName):
                 # print 'building solver: ',solverName
                 sol = mm.eval('ziva -s')
-                self.add_mObject(mc.ls(sol, type='zSolver')[0], zSolver)
-                self.add_mObject(mc.ls(sol, type='zSolverTransform')[0],
-                                 zSolverTransform)
+                self.track_m_object(mc.ls(sol, type='zSolver')[0], zSolver)
+                self.track_m_object(mc.ls(sol, type='zSolverTransform')[0],
+                                    zSolverTransform)
             else:
-                self.add_mObject(solverName, zSolver)
+                self.track_m_object(solverName, zSolver)
                 st = mm.eval('zQuery -t zSolverTransform ' + solverName)[0]
-                self.add_mObject(st, zSolverTransform)
+                self.track_m_object(st, zSolverTransform)
 
-            self.set_maya_attrs_for_node(zSolver, attr_filter=attr_filter)
-            self.set_maya_attrs_for_node(zSolverTransform,
-                                         attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(zSolver, attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(zSolverTransform,
+                                                 attr_filter=attr_filter)
 
     def __apply_bones(self, name_filter=None, attr_filter=None):
         solver = mc.ls(type='zSolver')
@@ -559,11 +557,11 @@ class ZivaSetup(Builder):
             # rename zBones-----------------------------------------------------
             for new, name, node in zip(outs[1::2], results['names'],
                                        results['nodes']):
-                self.add_mObject(new, node)
+                self.track_m_object(new, node)
                 mc.rename(new, name)
 
         for zBone in zBones:
-            self.set_maya_attrs_for_node(zBone, attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(zBone, attr_filter=attr_filter)
 
     def __apply_tissues(self, interp_maps=False, name_filter=None,
                         attr_filter=None):
@@ -591,29 +589,29 @@ class ZivaSetup(Builder):
             # rename zTissues and zTets-----------------------------------------
             for new, name, node in zip(outs[1::4], tissue_results['names'],
                                        tissue_results['nodes']):
-                self.add_mObject(new, node)
+                self.track_m_object(new, node)
                 mc.rename(new, name)
 
             for new, name, node in zip(outs[2::4], tet_results['names'],
                                        tet_results['nodes']):
-                self.add_mObject(new, node)
+                self.track_m_object(new, node)
                 mc.rename(new, name)
 
         for ztet, ztissue in zip(ztets, ztissue):
             # set the attributes in maya
-            self.set_maya_attrs_for_node(ztet, attr_filter=attr_filter)
-            self.set_maya_attrs_for_node(ztissue, attr_filter=attr_filter)
-            self.set_maya_weights_for_node(ztet, interp_maps=interp_maps)
+            self.set_maya_attrs_for_builder_node(ztet, attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(ztissue, attr_filter=attr_filter)
+            self.set_maya_weights_for_builder_node(ztet, interp_maps=interp_maps)
 
             # check and hookup any existing user tet meshes
             if ztet.get_user_tet_mesh():
                 try:
                     mc.connectAttr(str(ztet.get_user_tet_mesh()) + '.worldMesh',
-                                   ztet.get_scene_name_for_node() + '.iTet',
+                                   ztet.get_scene_name_for_builder_node() + '.iTet',
                                    f=True)
                 except:
                     user_mesh = str(ztet.get_user_tet_mesh())
-                    name = ztet.get_scene_name_for_node()
+                    name = ztet.get_scene_name_for_builder_node()
 
                     print 'could not connect {}.worldMesh to {}.iTet'.format(
                         user_mesh, name)
@@ -670,27 +668,27 @@ class ZivaSetup(Builder):
 
                 if existing:
                     if d_index < len(existing):
-                        self.add_mObject(existing[d_index], attachment)
+                        self.track_m_object(existing[d_index], attachment)
                         mc.rename(existing[d_index], name)
                     else:
                         mc.select(s_mesh, r=True)
                         mc.select(t_mesh, add=True)
                         new_att = mm.eval('ziva -a')
-                        self.add_mObject(new_att[0], attachment)
+                        self.track_m_object(new_att[0], attachment)
                         mc.rename(new_att[0], name)
                 else:
                     mc.select(s_mesh, r=True)
                     mc.select(t_mesh, add=True)
                     new_att = mm.eval('ziva -a')
-                    self.add_mObject(new_att[0], attachment)
+                    self.track_m_object(new_att[0], attachment)
                     mc.rename(new_att[0], name)
 
             else:
                 print mc.warning('skipping attachment creation...' + name)
 
             # set the attributes in maya
-            self.set_maya_attrs_for_node(attachment, attr_filter=attr_filter)
-            self.set_maya_weights_for_node(attachment, interp_maps=interp_maps)
+            self.set_maya_attrs_for_builder_node(attachment, attr_filter=attr_filter)
+            self.set_maya_weights_for_builder_node(attachment, interp_maps=interp_maps)
 
     def __apply_materials(self, interp_maps=False, name_filter=None,
                           attr_filter=None):
@@ -724,19 +722,19 @@ class ZivaSetup(Builder):
                 # if there are enough existing materials use those
                 # or else create a new material
                 if d_index < len(existing_materials):
-                    self.add_mObject(existing_materials[d_index], material)
+                    self.track_m_object(existing_materials[d_index], material)
                     mc.rename(existing_materials[d_index], name)
                 else:
                     mc.select(mesh, r=True)
                     tmpmat = mm.eval('ziva -m')
-                    self.add_mObject(tmpmat[0], material)
+                    self.track_m_object(tmpmat[0], material)
                     mc.rename(tmpmat[0], name)
             else:
                 logger.warning(
                     mesh + ' does not exist in scene, skipping zMaterial creation')
 
-            self.set_maya_attrs_for_node(material, attr_filter=attr_filter)
-            self.set_maya_weights_for_node(material, interp_maps=interp_maps)
+            self.set_maya_attrs_for_builder_node(material, attr_filter=attr_filter)
+            self.set_maya_weights_for_builder_node(material, interp_maps=interp_maps)
 
     def __apply_fibers(self, interp_maps=False, name_filter=None,
                        attr_filter=None):
@@ -760,25 +758,25 @@ class ZivaSetup(Builder):
 
                 if existing_fibers:
                     if d_index < len(existing_fibers):
-                        self.add_mObject(existing_fibers[d_index], fiber)
+                        self.track_m_object(existing_fibers[d_index], fiber)
                         mc.rename(existing_fibers[d_index], name)
                     else:
                         mc.select(mesh, r=True)
                         tmpmat = mm.eval('ziva -f')
-                        self.add_mObject(tmpmat[0], fiber)
+                        self.track_m_object(tmpmat[0], fiber)
                         mc.rename(tmpmat[0], name)
                 else:
                     mc.select(mesh, r=True)
                     tmpmat = mm.eval('ziva -f')
-                    self.add_mObject(tmpmat[0], fiber)
+                    self.track_m_object(tmpmat[0], fiber)
                     mc.rename(tmpmat[0], name)
 
             else:
                 logger.warning(
                     mesh + ' does not exist in scene, skipping zMaterial creation')
 
-            self.set_maya_attrs_for_node(fiber, attr_filter=attr_filter)
-            self.set_maya_weights_for_node(fiber, interp_maps=interp_maps)
+            self.set_maya_attrs_for_builder_node(fiber, attr_filter=attr_filter)
+            self.set_maya_weights_for_builder_node(fiber, interp_maps=interp_maps)
 
     def __apply_loa(self, interp_maps=False, name_filter=None,
                     attr_filter=None):
@@ -798,17 +796,17 @@ class ZivaSetup(Builder):
                     tmp = mm.eval('ziva -lineOfAction')
 
                     clt = mc.ls(tmp, type='zLineOfAction')[0]
-                    self.add_mObject(clt, item)
+                    self.track_m_object(clt, item)
                     mc.rename(clt, name)
 
                 else:
-                    self.add_mObject(name, item)
+                    self.track_m_object(name, item)
             else:
                 mc.warning(association[
                                0] + ' mesh does not exists in scene, skippings line of action')
 
             # set maya attributes
-            self.set_maya_attrs_for_node(item, attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(item, attr_filter=attr_filter)
 
     def __apply_cloth(self, interp_maps=False, name_filter=None,
                       attr_filter=None):
@@ -824,17 +822,17 @@ class ZivaSetup(Builder):
                     mc.select(association)
                     tmp = mm.eval('ziva -c')
                     clt = mc.ls(tmp, type='zCloth')[0]
-                    self.add_mObject(clt, item)
+                    self.track_m_object(clt, item)
                     mc.rename(clt, name)
 
                 else:
-                    self.add_mObject(name, item)
+                    self.track_m_object(name, item)
             else:
                 mc.warning(association[
                                0] + ' mesh does not exists in scene, skippings cloth')
 
             # set maya attributes
-            self.set_maya_attrs_for_node(item, attr_filter=attr_filter)
+            self.set_maya_attrs_for_builder_node(item, attr_filter=attr_filter)
 
     def __apply_embedded(self, interp_maps=False, name_filter=None,
                          attr_filter=None):
@@ -848,7 +846,7 @@ class ZivaSetup(Builder):
         if embeddedNode:
             embeddedNode = embeddedNode[0]
             name = embeddedNode.get_name()
-            self.add_mObject(name, embeddedNode)
+            self.track_m_object(name, embeddedNode)
             collision_meshes = embeddedNode.get_collision_meshes()
             embedded_meshes = embeddedNode.get_embedded_meshes()
 

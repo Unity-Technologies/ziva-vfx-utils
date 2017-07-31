@@ -4,7 +4,7 @@ import re
 
 import importlib
 import time
-import datetime
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -362,17 +362,6 @@ def replace_dict_keys(search, replace, dictionary):
         tmp[new] = dictionary[key]
 
     return tmp
-
-
-def time_this(original_function):
-    def new_function(*args, **kwargs):
-        before = datetime.datetime.now()
-        x = original_function(*args, **kwargs)
-        after = datetime.datetime.now()
-        logger.info("Finished: ---Elapsed Time = {0}".format(after - before))
-        return x
-
-    return new_function
 
 
 class BaseNodeEncoder(json.JSONEncoder):

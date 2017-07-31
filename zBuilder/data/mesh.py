@@ -193,7 +193,8 @@ def get_mesh_connectivity(mesh_name):
 
 
 def getMDagPathFromMeshName( meshName ): 
-  
+
+    print meshName
     mesh_mDagPath = om.MDagPath()
     selList = om.MSelectionList()
     selList.add( meshName )

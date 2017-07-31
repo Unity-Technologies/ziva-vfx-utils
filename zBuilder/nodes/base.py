@@ -275,7 +275,7 @@ def build_attr_key_values(selection,attrList):
     return tmp
 
 def set_attrs(nodes,attr_filter=None):
-    logger.info('DEPRACATED: Use .set_maya_attrs_for_node')
+    logger.info('DEPRACATED: Use .set_maya_attrs_for_builder_node')
 
     for node in nodes:
         name = node.get_name()
