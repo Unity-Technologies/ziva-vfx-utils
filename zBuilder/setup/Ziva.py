@@ -289,10 +289,12 @@ class ZivaSetup(Builder):
                 logger.info('getting line of actions.')
                 for fiber in mz.get_zFibers(selection):
                     loa = mz.get_fiber_lineofaction(fiber)
-                    self.__add_ziva_node(loa,
-                                             attr_filter=attr_filter.get('zLineOfAction',
-                                                                         None),
-                                             get_mesh=get_mesh, get_maps=get_maps)
+                    print loa
+                    if loa:
+                        self.__add_ziva_node(loa,
+                                                 attr_filter=attr_filter.get('zLineOfAction',
+                                                                             None),
+                                                 get_mesh=get_mesh, get_maps=get_maps)
             if embedder:
                 logger.info('getting embedder')
                 self.__retrieve_embedded_from_selection(selection,
