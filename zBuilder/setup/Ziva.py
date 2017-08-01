@@ -289,7 +289,6 @@ class ZivaSetup(Builder):
                 logger.info('getting line of actions.')
                 for fiber in mz.get_zFibers(selection):
                     loa = mz.get_fiber_lineofaction(fiber)
-                    print loa
                     if loa:
                         self.__add_ziva_node(loa,
                                                  attr_filter=attr_filter.get('zLineOfAction',
