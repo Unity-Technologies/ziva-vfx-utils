@@ -1,3 +1,5 @@
+import re
+
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
@@ -38,179 +40,6 @@ class MayaMixin(object):
         Clears the mObject list associated with the builder nodes.
         """
         self.__mobjects = [None] * len(self.get_nodes())
-
-    def track_m_object(self, maya_node, b_node):
-        """
-        Tracks an mObject with a builder node.  Given a maya node it looks up
-        its mobject and stores that in a list that corresponds with the
-        builder node list.
-        Args:
-            maya_node (str): The maya node to track.
-            b_node (object): The builder node to store it against.
-
-        Returns:
-            Nothing
-
-        """
-        index = self.get_nodes().index(b_node)
-
-        if mc.objExists(maya_node):
-            selection_list = om.MSelectionList()
-            selection_list.add(maya_node)
-            mobject = om.MObject()
-            selection_list.getDependNode(0, mobject)
-
-            self.__mobjects[index] = mobject
-            # logger.info(mObject)
-        else:
-            self.__mobjects[index] = None
-
-    def get_scene_name_for_builder_node(self, b_node, fullpath=True):
-        """
-        Given a Builder node this looks up the mObject list and checks if the
-        maya node is in the scene.  If it fails the mObject lookup it defaults
-        to the builder node name.
-
-        Args:
-            b_node (object): The builder node.
-            fullpath (bool): Return the fullpath or not.  Defaults to True.
-
-        Returns:
-            (str) Name of maya object.
-        """
-        index = self.get_nodes().index(b_node)
-        mobject = None
-        if self.__mobjects:
-            mobject = self.__mobjects[index]
-
-        if mobject:
-            if mobject.hasFn(om.MFn.kDagNode):
-                dagpath = om.MDagPath()
-                om.MFnDagNode(mobject).getPath(dagpath)
-                if fullpath:
-                    name = dagpath.fullPathName()
-                else:
-                    name = dagpath.partialPathName()
-            else:
-                name = om.MFnDependencyNode(mobject).name()
-        else:
-            name = None
-
-        if not name:
-            # if we have a mObject stored for node use it.  Ir else use the name
-            name = b_node.get_name()
-
-        return name
-
-    # ---------------------------------------------------------------------------
-    def set_maya_attrs_for_builder_node(self, b_node, attr_filter=None):
-        """
-        Given a Builder node this set the attributes of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored name.
-        Args:
-            b_node (object): The builder node with the stored attributes to be
-                set.
-            attr_filter (dict):  Attribute filter on what attributes to set.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                af = {'zSolver':['substeps']}
-        Returns:
-            nothing.
-        """
-        scene_name = self.get_scene_name_for_builder_node(b_node)
-
-        type_ = b_node.get_type()
-        node_attrs = b_node.get_attr_list()
-        if attr_filter:
-            if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
-
-        for attr in node_attrs:
-            if b_node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
-                        mc.setAttr(scene_name + '.' + attr, b_node.get_attr_value(attr),
-                                   type='doubleArray')
-                else:
-                    print scene_name + '.' + attr + ' not found, skipping'
-            else:
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
-                        try:
-                            mc.setAttr(scene_name + '.' + attr,
-                                       b_node.get_attr_value(attr))
-                        except:
-                            pass
-                else:
-                    print scene_name + '.' + attr + ' not found, skipping'
-
-    def set_maya_weights_for_builder_node(self, b_node, interp_maps=False):
-        """
-        Given a Builder node this set the map values of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored scene_name.
-
-        Args:
-            b_node (object):  The Builder node with the stored map to be applied
-                in scene.
-            interp_maps (str): Do you want maps interpolated?
-                True forces interpolation.
-                False cancels it.
-                auto checks if it needs to.  Default = "auto"
-
-        Returns:
-            nothing.
-        """
-        maps = b_node.get_maps()
-        scene_name = self.get_scene_name_for_builder_node(b_node)
-        original_name = b_node.get_name()
-        created_mesh = None
-
-        for MAP in maps:
-
-            map_data = self.get_data_by_key_name('map', MAP)
-            mesh_data = self.get_data_by_key_name('mesh', map_data.get_mesh(
-                longName=True))
-            mesh_name_short = mesh_data.get_name(longName=False)
-            weight_list = map_data.get_value()
-
-            if mc.objExists(mesh_name_short):
-                if interp_maps == 'auto':
-
-                    cur_conn = get_mesh_connectivity(mesh_name_short)
-
-                    if len(cur_conn['points']) != len(
-                            mesh_data.get_point_list()):
-                        interp_maps = True
-
-                if interp_maps == True or interp_maps == 'True' or interp_maps == 'true':
-                    logger.info('interpolating maps...{}'.format(MAP))
-                    created_mesh = mesh_data.build()
-                    weight_list = interpolateValues(created_mesh, mesh_name_short, weight_list)
-
-                MAP = MAP.replace(original_name, scene_name)
-
-                if mc.objExists('%s[0]' % (MAP)):
-                    if not mc.getAttr('%s[0]' % (MAP), l=True):
-                        tmp = []
-                        for w in weight_list:
-                            tmp.append(str(w))
-                        val = ' '.join(tmp)
-                        cmd = "setAttr " + '%s[0:%d] ' % (
-                        MAP, len(weight_list) - 1) + val
-                        # print 'setting',cmd
-                        mm.eval(cmd)
-
-                else:
-                    try:
-                        mc.setAttr(MAP, weight_list, type='doubleArray')
-                    except:
-                        pass
-                if created_mesh:
-                    mc.delete(created_mesh)
 
 
 def get_mesh_connectivity(mesh_name):
@@ -708,13 +537,36 @@ def get_tissue_parent(ztissue):
     return None
 
 
-def getMDagPathFromMeshName(meshName):
-    mesh_mDagPath = om.MDagPath()
-    selList = om.MSelectionList()
-    selList.add(meshName)
-    selList.getDagPath(0, mesh_mDagPath)
+def getMDagPathFromMeshName(mesh_name):
+    mesh_m_dag_path = om.MDagPath()
+    sel_list = om.MSelectionList()
+    sel_list.add(mesh_name)
+    sel_list.getDagPath(0, mesh_m_dag_path)
 
-    return mesh_mDagPath
+    return mesh_m_dag_path
+
+
+def get_name_from_m_object(m_object, long_name=True):
+    """
+
+    Args:
+        m_object:
+        long_name:
+
+    Returns:
+
+    """
+    if m_object.hasFn(om.MFn.kDagNode):
+
+        dagpath = om.MDagPath()
+        om.MFnDagNode(m_object).getPath(dagpath)
+        if long_name:
+            name = dagpath.fullPathName()
+        else:
+            name = dagpath.partialPathName()
+    else:
+        name = om.MFnDependencyNode(m_object).name()
+    return name
 
 
 def check_mesh_quality(meshes):
@@ -782,3 +634,124 @@ def parse_args_for_selection(args):
         if not selection:
             raise StandardError, 'Nothing selected or passed, please select something and try again.'
     return selection
+
+
+def build_attr_list(selection, attr_filter=None):
+    """
+    Builds a list of attributes to store values for.  It is looking at keyable
+    attributes and if they are in channelBox.
+
+    Args:
+        selection (str): maya object to find attributes
+
+    returns:
+        list: list of attributes names
+    """
+    exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
+               'vertexColor', 'target']
+
+    tmps = mc.listAttr(selection, k=True)
+    cb = mc.listAttr(selection, cb=True)
+    if cb:
+        tmps.extend(mc.listAttr(selection, cb=True))
+    attrs = []
+    for attr in tmps:
+        if not attr.split('.')[0] in exclude:
+            attrs.append(attr)
+
+    if attr_filter:
+        # attrs = list(set(attrs).intersection(attr_filter))
+        attrs = attr_filter
+
+    return attrs
+
+
+def build_attr_key_values(selection, attr_list):
+    """
+
+    Args:
+        selection:
+        attr_list:
+
+    Returns:
+
+    """
+    attr_dict = {}
+    for attr in attr_list:
+        attr_dict[attr] = {}
+        attr_dict[attr]['type'] = mc.getAttr(selection + '.' + attr, type=True)
+        attr_dict[attr]['value'] = mc.getAttr(selection + '.' + attr)
+        attr_dict[attr]['locked'] = mc.getAttr(selection + '.' + attr, l=True)
+
+    return attr_dict
+
+
+def replace_long_name(search, replace, long_name):
+    """
+    does a search and replace on a long name.  It splits it up by ('|') then
+    performs it on each piece
+
+    Args:
+        search (str): search term
+        replace (str): replace term
+        long_name (str): the long name to perform action on
+
+    returns:
+        str: result of search and replace
+    """
+    items = long_name.split('|')
+    new_name = ''
+    for i in items:
+        if i:
+            i = re.sub(search, replace, i)
+            if '|' in long_name:
+                new_name += '|' + i
+            else:
+                new_name += i
+
+    if new_name != long_name:
+        logger.info('replacing name: {}  {}'.format(long_name, new_name))
+
+    return new_name
+
+
+def cull_creation_nodes(b_nodes):
+    """
+    To help speed up the build of a Ziva setup we are creating the bones and
+    the tissues with one command.  Given a list of zBuilder nodes this checks
+    if a given node needs to be created in scene.  Checks to see if it
+    already exists or if associated mesh is missing.  Either case it culls
+    it from list.
+
+    Args:
+        b_nodes (object): the zBuilder nodes to check.
+    Returns:
+        dict: Dictionary of non culled
+    """
+
+    results = dict()
+    results['meshes'] = []
+    results['names'] = []
+    results['b_nodes'] = []
+
+    # -----------------------------------------------------------------------
+    # check meshes for existing zBones or zTissue
+    for i, b_node in enumerate(b_nodes):
+        type_ = b_node.get_type()
+        mesh = b_node.get_association()[0]
+        name = b_node.get_name()
+
+        if mc.objExists(mesh):
+            existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
+            if existing:
+                out = mc.rename(existing, name)
+                b_node.set_mobject(out)
+            else:
+                results['meshes'].append(mesh)
+                results['names'].append(name)
+                results['b_nodes'].append(b_node)
+        else:
+            logger.warning(
+                mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
+
+    return results

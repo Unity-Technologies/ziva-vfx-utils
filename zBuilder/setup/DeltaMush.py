@@ -1,3 +1,4 @@
+import zBuilder.zMaya
 from zBuilder.nodes.base import BaseNode
 from zBuilder.main import Builder
 
@@ -42,7 +43,7 @@ class DeltaMushSetup(Builder):
         for delta_mush in delta_mushes:
 
             node_attr_list = base.build_attr_list(delta_mush)
-            node_attrs = base.build_attr_key_values(delta_mush, node_attr_list)
+            node_attrs = zBuilder.zMaya.build_attr_key_values(delta_mush, node_attr_list)
 
             node = BaseNode()
             node.set_name(delta_mush)

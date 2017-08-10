@@ -9,6 +9,7 @@ import maya.cmds as mc
 import maya.mel as mm
 from maya import OpenMaya as om
 import zBuilder.setup.Ziva as zva
+import zBuilder.zMaya
 import zUI.util as util
 
 import zBuilder.zMaya as mz
@@ -968,7 +969,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
         # get base attributes and values for nodes------------------------------
         attrList = bse.build_attr_list(zNode)
-        attrs = bse.build_attr_key_values(zNode,attrList)
+        attrs = zBuilder.zMaya.build_attr_key_values(zNode, attrList)
 
         #add maps if needed-----------------------------------------------------
         maps = maplist.get(mc.objectType(zNode),[])

@@ -1,23 +1,44 @@
-import re
 import maya.cmds as mc
 import maya.mel as mm
+import zBuilder.zMaya as mz
 import maya.OpenMaya as om
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Mesh(object):
-    def __init__(self):
-        self._class = (self.__class__.__module__,self.__class__.__name__)
+    def __init__(self, *args, **kwargs):
+        self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._name = None
         self._pCountList = []
         self._pConnectList = []
         self._pointList = []
 
-    def get_name(self,longName=False):
+        mesh_name = kwargs.get('mesh_name', None)
+        if mesh_name:
+            self.create(mesh_name)
+
+    def create(self, mesh_name):
+        """
+
+        Args:
+            mesh_name:
+
+        Returns:
+
+        """
+        connectivity = get_mesh_connectivity(mesh_name)
+
+        self.set_name(mesh_name)
+        self.set_polygon_counts(connectivity['polygonCounts'])
+        self.set_polygon_connects(connectivity['polygonConnects'])
+        self.set_point_list(connectivity['points'])
+
+    def get_name(self, long_name=False):
         if self._name:
-            if longName:
+            if long_name:
                 return self._name
             else:
                 return self._name.split('|')[-1]
@@ -27,12 +48,11 @@ class Mesh(object):
     def set_name(self,name):
         self._name = name   
 
-    def string_replace(self,search,replace):
+    def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
-        name = self.get_name(longName=True)
-        newName = replace_longname(search,replace,name)
+        name = self.get_name(long_name=True)
+        newName = mz.replace_long_name(search, replace, name)
         self.set_name(newName)
-
 
     def set_polygon_counts(self,pCountList): 
         self._pCountList = pCountList
@@ -68,41 +88,13 @@ class Mesh(object):
             tmp.append([-item[0],item[1],item[2]])
         self.set_point_list(tmp)
 
-    # def __str__(self):
-    #     if self.get_name():
-    #         return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
-    #     return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
+    def __str__(self):
+        if self.get_name():
+            return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
+        return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
 
-    # def __repr__(self):
-    #     return self.__str__()
-
-def replace_longname(search,replace,longName):
-    '''
-    does a search and replace on a long name.  It splits it up by ('|') then
-    performs it on each piece
-
-    Args:
-        search (str): search term
-        replace (str): replace term
-        longName (str): the long name to perform action on
-
-    returns:
-        str: result of search and replace
-    '''
-    items = longName.split('|')
-    newName = ''
-    for i in items:
-        if i:
-            i = re.sub(search, replace,i)
-            if '|' in longName:
-                newName+='|'+i
-            else:
-                newName += i
-
-    if newName != longName:
-        logger.info('replacing name: {}  {}'.format(longName,newName))
-
-    return newName
+    def __repr__(self):
+        return self.__str__()
 
 
 def buildMesh( name,polygonCounts,polygonConnects,vertexArray ): 
@@ -190,8 +182,6 @@ def get_mesh_connectivity(mesh_name):
     return tmp
 
 
-
-
 def getMDagPathFromMeshName( meshName ): 
 
     print meshName
@@ -202,12 +192,3 @@ def getMDagPathFromMeshName( meshName ):
     
     return mesh_mDagPath
 
-def get_mesh_data( meshName ):
-    connectivity = get_mesh_connectivity(meshName)
-    m = Mesh()
-    m.set_name(meshName)
-    m.set_polygon_counts(connectivity['polygonCounts'])
-    m.set_polygon_connects(connectivity['polygonConnects'])
-    m.set_point_list(connectivity['points'])
-
-    return m

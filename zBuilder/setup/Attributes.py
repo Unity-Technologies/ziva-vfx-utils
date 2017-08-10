@@ -1,3 +1,4 @@
+import zBuilder.zMaya
 from zBuilder.main import Builder
 import zBuilder.nodes.base as base
 import zBuilder.nodeCollection as nc
@@ -20,7 +21,7 @@ class AttributesSetup(Builder):
 
         for sel in selection:
             nodeAttrList = base.build_attr_list(sel)
-            nodeAttrs = base.build_attr_key_values(sel, nodeAttrList)
+            nodeAttrs = zBuilder.zMaya.build_attr_key_values(sel, nodeAttrList)
 
             node = base.BaseNode()
             node.set_name(sel)

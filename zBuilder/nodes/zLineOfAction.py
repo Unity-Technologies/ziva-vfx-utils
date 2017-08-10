@@ -2,6 +2,8 @@ from zBuilder.nodes.base import BaseNode
 
 import logging
 
+from zBuilder.zMaya import replace_long_name
+
 logger = logging.getLogger(__name__)
 
 
@@ -13,21 +15,21 @@ class LineOfActionNode(BaseNode):
     def set_fiber(self, fiber):
         self._zFiber = fiber
 
-    def get_fiber(self, longName=False):
+    def get_fiber(self, long_name=False):
         return self._zFiber
 
     def print_(self):
         super(LineOfActionNode, self).print_()
         if self.get_fiber():
-            print 'zFiber: ', self.get_fiber(longName=True)
+            print 'zFiber: ', self.get_fiber(long_name=True)
 
     def string_replace(self, search, replace):
         super(LineOfActionNode, self).string_replace(search, replace)
 
         # name replace----------------------------------------------------------
-        name = self.get_fiber(longName=True)
+        name = self.get_fiber(long_name=True)
         if name:
-            newName = self.replace_longname(search, replace, name)
+            newName = replace_long_name(search, replace, name)
             self.set_fiber(newName)
 
 

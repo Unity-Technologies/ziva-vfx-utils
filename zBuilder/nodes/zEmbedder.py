@@ -23,8 +23,8 @@ class EmbedderNode(BaseNode):
     def set_embedded_meshes(self,meshes):
         self.__embedded_meshes = meshes
 
-    def get_collision_meshes(self,longName=False):
-        if longName:
+    def get_collision_meshes(self,long_name=False):
+        if long_name:
             return self.__collision_meshes
         else:
             tmp = {}
@@ -35,8 +35,8 @@ class EmbedderNode(BaseNode):
                 tmp[name.split('|')[-1]] = msh
             return tmp
 
-    def get_embedded_meshes(self,longName=False):
-        if longName:
+    def get_embedded_meshes(self,long_name=False):
+        if long_name:
             return self.__embedded_meshes
         else:
             tmp = {}
@@ -49,10 +49,10 @@ class EmbedderNode(BaseNode):
 
     def print_(self):
         super(EmbedderNode, self).print_()
-        if self.get_collision_meshes(longName=True):
-            print 'Collision Meshes: ',self.get_collision_meshes(longName=True)
-        if self.get_embedded_meshes(longName=True):
-            print 'Embedded Meshes: ',self.get_embedded_meshes(longName=True)
+        if self.get_collision_meshes(long_name=True):
+            print 'Collision Meshes: ',self.get_collision_meshes(long_name=True)
+        if self.get_embedded_meshes(long_name=True):
+            print 'Embedded Meshes: ',self.get_embedded_meshes(long_name=True)
 
 
 def get_zGeos(bodies):

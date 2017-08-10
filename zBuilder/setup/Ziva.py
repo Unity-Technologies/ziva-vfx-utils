@@ -1,3 +1,4 @@
+import zBuilder.zMaya
 import zBuilder.zMaya as mz
 
 import zBuilder.nodes.base as base
@@ -310,7 +311,7 @@ class ZivaSetup(Builder):
         type_ = mz.get_type(zNode)
 
         attrList = base.build_attr_list(zNode, attr_filter=attr_filter)
-        attrs = base.build_attr_key_values(zNode, attrList)
+        attrs = zBuilder.zMaya.build_attr_key_values(zNode, attrList)
 
         if type_ == 'zTet':
             node = TetNode()
@@ -358,8 +359,8 @@ class ZivaSetup(Builder):
 
     def __retrieve_node_selection(self, selection, attr_filter=None,
                                   get_mesh=True, get_maps=True):
-        longnames = mc.ls(selection, l=True)
-        for s in longnames:
+        long_names = mc.ls(selection, l=True)
+        for s in long_names:
             if mc.objectType(s) == 'transform' or mc.objectType(s) == 'mesh':
                 nodes = []
                 nodes.append(mm.eval('zQuery -t zTet'))
@@ -383,16 +384,16 @@ class ZivaSetup(Builder):
         if not attr_filter:
             attr_filter = {}
         # if connections:
-        longnames = mc.ls(selection, l=True)
-        embedder = embedderNode.get_zEmbedder(longnames)
+        long_names = mc.ls(selection, l=True)
+        embedder = embedderNode.get_zEmbedder(long_names)
         if embedder:
-            if longnames:
-                associations = embedderNode.get_embedded_meshes(longnames)
+            if long_names:
+                associations = embedderNode.get_embedded_meshes(long_names)
                 type_ = mz.get_type(embedder)
 
                 # get attributes/values
                 attrList = base.build_attr_list(embedder)
-                attrs = base.build_attr_key_values(embedder, attrList)
+                attrs = zBuilder.zMaya.build_attr_key_values(embedder, attrList)
 
                 node = embedderNode.EmbedderNode()
                 node.set_name(embedder)
@@ -607,11 +608,11 @@ class ZivaSetup(Builder):
             if ztet.get_user_tet_mesh():
                 try:
                     mc.connectAttr(str(ztet.get_user_tet_mesh()) + '.worldMesh',
-                                   ztet.get_scene_name_for_builder_node() + '.iTet',
+                                   ztet.get_scene_name() + '.iTet',
                                    f=True)
                 except:
                     user_mesh = str(ztet.get_user_tet_mesh())
-                    name = ztet.get_scene_name_for_builder_node()
+                    name = ztet.get_scene_name()
 
                     print 'could not connect {}.worldMesh to {}.iTet'.format(
                         user_mesh, name)

@@ -1,5 +1,6 @@
 import zBuilder.nodes.base as base
 import zBuilder.nodeCollection as nc
+import zBuilder.zMaya
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc
@@ -22,7 +23,7 @@ class ConstraintsSetup(nc.NodeCollection):
 
             for c in con:
                 nodeAttrList = base.build_attr_list(c)
-                nodeAttrs = base.build_attr_key_values(c, nodeAttrList)
+                nodeAttrs = zBuilder.zMaya.build_attr_key_values(c, nodeAttrList)
 
                 node = base.BaseNode()
                 node.set_name(c)

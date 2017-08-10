@@ -1,114 +1,114 @@
 import re
 import maya.cmds as mc
 import maya.mel as mm
-import maya.OpenMaya as om
+import zBuilder.zMaya as mz
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Map(object):
-    def __init__(self):
-        self._class = (self.__class__.__module__,self.__class__.__name__)
+    def __init__(self, *args, **kwargs):
+
+        self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._name = None
+        self._mesh = None
+        self._value = None
 
+        map_name = kwargs.get('map_name', None)
+        mesh_name = kwargs.get('mesh_name', None)
 
-    def get_name(self,longName=False):
+        if map_name and mesh_name:
+            self.create(map_name, mesh_name)
+
+    def create(self, map_name, mesh_name):
+        """
+
+        Args:
+            map_name:
+            mesh_name:
+
+        Returns:
+
+        """
+        weight_value = get_weights(map_name, mesh_name)
+
+        self.set_name(map_name)
+        self.set_mesh(mesh_name)
+        self.set_value(weight_value)
+
+    def get_name(self, long_name=False):
+        """
+
+        Args:
+            long_name:
+
+        Returns:
+
+        """
         if self._name:
-            if longName:
+            if long_name:
                 return self._name
             else:
                 return self._name.split('|')[-1]
         else:
             return None
         
-    def set_name(self,name):
+    def set_name(self, name):
         self._name = name   
 
-    def set_mesh(self,mesh):
+    def set_mesh(self, mesh):
         self._mesh = mesh   
 
-    def get_mesh(self,longName=False):
+    def get_mesh(self, long_name=False):
 
         if self._mesh:
-            if longName:
+            if long_name:
                 return self._mesh
             else:
                 return self._mesh.split('|')[-1]
         else:
             return None
 
-
-
-    def set_value(self,value):
-        #print value
+    def set_value(self, value):
         self._value = value
 
     def get_value(self):
         return self._value
 
-    def string_replace(self,search,replace):
+    def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
-        name = self.get_name(longName=True)
-        newName = replace_longname(search,replace,name)
+        name = self.get_name(long_name=True)
+        newName = mz.replace_long_name(search, replace, name)
         self.set_name(newName)
 
-        mesh = self.get_mesh(longName=True)
-        newMesh = replace_longname(search,replace,mesh)
+        mesh = self.get_mesh(long_name=True)
+        newMesh = mz.replace_long_name(search, replace, mesh)
         self.set_mesh(newMesh)
 
-    # def __str__(self):
-    #     if self.get_name():
-    #         return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
-    #     return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
+    # TODO overload __str__ and use that for print_()
+    def __str__(self):
+        if self.get_name():
+            return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
+        return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
 
-    # def __repr__(self):
-    #     return self.__str__()
-
-def replace_longname(search,replace,longName):
-    '''
-    does a search and replace on a long name.  It splits it up by ('|') then
-    performs it on each piece
-
-    Args:
-        search (str): search term
-        replace (str): replace term
-        longName (str): the long name to perform action on
-
-    returns:
-        str: result of search and replace
-    '''
-
-    items = longName.split('|')
-    newName = ''
-    for i in items:
-        if i:
-            i = re.sub(search, replace,i)
-            if '|' in longName:
-                newName+='|'+i
-            else:
-                newName += i
-
-    if newName != longName:
-        logger.info('replacing name: {}  {}'.format(longName,newName))
-
-    return newName
-
-
+    def __repr__(self):
+        return self.__str__()
 
 
 def set_weights(nodes,data,interp_maps=False):
-    logger.info('DEPRACATED: Use .set_maya_weights_for_builder_node')
+    logger.info('DEPRECATED: Use .set_maya_weights_for_builder_node')
     for node in nodes:
         maps = node.get_maps()
         name = node.get_name()
 
         for mp in maps:
             mapData = data.get_data_by_key_name('map',mp)
-            meshData = data.get_data_by_key_name('mesh',mapData.get_mesh(longName=True))
-            mname= meshData.get_name(longName=True)
-            mnameShort = meshData.get_name(longName=False)
+            meshData = data.get_data_by_key_name('mesh',mapData.get_mesh(long_name=True))
+            mname= meshData.get_name(long_name=True)
+            mnameShort = meshData.get_name(long_name=False)
             wList = mapData.get_value()
 
 
@@ -152,33 +152,21 @@ def set_weights(nodes,data,interp_maps=False):
                     mc.delete(origMesh)
 
 
+def get_weights(map_name, mesh_name):
+    """
 
+    Args:
+        map_name:
+        mesh_name:
 
+    Returns:
 
-
-def get_weights(node,mesh,attr):
-    tmp = {}
-
-    vc = mc.polyEvaluate(mesh,v=True)
+    """
+    vert_count = mc.polyEvaluate(mesh_name, v=True)
 
     try:
-        value = mc.getAttr('%s.%s[0:%d]' % (node,attr, vc-1))
+        value = mc.getAttr('{}[0:{}]' % (map_name, vert_count - 1))
     except:
-        value = mc.getAttr('%s.%s' % (node,attr))
-
+        value = mc.getAttr(map_name)
     return value
 
-
-
-
-
-
-
-def get_map_data( node,attr,mesh ):
-    mapName = '{}.{}'.format(node,attr)
-    value = get_weights(node,mesh,attr)
-    m = Map()
-    m.set_name(mapName)
-    m.set_mesh(mesh)
-    m.set_value(value)
-    return m
