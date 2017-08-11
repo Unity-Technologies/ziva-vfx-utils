@@ -1,16 +1,15 @@
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.nodes.base import BaseNode
-# import zBuilder.nodes.base as base
+from zBuilder.nodes import ZivaBaseNode
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class SolverTransformNode(BaseNode):
+class SolverNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
-        BaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """
@@ -29,7 +28,7 @@ class SolverTransformNode(BaseNode):
         if not mc.objExists(solver_name):
             # print 'building solver: ',solverName
             results = mm.eval('ziva -s')
-            solver = mc.ls(results, type='zSolverTransform')[0]
+            solver = mc.ls(results, type='zSolver')[0]
             mc.rename(solver, solver_name)
             self.set_mobject(solver_name)
 

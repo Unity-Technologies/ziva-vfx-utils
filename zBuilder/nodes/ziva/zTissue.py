@@ -1,4 +1,4 @@
-from zBuilder.nodes.base import BaseNode
+from zBuilder.nodes import ZivaBaseNode
 import logging
 import maya.mel as mm
 
@@ -7,9 +7,9 @@ from zBuilder.zMaya import replace_long_name
 logger = logging.getLogger(__name__)
 
 
-class TissueNode(BaseNode):
+class TissueNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
-        BaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseNode.__init__(self, *args, **kwargs)
         self._children_tissues = None
         self._parent_tissue = None
 
@@ -63,9 +63,9 @@ class TissueNode(BaseNode):
                 new_names.append(replace_long_name(search, replace, child))
             self.set_children_tissues(new_names)
 
-    def retrieve_from_scene(self, *args, **kwargs):
-        super(TissueNode, self).retrieve_from_scene(*args, **kwargs)
-
-        cmd = 'zQuery -t "{}" -l -m "{}"'.format('zTissue', args[0])
-        association = mm.eval(cmd)
-        self.set_association(association)
+    # def create(self, *args, **kwargs):
+    #     super(TissueNode, self).create(*args, **kwargs)
+    #
+    #     cmd = 'zQuery -t "{}" -l -m "{}"'.format('zTissue', args[0])
+    #     association = mm.eval(cmd)
+    #     self.set_association(association)

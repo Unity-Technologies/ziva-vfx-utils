@@ -1,5 +1,4 @@
 from zBuilder.nodeCollection import NodeCollection
-from zBuilder.zMaya import MayaMixin
 
 from functools import wraps
 
@@ -10,10 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Builder(MayaMixin, NodeCollection):
+class Builder(NodeCollection):
     def __init__(self):
         NodeCollection.__init__(self)
-        MayaMixin.__init__(self)
+
 
     @staticmethod
     def time_this(original_function):

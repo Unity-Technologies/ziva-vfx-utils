@@ -28,8 +28,8 @@ class BaseNode(object):
         self._type = None
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        if args:
-            self.retrieve_from_scene(args[0])
+        # if args:
+        #     self.retrieve_from_scene(args[0])
 
     # TODO overload __str__ and use that for print_()
     def __str__(self):
@@ -62,6 +62,7 @@ class BaseNode(object):
 
         """
         self.set_mobject(self.get_mobject())
+        print 'unserialize: ', self.get_mobject()
 
 
     # def __setattr__(self, key, value):
@@ -76,7 +77,7 @@ class BaseNode(object):
     #     # print self._serialize
     #     object.__setattr__(self, key, value)
 
-    def retrieve_from_scene(self, *args, **kwargs):
+    def create(self, *args, **kwargs):
         """
 
         Returns:
@@ -90,6 +91,8 @@ class BaseNode(object):
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
+
+        return self
 
     def print_(self):
         pp = pprint.PrettyPrinter(indent=4)

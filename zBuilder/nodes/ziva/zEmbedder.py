@@ -1,4 +1,4 @@
-from zBuilder.nodes.base import BaseNode
+from zBuilder.nodes import ZivaBaseNode
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -6,9 +6,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class EmbedderNode(BaseNode):
+
+class EmbedderNode(ZivaBaseNode):
     def __init__(self):
-        BaseNode.__init__(self)
+        ZivaBaseNode.__init__(self)
 
         self.__embedded_meshes = None
         self.__collision_meshes = None

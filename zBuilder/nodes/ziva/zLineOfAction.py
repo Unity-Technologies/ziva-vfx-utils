@@ -1,4 +1,4 @@
-from zBuilder.nodes.base import BaseNode
+from zBuilder.nodes import ZivaBaseNode
 
 import logging
 
@@ -7,9 +7,9 @@ from zBuilder.zMaya import replace_long_name
 logger = logging.getLogger(__name__)
 
 
-class LineOfActionNode(BaseNode):
+class LineOfActionNode(ZivaBaseNode):
     def __init__(self):
-        BaseNode.__init__(self)
+        ZivaBaseNode.__init__(self)
         self._zFiber = None
 
     def set_fiber(self, fiber):

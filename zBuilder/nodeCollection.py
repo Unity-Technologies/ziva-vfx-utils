@@ -1,6 +1,5 @@
 import json
 import maya.cmds as mc
-import re
 
 import zBuilder.zMaya as mz
 
@@ -21,9 +20,9 @@ class NodeCollection(object):
     def __init__(self):
         import zBuilder
 
-        self.__collection = []
-        self.data = {}
-        self.info = {}
+        self.__collection = list()
+        self.data = dict()
+        self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
@@ -237,6 +236,8 @@ class NodeCollection(object):
         writes data to disk in json format
 
         Args:
+            node_data:
+            component_data:
             filepath (str): filepath to write to disk
 
         Raises:
@@ -256,6 +257,7 @@ class NodeCollection(object):
         except IOError:
             print "Error: can\'t find file or write data"
         else:
+            self.unserialize()
             logger.info('Wrote File: {}'.format(filepath))
 
     def retrieve_from_file(self, filepath):
@@ -278,7 +280,6 @@ class NodeCollection(object):
             self.stats()
             self.unserialize()
             logger.info('Read File: {}'.format(filepath))
-
 
     def get_json_data(self, node_data=True, component_data=True):
         """
@@ -323,7 +324,7 @@ class NodeCollection(object):
         if 'd_type' in data[0]:
             return data
         else:
-            tmp = []
+            tmp = list()
             tmp.append(self.__wrap_data(data[0], 'node_data'))
             tmp.append(self.__wrap_data(data[1], 'component_data'))
             if len(data) == 3:
@@ -334,7 +335,7 @@ class NodeCollection(object):
         """
         Utility wrapper to identify data.
         """
-        wrapper = {}
+        wrapper = dict()
         wrapper['d_type'] = type_
         wrapper['data'] = data
         return wrapper
@@ -347,6 +348,7 @@ class NodeCollection(object):
         pass
 
     # @abc.abstractmethod
+
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
@@ -375,17 +377,9 @@ class NodeCollection(object):
 
 class BaseNodeEncoder(json.JSONEncoder):
     def default(self, obj):
-
-        from maya.OpenMaya import MObject
-
         if hasattr(obj, '_class'):
-            print 'ENCODE', obj.__dict__
             return obj.__dict__
-        #elif isinstance(obj, MObject):
-        #    print 'ENCODE2', mz.get_name_from_m_object(obj)
-        #    return mz.get_name_from_m_object(obj)
         else:
-            print 'ENCODE3', super(BaseNodeEncoder, self).default(obj)
             return super(BaseNodeEncoder, self).default(obj)
 
 
@@ -399,7 +393,6 @@ def load_base_node(json_object):
     Returns:
         obj:  Result of operation
     """
-    print 'JASON',json_object
     if '_class' in json_object:
         module = json_object['_class'][0]
         name = json_object['_class'][1]
@@ -452,3 +445,5 @@ def str_to_class(module, name):
     MyClass = getattr(i, name)
     instance = MyClass()
     return instance
+
+

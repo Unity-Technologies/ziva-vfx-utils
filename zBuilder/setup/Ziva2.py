@@ -1,21 +1,12 @@
-import zBuilder.zMaya as mz
-
-import zBuilder.nodes.base as base
-import zBuilder.nodes.zEmbedder as embedderNode
-
-
-import zBuilder.data.mesh as msh
-import zBuilder.data.maps as mps
-
-import zBuilder.nodes as nds
-
-import zBuilder.data as dta
-from zBuilder.main import Builder
+import logging
 
 import maya.cmds as mc
 import maya.mel as mm
 
-import logging
+import zBuilder.data as dta
+import zBuilder.data.mesh as msh
+import zBuilder.nodes as nds
+from zBuilder.main import Builder
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +21,12 @@ class ZivaSetup(Builder):
 
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
-            if cmds:
-                if 'ziva' in cmds:
-                    plug = plugin.split('/')[-1]
-                    continue
-                    # self.info['plugin_name'] = plug
-                    # self.info['plugin_version'] = mc.pluginInfo(plug,q=True,v=True)
+            if cmds and 'ziva' in cmds:
+                # self.info['plugin_name'] = plug
+                # self.info['plugin_version'] = mc.pluginInfo(plug,
+                #   q=True,v=True)
+                plug = plugin.split('/')[-1]
+                continue
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
@@ -45,35 +36,35 @@ class ZivaSetup(Builder):
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_maps', True)
 
+        map_names = []
+        mesh_names = []
+
         # ----------------------------------------------------------------------
         # NODE STORING----------------------------------------------------------
         # ----------------------------------------------------------------------
+        # TODO a way to instantiate a b_node based on maya node type.  Lookup?
+        # This way I would just need to query solver then from there maintain
+        # a list of node types and classes.  Then, just pass the node and have
+        # the correct class instantiate.
         solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))[0]
-        b_solver = nds.SolverNode(solver)
+        b_solver = nds.SolverNode().create(solver)
         solver_transform = mm.eval('zQuery -t "zSolverTransform" {}'.format(solver))
-        b_solver_transform = nds.SolverTransformNode(solver_transform)
+        b_solver_transform = nds.SolverTransformNode().create(solver_transform)
 
         self.add_node(b_solver)
         self.add_node(b_solver_transform)
 
-
         bones = mm.eval('zQuery -t "zBone" {}'.format(solver))
 
-
-        for bone in bones:
-            b_bone = nds.BoneNode(bone)
-            self.add_node(b_bone)
+        if bones:
+            for bone in bones:
+                b_bone = nds.BoneNode().create(bone)
+                self.add_node(b_bone)
 
         tets = mm.eval('zQuery -t "zTet" {}'.format(solver))
-        tissues = mm.eval('zQuery -t "zTissue" {}'.format(solver))
-
-        map_names = []
-        mesh_names = []
-
-
         if tets:
             for tet in tets:
-                b_tet = nds.TetNode(tet)
+                b_tet = nds.TetNode().create(tet)
                 self.add_node(b_tet)
                 # TODO ok, so currently I am getting map_name and mesh_name
                 # from the object.  Reason is this is not consistent between
@@ -82,15 +73,61 @@ class ZivaSetup(Builder):
                 # So, can either figure out a better way to get full map without
                 # knowing length OR storing the association between map and mesh
                 # in node.  I am creating that link here, not best place.
-                map_names.append(b_tet.get_maps()[0])
-                mesh_names.append(b_tet.get_association(long_name=True)[0])
+                map_names.extend(b_tet.get_maps())
+                mesh_names.extend(b_tet.get_association(long_name=True))
+
+        tissues = mm.eval('zQuery -t "zTissue" {}'.format(solver))
         if tissues:
             for tissue in tissues:
-                self.add_node(nds.TissueNode(tissue))
+                self.add_node(nds.TissueNode().create(tissue))
+
+        clothes = mm.eval('zQuery -t "zCloth" {}'.format(solver))
+        if clothes:
+            for cloth in clothes:
+                self.add_node(nds.ClothNode().create(cloth))
+
+        materials = mm.eval('zQuery -t "zMaterial" {}'.format(solver))
+        if materials:
+            for material in materials:
+                b_material = nds.MaterialNode().create(material)
+                self.add_node(b_material)
+                map_names.extend(b_material.get_maps())
+                mesh_names.extend(b_material.get_association(long_name=True))
+
+        attachments = mm.eval('zQuery -t "zAttachment" {}'.format(solver))
+        if attachments:
+            for attachment in attachments:
+                b_attachment = nds.AttachmentNode().create(attachment)
+                self.add_node(b_attachment)
+                map_names.extend(b_attachment.get_maps())
+                mesh_names.extend(b_attachment.get_association(long_name=True))
+
+        fibers = mm.eval('zQuery -t "zFiber" {}'.format(solver))
+        if fibers:
+            for fiber in fibers:
+                b_fiber = nds.FiberNode().create(fiber)
+                self.add_node(b_fiber)
+                map_names.extend(b_fiber.get_maps())
+                mesh_name = b_fiber.get_association(long_name=True)
+                mesh_names.append([mesh_name, mesh_name])
+
+        embedder = mm.eval('zQuery -t "zEmbedder" {}'.format(solver))
+        if embedder:
+            b_embedder = nds.EmbedderNode().create(embedder)
+            self.add_node(b_embedder)
+
+        # line_of_actions = mm.eval('zQuery -t "zLineOfAction" {}'.format(solver))
+        # if line_of_actions:
+        #     for line_of_action in line_of_actions:
+        #         self.add_node(nds.LineOfActionNode().create(line_of_action))
 
         # ----------------------------------------------------------------------
         # MAP AND MESH STORING--------------------------------------------------
         # ----------------------------------------------------------------------
+        # TODO so at this level this could be much simpler.  Maybe wrap this
+        # up so it works on a b_node.  Pass the list of b_nodes and it looks up
+        # to see what maps/meshes it needs to store.  Would be 2 lines
+        # better?  not sure.  More obfuscated? ya  shorter?  yes
         for map_name, mesh_name in zip(map_names, mesh_names):
 
             if get_maps:
@@ -103,7 +140,6 @@ class ZivaSetup(Builder):
                     self.add_data('mesh', mesh_name, data=mesh_data_object)
 
         self.stats()
-
 
     @Builder.time_this
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
@@ -140,9 +176,9 @@ class ZivaSetup(Builder):
         """
         node_types = ['zSolverTransform', 'zSolver']
         for node_type in node_types:
-            nodes = self.get_nodes(type_filter=node_type)
-            for node in nodes:
-                node.apply(attr_filter=attr_filter)
+            b_nodes = self.get_nodes(type_filter=node_type)
+            for b_node in b_nodes:
+                b_node.apply(attr_filter=attr_filter)
 
     def __apply_bones(self, name_filter=None, attr_filter=None):
         """
@@ -153,10 +189,7 @@ class ZivaSetup(Builder):
         Returns:
 
         """
-        from zBuilder.nodes.zBone import apply_multiple
+        from zBuilder.nodes.ziva.zBone import apply_multiple
 
-        nodes = self.get_nodes(type_filter='zBone', name_filter=name_filter)
-        apply_multiple(nodes, attr_filter=attr_filter)
-
-
-
+        b_nodes = self.get_nodes(type_filter='zBone', name_filter=name_filter)
+        apply_multiple(b_nodes, attr_filter=attr_filter)

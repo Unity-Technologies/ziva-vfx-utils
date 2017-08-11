@@ -27,69 +27,54 @@ ZNODES = [
     'zCacheTransform']
 
 
-class MayaMixin(object):
-    """
-    A Mixin class to deal with Maya specific functionality
-    """
-
-    def __init__(self):
-        self.__mobjects = list()
-
-    def clear_m_objects(self):
-        """
-        Clears the mObject list associated with the builder nodes.
-        """
-        self.__mobjects = [None] * len(self.get_nodes())
-
-
 def get_mesh_connectivity(mesh_name):
     space = om.MSpace.kWorld
-    meshToRebuild_mDagPath = getMDagPathFromMeshName(mesh_name)
-    meshToRebuild_mDagPath.extendToShape()
+    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
+    mesh_to_rebuild_m_dag_path.extendToShape()
 
-    meshToRebuild_polyIter = om.MItMeshPolygon(meshToRebuild_mDagPath)
-    meshToRebuild_vertIter = om.MItMeshVertex(meshToRebuild_mDagPath)
+    mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
+    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
 
-    numPolygons = 0
-    numVertices = 0
+    num_polygons = 0
+    num_vertices = 0
     # vertexArray_mFloatPointArray = om.MFloatPointArray()
     # polygonCounts_mIntArray = om.MIntArray()
-    polygonCountsList = list()
-    polygonConnectsList = list()
-    pointList = list()
+    polygon_counts_list = list()
+    polygon_connects_list = list()
+    point_list = list()
 
-    while not meshToRebuild_vertIter.isDone():
-        numVertices += 1
-        pos_mPoint = meshToRebuild_vertIter.position(space)
-        pos_mFloatPoint = om.MFloatPoint(pos_mPoint.x, pos_mPoint.y,
-                                         pos_mPoint.z)
+    while not mesh_to_rebuild_vert_iter.isDone():
+        num_vertices += 1
+        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
+        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y,
+                                         pos_m_point.z)
 
-        pointList.append([
-            pos_mFloatPoint[0],
-            pos_mFloatPoint[1],
-            pos_mFloatPoint[2]
+        point_list.append([
+            pos_m_float_point[0],
+            pos_m_float_point[1],
+            pos_m_float_point[2]
         ])
-        meshToRebuild_vertIter.next()
+        mesh_to_rebuild_vert_iter.next()
 
-    while not meshToRebuild_polyIter.isDone():
-        numPolygons += 1
-        polygonVertices_mIntArray = om.MIntArray()
-        meshToRebuild_polyIter.getVertices(polygonVertices_mIntArray)
-        for vertexIndex in polygonVertices_mIntArray:
-            polygonConnectsList.append(vertexIndex)
+    while not mesh_to_rebuild_poly_iter.isDone():
+        num_polygons += 1
+        polygon_vertices_m_int_array = om.MIntArray()
+        mesh_to_rebuild_poly_iter.getVertices(polygon_vertices_m_int_array)
+        for vertexIndex in polygon_vertices_m_int_array:
+            polygon_connects_list.append(vertexIndex)
 
-        polygonCountsList.append(polygonVertices_mIntArray.length())
+        polygon_counts_list.append(polygon_vertices_m_int_array.length())
 
-        meshToRebuild_polyIter.next()
-    tmp = {}
-    tmp['polygonCounts'] = polygonCountsList
-    tmp['polygonConnects'] = polygonConnectsList
-    tmp['points'] = pointList
+        mesh_to_rebuild_poly_iter.next()
+    tmp = dict()
+    tmp['polygonCounts'] = polygon_counts_list
+    tmp['polygonConnects'] = polygon_connects_list
+    tmp['points'] = point_list
 
     return tmp
 
 
-def interpolateValues(sourceMeshName, destinationMeshName, wList):
+def interpolate_values(source_mesh, destination_mesh, weight_list):
     """
     Description: 
         Will transfer values between similar meshes with differing topology. 
@@ -101,16 +86,16 @@ def interpolateValues(sourceMeshName, destinationMeshName, wList):
     Returns: 
       
     """
-    sourceMesh_mDagPath = getMDagPathFromMeshName(sourceMeshName)
-    destinationMesh_mDagPath = getMDagPathFromMeshName(destinationMeshName)
-    sourceMeshShape_mDagPath = om.MDagPath(sourceMesh_mDagPath)
-    sourceMeshShape_mDagPath.extendToShape()
+    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
+    destination_mesh_m_dag_path = get_mdagpath_from_mesh(destination_mesh)
+    source_mesh_shape_m_dag_path = om.MDagPath(source_mesh_m_dag_path)
+    source_mesh_shape_m_dag_path.extendToShape()
 
-    sourceMesh_mMeshIntersector = om.MMeshIntersector()
-    sourceMesh_mMeshIntersector.create(sourceMeshShape_mDagPath.node())
+    source_mesh_m_mesh_intersector = om.MMeshIntersector()
+    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node())
 
-    destinationMesh_mItMeshVertex = om.MItMeshVertex(destinationMesh_mDagPath)
-    sourceMesh_mItMeshPolygon = om.MItMeshPolygon(sourceMesh_mDagPath)
+    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
+    source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
 
     u_util = om.MScriptUtil()
     v_util = om.MScriptUtil()
@@ -119,57 +104,52 @@ def interpolateValues(sourceMeshName, destinationMeshName, wList):
 
     int_util = om.MScriptUtil()
 
-    interpolatedWeights = list()
+    interpolated_weights = list()
 
-    while not destinationMesh_mItMeshVertex.isDone():
+    while not destination_mesh_m_it_mesh_vertex.isDone():
 
-        closest_mPointOnMesh = om.MPointOnMesh()
-        sourceMesh_mMeshIntersector.getClosestPoint(
-            destinationMesh_mItMeshVertex.position(om.MSpace.kWorld),
-            closest_mPointOnMesh
+        closest_m_point_on_mesh = om.MPointOnMesh()
+        source_mesh_m_mesh_intersector.getClosestPoint(
+            destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld),
+            closest_m_point_on_mesh
         )
 
-        sourceMesh_mItMeshPolygon.setIndex(
-            closest_mPointOnMesh.faceIndex(),
+        source_mesh_m_it_mesh_polygon.setIndex(
+            closest_m_point_on_mesh.faceIndex(),
             int_util.asIntPtr()
         )
-        vertices_mIntArray = om.MIntArray()
+        triangle_m_point_array = om.MPointArray()
+        triangle_m_int_array = om.MIntArray()
 
-        triangle_mPointArray = om.MPointArray()
-        triangle_mIntArray = om.MIntArray()
-
-        sourceMesh_mItMeshPolygon.getTriangle(
-            closest_mPointOnMesh.triangleIndex(),
-            triangle_mPointArray,
-            triangle_mIntArray,
+        source_mesh_m_it_mesh_polygon.getTriangle(
+            closest_m_point_on_mesh.triangleIndex(),
+            triangle_m_point_array,
+            triangle_m_int_array,
             om.MSpace.kWorld
         )
 
-        closest_mPointOnMesh.getBarycentricCoords(
+        closest_m_point_on_mesh.getBarycentricCoords(
             u_util_ptr,
             v_util_ptr
         )
 
-        # -----  COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP --------------- #
         weights = list()
         for i in xrange(3):
-            vertexId_int = triangle_mIntArray[i]
-            weights.append(wList[vertexId_int])
-        # --------- COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP ------------ #
-        # print 'weights',weights
+            vertex_id_int = triangle_m_int_array[i]
+            weights.append(weight_list[vertex_id_int])
 
         bary_u = u_util.getFloat(u_util_ptr)
         bary_v = v_util.getFloat(v_util_ptr)
         bary_w = 1 - bary_u - bary_v
 
         interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (
-        bary_w * weights[2])
+            bary_w * weights[2])
 
-        interpolatedWeights.append(interp_weight)
+        interpolated_weights.append(interp_weight)
 
-        destinationMesh_mItMeshVertex.next()
+        destination_mesh_m_it_mesh_vertex.next()
 
-    return interpolatedWeights
+    return interpolated_weights
 
 
 def check_body_type(bodies):
@@ -352,6 +332,7 @@ def get_zTet_user_mesh(zTet):
             return mesh
     return None
 
+
 def get_fiber_lineofaction(zFiber):
     """
     Gets the zLineOfAction node hooked up to a given zFiber in any.
@@ -407,6 +388,9 @@ def get_association(zNode):
         tmp = mc.listConnections(zNode + '.curves')
         return tmp
 
+    elif _type == 'zEmbedder':
+        # empty list for embedder
+        return list()
 
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
@@ -537,7 +521,7 @@ def get_tissue_parent(ztissue):
     return None
 
 
-def getMDagPathFromMeshName(mesh_name):
+def get_mdagpath_from_mesh(mesh_name):
     mesh_m_dag_path = om.MDagPath()
     sel_list = om.MSelectionList()
     sel_list.add(mesh_name)
@@ -621,9 +605,10 @@ def parse_args_for_selection(args):
         # check if it exists and get long name----------------------------------
         for sel in selection:
             if mc.objExists(sel):
-                tmp.extend(mc.ls(sel,l=True))
+                tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError, '{} does not exist in scene, stopping!'.format(sel)
+                raise StandardError, '{} does not exist in scene, stopping!'.format(
+                    sel)
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -642,6 +627,7 @@ def build_attr_list(selection, attr_filter=None):
     attributes and if they are in channelBox.
 
     Args:
+        attr_filter:
         selection (str): maya object to find attributes
 
     returns:
