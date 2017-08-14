@@ -45,8 +45,8 @@ class NodeCollection(object):
             node.print_()
         print '----------------------------------------------------------------'
         for key in self.data:
-            print key, self.data[key]
-            #print 'Component Data - {}: {}'.format(key, self.data[key].keys())
+            for second in self.data[key]:
+                print self.data[key][second]
 
     def compare(self, type_filter=None, name_filter=None):
 
@@ -72,7 +72,9 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         """
         tmp = {}
+        #print
         for i, d in enumerate(self.get_nodes()):
+            #print d#,self.get_nodes()
             t = d.get_type()
             if type_filter:
                 if type_filter == t:
@@ -89,7 +91,7 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-    def add_data(self, key, name, data=None):
+    def add_data(self, data):
         """
         appends a mesh to the mesh list
 
@@ -97,12 +99,13 @@ class NodeCollection(object):
             key (str): places data in this key in dict.
             name (str): name of data to place.
         """
-        if not key in self.data:
-            self.data[key] = {}
+        type_ = data.get_type()
+        name = data.get_name(long_name=True)
+        if not type_ in self.data:
+            self.data[type_] = {}
 
-        if not self.get_data_by_key_name(key, name):
-            self.data[key][name] = data
-            # logger.info("adding data type: {}  name: {}".format(key,name) )
+        if not self.get_data_by_key_name(type_, name):
+            self.data[type_][name] = data
 
     def get_data_by_key_name(self, key, name):
         """

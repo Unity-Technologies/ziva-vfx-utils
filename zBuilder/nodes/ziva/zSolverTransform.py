@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class SolverTransformNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
+        self._type = 'zSolverTransform'
 
     def apply(self, *args, **kwargs):
         """

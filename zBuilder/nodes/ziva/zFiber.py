@@ -12,6 +12,9 @@ class FiberNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
+        self._map_list = ['weightList[0].weights', 'endPoints']
+        self._type = 'zFiber'
+
     def apply(self, *args, **kwargs):
         """
 

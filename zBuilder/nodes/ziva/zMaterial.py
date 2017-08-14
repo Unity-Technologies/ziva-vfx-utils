@@ -12,6 +12,9 @@ class MaterialNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
+        self._map_list = ['weightList[0].weights']
+        self._type = 'zMaterial'
+
     def apply(self, *args, **kwargs):
         """
 

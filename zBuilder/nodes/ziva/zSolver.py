@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 class SolverNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
+        self._type = 'zSolver'
 
     def apply(self, *args, **kwargs):
         """

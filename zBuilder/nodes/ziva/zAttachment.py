@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 class AttachmentNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
+        self._map_list = ['weightList[0].weights', 'weightList[1].weights']
+
+        self._type = 'zAttachment'
 
     def apply(self, *args, **kwargs):
         """

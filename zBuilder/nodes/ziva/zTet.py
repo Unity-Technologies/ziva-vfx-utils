@@ -13,9 +13,8 @@ class TetNode(ZivaBaseNode):
 
         self._map_list = ['weightList[0].weights']
         self._user_tet_mesh = None
-        # print 'dddsss'
-        # self.set_map_list()
-        # print 'init:ztet', self._map_list
+        self._type = 'zTet'
+
 
     def set_user_tet_mesh(self, mesh):
         self._user_tet_mesh = mesh
@@ -28,13 +27,6 @@ class TetNode(ZivaBaseNode):
                 return self._user_tet_mesh.split('|')[-1]
         else:
             return None
-
-    # TODO a way to print everything without having to override
-    # TODO print __dict__ or some variation
-    # def print_(self):
-    #     super(TetNode, self).print_()
-    #     if self.get_user_tet_mesh(long_name=True):
-    #         print 'User_Tet_Mesh: ', self.get_user_tet_mesh(long_name=True)
 
     def string_replace(self, search, replace):
         # TODO a way to manage string_replace without having to override.

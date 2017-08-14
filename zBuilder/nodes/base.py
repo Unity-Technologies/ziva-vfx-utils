@@ -1,10 +1,8 @@
 import logging
-import pprint
-import json
 
 import maya.OpenMaya as om
 import maya.cmds as mc
-
+import maya.mel as mm
 import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
@@ -17,7 +15,6 @@ class BaseNode(object):
         Returns:
             object: 
         """
-        self._serialize = dict()
         self._map_list = []
         self._attr_list = []
 
@@ -31,12 +28,15 @@ class BaseNode(object):
         # if args:
         #     self.retrieve_from_scene(args[0])
 
-    # TODO overload __str__ and use that for print_()
     def __str__(self):
         if self.get_name():
-            return '<%s.%s "%s">' % (
-                self.__class__.__module__, self.__class__.__name__,
-                self.get_name())
+            name = self.get_name()
+            output = ''
+            output += '= {} ====================================\n'.format(name)
+            for key in self.__dict__:
+                output += '\t{} - {}\n'.format(key, self.__dict__[key])
+
+            return output
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)
 
     def __repr__(self):
@@ -83,11 +83,12 @@ class BaseNode(object):
         Returns:
             object:
         """
-        logger.info('retrieving {}'.format(args))
+        # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])
-        self.set_type(mc.objectType(selection[0]))
+        if not self.type_:
+            self.set_type(mc.objectType(selection[0]))
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
@@ -95,31 +96,7 @@ class BaseNode(object):
         return self
 
     def print_(self):
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(self)
-        # # logger.info('{}'.format(current_material[0],name))
-        # print '----------------------------------------------------'
-        # # print 'index: \t',i
-        # print 'python node: \t', self
-        # print 'name: \t', self.get_name(long_name=True)
-        # print 'type: \t', self.get_type()
-        #
-        # attr_list = self.get_attr_list()
-        # if attr_list:
-        #     print 'attrs: ',
-        #     for attr in attr_list:
-        #         print '\t\t', attr, self.get_attr_key_value(attr,
-        #                                                     'type'), self.get_attr_key_value(
-        #             attr, 'value')
-        #
-        # maps = self.get_maps()
-        # if maps:
-        #     print 'maps: ', maps
-        #     # for key in maps:
-        #     #    print '\t\t',key,maps[key]['mesh'],maps[key]['value']
-        # associations = self.get_association(long_name=True)
-        # if associations:
-        #     print 'association: ', associations
+        print self
 
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
@@ -143,11 +120,6 @@ class BaseNode(object):
             for item in maps:
                 tmp.append(mz.replace_long_name(search, replace, item))
             self.set_maps(tmp)
-
-            # for key in maps:
-            #    if maps[key].get('mesh',None):
-            #        maps[key]['mesh'] = self.replace_long_name(search,replace,maps[key]['mesh'])
-            #        #print 'hmm',self.get_name(),maps[key]
 
     def get_attr_value(self, attr):
         """
@@ -281,22 +253,23 @@ class BaseNode(object):
                     if scene_val != obj_val:
                         print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
 
-    def get_scene_name(self, fullpath=True):
+    def get_scene_name(self, long_name=True):
         """
         This checks stored mObject and gets name of object in scene.  If no
         mObject it returns node name.
 
         Args:
-            fullpath (bool): Return the fullpath or not.  Defaults to True.
+            long_name (bool): Return the fullpath or not.  Defaults to True.
 
         Returns:
             (str) Name of maya object.
         """
+        name = None
         if self.get_mobject():
             name = mz.get_name_from_m_object(self.get_mobject())
 
         if not name:
-            name = self.get_name(long_name=True)
+            name = self.get_name(long_name=long_name)
 
         return name
 
@@ -365,9 +338,9 @@ class BaseNode(object):
         original_name = self.get_name()
         created_mesh = None
 
-        for MAP in maps:
-
-            map_data = self.get_data_by_key_name('map', MAP)
+        for map_ in maps:
+            # TODO bah, mesh needs to be here!
+            map_data = self.get_data_by_key_name('map', map_)
             mesh_data = self.get_data_by_key_name('mesh', map_data.get_mesh(
                 long_name=True))
             mesh_name_short = mesh_data.get_name(long_name=False)
@@ -375,41 +348,38 @@ class BaseNode(object):
 
             if mc.objExists(mesh_name_short):
                 if interp_maps == 'auto':
-
-                    cur_conn = get_mesh_connectivity(mesh_name_short)
+                    cur_conn = mz.get_mesh_connectivity(mesh_name_short)
 
                     if len(cur_conn['points']) != len(
                             mesh_data.get_point_list()):
                         interp_maps = True
 
                 if interp_maps == True or interp_maps == 'True' or interp_maps == 'true':
-                    logger.info('interpolating maps...{}'.format(MAP))
+                    logger.info('interpolating maps...{}'.format(map_))
                     created_mesh = mesh_data.build()
-                    weight_list = interpolateValues(created_mesh,
+                    weight_list = mz.interpolate_values(created_mesh,
                                                     mesh_name_short,
                                                     weight_list)
 
-                MAP = MAP.replace(original_name, scene_name)
+                map_ = map_.replace(original_name, scene_name)
 
-                if mc.objExists('%s[0]' % (MAP)):
-                    if not mc.getAttr('%s[0]' % (MAP), l=True):
+                if mc.objExists('%s[0]' % map_):
+                    if not mc.getAttr('%s[0]' % map_, l=True):
                         tmp = []
                         for w in weight_list:
                             tmp.append(str(w))
                         val = ' '.join(tmp)
                         cmd = "setAttr " + '%s[0:%d] ' % (
-                            MAP, len(weight_list) - 1) + val
-                        # print 'setting',cmd
+                            map_, len(weight_list) - 1) + val
                         mm.eval(cmd)
 
                 else:
                     try:
-                        mc.setAttr(MAP, weight_list, type='doubleArray')
+                        mc.setAttr(map_, weight_list, type='doubleArray')
                     except:
                         pass
                 if created_mesh:
                     mc.delete(created_mesh)
-
 
     def get_mobject(self):
         """
@@ -427,7 +397,6 @@ class BaseNode(object):
         builder node list.
         Args:
             maya_node (str): The maya node to track.
-            b_node (object): The builder node to store it against.
 
         Returns:
             Nothing
@@ -451,13 +420,13 @@ def set_attrs(nodes, attr_filter=None):
     for node in nodes:
         name = node.get_name()
         type_ = node.get_type()
-        nodeAttrs = node.get_attr_list()
+        node_attrs = node.get_attr_list()
         if attr_filter:
             if attr_filter.get(type_, None):
-                nodeAttrs = list(
-                    set(nodeAttrs).intersection(attr_filter[type_]))
+                node_attrs = list(
+                    set(node_attrs).intersection(attr_filter[type_]))
 
-        for attr in nodeAttrs:
+        for attr in node_attrs:
             if node.get_attr_key('type') == 'doubleArray':
                 if mc.objExists(name + '.' + attr):
                     if not mc.getAttr(name + '.' + attr, l=True):
@@ -476,5 +445,3 @@ def set_attrs(nodes, attr_filter=None):
                             pass
                 else:
                     print name + '.' + attr + ' not found, skipping'
-
-

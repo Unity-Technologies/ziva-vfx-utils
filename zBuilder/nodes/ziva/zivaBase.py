@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# TODO zivabase????  change name???
 class ZivaBaseNode(BaseNode):
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
@@ -27,7 +28,7 @@ class ZivaBaseNode(BaseNode):
             object:
         """
 
-        logger.info('retrieving {}'.format(args))
+        #logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])
@@ -39,11 +40,13 @@ class ZivaBaseNode(BaseNode):
         mesh = mz.get_association(selection[0])
         self.set_association(mesh)
 
-        print 'getting maps', self._map_list
+        # print 'getting maps', self._map_list
 
+        tmp = []
         for map_ in self._map_list:
             map_name = '{}.{}'.format(selection[0], map_)
-            self.set_maps([map_name])
+            tmp.append(map_name)
+        self.set_maps(tmp)
 
         # TODO  seriously?  Is returning self a good idea?  Probably not.
         return self

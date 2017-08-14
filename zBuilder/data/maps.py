@@ -1,4 +1,3 @@
-import re
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -16,12 +15,29 @@ class Map(object):
         self._name = None
         self._mesh = None
         self._value = None
+        if args:
+            map_name = args[0]
+            mesh_name = args[1]
 
-        map_name = kwargs.get('map_name', None)
-        mesh_name = kwargs.get('mesh_name', None)
+            if map_name and mesh_name:
+                self.create(map_name, mesh_name)
 
-        if map_name and mesh_name:
-            self.create(map_name, mesh_name)
+    def __str__(self):
+        name = self.get_name()
+        if self.get_value():
+            length = len(self.get_value())
+        else:
+            length = 'null'
+        output = ''
+        output += '< MAP: {} -- length: {} >'.format(name, length)
+        return output
+
+    def __repr__(self):
+        return self.__str__()
+
+    @staticmethod
+    def get_type():
+        return 'map'
 
     def create(self, map_name, mesh_name):
         """
@@ -88,14 +104,6 @@ class Map(object):
         newMesh = mz.replace_long_name(search, replace, mesh)
         self.set_mesh(newMesh)
 
-    # TODO overload __str__ and use that for print_()
-    def __str__(self):
-        if self.get_name():
-            return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
-        return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
-
-    def __repr__(self):
-        return self.__str__()
 
 
 def set_weights(nodes,data,interp_maps=False):
@@ -163,10 +171,9 @@ def get_weights(map_name, mesh_name):
 
     """
     vert_count = mc.polyEvaluate(mesh_name, v=True)
-
     try:
-        value = mc.getAttr('{}[0:{}]' % (map_name, vert_count - 1))
-    except:
+        value = mc.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
+    except ValueError:
         value = mc.getAttr(map_name)
     return value
 

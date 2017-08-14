@@ -13,6 +13,7 @@ class EmbedderNode(ZivaBaseNode):
 
         self.__embedded_meshes = None
         self.__collision_meshes = None
+        self._type = 'zEmbedder'
 
     def string_replace(self, search, replace, name=True, association=True):
         super(EmbedderNode, self).string_replace(search, replace)
@@ -48,13 +49,6 @@ class EmbedderNode(ZivaBaseNode):
                 tmp[name.split('|')[-1]] = msh
             return tmp
 
-    def print_(self):
-        super(EmbedderNode, self).print_()
-        if self.get_collision_meshes(long_name=True):
-            print 'Collision Meshes: ',self.get_collision_meshes(long_name=True)
-        if self.get_embedded_meshes(long_name=True):
-            print 'Embedded Meshes: ',self.get_embedded_meshes(long_name=True)
-
 
 def get_zGeos(bodies):
     mc.select(bodies,r=True)
@@ -74,23 +68,21 @@ def get_zEmbedder(bodies):
         return None
 
 
-
 def get_embedded_meshes(bodies):
 
     collision_meshes = {}
     embedded_meshes = {}
     for body in bodies:
-        colMesh = mm.eval('zQuery -cm -l ' + body )
-        emMesh = mm.eval('zQuery -em -l ' + body)
-        if emMesh and colMesh:
-            emMesh = list(set(set(emMesh)-set(colMesh)))
-            if emMesh == []:
-                emMesh = None
+        col_mesh = mm.eval('zQuery -cm -l ' + body)
+        em_mesh = mm.eval('zQuery -em -l ' + body)
+        if em_mesh and col_mesh:
+            em_mesh = list(set(set(em_mesh)-set(col_mesh)))
+            if em_mesh == []:
+                em_mesh = None
 
-        if emMesh:
-            embedded_meshes[body] = emMesh
-        if colMesh:
-            collision_meshes[body] = colMesh
+        if em_mesh:
+            embedded_meshes[body] = em_mesh
+        if col_mesh:
+            collision_meshes[body] = col_mesh
 
-    return embedded_meshes,collision_meshes
-    
+    return embedded_meshes, collision_meshes
