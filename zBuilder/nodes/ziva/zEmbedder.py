@@ -8,12 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 class EmbedderNode(ZivaBaseNode):
-    def __init__(self):
-        ZivaBaseNode.__init__(self)
+    TYPE = 'zEmbedder'
+
+    def __init__(self, *args, **kwargs):
+        ZivaBaseNode.__init__(self, *args, **kwargs)
 
         self.__embedded_meshes = None
         self.__collision_meshes = None
-        self._type = 'zEmbedder'
 
     def string_replace(self, search, replace, name=True, association=True):
         super(EmbedderNode, self).string_replace(search, replace)

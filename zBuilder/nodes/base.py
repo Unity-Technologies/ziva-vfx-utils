@@ -9,24 +9,26 @@ logger = logging.getLogger(__name__)
 
 
 class BaseNode(object):
+    TYPE = None
+    MAP_LIST = []
+
     def __init__(self, *args, **kwargs):
         """
 
         Returns:
             object: 
         """
-        self._map_list = []
         self._attr_list = []
 
         self._name = None
         self._attrs = {}
         self._maps = {}
         self._association = []
-        self._type = None
+
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        # if args:
-        #     self.retrieve_from_scene(args[0])
+        if args:
+            self.create(args[0])
 
     def __str__(self):
         if self.get_name():
@@ -87,8 +89,7 @@ class BaseNode(object):
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])
-        if not self.type_:
-            self.set_type(mc.objectType(selection[0]))
+        self.set_type(mc.objectType(selection[0]))
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
@@ -191,15 +192,18 @@ class BaseNode(object):
             name (str): the name of node.
         """
         self._name = name
-
-    def get_type(self):
+    @classmethod
+    def get_type(cls):
         """
         get type of node
 
         Returns:
             (str) of node name
         """
-        return self._type
+        try:
+            return cls.TYPE
+        except AttributeError:
+            return None
 
     def set_type(self, type_):
         """

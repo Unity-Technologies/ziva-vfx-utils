@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class MaterialNode(ZivaBaseNode):
+    TYPE = 'zMaterial'
+    MAP_LIST = ['weightList[0].weights']
+
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
-
-        self._map_list = ['weightList[0].weights']
-        self._type = 'zMaterial'
 
     def apply(self, *args, **kwargs):
         """

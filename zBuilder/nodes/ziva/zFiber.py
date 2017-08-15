@@ -1,19 +1,20 @@
+from zBuilder.nodes import ZivaBaseNode
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
-
-from zBuilder.nodes import ZivaBaseNode
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class FiberNode(ZivaBaseNode):
+    TYPE = 'zFiber'
+    MAP_LIST = ['weightList[0].weights', 'endPoints']
+
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
-        self._map_list = ['weightList[0].weights', 'endPoints']
-        self._type = 'zFiber'
+
 
     def apply(self, *args, **kwargs):
         """

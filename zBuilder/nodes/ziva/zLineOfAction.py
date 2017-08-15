@@ -8,10 +8,11 @@ logger = logging.getLogger(__name__)
 
 
 class LineOfActionNode(ZivaBaseNode):
-    def __init__(self):
-        ZivaBaseNode.__init__(self)
+    TYPE = 'zLineOfAction'
+
+    def __init__(self, *args, **kwargs):
+        ZivaBaseNode.__init__(self, *args, **kwargs)
         self._zFiber = None
-        self._type = 'zLineOfAction'
 
     def set_fiber(self, fiber):
         self._zFiber = fiber

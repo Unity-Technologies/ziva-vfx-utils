@@ -59,15 +59,17 @@ class ZivaSetup(Builder):
                       ]
 
         for node_type in node_types:
-            node = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
-            if node:
-                b_node = self.node_factory(node)
-                self.add_node(b_node)
+            nodes = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
+            if nodes:
+                for node in nodes:
+                    b_node = self.node_factory(node)
+                    print b_node
+                    self.add_node(b_node)
 
         if get_maps:
             self.store_maps()
             # self.component_factory('map')
-        if get_maps:
+        if get_mesh:
             self.store_mesh()
 
 

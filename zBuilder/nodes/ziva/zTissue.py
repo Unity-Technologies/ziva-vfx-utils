@@ -8,11 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class TissueNode(ZivaBaseNode):
+    TYPE = 'zTissue'
+
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
         self._children_tissues = None
         self._parent_tissue = None
-        self._type = 'zTissue'
 
     def set_children_tissues(self, children):
         self._children_tissues = children
@@ -79,16 +80,13 @@ class TissueNode(ZivaBaseNode):
 
         # print 'getting maps', self._map_list
 
-        tmp = []
-        for map_ in self._map_list:
-            map_name = '{}.{}'.format(selection[0], map_)
-            tmp.append(map_name)
-        self.set_maps(tmp)
+        # tmp = []
+        # for map_ in self._map_list:
+        #     map_name = '{}.{}'.format(selection[0], map_)
+        #     tmp.append(map_name)
+        # self.set_maps(tmp)
 
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
-
-        # TODO  seriously?  Is returning self a good idea?  Probably not.
-        return self
 
 

@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class ClothNode(ZivaBaseNode):
+    TYPE = 'zCloth'
+
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
-        self._type = 'zCloth'
 
     def apply(self, *args, **kwargs):
         """

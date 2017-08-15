@@ -5,16 +5,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
-
 class TetNode(ZivaBaseNode):
+    TYPE = 'zTet'
+    MAP_LIST = ['weightList[0].weights']
+
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
-        self._map_list = ['weightList[0].weights']
         self._user_tet_mesh = None
-        self._type = 'zTet'
-
 
     def set_user_tet_mesh(self, mesh):
         self._user_tet_mesh = mesh

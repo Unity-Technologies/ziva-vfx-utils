@@ -29,9 +29,12 @@ class Builder(NodeCollection):
         """
         type_ = mz.get_type(node)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
+
             if inspect.isclass(obj):
-                if type_ == obj().get_type():
-                    return obj().create(node)
+                if type_ == obj.TYPE:
+                    print type_,obj.TYPE
+                    return obj(node)
+
 
     @staticmethod
     def component_factory(*args):
@@ -67,6 +70,7 @@ class Builder(NodeCollection):
     # TODO name of this method is lame.
     def store_maps(self):
         for node in self.get_nodes():
+            print node
             map_names = node.get_maps()
             mesh_names = node.get_association(long_name=True)
             if map_names and mesh_names:

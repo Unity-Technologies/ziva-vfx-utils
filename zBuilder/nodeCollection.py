@@ -44,6 +44,7 @@ class NodeCollection(object):
                                    name_filter=name_filter):
             node.print_()
         print '----------------------------------------------------------------'
+        print self.data
         for key in self.data:
             for second in self.data[key]:
                 print self.data[key][second]

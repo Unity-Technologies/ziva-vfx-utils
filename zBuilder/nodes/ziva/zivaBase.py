@@ -10,16 +10,10 @@ logger = logging.getLogger(__name__)
 
 # TODO zivabase????  change name???
 class ZivaBaseNode(BaseNode):
+    MAP_LIST = []
+
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
-
-        self._map_list = list()
-
-    # def set_map_list(self, map_list):
-    #     self._map_list = map_list
-    #
-    # def get_map_list(self):
-    #     return self._map_list
 
     def create(self, *args, **kwargs):
         """
@@ -42,11 +36,9 @@ class ZivaBaseNode(BaseNode):
 
         # print 'getting maps', self._map_list
 
-        tmp = []
-        for map_ in self._map_list:
-            map_name = '{}.{}'.format(selection[0], map_)
-            tmp.append(map_name)
-        self.set_maps(tmp)
-
-        # TODO  seriously?  Is returning self a good idea?  Probably not.
-        return self
+        # tmp = []
+        # if self.get_map_list():
+        #     for map_ in self.get_map_list():
+        #         map_name = '{}.{}'.format(selection[0], map_)
+        #         tmp.append(map_name)
+        #     self.set_maps(tmp)
