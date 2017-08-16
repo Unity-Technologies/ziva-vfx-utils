@@ -627,7 +627,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 		self.item_add_act.setShortcut("s")
 				
 		#paint sel object Menu
-		self.item_add_paintBoth.triggered.connect(self.createPopupLables)
+		self.item_add_paintBoth.triggered.connect(self.paintBothMaps)
 		
 		self.popup_menu.addAction(self.item_add_act)
 		self.popup_menu.addSeparator().setText(("Paintable Objects"))
@@ -636,7 +636,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 		
 		self.treeWidget.customContextMenuRequested.connect(self._ctx_menu_cb)
     
-    def createPopupLables(self):
+    def paintBothMaps(self):
 		treeSelection =  self.treeWidget.selectedItems()[0]
 		treeSelectionNiceName = treeSelection.text(0)
 		treeSelected = treeSelectionNiceName
