@@ -32,7 +32,6 @@ class Builder(NodeCollection):
 
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
-                    print type_,obj.TYPE
                     return obj(node)
 
 
@@ -49,7 +48,7 @@ class Builder(NodeCollection):
         type_ = args[0]
         for name, obj in inspect.getmembers(sys.modules['zBuilder.data']):
             if inspect.isclass(obj):
-                if type_ == obj().get_type():
+                if type_ == obj.TYPE:
                     return obj(*args[1:])
 
     @staticmethod
@@ -70,7 +69,7 @@ class Builder(NodeCollection):
     # TODO name of this method is lame.
     def store_maps(self):
         for node in self.get_nodes():
-            print node
+            #print node
             map_names = node.get_maps()
             mesh_names = node.get_association(long_name=True)
             if map_names and mesh_names:

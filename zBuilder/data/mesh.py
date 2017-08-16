@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class Mesh(object):
+    TYPE = 'mesh'
+
     def __init__(self, *args, **kwargs):
         self._class = (self.__class__.__module__, self.__class__.__name__)
         self._name = None
@@ -30,10 +32,6 @@ class Mesh(object):
 
     def __repr__(self):
         return self.__str__()
-
-    @staticmethod
-    def get_type():
-        return 'mesh'
 
     def create(self, mesh_name):
         """

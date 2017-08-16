@@ -42,22 +42,6 @@ class TissueNode(ZivaBaseNode):
         else:
             return None
 
-    def string_replace(self, search, replace):
-        super(TissueNode, self).string_replace(search, replace)
-
-        # name replace----------------------------------------------------------
-        parent = self.get_parent_tissue(long_name=True)
-        if parent:
-            newName = replace_long_name(search, replace, parent)
-            self.set_parent_tissue(newName)
-
-        children = self.get_children_tissues(long_name=True)
-        if children:
-            new_names = list()
-            for child in children:
-                new_names.append(replace_long_name(search, replace, child))
-            self.set_children_tissues(new_names)
-
     # TODO super this, dont need duplicate code
     def create(self, *args, **kwargs):
         """

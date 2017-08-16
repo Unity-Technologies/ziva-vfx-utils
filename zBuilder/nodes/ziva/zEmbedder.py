@@ -16,10 +16,6 @@ class EmbedderNode(ZivaBaseNode):
         self.__embedded_meshes = None
         self.__collision_meshes = None
 
-    def string_replace(self, search, replace, name=True, association=True):
-        super(EmbedderNode, self).string_replace(search, replace)
-        print 'zEmbedder:string_replace'
-
     def set_collision_meshes(self,meshes):
         self.__collision_meshes = meshes
 

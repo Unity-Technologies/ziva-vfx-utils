@@ -63,7 +63,7 @@ class ZivaSetup(Builder):
             if nodes:
                 for node in nodes:
                     b_node = self.node_factory(node)
-                    print b_node
+                    #print b_node
                     self.add_node(b_node)
 
         if get_maps:

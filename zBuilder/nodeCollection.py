@@ -44,10 +44,9 @@ class NodeCollection(object):
                                    name_filter=name_filter):
             node.print_()
         print '----------------------------------------------------------------'
-        print self.data
+
         for key in self.data:
-            for second in self.data[key]:
-                print self.data[key][second]
+            print self.data[key]
 
     def compare(self, type_filter=None, name_filter=None):
 
@@ -100,7 +99,7 @@ class NodeCollection(object):
             key (str): places data in this key in dict.
             name (str): name of data to place.
         """
-        type_ = data.get_type()
+        type_ = data.TYPE
         name = data.get_name(long_name=True)
         if not type_ in self.data:
             self.data[type_] = {}
@@ -218,8 +217,6 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        # print 'SEARCh',search
-        # print 'REPLACE',replace
         for node in self.get_nodes():
             node.string_replace(search, replace)
 

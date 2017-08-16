@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class Map(object):
+    TYPE = 'map'
+
     def __init__(self, *args, **kwargs):
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
@@ -34,10 +36,6 @@ class Map(object):
 
     def __repr__(self):
         return self.__str__()
-
-    @staticmethod
-    def get_type():
-        return 'map'
 
     def create(self, map_name, mesh_name):
         """

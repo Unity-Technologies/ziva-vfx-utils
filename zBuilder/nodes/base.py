@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 class BaseNode(object):
     TYPE = None
-    MAP_LIST = []
+    MAP_LIST = None
+    SEARCH_EXCLUDE = ['_class', '_attrs', '_attr_list']
 
     def __init__(self, *args, **kwargs):
         """
@@ -19,10 +20,9 @@ class BaseNode(object):
             object: 
         """
         self._attr_list = []
-
         self._name = None
         self._attrs = {}
-        self._maps = {}
+        self._maps = []
         self._association = []
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
@@ -100,27 +100,51 @@ class BaseNode(object):
         print self
 
     def string_replace(self, search, replace):
-        # name replace----------------------------------------------------------
-        name = self.get_name(long_name=True)
-        new_name = mz.replace_long_name(search, replace, name)
-        self.set_name(new_name)
+        """
 
-        # association replace---------------------------------------------------
-        ass_names = self.get_association(long_name=True)
-        new_names = []
-        if ass_names:
-            for name in ass_names:
-                new_name = mz.replace_long_name(search, replace, name)
-                new_names.append(new_name)
-            self.set_association(new_names)
+        Args:
+            search:
+            replace:
 
-        # maps-------------------------------------------------------------------
-        maps = self.get_maps()
-        tmp = []
-        if maps:
-            for item in maps:
-                tmp.append(mz.replace_long_name(search, replace, item))
-            self.set_maps(tmp)
+        Returns:
+
+        """
+        for item in self.__dict__:
+            if item not in self.SEARCH_EXCLUDE:
+                if isinstance(self.__dict__[item], (tuple, list)):
+                    if self.__dict__[item]:
+                        new_names = []
+                        for name in self.__dict__[item]:
+                            new_name = mz.replace_long_name(search, replace, name)
+                            new_names.append(new_name)
+                        self.__dict__[item] = new_names
+                elif isinstance(self.__dict__[item], basestring):
+                    if self.__dict__[item]:
+                        self.__dict__[item] = mz.replace_long_name(
+                            search, replace, self.__dict__[item])
+                elif isinstance(self.__dict__[item], dict):
+                    print 'DICT', item
+        # # name replace----------------------------------------------------------
+        # name = self.get_name(long_name=True)
+        # new_name = mz.replace_long_name(search, replace, name)
+        # self.set_name(new_name)
+        #
+        # # association replace---------------------------------------------------
+        # ass_names = self.get_association(long_name=True)
+        # new_names = []
+        # if ass_names:
+        #     for name in ass_names:
+        #         new_name = mz.replace_long_name(search, replace, name)
+        #         new_names.append(new_name)
+        #     self.set_association(new_names)
+        #
+        # # maps-------------------------------------------------------------------
+        # maps = self.get_maps()
+        # tmp = []
+        # if maps:
+        #     for item in maps:
+        #         tmp.append(mz.replace_long_name(search, replace, item))
+        #     self.set_maps(tmp)
 
     def get_attr_value(self, attr):
         """
@@ -205,19 +229,29 @@ class BaseNode(object):
         except AttributeError:
             return None
 
-    def set_type(self, type_):
+    @classmethod
+    def set_type(cls, type_):
         """
         Sets type of node
 
         Args:
             type_ (str): the type of node.
         """
-        self._type = type_
+        cls.TYPE = type_
 
     def get_maps(self):
         return self._maps
 
     def set_maps(self, maps):
+        """
+        Sets the maps for a b_node as a list.
+
+        Args:
+            maps:
+
+        Returns:
+
+        """
         self._maps = maps
 
     def set_attrs(self, attrs):
