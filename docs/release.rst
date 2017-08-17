@@ -1,5 +1,12 @@
 Release Notes
 =============
+0.11.3
+------
+* zBuilder support for sub-tissues
+* mirroring of geo before application (experimental)
+* zLineOfAction functionality added to retrieve_from_scene_selecton
+* general bug fixes
+
 0.11.2
 ------
 * Restructure of class hierarchy
