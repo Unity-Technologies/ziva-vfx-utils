@@ -15,24 +15,17 @@ class AttributesSetup(Builder):
     def __init__(self):
         Builder.__init__(self)
 
-    @nc.time_this
+    @Builder.time_this
     def retrieve_from_scene(self):
         selection = mc.ls(sl=True, l=True)
 
-        for sel in selection:
-            nodeAttrList = base.build_attr_list(sel)
-            nodeAttrs = zBuilder.zMaya.build_attr_key_values(sel, nodeAttrList)
-
-            node = base.BaseNode()
-            node.set_name(sel)
-            node.set_type(mz.get_type(sel))
-            node.set_attrs(nodeAttrs)
-            self.add_node(node)
-
+        for item in selection:
+            b_node = self.node_factory(item)
+            self.add_node(b_node)
         self.stats()
 
-    @nc.time_this
+    @Builder.time_this
     def apply(self):
-        nodes = self.get_nodes()
-        for node in nodes:
-            self.set_maya_attrs_for_builder_node(node)
+        b_nodes = self.get_nodes()
+        for b_node in b_nodes:
+            b_node.set_maya_attrs()

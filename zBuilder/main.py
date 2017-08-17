@@ -34,6 +34,7 @@ class Builder(NodeCollection):
                 if type_ == obj.TYPE:
                     return obj(node)
 
+        return zBuilder.nodes.BaseNode(node)
 
     @staticmethod
     def component_factory(*args):
@@ -66,26 +67,4 @@ class Builder(NodeCollection):
 
         return new_function
 
-    # TODO name of this method is lame.
-    def store_maps(self):
-        for node in self.get_nodes():
-            #print node
-            map_names = node.get_maps()
-            mesh_names = node.get_association(long_name=True)
-            if map_names and mesh_names:
-                for map_name, mesh_name in zip(map_names, mesh_names):
-                    # TODO data_factory?????? For all types
-                    map_data_object = self.component_factory('map', map_name, mesh_name)
-                    self.add_data(map_data_object)
-                    logger.info('Retrieving Data : {}'.format(map_data_object))
 
-    def store_mesh(self):
-        for node in self.get_nodes():
-            map_names = node.get_maps()
-            mesh_names = node.get_association(long_name=True)
-            if map_names and mesh_names:
-                for map_name, mesh_name in zip(map_names, mesh_names):
-                    if not self.get_data_by_key_name('mesh', mesh_name):
-                        mesh_data_object = self.component_factory('mesh', mesh_name)
-                        self.add_data(mesh_data_object)
-                        logger.info('Retrieving Data : {}'.format(mesh_data_object))

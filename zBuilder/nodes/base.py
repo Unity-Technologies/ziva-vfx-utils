@@ -66,19 +66,6 @@ class BaseNode(object):
         self.set_mobject(self.get_mobject())
         print 'unserialize: ', self.get_mobject()
 
-
-    # def __setattr__(self, key, value):
-    #     try:
-    #         json.dumps(value)
-    #         tmp = {}
-    #         tmp[key] = value
-    #         # object.__setattr__(self, self._serialize, tmp)
-    #     except TypeError:
-    #         pass
-    #
-    #     # print self._serialize
-    #     object.__setattr__(self, key, value)
-
     def create(self, *args, **kwargs):
         """
 
@@ -95,6 +82,12 @@ class BaseNode(object):
         self.set_mobject(selection[0])
 
         return self
+
+    def apply(self):
+        # attr_filter = kwargs.get('attr_filter', None)
+
+        # scene_name = self.get_scene_name()
+        self.set_maya_attrs()
 
     def print_(self):
         print self
@@ -123,28 +116,8 @@ class BaseNode(object):
                         self.__dict__[item] = mz.replace_long_name(
                             search, replace, self.__dict__[item])
                 elif isinstance(self.__dict__[item], dict):
+                    # TODO needs functionality (replace keys)
                     print 'DICT', item
-        # # name replace----------------------------------------------------------
-        # name = self.get_name(long_name=True)
-        # new_name = mz.replace_long_name(search, replace, name)
-        # self.set_name(new_name)
-        #
-        # # association replace---------------------------------------------------
-        # ass_names = self.get_association(long_name=True)
-        # new_names = []
-        # if ass_names:
-        #     for name in ass_names:
-        #         new_name = mz.replace_long_name(search, replace, name)
-        #         new_names.append(new_name)
-        #     self.set_association(new_names)
-        #
-        # # maps-------------------------------------------------------------------
-        # maps = self.get_maps()
-        # tmp = []
-        # if maps:
-        #     for item in maps:
-        #         tmp.append(mz.replace_long_name(search, replace, item))
-        #     self.set_maps(tmp)
 
     def get_attr_value(self, attr):
         """
@@ -216,8 +189,8 @@ class BaseNode(object):
             name (str): the name of node.
         """
         self._name = name
-    @classmethod
-    def get_type(cls):
+
+    def get_type(self):
         """
         get type of node
 
@@ -225,19 +198,18 @@ class BaseNode(object):
             (str) of node name
         """
         try:
-            return cls.TYPE
+            return self.TYPE
         except AttributeError:
             return None
 
-    @classmethod
-    def set_type(cls, type_):
+    def set_type(self, type_):
         """
         Sets type of node
 
         Args:
             type_ (str): the type of node.
         """
-        cls.TYPE = type_
+        self.TYPE = type_
 
     def get_maps(self):
         return self._maps
@@ -450,36 +422,3 @@ class BaseNode(object):
             self.__mobject = mobject
 
             # logger.info('{} - {}'.format(self.__mobject, maya_node))
-
-
-def set_attrs(nodes, attr_filter=None):
-    logger.info('DEPRECATED: Use .set_maya_attrs')
-
-    for node in nodes:
-        name = node.get_name()
-        type_ = node.get_type()
-        node_attrs = node.get_attr_list()
-        if attr_filter:
-            if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
-
-        for attr in node_attrs:
-            if node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(name + '.' + attr):
-                    if not mc.getAttr(name + '.' + attr, l=True):
-                        mc.setAttr(name + '.' + attr, node.get_attr_value(attr),
-                                   type='doubleArray')
-                else:
-                    print name + '.' + attr + ' not found, skipping'
-            else:
-                if mc.objExists(name + '.' + attr):
-                    if not mc.getAttr(name + '.' + attr, l=True):
-                        try:
-                            mc.setAttr(name + '.' + attr,
-                                       node.get_attr_value(attr))
-                        except:
-                            # print 'tried...',attr
-                            pass
-                else:
-                    print name + '.' + attr + ' not found, skipping'
