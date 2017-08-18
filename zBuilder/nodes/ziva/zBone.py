@@ -43,7 +43,7 @@ def apply_multiple(b_nodes, attr_filter=None):
     # rename zBones-------------------------------------------------------------
     if results:
         results = mc.ls(results, type='zBone')
-        for new, name, b_node in zip(results[1::2], culled['names'], culled['b_nodes']):
+        for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
             b_node.set_mobject(new)
             mc.rename(new, name)
 

@@ -1,6 +1,8 @@
 from zBuilder.nodes import ZivaBaseNode
 import zBuilder.zMaya as mz
 import logging
+import maya.cmds as mc
+import maya.mel as mm
 
 logger = logging.getLogger(__name__)
 
@@ -24,4 +26,47 @@ class TetNode(ZivaBaseNode):
                 return self._user_tet_mesh.split('|')[-1]
         else:
             return None
+
+    def apply_user_tet_mesh(self):
+        """
+        Applies the user tet mesh if any.
+        """
+        if self.get_user_tet_mesh():
+            try:
+                mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
+                               self.get_scene_name() + '.iTet', f=True)
+            except:
+                user_mesh = str(self.get_user_tet_mesh())
+                name = self.get_scene_name()
+
+                print 'could not connect {}.worldMesh to {}.iTet'.format(
+                    user_mesh, name)
+
+    def apply(self, *args, **kwargs):
+        """
+        These get built after the tissues so it is assumed they are in scene.
+        This just checks what tet is associated with mesh and uses that one,
+        renames it and stores mObject then changes attributes.
+        There is only ever 1 per mesh so no need to worry about multiple tets
+
+        Args:
+            *args:
+            **kwargs:
+
+        Returns:
+
+        """
+        interp_maps = kwargs.get('interp_maps', 'auto')
+
+        name = self.get_scene_name()
+        if not mc.objExists(name):
+            mesh = self.get_association()[0]
+            name = mm.eval('zQuery -t zTet ' + mesh)[0]
+        if name:
+            new_name = mc.rename(name, self.get_name())
+            self.set_mobject(new_name)
+
+        self.apply_user_tet_mesh()
+        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_weights(interp_maps=interp_maps)
 

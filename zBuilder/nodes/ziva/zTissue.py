@@ -1,8 +1,8 @@
 from zBuilder.nodes import ZivaBaseNode
 import logging
 import zBuilder.zMaya as mz
-
-from zBuilder.zMaya import replace_long_name
+import maya.cmds as mc
+import maya.mel as mm
 
 logger = logging.getLogger(__name__)
 
@@ -74,3 +74,41 @@ class TissueNode(ZivaBaseNode):
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
 
 
+def apply_multiple(b_nodes, attr_filter=None):
+    """
+    Each node can deal with it's own building.  Though, with zBones it is much
+    faster to build them all at once with one command instead of looping
+    through them.  This function builds all the zBones at once.
+
+    Args:
+        attr_filter (obj):
+
+    Returns:
+
+    """
+    sel = mc.ls(sl=True)
+    # cull none buildable-------------------------------------------------------
+    culled = mz.cull_creation_nodes(b_nodes)
+
+    # check mesh quality--------------------------------------------------------
+    mz.check_mesh_quality(culled['meshes'])
+
+    # build tissues all at once-------------------------------------------------
+    results = None
+    if culled['meshes']:
+        mc.select(culled['meshes'], r=True)
+        results = mm.eval('ziva -t')
+
+    # rename zBones-------------------------------------------------------------
+    if results:
+        results = mc.ls(results, type='zTissue')
+
+        for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
+            b_node.set_mobject(new)
+            mc.rename(new, name)
+
+    # set the attributes
+    for b_node in b_nodes:
+        b_node.set_maya_attrs(attr_filter=attr_filter)
+
+    mc.select(sel)

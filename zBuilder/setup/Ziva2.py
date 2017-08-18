@@ -95,6 +95,8 @@ class ZivaSetup(Builder):
             self.__apply_solver(attr_filter=attr_filter)
         if bones:
             self.__apply_bones(attr_filter=attr_filter)
+        if tissues:
+            self.__apply_tissues(attr_filter=attr_filter)
 
         mc.select(sel)
 
@@ -107,6 +109,7 @@ class ZivaSetup(Builder):
         Returns:
 
         """
+        logger.info('Applying solver...')
         node_types = ['zSolverTransform', 'zSolver']
         for node_type in node_types:
             b_nodes = self.get_nodes(type_filter=node_type)
@@ -122,15 +125,32 @@ class ZivaSetup(Builder):
         Returns:
 
         """
+        logger.info('Applying bones...')
         from zBuilder.nodes.ziva.zBone import apply_multiple
 
         b_nodes = self.get_nodes(type_filter='zBone', name_filter=name_filter)
         apply_multiple(b_nodes, attr_filter=attr_filter)
 
-    def __get_map_names(self):
-        for node in self.get_nodes():
-            #print node
-            map_names = node.get_maps()
+    def __apply_tissues(self, name_filter=None, attr_filter=None,
+                        interp_maps='auto'):
+        """
+
+        Args:
+            attr_filter:
+
+        Returns:
+
+        """
+        logger.info('Applying tissues...')
+        from zBuilder.nodes.ziva.zTissue import apply_multiple
+
+        b_nodes = self.get_nodes(type_filter='zTissue', name_filter=name_filter)
+        apply_multiple(b_nodes, attr_filter=attr_filter)
+
+        b_nodes = self.get_nodes(type_filter='zTet', name_filter=name_filter)
+        for b_node in b_nodes:
+            b_node.apply(interp_maps=interp_maps)
+
 
     # TODO name of this method is lame.
     def store_maps(self):

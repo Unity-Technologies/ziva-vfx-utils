@@ -103,61 +103,6 @@ class Map(object):
         self.set_mesh(newMesh)
 
 
-
-def set_weights(nodes,data,interp_maps=False):
-    logger.info('DEPRECATED: Use .set_maya_weights_for_builder_node')
-    for node in nodes:
-        maps = node.get_maps()
-        name = node.get_name()
-
-        for mp in maps:
-            mapData = data.get_data_by_key_name('map',mp)
-            meshData = data.get_data_by_key_name('mesh',mapData.get_mesh(long_name=True))
-            mname= meshData.get_name(long_name=True)
-            mnameShort = meshData.get_name(long_name=False)
-            wList = mapData.get_value()
-
-
-            #mname= maps[attr]['mesh'] 
-            #wList = maps[attr]['value']
-            #mnameShort = mname.split('|')[-1]
-
-            if mc.objExists(mnameShort):
-                #mesh = meshes[mname]
-
-                if interp_maps == 'auto':
-                    
-                    cur_conn = get_mesh_connectivity(mnameShort)
-
-                    #print len(cur_conn['points']),len(mesh.get_point_list())
-                    if len(cur_conn['points']) != len(meshData.get_point_list()):
-                        interp_maps=True
-
-                if interp_maps == True:
-                    logger.info('interpolating maps...{}'.format(mp))
-                    origMesh = meshData.build( )
-                    wList = interpolateValues(origMesh,mnameShort,wList)
-
-                if mc.objExists('%s[0]' % (mp)):
-                    if not mc.getAttr('%s[0]' % (mp),l=True):
-                        tmp = []
-                        for w in wList:
-                            tmp.append(str(w))
-                        val = ' '.join(tmp)
-                        cmd = "setAttr "+'%s[0:%d] ' % (mp, len(wList)-1)+val
-                        #print 'setting',name,attr
-                        mm.eval(cmd)
-
-                else:
-                    try:
-                        #print 'here we go',name,attr,wList
-                        mc.setAttr(mp,wList,type='doubleArray')
-                    except:
-                        pass
-                if interp_maps == True:
-                    mc.delete(origMesh)
-
-
 def get_weights(map_name, mesh_name):
     """
 
