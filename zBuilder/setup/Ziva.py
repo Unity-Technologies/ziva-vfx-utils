@@ -340,7 +340,7 @@ class ZivaSetup(Builder):
                 for mp, ms in zip(ml, associations):
                     mapName = '{}.{}'.format(zNode, mp)
                     mapData = mps.get_map_data(zNode, mp, ms)
-                    self.add_data('map', mapName, data=mapData)
+                    self.add_data_object('map', mapName, data=mapData)
 
                     maps.append(mapName)
 
@@ -348,8 +348,8 @@ class ZivaSetup(Builder):
                 if get_mesh:
                     for ass in associations:
                         if not self.get_data_by_key_name('mesh', ass):
-                            self.add_data('mesh', ass,
-                                          data=msh.get_mesh_data(ass))
+                            self.add_data_object('mesh', ass,
+                                                 data=msh.get_mesh_data(ass))
 
         self.add_node(node)
 

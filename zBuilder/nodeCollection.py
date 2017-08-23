@@ -72,9 +72,9 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         """
         tmp = {}
-        #print
+        # print
         for i, d in enumerate(self.get_nodes()):
-            #print d#,self.get_nodes()
+            # print d#,self.get_nodes()
             t = d.get_type()
             if type_filter:
                 if type_filter == t:
@@ -91,13 +91,12 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-    def add_data(self, data):
+    def add_data_object(self, data):
         """
         appends a mesh to the mesh list
 
         Args:
-            key (str): places data in this key in dict.
-            name (str): name of data to place.
+
         """
         type_ = data.TYPE
         name = data.get_name(long_name=True)
@@ -106,6 +105,14 @@ class NodeCollection(object):
 
         if not self.get_data_by_key_name(type_, name):
             self.data[type_][name] = data
+
+    def get_data(self):
+        """
+
+        Returns:
+
+        """
+        return self.data
 
     def get_data_by_key_name(self, key, name):
         """
@@ -245,7 +252,6 @@ class NodeCollection(object):
             IOError: If not able to write file
 
         """
-        self.serialize()
 
         data = self.get_json_data(
             component_data=component_data,
@@ -258,7 +264,9 @@ class NodeCollection(object):
         except IOError:
             print "Error: can\'t find file or write data"
         else:
-            self.unserialize()
+            for b_node in self.get_nodes():
+                b_node.set_mobject(b_node.get_mobject())
+            self.stats()
             logger.info('Wrote File: {}'.format(filepath))
 
     def retrieve_from_file(self, filepath):
@@ -274,12 +282,16 @@ class NodeCollection(object):
         try:
             with open(filepath, 'rb') as handle:
                 data = json.load(handle, object_hook=load_base_node)
+
                 self.from_json_data(data)
         except IOError:
             print "Error: can\'t find file or read data"
         else:
             self.stats()
-            self.unserialize()
+            for b_node in self.get_nodes():
+                b_node.set_mobject(b_node.get_mobject())
+                b_node.set_data(self.get_data())
+
             logger.info('Read File: {}'.format(filepath))
 
     def get_json_data(self, node_data=True, component_data=True):
@@ -317,7 +329,6 @@ class NodeCollection(object):
                 logger.info("reading info")
                 self.info = d['data']
 
-
     def __check_data(self, data):
         """
         Utility to check data format.
@@ -349,37 +360,20 @@ class NodeCollection(object):
         pass
 
     # @abc.abstractmethod
-
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
         pass
 
-    def serialize(self):
-        """
-        Runs serialize on all nodes.
-        Returns:
-
-        """
-        for node in self.get_nodes():
-            node.serialize()
-
-
-    def unserialize(self):
-        """
-        Runs unserialize on all nodes.
-        Returns:
-
-        """
-        for node in self.get_nodes():
-            node.unserialize()
-
 
 class BaseNodeEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, '_class'):
-            return obj.__dict__
+            if hasattr(obj, 'serialize'):
+                return obj.serialize()
+            else:
+                return obj.__dict__
         else:
             return super(BaseNodeEncoder, self).default(obj)
 
@@ -395,12 +389,18 @@ def load_base_node(json_object):
         obj:  Result of operation
     """
     if '_class' in json_object:
-        module = json_object['_class'][0]
+        module_ = json_object['_class'][0]
         name = json_object['_class'][1]
 
         # TODO this
-        node = str_to_class(module, name)
-        node.__dict__ = json_object
+        node = str_to_class(module_, name)
+
+        if hasattr(node, 'deserialize'):
+            node.deserialize(json_object)
+
+        else:
+            node.__dict__ = json_object
+
         return node
 
     else:

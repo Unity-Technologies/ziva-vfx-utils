@@ -1,17 +1,17 @@
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
-
+from zBuilder.data import BaseComponent
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Map(object):
+class Map(BaseComponent):
     TYPE = 'map'
 
     def __init__(self, *args, **kwargs):
-
+        BaseComponent.__init__(self, *args, **kwargs)
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._name = None
@@ -52,26 +52,6 @@ class Map(object):
         self.set_name(map_name)
         self.set_mesh(mesh_name)
         self.set_value(weight_value)
-
-    def get_name(self, long_name=False):
-        """
-
-        Args:
-            long_name:
-
-        Returns:
-
-        """
-        if self._name:
-            if long_name:
-                return self._name
-            else:
-                return self._name.split('|')[-1]
-        else:
-            return None
-        
-    def set_name(self, name):
-        self._name = name   
 
     def set_mesh(self, mesh):
         self._mesh = mesh   

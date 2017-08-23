@@ -2,15 +2,17 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
+from zBuilder.data import BaseComponent
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Mesh(object):
+class Mesh(BaseComponent):
     TYPE = 'mesh'
 
     def __init__(self, *args, **kwargs):
+        BaseComponent.__init__(self, *args, **kwargs)
         self._class = (self.__class__.__module__, self.__class__.__name__)
         self._name = None
         self._pCountList = []
@@ -48,18 +50,6 @@ class Mesh(object):
         self.set_polygon_counts(connectivity['polygonCounts'])
         self.set_polygon_connects(connectivity['polygonConnects'])
         self.set_point_list(connectivity['points'])
-
-    def get_name(self, long_name=False):
-        if self._name:
-            if long_name:
-                return self._name
-            else:
-                return self._name.split('|')[-1]
-        else:
-            return None
-
-    def set_name(self, name):
-        self._name = name
 
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------

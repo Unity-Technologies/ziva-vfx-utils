@@ -4,6 +4,7 @@ import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class BaseNode(object):
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
+        self.__data = kwargs.get('data', None)
         if args:
             self.create(args[0])
 
@@ -42,29 +44,56 @@ class BaseNode(object):
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)
 
     def __repr__(self):
-        return self.__str__()
+        output = '{}()'.format(self.__class__.__name__)
+        return output
+
+    def set_data(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
+        self.__data = data
 
     def serialize(self):
         """
         This replaces an mObject with the name of the object in scene to make it
-        serializable for writing out to json.
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
 
         Returns:
-            nothing
+            dict: of serializable items
         """
+        # removing and storing mobject as a string (object name)
         if self.__mobject:
-            print 'serialize: ', self.__mobject
+            # print 'serialize: ', self.__mobject
             self.__mobject = mz.get_name_from_m_object(self.__mobject)
 
-    def unserialize(self):
+        # culling __dict__ of any non-serializable items so we can save as json
+        output = dict()
+        for key in self.__dict__:
+            try:
+                json.dumps(self.__dict__[key])
+                output[key] = self.__dict__[key]
+            except TypeError:
+                pass
+        return output
+
+    def deserialize(self, dictionary):
         """
         For now this sets the mobject with the string that is there now.
 
         Returns:
 
         """
-        self.set_mobject(self.get_mobject())
-        print 'unserialize: ', self.get_mobject()
+        for key in dictionary:
+            self.__dict__[key] = dictionary[key]
+        #  self.set_mobject(self.get_mobject())
+        print 'deserialize: ', self.__repr__()
 
     def create(self, *args, **kwargs):
         """
@@ -236,6 +265,14 @@ class BaseNode(object):
         self.set_attrs(attrs)
 
     def get_association(self, long_name=False):
+        """
+
+        Args:
+            long_name:
+
+        Returns:
+
+        """
         if not long_name:
             tmp = []
             for item in self._association:
@@ -245,6 +282,14 @@ class BaseNode(object):
             return self._association
 
     def set_association(self, association):
+        """
+
+        Args:
+            association:
+
+        Returns:
+
+        """
 
         if isinstance(association, str):
             self._association = [association]
@@ -252,6 +297,11 @@ class BaseNode(object):
             self._association = association
 
     def compare(self):
+        """
+
+        Returns:
+
+        """
         name = self.get_name(long_name=False)
 
         attr_list = self.get_attr_list()

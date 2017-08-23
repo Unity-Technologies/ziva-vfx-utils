@@ -161,7 +161,7 @@ class ZivaSetup(Builder):
             if map_names and mesh_names:
                 for map_name, mesh_name in zip(map_names, mesh_names):
                     map_data_object = self.component_factory('map', map_name, mesh_name)
-                    self.add_data(map_data_object)
+                    self.add_data_object(map_data_object)
                     logger.info('Retrieving Data : {}'.format(map_data_object))
 
     def store_mesh(self):
@@ -172,5 +172,5 @@ class ZivaSetup(Builder):
                 for map_name, mesh_name in zip(map_names, mesh_names):
                     if not self.get_data_by_key_name('mesh', mesh_name):
                         mesh_data_object = self.component_factory('mesh', mesh_name)
-                        self.add_data(mesh_data_object)
+                        self.add_data_object(mesh_data_object)
                         logger.info('Retrieving Data : {}'.format(mesh_data_object))

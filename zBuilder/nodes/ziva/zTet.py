@@ -57,6 +57,7 @@ class TetNode(ZivaBaseNode):
 
         """
         interp_maps = kwargs.get('interp_maps', 'auto')
+        attr_filter = kwargs.get('attr_filter', None)
 
         name = self.get_scene_name()
         if not mc.objExists(name):

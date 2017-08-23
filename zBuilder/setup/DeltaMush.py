@@ -59,13 +59,13 @@ class DeltaMushSetup(Builder):
                                             association[0])
                 maps.append(map_name)
                 node.set_maps(maps)
-                self.add_data('map', map_name, data=map_data)
+                self.add_data_object('map', map_name, data=map_data)
 
                 if get_mesh:
                     for ass in association:
                         if not self.get_data_by_key_name('mesh', ass):
-                            self.add_data('mesh', ass,
-                                          data=msh.get_mesh_data(ass))
+                            self.add_data_object('mesh', ass,
+                                                 data=msh.get_mesh_data(ass))
 
             self.add_node(node)
         self.stats()

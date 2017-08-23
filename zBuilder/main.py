@@ -1,8 +1,6 @@
 from zBuilder.nodeCollection import NodeCollection
 import zBuilder.nodes
 import zBuilder.zMaya as mz
-from zBuilder.data import Map
-from zBuilder.data import Mesh
 
 from functools import wraps
 import datetime
@@ -17,8 +15,7 @@ class Builder(NodeCollection):
     def __init__(self):
         NodeCollection.__init__(self)
 
-    @staticmethod
-    def node_factory(node):
+    def node_factory(self, node):
         """
 
         Args:
@@ -32,8 +29,7 @@ class Builder(NodeCollection):
 
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
-                    return obj(node)
-
+                    return obj(node, data=self.data)
         return zBuilder.nodes.BaseNode(node)
 
     @staticmethod
@@ -51,6 +47,7 @@ class Builder(NodeCollection):
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
                     return obj(*args[1:])
+        # return zBuilder.data.(node)
 
     @staticmethod
     def time_this(original_function):
