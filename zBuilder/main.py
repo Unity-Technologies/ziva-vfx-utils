@@ -1,4 +1,5 @@
 from zBuilder.nodeCollection import NodeCollection
+from zBuilder.IO import IO
 import zBuilder.nodes
 import zBuilder.zMaya as mz
 
@@ -11,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Builder(NodeCollection):
+class Builder(IO, NodeCollection):
     def __init__(self):
         NodeCollection.__init__(self)
 
