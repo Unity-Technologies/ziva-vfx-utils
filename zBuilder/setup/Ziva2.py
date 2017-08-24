@@ -106,8 +106,15 @@ class ZivaSetup(Builder):
             self.__apply_bones(attr_filter=attr_filter)
         if tissues:
             self.__apply_tissues(attr_filter=attr_filter)
+        if cloth:
+            self.__apply_cloth(attr_filter=attr_filter)
 
-        mc.select(sel)
+
+
+        try:
+            mc.select(sel)
+        except ValueError:
+            pass
 
     def __apply_solver(self, attr_filter=None):
         """
@@ -160,6 +167,16 @@ class ZivaSetup(Builder):
         for b_node in b_nodes:
             b_node.apply(interp_maps=interp_maps)
 
+    def __apply_cloth(self,attr_filter=None, name_filter=None):
+        """
+
+        Returns:
+
+        """
+        logger.info('Applying cloth...')
+        b_nodes = self.get_nodes(name_filter=None, type_filter='zCloth')
+        for b_node in b_nodes:
+            b_node.apply(attr_filter=attr_filter)
 
     # TODO name of this method is lame.
     def store_maps(self):
