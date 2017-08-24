@@ -114,6 +114,14 @@ class NodeCollection(object):
         """
         return self.data
 
+    def set_data(self, data):
+        """
+
+        Returns:
+
+        """
+        self.data = data
+
     def get_data_by_key_name(self, key, name):
         """
         Gets data given 'key'
@@ -242,14 +250,14 @@ class NodeCollection(object):
         """
         must create a method to inherit this class
         """
-        pass
+        raise NotImplementedError("Subclass must implement abstract method")
 
     # @abc.abstractmethod
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
-        pass
+        raise NotImplementedError("Subclass must implement abstract method")
 
 
 def replace_dict_keys(search, replace, dictionary):

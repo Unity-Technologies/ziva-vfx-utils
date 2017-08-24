@@ -58,6 +58,17 @@ class BaseNode(object):
         """
         self.__data = data
 
+    def get_data(self):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
+        return self.__data
+
     def serialize(self):
         """
         This replaces an mObject with the name of the object in scene to make it
@@ -376,6 +387,7 @@ class BaseNode(object):
                 else:
                     print scene_name + '.' + attr + ' not found, skipping'
 
+    # TODO move this to map node!!!!!!!!
     def set_maya_weights(self, interp_maps=False):
         """
         Given a Builder node this set the map values of the object in the maya
@@ -397,12 +409,14 @@ class BaseNode(object):
         scene_name = self.get_scene_name()
         original_name = self.get_name()
         created_mesh = None
+        data = self.get_data()
 
         for map_ in maps:
-            # TODO bah, mesh needs to be here!
-            map_data = self.get_data_by_key_name('map', map_)
-            mesh_data = self.get_data_by_key_name('mesh', map_data.get_mesh(
-                long_name=True))
+
+            map_data = data['map'].get(map_, None)
+            mesh = map_data.get_mesh(long_name=True)
+            mesh_data = data['mesh'].get(mesh, None)
+
             mesh_name_short = mesh_data.get_name(long_name=False)
             weight_list = map_data.get_value()
 
@@ -418,8 +432,8 @@ class BaseNode(object):
                     logger.info('interpolating maps...{}'.format(map_))
                     created_mesh = mesh_data.build()
                     weight_list = mz.interpolate_values(created_mesh,
-                                                    mesh_name_short,
-                                                    weight_list)
+                                                        mesh_name_short,
+                                                        weight_list)
 
                 map_ = map_.replace(original_name, scene_name)
 

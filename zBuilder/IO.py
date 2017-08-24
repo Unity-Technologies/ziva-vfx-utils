@@ -82,7 +82,7 @@ class IO(object):
             tmp.append(self.__wrap_data(self.get_nodes(), 'node_data'))
         if component_data:
             logger.info("writing component_data")
-            tmp.append(self.__wrap_data(self.data, 'component_data'))
+            tmp.append(self.__wrap_data(self.get_data(), 'component_data'))
         logger.info("writing info")
         tmp.append(self.__wrap_data(self.info, 'info'))
 
@@ -96,11 +96,11 @@ class IO(object):
 
         for d in data:
             if d['d_type'] == 'node_data':
-                logger.info("reading node_data")
                 self.set_nodes(d['data'])
+                logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
-                logger.info("reading component_data")
-                self.data = d['data']
+                self.set_data(d['data'])
+                logger.info("reading component_data. ")
             if d['d_type'] == 'info':
                 logger.info("reading info")
                 self.info = d['data']
@@ -155,15 +155,14 @@ def load_base_node(json_object):
         name = json_object['_class'][1]
 
         # TODO this
-        node = str_to_class(module_, name)
+        b_node = str_to_class(module_, name)
 
-        if hasattr(node, 'deserialize'):
-            node.deserialize(json_object)
-
+        if hasattr(b_node, 'deserialize'):
+            b_node.deserialize(json_object)
         else:
-            node.__dict__ = json_object
+            b_node.__dict__ = json_object
 
-        return node
+        return b_node
 
     else:
         return json_object
