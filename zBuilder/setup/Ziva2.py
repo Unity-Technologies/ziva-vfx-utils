@@ -105,14 +105,16 @@ class ZivaSetup(Builder):
         if bones:
             self.__apply_bones(attr_filter=attr_filter)
         if tissues:
-            self.__apply_tissues(attr_filter=attr_filter, interp_maps=interp_maps)
+            self.__apply_tissues(attr_filter=attr_filter,
+                                 interp_maps=interp_maps)
         if cloth:
             self.__apply_cloth(attr_filter=attr_filter)
         if materials:
-            self.__apply_materials(attr_filter=attr_filter, interp_maps=interp_maps)
+            self.__apply_materials(attr_filter=attr_filter,
+                                   interp_maps=interp_maps)
         if attachments:
-            self.__apply_attachments(attr_filter=attr_filter, interp_maps=interp_maps)
-
+            self.__apply_attachments(attr_filter=attr_filter,
+                                     interp_maps=interp_maps)
 
         try:
             mc.select(sel)
