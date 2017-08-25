@@ -14,7 +14,7 @@ class AttributesSetup(Builder):
     def __init__(self):
         Builder.__init__(self)
 
-    @nc.time_this
+    @Builder.time_this
     def retrieve_from_scene(self):
         selection = mc.ls(sl=True, l=True)
 
@@ -30,7 +30,7 @@ class AttributesSetup(Builder):
 
         self.stats()
 
-    @nc.time_this
+    @Builder.time_this
     def apply(self):
         nodes = self.get_nodes()
         for node in nodes:
