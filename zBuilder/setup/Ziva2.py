@@ -105,10 +105,13 @@ class ZivaSetup(Builder):
         if bones:
             self.__apply_bones(attr_filter=attr_filter)
         if tissues:
-            self.__apply_tissues(attr_filter=attr_filter)
+            self.__apply_tissues(attr_filter=attr_filter, interp_maps=interp_maps)
         if cloth:
             self.__apply_cloth(attr_filter=attr_filter)
-
+        if materials:
+            self.__apply_materials(attr_filter=attr_filter, interp_maps=interp_maps)
+        if attachments:
+            self.__apply_attachments(attr_filter=attr_filter, interp_maps=interp_maps)
 
 
         try:
@@ -167,16 +170,43 @@ class ZivaSetup(Builder):
         for b_node in b_nodes:
             b_node.apply(interp_maps=interp_maps)
 
-    def __apply_cloth(self,attr_filter=None, name_filter=None):
+    def __apply_cloth(self, attr_filter=None, name_filter=None):
         """
 
         Returns:
 
         """
         logger.info('Applying cloth...')
-        b_nodes = self.get_nodes(name_filter=None, type_filter='zCloth')
+        b_nodes = self.get_nodes(name_filter=name_filter, type_filter='zCloth')
         for b_node in b_nodes:
             b_node.apply(attr_filter=attr_filter)
+
+    def __apply_materials(self, attr_filter=None, name_filter=None,
+                          interp_maps='auto'):
+        """
+
+        Returns:
+
+        """
+        logger.info('Applying materials...')
+        b_nodes = self.get_nodes(name_filter=name_filter,
+                                 type_filter='zMaterial')
+        for b_node in b_nodes:
+            b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
+
+    def __apply_attachments(self, attr_filter=None, name_filter=None,
+                            interp_maps=False):
+        """
+
+        Returns:
+
+        """
+        logger.info('Applying attachments...')
+        b_nodes = self.get_nodes(name_filter=name_filter,
+                                 type_filter='zAttachment')
+        for b_node in b_nodes:
+            b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
+
 
     # TODO name of this method is lame.
     def store_maps(self):

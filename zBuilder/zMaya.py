@@ -155,7 +155,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list):
 def check_body_type(bodies):
     """
     Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
-    used to see if we can create a zAttachment before we try.  Additionaly
+    used to see if we can create a zAttachment before we try.  Additionally
     does a check if all objects exist in scene.
 
     Args:

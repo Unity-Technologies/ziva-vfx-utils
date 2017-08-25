@@ -29,6 +29,8 @@ class BaseNode(object):
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self.__data = kwargs.get('data', None)
+        self._parent = kwargs.get('parent', None)
+
         if args:
             self.create(args[0])
 
@@ -68,6 +70,7 @@ class BaseNode(object):
 
         """
         return self.__data
+
 
     def serialize(self):
         """

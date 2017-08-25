@@ -30,7 +30,7 @@ class Builder(IO, NodeCollection):
 
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
-                    return obj(node, data=self.data)
+                    return obj(node, data=self.data, parent=self)
         return zBuilder.nodes.BaseNode(node)
 
     @staticmethod

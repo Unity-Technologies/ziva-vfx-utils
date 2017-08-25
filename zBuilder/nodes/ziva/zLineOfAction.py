@@ -20,14 +20,3 @@ class LineOfActionNode(ZivaBaseNode):
     def get_fiber(self, long_name=False):
         return self._zFiber
 
-    # def string_replace(self, search, replace):
-    #     super(LineOfActionNode, self).string_replace(search, replace)
-    #
-    #     # name replace----------------------------------------------------------
-    #     name = self.get_fiber(long_name=True)
-    #     if name:
-    #         newName = replace_long_name(search, replace, name)
-    #         self.set_fiber(newName)
-    #
-    #
-    #
