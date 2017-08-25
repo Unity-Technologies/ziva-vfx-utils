@@ -407,7 +407,8 @@ class ZivaSetup(Builder):
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
-              lineOfActions=True, mirror=False, permisive=True):
+              lineOfActions=True, mirror=False, permisive=True,
+              check_meshes=True):
 
         """
         Args:
@@ -439,11 +440,13 @@ class ZivaSetup(Builder):
             pass
 
         if bones:
-            self.__apply_bones(name_filter=name_filter)
+            self.__apply_bones(name_filter=name_filter,
+                               check_meshes=check_meshes)
         if tissues:
             self.__apply_tissues(interp_maps=interp_maps,
                                  name_filter=name_filter,
-                                 attr_filter=attr_filter)
+                                 attr_filter=attr_filter,
+                                 check_meshes=check_meshes)
         if cloth:
             self.__apply_cloth(interp_maps=interp_maps, name_filter=name_filter,
                                attr_filter=attr_filter)
@@ -536,7 +539,8 @@ class ZivaSetup(Builder):
             self.set_maya_attrs_for_builder_node(zSolverTransform,
                                                  attr_filter=attr_filter)
 
-    def __apply_bones(self, name_filter=None, attr_filter=None):
+    def __apply_bones(self, name_filter=None, attr_filter=None,
+                      check_meshes=True):
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
@@ -547,7 +551,8 @@ class ZivaSetup(Builder):
         results = self.__cull_creation_nodes(zBones)
 
         # check mesh quality----------------------------------------------------
-        mz.check_mesh_quality(results['meshes'])
+        if check_meshes:
+            mz.check_mesh_quality(results['meshes'])
 
         # build bones all at once----------------------------------------------
         if results['meshes']:
@@ -564,7 +569,7 @@ class ZivaSetup(Builder):
             self.set_maya_attrs_for_builder_node(zBone, attr_filter=attr_filter)
 
     def __apply_tissues(self, interp_maps=False, name_filter=None,
-                        attr_filter=None):
+                        attr_filter=None, check_meshes=True):
         solver = mc.ls(type='zSolver')
         if not solver:
             mm.eval('ziva -s')
@@ -579,7 +584,8 @@ class ZivaSetup(Builder):
         tissue_results = self.__cull_creation_nodes(ztissue)
 
         # check mesh quality----------------------------------------------------
-        mz.check_mesh_quality(tissue_results['meshes'])
+        if check_meshes:
+            mz.check_mesh_quality(tissue_results['meshes'])
 
         # build tissues all at once---------------------------------------------
         if tissue_results['meshes']:
