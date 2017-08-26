@@ -14,7 +14,7 @@ class ZivaBaseNode(BaseNode):
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
 
-    def create(self, *args, **kwargs):
+    def populate(self, *args, **kwargs):
         """
 
         Returns:

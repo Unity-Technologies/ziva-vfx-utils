@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class IO(object):
 
-    def write(self, filepath,
+    def write(self, file_path,
               component_data=True,
               node_data=True):
         """
@@ -22,7 +22,7 @@ class IO(object):
         Args:
             node_data:
             component_data:
-            filepath (str): filepath to write to disk
+            file_path (str): file path to write to disk
 
         Raises:
             IOError: If not able to write file
@@ -34,7 +34,7 @@ class IO(object):
             node_data=node_data
         )
         try:
-            with open(filepath, 'w') as outfile:
+            with open(file_path, 'w') as outfile:
                 json.dump(data, outfile, cls=BaseNodeEncoder,
                           sort_keys=True, indent=4, separators=(',', ': '))
         except IOError:
@@ -43,7 +43,7 @@ class IO(object):
             for b_node in self.get_nodes():
                 b_node.set_mobject(b_node.get_mobject())
             self.stats()
-            logger.info('Wrote File: {}'.format(filepath))
+            logger.info('Wrote File: {}'.format(file_path))
 
     def retrieve_from_file(self, filepath):
         """
@@ -57,7 +57,7 @@ class IO(object):
         """
         try:
             with open(filepath, 'rb') as handle:
-                data = json.load(handle, object_hook=load_base_node)
+                data = json.load(handle, object_hook=self.load_base_node)
 
                 self.from_json_data(data)
         except IOError:
@@ -66,7 +66,7 @@ class IO(object):
             self.stats()
             for b_node in self.get_nodes():
                 b_node.set_mobject(b_node.get_mobject())
-                b_node.set_data(self.get_data())
+                # b_node.set_data(self.get_data())
 
             logger.info('Read File: {}'.format(filepath))
 
@@ -90,7 +90,7 @@ class IO(object):
 
     def from_json_data(self, data):
         """
-        Gets data out of json serialization
+        Gets data out of json serialization and assigns it to object
         """
         data = self.__check_data(data)
 
@@ -119,7 +119,8 @@ class IO(object):
                 tmp.append(self.__wrap_data(data[2], 'info'))
             return tmp
 
-    def __wrap_data(self, data, type_):
+    @staticmethod
+    def __wrap_data(data, type_):
         """
         Utility wrapper to identify data.
         """
@@ -127,6 +128,35 @@ class IO(object):
         wrapper['d_type'] = type_
         wrapper['data'] = data
         return wrapper
+
+    def load_base_node(self, json_object):
+        """
+        Loads json objects into proper classes
+
+        Args:
+            json_object (obj): json obj to perform action on
+
+        Returns:
+            obj:  Result of operation
+        """
+        if '_class' in json_object:
+            module_ = json_object['_class'][0]
+            name = json_object['_class'][1]
+
+            # TODO this
+            print 'KEYS', json_object.keys()
+            my_class = str_to_class(module_, name)
+            b_node = my_class(parent=self)
+
+            if hasattr(b_node, 'deserialize'):
+                b_node.deserialize(json_object)
+            else:
+                b_node.__dict__ = json_object
+
+            return b_node
+
+        else:
+            return json_object
 
 
 class BaseNodeEncoder(json.JSONEncoder):
@@ -140,37 +170,9 @@ class BaseNodeEncoder(json.JSONEncoder):
             return super(BaseNodeEncoder, self).default(obj)
 
 
-def load_base_node(json_object):
-    """
-    Loads json objects into proper classes
-
-    Args:
-        json_object (obj): json obj to perform action on
-
-    Returns:
-        obj:  Result of operation
-    """
-    if '_class' in json_object:
-        module_ = json_object['_class'][0]
-        name = json_object['_class'][1]
-
-        # TODO this
-        b_node = str_to_class(module_, name)
-
-        if hasattr(b_node, 'deserialize'):
-            b_node.deserialize(json_object)
-        else:
-            b_node.__dict__ = json_object
-
-        return b_node
-
-    else:
-        return json_object
-
-
 def str_to_class(module_, name):
     """
-    Given module and name instantiates a class
+    Given module and name returns a class
 
     Args:
         module_ (str): module
@@ -185,6 +187,5 @@ def str_to_class(module_, name):
 
     i = importlib.import_module(module_)
     my_class = getattr(i, name)
-    instance = my_class()
-    return instance
+    return my_class
 

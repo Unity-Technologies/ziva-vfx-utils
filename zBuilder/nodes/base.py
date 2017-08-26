@@ -28,11 +28,10 @@ class BaseNode(object):
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        self.__data = kwargs.get('data', None)
         self._parent = kwargs.get('parent', None)
 
         if args:
-            self.create(args[0])
+            self.populate(args[0])
 
     def __str__(self):
         if self.get_name():
@@ -48,29 +47,6 @@ class BaseNode(object):
     def __repr__(self):
         output = '{}()'.format(self.__class__.__name__)
         return output
-
-    def set_data(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
-        self.__data = data
-
-    def get_data(self):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
-        return self.__data
-
 
     def serialize(self):
         """
@@ -109,7 +85,7 @@ class BaseNode(object):
         #  self.set_mobject(self.get_mobject())
         print 'deserialize: ', self.__repr__()
 
-    def create(self, *args, **kwargs):
+    def populate(self, *args, **kwargs):
         """
 
         Returns:
@@ -412,13 +388,11 @@ class BaseNode(object):
         scene_name = self.get_scene_name()
         original_name = self.get_name()
         created_mesh = None
-        data = self.get_data()
 
         for map_ in maps:
-
-            map_data = data['map'].get(map_, None)
+            map_data = self._parent.get_data_by_key_name('map', map_)
             mesh = map_data.get_mesh(long_name=True)
-            mesh_data = data['mesh'].get(mesh, None)
+            mesh_data = self._parent.get_data_by_key_name('mesh', mesh)
 
             mesh_name_short = mesh_data.get_name(long_name=False)
             weight_list = map_data.get_value()

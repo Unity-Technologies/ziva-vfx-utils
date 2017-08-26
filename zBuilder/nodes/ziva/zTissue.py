@@ -43,7 +43,7 @@ class TissueNode(ZivaBaseNode):
             return None
 
     # TODO super this, dont need duplicate code
-    def create(self, *args, **kwargs):
+    def populate(self, *args, **kwargs):
         """
 
         Returns:
