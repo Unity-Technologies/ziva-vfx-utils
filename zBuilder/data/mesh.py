@@ -22,7 +22,7 @@ class Mesh(BaseComponent):
         if args:
             mesh_name = args[0]
             if mesh_name:
-                self.create(mesh_name)
+                self.populate(mesh_name)
 
     def __str__(self):
         name = self.get_name(long_name=True)
@@ -35,7 +35,7 @@ class Mesh(BaseComponent):
     def __repr__(self):
         return self.__str__()
 
-    def create(self, mesh_name):
+    def populate(self, mesh_name):
         """
 
         Args:
@@ -47,6 +47,7 @@ class Mesh(BaseComponent):
         connectivity = get_mesh_connectivity(mesh_name)
 
         self.set_name(mesh_name)
+        self.set_type('mesh')
         self.set_polygon_counts(connectivity['polygonCounts'])
         self.set_polygon_connects(connectivity['polygonConnects'])
         self.set_point_list(connectivity['points'])

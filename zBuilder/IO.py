@@ -1,10 +1,6 @@
 import json
-
-import maya.cmds as mc
-import zBuilder.zMaya as mz
-
-import importlib
-import time
+import inspect
+import sys
 
 import logging
 
@@ -58,7 +54,7 @@ class IO(object):
         try:
             with open(filepath, 'rb') as handle:
                 data = json.load(handle, object_hook=self.load_base_node)
-
+                # data = json.load(handle)
                 self.from_json_data(data)
         except IOError:
             print "Error: can\'t find file or read data"
@@ -66,7 +62,6 @@ class IO(object):
             self.stats()
             for b_node in self.get_nodes():
                 b_node.set_mobject(b_node.get_mobject())
-                # b_node.set_data(self.get_data())
 
             logger.info('Read File: {}'.format(filepath))
 
@@ -143,18 +138,14 @@ class IO(object):
             module_ = json_object['_class'][0]
             name = json_object['_class'][1]
 
-            # TODO this
-            print 'KEYS', json_object.keys()
-            my_class = str_to_class(module_, name)
-            b_node = my_class(parent=self)
+            if 'zBuilder.data' in module_:
+                object = find_class('zBuilder.data', json_object['TYPE'])
+            elif 'zBuilder.nodes' in module_:
+                object = find_class('zBuilder.nodes', json_object['TYPE'])
 
-            if hasattr(b_node, 'deserialize'):
-                b_node.deserialize(json_object)
-            else:
-                b_node.__dict__ = json_object
+            b_node = object(deserialize=json_object, parent=self)
 
             return b_node
-
         else:
             return json_object
 
@@ -170,22 +161,18 @@ class BaseNodeEncoder(json.JSONEncoder):
             return super(BaseNodeEncoder, self).default(obj)
 
 
-def str_to_class(module_, name):
+def find_class(module_, type_):
     """
-    Given module and name returns a class
 
     Args:
-        module_ (str): module
-        name (str): the class name
+        module_:
+        type_:
 
-    returns:
-        obj: class object
+    Returns:
+
     """
-
-    if module_ == 'zBuilder.data.map':
-        module_ = 'zBuilder.data.maps'
-
-    i = importlib.import_module(module_)
-    my_class = getattr(i, name)
-    return my_class
-
+    for name, obj in inspect.getmembers(
+            sys.modules[module_]):
+        if inspect.isclass(obj):
+            if type_ == obj.TYPE:
+                return obj

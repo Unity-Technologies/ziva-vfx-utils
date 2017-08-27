@@ -54,7 +54,7 @@ class TissueNode(ZivaBaseNode):
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])
-        # self.set_type(mz.get_type(selection[0]))
+        self.set_type(mz.get_type(selection[0]))
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])

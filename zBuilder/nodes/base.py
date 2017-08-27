@@ -30,6 +30,9 @@ class BaseNode(object):
 
         self._parent = kwargs.get('parent', None)
 
+        if kwargs.get('deserialize', None):
+            self.deserialize(kwargs.get('deserialize', None))
+
         if args:
             self.populate(args[0])
 
@@ -83,7 +86,7 @@ class BaseNode(object):
         for key in dictionary:
             self.__dict__[key] = dictionary[key]
         #  self.set_mobject(self.get_mobject())
-        print 'deserialize: ', self.__repr__()
+        # print 'deserialize: ', self.__repr__()
 
     def populate(self, *args, **kwargs):
         """

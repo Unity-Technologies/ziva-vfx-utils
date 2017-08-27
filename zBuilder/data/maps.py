@@ -17,12 +17,14 @@ class Map(BaseComponent):
         self._name = None
         self._mesh = None
         self._value = None
+
+
         if args:
             map_name = args[0]
             mesh_name = args[1]
 
             if map_name and mesh_name:
-                self.create(map_name, mesh_name)
+                self.populate(map_name, mesh_name)
 
     def __str__(self):
         name = self.get_name()
@@ -37,7 +39,7 @@ class Map(BaseComponent):
     def __repr__(self):
         return self.__str__()
 
-    def create(self, map_name, mesh_name):
+    def populate(self, map_name, mesh_name):
         """
 
         Args:
@@ -51,6 +53,7 @@ class Map(BaseComponent):
 
         self.set_name(map_name)
         self.set_mesh(mesh_name)
+        self.set_type('map')
         self.set_value(weight_value)
 
     def set_mesh(self, mesh):

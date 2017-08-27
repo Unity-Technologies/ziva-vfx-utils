@@ -31,6 +31,28 @@ class BaseComponent(object):
     def set_name(self, name):
         self._name = name
 
+    def get_type(self):
+        """
+        get type of node
+
+        Returns:
+            (str) of node name
+        """
+        try:
+            return self.TYPE
+        except AttributeError:
+            return None
+
+    def set_type(self, type_):
+        """
+        Sets type of node
+
+        Args:
+            type_ (str): the type of node.
+        """
+        self.TYPE = type_
+
+
     def serialize(self):
         """
         it loops through keys in dict and saves out a temp dict of items that
@@ -61,5 +83,5 @@ class BaseComponent(object):
         for key in dictionary:
             self.__dict__[key] = dictionary[key]
         #  self.set_mobject(self.get_mobject())
-        print 'deserialize: ', self.__repr__()
+        # print 'deserialize: ', self.__repr__()
 
