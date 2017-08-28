@@ -57,6 +57,7 @@ class DeltaMushSetup(Builder):
         for b_node in b_nodes:
             b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
 
+
 def get_association(delta_mush):
     hist = mc.listHistory(delta_mush)
     mesh = mc.ls(hist, type='mesh')

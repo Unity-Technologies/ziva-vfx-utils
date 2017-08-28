@@ -35,7 +35,6 @@ class BaseNode(object):
 
         if args:
             self.populate(args[0])
-        print 'init:: BaseNode'
 
     def __str__(self):
         if self.get_name():
@@ -104,7 +103,6 @@ class BaseNode(object):
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
-
 
     def apply(self):
         # attr_filter = kwargs.get('attr_filter', None)

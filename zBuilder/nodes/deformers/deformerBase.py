@@ -13,7 +13,6 @@ class DeformerBaseNode(BaseNode):
 
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
-        print 'init:: DeformerBaseNode'
 
     def populate(self, *args, **kwargs):
         """
@@ -21,7 +20,6 @@ class DeformerBaseNode(BaseNode):
         Returns:
             object:
         """
-        print 'POPULATE:: DeformerBaseNode'
 
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
@@ -51,7 +49,6 @@ class DeformerBaseNode(BaseNode):
                     mesh_data_object = self._parent.component_factory('mesh',
                                                                       mesh_name)
                     self._parent.add_data_object(mesh_data_object)
-
 
 
 def get_association(node):

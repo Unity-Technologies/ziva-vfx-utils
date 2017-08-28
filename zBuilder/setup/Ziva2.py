@@ -75,12 +75,6 @@ class ZivaSetup(Builder):
                     #print b_node
                     self.add_node(b_node)
 
-        if get_maps:
-            self.store_maps()
-            # self.component_factory('map')
-        if get_mesh:
-            self.store_mesh()
-
         self.stats()
 
     @Builder.time_this
@@ -209,26 +203,3 @@ class ZivaSetup(Builder):
         for b_node in b_nodes:
             b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
 
-
-    # TODO name of this method is lame.
-    def store_maps(self):
-        for node in self.get_nodes():
-            #print node
-            map_names = node.get_maps()
-            mesh_names = node.get_association(long_name=True)
-            if map_names and mesh_names:
-                for map_name, mesh_name in zip(map_names, mesh_names):
-                    map_data_object = self.component_factory('map', map_name, mesh_name)
-                    self.add_data_object(map_data_object)
-                    logger.info('Retrieving Data : {}'.format(map_data_object))
-
-    def store_mesh(self):
-        for node in self.get_nodes():
-            map_names = node.get_maps()
-            mesh_names = node.get_association(long_name=True)
-            if map_names and mesh_names:
-                for map_name, mesh_name in zip(map_names, mesh_names):
-                    if not self.get_data_by_key_name('mesh', mesh_name):
-                        mesh_data_object = self.component_factory('mesh', mesh_name)
-                        self.add_data_object(mesh_data_object)
-                        logger.info('Retrieving Data : {}'.format(mesh_data_object))

@@ -91,6 +91,15 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
+        data_types = self.get_data().keys()
+        output = 'component data: '
+        for data_type in data_types:
+            amount = len(self.get_data_by_key(data_type))
+            output += '{} {}   '.format(data_type,amount)
+
+        logger.info(output)
+
+
     def add_data_object(self, data):
         """
         appends a mesh to the mesh list

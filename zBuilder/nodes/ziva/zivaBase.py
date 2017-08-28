@@ -33,9 +33,20 @@ class ZivaBaseNode(BaseNode):
         mesh = mz.get_association(selection[0])
         self.set_association(mesh)
 
-        tmp = []
-        if self.MAP_LIST:
-            for map_ in self.MAP_LIST:
-                map_name = '{}.{}'.format(selection[0], map_)
-                tmp.append(map_name)
-            self.set_maps(tmp)
+        map_names = []
+        for map_ in self.MAP_LIST:
+            map_names.append('{}.{}'.format(selection[0], map_))
+        self.set_maps(map_names)
+
+        # get map component data------------------------------------------------
+        mesh_names = self.get_association(long_name=True)
+        if map_names and mesh_names:
+            for map_name, mesh_name in zip(map_names, mesh_names):
+                map_data_object = self._parent.component_factory('map',
+                                                    map_name, mesh_name)
+                self._parent.add_data_object(map_data_object)
+
+                if not self._parent.get_data_by_key_name('mesh', mesh_name):
+                    mesh_data_object = self._parent.component_factory('mesh',
+                                                                      mesh_name)
+                    self._parent.add_data_object(mesh_data_object)
