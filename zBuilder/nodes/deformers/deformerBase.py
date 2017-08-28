@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class DeformerBaseNode(BaseNode):
-    MAP_LIST = []
 
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
