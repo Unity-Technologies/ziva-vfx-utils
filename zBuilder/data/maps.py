@@ -56,6 +56,8 @@ class Map(BaseComponent):
         self.set_type('map')
         self.set_value(weight_value)
 
+        logger.info('Retrieving Data : {}'.format(self))
+
     def set_mesh(self, mesh):
         self._mesh = mesh   
 

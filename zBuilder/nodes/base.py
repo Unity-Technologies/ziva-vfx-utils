@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class BaseNode(object):
     TYPE = None
-    MAP_LIST = None
+    MAP_LIST = []
     SEARCH_EXCLUDE = ['_class', '_attrs', '_attr_list']
 
     def __init__(self, *args, **kwargs):
@@ -35,6 +35,7 @@ class BaseNode(object):
 
         if args:
             self.populate(args[0])
+        print 'init:: BaseNode'
 
     def __str__(self):
         if self.get_name():
@@ -94,6 +95,7 @@ class BaseNode(object):
         Returns:
             object:
         """
+        print 'POPULATE:: BaseNode'
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
@@ -103,7 +105,6 @@ class BaseNode(object):
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
 
-        return self
 
     def apply(self):
         # attr_filter = kwargs.get('attr_filter', None)
@@ -274,6 +275,7 @@ class BaseNode(object):
         else:
             return self._association
 
+    # TODO get long name under hood and check for duplicate short names
     def set_association(self, association):
         """
 
@@ -392,6 +394,7 @@ class BaseNode(object):
         original_name = self.get_name()
         created_mesh = None
 
+        print 'sdaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         for map_ in maps:
             map_data = self._parent.get_data_by_key_name('map', map_)
             mesh = map_data.get_mesh(long_name=True)

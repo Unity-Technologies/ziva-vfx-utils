@@ -21,7 +21,7 @@ class ZivaBaseNode(BaseNode):
             object:
         """
 
-        #logger.info('retrieving {}'.format(args))
+        # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])

@@ -31,7 +31,7 @@ class Builder(IO, NodeCollection):
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
                     return obj(node, parent=self)
-        return zBuilder.nodes.BaseNode(node)
+        return zBuilder.nodes.BaseNode(node, parent=self)
 
     @staticmethod
     def component_factory(*args):

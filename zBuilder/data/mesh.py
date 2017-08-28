@@ -52,6 +52,8 @@ class Mesh(BaseComponent):
         self.set_polygon_connects(connectivity['polygonConnects'])
         self.set_point_list(connectivity['points'])
 
+        logger.info('Retrieving Data : {}'.format(self))
+
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
         name = self.get_name(long_name=True)

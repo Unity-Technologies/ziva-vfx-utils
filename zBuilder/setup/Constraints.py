@@ -12,6 +12,18 @@ class ConstraintsSetup(nc.NodeCollection):
     def __init__(self):
         super(ConstraintsSetup, self).__init__()
 
+    @staticmethod
+    def get_target(node):
+        _type = mz.get_type(node)
+        if _type == 'parentConstraint':
+            return mc.listConnections(node + '.target[0].targetScale')[0]
+        if _type == 'orientConstraint':
+            return mc.listConnections(node + '.target[0].targetRotate')[0]
+
+    @staticmethod
+    def get_source(node):
+        return mc.listConnections(node + '.constraintRotateX')[0]
+    
     def retrieve_from_scene(self):
         sel = mc.ls(sl=True, l=True)
 
@@ -34,16 +46,6 @@ class ConstraintsSetup(nc.NodeCollection):
 
         self.stats()
         mc.select(sel)
-
-    def get_target(self, node):
-        _type = mz.get_type(node)
-        if _type == 'parentConstraint':
-            return mc.listConnections(node + '.target[0].targetScale')[0]
-        if _type == 'orientConstraint':
-            return mc.listConnections(node + '.target[0].targetRotate')[0]
-
-    def get_source(self, node):
-        return mc.listConnections(node + '.constraintRotateX')[0]
 
     def apply(self):
         nodes = self.get_nodes()

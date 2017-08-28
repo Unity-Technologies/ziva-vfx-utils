@@ -1,12 +1,11 @@
 import zBuilder.zMaya
-from zBuilder.nodes.base import BaseNode
-from zBuilder.main import Builder
 
+import zBuilder.data as dta
 import zBuilder.data.mesh as msh
-import zBuilder.data.maps as mps
-
+import zBuilder.nodes as nds
+from zBuilder.main import Builder
 import zBuilder.zMaya as mz
-import zBuilder.nodes.base as base
+
 
 import maya.cmds as mc
 
@@ -19,11 +18,12 @@ MAPLIST = {'deltaMush': ['weightList[0].weights']}
 
 class DeltaMushSetup(Builder):
     """
-    Storing maya attributes
+    To capture a ziva setup
     """
 
     def __init__(self):
         Builder.__init__(self)
+
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
@@ -41,33 +41,8 @@ class DeltaMushSetup(Builder):
             raise StandardError, 'No delta mushes found, aborting!'
 
         for delta_mush in delta_mushes:
-
-            node_attr_list = base.build_attr_list(delta_mush)
-            node_attrs = zBuilder.zMaya.build_attr_key_values(delta_mush, node_attr_list)
-
-            node = BaseNode()
-            node.set_name(delta_mush)
-            node.set_type('deltaMush')
-            node.set_attrs(node_attrs)
-            node.set_association(get_association(delta_mush))
-
-            if get_maps:
-                maps = []
-                map_name = '{}.weightList[0].weights'.format(delta_mush)
-                association = get_association(delta_mush)
-                map_data = mps.get_map_data(delta_mush, 'weightList[0].weights',
-                                            association[0])
-                maps.append(map_name)
-                node.set_maps(maps)
-                self.add_data_object('map', map_name, data=map_data)
-
-                if get_mesh:
-                    for ass in association:
-                        if not self.get_data_by_key_name('mesh', ass):
-                            self.add_data_object('mesh', ass,
-                                                 data=msh.get_mesh_data(ass))
-
-            self.add_node(node)
+            b_node = self.node_factory(delta_mush)
+            self.add_node(b_node)
         self.stats()
 
     @Builder.time_this
@@ -75,19 +50,12 @@ class DeltaMushSetup(Builder):
         logger.info('Applying deltaMush....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
+        name_filter = kwargs.get('name_filter', None)
 
-        # get all the nodes
-        b_nodes = self.get_nodes()
-
+        b_nodes = self.get_nodes(name_filter=name_filter,
+                                 type_filter='deltaMush')
         for b_node in b_nodes:
-            name = b_node.get_name()
-            if not mc.objExists(name):
-                mc.select(b_node.get_association(), r=True)
-                mc.deltaMush(name=name)
-
-            self.set_maya_attrs_for_builder_node(b_node, attr_filter=attr_filter)
-            self.set_maya_weights_for_builder_node(b_node, interp_maps=interp_maps)
-
+            b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
 
 def get_association(delta_mush):
     hist = mc.listHistory(delta_mush)

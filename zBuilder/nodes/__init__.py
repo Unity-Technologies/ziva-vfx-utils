@@ -18,3 +18,7 @@ from .ziva.zAttachment import AttachmentNode
 from .ziva.zEmbedder import EmbedderNode
 from .ziva.zFiber import FiberNode
 from .ziva.zLineOfAction import LineOfActionNode
+
+# deformer----------------------------------------------------------------------
+from .deformers.deformerBase import DeformerBaseNode
+from .deformers.deltaMush import DeltaMushNode

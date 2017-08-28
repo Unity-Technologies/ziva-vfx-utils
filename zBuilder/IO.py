@@ -136,7 +136,6 @@ class IO(object):
         """
         if '_class' in json_object:
             module_ = json_object['_class'][0]
-            name = json_object['_class'][1]
 
             if 'zBuilder.data' in module_:
                 object = find_class('zBuilder.data', json_object['TYPE'])
