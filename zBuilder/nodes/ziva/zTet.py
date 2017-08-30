@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 class TetNode(ZivaBaseNode):
     TYPE = 'zTet'
-    # TODO need to associate a map with a mesh===
     MAP_LIST = ['weightList[0].weights']
 
     def __init__(self, *args, **kwargs):

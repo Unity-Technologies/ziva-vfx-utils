@@ -18,7 +18,6 @@ class Map(BaseComponent):
         self._mesh = None
         self._value = None
 
-
         if args:
             map_name = args[0]
             mesh_name = args[1]
@@ -80,12 +79,12 @@ class Map(BaseComponent):
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
         name = self.get_name(long_name=True)
-        newName = mz.replace_long_name(search, replace, name)
-        self.set_name(newName)
+        new_name = mz.replace_long_name(search, replace, name)
+        self.set_name(new_name)
 
         mesh = self.get_mesh(long_name=True)
-        newMesh = mz.replace_long_name(search, replace, mesh)
-        self.set_mesh(newMesh)
+        new_mesh = mz.replace_long_name(search, replace, mesh)
+        self.set_mesh(new_mesh)
 
 
 def get_weights(map_name, mesh_name):

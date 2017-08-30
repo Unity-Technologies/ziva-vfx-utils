@@ -1,0 +1,13 @@
+Todo
+
+- zip json file
+- utility to export node and each components separately
+- take a look at component factory interface (make consistent with nodes)
+- defining outputs for setups???
+
+- qModel for viewing a tree for different types
+- ui for universal exporter
+- transform node
+- kwargs for the nodes
+- decorator to check name collisions and long name etc etc etc
+- add zGeo to keep track of name

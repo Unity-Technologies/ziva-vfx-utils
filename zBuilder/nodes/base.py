@@ -94,7 +94,6 @@ class BaseNode(object):
         Returns:
             object:
         """
-        print 'POPULATE:: BaseNode'
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
@@ -392,7 +391,6 @@ class BaseNode(object):
         original_name = self.get_name()
         created_mesh = None
 
-        print 'sdaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         for map_ in maps:
             map_data = self._parent.get_data_by_key_name('map', map_)
             mesh = map_data.get_mesh(long_name=True)

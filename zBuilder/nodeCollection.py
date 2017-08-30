@@ -99,7 +99,6 @@ class NodeCollection(object):
 
         logger.info(output)
 
-
     def add_data_object(self, data):
         """
         appends a mesh to the mesh list

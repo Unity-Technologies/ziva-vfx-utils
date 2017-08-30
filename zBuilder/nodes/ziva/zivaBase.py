@@ -1,5 +1,3 @@
-import maya.cmds as mc
-import maya.mel as mm
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes.base import BaseNode
@@ -8,11 +6,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# TODO zivabase????  change name???
 class ZivaBaseNode(BaseNode):
 
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
+
+    def get_map_meshes(self):
+        """
+        This is the mesh associated with each map in obj.MAP_LIST.  Typically
+        it seems to coincide with mesh store in get_association.  Sometimes
+        it deviates, so you can override this method to define your own
+        list of meshes against the map list.
+
+        Returns:
+            list(): of long mesh names.
+        """
+        return self.get_association(long_name=True)
 
     def populate(self, *args, **kwargs):
         """
@@ -39,7 +48,8 @@ class ZivaBaseNode(BaseNode):
         self.set_maps(map_names)
 
         # get map component data------------------------------------------------
-        mesh_names = self.get_association(long_name=True)
+        mesh_names = self.get_map_meshes()
+
         if map_names and mesh_names:
             for map_name, mesh_name in zip(map_names, mesh_names):
                 map_data_object = self._parent.component_factory('map',

@@ -52,7 +52,6 @@ class BaseComponent(object):
         """
         self.TYPE = type_
 
-
     def serialize(self):
         """
         it loops through keys in dict and saves out a temp dict of items that

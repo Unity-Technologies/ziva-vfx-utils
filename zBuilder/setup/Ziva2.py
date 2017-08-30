@@ -62,6 +62,7 @@ class ZivaSetup(Builder):
                       'zAttachment',
                       'zFiber',
                       'zEmbedder',
+                      # 'zLineOfAction'
                       ]
 
         for node_type in node_types:
@@ -73,6 +74,8 @@ class ZivaSetup(Builder):
                     self.add_node(b_node)
 
         self.stats()
+
+
 
     @Builder.time_this
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
@@ -105,6 +108,9 @@ class ZivaSetup(Builder):
                                    interp_maps=interp_maps)
         if attachments:
             self.__apply_attachments(attr_filter=attr_filter,
+                                     interp_maps=interp_maps)
+        if fibers:
+            self.__apply_fibers(attr_filter=attr_filter,
                                      interp_maps=interp_maps)
 
         try:
@@ -200,3 +206,15 @@ class ZivaSetup(Builder):
         for b_node in b_nodes:
             b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
 
+    def __apply_fibers(self, attr_filter=None, name_filter=None,
+                       interp_maps=False):
+        """
+
+        Returns:
+
+        """
+        logger.info('Applying fibers...')
+        b_nodes = self.get_nodes(name_filter=name_filter,
+                                 type_filter='zFiber')
+        for b_node in b_nodes:
+            b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)

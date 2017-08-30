@@ -50,7 +50,7 @@ class TissueNode(ZivaBaseNode):
             object:
         """
 
-        #logger.info('retrieving {}'.format(args))
+        # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.set_name(selection[0])
@@ -61,14 +61,6 @@ class TissueNode(ZivaBaseNode):
 
         mesh = mz.get_association(selection[0])
         self.set_association(mesh)
-
-        # print 'getting maps', self._map_list
-
-        # tmp = []
-        # for map_ in self._map_list:
-        #     map_name = '{}.{}'.format(selection[0], map_)
-        #     tmp.append(map_name)
-        # self.set_maps(tmp)
 
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
