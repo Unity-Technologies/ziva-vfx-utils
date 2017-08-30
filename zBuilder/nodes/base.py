@@ -25,6 +25,7 @@ class BaseNode(object):
         self._attrs = {}
         self._maps = []
         self._association = []
+        self.__mobject = None
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
@@ -40,7 +41,7 @@ class BaseNode(object):
         if self.get_name():
             name = self.get_name()
             output = ''
-            output += '= {} ====================================\n'.format(name)
+            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__,self.__class__.__name__)
             for key in self.__dict__:
                 output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
@@ -83,8 +84,10 @@ class BaseNode(object):
         Returns:
 
         """
+        print 'before:', self.__dict__
         for key in dictionary:
             self.__dict__[key] = dictionary[key]
+        print 'after:',self.__dict__
         #  self.set_mobject(self.get_mobject())
         # print 'deserialize: ', self.__repr__()
 
@@ -456,12 +459,13 @@ class BaseNode(object):
 
         """
         self.__mobject = None
+        if maya_node:
+            if mc.objExists(maya_node):
+                selection_list = om.MSelectionList()
+                selection_list.add(maya_node)
+                mobject = om.MObject()
+                selection_list.getDependNode(0, mobject)
+                self.__mobject = mobject
 
-        if mc.objExists(maya_node):
-            selection_list = om.MSelectionList()
-            selection_list.add(maya_node)
-            mobject = om.MObject()
-            selection_list.getDependNode(0, mobject)
-            self.__mobject = mobject
 
             # logger.info('{} - {}'.format(self.__mobject, maya_node))

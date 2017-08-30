@@ -61,6 +61,7 @@ class IO(object):
         else:
             self.stats()
             for b_node in self.get_nodes():
+                print b_node
                 b_node.set_mobject(b_node.get_mobject())
 
             logger.info('Read File: {}'.format(filepath))
@@ -137,16 +138,38 @@ class IO(object):
         if '_class' in json_object:
             module_ = json_object['_class'][0]
 
+            type_ = self.get_type_from_json_object(json_object)
+            # print 'TYPE',type_
             if 'zBuilder.data' in module_:
-                object = find_class('zBuilder.data', json_object['TYPE'])
+                object = find_class('zBuilder.data', type_)
             elif 'zBuilder.nodes' in module_:
-                object = find_class('zBuilder.nodes', json_object['TYPE'])
+                object = find_class('zBuilder.nodes', type_)
 
             b_node = object(deserialize=json_object, parent=self)
-
+            # print b_node
             return b_node
         else:
             return json_object
+
+    @staticmethod
+    def get_type_from_json_object(json_object):
+        """
+        backwards compatibility here (change class name)
+        Args:
+            json_object:
+
+        Returns:
+
+        """
+        if 'TYPE' in json_object:
+            type_ = json_object['TYPE']
+        elif '_type' in json_object:
+            type_ = json_object['_type']
+            json_object['TYPE'] = type_
+            json_object.pop('_type', None)
+        else:
+            type_ = json_object['_class'][1].lower()
+        return type_
 
 
 class BaseNodeEncoder(json.JSONEncoder):
@@ -173,5 +196,6 @@ def find_class(module_, type_):
     for name, obj in inspect.getmembers(
             sys.modules[module_]):
         if inspect.isclass(obj):
+
             if type_ == obj.TYPE:
                 return obj
