@@ -12,8 +12,9 @@ class TetNode(ZivaBaseNode):
     MAP_LIST = ['weightList[0].weights']
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
         self._user_tet_mesh = None
+
+        ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def set_user_tet_mesh(self, mesh):
         self._user_tet_mesh = mesh

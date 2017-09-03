@@ -11,10 +11,10 @@ class EmbedderNode(ZivaBaseNode):
     TYPE = 'zEmbedder'
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
-
         self.__embedded_meshes = None
         self.__collision_meshes = None
+
+        ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def set_collision_meshes(self, meshes):
         self.__collision_meshes = meshes

@@ -49,7 +49,7 @@ class BaseNode(object):
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)
 
     def __repr__(self):
-        output = '{}()'.format(self.__class__.__name__)
+        output = '{}("{}")'.format(self.__class__.__name__, self.get_name())
         return output
 
     def serialize(self):
@@ -106,12 +106,9 @@ class BaseNode(object):
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
 
-    def apply(self):
-        # attr_filter = kwargs.get('attr_filter', None)
-
-        # scene_name = self.get_scene_name()
-        self.set_maya_attrs()
-
+    def apply(self, *args, **kwargs):
+        raise NotImplementedError
+    
     def print_(self):
         print self
 

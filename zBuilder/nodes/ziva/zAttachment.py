@@ -23,6 +23,8 @@ class AttachmentNode(ZivaBaseNode):
         source_mesh = self.get_association()[0]
         t_mesh = self.get_association()[1]
 
+        self.are_maps_valid()
+
         # check if both meshes exist
         if mz.check_body_type([source_mesh, t_mesh]):
             # check existing attachments in scene
@@ -71,3 +73,18 @@ class AttachmentNode(ZivaBaseNode):
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
 
+    # TODO need to interp maps before this check happens.
+    def are_maps_valid(self):
+        """
+        Checking maps to see if they are all zeros.  An attachment map with
+        only zero's fail.
+
+        Returns:
+
+        """
+        for map_name in self.get_maps():
+            map_object = self._parent.get_data_by_key_name('map', map_name)
+            values = map_object.get_value()
+
+            if all(v == 0 for v in values):
+                raise ValueError('{} all 0s'.format(map_name))

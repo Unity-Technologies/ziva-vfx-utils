@@ -43,6 +43,7 @@ class NodeCollection(object):
         for node in self.get_nodes(type_filter=type_filter,
                                    name_filter=name_filter):
             node.print_()
+
         print '----------------------------------------------------------------'
 
         for key in self.data:

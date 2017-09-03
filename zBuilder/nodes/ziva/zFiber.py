@@ -41,6 +41,8 @@ class FiberNode(ZivaBaseNode):
             data_fibers = self._parent.get_nodes(type_filter='zFiber',
                                          name_filter=mesh)
 
+            # self.are_maps_valid()
+
             d_index = data_fibers.index(self)
 
             if existing_fibers:
@@ -65,3 +67,19 @@ class FiberNode(ZivaBaseNode):
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
+
+    # TODO need to interp maps before this check happens.
+    def are_maps_valid(self):
+        """
+        Checking maps to see if they are all zeros.  An attachment map with
+        only zero's fail.
+
+        Returns:
+
+        """
+        map_name = self.get_maps()[1]
+        map_object = self._parent.get_data_by_key_name('map', map_name)
+        values = map_object.get_value()
+        print self.get_name(), values
+        if 0 not in values or 1 not in values:
+            raise ValueError('{} bad map'.format(map_name))

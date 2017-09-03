@@ -31,7 +31,7 @@ class SolverNode(ZivaBaseNode):
             # print 'building solver: ',solverName
             results = mm.eval('ziva -s')
             solver = mc.ls(results, type='zSolver')[0]
-            mc.rename(solver, solver_name)
+            mc.rename(solver, solver_name.split('|')[-1])
             self.set_mobject(solver_name)
 
         else:

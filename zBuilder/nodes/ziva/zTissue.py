@@ -11,9 +11,10 @@ class TissueNode(ZivaBaseNode):
     TYPE = 'zTissue'
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
         self._children_tissues = None
         self._parent_tissue = None
+
+        ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def set_children_tissues(self, children):
         self._children_tissues = children
@@ -65,6 +66,15 @@ class TissueNode(ZivaBaseNode):
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
 
+    def apply(self, *args, **kwargs):
+        attr_filter = kwargs.get('attr_filter', None)
+        name_filter = kwargs.get('name_filter', None)
+
+        b_nodes = self._parent.get_nodes(type_filter='zTissue',
+                                         name_filter=name_filter)
+
+        if self == b_nodes[0]:
+            apply_multiple(b_nodes, attr_filter=attr_filter)
 
 def apply_multiple(b_nodes, attr_filter=None):
     """

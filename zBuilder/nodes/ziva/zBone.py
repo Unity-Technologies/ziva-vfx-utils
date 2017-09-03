@@ -14,6 +14,16 @@ class BoneNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
+    def apply(self, *args, **kwargs):
+        attr_filter = kwargs.get('attr_filter', None)
+        name_filter = kwargs.get('name_filter', None)
+
+        b_nodes = self._parent.get_nodes(type_filter='zBone',
+                                         name_filter=name_filter)
+
+        if self == b_nodes[0]:
+            apply_multiple(b_nodes, attr_filter=attr_filter)
+
 
 def apply_multiple(b_nodes, attr_filter=None):
     """
@@ -22,6 +32,7 @@ def apply_multiple(b_nodes, attr_filter=None):
     through them.  This function builds all the zBones at once.
 
     Args:
+        b_nodes:
         attr_filter (obj):
 
     Returns:
