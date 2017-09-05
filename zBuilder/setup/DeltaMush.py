@@ -24,7 +24,6 @@ class DeltaMushSetup(Builder):
     def __init__(self):
         Builder.__init__(self)
 
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
@@ -32,7 +31,7 @@ class DeltaMushSetup(Builder):
 
         # kwargs----------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_maps', True)
+        get_maps = kwargs.get('get_map_names', True)
 
         hist = mc.listHistory(selection)
         delta_mushes = mc.ls(hist, type='deltaMush')[::-1]

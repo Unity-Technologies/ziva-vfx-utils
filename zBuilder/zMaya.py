@@ -74,84 +74,6 @@ def get_mesh_connectivity(mesh_name):
     return tmp
 
 
-def interpolate_values(source_mesh, destination_mesh, weight_list):
-    """
-    Description: 
-        Will transfer values between similar meshes with differing topology. 
-        Lerps values from triangleIndex of closest point on mesh. 
-      
-    Accepts: 
-        sourceMeshName, destinationMeshName - strings for each mesh transform
-      
-    Returns: 
-      
-    """
-    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
-    destination_mesh_m_dag_path = get_mdagpath_from_mesh(destination_mesh)
-    source_mesh_shape_m_dag_path = om.MDagPath(source_mesh_m_dag_path)
-    source_mesh_shape_m_dag_path.extendToShape()
-
-    source_mesh_m_mesh_intersector = om.MMeshIntersector()
-    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node())
-
-    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
-    source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
-
-    u_util = om.MScriptUtil()
-    v_util = om.MScriptUtil()
-    u_util_ptr = u_util.asFloatPtr()
-    v_util_ptr = v_util.asFloatPtr()
-
-    int_util = om.MScriptUtil()
-
-    interpolated_weights = list()
-
-    while not destination_mesh_m_it_mesh_vertex.isDone():
-
-        closest_m_point_on_mesh = om.MPointOnMesh()
-        source_mesh_m_mesh_intersector.getClosestPoint(
-            destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld),
-            closest_m_point_on_mesh
-        )
-
-        source_mesh_m_it_mesh_polygon.setIndex(
-            closest_m_point_on_mesh.faceIndex(),
-            int_util.asIntPtr()
-        )
-        triangle_m_point_array = om.MPointArray()
-        triangle_m_int_array = om.MIntArray()
-
-        source_mesh_m_it_mesh_polygon.getTriangle(
-            closest_m_point_on_mesh.triangleIndex(),
-            triangle_m_point_array,
-            triangle_m_int_array,
-            om.MSpace.kWorld
-        )
-
-        closest_m_point_on_mesh.getBarycentricCoords(
-            u_util_ptr,
-            v_util_ptr
-        )
-
-        weights = list()
-        for i in xrange(3):
-            vertex_id_int = triangle_m_int_array[i]
-            weights.append(weight_list[vertex_id_int])
-
-        bary_u = u_util.getFloat(u_util_ptr)
-        bary_v = v_util.getFloat(v_util_ptr)
-        bary_w = 1 - bary_u - bary_v
-
-        interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (
-            bary_w * weights[2])
-
-        interpolated_weights.append(interp_weight)
-
-        destination_mesh_m_it_mesh_vertex.next()
-
-    return interpolated_weights
-
-
 def check_body_type(bodies):
     """
     Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
@@ -214,7 +136,6 @@ def get_zAttachments(bodies):
     attachments = mm.eval('zQuery -t zAttachment')
     mc.select(sel, r=True)
     if attachments:
-        # todo remove duplicates while mainiting order
         return list(set(attachments))
     else:
         return []

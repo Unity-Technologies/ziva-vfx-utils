@@ -12,12 +12,13 @@ class Mesh(BaseComponent):
     TYPE = 'mesh'
 
     def __init__(self, *args, **kwargs):
-        BaseComponent.__init__(self, *args, **kwargs)
         self._class = (self.__class__.__module__, self.__class__.__name__)
         self._name = None
         self._pCountList = []
         self._pConnectList = []
         self._pointList = []
+
+        BaseComponent.__init__(self, *args, **kwargs)
 
         if args:
             mesh_name = args[0]
@@ -39,12 +40,12 @@ class Mesh(BaseComponent):
         """
 
         Args:
-            mesh_name:
+            mesh_name: Name of mesh to populate node with.
 
         Returns:
 
         """
-        connectivity = get_mesh_connectivity(mesh_name)
+        connectivity = mz.get_mesh_connectivity(mesh_name)
 
         self.set_name(mesh_name)
         self.set_type('mesh')
@@ -66,8 +67,8 @@ class Mesh(BaseComponent):
     def set_polygon_connects(self, pConnectList):
         self._pConnectList = pConnectList
 
-    def set_point_list(self, pointList):
-        self._pointList = pointList
+    def set_point_list(self, point_list):
+        self._pointList = point_list
 
     def get_polygon_counts(self):
         return self._pCountList
@@ -79,7 +80,7 @@ class Mesh(BaseComponent):
         return self._pointList
 
     def build(self):
-        mesh = buildMesh(
+        mesh = build_mesh(
             self.get_name(),
             self.get_polygon_counts(),
             self.get_polygon_connects(),
@@ -94,8 +95,24 @@ class Mesh(BaseComponent):
             tmp.append([-item[0], item[1], item[2]])
         self.set_point_list(tmp)
 
+    def is_topologically_corrispoding(self):
+        """
+        Compare a mesh in scene with one saved in this node.  Currently just
+        checking if vert count is same.  Need to update this to a better method.
 
-def buildMesh(name, polygonCounts, polygonConnects, vertexArray):
+        Args:
+
+        Returns: True if topologically corrisponding
+
+        """
+        cur_conn = mz.get_mesh_connectivity(self.get_name())
+
+        if len(cur_conn['points']) == len(self.get_point_list()):
+            return True
+        return False
+
+
+def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
     polygonCounts_mIntArray = om.MIntArray()
     polygonConnects_mIntArray = om.MIntArray()
     vertexArray_mFloatPointArray = vertexArray
@@ -130,58 +147,3 @@ def buildMesh(name, polygonCounts, polygonConnects, vertexArray):
 
     return rebuiltMesh
 
-
-def get_mesh_connectivity(mesh_name):
-    space = om.MSpace.kWorld
-    meshToRebuild_mDagPath = getMDagPathFromMeshName(mesh_name)
-    meshToRebuild_mDagPath.extendToShape()
-
-    meshToRebuild_polyIter = om.MItMeshPolygon(meshToRebuild_mDagPath)
-    meshToRebuild_vertIter = om.MItMeshVertex(meshToRebuild_mDagPath)
-
-    numPolygons = 0
-    numVertices = 0
-    # vertexArray_mFloatPointArray = om.MFloatPointArray()
-    # polygonCounts_mIntArray = om.MIntArray()
-    polygonCountsList = list()
-    polygonConnectsList = list()
-    pointList = list()
-
-    while not meshToRebuild_vertIter.isDone():
-        numVertices += 1
-        pos_mPoint = meshToRebuild_vertIter.position(space)
-        pos_mFloatPoint = om.MFloatPoint(pos_mPoint.x, pos_mPoint.y,
-                                         pos_mPoint.z)
-
-        pointList.append([
-            pos_mFloatPoint[0],
-            pos_mFloatPoint[1],
-            pos_mFloatPoint[2]
-        ])
-        meshToRebuild_vertIter.next()
-
-    while not meshToRebuild_polyIter.isDone():
-        numPolygons += 1
-        polygonVertices_mIntArray = om.MIntArray()
-        meshToRebuild_polyIter.getVertices(polygonVertices_mIntArray)
-        for vertexIndex in polygonVertices_mIntArray:
-            polygonConnectsList.append(vertexIndex)
-
-        polygonCountsList.append(polygonVertices_mIntArray.length())
-
-        meshToRebuild_polyIter.next()
-    tmp = dict()
-    tmp['polygonCounts'] = polygonCountsList
-    tmp['polygonConnects'] = polygonConnectsList
-    tmp['points'] = pointList
-
-    return tmp
-
-
-def getMDagPathFromMeshName(meshName):
-    mesh_mDagPath = om.MDagPath()
-    selList = om.MSelectionList()
-    selList.add(meshName)
-    selList.getDagPath(0, mesh_mDagPath)
-
-    return mesh_mDagPath

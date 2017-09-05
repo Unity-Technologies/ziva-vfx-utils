@@ -1,4 +1,5 @@
 import zBuilder.zMaya as mz
+import maya.cmds as mc
 
 from zBuilder.nodes.base import BaseNode
 import logging
@@ -11,17 +12,8 @@ class ZivaBaseNode(BaseNode):
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
 
-    def get_map_meshes(self):
-        """
-        This is the mesh associated with each map in obj.MAP_LIST.  Typically
-        it seems to coincide with mesh store in get_association.  Sometimes
-        it deviates, so you can override this method to define your own
-        list of meshes against the map list.
-
-        Returns:
-            list(): of long mesh names.
-        """
-        return self.get_association(long_name=True)
+    def apply(self, *args, **kwargs):
+        pass
 
     def populate(self, *args, **kwargs):
         """
@@ -45,18 +37,20 @@ class ZivaBaseNode(BaseNode):
         map_names = []
         for map_ in self.MAP_LIST:
             map_names.append('{}.{}'.format(selection[0], map_))
-        self.set_maps(map_names)
+        self.set_map_names(map_names)
 
         # get map component data------------------------------------------------
         mesh_names = self.get_map_meshes()
 
         if map_names and mesh_names:
             for map_name, mesh_name in zip(map_names, mesh_names):
-                map_data_object = self._parent.component_factory('map',
-                                                    map_name, mesh_name)
-                self._parent.add_data_object(map_data_object)
+                map_data_object = self._setup.component_factory(map_name,
+                                                                mesh_name,
+                                                                type='map')
+                self._setup.add_data_object(map_data_object)
 
-                if not self._parent.get_data_by_key_name('mesh', mesh_name):
-                    mesh_data_object = self._parent.component_factory('mesh',
-                                                                      mesh_name)
-                    self._parent.add_data_object(mesh_data_object)
+                if not self._setup.get_data_by_key_name('mesh', mesh_name):
+                    mesh_data_object = self._setup.component_factory(mesh_name,
+                                                                     type='mesh'
+                                                                    )
+                    self._setup.add_data_object(mesh_data_object)

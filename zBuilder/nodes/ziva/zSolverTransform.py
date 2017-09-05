@@ -2,7 +2,6 @@ import maya.cmds as mc
 import maya.mel as mm
 
 from zBuilder.nodes import ZivaBaseNode
-# import zBuilder.nodes.base as base
 import logging
 
 logger = logging.getLogger(__name__)

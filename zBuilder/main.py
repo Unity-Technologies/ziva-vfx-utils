@@ -30,11 +30,10 @@ class Builder(IO, NodeCollection):
 
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
-                    return obj(node, parent=self)
-        return zBuilder.nodes.BaseNode(node, parent=self)
+                    return obj(node, setup=self)
+        return zBuilder.nodes.BaseNode(node, setup=self)
 
-    @staticmethod
-    def component_factory(*args):
+    def component_factory(self, *args, **kwargs):
         """
 
         Args:
@@ -43,12 +42,12 @@ class Builder(IO, NodeCollection):
         Returns:
 
         """
-        type_ = args[0]
+
+        type_ = kwargs.get('type', True)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.data']):
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
-                    return obj(*args[1:])
-        # return zBuilder.data.(node)
+                    return obj(*args, setup=self)
 
     @staticmethod
     def time_this(original_function):

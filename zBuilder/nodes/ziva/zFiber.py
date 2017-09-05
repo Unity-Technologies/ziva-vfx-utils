@@ -38,9 +38,10 @@ class FiberNode(ZivaBaseNode):
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
-            data_fibers = self._parent.get_nodes(type_filter='zFiber',
-                                         name_filter=mesh)
+            data_fibers = self._setup.get_nodes(type_filter='zFiber',
+                                                name_filter=mesh)
 
+            self.interpolate_maps(interp_maps)
             # self.are_maps_valid()
 
             d_index = data_fibers.index(self)
@@ -59,14 +60,13 @@ class FiberNode(ZivaBaseNode):
                 results = mm.eval('ziva -f')
                 self.set_mobject(results[0])
                 mc.rename(results[0], name)
-
         else:
             logger.warning(
                 mesh + ' does not exist in scene, skipping zFiber creation')
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=interp_maps)
+        self.set_maya_weights(interp_maps=False)
 
     # TODO need to interp maps before this check happens.
     def are_maps_valid(self):
@@ -74,11 +74,12 @@ class FiberNode(ZivaBaseNode):
         Checking maps to see if they are all zeros.  An attachment map with
         only zero's fail.
 
-        Returns:
+        Raises:
+            ValueError: If map fails test.
 
         """
-        map_name = self.get_maps()[1]
-        map_object = self._parent.get_data_by_key_name('map', map_name)
+        map_name = self.get_map_names()[1]
+        map_object = self._setup.get_data_by_key_name('map', map_name)
         values = map_object.get_value()
         print self.get_name(), values
         if 0 not in values or 1 not in values:

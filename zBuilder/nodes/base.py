@@ -29,7 +29,7 @@ class BaseNode(object):
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        self._parent = kwargs.get('parent', None)
+        self._setup = kwargs.get('setup', None)
 
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
@@ -139,6 +139,17 @@ class BaseNode(object):
                     # TODO needs functionality (replace keys)
                     print 'DICT', item
 
+    def set_attrs(self, attrs):
+        """
+
+        Args:
+            attrs:
+
+        Returns:
+
+        """
+        self._attrs = attrs
+
     def get_attr_value(self, attr):
         """
         gets value of an attribute in node
@@ -231,10 +242,49 @@ class BaseNode(object):
         """
         self.TYPE = type_
 
-    def get_maps(self):
+    def get_map_meshes(self):
+        """
+        This is the mesh associated with each map in obj.MAP_LIST.  Typically
+        it seems to coincide with mesh store in get_association.  Sometimes
+        it deviates, so you can override this method to define your own
+        list of meshes against the map list.
+
+        Returns:
+            list(): of long mesh names.
+        """
+        return self.get_association(long_name=True)
+
+    def get_mesh_objects(self):
+        """
+
+        Returns:
+
+        """
+        meshes = list()
+        for mesh_name in self.get_map_meshes():
+            meshes.append(self._setup.get_data_by_key_name('mesh', mesh_name))
+        return meshes
+
+    def get_map_objects(self):
+        """
+
+        Returns:
+
+        """
+        maps_ = list()
+        for map_name in self.get_map_names():
+            maps_.append(self._setup.get_data_by_key_name('map', map_name))
+        return maps_
+
+    def get_map_names(self):
+        """
+
+        Returns:
+
+        """
         return self._maps
 
-    def set_maps(self, maps):
+    def set_map_names(self, maps):
         """
         Sets the maps for a b_node as a list.
 
@@ -246,11 +296,15 @@ class BaseNode(object):
         """
         self._maps = maps
 
-    def set_attrs(self, attrs):
-        # TODO explicit set 
-        self._attrs = attrs
-
     def populate_attrs(self, item):
+        """
+
+        Args:
+            item:
+
+        Returns:
+
+        """
         attr_list = self.get_attr_list()
         attrs = mz.build_attr_key_values(item, attr_list)
         self.set_attrs(attrs)
@@ -368,7 +422,26 @@ class BaseNode(object):
                 else:
                     print scene_name + '.' + attr + ' not found, skipping'
 
-    # TODO move this to map node!!!!!!!!
+    def interpolate_maps(self, interp_maps):
+        """
+
+        Args:
+            interp_maps:
+
+        Returns:
+
+        """
+        # TODO move to base!
+        map_objects = self.get_map_objects()
+        if interp_maps == 'auto':
+            for map_object in map_objects:
+                if not map_object.is_topologically_corrispoding():
+                    interp_maps = True
+
+        if interp_maps in [True, 'True', 'true']:
+            for map_object in map_objects:
+                map_object.interpolate()
+
     def set_maya_weights(self, interp_maps=False):
         """
         Given a Builder node this set the map values of the object in the maya
@@ -376,8 +449,6 @@ class BaseNode(object):
         it has it uses that instead of stored scene_name.
 
         Args:
-            b_node (object):  The Builder node with the stored map to be applied
-                in scene.
             interp_maps (str): Do you want maps interpolated?
                 True forces interpolation.
                 False cancels it.
@@ -386,53 +457,32 @@ class BaseNode(object):
         Returns:
             nothing.
         """
-        maps = self.get_maps()
+        maps = self.get_map_names()
         scene_name = self.get_scene_name()
         original_name = self.get_name()
-        created_mesh = None
 
         for map_ in maps:
-            map_data = self._parent.get_data_by_key_name('map', map_)
-            mesh = map_data.get_mesh(long_name=True)
-            mesh_data = self._parent.get_data_by_key_name('mesh', mesh)
-
-            mesh_name_short = mesh_data.get_name(long_name=False)
+            map_data = self._setup.get_data_by_key_name('map', map_)
+            self.interpolate_maps(interp_maps)
             weight_list = map_data.get_value()
 
-            if mc.objExists(mesh_name_short):
-                if interp_maps == 'auto':
-                    cur_conn = mz.get_mesh_connectivity(mesh_name_short)
+            map_ = map_.replace(original_name, scene_name)
 
-                    if len(cur_conn['points']) != len(
-                            mesh_data.get_point_list()):
-                        interp_maps = True
+            if mc.objExists('%s[0]' % map_):
+                if not mc.getAttr('%s[0]' % map_, l=True):
+                    tmp = []
+                    for w in weight_list:
+                        tmp.append(str(w))
+                    val = ' '.join(tmp)
+                    cmd = "setAttr " + '%s[0:%d] ' % (
+                        map_, len(weight_list) - 1) + val
+                    mm.eval(cmd)
 
-                if interp_maps == True or interp_maps == 'True' or interp_maps == 'true':
-                    logger.info('interpolating maps...{}'.format(map_))
-                    created_mesh = mesh_data.build()
-                    weight_list = mz.interpolate_values(created_mesh,
-                                                        mesh_name_short,
-                                                        weight_list)
-
-                map_ = map_.replace(original_name, scene_name)
-
-                if mc.objExists('%s[0]' % map_):
-                    if not mc.getAttr('%s[0]' % map_, l=True):
-                        tmp = []
-                        for w in weight_list:
-                            tmp.append(str(w))
-                        val = ' '.join(tmp)
-                        cmd = "setAttr " + '%s[0:%d] ' % (
-                            map_, len(weight_list) - 1) + val
-                        mm.eval(cmd)
-
-                else:
-                    try:
-                        mc.setAttr(map_, weight_list, type='doubleArray')
-                    except:
-                        pass
-                if created_mesh:
-                    mc.delete(created_mesh)
+            else:
+                try:
+                    mc.setAttr(map_, weight_list, type='doubleArray')
+                except:
+                    pass
 
     def get_mobject(self):
         """

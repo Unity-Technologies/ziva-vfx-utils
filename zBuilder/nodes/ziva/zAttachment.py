@@ -38,8 +38,8 @@ class AttachmentNode(ZivaBaseNode):
                     if att_s == source_mesh and att_t == t_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self._parent.get_nodes(type_filter='zAttachment',
-                                              name_filter=source_mesh)
+            data_attachments = self._setup.get_nodes(type_filter='zAttachment',
+                                                     name_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.get_association()[0]
@@ -48,6 +48,7 @@ class AttachmentNode(ZivaBaseNode):
                     data.append(data_attachment)
 
             d_index = data.index(self)
+            self.interpolate_maps(interp_maps)
 
             if existing:
                 if d_index < len(existing):
@@ -71,7 +72,7 @@ class AttachmentNode(ZivaBaseNode):
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=interp_maps)
+        self.set_maya_weights(interp_maps=False)
 
     # TODO need to interp maps before this check happens.
     def are_maps_valid(self):
@@ -79,11 +80,11 @@ class AttachmentNode(ZivaBaseNode):
         Checking maps to see if they are all zeros.  An attachment map with
         only zero's fail.
 
-        Returns:
-
+        Raises:
+            ValueError: If map doesn't pass check.
         """
-        for map_name in self.get_maps():
-            map_object = self._parent.get_data_by_key_name('map', map_name)
+        for map_name in self.get_map_names():
+            map_object = self._setup.get_data_by_key_name('map', map_name)
             values = map_object.get_value()
 
             if all(v == 0 for v in values):

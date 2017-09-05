@@ -10,6 +10,7 @@ class BaseComponent(object):
     def __init__(self, *args, **kwargs):
 
         self._name = None
+        self._setup = kwargs.get('setup', None)
 
     def get_name(self, long_name=False):
         """
@@ -56,7 +57,7 @@ class BaseComponent(object):
         """
         it loops through keys in dict and saves out a temp dict of items that
         can be serializable and returns that temp dict for json writing
-        \purposes.
+        purposes.
 
         Returns:
             dict: of serializable items

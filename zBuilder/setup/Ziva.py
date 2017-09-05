@@ -16,7 +16,7 @@ from zBuilder.nodes.ziva.zLineOfAction import LineOfActionNode
 
 logger = logging.getLogger(__name__)
 
-MAPLIST = {}
+MAPLIST = dict()
 MAPLIST['zTet'] = ['weightList[0].weights']
 MAPLIST['zMaterial'] = ['weightList[0].weights']
 MAPLIST['zFiber'] = ['weightList[0].weights', 'endPoints']
@@ -79,7 +79,7 @@ class ZivaSetup(Builder):
         # kwargs
         attr_filter = kwargs.get('attr_filter', None)
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_maps', True)
+        get_maps = kwargs.get('get_map_names', True)
 
         try:
             if selection:
@@ -209,7 +209,7 @@ class ZivaSetup(Builder):
         lineOfAction = kwargs.get('lineOfAction', True)
         embedder = kwargs.get('embedder', True)
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_maps', True)
+        get_maps = kwargs.get('get_map_names', True)
 
         print '\ngetting ziva......'
 
@@ -344,7 +344,7 @@ class ZivaSetup(Builder):
 
                     maps.append(mapName)
 
-                node.set_maps(maps)
+                node.set_map_names(maps)
                 if get_mesh:
                     for ass in associations:
                         if not self.get_data_by_key_name('mesh', ass):
@@ -833,10 +833,6 @@ class ZivaSetup(Builder):
 
     def __apply_embedded(self, interp_maps=False, name_filter=None,
                          attr_filter=None):
-        # TODO get maps working and name_filter.  Will need to filter slightly
-        # differently then other nodes as there is 1 embedder and we care
-        # about associations in this case
-
         logger.info('applying embedder')
 
         embeddedNode = self.get_nodes(type_filter='zEmbedder')

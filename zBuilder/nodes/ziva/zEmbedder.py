@@ -46,6 +46,9 @@ class EmbedderNode(ZivaBaseNode):
                 tmp[name.split('|')[-1]] = msh
             return tmp
 
+    def apply(self, *args, **kwargs):
+        pass
+
 
 def get_zGeos(bodies):
     mc.select(bodies, r=True)
