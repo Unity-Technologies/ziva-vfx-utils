@@ -621,7 +621,7 @@ def replace_long_name(search, replace, long_name):
     return new_name
 
 
-def cull_creation_nodes(b_nodes):
+def cull_creation_nodes(b_nodes, permissive=True):
     """
     To help speed up the build of a Ziva setup we are creating the bones and
     the tissues with one command.  Given a list of zBuilder nodes this checks
@@ -630,6 +630,7 @@ def cull_creation_nodes(b_nodes):
     it from list.
 
     Args:
+        permissive (bool):
         b_nodes (object): the zBuilder nodes to check.
     Returns:
         dict: Dictionary of non culled
@@ -657,6 +658,8 @@ def cull_creation_nodes(b_nodes):
                 results['names'].append(name)
                 results['b_nodes'].append(b_node)
         else:
+            if not permissive:
+                raise StandardError('{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.format(mesh, type_))
             logger.warning(
                 mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
 

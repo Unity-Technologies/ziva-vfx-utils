@@ -57,13 +57,18 @@ class TetNode(ZivaBaseNode):
         Returns:
 
         """
+        permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.get_scene_name()
         if not mc.objExists(name):
             mesh = self.get_association()[0]
-            name = mm.eval('zQuery -t zTet ' + mesh)[0]
+            if mc.objExists(mesh):
+                if permissive:
+                    name = mm.eval('zQuery -t zTet ' + mesh)[0]
+                else:
+                    raise StandardError('{} does not exist in scene.  Check meshes.'.format(mesh))
         if name:
             new_name = mc.rename(name, self.get_name())
             self.set_mobject(new_name)

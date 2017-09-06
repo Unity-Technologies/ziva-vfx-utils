@@ -83,11 +83,12 @@ class ZivaSetup(Builder):
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
-              lineOfActions=True, mirror=False, permisive=True):
+              lineOfActions=True, mirror=False, permissive=True):
 
         """
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get. 
+            permissive (bool): False raises errors if something is wrong.  Defaults to True
+            attr_filter (dict):  Attribute filter on what attributes to get.
                 dictionary is key value where key is node type and value is 
                 list of attributes to use.
 
@@ -121,7 +122,7 @@ class ZivaSetup(Builder):
 
         for node_type in node_types_to_apply:
             for b_node in self.get_nodes(type_filter=node_type):
-                b_node.apply(attr_filter=attr_filter)
+                b_node.apply(attr_filter=attr_filter, permissive=permissive)
         try:
             mc.select(sel)
         except ValueError:
