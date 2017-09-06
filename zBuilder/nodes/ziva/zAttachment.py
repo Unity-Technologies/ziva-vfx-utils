@@ -24,6 +24,7 @@ class AttachmentNode(ZivaBaseNode):
         source_mesh = self.get_association()[0]
         target_mesh = self.get_association()[1]
 
+        self.interpolate_maps(interp_maps)
         self.are_maps_valid()
 
         # check if both meshes exist
@@ -78,7 +79,6 @@ class AttachmentNode(ZivaBaseNode):
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=False)
 
-    # TODO need to interp maps before this check happens.
     def are_maps_valid(self):
         """
         Checking maps to see if they are all zeros.  An attachment map with
