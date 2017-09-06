@@ -18,15 +18,16 @@ class AttachmentNode(ZivaBaseNode):
     def apply(self, *args, **kwargs):
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
+        permissive = kwargs.get('permissive', True)
 
         name = self.get_scene_name()
         source_mesh = self.get_association()[0]
-        t_mesh = self.get_association()[1]
+        target_mesh = self.get_association()[1]
 
         self.are_maps_valid()
 
         # check if both meshes exist
-        if mz.check_body_type([source_mesh, t_mesh]):
+        if mz.check_body_type([source_mesh, target_mesh]):
             # check existing attachments in scene
             cmd = 'zQuery -t zAttachment {}'.format(source_mesh)
             existing_attachments = mm.eval(cmd)
@@ -35,7 +36,7 @@ class AttachmentNode(ZivaBaseNode):
                 for existing_attachment in existing_attachments:
                     att_s = mm.eval('zQuery -as ' + existing_attachment)[0]
                     att_t = mm.eval('zQuery -at ' + existing_attachment)[0]
-                    if att_s == source_mesh and att_t == t_mesh:
+                    if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
             data_attachments = self._setup.get_nodes(type_filter='zAttachment',
@@ -44,7 +45,7 @@ class AttachmentNode(ZivaBaseNode):
             for data_attachment in data_attachments:
                 data_s = data_attachment.get_association()[0]
                 data_t = data_attachment.get_association()[1]
-                if data_s == source_mesh and data_t == t_mesh:
+                if data_s == source_mesh and data_t == target_mesh:
                     data.append(data_attachment)
 
             d_index = data.index(self)
@@ -56,19 +57,22 @@ class AttachmentNode(ZivaBaseNode):
                     mc.rename(existing[d_index], name)
                 else:
                     mc.select(source_mesh, r=True)
-                    mc.select(t_mesh, add=True)
+                    mc.select(target_mesh, add=True)
                     new_att = mm.eval('ziva -a')
                     self.set_mobject(new_att[0])
                     mc.rename(new_att[0], name)
             else:
                 mc.select(source_mesh, r=True)
-                mc.select(t_mesh, add=True)
+                mc.select(target_mesh, add=True)
                 new_att = mm.eval('ziva -a')
                 self.set_mobject(new_att[0])
                 mc.rename(new_att[0], name)
 
         else:
-            print mc.warning('skipping attachment creation...' + name)
+            if permissive:
+                logger.info('skipping attachment creation...' + name)
+            else:
+                raise StandardError('Cannot create attachment between {} and {}.  Check meshes.'.format(source_mesh,target_mesh))
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
@@ -88,4 +92,4 @@ class AttachmentNode(ZivaBaseNode):
             values = map_object.get_value()
 
             if all(v == 0 for v in values):
-                raise ValueError('{} all 0s'.format(map_name))
+                raise ValueError('{} all 0s.  Check map.'.format(map_name))
