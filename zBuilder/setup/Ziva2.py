@@ -83,7 +83,8 @@ class ZivaSetup(Builder):
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
-              lineOfActions=True, mirror=False, permissive=True):
+              lineOfActions=True, mirror=False, permissive=True,
+              check_meshes=True):
 
         """
         Args:
@@ -122,7 +123,8 @@ class ZivaSetup(Builder):
 
         for node_type in node_types_to_apply:
             for b_node in self.get_nodes(type_filter=node_type):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive)
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes)
         try:
             mc.select(sel)
         except ValueError:
