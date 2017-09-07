@@ -12,6 +12,9 @@ class BaseComponent(object):
         self._name = None
         self._setup = kwargs.get('setup', None)
 
+        if kwargs.get('deserialize', None):
+            self.deserialize(kwargs.get('deserialize', None))
+
     def get_name(self, long_name=False):
         """
 
@@ -80,8 +83,10 @@ class BaseComponent(object):
         Returns:
 
         """
+        print 'before:', self.__dict__
         for key in dictionary:
             self.__dict__[key] = dictionary[key]
+        print 'after:', self.__dict__
         #  self.set_mobject(self.get_mobject())
         # print 'deserialize: ', self.__repr__()
 

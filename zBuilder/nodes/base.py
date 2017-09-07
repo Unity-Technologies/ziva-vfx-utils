@@ -84,10 +84,9 @@ class BaseNode(object):
         Returns:
 
         """
-        print 'before:', self.__dict__
         for key in dictionary:
-            self.__dict__[key] = dictionary[key]
-        print 'after:',self.__dict__
+            if not key == '_setup':
+                self.__dict__[key] = dictionary[key]
         #  self.set_mobject(self.get_mobject())
         # print 'deserialize: ', self.__repr__()
 
@@ -431,7 +430,6 @@ class BaseNode(object):
         Returns:
 
         """
-        # TODO move to base!
         map_objects = self.get_map_objects()
         if interp_maps == 'auto':
             for map_object in map_objects:

@@ -61,8 +61,8 @@ class IO(object):
         else:
             self.stats()
             for b_node in self.get_nodes():
-                print b_node
                 b_node.set_mobject(b_node.get_mobject())
+
 
             logger.info('Read File: {}'.format(filepath))
 
@@ -145,7 +145,7 @@ class IO(object):
             elif 'zBuilder.nodes' in module_:
                 object = find_class('zBuilder.nodes', type_)
 
-            b_node = object(deserialize=json_object, parent=self)
+            b_node = object(deserialize=json_object, setup=self)
             # print b_node
             return b_node
         else:
