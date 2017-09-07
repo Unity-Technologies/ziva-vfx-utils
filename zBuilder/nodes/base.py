@@ -41,7 +41,7 @@ class BaseNode(object):
         if self.get_name():
             name = self.get_name()
             output = ''
-            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__,self.__class__.__name__)
+            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
@@ -85,10 +85,8 @@ class BaseNode(object):
 
         """
         for key in dictionary:
-            if not key == '_setup':
+            if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
-        #  self.set_mobject(self.get_mobject())
-        # print 'deserialize: ', self.__repr__()
 
     def populate(self, *args, **kwargs):
         """

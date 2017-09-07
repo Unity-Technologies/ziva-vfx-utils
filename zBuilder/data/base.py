@@ -83,10 +83,9 @@ class BaseComponent(object):
         Returns:
 
         """
-        print 'before:', self.__dict__
         for key in dictionary:
-            self.__dict__[key] = dictionary[key]
-        print 'after:', self.__dict__
+            if key not in ['_setup', '_class']:
+                self.__dict__[key] = dictionary[key]
         #  self.set_mobject(self.get_mobject())
         # print 'deserialize: ', self.__repr__()
 
