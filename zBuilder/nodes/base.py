@@ -88,6 +88,8 @@ class BaseNode(object):
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
 
+        self.set_attr_list(self._attrs.keys())
+
     def populate(self, *args, **kwargs):
         """
 
