@@ -264,6 +264,15 @@ class BaseNode(object):
             meshes.append(self._setup.get_data_by_key_name('mesh', mesh_name))
         return meshes
 
+    def mirror(self):
+        """
+
+        Returns:
+
+        """
+        for mesh in self.get_mesh_objects():
+            mesh.mirror()
+
     def get_map_objects(self):
         """
 

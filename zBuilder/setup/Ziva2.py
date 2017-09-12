@@ -124,7 +124,7 @@ class ZivaSetup(Builder):
         for node_type in node_types_to_apply:
             for b_node in self.get_nodes(type_filter=node_type):
                 b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes)
+                             check_meshes=check_meshes, mirror=mirror)
         try:
             mc.select(sel)
         except ValueError:

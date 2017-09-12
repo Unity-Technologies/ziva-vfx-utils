@@ -19,6 +19,10 @@ class AttachmentNode(ZivaBaseNode):
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
+        mirror = kwargs.get('mirror', False)
+
+        if mirror:
+            self.mirror()
 
         name = self.get_scene_name()
         source_mesh = self.get_association()[0]
