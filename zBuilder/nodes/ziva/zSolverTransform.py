@@ -1,4 +1,5 @@
 import maya.cmds as mc
+import maya.cmds as mc
 import maya.mel as mm
 
 from zBuilder.nodes import ZivaBaseNode
@@ -28,7 +29,6 @@ class SolverTransformNode(ZivaBaseNode):
         solver_name = self.get_scene_name()
 
         if not mc.objExists(solver_name):
-            # print 'building solver: ',solverName
             results = mm.eval('ziva -s')
             solver = mc.ls(results, type='zSolverTransform')[0]
             mc.rename(solver, solver_name)
@@ -39,3 +39,7 @@ class SolverTransformNode(ZivaBaseNode):
             self.set_mobject(new_name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
+
+        # ----------------------------------------------------------------------
+        # turn off solver to speed up build
+        mc.setAttr(solver_name + '.enable', 0)

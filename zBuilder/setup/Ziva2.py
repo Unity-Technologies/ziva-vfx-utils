@@ -88,7 +88,7 @@ class ZivaSetup(Builder):
 
         """
         Args:
-            permissive (bool): False raises errors if something is wrong.  Defaults to True
+            permissive (bool): False raises errors if something is wrong. Defaults to True
             attr_filter (dict):  Attribute filter on what attributes to get.
                 dictionary is key value where key is node type and value is 
                 list of attributes to use.
@@ -99,6 +99,12 @@ class ZivaSetup(Builder):
         logger.info('applying setup....')
         sel = mc.ls(sl=True)
 
+        # get stored solver enable value to apply later. The solver comes in OFF
+        solver_transform = self.get_nodes(type_filter='zSolverTransform')[0]
+        sn = solver_transform.get_name()
+        solver_value = solver_transform.get_attr_value('enable')
+
+        # generate list of node types to build
         node_types_to_apply = list()
         if solver:
             node_types_to_apply.append('zSolver')
@@ -121,11 +127,17 @@ class ZivaSetup(Builder):
         if embedder:
             node_types_to_apply.append('zEmbedder')
 
+        if mirror:
+            meshes = self.get_data_by_key('mesh')
+            for mesh in meshes:
+                meshes[mesh].mirror()
+
+        # build the nodes by calling apply method on each one
         for node_type in node_types_to_apply:
             for b_node in self.get_nodes(type_filter=node_type):
                 b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, mirror=mirror)
-        try:
-            mc.select(sel)
-        except ValueError:
-            pass
+                             check_meshes=check_meshes)
+
+        # turn on solver
+        mc.setAttr(sn + '.enable', solver_value)
+        mc.select(sel, r=True)
