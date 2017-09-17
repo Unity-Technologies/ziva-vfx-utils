@@ -15,10 +15,10 @@ z.retrieve_from_file('C:\\Temp\\test.ziva')
 
 
 
-for node in z.get_nodes():
-    print node
-    print node.__dict__
-    break
+# for node in z.get_nodes():
+#     print node
+#     print node.__dict__
+#     break
 
 
 import zBuilder.nodes.base as base

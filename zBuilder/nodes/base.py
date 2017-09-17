@@ -18,7 +18,7 @@ class BaseNode(object):
         """
 
         Returns:
-            object: 
+            object:
         """
         self._attr_list = []
         self._name = None
@@ -64,7 +64,6 @@ class BaseNode(object):
         """
         # removing and storing mobject as a string (object name)
         if self.__mobject:
-            # print 'serialize: ', self.__mobject
             self.__mobject = mz.get_name_from_m_object(self.__mobject)
 
         # culling __dict__ of any non-serializable items so we can save as json
@@ -107,7 +106,7 @@ class BaseNode(object):
 
     def apply(self, *args, **kwargs):
         raise NotImplementedError
-    
+
     def print_(self):
         print self
 
@@ -136,7 +135,7 @@ class BaseNode(object):
                             search, replace, self.__dict__[item])
                 elif isinstance(self.__dict__[item], dict):
                     # TODO needs functionality (replace keys)
-                    print 'DICT', item
+                    print 'DICT', item, self.__dict__
 
     def set_attrs(self, attrs):
         """
@@ -264,14 +263,14 @@ class BaseNode(object):
             meshes.append(self._setup.get_data_by_key_name('mesh', mesh_name))
         return meshes
 
-    def mirror(self):
-        """
-
-        Returns:
-
-        """
-        for mesh in self.get_mesh_objects():
-            mesh.mirror()
+    # def mirror(self):
+    #     """
+    #
+    #     Returns:
+    #
+    #     """
+    #     for mesh in self.get_mesh_objects():
+    #         mesh.mirror()
 
     def get_map_objects(self):
         """
@@ -418,7 +417,8 @@ class BaseNode(object):
                                    self.get_attr_value(attr),
                                    type='doubleArray')
                 else:
-                    print scene_name + '.' + attr + ' not found, skipping'
+                    text = '{}.{} not found, skipping.'.format(scene_name, attr)
+                    logger.info(text)
             else:
                 if mc.objExists(scene_name + '.' + attr):
                     if not mc.getAttr(scene_name + '.' + attr, l=True):
@@ -428,7 +428,8 @@ class BaseNode(object):
                         except:
                             pass
                 else:
-                    print scene_name + '.' + attr + ' not found, skipping'
+                    text = '{}.{} not found, skipping.'.format(scene_name, attr)
+                    logger.info(text)
 
     def interpolate_maps(self, interp_maps):
         """

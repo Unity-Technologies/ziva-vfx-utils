@@ -23,6 +23,9 @@ class BoneNode(ZivaBaseNode):
         b_nodes = self._setup.get_nodes(type_filter='zBone',
                                         name_filter=name_filter)
 
+        # checking if the node is the first one in list.  If it is I get
+        # all the zBones and build them together for speed reasons.
+        # This feels kinda sloppy to me.
         if self == b_nodes[0]:
             apply_multiple(b_nodes, attr_filter=attr_filter,
                            permissive=permissive, check_meshes=check_meshes)

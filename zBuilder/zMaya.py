@@ -386,7 +386,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 print 'rename: ', attachment, '{}__{}_{}'.format(s, t,
                                                                  'zAttachment')
 
-    print 'finished renaming.... '
+    logger.info('finished renaming.... ')
 
 
 def select_tissue_meshes():

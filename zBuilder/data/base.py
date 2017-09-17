@@ -86,6 +86,5 @@ class BaseComponent(object):
         for key in dictionary:
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
-        #  self.set_mobject(self.get_mobject())
-        # print 'deserialize: ', self.__repr__()
+
 

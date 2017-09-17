@@ -39,7 +39,7 @@ class TetNode(ZivaBaseNode):
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 name = self.get_scene_name()
-
+                # TODO permissive check
                 print 'could not connect {}.worldMesh to {}.iTet'.format(
                     user_mesh, name)
 

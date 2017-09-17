@@ -108,12 +108,12 @@ class Map(BaseComponent):
 
     def interpolate(self):
         mesh_data = self.get_mesh_data()
-        logger.info('interpolating maps...{}'.format(self.get_name()))
+        logger.info('interpolating map:  {}'.format(self.get_name()))
         created_mesh = mesh_data.build()
         weight_list = interpolate_values(created_mesh,
                                             mesh_data.get_name(),
                                             self.get_value())
-        self.set_value(weight_list)
+        # self.set_value(weight_list)
         mc.delete(created_mesh)
 
     def set_value(self, value):

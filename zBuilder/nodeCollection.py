@@ -73,9 +73,7 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         """
         tmp = {}
-        # print
         for i, d in enumerate(self.get_nodes()):
-            # print d#,self.get_nodes()
             t = d.get_type()
             if type_filter:
                 if type_filter == t:

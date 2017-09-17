@@ -19,10 +19,6 @@ class AttachmentNode(ZivaBaseNode):
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
-        mirror = kwargs.get('mirror', False)
-
-        if mirror:
-            self.mirror()
 
         name = self.get_scene_name()
         source_mesh = self.get_association()[0]
@@ -30,6 +26,8 @@ class AttachmentNode(ZivaBaseNode):
 
         self.interpolate_maps(interp_maps)
         self.are_maps_valid()
+
+        # logger.info('creating attachment {}'.format(name))
 
         # check if both meshes exist
         if mz.check_body_type([source_mesh, target_mesh]):

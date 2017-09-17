@@ -89,6 +89,8 @@ class Mesh(BaseComponent):
         return mesh
 
     def mirror(self):
+        # TODO faster mirroring
+        logger.info('Mirroring mesh: {}'.format(self.get_name()))
         pl = self.get_point_list()
         tmp = []
         for item in pl:

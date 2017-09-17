@@ -41,8 +41,8 @@ class FiberNode(ZivaBaseNode):
             data_fibers = self._setup.get_nodes(type_filter='zFiber',
                                                 name_filter=mesh)
 
-            self.interpolate_maps(interp_maps)
-            self.are_maps_valid()
+            # self.interpolate_maps(interp_maps)
+            # self.are_maps_valid()
 
             d_index = data_fibers.index(self)
 

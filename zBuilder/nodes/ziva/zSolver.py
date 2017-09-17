@@ -28,7 +28,6 @@ class SolverNode(ZivaBaseNode):
         solver_name = self.get_scene_name()
 
         if not mc.objExists(solver_name):
-            # print 'building solver: ',solverName
             results = mm.eval('ziva -s')
             solver = mc.ls(results, type='zSolver')[0]
             mc.rename(solver, solver_name.split('|')[-1])

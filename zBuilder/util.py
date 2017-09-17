@@ -6,7 +6,6 @@ def copy_paste(*args, **kwargs):
     A utility wrapper for copying and pasting a tissue
     '''
     sel = mc.ls(sl=True)
-    # print sel
 
     selection = None
     if args:

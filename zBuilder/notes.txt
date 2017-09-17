@@ -2,7 +2,6 @@ Todo
 
 - zip json file
 - utility to export node and each components separately
-- take a look at component factory interface (make consistent with nodes)
 - defining outputs for setups???
 
 - qModel for viewing a tree for different types

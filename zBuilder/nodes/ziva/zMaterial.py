@@ -29,6 +29,8 @@ class MaterialNode(ZivaBaseNode):
         name = self.get_scene_name()
         mesh = self.get_association()[0]
 
+        # logger.info('creating material {}'.format(name))
+
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_materials = mm.eval(

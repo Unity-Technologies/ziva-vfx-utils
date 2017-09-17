@@ -158,7 +158,7 @@ class ZivaSetup(Builder):
                 mm.eval('zQuery -t "zTissue" -m'))
             self.stats()
         else:
-            print 'no solver found in scene'
+            logger.info('no solver found in scene')
         mc.select(sel, r=True)
 
     @Builder.time_this
