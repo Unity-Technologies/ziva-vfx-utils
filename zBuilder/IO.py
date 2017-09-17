@@ -1,7 +1,7 @@
 import json
 import inspect
 import sys
-
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class IO(object):
                 json.dump(data, outfile, cls=BaseNodeEncoder,
                           sort_keys=True, indent=4, separators=(',', ': '))
         except IOError:
-            print "Error: can\'t find file or write data"
+            logger.error("Error: can\'t find file or write data")
         else:
             for b_node in self.get_nodes():
                 b_node.set_mobject(b_node.get_mobject())
@@ -51,20 +51,20 @@ class IO(object):
         Raises:
             IOError: If not able to read file
         """
+        before = datetime.datetime.now()
         try:
             with open(filepath, 'rb') as handle:
                 data = json.load(handle, object_hook=self.load_base_node)
                 # data = json.load(handle)
                 self.from_json_data(data)
         except IOError:
-            print "Error: can\'t find file or read data"
+            logger.error("Error: can\'t find file or read data")
         else:
             self.stats()
             for b_node in self.get_nodes():
                 b_node.set_mobject(b_node.get_mobject())
-
-
-            logger.info('Read File: {}'.format(filepath))
+            after = datetime.datetime.now()
+            logger.info('Read File: {} in {}'.format(filepath, after - before))
 
     def get_json_data(self, node_data=True, component_data=True):
         """
@@ -139,14 +139,12 @@ class IO(object):
             module_ = json_object['_class'][0]
 
             type_ = self.get_type_from_json_object(json_object)
-            # print 'TYPE',type_
             if 'zBuilder.data' in module_:
                 object = find_class('zBuilder.data', type_)
             elif 'zBuilder.nodes' in module_:
                 object = find_class('zBuilder.nodes', type_)
 
             b_node = object(deserialize=json_object, setup=self)
-            # print b_node
             return b_node
         else:
             return json_object
