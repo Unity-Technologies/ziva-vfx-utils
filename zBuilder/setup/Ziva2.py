@@ -48,7 +48,16 @@ class ZivaSetup(Builder):
         # ----------------------------------------------------------------------
         # NODE STORING----------------------------------------------------------
         # ----------------------------------------------------------------------
-        solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))[0]
+        solver = None
+        if args:
+            solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))
+        else:
+            solver = mm.eval('zQuery -t "zSolver"')
+
+        if solver:
+            solver = solver[0]
+        else:
+            raise StandardError('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.node_factory(solver)
         self.add_node(b_solver)
