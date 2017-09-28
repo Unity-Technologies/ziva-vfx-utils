@@ -1,19 +1,11 @@
-import zBuilder.zMaya
-
-import zBuilder.data as dta
-import zBuilder.data.mesh as msh
-import zBuilder.nodes as nds
 from zBuilder.main import Builder
 import zBuilder.zMaya as mz
-
 
 import maya.cmds as mc
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-MAPLIST = {'deltaMush': ['weightList[0].weights']}
 
 
 class DeltaMushSetup(Builder):
@@ -37,7 +29,7 @@ class DeltaMushSetup(Builder):
         delta_mushes = mc.ls(hist, type='deltaMush')[::-1]
 
         if not delta_mushes:
-            raise StandardError, 'No delta mushes found, aborting!'
+            raise StandardError('No delta mushes found, aborting!')
 
         for delta_mush in delta_mushes:
             b_node = self.node_factory(delta_mush)
@@ -55,11 +47,3 @@ class DeltaMushSetup(Builder):
                                  type_filter='deltaMush')
         for b_node in b_nodes:
             b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
-
-
-def get_association(delta_mush):
-    hist = mc.listHistory(delta_mush)
-    mesh = mc.ls(hist, type='mesh')
-    parent = mc.listRelatives(mesh, p=True)[0]
-    return [parent]
-
