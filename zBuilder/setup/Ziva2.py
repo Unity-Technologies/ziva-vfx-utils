@@ -105,47 +105,87 @@ class ZivaSetup(Builder):
                 tmp = {'zSolver':['substeps']}
             name_filter (str): filter by node name.  Defaults to **None**
         """
+        if mirror:
+            meshes = self.get_data_by_key('mesh')
+            for mesh in meshes:
+                meshes[mesh].mirror()
+                
         logger.info('applying setup....')
         sel = mc.ls(sl=True)
 
         # get stored solver enable value to apply later. The solver comes in OFF
         solver_transform = self.get_nodes(type_filter='zSolverTransform')[0]
-        sn = solver_transform.get_name()
+        sn = solver_transform.name
         solver_value = solver_transform.get_attr_value('enable')
 
         # generate list of node types to build
         node_types_to_apply = list()
         if solver:
-            node_types_to_apply.append('zSolver')
-            node_types_to_apply.append('zSolverTransform')
+            logger.info('Building solver.')
+            for node_type in ['zSolver', 'zSolverTransform']:
+                for b_node in self.get_nodes(type_filter=node_type):
+                    b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                                 check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zSolver')
+            # node_types_to_apply.append('zSolverTransform')
         if bones:
-            node_types_to_apply.append('zBone')
-        if tissues:
-            node_types_to_apply.append('zTissue')
-            node_types_to_apply.append('zTet')
-        if cloth:
-            node_types_to_apply.append('zCloth')
-        if materials:
-            node_types_to_apply.append('zMaterial')
-        if attachments:
-            node_types_to_apply.append('zAttachment')
-        if fibers:
-            node_types_to_apply.append('zFiber')
-        if lineOfActions:
-            node_types_to_apply.append('zLineOfAction')
-        if embedder:
-            node_types_to_apply.append('zEmbedder')
-
-        if mirror:
-            meshes = self.get_data_by_key('mesh')
-            for mesh in meshes:
-                meshes[mesh].mirror()
-
-        # build the nodes by calling apply method on each one
-        for node_type in node_types_to_apply:
-            for b_node in self.get_nodes(type_filter=node_type):
+            logger.info('Building bones.')
+            for b_node in self.get_nodes(type_filter='zBone'):
                 b_node.apply(attr_filter=attr_filter, permissive=permissive,
                              check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zBone')
+        if tissues:
+            logger.info('Building tissues.')
+            for node_type in ['zTissue', 'zTet']:
+                for b_node in self.get_nodes(type_filter=node_type):
+                    b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                                 check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zTissue')
+            # node_types_to_apply.append('zTet')
+        if cloth:
+            logger.info('Building cloth.')
+            for b_node in self.get_nodes(type_filter='zCloth'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zCloth')
+        if materials:
+            logger.info('Building materials.')
+            for b_node in self.get_nodes(type_filter='zMaterial'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zMaterial')
+        if attachments:
+            logger.info('Building attachments.')
+            for b_node in self.get_nodes(type_filter='zAttachment'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            #node_types_to_apply.append('zAttachment')
+        if fibers:
+            logger.info('Building fibers.')
+            for b_node in self.get_nodes(type_filter='zFiber'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zFiber')
+        if lineOfActions:
+            logger.info('Building lines of action.')
+            for b_node in self.get_nodes(type_filter='zLineOfAction'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zLineOfAction')
+        if embedder:
+            logger.info('Building embedder.')
+            for b_node in self.get_nodes(type_filter='zEmbedder'):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
+            # node_types_to_apply.append('zEmbedder')
+
+
+
+        # build the nodes by calling apply method on each one
+        # for node_type in node_types_to_apply:
+        #     for b_node in self.get_nodes(type_filter=node_type):
+        #         b_node.apply(attr_filter=attr_filter, permissive=permissive,
+        #                      check_meshes=check_meshes, interp_maps=interp_maps)
 
         # turn on solver
         mc.setAttr(sn + '.enable', solver_value)
