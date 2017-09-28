@@ -60,10 +60,10 @@ class TissueNode(ZivaBaseNode):
         self.type = mz.get_type(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
-        self.set_mobject(selection[0])
+        self.mobject = selection[0]
 
         mesh = mz.get_association(selection[0])
-        self.set_association(mesh)
+        self.association = mesh
 
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
@@ -117,7 +117,7 @@ def apply_multiple(b_nodes, attr_filter=None, permissive=True,
         results = mc.ls(results, type='zTissue')
 
         for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
-            b_node.set_mobject(new)
+            b_node.mobject = new
             mc.rename(new, name)
 
     # set the attributes

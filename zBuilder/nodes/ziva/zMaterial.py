@@ -27,7 +27,7 @@ class MaterialNode(ZivaBaseNode):
 
         # get mesh name and node name from data
         name = self.get_scene_name()
-        mesh = self.get_association()[0]
+        mesh = self.association[0]
 
         # logger.info('creating material {}'.format(name))
 
@@ -43,12 +43,12 @@ class MaterialNode(ZivaBaseNode):
             # if there are enough existing materials use those
             # or else create a new material
             if d_index < len(existing_materials):
-                self.set_mobject(existing_materials[d_index])
+                self.mobject = existing_materials[d_index]
                 mc.rename(existing_materials[d_index], name)
             else:
                 mc.select(mesh, r=True)
                 results = mm.eval('ziva -m')
-                self.set_mobject(results[0])
+                self.mobject = results[0]
                 mc.rename(results[0], name)
         else:
             logger.warning(

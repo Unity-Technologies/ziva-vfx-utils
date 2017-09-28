@@ -63,7 +63,7 @@ class TetNode(ZivaBaseNode):
 
         name = self.get_scene_name()
         if not mc.objExists(name):
-            mesh = self.get_association()[0]
+            mesh = self.association[0]
             if mc.objExists(mesh):
                 if permissive:
                     name = mm.eval('zQuery -t zTet ' + mesh)[0]

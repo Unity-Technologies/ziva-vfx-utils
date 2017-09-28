@@ -32,7 +32,7 @@ class SolverTransformNode(ZivaBaseNode):
             results = mm.eval('ziva -s')
             solver = mc.ls(results, type='zSolverTransform')[0]
             mc.rename(solver, solver_name)
-            self.set_mobject(solver_name)
+            self.mobject = solver_name
 
         else:
             new_name = mc.rename(self.get_scene_name(), self.name)

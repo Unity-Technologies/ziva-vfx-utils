@@ -652,7 +652,7 @@ def cull_creation_nodes(b_nodes, permissive=True):
             existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
                 out = mc.rename(existing, name)
-                b_node.set_mobject(out)
+                b_node.mobject = out
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)

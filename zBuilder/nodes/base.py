@@ -102,7 +102,7 @@ class BaseNode(object):
         self.type = mc.objectType(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
-        self.set_mobject(selection[0])
+        self.mobject (selection[0])
 
     def apply(self, *args, **kwargs):
         raise NotImplementedError
@@ -167,6 +167,7 @@ class BaseNode(object):
         """
         self._attrs[attr]['value'] = value
 
+    # todo dont think this is needed
     def get_attr_list(self):
         """
         gets list of attribute names stored with node
@@ -229,7 +230,7 @@ class BaseNode(object):
         Returns:
             list(): of long mesh names.
         """
-        return self.get_association(long_name=True)
+        return self.long_association
 
     def get_mesh_objects(self):
         """
@@ -295,38 +296,56 @@ class BaseNode(object):
         attrs = mz.build_attr_key_values(item, attr_list)
         self.set_attrs(attrs)
 
-    def get_association(self, long_name=False):
-        """
+    @property
+    def association(self):
+        tmp = []
+        for item in self._association:
+            tmp.append(item.split('|')[-1])
+        return tmp
 
-        Args:
-            long_name:
-
-        Returns:
-
-        """
-        if not long_name:
-            tmp = []
-            for item in self._association:
-                tmp.append(item.split('|')[-1])
-            return tmp
-        else:
-            return self._association
-
-    # TODO get long name under hood and check for duplicate short names
-    def set_association(self, association):
-        """
-
-        Args:
-            association:
-
-        Returns:
-
-        """
-
+    @association.setter
+    def association(self, association):
         if isinstance(association, str):
             self._association = [association]
         else:
             self._association = association
+
+    @property
+    def long_association(self):
+        return self._association
+    #
+    # def get_association(self, long_name=False):
+    #     """
+    #
+    #     Args:
+    #         long_name:
+    #
+    #     Returns:
+    #
+    #     """
+    #     if not long_name:
+    #         tmp = []
+    #         for item in self._association:
+    #             tmp.append(item.split('|')[-1])
+    #         return tmp
+    #     else:
+    #         return self._association
+    #
+    # # TODO get long name under hood and check for duplicate short names
+    # def set_association(self, association):
+    #     """
+    #
+    #     Args:
+    #         association:
+    #
+    #     Returns:
+    #
+    #     """
+    #
+    #     if isinstance(association, str):
+    #         self._association = [association]
+    #     else:
+    #         self._association = association
 
     def compare(self):
         """
@@ -357,8 +376,8 @@ class BaseNode(object):
             (str) Name of maya object.
         """
         name = None
-        if self.get_mobject():
-            name = mz.get_name_from_m_object(self.get_mobject())
+        if self.mobject:
+            name = mz.get_name_from_m_object(self.mobject)
 
         if not name:
             name = self.long_name
@@ -446,7 +465,7 @@ class BaseNode(object):
         """
         maps = self.get_map_names()
         scene_name = self.get_scene_name()
-        original_name = self.get_name()
+        original_name = self.name
 
         for map_ in maps:
             map_data = self._setup.get_data_by_key_name('map', map_)
@@ -471,7 +490,8 @@ class BaseNode(object):
                 except:
                     pass
 
-    def get_mobject(self):
+    @property
+    def mobject(self):
         """
         Gets mObject stored with node.
         Returns:
@@ -480,7 +500,8 @@ class BaseNode(object):
         """
         return self.__mobject
 
-    def set_mobject(self, maya_node):
+    @mobject.setter
+    def mobject(self, maya_node):
         """
         Tracks an mObject with a builder node.  Given a maya node it looks up
         its mobject and stores that in a list that corresponds with the

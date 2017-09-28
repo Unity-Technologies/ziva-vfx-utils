@@ -21,5 +21,4 @@ from .ziva.zFiber import FiberNode
 from .ziva.zLineOfAction import LineOfActionNode
 
 # deformer----------------------------------------------------------------------
-from .deformers.deformerBase import DeformerBaseNode
 from .deformers.deltaMush import DeltaMushNode

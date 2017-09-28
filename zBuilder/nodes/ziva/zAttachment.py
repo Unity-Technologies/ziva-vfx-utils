@@ -21,8 +21,8 @@ class AttachmentNode(ZivaBaseNode):
         permissive = kwargs.get('permissive', True)
 
         name = self.get_scene_name()
-        source_mesh = self.get_association()[0]
-        target_mesh = self.get_association()[1]
+        source_mesh = self.association[0]
+        target_mesh = self.association[1]
 
         self.interpolate_maps(interp_maps)
         self.are_maps_valid()
@@ -56,19 +56,19 @@ class AttachmentNode(ZivaBaseNode):
 
             if existing:
                 if d_index < len(existing):
-                    self.set_mobject(existing[d_index])
+                    self.mobject = existing[d_index]
                     mc.rename(existing[d_index], name)
                 else:
                     mc.select(source_mesh, r=True)
                     mc.select(target_mesh, add=True)
                     new_att = mm.eval('ziva -a')
-                    self.set_mobject(new_att[0])
+                    self.mobject = new_att[0]
                     mc.rename(new_att[0], name)
             else:
                 mc.select(source_mesh, r=True)
                 mc.select(target_mesh, add=True)
                 new_att = mm.eval('ziva -a')
-                self.set_mobject(new_att[0])
+                self.mobject = new_att[0]
                 mc.rename(new_att[0], name)
 
         else:

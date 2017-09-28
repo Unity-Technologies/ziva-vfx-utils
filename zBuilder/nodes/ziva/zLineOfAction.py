@@ -36,10 +36,10 @@ class LineOfActionNode(ZivaBaseNode):
         self.type = mz.get_type(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
-        self.set_mobject(selection[0])
+        self.mobject = selection[0]
 
         mesh = mz.get_association(selection[0])
-        self.set_association(mesh)
+        self.association = mesh
         self.set_fiber(mz.get_lineOfAction_fiber(self.get_scene_name()))
 
     def apply(self, *args, **kwargs):
@@ -55,14 +55,14 @@ class LineOfActionNode(ZivaBaseNode):
         """
         attr_filter = kwargs.get('attr_filter', None)
         name = self.get_scene_name()
-        association = self.get_association()
+        association = self.association
         fiber = self.get_fiber()
         if mc.objExists(association[0]) and mc.objExists(fiber):
             if not mc.objExists(name):
                 mc.select(fiber, association[0])
                 results_ = mm.eval('ziva -lineOfAction')
                 clt = mc.ls(results_, type='zLineOfAction')[0]
-                self.set_mobject(clt)
+                self.mobject = clt
                 mc.rename(clt, name)
 
             else:

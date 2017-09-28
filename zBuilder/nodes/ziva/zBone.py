@@ -63,7 +63,7 @@ def apply_multiple(b_nodes, attr_filter=None, permissive=False, check_meshes=Tru
     if results:
         results = mc.ls(results, type='zBone')
         for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
-            b_node.set_mobject(new)
+            b_node.mobject = new
             mc.rename(new, name)
 
     # set the attributes

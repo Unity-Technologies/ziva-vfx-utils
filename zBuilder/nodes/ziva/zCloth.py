@@ -29,13 +29,13 @@ class ClothNode(ZivaBaseNode):
         name = self.get_scene_name()
 
         if not mc.objExists(name):
-            mc.select(self.get_association())
+            mc.select(self.association)
             results = mm.eval('ziva -c')
             cloth = mc.ls(results, type='zCloth')[0]
             mc.rename(cloth, name)
-            self.set_mobject(name)
+            self.mobject = name
         else:
-            new_name = mc.rename(self.get_scene_name(), self.get_name())
-            self.set_mobject(new_name)
+            new_name = mc.rename(self.get_scene_name(), self.name)
+            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)

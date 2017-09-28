@@ -29,10 +29,10 @@ class ZivaBaseNode(BaseNode):
         self.type = mz.get_type(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
-        self.set_mobject(selection[0])
+        self.mobject = selection[0]
 
         mesh = mz.get_association(selection[0])
-        self.set_association(mesh)
+        self.association = mesh
 
         map_names = []
         for map_ in self.MAP_LIST:

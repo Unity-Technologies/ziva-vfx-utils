@@ -24,8 +24,8 @@ class FiberNode(ZivaBaseNode):
         Returns:
             list(): of long mesh names.
         """
-        return [self.get_association(long_name=True)[0],
-                self.get_association(long_name=True)[0]]
+        return [self.long_association[0],
+                self.long_association[0]]
 
     def apply(self, *args, **kwargs):
 
@@ -33,7 +33,7 @@ class FiberNode(ZivaBaseNode):
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.get_scene_name()
-        mesh = self.get_association()[0]
+        mesh = self.association[0]
 
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
@@ -48,17 +48,17 @@ class FiberNode(ZivaBaseNode):
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    self.set_mobject(existing_fibers[d_index])
+                    self.mobject = existing_fibers[d_index]
                     mc.rename(existing_fibers[d_index], name)
                 else:
                     mc.select(mesh, r=True)
                     results = mm.eval('ziva -f')
-                    self.set_mobject(results[0])
+                    self.mobject = results[0]
                     mc.rename(results[0], name)
             else:
                 mc.select(mesh, r=True)
                 results = mm.eval('ziva -f')
-                self.set_mobject(results[0])
+                self.mobject = results[0]
                 mc.rename(results[0], name)
         else:
             logger.warning(
