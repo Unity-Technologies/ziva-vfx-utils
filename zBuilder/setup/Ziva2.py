@@ -77,8 +77,9 @@ class ZivaSetup(Builder):
         for node_type in node_types:
             if node_type == 'zLineOfAction':
                 fibers = mm.eval('zQuery -t "{}" {}'.format('zFiber', solver))
-                fiber_history = mc.listHistory(fibers)
-                nodes = mc.ls(fiber_history, type='zLineOfAction')
+                if fibers:
+                    fiber_history = mc.listHistory(fibers)
+                    nodes = mc.ls(fiber_history, type='zLineOfAction')
             else:
                 nodes = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
             if nodes:
