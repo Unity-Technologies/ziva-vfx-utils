@@ -102,7 +102,7 @@ class BaseNode(object):
         self.type = mc.objectType(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
-        self.mobject (selection[0])
+        self.mobject = selection[0]
 
     def apply(self, *args, **kwargs):
         raise NotImplementedError
