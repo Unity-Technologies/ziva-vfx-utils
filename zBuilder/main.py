@@ -1,8 +1,9 @@
 from zBuilder.nodeCollection import NodeCollection
 from zBuilder.IO import IO
-import zBuilder.nodes
-import zBuilder.zMaya as mz
 
+import zBuilder.zMaya as mz
+import zBuilder.data
+import zBuilder.nodes
 from functools import wraps
 import datetime
 import sys
@@ -27,7 +28,6 @@ class Builder(IO, NodeCollection):
         """
         type_ = mz.get_type(node)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
-
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
                     return obj(node, setup=self)
