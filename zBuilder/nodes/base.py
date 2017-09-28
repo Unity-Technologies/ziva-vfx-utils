@@ -107,9 +107,6 @@ class BaseNode(object):
     def apply(self, *args, **kwargs):
         raise NotImplementedError
 
-    def print_(self):
-        print self
-
     def string_replace(self, search, replace):
         """
 
