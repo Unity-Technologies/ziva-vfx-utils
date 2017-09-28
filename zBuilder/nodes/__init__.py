@@ -1,8 +1,6 @@
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
-# __all__ = ["zTet", "zTissue", "zSolver"]
-
 from zBuilder.nodes.base import BaseNode
 from zBuilder.nodes.deformerBase import DeformerBaseNode
 
@@ -20,13 +18,14 @@ from .ziva.zEmbedder import EmbedderNode
 from .ziva.zFiber import FiberNode
 from .ziva.zLineOfAction import LineOfActionNode
 
+# deformer----------------------------------------------------------------------
+from .deformers.deltaMush import DeltaMushNode
+from .deformers.blendShape import BlendShapeNode
+
 # zit nodes---------------------------------------------------------------------
 from .zit.zRelaxer import ZRelaxerNode
 from .zit.zItto import ZIttoNode
 from .zit.zPolyCombine import ZPolyCombineNode
 from .zit.zWrap import ZWrapNode
 
-# deformer----------------------------------------------------------------------
-from .deformers.deltaMush import DeltaMushNode
-from .deformers.blendShape import BlendShapeNode
 
