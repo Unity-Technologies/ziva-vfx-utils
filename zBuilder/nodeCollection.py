@@ -202,19 +202,19 @@ class NodeCollection(object):
                         items.append(node)
         return items
 
-    def get_node_by_name(self, name):
-        """
-        utility function to get node by name.
-
-        Args:
-            name (str): name of node.
-
-        Returns:
-            builder node (obj)
-        """
-        for node in self.__collection:
-            if node.get_name() == name:
-                return node
+    # def get_node_by_name(self, name):
+    #     """
+    #     utility function to get node by name.
+    #
+    #     Args:
+    #         name (str): name of node.
+    #
+    #     Returns:
+    #         builder node (obj)
+    #     """
+    #     for node in self.__collection:
+    #         if node.get_name() == name:
+    #             return node
 
     def set_nodes(self, nodes):
         """
