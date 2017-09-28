@@ -1,5 +1,6 @@
 import logging
 import json
+import maya.cmds as mc
 
 logger = logging.getLogger(__name__)
 
@@ -15,27 +16,20 @@ class BaseComponent(object):
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
 
-    def get_name(self, long_name=False):
-        """
+    @property
+    def long_name(self):
+        return self._name
 
-        Args:
-            long_name:
+    @property
+    def name(self):
+        return self._name.split('|')[-1]
 
-        Returns:
+    @name.setter
+    def name(self, name):
+        self._name = mc.ls(name, long=True)[0]
 
-        """
-        if self._name:
-            if long_name:
-                return self._name
-            else:
-                return self._name.split('|')[-1]
-        else:
-            return None
-
-    def set_name(self, name):
-        self._name = name
-
-    def get_type(self):
+    @property
+    def type(self):
         """
         get type of node
 
@@ -47,7 +41,8 @@ class BaseComponent(object):
         except AttributeError:
             return None
 
-    def set_type(self, type_):
+    @type.setter
+    def type(self, type_):
         """
         Sets type of node
 

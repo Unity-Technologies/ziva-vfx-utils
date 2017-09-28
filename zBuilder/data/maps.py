@@ -28,7 +28,7 @@ class Map(BaseComponent):
                 self.populate(map_name, mesh_name)
 
     def __str__(self):
-        name = self.get_name()
+        name = self.name
         if self.get_value():
             length = len(self.get_value())
         else:
@@ -52,9 +52,9 @@ class Map(BaseComponent):
         """
         weight_value = get_weights(map_name, mesh_name)
 
-        self.set_name(map_name)
+        self.name = map_name
         self.set_mesh(mesh_name)
-        self.set_type('map')
+        self.type = 'map'
         self.set_value(weight_value)
 
         logger.info('Retrieving Data : {}'.format(self))
@@ -104,16 +104,16 @@ class Map(BaseComponent):
 
         """
         mesh_data = self.get_mesh_data()
-        return mesh_data.is_topologically_corrispoding()
+        return mesh_data.is_topologically_corresponding()
 
     def interpolate(self):
         mesh_data = self.get_mesh_data()
-        logger.info('interpolating map:  {}'.format(self.get_name()))
+        logger.info('interpolating map:  {}'.format(self.name))
         created_mesh = mesh_data.build()
         weight_list = interpolate_values(created_mesh,
-                                            mesh_data.get_name(),
-                                            self.get_value())
-        # self.set_value(weight_list)
+                                         mesh_data.name,
+                                         self.get_value())
+        self.set_value(weight_list)
         mc.delete(created_mesh)
 
     def set_value(self, value):
@@ -138,9 +138,8 @@ class Map(BaseComponent):
     # TODO remove this and do it in __dict__
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
-        name = self.get_name(long_name=True)
-        new_name = mz.replace_long_name(search, replace, name)
-        self.set_name(new_name)
+        new_name = mz.replace_long_name(search, replace, self.long_name)
+        self.name = new_name
 
         mesh = self.get_mesh(long_name=True)
         new_mesh = mz.replace_long_name(search, replace, mesh)

@@ -35,8 +35,8 @@ class SolverTransformNode(ZivaBaseNode):
             self.set_mobject(solver_name)
 
         else:
-            new_name = mc.rename(self.get_scene_name(), self.get_name())
-            self.set_mobject(new_name)
+            new_name = mc.rename(self.get_scene_name(), self.name)
+            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

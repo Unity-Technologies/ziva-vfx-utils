@@ -4,6 +4,7 @@ __path__ = extend_path(__path__, __name__)
 # __all__ = ["zTet", "zTissue", "zSolver"]
 
 from zBuilder.nodes.base import BaseNode
+from zBuilder.nodes.deformerBase import DeformerBaseNode
 
 # ziva nodes--------------------------------------------------------------------
 from .ziva.zivaBase import ZivaBaseNode

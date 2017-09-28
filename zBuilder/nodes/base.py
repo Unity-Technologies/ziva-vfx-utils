@@ -38,8 +38,8 @@ class BaseNode(object):
             self.populate(args[0])
 
     def __str__(self):
-        if self.get_name():
-            name = self.get_name()
+        if self.name:
+            name = self.name
             output = ''
             output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
@@ -49,7 +49,7 @@ class BaseNode(object):
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)
 
     def __repr__(self):
-        output = '{}("{}")'.format(self.__class__.__name__, self.get_name())
+        output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
     def serialize(self):
@@ -98,8 +98,8 @@ class BaseNode(object):
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
-        self.set_name(selection[0])
-        self.set_type(mc.objectType(selection[0]))
+        self.name = selection[0]
+        self.type = mc.objectType(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
@@ -189,34 +189,20 @@ class BaseNode(object):
     def set_attr_key_value(self, attr, key, value):
         self._attrs[attr][key] = value
 
-    def get_name(self, long_name=False):
-        """
-        get name of node
+    @property
+    def long_name(self):
+        return self._name
 
-        Args:
-            long_name (bool): If True returns the long name of node.  Defaults to **False**
+    @property
+    def name(self):
+        return self._name.split('|')[-1]
 
-        Returns:
-            (str) of node name
-        """
-        if self._name:
-            if long_name:
-                return self._name
-            else:
-                return self._name.split('|')[-1]
-        else:
-            return None
+    @name.setter
+    def name(self, name):
+        self._name = mc.ls(name, long=True)[0]
 
-    def set_name(self, name):
-        """
-        Sets name of node
-
-        Args:
-            name (str): the name of node.
-        """
-        self._name = name
-
-    def get_type(self):
+    @property
+    def type(self):
         """
         get type of node
 
@@ -228,13 +214,9 @@ class BaseNode(object):
         except AttributeError:
             return None
 
-    def set_type(self, type_):
-        """
-        Sets type of node
+    @type.setter
+    def type(self, type_):
 
-        Args:
-            type_ (str): the type of node.
-        """
         self.TYPE = type_
 
     def get_map_meshes(self):
@@ -352,7 +334,7 @@ class BaseNode(object):
         Returns:
 
         """
-        name = self.get_name(long_name=False)
+        name = self.name
 
         attr_list = self.get_attr_list()
         if mc.objExists(name):
@@ -379,7 +361,7 @@ class BaseNode(object):
             name = mz.get_name_from_m_object(self.get_mobject())
 
         if not name:
-            name = self.get_name(long_name=long_name)
+            name = self.long_name
 
         return name
 
@@ -399,7 +381,7 @@ class BaseNode(object):
         """
         scene_name = self.get_scene_name()
 
-        type_ = self.get_type()
+        type_ = self.type
         node_attrs = self.get_attr_list()
         if attr_filter:
             if attr_filter.get(type_, None):
@@ -440,7 +422,7 @@ class BaseNode(object):
         map_objects = self.get_map_objects()
         if interp_maps == 'auto':
             for map_object in map_objects:
-                if not map_object.is_topologically_corrispoding():
+                if not map_object.is_topologically_corresponding():
                     interp_maps = True
 
         if interp_maps in [True, 'True', 'true']:

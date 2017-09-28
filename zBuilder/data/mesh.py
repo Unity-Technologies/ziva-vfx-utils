@@ -26,7 +26,7 @@ class Mesh(BaseComponent):
                 self.populate(mesh_name)
 
     def __str__(self):
-        name = self.get_name(long_name=True)
+        name = self.long_name
         poly = len(self.get_polygon_counts())
         vert = len(self.get_point_list())
         output = ''
@@ -47,8 +47,8 @@ class Mesh(BaseComponent):
         """
         connectivity = mz.get_mesh_connectivity(mesh_name)
 
-        self.set_name(mesh_name)
-        self.set_type('mesh')
+        self.name = mesh_name
+        self.type = 'mesh'
         self.set_polygon_counts(connectivity['polygonCounts'])
         self.set_polygon_connects(connectivity['polygonConnects'])
         self.set_point_list(connectivity['points'])
@@ -57,9 +57,9 @@ class Mesh(BaseComponent):
 
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
-        name = self.get_name(long_name=True)
-        newName = mz.replace_long_name(search, replace, name)
-        self.set_name(newName)
+        name = self.long_name
+        new_name = mz.replace_long_name(search, replace, name)
+        self.name = new_name
 
     def set_polygon_counts(self, pCountList):
         self._pCountList = pCountList
@@ -81,7 +81,7 @@ class Mesh(BaseComponent):
 
     def build(self):
         mesh = build_mesh(
-            self.get_name(),
+            self.name,
             self.get_polygon_counts(),
             self.get_polygon_connects(),
             self.get_point_list(),
@@ -90,24 +90,24 @@ class Mesh(BaseComponent):
 
     def mirror(self):
         # TODO faster mirroring
-        logger.info('Mirroring mesh: {}'.format(self.get_name()))
+        logger.info('Mirroring mesh: {}'.format(self.name))
         pl = self.get_point_list()
         tmp = []
         for item in pl:
             tmp.append([-item[0], item[1], item[2]])
         self.set_point_list(tmp)
 
-    def is_topologically_corrispoding(self):
+    def is_topologically_corresponding(self):
         """
         Compare a mesh in scene with one saved in this node.  Currently just
         checking if vert count is same.  Need to update this to a better method.
 
         Args:
 
-        Returns: True if topologically corrisponding
+        Returns: True if topologically corresponding
 
         """
-        cur_conn = mz.get_mesh_connectivity(self.get_name())
+        cur_conn = mz.get_mesh_connectivity(self.name)
 
         if len(cur_conn['points']) == len(self.get_point_list()):
             return True

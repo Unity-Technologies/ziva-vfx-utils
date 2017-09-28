@@ -13,7 +13,7 @@ class DeltaMushNode(DeformerBaseNode):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_name()
+        name = self.name
         if not mc.objExists(name):
             mc.select(self.get_association(), r=True)
             mc.deltaMush(name=name)

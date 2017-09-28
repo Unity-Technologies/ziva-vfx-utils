@@ -70,8 +70,8 @@ class TetNode(ZivaBaseNode):
                 else:
                     raise StandardError('{} does not exist in scene.  Check meshes.'.format(mesh))
         if name:
-            new_name = mc.rename(name, self.get_name())
-            self.set_mobject(new_name)
+            new_name = mc.rename(name, self.name)
+            self.mobject = new_name
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)

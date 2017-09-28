@@ -32,8 +32,8 @@ class LineOfActionNode(ZivaBaseNode):
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
-        self.set_name(selection[0])
-        self.set_type(mz.get_type(selection[0]))
+        self.name = selection[0]
+        self.type = mz.get_type(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
@@ -66,8 +66,8 @@ class LineOfActionNode(ZivaBaseNode):
                 mc.rename(clt, name)
 
             else:
-                self.set_mobject(name)
-                mc.rename(name, self.get_name())
+                self.mobject = name
+                mc.rename(name, self.name)
 
         else:
             mc.warning(association[

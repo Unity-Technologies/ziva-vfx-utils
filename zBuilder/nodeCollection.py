@@ -74,7 +74,7 @@ class NodeCollection(object):
         """
         tmp = {}
         for i, d in enumerate(self.get_nodes()):
-            t = d.get_type()
+            t = d.type
             if type_filter:
                 if type_filter == t:
                     if not t in tmp:
@@ -106,13 +106,14 @@ class NodeCollection(object):
 
         """
         type_ = data.TYPE
-        name = data.get_name(long_name=True)
+        name = data.long_name
         if not type_ in self.data:
             self.data[type_] = {}
 
         if not self.get_data_by_key_name(type_, name):
             self.data[type_][name] = data
 
+    # TODO make it a property
     def get_data(self):
         """
 
@@ -189,7 +190,7 @@ class NodeCollection(object):
             return self.__collection
         else:
             for i, node in enumerate(self.__collection):
-                if node.get_type() == type_filter:
+                if node.type == type_filter:
 
                     if name_filter:
                         if not isinstance(name_filter, (list, tuple)):

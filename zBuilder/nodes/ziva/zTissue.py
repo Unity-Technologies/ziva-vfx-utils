@@ -16,6 +16,7 @@ class TissueNode(ZivaBaseNode):
 
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
+    # TODO property and store zTissue instead of mesh for parents and childs
     def set_children_tissues(self, children):
         self._children_tissues = children
 
@@ -43,6 +44,7 @@ class TissueNode(ZivaBaseNode):
         else:
             return None
 
+
     # TODO super this, dont need duplicate code
     def populate(self, *args, **kwargs):
         """
@@ -54,8 +56,8 @@ class TissueNode(ZivaBaseNode):
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
-        self.set_name(selection[0])
-        self.set_type(mz.get_type(selection[0]))
+        self.name = selection[0]
+        self.type = mz.get_type(selection[0])
         self.set_attr_list(mz.build_attr_list(selection[0]))
         self.populate_attrs(selection[0])
         self.set_mobject(selection[0])
@@ -88,6 +90,7 @@ def apply_multiple(b_nodes, attr_filter=None, permissive=True,
     through them.  This function builds all the zBones at once.
 
     Args:
+        check_meshes:
         permissive (bool):
         b_nodes:
         attr_filter (obj):
