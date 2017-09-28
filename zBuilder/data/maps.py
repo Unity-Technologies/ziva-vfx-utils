@@ -97,7 +97,7 @@ class Map(BaseComponent):
         mesh_data = self._setup.get_data_by_key_name('mesh', mesh_name)
         return mesh_data
 
-    def is_topologically_corrispoding(self):
+    def is_topologically_corresponding(self):
         """
 
         Returns:
