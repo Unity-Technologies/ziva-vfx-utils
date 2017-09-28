@@ -553,17 +553,23 @@ def build_attr_list(selection, attr_filter=None):
     returns:
         list: list of attributes names
     """
-    exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
-               'vertexColor', 'target']
+    # exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
+    #          'vertexColor', 'target']
 
     tmps = mc.listAttr(selection, k=True)
     cb = mc.listAttr(selection, cb=True)
     if cb:
         tmps.extend(mc.listAttr(selection, cb=True))
     attrs = []
-    for attr in tmps:
-        if not attr.split('.')[0] in exclude:
-            attrs.append(attr)
+    if tmps:
+        for attr in tmps:
+            obj = '{}.{}'.format(selection, attr)
+            if mc.objExists(obj):
+                type_ = mc.getAttr(obj, type=True)
+                if not type_ == 'TdataCompound':
+                    attrs.append(attr)
+            # if not attr.split('.')[0] in exclude:
+            #    attrs.append(attr)
 
     if attr_filter:
         # attrs = list(set(attrs).intersection(attr_filter))
@@ -584,10 +590,14 @@ def build_attr_key_values(selection, attr_list):
     """
     attr_dict = {}
     for attr in attr_list:
-        attr_dict[attr] = {}
-        attr_dict[attr]['type'] = mc.getAttr(selection + '.' + attr, type=True)
-        attr_dict[attr]['value'] = mc.getAttr(selection + '.' + attr)
-        attr_dict[attr]['locked'] = mc.getAttr(selection + '.' + attr, l=True)
+        obj = '{}.{}'.format(selection, attr)
+        if mc.objExists(obj):
+            type_ = mc.getAttr(obj, type=True)
+            if not type_ == 'TdataCompound':
+                attr_dict[attr] = {}
+                attr_dict[attr]['type'] = type_
+                attr_dict[attr]['value'] = mc.getAttr(obj)
+                attr_dict[attr]['locked'] = mc.getAttr(obj, lock=True)
 
     return attr_dict
 
