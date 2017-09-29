@@ -28,6 +28,12 @@ class NodeCollection(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
+    def __iter__(self):
+        return iter(self.__collection)
+
+    def __len__(self):
+        return len(self.__collection)
+
     def print_(self, type_filter=None, name_filter=None, component_data=True):
 
         """

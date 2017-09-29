@@ -37,6 +37,16 @@ class BaseNode(object):
         if args:
             self.populate(args[0])
 
+    # def __iter__(self):
+    #     return self
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __ne__(self, other):
+        """Define a non-equality test"""
+        return not self.__eq__(other)
+
     def __str__(self):
         if self.name:
             name = self.name
