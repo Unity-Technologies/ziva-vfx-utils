@@ -3,9 +3,7 @@ import logging
 import maya.cmds as mc
 import maya.mel as mm
 
-import zBuilder.data as dta
-import zBuilder.data.mesh as msh
-import zBuilder.nodes as nds
+import zBuilder.zMaya as mz
 from zBuilder.main import Builder
 
 logger = logging.getLogger(__name__)
@@ -87,6 +85,108 @@ class ZivaSetup(Builder):
                     b_node = self.node_factory(node)
                     self.add_node(b_node)
 
+        self.stats()
+
+    @Builder.time_this
+    def retrieve_from_scene_selection(self, *args, **kwargs):
+        """
+        Gets data based on selection
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                af = {'zSolver':['substeps']}
+            connections (bool): Gets the ziva nodes connected to selection as well. Defaults to True
+            solver (bool): Gets solver data.  Defaults to True
+            bones (bool): Gets bone data.  Defaults to True
+            tissue (bool): Gets tissue data.  Defaults to True
+            attachments (bool): Gets attachments data.  Defaults to True
+            materials (bool): Gets materials data.  Defaults to True
+            fibers (bool): Gets fibers data.  Defaults to True
+            cloth (bool): Gets cloth data.  Defaults to True
+            lineOfAction (bool): Gets line of action data.  Defaults to True
+            embedder (bool): Gets embedder data.  Defaults to True
+            get_mesh (bool): get mesh info. Defaults to True
+            get_maps (bool): get map info. Defaults to True
+        """
+
+        # get current selection to re-apply
+        sel = mc.ls(sl=True)
+
+        # args
+        selection = None
+        if args:
+            selection = mc.ls(args[0], l=True)
+        else:
+            selection = mc.ls(sl=True, l=True)
+
+        print selection,'dfddddddddd'
+        # kwargs
+        connections = kwargs.get('connections', True)
+        attr_filter = kwargs.get('attr_filter', None)
+        solver = kwargs.get('solver', True)
+        bones = kwargs.get('bones', True)
+        tissues = kwargs.get('tissues', True)
+        attachments = kwargs.get('attachments', True)
+        materials = kwargs.get('materials', True)
+        fibers = kwargs.get('fibers', True)
+        cloth = kwargs.get('cloth', True)
+        lineOfAction = kwargs.get('lineOfAction', True)
+        embedder = kwargs.get('embedder', True)
+        get_mesh = kwargs.get('get_mesh', True)
+        get_maps = kwargs.get('get_map_names', True)
+
+        print '\ngetting ziva......'
+
+        if not attr_filter:
+            attr_filter = {}
+
+        nodes = list()
+        if connections:
+            if solver:
+                logger.info('getting solver')
+                sol = mz.get_zSolver(selection[0])
+                if sol:
+                    nodes.extend(sol)
+                    nodes.extend(mz.get_zSolverTransform(selection[0]))
+            if bones:
+                logger.info('getting bones')
+                nodes.extend(mz.get_zBones(selection))
+            if tissues:
+                logger.info('getting tissues')
+                nodes.extend(mz.get_zTissues(selection))
+                nodes.extend(mz.get_zTets(selection))
+            if attachments:
+                logger.info('getting attachments')
+                nodes.extend(mz.get_zAttachments(selection))
+            if materials:
+                logger.info('getting materials')
+                nodes.extend(mz.get_zMaterials(selection))
+            if fibers:
+                logger.info('getting fibers')
+                nodes.extend(mz.get_zFibers(selection))
+            if cloth:
+                logger.info('getting cloth')
+                nodes.extend(mz.get_zCloth(selection))
+            # if lineOfAction:
+            #     logger.info('getting line of actions.')
+            #     for fiber in mz.get_zFibers(selection):
+            #         nodes.append(mz.get_fiber_lineofaction(fiber))
+            # if embedder:
+            #     logger.info('getting embedder')
+            #     self.__retrieve_embedded_from_selection(selection,
+            #                                             attr_filter=attr_filter)
+        else:
+            nodes = selection
+
+        if nodes:
+            for node in nodes:
+                b_node = self.node_factory(node)
+                self.add_node(b_node)
+
+        mc.select(sel, r=True)
         self.stats()
 
     @Builder.time_this
