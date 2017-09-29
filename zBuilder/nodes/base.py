@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class BaseNode(object):
     TYPE = None
     MAP_LIST = []
-    SEARCH_EXCLUDE = ['_class', '_attrs', '_attr_list']
+    SEARCH_EXCLUDE = ['_class', '_attrs']
     EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
@@ -98,7 +98,7 @@ class BaseNode(object):
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
 
-        self.set_attr_list(self._attrs.keys())
+        # self.set_attr_list(self._attrs.keys())
 
     def populate(self, *args, **kwargs):
         """
@@ -110,11 +110,10 @@ class BaseNode(object):
 
         self.name = selection[0]
         self.type = mc.objectType(selection[0])
-        attrs = mz.build_attr_list(selection[0])
+        attr_list = mz.build_attr_list(selection[0])
         if self.EXTEND_ATTR_LIST:
-            attrs.extend(self.EXTEND_ATTR_LIST)
-        self.set_attr_list(attrs)
-        self.populate_attrs(selection[0])
+            attr_list.extend(self.EXTEND_ATTR_LIST)
+        self.populate_attrs(selection[0], attr_list)
         self.mobject = selection[0]
 
     def apply(self, *args, **kwargs):
@@ -180,7 +179,6 @@ class BaseNode(object):
         """
         self._attrs[attr]['value'] = value
 
-    # todo dont think this is needed
     def get_attr_list(self):
         """
         gets list of attribute names stored with node
@@ -188,11 +186,7 @@ class BaseNode(object):
         Returns:
             [] of attribute names
         """
-        return self._attr_list
-
-    def set_attr_list(self, attrs):
-
-        self._attr_list = attrs
+        return self._attrs.keys()
 
     def get_attr_key(self, key):
         return self._attrs.get(key)
@@ -256,15 +250,6 @@ class BaseNode(object):
             meshes.append(self._setup.get_data_by_key_name('mesh', mesh_name))
         return meshes
 
-    # def mirror(self):
-    #     """
-    #
-    #     Returns:
-    #
-    #     """
-    #     for mesh in self.get_mesh_objects():
-    #         mesh.mirror()
-
     def get_map_objects(self):
         """
 
@@ -296,16 +281,16 @@ class BaseNode(object):
         """
         self._maps = maps
 
-    def populate_attrs(self, item):
+    def populate_attrs(self, item, attr_list):
         """
 
         Args:
             item:
+            attr_list:
 
         Returns:
 
         """
-        attr_list = self.get_attr_list()
         attrs = mz.build_attr_key_values(item, attr_list)
         self.set_attrs(attrs)
 
@@ -326,39 +311,6 @@ class BaseNode(object):
     @property
     def long_association(self):
         return self._association
-    #
-    # def get_association(self, long_name=False):
-    #     """
-    #
-    #     Args:
-    #         long_name:
-    #
-    #     Returns:
-    #
-    #     """
-    #     if not long_name:
-    #         tmp = []
-    #         for item in self._association:
-    #             tmp.append(item.split('|')[-1])
-    #         return tmp
-    #     else:
-    #         return self._association
-    #
-    # # TODO get long name under hood and check for duplicate short names
-    # def set_association(self, association):
-    #     """
-    #
-    #     Args:
-    #         association:
-    #
-    #     Returns:
-    #
-    #     """
-    #
-    #     if isinstance(association, str):
-    #         self._association = [association]
-    #     else:
-    #         self._association = association
 
     def compare(self):
         """

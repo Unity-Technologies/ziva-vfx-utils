@@ -44,26 +44,8 @@ class TissueNode(ZivaBaseNode):
         else:
             return None
 
-
-    # TODO super this, dont need duplicate code
     def populate(self, *args, **kwargs):
-        """
-
-        Returns:
-            object:
-        """
-
-        # logger.info('retrieving {}'.format(args))
-        selection = mz.parse_args_for_selection(args)
-
-        self.name = selection[0]
-        self.type = mz.get_type(selection[0])
-        self.set_attr_list(mz.build_attr_list(selection[0]))
-        self.populate_attrs(selection[0])
-        self.mobject = selection[0]
-
-        mesh = mz.get_association(selection[0])
-        self.association = mesh
+        super(TissueNode, self).populate(*args, **kwargs)
 
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))

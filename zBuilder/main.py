@@ -37,13 +37,14 @@ class Builder(IO, NodeCollection):
         """
 
         Args:
-            *args:
+            args:
+            type:
 
         Returns:
 
         """
-
         type_ = kwargs.get('type', True)
+
         for name, obj in inspect.getmembers(sys.modules['zBuilder.data']):
             if inspect.isclass(obj):
                 if type_ == obj.TYPE:
