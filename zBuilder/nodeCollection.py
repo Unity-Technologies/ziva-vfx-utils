@@ -21,7 +21,7 @@ class NodeCollection(object):
         import zBuilder
 
         self.__collection = list()
-        self.data = dict()
+        self._data = dict()
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -96,11 +96,11 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-        data_types = self.get_data().keys()
+        data_types = self.data.keys()
         output = 'component data: '
         for data_type in data_types:
             amount = len(self.get_data_by_key(data_type))
-            output += '{} {}   '.format(data_type,amount)
+            output += '{} {}   '.format(data_type, amount)
 
         logger.info(output)
 
@@ -119,22 +119,23 @@ class NodeCollection(object):
         if not self.get_data_by_key_name(type_, name):
             self.data[type_][name] = data
 
-    # TODO make it a property
-    def get_data(self):
+    @property
+    def data(self):
         """
 
         Returns:
 
         """
-        return self.data
+        return self._data
 
-    def set_data(self, data):
+    @data.setter
+    def data(self, data):
         """
 
         Returns:
 
         """
-        self.data = data
+        self._data = data
 
     def get_data_by_key_name(self, key, name):
         """
@@ -185,23 +186,31 @@ class NodeCollection(object):
         get nodes in data object
 
         Args:
-            type_filter (str): filter by node type.  Defaults to **None**
+            type_filter (list): filter by node type.  Defaults to **None**
             name_filter (list): filter by node name.  Looks for association.  Defaults to **None**
 
         Returns:
             [] of nodes
         """
-        items = list()
-        if not type_filter:
-            items = self.__collection
-        else:
-            items = [x for x in self if x.type == type_filter]
+        if not isinstance(type_filter, list):
+            type_filter = [type_filter]
 
-        if name_filter:
-            nf_set = set(name_filter)
-            items = [item for item in items if not nf_set.isdisjoint(item.association)]
+        types = set(type_filter or [])
+        names = set(name_filter or [])
+        keep_type = lambda item : type_filter is None or item.type in types
+        keep_name = lambda item : name_filter is None or not names.isdisjoint(item.association)
+        return [item for item in self if keep_name(item) and keep_type(item)]
 
-        return items
+        # if not type_filter:
+        #     items = self.__collection
+        # else:
+        #     items = [x for x in self if x.type == type_filter]
+        #
+        # if name_filter:
+        #     nf_set = set(name_filter)
+        #     items = [item for item in items if not nf_set.isdisjoint(item.association)]
+
+        # return items
 
     # def get_node_by_name(self, name):
     #     """
@@ -241,8 +250,9 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        for node in self.get_nodes():
-            node.string_replace(search, replace)
+        [node.string_replace(search, replace) for node in self]
+        # for node in self.get_nodes():
+        #    node.string_replace(search, replace)
 
         # deal with the data search and replacing
         for key in self.data:

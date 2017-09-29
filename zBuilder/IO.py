@@ -78,7 +78,7 @@ class IO(object):
             tmp.append(self.__wrap_data(self.get_nodes(), 'node_data'))
         if component_data:
             logger.info("writing component_data")
-            tmp.append(self.__wrap_data(self.get_data(), 'component_data'))
+            tmp.append(self.__wrap_data(self.data, 'component_data'))
         logger.info("writing info")
         tmp.append(self.__wrap_data(self.info, 'info'))
 
@@ -95,7 +95,7 @@ class IO(object):
                 self.set_nodes(d['data'])
                 logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
-                self.set_data(d['data'])
+                self.data = d['data']
                 logger.info("reading component_data. ")
             if d['d_type'] == 'info':
                 logger.info("reading info")
