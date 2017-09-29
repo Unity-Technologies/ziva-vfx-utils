@@ -26,7 +26,10 @@ class BaseComponent(object):
 
     @name.setter
     def name(self, name):
-        self._name = mc.ls(name, long=True)[0]
+        try:
+            self._name = mc.ls(name, long=True)[0]
+        except IndexError:
+            self._name = name
 
     @property
     def type(self):
