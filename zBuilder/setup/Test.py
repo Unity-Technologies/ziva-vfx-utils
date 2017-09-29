@@ -28,9 +28,9 @@ class TestSetup(Builder):
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
                    'blendShape']
         tmp = list()
-        history = mc.listHistory(selection, f=True, bf=True)
-        history.extend(mc.listHistory(selection, bf=True))
-        history = list(set(history))
+        history = mc.listHistory(selection, f=True)
+        history.extend(mc.listHistory(selection))
+        history = list(set(history))[::-1]
 
         for hist in history:
             if mc.objectType(hist) in acquire:

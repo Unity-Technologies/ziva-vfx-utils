@@ -13,11 +13,13 @@ class DeltaMushNode(DeformerBaseNode):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.name
+        name = self.get_scene_name()
         if not mc.objExists(name):
             mc.select(self.association, r=True)
-            mc.deltaMush(name=name)
+            delta_mush = mc.deltaMush(name=name)
+            self.mobject = delta_mush
+        else:
+            self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
-
