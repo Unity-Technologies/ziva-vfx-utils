@@ -17,6 +17,7 @@ class DeformerBaseNode(BaseNode):
         raise NotImplementedError
 
     def populate(self, *args, **kwargs):
+        super(DeformerBaseNode, self).populate(*args, **kwargs)
         """
 
         Returns:
@@ -26,13 +27,7 @@ class DeformerBaseNode(BaseNode):
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
-        self.name = selection[0]
-        self.type = mz.get_type(selection[0])
-        self.set_attr_list(mz.build_attr_list(selection[0]))
-        self.populate_attrs(selection[0])
-        self.mobject = selection[0]
-
-        self.association = get_association(selection[0])
+        self.association = self.get_meshes(selection[0])
 
         map_names = []
         for map_ in self.MAP_LIST:
@@ -53,11 +48,11 @@ class DeformerBaseNode(BaseNode):
                                                                      type='mesh')
                     self._setup.add_data_object(mesh_data_object)
 
-
-def get_association(node):
-    meshes = mc.deformer(node, query=True, g=True)
-    tmp = list()
-    for mesh in meshes:
-        parent = mc.listRelatives(mesh, p=True)
-        tmp.extend(mc.ls(parent, long=True))
-    return tmp
+    @staticmethod
+    def get_meshes(node):
+        meshes = mc.deformer(node, query=True, g=True)
+        tmp = list()
+        for mesh in meshes:
+            parent = mc.listRelatives(mesh, p=True)
+            tmp.extend(mc.ls(parent, long=True))
+        return tmp

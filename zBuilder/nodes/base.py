@@ -13,6 +13,7 @@ class BaseNode(object):
     TYPE = None
     MAP_LIST = []
     SEARCH_EXCLUDE = ['_class', '_attrs', '_attr_list']
+    EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
         """
@@ -105,12 +106,14 @@ class BaseNode(object):
         Returns:
             object:
         """
-        # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.name = selection[0]
         self.type = mc.objectType(selection[0])
-        self.set_attr_list(mz.build_attr_list(selection[0]))
+        attrs = mz.build_attr_list(selection[0])
+        if self.EXTEND_ATTR_LIST:
+            attrs.extend(self.EXTEND_ATTR_LIST)
+        self.set_attr_list(attrs)
         self.populate_attrs(selection[0])
         self.mobject = selection[0]
 

@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class ZivaBaseNode(BaseNode):
+    EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
@@ -16,20 +17,13 @@ class ZivaBaseNode(BaseNode):
         pass
 
     def populate(self, *args, **kwargs):
+        super(ZivaBaseNode, self).populate(*args, **kwargs)
         """
 
         Returns:
             object:
         """
-
-        # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
-
-        self.name = selection[0]
-        self.type = mz.get_type(selection[0])
-        self.set_attr_list(mz.build_attr_list(selection[0]))
-        self.populate_attrs(selection[0])
-        self.mobject = selection[0]
 
         mesh = mz.get_association(selection[0])
         self.association = mesh
