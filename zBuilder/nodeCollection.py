@@ -186,26 +186,21 @@ class NodeCollection(object):
 
         Args:
             type_filter (str): filter by node type.  Defaults to **None**
-            name_filter (str): filter by node name.  Defaults to **None**
+            name_filter (list): filter by node name.  Looks for association.  Defaults to **None**
 
         Returns:
             [] of nodes
         """
-        items = []
+        items = list()
         if not type_filter:
-            return self.__collection
+            items = self.__collection
         else:
-            for i, node in enumerate(self.__collection):
-                if node.type == type_filter:
+            items = [x for x in self if x.type == type_filter]
 
-                    if name_filter:
-                        if not isinstance(name_filter, (list, tuple)):
-                            name_filter = name_filter.split(' ')
-                        if not set(name_filter).isdisjoint(
-                                node.get_association()):
-                            items.append(node)
-                    else:
-                        items.append(node)
+        if name_filter:
+            nf_set = set(name_filter)
+            items = [item for item in items if not nf_set.isdisjoint(item.association)]
+
         return items
 
     # def get_node_by_name(self, name):
