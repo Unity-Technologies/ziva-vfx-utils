@@ -29,8 +29,8 @@ class Map(BaseComponent):
 
     def __str__(self):
         name = self.name
-        if self.get_value():
-            length = len(self.get_value())
+        if self.value:
+            length = len(self.value)
         else:
             length = 'null'
         output = ''
@@ -55,9 +55,9 @@ class Map(BaseComponent):
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
-        self.set_value(weight_value)
+        self.value = weight_value
 
-        logger.info('Retrieving Data : {}'.format(self))
+        # logger.info('Retrieving Data : {}'.format(self))
 
     def set_mesh(self, mesh):
         """
@@ -94,7 +94,8 @@ class Map(BaseComponent):
 
         """
         mesh_name = self.get_mesh(long_name=True)
-        mesh_data = self._setup.get_data_by_key_name('mesh', mesh_name)
+        mesh_data = self._setup.get_data(type_filter='mesh',
+                                         name_filter=mesh_name)
         return mesh_data
 
     def is_topologically_corresponding(self):
@@ -112,11 +113,21 @@ class Map(BaseComponent):
         created_mesh = mesh_data.build()
         weight_list = interpolate_values(created_mesh,
                                          mesh_data.name,
-                                         self.get_value())
-        self.set_value(weight_list)
+                                         self.value)
+        self.value = weight_list
         mc.delete(created_mesh)
 
-    def set_value(self, value):
+    @property
+    def value(self):
+        """
+
+        Returns:
+
+        """
+        return self._value
+
+    @value.setter
+    def value(self, value):
         """
 
         Args:
@@ -126,14 +137,6 @@ class Map(BaseComponent):
 
         """
         self._value = value
-
-    def get_value(self):
-        """
-
-        Returns:
-
-        """
-        return self._value
 
     # TODO remove this and do it in __dict__
     def string_replace(self, search, replace):

@@ -82,8 +82,9 @@ class FiberNode(ZivaBaseNode):
 
         """
         map_name = self.get_map_names()[1]
-        map_object = self._setup.get_data_by_key_name('map', map_name)
-        values = map_object.get_value()
+        map_object = self._setup.get_data(type_filter='map',
+                                          name_filter=map_name)
+        values = map_object.value
 
         upper = False
         lower = False

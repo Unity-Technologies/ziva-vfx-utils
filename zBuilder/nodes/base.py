@@ -435,7 +435,7 @@ class BaseNode(object):
         for map_ in maps:
             map_data = self._setup.get_data_by_key_name('map', map_)
             self.interpolate_maps(interp_maps)
-            weight_list = map_data.get_value()
+            weight_list = map_data.value
 
             map_ = map_.replace(original_name, scene_name)
 
