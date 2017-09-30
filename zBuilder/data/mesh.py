@@ -53,7 +53,7 @@ class Mesh(BaseComponent):
         self.set_polygon_connects(connectivity['polygonConnects'])
         self.set_point_list(connectivity['points'])
 
-        logger.info('Retrieving Data : {}'.format(self))
+        # logger.info('Retrieving Data : {}'.format(self))
 
     def string_replace(self, search, replace):
         # name replace----------------------------------------------------------
@@ -91,9 +91,8 @@ class Mesh(BaseComponent):
     def mirror(self):
         # TODO faster mirroring
         logger.info('Mirroring mesh: {}'.format(self.name))
-        pl = self.get_point_list()
         tmp = []
-        for item in pl:
+        for item in self.get_point_list():
             tmp.append([-item[0], item[1], item[2]])
         self.set_point_list(tmp)
 
