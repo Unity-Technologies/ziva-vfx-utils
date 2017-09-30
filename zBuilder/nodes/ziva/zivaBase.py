@@ -41,10 +41,11 @@ class ZivaBaseNode(BaseNode):
                 map_data_object = self._setup.component_factory(map_name,
                                                                 mesh_name,
                                                                 type='map')
-                self._setup.add_data_object(map_data_object)
+                self._setup.add_data(map_data_object)
 
-                if not self._setup.get_data_by_key_name('mesh', mesh_name):
+                if not self._setup.get_data(type_filter='mesh',
+                                            name_filter=mesh_name):
                     mesh_data_object = self._setup.component_factory(mesh_name,
                                                                      type='mesh'
                                                                     )
-                    self._setup.add_data_object(mesh_data_object)
+                    self._setup.add_data(mesh_data_object)

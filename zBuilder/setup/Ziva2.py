@@ -146,29 +146,22 @@ class ZivaSetup(Builder):
         nodes = list()
         if connections:
             if solver:
-                logger.info('getting solver')
                 sol = mz.get_zSolver(selection[0])
                 if sol:
                     nodes.extend(sol)
                     nodes.extend(mz.get_zSolverTransform(selection[0]))
             if bones:
-                logger.info('getting bones')
                 nodes.extend(mz.get_zBones(selection))
             if tissues:
-                logger.info('getting tissues')
                 nodes.extend(mz.get_zTissues(selection))
                 nodes.extend(mz.get_zTets(selection))
             if attachments:
-                logger.info('getting attachments')
                 nodes.extend(mz.get_zAttachments(selection))
             if materials:
-                logger.info('getting materials')
                 nodes.extend(mz.get_zMaterials(selection))
             if fibers:
-                logger.info('getting fibers')
                 nodes.extend(mz.get_zFibers(selection))
             if cloth:
-                logger.info('getting cloth')
                 nodes.extend(mz.get_zCloth(selection))
             # if lineOfAction:
             #     logger.info('getting line of actions.')
@@ -207,7 +200,7 @@ class ZivaSetup(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            meshes = self.get_data_by_key('mesh')
+            meshes = self.get_data(type_filter='mesh')
             for mesh in meshes:
                 meshes[mesh].mirror()
                 

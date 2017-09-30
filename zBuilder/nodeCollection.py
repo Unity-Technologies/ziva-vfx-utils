@@ -21,7 +21,7 @@ class NodeCollection(object):
         import zBuilder
 
         self.__collection = list()
-        self._data = dict()
+        self._data = list()
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -79,7 +79,8 @@ class NodeCollection(object):
             type_filter (str): filter by node type.  Defaults to None
         """
         tmp = {}
-        for i, d in enumerate(self.get_nodes()):
+        for i, d in enumerate(self):
+
             t = d.type
             if type_filter:
                 if type_filter == t:
@@ -96,28 +97,31 @@ class NodeCollection(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-        data_types = self.data.keys()
+        data_types = set([item.type for item in self.data])
+
         output = 'component data: '
         for data_type in data_types:
-            amount = len(self.get_data_by_key(data_type))
+            amount = len([x for x in self.data if x.type == data_type])
             output += '{} {}   '.format(data_type, amount)
 
         logger.info(output)
 
-    def add_data_object(self, data):
+    def add_data(self, data):
         """
         appends a mesh to the mesh list
 
         Args:
 
         """
-        type_ = data.TYPE
-        name = data.long_name
-        if not type_ in self.data:
-            self.data[type_] = {}
+        # type_ = data.TYPE
+        # name = data.long_name
+        # if not type_ in self.data:
+        #     self.data[type_] = {}
+        #
+        # if not self.get_data_by_key_name(type_, name):
+        #     self.data[type_][name] = data
 
-        if not self.get_data_by_key_name(type_, name):
-            self.data[type_][name] = data
+        self._data.append(data)
 
     @property
     def data(self):
@@ -137,40 +141,42 @@ class NodeCollection(object):
         """
         self._data = data
 
-    def get_data_by_key_name(self, key, name):
-        """
-        Gets data given 'key'
+    # def get_data_by_key_name(self, key, name):
+    #     """
+    #     Gets data given 'key'
+    #
+    #     Args:
+    #         key (str): the key to get data from.
+    #         name (str): name of the data.
+    #
+    #     Returns:
+    #         obj: Object of data.
+    #
+    #     Example:
+    #
+    #         >>> get_data_by_key_name('mesh','l_bicepMuscle')
+    #     """
+    #     # print 'AAA', self.get_data(type_filter=key, name_filter=name)
+    #     return self.get_data(type_filter=key, name_filter=name)
+    #     # if self.data.get(key):
+    #     #     return self.data[key].get(name, None)
+    #     # else:
+    #     #     return None
 
-        Args:
-            key (str): the key to get data from.
-            name (str): name of the data.
-
-        Returns:
-            obj: Object of data.
-
-        Example:
-            
-            >>> get_data_by_key_name('mesh','l_bicepMuscle')
-        """
-        if self.data.get(key):
-            return self.data[key].get(name, None)
-        else:
-            return None
-
-    def get_data_by_key(self, key):
-        """
-        Gets all data for given 'key'
-
-        args:
-            key (str): the key to get data from
-
-        returns:
-            list: of data objs
-
-        Example:
-           get_data_by_key('mesh')
-        """
-        return self.data.get(key, None)
+    # def get_data_by_key(self, key):
+    #     """
+    #     Gets all data for given 'key'
+    #
+    #     args:
+    #         key (str): the key to get data from
+    #
+    #     returns:
+    #         list: of data objs
+    #
+    #     Example:
+    #        get_data_by_key('mesh')
+    #     """
+    #     return self.data.get(key, None)
 
     def add_node(self, node):
         """
@@ -181,6 +187,35 @@ class NodeCollection(object):
         """
         self.__collection.append(node)
 
+    # todo type and name filter need to accpet strings or lists
+    def get_data(self, type_filter=None, name_filter=None):
+        """
+        get nodes in data object
+
+        Args:
+            type_filter (list): filter by node type.  Defaults to **None**
+            name_filter (list): filter by node name.  Looks for association.  Defaults to **None**
+
+        Returns:
+            [] of nodes
+        """
+
+        #if not isinstance(name_filter, list):
+        #    name_filter = [name_filter]
+
+        if not type_filter:
+            items = self.data
+        else:
+            items = [x for x in self.data if x.type == type_filter]
+            # for item in items:
+            #    print item.long_name, name_filter
+        if name_filter:
+
+            items = [item for item in items if item.long_name == name_filter]
+
+        return items
+
+    # todo type and name filter need to accpet strings or lists
     def get_nodes(self, type_filter=None, name_filter=None):
         """
         get nodes in data object
@@ -192,25 +227,25 @@ class NodeCollection(object):
         Returns:
             [] of nodes
         """
-        if not isinstance(type_filter, list):
-            type_filter = [type_filter]
-
-        types = set(type_filter or [])
-        names = set(name_filter or [])
-        keep_type = lambda item : type_filter is None or item.type in types
-        keep_name = lambda item : name_filter is None or not names.isdisjoint(item.association)
-        return [item for item in self if keep_name(item) and keep_type(item)]
-
-        # if not type_filter:
-        #     items = self.__collection
-        # else:
-        #     items = [x for x in self if x.type == type_filter]
+        # if not isinstance(type_filter, list):
+        #     type_filter = [type_filter]
         #
-        # if name_filter:
-        #     nf_set = set(name_filter)
-        #     items = [item for item in items if not nf_set.isdisjoint(item.association)]
+        # types = set(type_filter or [])
+        # names = set(name_filter or [])
+        # keep_type = lambda item : type_filter is None or item.type in types
+        # keep_name = lambda item : name_filter is None or not names.isdisjoint(item.association)
+        # return [item for item in self if keep_name(item) and keep_type(item)]
 
-        # return items
+        if not type_filter:
+            items = self.__collection
+        else:
+            items = [x for x in self if x.type == type_filter]
+
+        if name_filter:
+            nf_set = set(name_filter)
+            items = [item for item in items if not nf_set.isdisjoint(item.association)]
+
+        return items
 
     # def get_node_by_name(self, name):
     #     """
