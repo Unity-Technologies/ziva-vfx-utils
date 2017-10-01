@@ -21,7 +21,6 @@ class BaseNode(object):
         Returns:
             object:
         """
-        self._attr_list = []
         self._name = None
         self._attrs = {}
         self._maps = []
