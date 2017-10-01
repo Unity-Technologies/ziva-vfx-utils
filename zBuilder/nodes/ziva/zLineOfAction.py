@@ -16,31 +16,18 @@ class LineOfActionNode(ZivaBaseNode):
 
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
-    def set_fiber(self, fiber):
-        self._zFiber = fiber
-
-    def get_fiber(self, long_name=False):
+    @property
+    def fiber(self):
         return self._zFiber
 
+    @fiber.setter
+    def fiber(self, fiber):
+        self._zFiber = fiber
+
     def populate(self, *args, **kwargs):
-        """
+        super(LineOfActionNode, self).populate(*args, **kwargs)
 
-        Returns:
-            object:
-        """
-
-        # logger.info('retrieving {}'.format(args))
-        selection = mz.parse_args_for_selection(args)
-
-        self.name = selection[0]
-        self.type = mz.get_type(selection[0])
-        self.set_attr_list(mz.build_attr_list(selection[0]))
-        self.populate_attrs(selection[0])
-        self.mobject = selection[0]
-
-        mesh = mz.get_association(selection[0])
-        self.association = mesh
-        self.set_fiber(mz.get_lineOfAction_fiber(self.get_scene_name()))
+        self.fiber = mz.get_lineOfAction_fiber(self.get_scene_name())
 
     def apply(self, *args, **kwargs):
 
@@ -56,7 +43,7 @@ class LineOfActionNode(ZivaBaseNode):
         attr_filter = kwargs.get('attr_filter', None)
         name = self.get_scene_name()
         association = self.association
-        fiber = self.get_fiber()
+        fiber = self.fiber
         if mc.objExists(association[0]) and mc.objExists(fiber):
             if not mc.objExists(name):
                 mc.select(fiber, association[0])
