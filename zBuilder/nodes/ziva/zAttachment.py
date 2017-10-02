@@ -46,8 +46,8 @@ class AttachmentNode(ZivaBaseNode):
                                                      name_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
-                data_s = data_attachment.get_association()[0]
-                data_t = data_attachment.get_association()[1]
+                data_s = data_attachment.association[0]
+                data_t = data_attachment.association[1]
                 if data_s == source_mesh and data_t == target_mesh:
                     data.append(data_attachment)
 
@@ -91,7 +91,7 @@ class AttachmentNode(ZivaBaseNode):
         """
         for map_name in self.get_map_names():
             map_object = self._setup.get_data(type_filter='map',
-                                              name_filter=map_name)
+                                              name_filter=map_name)[0]
             values = map_object.value
 
             if all(v == 0 for v in values):

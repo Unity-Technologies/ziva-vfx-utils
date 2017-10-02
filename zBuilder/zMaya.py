@@ -655,7 +655,7 @@ def cull_creation_nodes(b_nodes, permissive=True):
     # check meshes for existing zBones or zTissue
     for i, b_node in enumerate(b_nodes):
         type_ = b_node.type
-        mesh = b_node.get_association()[0]
+        mesh = b_node.association[0]
         name = b_node.name
 
         if mc.objExists(mesh):

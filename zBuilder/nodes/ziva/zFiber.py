@@ -29,7 +29,9 @@ class FiberNode(ZivaBaseNode):
 
     def apply(self, *args, **kwargs):
 
-        attr_filter = kwargs.get('attr_filter', None)
+        attr_filter = kwargs.get('attr_filter', list())
+        name_filter = kwargs.get('name_filter', list())
+        permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.get_scene_name()

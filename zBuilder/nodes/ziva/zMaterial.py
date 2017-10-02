@@ -16,7 +16,9 @@ class MaterialNode(ZivaBaseNode):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
-        attr_filter = kwargs.get('attr_filter', None)
+        attr_filter = kwargs.get('attr_filter', list())
+        name_filter = kwargs.get('name_filter', list())
+        permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         # - check for existing materials on associated mesh for each material

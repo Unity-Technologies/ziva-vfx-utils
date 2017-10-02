@@ -206,7 +206,7 @@ class BaseNode(object):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.append(self._setup.get_data(type_filter='mesh',
+            meshes.extend(self._setup.get_data(type_filter='mesh',
                                                name_filter=mesh_name))
         return meshes
 
@@ -218,7 +218,7 @@ class BaseNode(object):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.append(self._setup.get_data(type_filter='map',
+            maps_.extend(self._setup.get_data(type_filter='map',
                                               name_filter=map_name))
         return maps_
 
@@ -356,6 +356,7 @@ class BaseNode(object):
         Returns:
 
         """
+
         map_objects = self.get_map_objects()
         if interp_maps == 'auto':
             for map_object in map_objects:
@@ -387,7 +388,7 @@ class BaseNode(object):
 
         for map_ in maps:
             map_data = self._setup.get_data(type_filter='map',
-                                            name_filter=map_)
+                                            name_filter=map_)[0]
             self.interpolate_maps(interp_maps)
             weight_list = map_data.value
 

@@ -104,7 +104,7 @@ class Map(BaseComponent):
         Returns:
 
         """
-        mesh_data = self.get_mesh_data()
+        mesh_data = self.get_mesh_data()[0]
         return mesh_data.is_topologically_corresponding()
 
     def interpolate(self):

@@ -15,8 +15,8 @@ class BoneNode(ZivaBaseNode):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
-        attr_filter = kwargs.get('attr_filter', None)
-        name_filter = kwargs.get('name_filter', None)
+        attr_filter = kwargs.get('attr_filter', list())
+        name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
@@ -26,6 +26,7 @@ class BoneNode(ZivaBaseNode):
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.
         # This feels kinda sloppy to me.
+
         if self == b_nodes[0]:
             apply_multiple(b_nodes, attr_filter=attr_filter,
                            permissive=permissive, check_meshes=check_meshes)

@@ -210,76 +210,76 @@ class ZivaSetup(Builder):
         # get stored solver enable value to apply later. The solver comes in OFF
         solver_transform = self.get_nodes(type_filter='zSolverTransform')[0]
         sn = solver_transform.name
-        solver_value = solver_transform.attr['enable']['value']
+        solver_value = solver_transform.attrs['enable']['value']
 
         # generate list of node types to build
         node_types_to_apply = list()
         if solver:
-            logger.info('Building solver.')
-            for node_type in ['zSolver', 'zSolverTransform']:
-                for b_node in self.get_nodes(type_filter=node_type):
-                    b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                                 check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zSolver')
-            # node_types_to_apply.append('zSolverTransform')
+            # logger.info('Building solver.')
+            # for node_type in ['zSolver', 'zSolverTransform']:
+            #     for b_node in self.get_nodes(type_filter=node_type):
+            #         b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                      check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zSolver')
+            node_types_to_apply.append('zSolverTransform')
         if bones:
-            logger.info('Building bones.')
-            for b_node in self.get_nodes(type_filter='zBone'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zBone')
+            # logger.info('Building bones.')
+            # for b_node in self.get_nodes(type_filter='zBone'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zBone')
         if tissues:
-            logger.info('Building tissues.')
-            for node_type in ['zTissue', 'zTet']:
-                for b_node in self.get_nodes(type_filter=node_type):
-                    b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                                 check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zTissue')
-            # node_types_to_apply.append('zTet')
+            # logger.info('Building tissues.')
+            # for node_type in ['zTissue', 'zTet']:
+            #     for b_node in self.get_nodes(type_filter=node_type):
+            #         b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                      check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zTissue')
+            node_types_to_apply.append('zTet')
         if cloth:
-            logger.info('Building cloth.')
-            for b_node in self.get_nodes(type_filter='zCloth'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zCloth')
+            # logger.info('Building cloth.')
+            # for b_node in self.get_nodes(type_filter='zCloth'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zCloth')
         if materials:
-            logger.info('Building materials.')
-            for b_node in self.get_nodes(type_filter='zMaterial'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zMaterial')
+            # logger.info('Building materials.')
+            # for b_node in self.get_nodes(type_filter='zMaterial'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zMaterial')
         if attachments:
-            logger.info('Building attachments.')
-            for b_node in self.get_nodes(type_filter='zAttachment'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            #node_types_to_apply.append('zAttachment')
+            # logger.info('Building attachments.')
+            # for b_node in self.get_nodes(type_filter='zAttachment'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zAttachment')
         if fibers:
-            logger.info('Building fibers.')
-            for b_node in self.get_nodes(type_filter='zFiber'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zFiber')
+            # logger.info('Building fibers.')
+            # for b_node in self.get_nodes(type_filter='zFiber'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zFiber')
         if lineOfActions:
-            logger.info('Building lines of action.')
-            for b_node in self.get_nodes(type_filter='zLineOfAction'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zLineOfAction')
+            # logger.info('Building lines of action.')
+            # for b_node in self.get_nodes(type_filter='zLineOfAction'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zLineOfAction')
         if embedder:
-            logger.info('Building embedder.')
-            for b_node in self.get_nodes(type_filter='zEmbedder'):
-                b_node.apply(attr_filter=attr_filter, permissive=permissive,
-                             check_meshes=check_meshes, interp_maps=interp_maps)
-            # node_types_to_apply.append('zEmbedder')
+            # logger.info('Building embedder.')
+            # for b_node in self.get_nodes(type_filter='zEmbedder'):
+            #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
+            #                  check_meshes=check_meshes, interp_maps=interp_maps)
+            node_types_to_apply.append('zEmbedder')
 
 
 
         # build the nodes by calling apply method on each one
-        # for node_type in node_types_to_apply:
-        #     for b_node in self.get_nodes(type_filter=node_type):
-        #         b_node.apply(attr_filter=attr_filter, permissive=permissive,
-        #                      check_meshes=check_meshes, interp_maps=interp_maps)
+        for node_type in node_types_to_apply:
+            for b_node in self.get_nodes(type_filter=node_type):
+                b_node.apply(attr_filter=attr_filter, permissive=permissive,
+                             check_meshes=check_meshes, interp_maps=interp_maps)
 
         # turn on solver
         mc.setAttr(sn + '.enable', solver_value)

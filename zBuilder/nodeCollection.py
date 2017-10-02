@@ -34,14 +34,14 @@ class NodeCollection(object):
     def __len__(self):
         return len(self.__collection)
 
-    def print_(self, type_filter=None, name_filter=None, component_data=True):
+    def print_(self, type_filter=list(), name_filter=list(), component_data=False):
 
         """
         print info on each node
 
         Args:
-            type_filter (str): filter by node type.  Defaults to None
-            name_filter (str): filter by node name. Defaults to None
+            type_filter (str): filter by node type.  Defaults to list()
+            name_filter (str): filter by node name. Defaults to list()
             component_data (bool): prints name of data stored.  Defaults to False
 
         """
@@ -52,19 +52,18 @@ class NodeCollection(object):
 
         print '----------------------------------------------------------------'
 
+        if component_data:
+            for item in self.data:
+                 print item
 
-        # for item in self.data:
-        #      print item
-
-    def compare(self, type_filter=None, name_filter=None):
+    def compare(self, type_filter=list(), name_filter=list()):
 
         """
-        print info on each node
+        Compares info in memory with that which is in scene.
 
         Args:
-            type_filter (str): filter by node type.  Defaults to **None**
-            name_filter (str): filter by node name. Defaults to **None**
-            print_data (bool): prints name of data stored.  Defaults to **False**
+            type_filter (str): filter by node type.  Defaults to list()
+            name_filter (str): filter by node name. Defaults to list()
 
         """
 
@@ -72,12 +71,12 @@ class NodeCollection(object):
                                    name_filter=name_filter):
             node.compare()
 
-    def stats(self, type_filter=None):
+    def stats(self, type_filter=list()):
         """
         prints out basic stats on data
 
         Args:
-            type_filter (str): filter by node type.  Defaults to None
+            type_filter (str): filter by node type.  Defaults to list()
         """
         tmp = {}
         for i, d in enumerate(self):
@@ -114,14 +113,6 @@ class NodeCollection(object):
         Args:
 
         """
-        # type_ = data.TYPE
-        # name = data.long_name
-        # if not type_ in self.data:
-        #     self.data[type_] = {}
-        #
-        # if not self.get_data_by_key_name(type_, name):
-        #     self.data[type_][name] = data
-
         self._data.append(data)
 
     @property
@@ -142,8 +133,6 @@ class NodeCollection(object):
         """
         self._data = data
 
-
-
     @property
     def nodes(self):
         return self.__collection
@@ -162,16 +151,16 @@ class NodeCollection(object):
         self.__collection.append(node)
 
     # TODO lookup by short name
-    def get_data(self, type_filter=[], name_filter=[]):
+    def get_data(self, type_filter=list(), name_filter=list()):
         """
         get nodes in data object
 
         Args:
-            type_filter (list): filter by node type.  Defaults to **None**
-            name_filter (list): filter by node name.  Looks for association.  Defaults to **None**
+            type_filter (str or list): filter by node type.  Defaults to list()
+            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
 
         Returns:
-            [] of nodes
+            [] of component data
         """
 
         if not type_filter and not name_filter:
@@ -198,8 +187,8 @@ class NodeCollection(object):
         get nodes in data object
 
         Args:
-            type_filter (list): filter by node type.  Defaults to **None**
-            name_filter (list): filter by node name.  Looks for association.  Defaults to **None**
+            type_filter (str or list): filter by node type.  Defaults to list()
+            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
 
         Returns:
             [] of nodes
@@ -258,8 +247,6 @@ class NodeCollection(object):
             >>> z.string_replace('_r$','_l')
         """
         [node.string_replace(search, replace) for node in self]
-        # for node in self.get_nodes():
-        #    node.string_replace(search, replace)
 
         # deal with the data search and replacing
         for key in self.data:

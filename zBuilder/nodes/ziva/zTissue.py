@@ -51,8 +51,8 @@ class TissueNode(ZivaBaseNode):
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
 
     def apply(self, *args, **kwargs):
-        attr_filter = kwargs.get('attr_filter', None)
-        name_filter = kwargs.get('name_filter', None)
+        attr_filter = kwargs.get('attr_filter', list())
+        name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
