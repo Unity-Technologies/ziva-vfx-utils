@@ -36,8 +36,8 @@ class IO(object):
         except IOError:
             logger.error("Error: can\'t find file or write data")
         else:
-            for b_node in self.get_nodes():
-                b_node.set_mobject(b_node.get_mobject())
+            for b_node in self.nodes:
+                b_node.mobject = b_node.mobject
             self.stats()
             logger.info('Wrote File: {}'.format(file_path))
 
@@ -61,8 +61,8 @@ class IO(object):
             logger.error("Error: can\'t find file or read data")
         else:
             self.stats()
-            for b_node in self.get_nodes():
-                b_node.set_mobject(b_node.get_mobject())
+            for b_node in self.nodes:
+                b_node.mobject = b_node.mobject
             after = datetime.datetime.now()
             logger.info('Read File: {} in {}'.format(filepath, after - before))
 
@@ -75,7 +75,7 @@ class IO(object):
 
         if node_data:
             logger.info("writing node_data")
-            tmp.append(self.__wrap_data(self.get_nodes(), 'node_data'))
+            tmp.append(self.__wrap_data(self.nodes, 'node_data'))
         if component_data:
             logger.info("writing component_data")
             tmp.append(self.__wrap_data(self.data, 'component_data'))
@@ -92,7 +92,7 @@ class IO(object):
 
         for d in data:
             if d['d_type'] == 'node_data':
-                self.set_nodes(d['data'])
+                self.nodes = d['data']
                 logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 self.data = d['data']

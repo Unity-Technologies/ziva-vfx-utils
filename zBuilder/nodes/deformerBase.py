@@ -23,19 +23,15 @@ class DeformerBaseNode(BaseNode):
         Returns:
             object:
         """
-
         # logger.info('retrieving {}'.format(args))
         selection = mz.parse_args_for_selection(args)
 
         self.association = self.get_meshes(selection[0])
 
-        map_names = []
-        for map_ in self.MAP_LIST:
-            map_names.append('{}.{}'.format(selection[0], map_))
-        self.set_map_names(map_names)
-
         # get map component data------------------------------------------------
         mesh_names = self.long_association
+        map_names = self.get_map_names()
+
         if map_names and mesh_names:
             for map_name, mesh_name in zip(map_names, mesh_names):
                 map_data_object = self._setup.component_factory(map_name,
@@ -43,7 +39,8 @@ class DeformerBaseNode(BaseNode):
                                                                 type='map')
                 self._setup.add_data(map_data_object)
 
-                if not self._setup.get_data(type_filter='mesh', name_filter=mesh_name):
+                if not self._setup.get_data(type_filter='mesh',
+                                            name_filter=mesh_name):
                     mesh_data_object = self._setup.component_factory(mesh_name,
                                                                      type='mesh')
                     self._setup.add_data(mesh_data_object)

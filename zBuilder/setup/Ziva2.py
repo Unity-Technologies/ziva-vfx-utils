@@ -210,7 +210,7 @@ class ZivaSetup(Builder):
         # get stored solver enable value to apply later. The solver comes in OFF
         solver_transform = self.get_nodes(type_filter='zSolverTransform')[0]
         sn = solver_transform.name
-        solver_value = solver_transform.get_attr_value('enable')
+        solver_value = solver_transform.attr['enable']['value']
 
         # generate list of node types to build
         node_types_to_apply = list()

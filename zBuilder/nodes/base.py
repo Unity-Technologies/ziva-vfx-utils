@@ -23,9 +23,10 @@ class BaseNode(object):
         """
         self._name = None
         self._attrs = {}
-        self._maps = []
         self._association = []
         self.__mobject = None
+
+        self.attribute = None
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
@@ -79,6 +80,8 @@ class BaseNode(object):
         # culling __dict__ of any non-serializable items so we can save as json
         output = dict()
         for key in self.__dict__:
+            if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
+                output[key] = self.__dict__[key].serialize()
             try:
                 json.dumps(self.__dict__[key])
                 output[key] = self.__dict__[key]
@@ -145,56 +148,13 @@ class BaseNode(object):
                     # TODO needs functionality (replace keys)
                     print 'DICT', item, self.__dict__
 
-    def set_attrs(self, attrs):
-        """
+    @property
+    def attrs(self):
+        return self._attrs
 
-        Args:
-            attrs:
-
-        Returns:
-
-        """
-        self._attrs = attrs
-
-    def get_attr_value(self, attr):
-        """
-        gets value of an attribute in node
-
-        Args:
-            attr (str): The attribute to get value of
-
-        Returns:
-            value of attribute
-        """
-        return self._attrs[attr]['value']
-
-    def set_attr_value(self, attr, value):
-        """
-        sets value of an attribute in node
-
-        Args:
-            attr (str): The attribute to get value of
-            value : the value to set
-        """
-        self._attrs[attr]['value'] = value
-
-    def get_attr_list(self):
-        """
-        gets list of attribute names stored with node
-
-        Returns:
-            [] of attribute names
-        """
-        return self._attrs.keys()
-
-    def get_attr_key(self, key):
-        return self._attrs.get(key)
-
-    def get_attr_key_value(self, attr, key):
-        return self._attrs[attr][key]
-
-    def set_attr_key_value(self, attr, key, value):
-        self._attrs[attr][key] = value
+    @attrs.setter
+    def attrs(self, value):
+        self._attrs = value
 
     @property
     def long_name(self):
@@ -246,7 +206,8 @@ class BaseNode(object):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.append(self._setup.get_data_by_key_name('mesh', mesh_name))
+            meshes.append(self._setup.get_data(type_filter='mesh',
+                                               name_filter=mesh_name))
         return meshes
 
     def get_map_objects(self):
@@ -257,28 +218,21 @@ class BaseNode(object):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.append(self._setup.get_data_by_key_name('map', map_name))
+            maps_.append(self._setup.get_data(type_filter='map',
+                                              name_filter=map_name))
         return maps_
 
     def get_map_names(self):
         """
-
-        Returns:
-
-        """
-        return self._maps
-
-    def set_map_names(self, maps):
-        """
-        Sets the maps for a b_node as a list.
-
-        Args:
-            maps:
-
-        Returns:
+        This builds the map names.  maps from MAP_LIST with the object name
+        in front
 
         """
-        self._maps = maps
+        map_names = []
+        for map_ in self.MAP_LIST:
+            map_names.append('{}.{}'.format(self.get_scene_name(), map_))
+
+        return map_names
 
     def populate_attrs(self, item, attr_list):
         """
@@ -291,7 +245,7 @@ class BaseNode(object):
 
         """
         attrs = mz.build_attr_key_values(item, attr_list)
-        self.set_attrs(attrs)
+        self.attrs = attrs
 
     @property
     def association(self):
@@ -319,12 +273,12 @@ class BaseNode(object):
         """
         name = self.name
 
-        attr_list = self.get_attr_list()
+        attr_list = self.attrs.keys()
         if mc.objExists(name):
             if attr_list:
                 for attr in attr_list:
                     scene_val = mc.getAttr(name + '.' + attr)
-                    obj_val = self.get_attr_key_value(attr, 'value')
+                    obj_val = self.attrs[attr]['value']
                     if scene_val != obj_val:
                         print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
 
@@ -365,28 +319,28 @@ class BaseNode(object):
         scene_name = self.get_scene_name()
 
         type_ = self.type
-        node_attrs = self.get_attr_list()
+        node_attrs = self.attrs.keys()
         if attr_filter:
             if attr_filter.get(type_, None):
                 node_attrs = list(
                     set(node_attrs).intersection(attr_filter[type_]))
 
         for attr in node_attrs:
-            if self.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
-                        mc.setAttr(scene_name + '.' + attr,
-                                   self.get_attr_value(attr),
+            if self.attrs[attr]['type'] == 'doubleArray':
+                if mc.objExists('{}.{}'.format(scene_name, attr)):
+                    if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
+                        mc.setAttr('{}.{}'.format(scene_name, attr),
+                                   self.attrs[attr]['value'],
                                    type='doubleArray')
                 else:
                     text = '{}.{} not found, skipping.'.format(scene_name, attr)
                     logger.info(text)
             else:
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
+                if mc.objExists('{}.{}'.format(scene_name, attr)):
+                    if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
                         try:
-                            mc.setAttr(scene_name + '.' + attr,
-                                       self.get_attr_value(attr))
+                            mc.setAttr('{}.{}'.format(scene_name, attr),
+                                       self.attrs[attr]['value'])
                         except:
                             pass
                 else:
@@ -432,7 +386,8 @@ class BaseNode(object):
         original_name = self.name
 
         for map_ in maps:
-            map_data = self._setup.get_data_by_key_name('map', map_)
+            map_data = self._setup.get_data(type_filter='map',
+                                            name_filter=map_)
             self.interpolate_maps(interp_maps)
             weight_list = map_data.value
 
