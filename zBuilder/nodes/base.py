@@ -26,8 +26,6 @@ class BaseNode(object):
         self._association = []
         self.__mobject = None
 
-        self.attribute = None
-
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._setup = kwargs.get('setup', None)
