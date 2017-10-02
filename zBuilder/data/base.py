@@ -16,6 +16,14 @@ class BaseComponent(object):
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
 
+    def __eq__(self, other):
+        if isinstance(other, BaseComponent):
+            return self.name == other.name
+
+    def __ne__(self, other):
+        """Define a non-equality test"""
+        return not self.__eq__(other)
+
     @property
     def long_name(self):
         return self._name

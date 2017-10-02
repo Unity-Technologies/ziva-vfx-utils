@@ -42,7 +42,8 @@ class BaseNode(object):
     #     return self
 
     def __eq__(self, other):
-        return self.name == other.name
+        if isinstance(other, BaseNode):
+            return self.name == other.name
 
     def __ne__(self, other):
         """Define a non-equality test"""

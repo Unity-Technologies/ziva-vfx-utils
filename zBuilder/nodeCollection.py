@@ -106,15 +106,6 @@ class NodeCollection(object):
 
         logger.info(output)
 
-    def add_data(self, data):
-        """
-        appends a mesh to the mesh list
-
-        Args:
-
-        """
-        self._data.append(data)
-
     @property
     def data(self):
         """
@@ -133,6 +124,19 @@ class NodeCollection(object):
         """
         self._data = data
 
+    def add_data(self, data):
+        """
+        appends a data obj to the data list.  Checks if data is already in list,
+        if it is it overrides the previous one.
+
+        Args:
+
+        """
+        if data in self._data:
+            self._data = [data if item == data else item for item in self._data]
+        else:
+            self._data.append(data)
+
     @property
     def nodes(self):
         return self.__collection
@@ -143,12 +147,17 @@ class NodeCollection(object):
 
     def add_node(self, node):
         """
-        appends a node to the node list
+        appends a node to the node list.  Checks if node is already in list, if
+        it is it overrides the previous one.
 
         Args:
             node (obj): the node obj to append to collection list.
         """
-        self.__collection.append(node)
+
+        if node in self.__collection:
+            self.__collection = [node if item == node else item for item in self.__collection]
+        else:
+            self.__collection.append(node)
 
     # TODO lookup by short name
     def get_data(self, type_filter=list(), name_filter=list()):
