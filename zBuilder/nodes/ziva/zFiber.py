@@ -24,8 +24,8 @@ class FiberNode(ZivaBaseNode):
         Returns:
             list(): of long mesh names.
         """
-        return [self.long_association[0],
-                self.long_association[0]]
+        return [self.association[0],
+                self.association[0]]
 
     def apply(self, *args, **kwargs):
 

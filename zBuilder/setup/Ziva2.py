@@ -122,7 +122,6 @@ class ZivaSetup(Builder):
         else:
             selection = mc.ls(sl=True, l=True)
 
-        print selection,'dfddddddddd'
         # kwargs
         connections = kwargs.get('connections', True)
         attr_filter = kwargs.get('attr_filter', None)
@@ -272,8 +271,6 @@ class ZivaSetup(Builder):
             #     b_node.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_apply.append('zEmbedder')
-
-
 
         # build the nodes by calling apply method on each one
         for node_type in node_types_to_apply:

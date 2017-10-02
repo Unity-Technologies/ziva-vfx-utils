@@ -115,7 +115,9 @@ class BaseNode(object):
         attr_list = mz.build_attr_list(selection[0])
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
-        self.populate_attrs(selection[0], attr_list)
+        attrs = mz.build_attr_key_values(selection[0], attr_list)
+
+        self.attrs = attrs
         self.mobject = selection[0]
 
     def apply(self, *args, **kwargs):
@@ -196,7 +198,8 @@ class BaseNode(object):
         Returns:
             list(): of long mesh names.
         """
-        return self.long_association
+        # return self.long_association
+        return self.association
 
     def get_mesh_objects(self):
         """
@@ -233,19 +236,6 @@ class BaseNode(object):
             map_names.append('{}.{}'.format(self.get_scene_name(), map_))
 
         return map_names
-
-    def populate_attrs(self, item, attr_list):
-        """
-
-        Args:
-            item:
-            attr_list:
-
-        Returns:
-
-        """
-        attrs = mz.build_attr_key_values(item, attr_list)
-        self.attrs = attrs
 
     @property
     def association(self):

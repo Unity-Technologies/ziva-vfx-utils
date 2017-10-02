@@ -178,7 +178,7 @@ class NodeCollection(object):
             items = self.data
 
         if name_filter:
-            items = [item for item in items if item.long_name in name_filter]
+            items = [item for item in items if item.name in name_filter]
 
         return items
 

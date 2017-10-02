@@ -29,7 +29,7 @@ class DeformerBaseNode(BaseNode):
         self.association = self.get_meshes(selection[0])
 
         # get map component data------------------------------------------------
-        mesh_names = self.long_association
+        mesh_names = self.association
         map_names = self.get_map_names()
 
         if map_names and mesh_names:
