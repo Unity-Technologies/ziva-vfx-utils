@@ -1,5 +1,6 @@
 import zBuilder.zMaya as mz
 import maya.cmds as mc
+import maya.mel as mm
 
 from zBuilder.nodes.base import BaseNode
 import logging
@@ -11,6 +12,8 @@ class ZivaBaseNode(BaseNode):
     EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
+        self._solver = None
+
         BaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
@@ -28,13 +31,11 @@ class ZivaBaseNode(BaseNode):
         mesh = mz.get_association(selection[0])
         self.association = mesh
 
-        map_names = []
-        for map_ in self.MAP_LIST:
-            map_names.append('{}.{}'.format(selection[0], map_))
-        self.set_map_names(map_names)
+        self.solver = mm.eval('zQuery -t zSolver {}'.format(self.name))[0]
 
         # get map component data------------------------------------------------
         mesh_names = self.get_map_meshes()
+        map_names = self.get_map_names()
 
         if map_names and mesh_names:
             for map_name, mesh_name in zip(map_names, mesh_names):
@@ -49,3 +50,11 @@ class ZivaBaseNode(BaseNode):
                                                                      type='mesh'
                                                                     )
                     self._setup.add_data(mesh_data_object)
+
+    @property
+    def solver(self):
+        return self._solver
+
+    @solver.setter
+    def solver(self, value):
+        self._solver = value
