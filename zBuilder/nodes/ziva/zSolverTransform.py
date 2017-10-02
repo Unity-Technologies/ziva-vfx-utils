@@ -25,7 +25,6 @@ class SolverTransformNode(ZivaBaseNode):
 
         """
         attr_filter = kwargs.get('attr_filter', list())
-        name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
 
         solver_name = self.get_scene_name()
