@@ -89,13 +89,21 @@ class IO(object):
         Gets data out of json serialization and assigns it to object
         """
         data = self.__check_data(data)
-
         for d in data:
+
             if d['d_type'] == 'node_data':
                 self.nodes = d['data']
                 logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
-                self.data = d['data']
+                # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
+                if not isinstance(d['data'], list):
+                    for k, v in d['data'].iteritems():
+                        for k2 in d['data'][k]:
+                            self.data.append(d['data'][k][k2])
+                else:
+                    # saved as 1.0.0
+                    self.data = d['data']
+
                 logger.info("reading component_data. ")
             if d['d_type'] == 'info':
                 logger.info("reading info")

@@ -159,7 +159,6 @@ class NodeCollection(object):
         else:
             self.__collection.append(node)
 
-    # TODO lookup by short name
     def get_data(self, type_filter=list(), name_filter=list()):
         """
         get nodes in data object
@@ -258,14 +257,7 @@ class NodeCollection(object):
         [node.string_replace(search, replace) for node in self]
 
         # deal with the data search and replacing
-        for key in self.data:
-
-            # replace the key names in data
-            self.data[key] = replace_dict_keys(search, replace, self.data[key])
-
-            # run search and replace on individual items
-            for item in self.data[key]:
-                self.data[key][item].string_replace(search, replace)
+        [item.string_replace(search, replace) for item in self.data]
 
     # @abc.abstractmethod
     def apply(self, *args, **kwargs):

@@ -95,7 +95,7 @@ class Map(BaseComponent):
         """
         mesh_name = self.get_mesh(long_name=False)
         mesh_data = self._setup.get_data(type_filter='mesh',
-                                         name_filter=mesh_name)
+                                         name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):

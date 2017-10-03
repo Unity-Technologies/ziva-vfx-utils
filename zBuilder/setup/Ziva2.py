@@ -213,10 +213,8 @@ class ZivaSetup(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            meshes = self.get_data(type_filter='mesh')
-            for mesh in meshes:
-                meshes[mesh].mirror()
-                
+            [item.mirror() for item in self.get_data(type_filter='mesh')]
+
         logger.info('applying setup....')
         sel = mc.ls(sl=True)
 
