@@ -31,7 +31,9 @@ class ZivaBaseNode(BaseNode):
         mesh = mz.get_association(selection[0])
         self.association = mesh
 
-        self.solver = mm.eval('zQuery -t zSolver {}'.format(self.name))[0]
+        solver = mm.eval('zQuery -t zSolver {}'.format(self.name))
+        if solver:
+            self.solver = solver[0]
 
         # get map component data------------------------------------------------
         mesh_names = self.get_map_meshes()
