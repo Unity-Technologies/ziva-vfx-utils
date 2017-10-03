@@ -16,6 +16,13 @@ class EmbedderNode(ZivaBaseNode):
 
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
+    def populate(self, *args, **kwargs):
+        super(EmbedderNode, self).populate(*args, **kwargs)
+
+        embedded_meshes = get_embedded_meshes([self.get_scene_name()])
+        self.set_embedded_meshes(embedded_meshes[0])
+        self.set_collision_meshes(embedded_meshes[1])
+
     def set_collision_meshes(self, meshes):
         self.__collision_meshes = meshes
 
@@ -47,25 +54,23 @@ class EmbedderNode(ZivaBaseNode):
             return tmp
 
     def apply(self, *args, **kwargs):
-        pass
+        # logger.info('applying embedder')
 
+        name = self.get_scene_name()
+        collision_meshes = self.get_collision_meshes()
+        embedded_meshes = self.get_embedded_meshes()
 
-def get_zGeos(bodies):
-    mc.select(bodies, r=True)
-    zGeo = mm.eval('zQuery-t "zGeo"')
-    if zGeo:
-        return zGeo
-    else:
-        return []
-
-
-def get_zEmbedder(bodies):
-    mc.select(bodies, r=True)
-    embedder = mm.eval('zQuery -t "zEmbedder"')
-    if embedder:
-        return embedder[0]
-    else:
-        return None
+        # if collision_meshes:
+        #     for mesh in collision_meshes:
+        #         for item in collision_meshes[mesh]:
+        #             mc.select(mesh, item, r=True)
+        #             mm.eval('ziva -tcm')
+        #
+        # if embedded_meshes:
+        #     for mesh in embedded_meshes:
+        #         for item in embedded_meshes[mesh]:
+        #             mc.select(mesh, item, r=True)
+        #             mm.eval('ziva -e')
 
 
 def get_embedded_meshes(bodies):
