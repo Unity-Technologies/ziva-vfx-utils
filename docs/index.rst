@@ -11,7 +11,6 @@ Welcome to Ziva's VFX Utilities!
    :maxdepth: 1
    :caption: Contents:
 
-   zBuilder
    installation
    release
    modules
