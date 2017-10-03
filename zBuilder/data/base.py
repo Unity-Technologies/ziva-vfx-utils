@@ -1,12 +1,14 @@
 import logging
 import json
 import maya.cmds as mc
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
 
 class BaseComponent(object):
     TYPE = None
+    SEARCH_EXCLUDE = ['_class']
 
     def __init__(self, *args, **kwargs):
 
@@ -23,6 +25,35 @@ class BaseComponent(object):
     def __ne__(self, other):
         """Define a non-equality test"""
         return not self.__eq__(other)
+
+    def string_replace(self, search, replace):
+        """
+
+        Args:
+            search:
+            replace:
+
+        Returns:
+
+        """
+        for item in self.__dict__:
+            if item not in self.SEARCH_EXCLUDE:
+                if isinstance(self.__dict__[item], (tuple, list)):
+                    if self.__dict__[item]:
+                        new_names = []
+                        for name in self.__dict__[item]:
+                            if isinstance(name, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item] = new_names
+                elif isinstance(self.__dict__[item], basestring):
+                    if self.__dict__[item]:
+                        self.__dict__[item] = mz.replace_long_name(
+                            search, replace, self.__dict__[item])
+                elif isinstance(self.__dict__[item], dict):
+                    # TODO needs functionality (replace keys)
+                    print 'DICT', item, self.__dict__[item], self.name
+                    # raise StandardError('HELP')
 
     @property
     def long_name(self):

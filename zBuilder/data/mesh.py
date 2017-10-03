@@ -55,12 +55,6 @@ class Mesh(BaseComponent):
 
         # logger.info('Retrieving Data : {}'.format(self))
 
-    def string_replace(self, search, replace):
-        # name replace----------------------------------------------------------
-        name = self.long_name
-        new_name = mz.replace_long_name(search, replace, name)
-        self.name = new_name
-
     def set_polygon_counts(self, pCountList):
         self._pCountList = pCountList
 

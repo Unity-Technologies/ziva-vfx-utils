@@ -122,6 +122,7 @@ class BaseNode(object):
     def apply(self, *args, **kwargs):
         raise NotImplementedError
 
+    # TODO clean this up.  could be more readable
     def string_replace(self, search, replace):
         """
 
@@ -138,16 +139,18 @@ class BaseNode(object):
                     if self.__dict__[item]:
                         new_names = []
                         for name in self.__dict__[item]:
-                            new_name = mz.replace_long_name(search, replace, name)
-                            new_names.append(new_name)
-                        self.__dict__[item] = new_names
+                            if isinstance(name, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item] = new_names
                 elif isinstance(self.__dict__[item], basestring):
                     if self.__dict__[item]:
                         self.__dict__[item] = mz.replace_long_name(
                             search, replace, self.__dict__[item])
                 elif isinstance(self.__dict__[item], dict):
                     # TODO needs functionality (replace keys)
-                    print 'DICT', item, self.__dict__
+                    print 'DICT', item, self.__dict__[item], self.name
+                    # raise StandardError('HELP')
 
     @property
     def attrs(self):

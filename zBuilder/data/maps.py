@@ -38,7 +38,14 @@ class Map(BaseComponent):
         return output
 
     def __repr__(self):
-        return self.__str__()
+        name = self.name
+        if self.value:
+            length = len(self.value)
+        else:
+            length = 'null'
+        output = ''
+        output += '< MAP: {} -- length: {} >'.format(name, length)
+        return output
 
     def populate(self, map_name, mesh_name):
         """
@@ -137,16 +144,6 @@ class Map(BaseComponent):
 
         """
         self._value = value
-
-    # TODO remove this and do it in __dict__
-    def string_replace(self, search, replace):
-        # name replace----------------------------------------------------------
-        new_name = mz.replace_long_name(search, replace, self.long_name)
-        self.name = new_name
-
-        mesh = self.get_mesh(long_name=True)
-        new_mesh = mz.replace_long_name(search, replace, mesh)
-        self.set_mesh(new_mesh)
 
 
 def get_weights(map_name, mesh_name):
