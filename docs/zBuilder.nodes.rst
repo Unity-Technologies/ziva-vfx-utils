@@ -1,17 +1,12 @@
 zBuilder.nodes package
 ======================
 
-Subpackages
------------
 
 .. toctree::
 
     zBuilder.nodes.deformers
     zBuilder.nodes.zit
     zBuilder.nodes.ziva
-
-Submodules
-----------
 
 zBuilder.nodes.base module
 --------------------------
@@ -30,8 +25,6 @@ zBuilder.nodes.deformerBase module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.nodes
     :members:

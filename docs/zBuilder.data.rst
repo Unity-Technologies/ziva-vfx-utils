@@ -1,9 +1,6 @@
 zBuilder.data package
 =====================
 
-Submodules
-----------
-
 zBuilder.data.base module
 -------------------------
 
@@ -29,8 +26,6 @@ zBuilder.data.mesh module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.data
     :members:

@@ -1,9 +1,6 @@
 zBuilder.nodes.ziva package
 ===========================
 
-Submodules
-----------
-
 zBuilder.nodes.ziva.zAttachment module
 --------------------------------------
 
@@ -100,9 +97,6 @@ zBuilder.nodes.ziva.zivaBase module
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
 
 .. automodule:: zBuilder.nodes.ziva
     :members:

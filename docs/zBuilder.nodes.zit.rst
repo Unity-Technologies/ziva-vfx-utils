@@ -1,9 +1,6 @@
 zBuilder.nodes.zit package
 ==========================
 
-Submodules
-----------
-
 zBuilder.nodes.zit.zItto module
 -------------------------------
 
@@ -37,8 +34,6 @@ zBuilder.nodes.zit.zWrap module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.nodes.zit
     :members:

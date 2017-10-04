@@ -1,8 +1,6 @@
 zBuilder.nodes.deformers package
 ================================
 
-Submodules
-----------
 
 zBuilder.nodes.deformers.blendShape module
 ------------------------------------------
@@ -21,8 +19,6 @@ zBuilder.nodes.deformers.deltaMush module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.nodes.deformers
     :members:

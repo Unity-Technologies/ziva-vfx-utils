@@ -1,9 +1,6 @@
 zBuilder.setup package
 ======================
 
-Submodules
-----------
-
 zBuilder.setup.Attributes module
 --------------------------------
 
@@ -61,8 +58,6 @@ zBuilder.setup.Ziva2 module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.setup
     :members:
