@@ -159,6 +159,20 @@ class NodeCollection(object):
         else:
             self.__collection.append(node)
 
+    def remove_node(self, node):
+        """
+        Removes a given node from list
+        Args:
+            node:
+
+        Returns:
+
+        """
+        self.nodes.remove(node)
+
+    def remove_data(self, data):
+        self.data.remove(data)
+
     def get_data(self, type_filter=list(), name_filter=list()):
         """
         get nodes in data object
@@ -254,19 +268,18 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        [node.string_replace(search, replace) for node in self]
+        for node in self:
+            node.string_replace(search, replace)
 
-        # deal with the data search and replacing
-        [item.string_replace(search, replace) for item in self.data]
+        for item in self.data:
+            item.string_replace(search, replace)
 
-    # @abc.abstractmethod
     def apply(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
         raise NotImplementedError("Subclass must implement abstract method")
 
-    # @abc.abstractmethod
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
