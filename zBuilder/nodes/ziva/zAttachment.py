@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class AttachmentNode(ZivaBaseNode):
+    """ This node for storing information related to zAttachments.
+    """
     TYPE = 'zAttachment'
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
 
@@ -16,6 +18,17 @@ class AttachmentNode(ZivaBaseNode):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
+        """ Builds the zAttachment in maya scene.
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            interp_maps (str): Interpolating maps.  Defaults to ``auto``
+            permissive (bool): Pass on errors. Defaults to ``True``
+        """
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
@@ -82,8 +95,7 @@ class AttachmentNode(ZivaBaseNode):
         self.set_maya_weights(interp_maps=False)
 
     def are_maps_valid(self):
-        """
-        Checking maps to see if they are all zeros.  An attachment map with
+        """ Checking maps to see if they are all zeros.  An attachment map with
         only zero's fail.
 
         Raises:

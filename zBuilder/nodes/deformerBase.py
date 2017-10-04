@@ -14,16 +14,23 @@ class DeformerBaseNode(BaseNode):
         BaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
+        """ Builds the node in maya.  mean to be overwritten.
+        """
         raise NotImplementedError
 
     def populate(self, *args, **kwargs):
-        super(DeformerBaseNode, self).populate(*args, **kwargs)
-        """
+        """ Populates the node with the info from the passed maya node in args.
 
-        Returns:
-            object:
+        This is deals with basic stuff including attributes.  For other things it
+        is meant to be overridden in inherited node.
+
+        This is inherited from Base and extended to deal with maps and meshes.
+        Args:
+            *args (str): The maya node to populate it with.
+
         """
-        # logger.info('retrieving {}'.format(args))
+        super(DeformerBaseNode, self).populate(*args, **kwargs)
+
         selection = mz.parse_args_for_selection(args)
 
         self.association = self.get_meshes(selection[0])
@@ -47,6 +54,14 @@ class DeformerBaseNode(BaseNode):
 
     @staticmethod
     def get_meshes(node):
+        """ Queries the deformer and returns the meshes associated with it.
+
+        Args:
+            node: Maya node to query.
+
+        Returns:
+            list od strings: list of strings of mesh names.
+        """
         meshes = mc.deformer(node, query=True, g=True)
         tmp = list()
         for mesh in meshes:

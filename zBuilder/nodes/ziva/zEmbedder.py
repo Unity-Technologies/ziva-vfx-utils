@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class EmbedderNode(ZivaBaseNode):
+    """ This node for storing information related to zEmebedder.
+    """
     TYPE = 'zEmbedder'
 
     def __init__(self, *args, **kwargs):
@@ -17,6 +19,13 @@ class EmbedderNode(ZivaBaseNode):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def populate(self, *args, **kwargs):
+        """ This extends ZivaBase.populate()
+
+        Adds collision mesh and embedded mesh storage.
+
+        Args:
+            *args: Maya node to populate with.
+        """
         super(EmbedderNode, self).populate(*args, **kwargs)
 
         embedded_meshes = get_embedded_meshes([self.get_scene_name()])
@@ -24,12 +33,29 @@ class EmbedderNode(ZivaBaseNode):
         self.set_collision_meshes(embedded_meshes[1])
 
     def set_collision_meshes(self, meshes):
+        """ Sets the collision meshes.
+
+        Args:
+            meshes (list): The meshes to set.
+        """
         self.__collision_meshes = meshes
 
     def set_embedded_meshes(self, meshes):
+        """ Sets the embedded meshes.
+
+        Args:
+            meshes (list): The meshes to set.
+        """
         self.__embedded_meshes = meshes
 
     def get_collision_meshes(self, long_name=False):
+        """ Gets the collision meshes stored.
+        Args:
+            long_name (bool): Returns long name or short.  Default ``False``
+
+        Returns:
+            str: String of collision mesh name.
+        """
         if long_name:
             return self.__collision_meshes
         else:
@@ -42,6 +68,13 @@ class EmbedderNode(ZivaBaseNode):
             return tmp
 
     def get_embedded_meshes(self, long_name=False):
+        """ Gets the embedded meshes stored.
+        Args:
+            long_name (bool): Returns long name or short.  Default ``False``
+
+        Returns:
+            str: String of embedded mesh name.
+        """
         if long_name:
             return self.__embedded_meshes
         else:
@@ -54,7 +87,16 @@ class EmbedderNode(ZivaBaseNode):
             return tmp
 
     def apply(self, *args, **kwargs):
-        # logger.info('applying embedder')
+        """ Builds the zEmbedder in maya scene.
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            permissive (bool): Pass on errors. Defaults to ``True``
+        """
 
         name = self.get_scene_name()
         collision_meshes = self.get_collision_meshes()
@@ -74,6 +116,13 @@ class EmbedderNode(ZivaBaseNode):
 
 
 def get_embedded_meshes(bodies):
+    """ Returns embedded meshes for given body.
+    Args:
+        bodies: Maya mesh to find embedded meshes with.
+
+    Returns:
+        2 dict: of embedded meshes and collision meshes.
+    """
     collision_meshes = {}
     embedded_meshes = {}
     for body in bodies:

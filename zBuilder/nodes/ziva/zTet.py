@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class TetNode(ZivaBaseNode):
+    """ This node for storing information related to zTets.
+    """
     TYPE = 'zTet'
     MAP_LIST = ['weightList[0].weights']
 
@@ -17,9 +19,21 @@ class TetNode(ZivaBaseNode):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def set_user_tet_mesh(self, mesh):
+        """ Setting of the user tet mesh.
+        Args:
+            mesh (str): A maya mesh.
+        """
         self._user_tet_mesh = mesh
 
     def get_user_tet_mesh(self, long_name=False):
+        """ Get user tet mesh.
+        Args:
+            long_name: return long name or not.  Defaults to ``False``
+
+        Returns:
+            str: String of user tet mesh name.
+
+        """
         if self._user_tet_mesh:
             if long_name:
                 return self._user_tet_mesh
@@ -29,8 +43,7 @@ class TetNode(ZivaBaseNode):
             return None
 
     def apply_user_tet_mesh(self):
-        """
-        Applies the user tet mesh if any.
+        """ Applies the user tet mesh if any.
         """
         if self.get_user_tet_mesh():
             try:
@@ -44,19 +57,23 @@ class TetNode(ZivaBaseNode):
                     user_mesh, name)
 
     def apply(self, *args, **kwargs):
-        """
+        """ Builds the zTets in maya scene.
+
         These get built after the tissues so it is assumed they are in scene.
         This just checks what tet is associated with mesh and uses that one,
         renames it and stores mObject then changes attributes.
         There is only ever 1 per mesh so no need to worry about multiple tets
 
         Args:
-            *args:
-            **kwargs:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
 
-        Returns:
-
+                tmp = {'zSolver':['substeps']}
+            interp_maps (str): Interpolating maps.  Defaults to ``auto``
+            permissive (bool): Pass on errors. Defaults to ``True``
         """
+
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')

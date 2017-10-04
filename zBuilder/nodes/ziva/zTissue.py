@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class TissueNode(ZivaBaseNode):
+    """ This node for storing information related to zTissues.
+    """
     TYPE = 'zTissue'
 
     def __init__(self, *args, **kwargs):
@@ -18,12 +20,28 @@ class TissueNode(ZivaBaseNode):
 
     # TODO property and store zTissue instead of mesh for parents and childs
     def set_children_tissues(self, children):
+        """ Stores children tissues.
+        Args:
+            children: The children tissues to store.
+        """
         self._children_tissues = children
 
     def set_parent_tissue(self, parent):
+        """ Stores parent tissues.
+        Args:
+            children: The parent tissues to store.
+        """
         self._parent_tissue = parent
 
     def get_children_tissues(self, long_name=False):
+        """ Get children tissues.
+        Args:
+            long_name: return long name or not.  Defaults to ``False``
+
+        Returns:
+            list of str: list of children tissues.
+
+        """
         if not long_name:
             tmp = []
             if self._children_tissues:
@@ -36,6 +54,14 @@ class TissueNode(ZivaBaseNode):
             return self._children_tissues
 
     def get_parent_tissue(self, long_name=False):
+        """ Get parent tissues.
+        Args:
+            long_name: return long name or not.  Defaults to ``False``
+
+        Returns:
+            list of str: list of parent tissues.
+
+        """
         if self._parent_tissue:
             if long_name:
                 return self._parent_tissue
@@ -45,12 +71,30 @@ class TissueNode(ZivaBaseNode):
             return None
 
     def populate(self, *args, **kwargs):
+        """ This extends ZivaBase.populate()
+
+        Adds parent and child storage.
+
+        Args:
+            *args: Maya node to populate with.
+        """
         super(TissueNode, self).populate(*args, **kwargs)
 
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
 
     def apply(self, *args, **kwargs):
+        """ Builds the zTissue in maya scene.
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            interp_maps (str): Interpolating maps.  Defaults to ``auto``
+            permissive (bool): Pass on errors. Defaults to ``True``
+        """
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
