@@ -43,7 +43,7 @@ class AttachmentNode(ZivaBaseNode):
                         existing.append(existing_attachment)
 
             data_attachments = self._setup.get_nodes(type_filter='zAttachment',
-                                                     name_filter=source_mesh)
+                                                     association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.association[0]

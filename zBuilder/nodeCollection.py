@@ -1,9 +1,7 @@
-import json
 import maya.cmds as mc
-
 import zBuilder.zMaya as mz
 
-import importlib
+import re
 import time
 
 import logging
@@ -172,67 +170,53 @@ class NodeCollection(object):
 
     def remove_data(self, data):
         self.data.remove(data)
+    #
+    # def get_data(self, type_filter=list(), name_filter=list()):
+    #     """
+    #     get nodes in data object
+    #
+    #     Args:
+    #         type_filter (str or list): filter by node type.  Defaults to list()
+    #         name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
+    #
+    #     Returns:
+    #         [] of component data
+    #     """
+    #
+    #     if not type_filter and not name_filter:
+    #         return self.nodes
+    #
+    #     if not isinstance(type_filter, list):
+    #         type_filter = [type_filter]
+    #     #
+    #     if not isinstance(name_filter, list):
+    #         name_filter = [name_filter]
+    #
+    #     if type_filter:
+    #         items = [x for x in self.data if x.type in type_filter]
+    #     else:
+    #         items = self.data
+    #
+    #     if name_filter:
+    #         items = [item for item in items if item.name in name_filter]
+    #
+    #     return items
 
-    def get_data(self, type_filter=list(), name_filter=list()):
+    def get_data(self, type_filter=list(),
+                  name_filter=list(),
+                  name_regex=None):
         """
         get nodes in data object
 
         Args:
             type_filter (str or list): filter by node type.  Defaults to list()
-            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
-
-        Returns:
-            [] of component data
-        """
-
-        if not type_filter and not name_filter:
-            return self.nodes
-
-        if not isinstance(type_filter, list):
-            type_filter = [type_filter]
-        #
-        if not isinstance(name_filter, list):
-            name_filter = [name_filter]
-
-        if type_filter:
-            items = [x for x in self.data if x.type in type_filter]
-        else:
-            items = self.data
-
-        if name_filter:
-            items = [item for item in items if item.name in name_filter]
-
-        return items
-
-    def get_nodes(self, type_filter=list(), name_filter=list()):
-        """
-        get nodes in data object
-
-        Args:
-            type_filter (str or list): filter by node type.  Defaults to list()
-            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
-
+            name_filter (str or list): filter by node name.  Defaults to list()
+            name_regex (str) filter by node name by regular expression.  Defaults to None
         Returns:
             [] of nodes
         """
-        # if not type_filter and not name_filter:
-        #     return self.nodes
-        #
-
-        #
-        # if not isinstance(name_filter, list):
-        #     name_filter = [name_filter]
-        #
-        # types = set(type_filter or [])
-        # names = set(name_filter or [])
-        # print types
-        # print names
-        # keep_type = lambda item : type_filter is None or item.type in types
-        # keep_name = lambda item : name_filter is None or not names.isdisjoint(item.association)
-        # return [item for item in self if keep_name(item) and keep_type(item)]
-
-        if not type_filter and not name_filter:
-            return self.nodes
+        if not type_filter and not name_filter and not name_regex:
+            return self.data
 
         if not isinstance(type_filter, list):
             type_filter = [type_filter]
@@ -240,16 +224,67 @@ class NodeCollection(object):
         if not isinstance(name_filter, list):
             name_filter = [name_filter]
 
-        if type_filter:
-            items = [x for x in self if x.type in type_filter]
-        else:
-            items = self.nodes
+        type_set = set(type_filter)
+        name_set = set(name_filter)
 
-        if name_filter:
-            nf_set = set(name_filter)
-            items = [item for item in items if not nf_set.isdisjoint(item.association)]
+        def keep_me(item):
+            if type_set and item.type not in type_set:
+                return False
+            if name_set and item.name not in name_set:
+                return False
+            if name_regex and not re.search(name_regex, item.name):
+                return False
+            return True
 
-        return items
+        return [item for item in self.data if keep_me(item)]
+
+    def get_nodes(self, type_filter=list(),
+                  name_filter=list(),
+                  name_regex=None,
+                  association_filter=list(),
+                  association_regex=None):
+        """
+        get nodes in data object
+
+        Args:
+            type_filter (str or list): filter by node type.  Defaults to list()
+            name_filter (str or list): filter by node name.  Defaults to list()
+            name_regex (str) filter by node name by regular expression.  Defaults to None
+            association_filter (str or list): filter by node association.  Looks for association.  Defaults to list()
+            association_regex (str) filter by node association by regular expression.  Defaults to None
+        Returns:
+            [] of nodes
+        """
+        if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
+            return self.nodes
+
+        if not isinstance(type_filter, list):
+            type_filter = [type_filter]
+
+        if not isinstance(association_filter, list):
+            association_filter = [association_filter]
+
+        if not isinstance(name_filter, list):
+            name_filter = [name_filter]
+
+        type_set = set(type_filter)
+        name_set = set(name_filter)
+        association_set = set(association_filter)
+
+        def keep_me(item):
+            if type_set and item.type not in type_set:
+                return False
+            if name_set and item.name not in name_set:
+                return False
+            if association_set and association_set.isdisjoint(item.association):
+                return False
+            if name_regex and not re.search(name_regex, item.name):
+                return False
+            if association_regex and not re.search(association_regex, item.association):
+                return False
+            return True
+
+        return [item for item in self if keep_me(item)]
 
     def string_replace(self, search, replace):
         """

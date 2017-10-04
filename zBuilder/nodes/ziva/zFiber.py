@@ -40,7 +40,7 @@ class FiberNode(ZivaBaseNode):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
             data_fibers = self._setup.get_nodes(type_filter='zFiber',
-                                                name_filter=mesh)
+                                                association_filter=mesh)
 
             # self.interpolate_maps(interp_maps)
             # self.are_maps_valid()
