@@ -12,6 +12,7 @@ class BoneNode(ZivaBaseNode):
     """ This node for storing information related to zBones.
     """
     TYPE = 'zBone'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)

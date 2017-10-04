@@ -11,6 +11,7 @@ class EmbedderNode(ZivaBaseNode):
     """ This node for storing information related to zEmebedder.
     """
     TYPE = 'zEmbedder'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         self.__embedded_meshes = None

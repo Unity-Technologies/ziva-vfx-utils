@@ -11,7 +11,10 @@ class TetNode(ZivaBaseNode):
     """ This node for storing information related to zTets.
     """
     TYPE = 'zTet'
+    """ The type of node. """
+
     MAP_LIST = ['weightList[0].weights']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         self._user_tet_mesh = None

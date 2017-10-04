@@ -13,9 +13,13 @@ class BaseNode(object):
     """ The base node for the node functionality of all nodes
     """
     TYPE = None
+    """ The type of node. """
     MAP_LIST = []
+    """ List of maps to store. """
     SEARCH_EXCLUDE = ['_class', '_attrs']
+    """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
+    """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
         self._name = None
@@ -134,8 +138,6 @@ class BaseNode(object):
         Args:
             search (str): string to search for.
             replace (str): string to replace it with.
-
-        Returns:
 
         """
         for item in self.__dict__:

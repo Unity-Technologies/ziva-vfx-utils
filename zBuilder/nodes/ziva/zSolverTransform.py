@@ -12,6 +12,7 @@ class SolverTransformNode(ZivaBaseNode):
     """ This node for storing information related to zSolverTransform.
     """
     TYPE = 'zSolverTransform'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)

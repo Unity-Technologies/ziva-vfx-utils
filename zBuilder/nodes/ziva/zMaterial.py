@@ -12,7 +12,10 @@ class MaterialNode(ZivaBaseNode):
     """ This node for storing information related to zMaterials.
     """
     TYPE = 'zMaterial'
+    """ The type of node. """
+
     MAP_LIST = ['weightList[0].weights']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)

@@ -11,7 +11,9 @@ class FiberNode(ZivaBaseNode):
     """ This node for storing information related to zFibers.
     """
     TYPE = 'zFiber'
+    """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'endPoints']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)

@@ -11,6 +11,7 @@ class TissueNode(ZivaBaseNode):
     """ This node for storing information related to zTissues.
     """
     TYPE = 'zTissue'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         self._children_tissues = None

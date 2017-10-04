@@ -12,7 +12,9 @@ class AttachmentNode(ZivaBaseNode):
     """ This node for storing information related to zAttachments.
     """
     TYPE = 'zAttachment'
+    """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
