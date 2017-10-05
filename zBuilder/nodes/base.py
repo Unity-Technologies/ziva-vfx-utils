@@ -24,11 +24,16 @@ class BaseNode(object):
 
     def __init__(self, *args, **kwargs):
         self._name = None
-        self._attrs = {}
+        self.attrs = {}
         self._association = []
         self.__mobject = None
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
+
+        if 'data' in self.__class__.__module__:
+            self._builder_type = 'zBuilder.data'
+        if 'nodes' in self.__class__.__module__:
+            self._builder_type = 'zBuilder.nodes'
 
         self._setup = kwargs.get('setup', None)
 
@@ -120,7 +125,6 @@ class BaseNode(object):
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
         attrs = mz.build_attr_key_values(selection[0], attr_list)
-
         self.attrs = attrs
         self.mobject = selection[0]
 
@@ -160,15 +164,15 @@ class BaseNode(object):
                     print 'DICT', item, self.__dict__[item], self.name
                     # raise StandardError('HELP')
 
-    @property
-    def attrs(self):
-        """ Stored attributes of node.
-        """
-        return self._attrs
-
-    @attrs.setter
-    def attrs(self, value):
-        self._attrs = value
+    # @property
+    # def attrs(self):
+    #     """ Stored attributes of node.
+    #     """
+    #     return self._attrs
+    #
+    # @attrs.setter
+    # def attrs(self, value):
+    #     self._attrs = value
 
     @property
     def long_name(self):

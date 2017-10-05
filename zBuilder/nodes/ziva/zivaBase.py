@@ -16,7 +16,7 @@ class ZivaBaseNode(BaseNode):
     EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
-        self._solver = None
+        self.solver = None
 
         BaseNode.__init__(self, *args, **kwargs)
 
@@ -68,15 +68,15 @@ class ZivaBaseNode(BaseNode):
                                                                     )
                     self._setup.add_data(mesh_data_object)
 
-    @property
-    def solver(self):
-        """ :obj:`str`: The solver name this node used.
-
-        Used for allowing multiple solvers in scene and building a setup on one
-        of them.
-        """
-        return self._solver
-
-    @solver.setter
-    def solver(self, value):
-        self._solver = value
+    # @property
+    # def solver(self):
+    #     """ :obj:`str`: The solver name this node used.
+    #
+    #     Used for allowing multiple solvers in scene and building a setup on one
+    #     of them.
+    #     """
+    #     return self._solver
+    #
+    # @solver.setter
+    # def solver(self, value):
+    #     self._solver = value

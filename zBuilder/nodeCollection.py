@@ -17,8 +17,8 @@ class NodeCollection(object):
     def __init__(self):
         import zBuilder
 
-        self.__collection = list()
-        self._data = list()
+        self.nodes = list()
+        self.data = list()
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -32,7 +32,7 @@ class NodeCollection(object):
             Iterator of nodes.
 
         """
-        return iter(self.__collection)
+        return iter(self.nodes)
 
     def __len__(self):
         """
@@ -40,7 +40,7 @@ class NodeCollection(object):
         Returns: Length of nodes.
 
         """
-        return len(self.__collection)
+        return len(self.nodes)
 
     def print_(self, type_filter=list(), name_filter=list(), component_data=False):
         """Prints info on each node.
@@ -117,15 +117,15 @@ class NodeCollection(object):
 
         logger.info(output)
 
-    @property
-    def data(self):
-        """ (:obj:`list` of :obj:`obj`) The dense data nodes stored in collection.
-        """
-        return self._data
-
-    @data.setter
-    def data(self, data):
-        self._data = data
+    # @property
+    # def data(self):
+    #     """ (:obj:`list` of :obj:`obj`) The dense data nodes stored in collection.
+    #     """
+    #     return self._data
+    #
+    # @data.setter
+    # def data(self, data):
+    #     self._data = data
 
     def add_data(self, data):
         """ appends a data obj to the data list.  Checks if data is already in
@@ -134,20 +134,10 @@ class NodeCollection(object):
         Args:
             data (:obj:`obj`) data object to append to list
         """
-        if data in self._data:
-            self._data = [data if item == data else item for item in self._data]
+        if data in self.data:
+            self.data = [data if item == data else item for item in self.data]
         else:
-            self._data.append(data)
-
-    @property
-    def nodes(self):
-        """ (:obj:`list` of :obj:`obj`) The nodes stored in collection.
-        """
-        return self.__collection
-
-    @nodes.setter
-    def nodes(self, value):
-        self.__collection = value
+            self.data.append(data)
 
     def add_node(self, node):
         """
@@ -158,10 +148,10 @@ class NodeCollection(object):
             node (:obj:`obj`): the node obj to append to collection list.
         """
 
-        if node in self.__collection:
-            self.__collection = [node if item == node else item for item in self.__collection]
+        if node in self.nodes:
+            self.nodes = [node if item == node else item for item in self.nodes]
         else:
-            self.__collection.append(node)
+            self.nodes.append(node)
 
     def remove_node(self, node):
         """

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TestSetup(Builder):
     """
-    To capture a ziva setup
+    Test setup to play with deformers and how they are ordered on a mesh.
     """
 
     def __init__(self):

@@ -162,39 +162,52 @@ class IO(object):
         Returns:
             obj:  Result of operation
         """
+        self.update_json(json_object)
+
         if '_class' in json_object:
             module_ = json_object['_class'][0]
 
-            type_ = self.get_type_from_json_object(json_object)
+            type_ = json_object['TYPE']
             if 'zBuilder.data' in module_:
-                object = find_class('zBuilder.data', type_)
+                obj = find_class('zBuilder.data', type_)
             elif 'zBuilder.nodes' in module_:
-                object = find_class('zBuilder.nodes', type_)
+                obj = find_class('zBuilder.nodes', type_)
 
-            b_node = object(deserialize=json_object, setup=self)
+            b_node = obj(deserialize=json_object, setup=self)
             return b_node
         else:
             return json_object
 
     @staticmethod
-    def get_type_from_json_object(json_object):
-        """ This checks type in json data object.  Type could be stored in one
-        of two ways so this can handle that.
-        Args:
-            json_object: The json object to check for type attribute.
+    def update_json(json_object):
+        """
+        This takes the json_object and updates it to work with 1.0.0
 
         Returns:
-            basestring: String of type.
+            modified json_object
         """
-        if 'TYPE' in json_object:
-            type_ = json_object['TYPE']
-        elif '_type' in json_object:
-            type_ = json_object['_type']
-            json_object['TYPE'] = type_
-            json_object.pop('_type', None)
-        else:
-            type_ = json_object['_class'][1].lower()
-        return type_
+
+        # replacing key attribute names with value.  A simple swap.
+        replace_me = dict()
+        replace_me['_type'] = 'TYPE'
+        replace_me['_attrs'] = 'attrs'
+        replace_me['_value'] = 'value'
+        replace_me['__collection'] = 'nodes'
+        replace_me['_zFiber'] = 'fiber'
+
+        if '_class' in json_object:
+
+            for key, value in replace_me.iteritems():
+                if key in json_object:
+                    json_object[value] = json_object[key]
+                    json_object.pop(key, None)
+                else:
+                    # print 'NOPE', value, json_object.keys()
+                    # maps and meshes didn't have a type.  lets make one.
+                    if value == 'TYPE':
+                        json_object[value] = json_object['_class'][1].lower()
+
+        return json_object
 
 
 class BaseNodeEncoder(json.JSONEncoder):

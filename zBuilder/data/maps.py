@@ -17,7 +17,7 @@ class Map(BaseComponent):
 
         self._name = None
         self._mesh = None
-        self._value = None
+        self.value = None
 
         BaseComponent.__init__(self, *args, **kwargs)
         if args:
@@ -121,15 +121,15 @@ class Map(BaseComponent):
         self.value = weight_list
         mc.delete(created_mesh)
 
-    @property
-    def value(self):
-        """ The map value.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = value
+    # @property
+    # def value(self):
+    #     """ The map value.
+    #     """
+    #     return self._value
+    #
+    # @value.setter
+    # def value(self, value):
+    #     self._value = value
 
 
 def get_weights(map_name, mesh_name):
