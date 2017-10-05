@@ -35,6 +35,11 @@ class Builder(IO, NodeCollection):
         type_ = mz.get_type(node)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
+                print obj
+                if obj.TYPES:
+                    print obj.TYPES, type_
+                    if type_ in obj.TYPES:
+                        return obj(node, setup=self)
                 if type_ == obj.TYPE:
                     return obj(node, setup=self)
         return zBuilder.nodes.BaseNode(node, setup=self)
