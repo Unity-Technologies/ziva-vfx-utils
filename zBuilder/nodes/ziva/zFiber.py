@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class FiberNode(ZivaBaseNode):
     """ This node for storing information related to zFibers.
     """
-    TYPE = 'zFiber'
+    type = 'zFiber'
     """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'endPoints']
     """ List of maps to store. """

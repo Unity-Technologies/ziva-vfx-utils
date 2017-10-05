@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class EmbedderNode(ZivaBaseNode):
     """ This node for storing information related to zEmebedder.
     """
-    TYPE = 'zEmbedder'
+    type = 'zEmbedder'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

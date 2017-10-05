@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class BoneNode(ZivaBaseNode):
     """ This node for storing information related to zBones.
     """
-    TYPE = 'zBone'
+    type = 'zBone'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

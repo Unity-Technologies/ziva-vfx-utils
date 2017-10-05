@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Mesh(BaseComponent):
-    TYPE = 'mesh'
+    type = 'mesh'
     """ Type of node. """
 
     def __init__(self, *args, **kwargs):

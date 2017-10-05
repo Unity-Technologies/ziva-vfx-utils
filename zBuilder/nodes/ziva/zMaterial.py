@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class MaterialNode(ZivaBaseNode):
     """ This node for storing information related to zMaterials.
     """
-    TYPE = 'zMaterial'
+    type = 'zMaterial'
     """ The type of node. """
 
     MAP_LIST = ['weightList[0].weights']

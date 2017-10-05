@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SolverTransformNode(ZivaBaseNode):
     """ This node for storing information related to zSolverTransform.
     """
-    TYPE = 'zSolverTransform'
+    type = 'zSolverTransform'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

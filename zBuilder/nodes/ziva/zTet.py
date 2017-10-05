@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class TetNode(ZivaBaseNode):
     """ This node for storing information related to zTets.
     """
-    TYPE = 'zTet'
+    type = 'zTet'
     """ The type of node. """
 
     MAP_LIST = ['weightList[0].weights']

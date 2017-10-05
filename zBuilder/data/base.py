@@ -12,7 +12,7 @@ class BaseComponent(object):
     Args:
         deserialize (dict, optional): a dictionary to deserialize into node.
     """
-    TYPE = None
+    type = None
     """ The type of the node."""
     SEARCH_EXCLUDE = ['_class']
     """ List of attributes to exclude with a string_replace"""
@@ -24,6 +24,8 @@ class BaseComponent(object):
 
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
+
+        self.type = self.type
 
     def __eq__(self, other):
         """ Are names == in node objects?
