@@ -10,17 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class BaseNode(object):
+    """ The base node for the node functionality of all nodes
+    """
     TYPE = None
+    """ The type of node. """
     MAP_LIST = []
+    """ List of maps to store. """
     SEARCH_EXCLUDE = ['_class', '_attrs']
+    """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
+    """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
-        """
-
-        Returns:
-            object:
-        """
         self._name = None
         self._attrs = {}
         self._association = []
@@ -36,15 +37,15 @@ class BaseNode(object):
         if args:
             self.populate(args[0])
 
-    # def __iter__(self):
-    #     return self
-
     def __eq__(self, other):
+        """ Are names == in node objects?
+        """
         if isinstance(other, BaseNode):
             return self.name == other.name
 
     def __ne__(self, other):
-        """Define a non-equality test"""
+        """ Define a non-equality test
+        """
         return not self.__eq__(other)
 
     def __str__(self):
@@ -63,7 +64,8 @@ class BaseNode(object):
         return output
 
     def serialize(self):
-        """
+        """  Makes node serializable.
+
         This replaces an mObject with the name of the object in scene to make it
         serializable for writing out to json.  Then it loops through keys in
         dict and saves out a temp dict of items that can be serializable and
@@ -89,23 +91,25 @@ class BaseNode(object):
         return output
 
     def deserialize(self, dictionary):
-        """
-        For now this sets the mobject with the string that is there now.
+        """ Deserializes a node with given dict.
 
-        Returns:
+        Takes a dictionary and goes through keys and fills up __dict__.
 
+        Args (dict): The given dict.
         """
         for key in dictionary:
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
 
-        # self.set_attr_list(self._attrs.keys())
-
     def populate(self, *args, **kwargs):
-        """
+        """ Populates the node with the info from the passed maya node in args.
 
-        Returns:
-            object:
+        This is deals with basic stuff including attributes.  For other things it
+        is meant to be overridden in inherited node.
+
+        Args:
+            *args (str): The maya node to populate it with.
+
         """
         selection = mz.parse_args_for_selection(args)
 
@@ -120,16 +124,20 @@ class BaseNode(object):
         self.mobject = selection[0]
 
     def apply(self, *args, **kwargs):
+        """ Builds the node in maya.  meant to be overwritten.
+        """
         raise NotImplementedError
 
+    # TODO clean this up.  could be more readable
     def string_replace(self, search, replace):
-        """
+        """ Search and replaces items in the node.  Uses regular expressions.
+        Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
+
+        Goes through the dictionary and search and replace items.
 
         Args:
-            search:
-            replace:
-
-        Returns:
+            search (str): string to search for.
+            replace (str): string to replace it with.
 
         """
         for item in self.__dict__:
@@ -138,19 +146,23 @@ class BaseNode(object):
                     if self.__dict__[item]:
                         new_names = []
                         for name in self.__dict__[item]:
-                            new_name = mz.replace_long_name(search, replace, name)
-                            new_names.append(new_name)
-                        self.__dict__[item] = new_names
+                            if isinstance(name, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item] = new_names
                 elif isinstance(self.__dict__[item], basestring):
                     if self.__dict__[item]:
                         self.__dict__[item] = mz.replace_long_name(
                             search, replace, self.__dict__[item])
                 elif isinstance(self.__dict__[item], dict):
                     # TODO needs functionality (replace keys)
-                    print 'DICT', item, self.__dict__
+                    print 'DICT', item, self.__dict__[item], self.name
+                    # raise StandardError('HELP')
 
     @property
     def attrs(self):
+        """ Stored attributes of node.
+        """
         return self._attrs
 
     @attrs.setter
@@ -159,10 +171,14 @@ class BaseNode(object):
 
     @property
     def long_name(self):
+        """ Long name of node.
+        """
         return self._name
 
     @property
     def name(self):
+        """ Name of node.
+        """
         return self._name.split('|')[-1]
 
     @name.setter
@@ -171,11 +187,7 @@ class BaseNode(object):
 
     @property
     def type(self):
-        """
-        get type of node
-
-        Returns:
-            (str) of node name
+        """ Type of node.
         """
         try:
             return self.TYPE
@@ -187,6 +199,8 @@ class BaseNode(object):
 
         self.TYPE = type_
 
+    # TODO instead of get_map* and get_mesh* should be more generic.
+    # get_data*(type_filter)
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically
@@ -195,9 +209,8 @@ class BaseNode(object):
         list of meshes against the map list.
 
         Returns:
-            list(): of long mesh names.
+            list: List of long mesh names.
         """
-        # return self.long_association
         return self.association
 
     def get_mesh_objects(self):
@@ -238,6 +251,8 @@ class BaseNode(object):
 
     @property
     def association(self):
+        """ associations of node.
+        """
         tmp = []
         for item in self._association:
             tmp.append(item.split('|')[-1])
@@ -252,13 +267,15 @@ class BaseNode(object):
 
     @property
     def long_association(self):
+        """ Long names of associations.
+        """
         return self._association
 
     def compare(self):
-        """
+        """ Compares node in memory with that which is in maya scene.
 
         Returns:
-
+            prints out items that are different.
         """
         name = self.name
 
@@ -336,14 +353,12 @@ class BaseNode(object):
                     text = '{}.{} not found, skipping.'.format(scene_name, attr)
                     logger.info(text)
 
+    # TODO this level????  pass a false?  seriously??
     def interpolate_maps(self, interp_maps):
-        """
+        """ Interpolates maps in node.
 
         Args:
-            interp_maps:
-
-        Returns:
-
+            interp_maps (bool): Do you want to do it?
         """
 
         map_objects = self.get_map_objects()

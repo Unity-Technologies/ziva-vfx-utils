@@ -80,10 +80,11 @@ class ZivaSetup(Builder):
                     nodes = mc.ls(fiber_history, type='zLineOfAction')
             else:
                 nodes = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
+
             if nodes:
-                for node in nodes:
-                    b_node = self.node_factory(node)
-                    self.add_node(b_node)
+                self._populate_nodes(nodes,
+                                     get_mesh=get_mesh,
+                                     get_maps=get_maps)
 
         self.stats()
 
@@ -162,24 +163,37 @@ class ZivaSetup(Builder):
                 nodes.extend(mz.get_zFibers(selection))
             if cloth:
                 nodes.extend(mz.get_zCloth(selection))
-            # if lineOfAction:
-            #     logger.info('getting line of actions.')
-            #     for fiber in mz.get_zFibers(selection):
-            #         nodes.append(mz.get_fiber_lineofaction(fiber))
-            # if embedder:
-            #     logger.info('getting embedder')
-            #     self.__retrieve_embedded_from_selection(selection,
-            #                                             attr_filter=attr_filter)
+            if lineOfAction:
+                for fiber in mz.get_zFibers(selection):
+                    nodes.append(mz.get_fiber_lineofaction(fiber))
+            if embedder:
+                mc.select(selection)
+                embedder = mm.eval('zQuery -t "zEmbedder"')
+                if embedder:
+                    nodes.extend(embedder)
         else:
             nodes = selection
 
         if nodes:
-            for node in nodes:
-                b_node = self.node_factory(node)
-                self.add_node(b_node)
+            self._populate_nodes(nodes)
 
         mc.select(sel, r=True)
         self.stats()
+
+    def _populate_nodes(self, nodes, get_mesh=True, get_maps=True):
+        """
+        This instantiates a builder node and populates it with given maya node.
+
+        Args:
+            nodes:
+
+        Returns:
+
+        """
+        for node in nodes:
+            b_node = self.node_factory(node)
+            self.add_node(b_node)
+
 
     @Builder.time_this
     def apply(self, name_filter=None, attr_filter=None, interp_maps='auto',
@@ -199,10 +213,8 @@ class ZivaSetup(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            meshes = self.get_data(type_filter='mesh')
-            for mesh in meshes:
-                meshes[mesh].mirror()
-                
+            [item.mirror() for item in self.get_data(type_filter='mesh')]
+
         logger.info('applying setup....')
         sel = mc.ls(sl=True)
 

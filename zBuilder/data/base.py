@@ -1,12 +1,21 @@
 import logging
 import json
 import maya.cmds as mc
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
 
 class BaseComponent(object):
+    """ This is the base node for storing component data..
+
+    Args:
+        deserialize (dict, optional): a dictionary to deserialize into node.
+    """
     TYPE = None
+    """ The type of the node."""
+    SEARCH_EXCLUDE = ['_class']
+    """ List of attributes to exclude with a string_replace"""
 
     def __init__(self, *args, **kwargs):
 
@@ -17,12 +26,45 @@ class BaseComponent(object):
             self.deserialize(kwargs.get('deserialize', None))
 
     def __eq__(self, other):
+        """ Are names == in node objects?
+        """
         if isinstance(other, BaseComponent):
             return self.name == other.name
 
     def __ne__(self, other):
-        """Define a non-equality test"""
+        """ Define a non-equality test
+        """
         return not self.__eq__(other)
+
+    def string_replace(self, search, replace):
+        """ Search and replaces items in the node.  Uses regular expressions.
+        Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
+
+        Goes through the dictionary and search and replace items.
+
+        Args:
+            search (str): string to search for.
+            replace (str): string to replace it with.
+
+        """
+        for item in self.__dict__:
+            if item not in self.SEARCH_EXCLUDE:
+                if isinstance(self.__dict__[item], (tuple, list)):
+                    if self.__dict__[item]:
+                        new_names = []
+                        for name in self.__dict__[item]:
+                            if isinstance(name, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item] = new_names
+                elif isinstance(self.__dict__[item], basestring):
+                    if self.__dict__[item]:
+                        self.__dict__[item] = mz.replace_long_name(
+                            search, replace, self.__dict__[item])
+                elif isinstance(self.__dict__[item], dict):
+                    # TODO needs functionality (replace keys)
+                    print 'DICT', item, self.__dict__[item], self.name
+                    # raise StandardError('HELP')
 
     @property
     def long_name(self):
@@ -30,6 +72,8 @@ class BaseComponent(object):
 
     @property
     def name(self):
+        """ The name of the node.
+        """
         return self._name.split('|')[-1]
 
     @name.setter
@@ -41,11 +85,7 @@ class BaseComponent(object):
 
     @property
     def type(self):
-        """
-        get type of node
-
-        Returns:
-            (str) of node name
+        """ The type of node.
         """
         try:
             return self.TYPE
@@ -63,10 +103,12 @@ class BaseComponent(object):
         self.TYPE = type_
 
     def serialize(self):
-        """
-        it loops through keys in dict and saves out a temp dict of items that
-        can be serializable and returns that temp dict for json writing
-        purposes.
+        """  Makes node serializable.
+
+        This replaces an mObject with the name of the object in scene to make it
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
 
         Returns:
             dict: of serializable items
@@ -83,12 +125,12 @@ class BaseComponent(object):
         return output
 
     def deserialize(self, dictionary):
-        """
-        For now this sets the mobject with the string that is there now.
+        """ Deserializes a node with given dict.
 
-        Returns:
+         Takes a dictionary and goes through keys and fills up __dict__.
 
-        """
+         Args (dict): The given dict.
+         """
         for key in dictionary:
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]

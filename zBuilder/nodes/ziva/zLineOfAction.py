@@ -9,7 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class LineOfActionNode(ZivaBaseNode):
+    """ This node for storing information related to zLineOfAction.
+    """
     TYPE = 'zLineOfAction'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         self._zFiber = None
@@ -18,6 +21,8 @@ class LineOfActionNode(ZivaBaseNode):
 
     @property
     def fiber(self):
+        """ The associated fiber.
+        """
         return self._zFiber
 
     @fiber.setter
@@ -25,20 +30,27 @@ class LineOfActionNode(ZivaBaseNode):
         self._zFiber = fiber
 
     def populate(self, *args, **kwargs):
+        """ This extends ZivaBase.populate()
+
+        Adds fiber storage.
+
+        Args:
+            *args: Maya node to populate with.
+        """
         super(LineOfActionNode, self).populate(*args, **kwargs)
 
         self.fiber = mz.get_lineOfAction_fiber(self.get_scene_name())
 
     def apply(self, *args, **kwargs):
-
-        """
+        """ Builds the Line of Actions in maya scene.
 
         Args:
-            *args:
-            **kwargs:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
 
-        Returns:
-
+                tmp = {'zSolver':['substeps']}
+            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)

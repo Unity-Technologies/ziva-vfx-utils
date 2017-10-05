@@ -9,12 +9,26 @@ logger = logging.getLogger(__name__)
 
 
 class BoneNode(ZivaBaseNode):
+    """ This node for storing information related to zBones.
+    """
     TYPE = 'zBone'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
+        """ Builds the zBones in maya scene.
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            permissive (bool): Pass on errors. Defaults to ``True``
+
+        """
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
@@ -33,8 +47,7 @@ class BoneNode(ZivaBaseNode):
 
 
 def apply_multiple(b_nodes, attr_filter=None, permissive=False, check_meshes=True):
-    """
-    Each node can deal with it's own building.  Though, with zBones it is much
+    """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
 

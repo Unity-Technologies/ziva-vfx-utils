@@ -25,9 +25,18 @@ ZNODES = [
     'zMaterial',
     'zFiber',
     'zCacheTransform']
+""" All available ziva nodes to be able to cleanup. """
 
 
 def get_mesh_connectivity(mesh_name):
+    """ Gets mesh connectivity for given mesh.
+
+    Args:
+        mesh_name: Name of mesh to process.
+
+    Returns:
+        dict: Dictionary of polygonCounts, polygonConnects, and points.
+    """
     space = om.MSpace.kWorld
     mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
     mesh_to_rebuild_m_dag_path.extendToShape()
@@ -75,15 +84,14 @@ def get_mesh_connectivity(mesh_name):
 
 
 def check_body_type(bodies):
-    """
-    Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
+    """ Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
     used to see if we can create a zAttachment before we try.  Additionally
     does a check if all objects exist in scene.
 
     Args:
         bodies (list):  List of bodies we want to check type of.  
 
-    Rerturns:
+    Returns:
         (bool): True if all bodies pass test, else False.
     """
     sel = mc.ls(sl=True)
@@ -101,6 +109,15 @@ def check_body_type(bodies):
 
 
 def get_type(body):
+    """ Really light wrapper for getting type of maya node.  Ya, I know.
+
+    Args:
+        body (str): Maya node to get type of
+
+    Returns:
+        str: String of node type.
+
+    """
     try:
         return mc.objectType(body)
     except:
@@ -108,6 +125,8 @@ def get_type(body):
 
 
 def clean_scene():
+    """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
+    """
     for node in ZNODES:
         in_scene = mc.ls(type=node)
         if len(in_scene) > 0:
@@ -115,6 +134,13 @@ def clean_scene():
 
 
 def get_zSolver(body):
+    """ Gets zSolver in scene.
+    Args:
+        body: Maya node to find associated solver.
+
+    Returns:
+        returns long name of zSolver.
+    """
     sel = mc.ls(sl=True)
     mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolver" -l')
@@ -123,6 +149,13 @@ def get_zSolver(body):
 
 
 def get_zSolverTransform(body):
+    """ Gets zSolverTransform in scene.
+    Args:
+        body: Maya node to find associated solverTransform.
+
+    Returns:
+        returns long name of zSolverTransform.
+    """
     sel = mc.ls(sl=True)
     mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolverTransform" -l')
@@ -131,6 +164,13 @@ def get_zSolverTransform(body):
 
 
 def get_zAttachments(bodies):
+    """ Gets zAttachments in scene.
+    Args:
+        body: Maya node to find associated zAttachments.
+
+    Returns:
+        string of name of zAttachments.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     attachments = mm.eval('zQuery -t zAttachment')
@@ -142,6 +182,13 @@ def get_zAttachments(bodies):
 
 
 def isSolver(selection):
+    """ Checks if passed is zSolver or zSolverTransform.
+    Args:
+        selection: Item of interest.
+
+    Returns:
+        True if it is solver, else false.
+    """
     isSolver = False
     for s in selection:
         if mc.objectType(s) == 'zSolver' or mc.objectType(
@@ -152,6 +199,13 @@ def isSolver(selection):
 
 
 def get_zBones(bodies):
+    """ Gets zBones in scene.
+    Args:
+        body: Maya node to find associated zBones.
+
+    Returns:
+        string of name of zBones.
+    """
     sel = mc.ls(sl=True)
 
     if isSolver(sel):
@@ -181,6 +235,13 @@ def get_zBones(bodies):
 
 
 def get_zTets(bodies):
+    """ Gets zTets in scene.
+    Args:
+        body: Maya node to find associated zTets.
+
+    Returns:
+        string of name of zTets.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zTets = mm.eval('zQuery -t "zTet"')
@@ -192,6 +253,13 @@ def get_zTets(bodies):
 
 
 def get_zTissues(bodies):
+    """ Gets zTissues in scene.
+    Args:
+        body: Maya node to find associated zTissues.
+
+    Returns:
+        string of name of zTissues.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zTissues = mm.eval('zQuery -t "zTissue"')
@@ -203,8 +271,12 @@ def get_zTissues(bodies):
 
 
 def get_zMaterials(bodies):
-    """
-    Gets zMaterial nodes given a mesh
+    """ Gets zmaterials in scene.
+    Args:
+        body: Maya node to find associated zMaterials.
+
+    Returns:
+        string of name of zmaterials.
     """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
@@ -217,6 +289,13 @@ def get_zMaterials(bodies):
 
 
 def get_zFibers(bodies):
+    """ Gets zFibers in scene.
+    Args:
+        body: Maya node to find associated zFibers.
+
+    Returns:
+        string of name of zFibers.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zFibers = mm.eval('zQuery -t "zFiber"')
@@ -228,6 +307,13 @@ def get_zFibers(bodies):
 
 
 def get_zCloth(bodies):
+    """ Gets zCloth in scene.
+    Args:
+        body: Maya node to find associated zCloth.
+
+    Returns:
+        string of name of zCloth.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zCloth = mm.eval('zQuery -t "zCloth"')
@@ -239,11 +325,13 @@ def get_zCloth(bodies):
 
 
 def get_zTet_user_mesh(zTet):
-    """
-    Gets the user tet mesh hooked up to a given zTet in any.
+    """ Gets the user tet mesh hooked up to a given zTet in any.
 
-    args:
+    Args:
         zTet (string): the zTet to query.
+
+    Returns:
+        str: User tet mesh.
     """
     if mc.objExists(zTet + '.iTet'):
         mesh = mc.listConnections(zTet + '.iTet')
@@ -255,11 +343,13 @@ def get_zTet_user_mesh(zTet):
 
 
 def get_fiber_lineofaction(zFiber):
-    """
-    Gets the zLineOfAction node hooked up to a given zFiber in any.
+    """ Gets the zLineOfAction node hooked up to a given zFiber in any.
 
-    args:
+    Args:
         zFiber (string): the zFiber to query.
+
+    Returns:
+        str: zLineOfAction
     """
     if mc.objExists(zFiber + '.iLineOfActionData'):
         conn = mc.listConnections(zFiber + '.iLineOfActionData')
@@ -272,11 +362,13 @@ def get_fiber_lineofaction(zFiber):
 
 
 def get_lineOfAction_fiber(zlineofaction):
-    """
-    Gets the zFiber node hooked up to a given zLineOfAction in any.
+    """ Gets the zFiber node hooked up to a given zLineOfAction in any.
 
-    args:
+    Args:
         zlineofaction (string): the zLineOfAction to query.
+
+    Returns:
+        str: Name of zFiber hooked up to lineOfAction
     """
     if mc.objExists(zlineofaction + '.oLineOfActionData'):
         conn = mc.listConnections(zlineofaction + '.oLineOfActionData')
@@ -289,8 +381,7 @@ def get_lineOfAction_fiber(zlineofaction):
 
 
 def get_association(zNode):
-    """
-    Gets an association of given zNode
+    """ Gets an association of given zNode
 
     args:
         zNode (string): the zNode to find association of.
@@ -324,8 +415,7 @@ def get_association(zNode):
 
 
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
-    """
-    Renames zNodes based on mesh it's connected to.
+    """ Renames zNodes based on mesh it's connected to.
 
     args:
         replace (list): subset of mesh name to replace with zNode name
@@ -390,8 +480,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
 
 
 def select_tissue_meshes():
-    """
-    Selects all zTissues in scene
+    """ Selects all zTissues in scene
     """
     mc.select(cl=True)
     meshes = mm.eval('zQuery -t "zTissue" -m')
@@ -399,8 +488,7 @@ def select_tissue_meshes():
 
 
 def get_tissue_children(ztissue):
-    """
-    This checks a zTissue if it has children.  Useful for sub-tissues.
+    """ This checks a zTissue if it has children.  Useful for sub-tissues.
     Args:
         ztissue (str): The zTissue object in the maya scene.
 
@@ -423,8 +511,7 @@ def get_tissue_children(ztissue):
 
 
 def get_tissue_parent(ztissue):
-    """
-    This checks a zTissue if it has a parent.  Useful for sub-tissues.
+    """ This checks a zTissue if it has a parent.  Useful for sub-tissues.
     Args:
         ztissue (str): The zTissue object in the maya scene.
 
@@ -442,6 +529,11 @@ def get_tissue_parent(ztissue):
 
 
 def get_mdagpath_from_mesh(mesh_name):
+    """ Maya stuff, getting the dagpath from a mesh name
+
+    Args:
+        mesh_name: The mesh to get dagpath from.
+    """
     mesh_m_dag_path = om.MDagPath()
     sel_list = om.MSelectionList()
     sel_list.add(mesh_name)
@@ -451,13 +543,13 @@ def get_mdagpath_from_mesh(mesh_name):
 
 
 def get_name_from_m_object(m_object, long_name=True):
-    """
-
+    """ Gets maya scene name from given mObject.
     Args:
-        m_object:
-        long_name:
+        m_object: The m_object to get name from.
+        long_name: Returns long name. Default = ``True``
 
     Returns:
+        str: Maya object name.
 
     """
     if m_object.hasFn(om.MFn.kDagNode):
@@ -474,8 +566,7 @@ def get_name_from_m_object(m_object, long_name=True):
 
 
 def check_mesh_quality(meshes):
-    """
-    Light wrapper around checking mesh quality.
+    """ Light wrapper around checking mesh quality.
 
     args:
         meshes (list): A list of meshes you want to check
@@ -579,13 +670,14 @@ def build_attr_list(selection, attr_filter=None):
 
 
 def build_attr_key_values(selection, attr_list):
-    """
-
+    """ Builds a dictionary of attribute key/values.  Stores the value, type, and
+    locked status.
     Args:
-        selection:
-        attr_list:
+        selection: Items to save attrbutes for.
+        attr_list: List of attributes to save.
 
     Returns:
+        dict: of attribute values.
 
     """
     attr_dict = {}
@@ -603,8 +695,7 @@ def build_attr_key_values(selection, attr_list):
 
 
 def replace_long_name(search, replace, long_name):
-    """
-    does a search and replace on a long name.  It splits it up by ('|') then
+    """ does a search and replace on a long name.  It splits it up by ('|') then
     performs it on each piece
 
     Args:
@@ -632,8 +723,7 @@ def replace_long_name(search, replace, long_name):
 
 
 def cull_creation_nodes(b_nodes, permissive=True):
-    """
-    To help speed up the build of a Ziva setup we are creating the bones and
+    """ To help speed up the build of a Ziva setup we are creating the bones and
     the tissues with one command.  Given a list of zBuilder nodes this checks
     if a given node needs to be created in scene.  Checks to see if it
     already exists or if associated mesh is missing.  Either case it culls

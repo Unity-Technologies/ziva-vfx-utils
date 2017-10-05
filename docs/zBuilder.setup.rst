@@ -1,50 +1,63 @@
-zBuilder\.setup package
-=======================
+zBuilder.setup package
+======================
 
-
-zBuilder\.setup\.Attributes module
-----------------------------------
+zBuilder.setup.Attributes module
+--------------------------------
 
 .. automodule:: zBuilder.setup.Attributes
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder\.setup\.Constraints module
------------------------------------
+zBuilder.setup.Constraints module
+---------------------------------
 
 .. automodule:: zBuilder.setup.Constraints
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder\.setup\.Selection module
----------------------------------
+zBuilder.setup.DeltaMush module
+-------------------------------
+
+.. automodule:: zBuilder.setup.DeltaMush
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+zBuilder.setup.Selection module
+-------------------------------
 
 .. automodule:: zBuilder.setup.Selection
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder\.setup\.Ziva module
-----------------------------
+zBuilder.setup.Test module
+--------------------------
+
+.. automodule:: zBuilder.setup.Test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+zBuilder.setup.Ziva module
+--------------------------
 
 .. automodule:: zBuilder.setup.Ziva
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder\.setup\.base module
-----------------------------
+zBuilder.setup.Ziva2 module
+---------------------------
 
-.. automodule:: zBuilder.setup.base
+.. automodule:: zBuilder.setup.Ziva2
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.setup
     :members:

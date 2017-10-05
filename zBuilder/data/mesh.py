@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Mesh(BaseComponent):
     TYPE = 'mesh'
+    """ Type of node. """
 
     def __init__(self, *args, **kwargs):
         self._class = (self.__class__.__module__, self.__class__.__name__)
@@ -37,14 +38,12 @@ class Mesh(BaseComponent):
         return self.__str__()
 
     def populate(self, mesh_name):
-        """
+        """ Populate node with that from the maya scene.
 
-        Args:
-            mesh_name: Name of mesh to populate node with.
+         Args:
+             mesh_name: Name of mesh to populate it with.
 
-        Returns:
-
-        """
+         """
         connectivity = mz.get_mesh_connectivity(mesh_name)
 
         self.name = mesh_name
@@ -55,31 +54,48 @@ class Mesh(BaseComponent):
 
         # logger.info('Retrieving Data : {}'.format(self))
 
-    def string_replace(self, search, replace):
-        # name replace----------------------------------------------------------
-        name = self.long_name
-        new_name = mz.replace_long_name(search, replace, name)
-        self.name = new_name
-
     def set_polygon_counts(self, pCountList):
+        """ Stores the polygon counts.
+
+        Args:
+            pCountList (list): The count list.
+        """
         self._pCountList = pCountList
 
     def set_polygon_connects(self, pConnectList):
+        """ Stores the polygon connects.
+
+        Args:
+            pConnectList (list): The connect list.
+        """
         self._pConnectList = pConnectList
 
     def set_point_list(self, point_list):
+        """ Stores the point list.
+
+        Args:
+            point_list (list): List of points.
+        """
         self._pointList = point_list
 
     def get_polygon_counts(self):
+        """ Get polygon counts. """
         return self._pCountList
 
     def get_polygon_connects(self):
+        """ Get polygon Connects """
         return self._pConnectList
 
     def get_point_list(self):
+        """ Get point List """
         return self._pointList
 
     def build(self):
+        """ Builds mesh in maya scene.
+
+        Returns:
+            mesh name.
+        """
         mesh = build_mesh(
             self.name,
             self.get_polygon_counts(),
@@ -89,21 +105,19 @@ class Mesh(BaseComponent):
         return mesh
 
     def mirror(self):
-        # TODO faster mirroring
+        """ Mirrors internal mesh by negating translate X on all points.
+        """
         logger.info('Mirroring mesh: {}'.format(self.name))
-        tmp = []
-        for item in self.get_point_list():
-            tmp.append([-item[0], item[1], item[2]])
-        self.set_point_list(tmp)
+
+        value = [[-item[0], item[1], item[2]] for item in self.get_point_list()]
+        self.set_point_list(value)
 
     def is_topologically_corresponding(self):
-        """
-        Compare a mesh in scene with one saved in this node.  Currently just
+        """ Compare a mesh in scene with one saved in this node.  Currently just
         checking if vert count is same.  Need to update this to a better method.
 
-        Args:
-
-        Returns: True if topologically corresponding
+        Returns:
+            True if topologically corresponding, else False
 
         """
         cur_conn = mz.get_mesh_connectivity(self.name)
@@ -114,6 +128,17 @@ class Mesh(BaseComponent):
 
 
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
+    """ Builds mesh in maya scene.
+    Args:
+        name: Name of mesh.
+        polygonCounts: The polygon counts.
+        polygonConnects: The polygon connects.
+        vertexArray: The point list.
+
+    Returns:
+        Name of newly built mesh.
+
+    """
     polygonCounts_mIntArray = om.MIntArray()
     polygonConnects_mIntArray = om.MIntArray()
     vertexArray_mFloatPointArray = vertexArray

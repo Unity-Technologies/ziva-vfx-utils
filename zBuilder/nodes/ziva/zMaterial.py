@@ -9,13 +9,29 @@ logger = logging.getLogger(__name__)
 
 
 class MaterialNode(ZivaBaseNode):
+    """ This node for storing information related to zMaterials.
+    """
     TYPE = 'zMaterial'
+    """ The type of node. """
+
     MAP_LIST = ['weightList[0].weights']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
+        """ Builds the zMaterial in maya scene.
+
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            interp_maps (str): Interpolating maps.  Defaults to ``auto``
+            permissive (bool): Pass on errors. Defaults to ``True``
+        """
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
@@ -37,7 +53,7 @@ class MaterialNode(ZivaBaseNode):
             existing_materials = mm.eval(
                 'zQuery -t zMaterial {}'.format(mesh))
             data_materials = self._setup.get_nodes(type_filter='zMaterial',
-                                                   name_filter=mesh)
+                                                   association_filter=mesh)
 
             d_index = data_materials.index(self)
 

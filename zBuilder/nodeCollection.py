@@ -1,9 +1,7 @@
-import json
 import maya.cmds as mc
-
 import zBuilder.zMaya as mz
 
-import importlib
+import re
 import time
 
 import logging
@@ -12,9 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class NodeCollection(object):
-    # __metaclass__ = abc.ABCMeta
-    """
-    This is an object that holds the node data in a list
+    """Mixin class to deal with storing node data and component data.  meant to
+    be inherited by main.
     """
 
     def __init__(self):
@@ -29,20 +26,31 @@ class NodeCollection(object):
         self.info['operating_system'] = mc.about(os=True)
 
     def __iter__(self):
+        """ This iterates through the nodes.
+
+        Returns:
+            Iterator of nodes.
+
+        """
         return iter(self.__collection)
 
     def __len__(self):
+        """
+
+        Returns: Length of nodes.
+
+        """
         return len(self.__collection)
 
     def print_(self, type_filter=list(), name_filter=list(), component_data=False):
-
-        """
-        print info on each node
+        """Prints info on each node.
 
         Args:
-            type_filter (str): filter by node type.  Defaults to list()
-            name_filter (str): filter by node name. Defaults to list()
-            component_data (bool): prints name of data stored.  Defaults to False
+            type_filter (:obj:`list` or :obj:`str`): filter by node type.
+                Defaults to :obj:`list`
+            name_filter (:obj:`list` or :obj:`str`): filter by node name.
+                Defaults to :obj:`list`
+            component_data (:obj:`bool`): prints name of data stored.  Defaults to ``False``
 
         """
 
@@ -62,8 +70,10 @@ class NodeCollection(object):
         Compares info in memory with that which is in scene.
 
         Args:
-            type_filter (str): filter by node type.  Defaults to list()
-            name_filter (str): filter by node name. Defaults to list()
+            type_filter (:obj:`list` or :obj:`str`): filter by node type.
+                Defaults to :obj:`list`
+            name_filter (:obj:`list` or :obj:`str`): filter by node name.
+                Defaults to :obj:`list`
 
         """
 
@@ -71,12 +81,13 @@ class NodeCollection(object):
                                    name_filter=name_filter):
             node.compare()
 
-    def stats(self, type_filter=list()):
+    def stats(self, type_filter=str()):
         """
         prints out basic stats on data
 
         Args:
-            type_filter (str): filter by node type.  Defaults to list()
+            type_filter (:obj:`str`): filter by node type.
+                Defaults to :obj:`str`
         """
         tmp = {}
         for i, d in enumerate(self):
@@ -108,29 +119,20 @@ class NodeCollection(object):
 
     @property
     def data(self):
-        """
-
-        Returns:
-
+        """ (:obj:`list` of :obj:`obj`) The dense data nodes stored in collection.
         """
         return self._data
 
     @data.setter
     def data(self, data):
-        """
-
-        Returns:
-
-        """
         self._data = data
 
     def add_data(self, data):
-        """
-        appends a data obj to the data list.  Checks if data is already in list,
-        if it is it overrides the previous one.
+        """ appends a data obj to the data list.  Checks if data is already in
+        list, if it is it overrides the previous one.
 
         Args:
-
+            data (:obj:`obj`) data object to append to list
         """
         if data in self._data:
             self._data = [data if item == data else item for item in self._data]
@@ -139,6 +141,8 @@ class NodeCollection(object):
 
     @property
     def nodes(self):
+        """ (:obj:`list` of :obj:`obj`) The nodes stored in collection.
+        """
         return self.__collection
 
     @nodes.setter
@@ -151,7 +155,7 @@ class NodeCollection(object):
         it is it overrides the previous one.
 
         Args:
-            node (obj): the node obj to append to collection list.
+            node (:obj:`obj`): the node obj to append to collection list.
         """
 
         if node in self.__collection:
@@ -159,67 +163,40 @@ class NodeCollection(object):
         else:
             self.__collection.append(node)
 
-    # TODO lookup by short name
-    def get_data(self, type_filter=list(), name_filter=list()):
+    def remove_node(self, node):
         """
-        get nodes in data object
+        Removes a node from the node list while keeping order.
+        Args:
+            node (:obj:`obj`): The node object to remove.
+        """
+        self.nodes.remove(node)
+
+    def remove_data(self, data):
+        """
+        Removes a data from the data list while keeping order.
+        Args:
+            data (:obj:`obj`): The data obj to remove.
+        """
+        self.data.remove(data)
+
+    def get_data(self, type_filter=list(),
+                 name_filter=list(),
+                 name_regex=None):
+        """
+        Gets data objects from data list.
 
         Args:
-            type_filter (str or list): filter by node type.  Defaults to list()
-            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
-
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by data ``type``.
+                Defaults to :obj:`list`.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by data ``name``.
+                Defaults to :obj:`list`.
+            name_regex (:obj:`str`): filter by node name by regular expression.
+                Defaults to ``None``.
         Returns:
-            [] of component data
+            list: List of data objects.
         """
-
-        if not type_filter and not name_filter:
-            return self.nodes
-
-        if not isinstance(type_filter, list):
-            type_filter = [type_filter]
-        #
-        if not isinstance(name_filter, list):
-            name_filter = [name_filter]
-
-        if type_filter:
-            items = [x for x in self.data if x.type in type_filter]
-        else:
-            items = self.data
-
-        if name_filter:
-            items = [item for item in items if item.name in name_filter]
-
-        return items
-
-    def get_nodes(self, type_filter=list(), name_filter=list()):
-        """
-        get nodes in data object
-
-        Args:
-            type_filter (str or list): filter by node type.  Defaults to list()
-            name_filter (str or list): filter by node name.  Looks for association.  Defaults to list()
-
-        Returns:
-            [] of nodes
-        """
-        # if not type_filter and not name_filter:
-        #     return self.nodes
-        #
-
-        #
-        # if not isinstance(name_filter, list):
-        #     name_filter = [name_filter]
-        #
-        # types = set(type_filter or [])
-        # names = set(name_filter or [])
-        # print types
-        # print names
-        # keep_type = lambda item : type_filter is None or item.type in types
-        # keep_name = lambda item : name_filter is None or not names.isdisjoint(item.association)
-        # return [item for item in self if keep_name(item) and keep_type(item)]
-
-        if not type_filter and not name_filter:
-            return self.nodes
+        if not type_filter and not name_filter and not name_regex:
+            return self.data
 
         if not isinstance(type_filter, list):
             type_filter = [type_filter]
@@ -227,24 +204,81 @@ class NodeCollection(object):
         if not isinstance(name_filter, list):
             name_filter = [name_filter]
 
-        if type_filter:
-            items = [x for x in self if x.type in type_filter]
-        else:
-            items = self.nodes
+        type_set = set(type_filter)
+        name_set = set(name_filter)
 
-        if name_filter:
-            nf_set = set(name_filter)
-            items = [item for item in items if not nf_set.isdisjoint(item.association)]
+        def keep_me(item):
+            if type_set and item.type not in type_set:
+                return False
+            if name_set and item.name not in name_set:
+                return False
+            if name_regex and not re.search(name_regex, item.name):
+                return False
+            return True
 
-        return items
+        return [item for item in self.data if keep_me(item)]
+
+    def get_nodes(self, type_filter=list(),
+                  name_filter=list(),
+                  name_regex=None,
+                  association_filter=list(),
+                  association_regex=None):
+
+        """
+        Gets node objects from node list.
+
+        Args:
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by node ``type``.
+                Defaults to :obj:`list`.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by node ``name``.
+                Defaults to :obj:`list`.
+            name_regex (:obj:`str`): filter by node name by regular expression.
+                Defaults to ``None``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by node ``association``.
+                Defaults to :obj:`list`.
+            association_regex (:obj:`str`): filter by node ``association`` by regular expression.
+                Defaults to ``None``.
+        Returns:
+            list: List of node objects.
+        """
+        if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
+            return self.nodes
+
+        if not isinstance(type_filter, list):
+            type_filter = [type_filter]
+
+        if not isinstance(association_filter, list):
+            association_filter = [association_filter]
+
+        if not isinstance(name_filter, list):
+            name_filter = [name_filter]
+
+        type_set = set(type_filter)
+        name_set = set(name_filter)
+        association_set = set(association_filter)
+
+        def keep_me(item):
+            if type_set and item.type not in type_set:
+                return False
+            if name_set and item.name not in name_set:
+                return False
+            if association_set and association_set.isdisjoint(item.association):
+                return False
+            if name_regex and not re.search(name_regex, item.name):
+                return False
+            if association_regex and not re.search(association_regex, item.association):
+                return False
+            return True
+
+        return [item for item in self if keep_me(item)]
 
     def string_replace(self, search, replace):
         """
         searches and replaces with regular expressions items in data
 
         Args:
-            search (str): what to search for
-            replace (str): what to replace it with
+            search (:obj:`str`): what to search for
+            replace (:obj:`str`): what to replace it with
 
         Example:
             replace `r_` at front of item with `l_`:
@@ -255,26 +289,18 @@ class NodeCollection(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        [node.string_replace(search, replace) for node in self]
+        for node in self:
+            node.string_replace(search, replace)
 
-        # deal with the data search and replacing
-        for key in self.data:
+        for item in self.data:
+            item.string_replace(search, replace)
 
-            # replace the key names in data
-            self.data[key] = replace_dict_keys(search, replace, self.data[key])
-
-            # run search and replace on individual items
-            for item in self.data[key]:
-                self.data[key][item].string_replace(search, replace)
-
-    # @abc.abstractmethod
     def apply(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
         raise NotImplementedError("Subclass must implement abstract method")
 
-    # @abc.abstractmethod
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
@@ -287,12 +313,12 @@ def replace_dict_keys(search, replace, dictionary):
     Does a search and replace on dictionary keys
 
     Args:
-        search (str): search term
-        replace (str): replace term
-        dictionary (dict): the dictionary to do search on
+        search (:obj:`str`): search term
+        replace (:obj:`str`): replace term
+        dictionary (:obj:`dict`): the dictionary to do search on
 
     Returns:
-        dict: result of search and replace
+        :obj:`dict`: result of search and replace
     """
     tmp = {}
     for key in dictionary:

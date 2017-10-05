@@ -9,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class ZivaBaseNode(BaseNode):
+    """Base node for Ziva type nodes.
+
+    extended from base to deal with maps and meshes and storing the solver.
+    """
     EXTEND_ATTR_LIST = list()
 
     def __init__(self, *args, **kwargs):
@@ -17,21 +21,34 @@ class ZivaBaseNode(BaseNode):
         BaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
-        pass
+        """
+
+        Args:
+            *args:
+            **kwargs:
+
+        Raises:
+            NotImplementedError: if not implemented
+
+        """
+        raise NotImplementedError
 
     def populate(self, *args, **kwargs):
-        super(ZivaBaseNode, self).populate(*args, **kwargs)
-        """
+        """ This populates the node given a selection.
 
-        Returns:
-            object:
+        Args:
+            *args: Maya node to populate with.
         """
+        super(ZivaBaseNode, self).populate(*args, **kwargs)
+
         selection = mz.parse_args_for_selection(args)
 
         mesh = mz.get_association(selection[0])
         self.association = mesh
 
-        self.solver = mm.eval('zQuery -t zSolver {}'.format(self.name))[0]
+        solver = mm.eval('zQuery -t zSolver {}'.format(self.name))
+        if solver:
+            self.solver = solver[0]
 
         # get map component data------------------------------------------------
         mesh_names = self.get_map_meshes()
@@ -53,6 +70,11 @@ class ZivaBaseNode(BaseNode):
 
     @property
     def solver(self):
+        """ :obj:`str`: The solver name this node used.
+
+        Used for allowing multiple solvers in scene and building a setup on one
+        of them.
+        """
         return self._solver
 
     @solver.setter

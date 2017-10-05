@@ -1,6 +1,14 @@
 zBuilder.data package
 =====================
 
+zBuilder.data.base module
+-------------------------
+
+.. automodule:: zBuilder.data.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 zBuilder.data.maps module
 -------------------------
 
@@ -18,8 +26,6 @@ zBuilder.data.mesh module
     :show-inheritance:
 
 
-Module contents
----------------
 
 .. automodule:: zBuilder.data
     :members:

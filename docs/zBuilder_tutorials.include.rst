@@ -1,6 +1,10 @@
 Ziva Setup
 ----------
 
+.. toctree::
+    :caption: Table of Contents
+    :maxdepth: 2
+
 Retrieving Setups
 ^^^^^^^^^^^^^^^^^
 

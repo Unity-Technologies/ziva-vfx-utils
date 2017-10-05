@@ -38,16 +38,21 @@ class Map(BaseComponent):
         return output
 
     def __repr__(self):
-        return self.__str__()
+        name = self.name
+        if self.value:
+            length = len(self.value)
+        else:
+            length = 'null'
+        output = ''
+        output += '< MAP: {} -- length: {} >'.format(name, length)
+        return output
 
     def populate(self, map_name, mesh_name):
-        """
+        """ Populate node with that from the maya scene.
 
         Args:
-            map_name:
-            mesh_name:
-
-        Returns:
+            map_name: Name of map to populate it with.
+            mesh_name: Name of mesh to populate it with.
 
         """
         weight_value = get_weights(map_name, mesh_name)
@@ -60,23 +65,21 @@ class Map(BaseComponent):
         # logger.info('Retrieving Data : {}'.format(self))
 
     def set_mesh(self, mesh):
-        """
+        """ Stores the mesh name.
 
         Args:
-            mesh:
-
-        Returns:
-
+            mesh: The mesh name to store.
         """
         self._mesh = mesh   
 
     def get_mesh(self, long_name=False):
-        """
+        """ Gets the stores name of the mesh associated with map.
 
         Args:
-            long_name:
+            long_name: Returns long name.  Default to ``False``
 
         Returns:
+            Name of mesh.
 
         """
         if self._mesh:
@@ -88,26 +91,27 @@ class Map(BaseComponent):
             return None
 
     def get_mesh_data(self):
-        """
+        """ Gets the mesh data object.
 
         Returns:
-
+            zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
         mesh_data = self._setup.get_data(type_filter='mesh',
-                                         name_filter=mesh_name)
+                                         name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):
-        """
+        """ Checks if mesh ih data object is corresponding with mesh in scene.
 
         Returns:
-
+            True if they are, else False.
         """
         mesh_data = self.get_mesh_data()[0]
         return mesh_data.is_topologically_corresponding()
 
     def interpolate(self):
+        """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_data()
         logger.info('interpolating map:  {}'.format(self.name))
         created_mesh = mesh_data.build()
@@ -119,45 +123,26 @@ class Map(BaseComponent):
 
     @property
     def value(self):
-        """
-
-        Returns:
-
+        """ The map value.
         """
         return self._value
 
     @value.setter
     def value(self, value):
-        """
-
-        Args:
-            value:
-
-        Returns:
-
-        """
         self._value = value
-
-    # TODO remove this and do it in __dict__
-    def string_replace(self, search, replace):
-        # name replace----------------------------------------------------------
-        new_name = mz.replace_long_name(search, replace, self.long_name)
-        self.name = new_name
-
-        mesh = self.get_mesh(long_name=True)
-        new_mesh = mz.replace_long_name(search, replace, mesh)
-        self.set_mesh(new_mesh)
 
 
 def get_weights(map_name, mesh_name):
-    """
-
+    """ Gets the weights for the map.
     Args:
-        map_name:
-        mesh_name:
+        map_name: Map to get weights from.
+        mesh_name: Mesh to check vert count.
 
     Returns:
+        value of map
 
+    Raises:
+        ValueError: if there is a problem getting map.
     """
     vert_count = mc.polyEvaluate(mesh_name, v=True)
     try:

@@ -8,20 +8,24 @@ logger = logging.getLogger(__name__)
 
 
 class SolverNode(ZivaBaseNode):
+    """ This node for storing information related to zSolver.
+    """
     TYPE = 'zSolver'
+    """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
-        """
+        """ Builds the zSolver in maya scene.
 
         Args:
-            *args:
-            **kwargs:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
 
-        Returns:
-
+                tmp = {'zSolver':['substeps']}
+            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)

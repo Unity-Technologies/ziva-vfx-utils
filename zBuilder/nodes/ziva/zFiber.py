@@ -8,8 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class FiberNode(ZivaBaseNode):
+    """ This node for storing information related to zFibers.
+    """
     TYPE = 'zFiber'
+    """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'endPoints']
+    """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
         ZivaBaseNode.__init__(self, *args, **kwargs)
@@ -28,7 +32,17 @@ class FiberNode(ZivaBaseNode):
                 self.association[0]]
 
     def apply(self, *args, **kwargs):
+        """ Builds the zFiber in maya scene.
 
+        Args:
+            attr_filter (dict):  Attribute filter on what attributes to get.
+                dictionary is key value where key is node type and value is
+                list of attributes to use.
+
+                tmp = {'zSolver':['substeps']}
+            interp_maps (str): Interpolating maps.  Defaults to ``auto``
+            permissive (bool): Pass on errors. Defaults to ``True``
+        """
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
@@ -40,7 +54,7 @@ class FiberNode(ZivaBaseNode):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
             data_fibers = self._setup.get_nodes(type_filter='zFiber',
-                                                name_filter=mesh)
+                                                association_filter=mesh)
 
             # self.interpolate_maps(interp_maps)
             # self.are_maps_valid()
