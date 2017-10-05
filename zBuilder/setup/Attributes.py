@@ -1,5 +1,5 @@
 import zBuilder.zMaya
-from zBuilder.main import Builder
+from zBuilder.builder import Builder
 import zBuilder.nodes.base as base
 import zBuilder.nodeCollection as nc
 import zBuilder.zMaya as mz

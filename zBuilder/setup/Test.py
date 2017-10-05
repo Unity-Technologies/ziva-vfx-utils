@@ -1,4 +1,4 @@
-from zBuilder.main import Builder
+from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc
