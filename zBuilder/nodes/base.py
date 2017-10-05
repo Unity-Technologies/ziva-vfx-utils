@@ -13,6 +13,7 @@ class BaseNode(object):
     """ The base node for the node functionality of all nodes
     """
     TYPE = None
+    TYPES = None
     """ The type of node. """
     MAP_LIST = []
     """ List of maps to store. """
