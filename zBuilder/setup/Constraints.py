@@ -1,66 +1,28 @@
-import zBuilder.nodes.base as base
-import zBuilder.nodeCollection as nc
-import zBuilder.zMaya
+from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc
 
-TYPES = ['parentConstraint', 'orientConstraint']
 
-
-class ConstraintsSetup(nc.NodeCollection):
+class ConstraintsSetup(Builder):
     def __init__(self):
         super(ConstraintsSetup, self).__init__()
 
-    @staticmethod
-    def get_target(node):
-        _type = mz.get_type(node)
-        if _type == 'parentConstraint':
-            return mc.listConnections(node + '.target[0].targetScale')[0]
-        if _type == 'orientConstraint':
-            return mc.listConnections(node + '.target[0].targetRotate')[0]
+    @Builder.time_this
+    def retrieve_from_scene(self, *args, **kwargs):
+        # parse args------------------------------------------------------------
+        selection = mz.parse_args_for_selection(args)
 
-    @staticmethod
-    def get_source(node):
-        return mc.listConnections(node + '.constraintRotateX')[0]
-    
-    def retrieve_from_scene(self):
-        sel = mc.ls(sl=True, l=True)
+        acquire = ['pointConstraint', 'orientConstraint']
+        tmp = list()
+        connections = list(set(mc.listConnections(selection)))
 
-        for type_ in TYPES:
-            constraints = mc.listConnections(sel, type=type_, s=True, d=False)
-            con = []
-            if constraints:
-                con = list(set(constraints))
+        tmp.extend([x for x in connections if mc.objectType(x) in acquire])
 
-            for c in con:
-                nodeAttrList = base.build_attr_list(c)
-                nodeAttrs = zBuilder.zMaya.build_attr_key_values(c, nodeAttrList)
-
-                node = base.BaseNode()
-                node.set_name(c)
-                node.set_type(mz.get_type(c))
-                node.set_attrs(nodeAttrs)
-                node.set_association([self.get_target(c), self.get_source(c)])
-                self.add_node(node)
-
+        for item in tmp:
+            b_node = self.node_factory(item)
+            self.add_node(b_node)
         self.stats()
-        mc.select(sel)
 
     def apply(self):
-        nodes = self.get_nodes()
-
-        for n in nodes:
-            name = n.get_name()
-            _type = n.get_type()
-            if not mc.objExists(name):
-                if _type == 'parentConstraint':
-                    ass = n.get_association()
-                    if mc.objExists(ass[0]) and mc.objExists(ass[1]):
-                        mc.parentConstraint(ass[0], ass[1], mo=True)
-                if _type == 'orientConstraint':
-                    ass = n.get_association()
-                    if mc.objExists(ass[0]) and mc.objExists(ass[1]):
-                        mc.orientConstraint(ass[0], ass[1], mo=True)
-
-        base.set_attrs(nodes)
+        pass
