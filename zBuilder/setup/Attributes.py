@@ -1,16 +1,11 @@
-import zBuilder.zMaya
 from zBuilder.builder import Builder
-import zBuilder.nodes.base as base
-import zBuilder.nodeCollection as nc
-import zBuilder.zMaya as mz
-
 import maya.cmds as mc
 
 
 class AttributesSetup(Builder):
-    '''
+    """
     Storing maya attributes
-    '''
+    """
 
     def __init__(self):
         Builder.__init__(self)
