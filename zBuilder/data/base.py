@@ -14,7 +14,7 @@ class BaseComponent(object):
     """
     type = None
     """ The type of the node."""
-    SEARCH_EXCLUDE = ['_class']
+    SEARCH_EXCLUDE = ['_class','_builder_type']
     """ List of attributes to exclude with a string_replace"""
 
     def __init__(self, *args, **kwargs):
@@ -24,6 +24,10 @@ class BaseComponent(object):
 
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
+
+        self._builder_type = self.__class__.__module__.split('.')
+        self._builder_type = '{}.{}'.format(self._builder_type[0],
+                                            self._builder_type[1])
 
         self.type = self.type
 

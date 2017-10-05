@@ -17,7 +17,7 @@ class BaseNode(object):
     """ The type of node. """
     MAP_LIST = []
     """ List of maps to store. """
-    SEARCH_EXCLUDE = ['_class', '_attrs']
+    SEARCH_EXCLUDE = ['_class', '_attrs', '_builder_type']
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
@@ -30,10 +30,9 @@ class BaseNode(object):
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        if 'data' in self.__class__.__module__:
-            self._builder_type = 'zBuilder.data'
-        if 'nodes' in self.__class__.__module__:
-            self._builder_type = 'zBuilder.nodes'
+        self._builder_type = self.__class__.__module__.split('.')
+        self._builder_type = '{}.{}'.format(self._builder_type[0],
+                                            self._builder_type[1])
 
         self._setup = kwargs.get('setup', None)
 

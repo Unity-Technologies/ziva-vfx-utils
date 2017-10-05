@@ -30,7 +30,6 @@ class Builder(IO, NodeCollection):
 
         Returns:
             obj: zBuilder node populated.
-
         """
         type_ = mz.get_type(node)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
