@@ -89,25 +89,6 @@ class BaseComponent(object):
         except IndexError:
             self._name = name
 
-    @property
-    def type(self):
-        """ The type of node.
-        """
-        try:
-            return self.TYPE
-        except AttributeError:
-            return None
-
-    @type.setter
-    def type(self, type_):
-        """
-        Sets type of node
-
-        Args:
-            type_ (str): the type of node.
-        """
-        self.TYPE = type_
-
     def serialize(self):
         """  Makes node serializable.
 

@@ -121,16 +121,6 @@ class Map(BaseComponent):
         self.value = weight_list
         mc.delete(created_mesh)
 
-    # @property
-    # def value(self):
-    #     """ The map value.
-    #     """
-    #     return self._value
-    #
-    # @value.setter
-    # def value(self, value):
-    #     self._value = value
-
 
 def get_weights(map_name, mesh_name):
     """ Gets the weights for the map.

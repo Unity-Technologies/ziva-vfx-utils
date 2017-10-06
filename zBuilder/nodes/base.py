@@ -166,7 +166,10 @@ class BaseNode(object):
                 elif isinstance(self.__dict__[item], dict):
                     # TODO needs functionality (replace keys)
                     print 'DICT', item, self.__dict__[item], self.name
-                    # raise StandardError('HELP')
+                    # tmp = {}
+                    # for key in dictionary:
+                    #     new = mz.replace_long_name(search, replace, key)
+                    #     tmp[new] = dictionary[key]
 
     # @property
     # def attrs(self):
