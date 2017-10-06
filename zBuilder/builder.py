@@ -74,4 +74,14 @@ class Builder(IO, NodeCollection):
 
         return new_function
 
+    def apply(self, *args, **kwargs):
+        """
+        must create a method to inherit this class
+        """
+        raise NotImplementedError("Subclass must implement abstract method")
 
+    def retrieve_from_scene(self, *args, **kwargs):
+        """
+        must create a method to inherit this class
+        """
+        raise NotImplementedError("Subclass must implement abstract method")

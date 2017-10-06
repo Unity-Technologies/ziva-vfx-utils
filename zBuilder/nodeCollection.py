@@ -117,16 +117,6 @@ class NodeCollection(object):
 
         logger.info(output)
 
-    # @property
-    # def data(self):
-    #     """ (:obj:`list` of :obj:`obj`) The dense data nodes stored in collection.
-    #     """
-    #     return self._data
-    #
-    # @data.setter
-    # def data(self, data):
-    #     self._data = data
-
     def add_data(self, data):
         """ appends a data obj to the data list.  Checks if data is already in
         list, if it is it overrides the previous one.
@@ -256,7 +246,8 @@ class NodeCollection(object):
                 return False
             if name_regex and not re.search(name_regex, item.name):
                 return False
-            if association_regex and not re.search(association_regex, item.association):
+            if association_regex and not re.search(association_regex,
+                                                   item.association):
                 return False
             return True
 
@@ -284,18 +275,6 @@ class NodeCollection(object):
 
         for item in self.data:
             item.string_replace(search, replace)
-
-    def apply(self, *args, **kwargs):
-        """
-        must create a method to inherit this class
-        """
-        raise NotImplementedError("Subclass must implement abstract method")
-
-    def retrieve_from_scene(self, *args, **kwargs):
-        """
-        must create a method to inherit this class
-        """
-        raise NotImplementedError("Subclass must implement abstract method")
 
 
 def replace_dict_keys(search, replace, dictionary):
