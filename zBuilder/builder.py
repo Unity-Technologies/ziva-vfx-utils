@@ -130,7 +130,7 @@ class Builder(NodeCollection):
         object.
 
         Args:
-            data: Data to check.
+            json_data: Data to assign to builder object.
         """
         data = io.check_data(json_data)
         for d in data:

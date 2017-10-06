@@ -123,7 +123,7 @@ def find_class(module_, type_):
 
 def update_json(json_object):
     """
-    This takes the json_object and updates it to work with 1.0.0
+    This takes the json_object and updates it to work with zBuilder 1.0.0
 
     Returns:
         modified json_object
@@ -144,7 +144,6 @@ def update_json(json_object):
                 json_object[value] = json_object[key]
                 json_object.pop(key, None)
             else:
-                # print 'NOPE', value, json_object.keys()
                 # maps and meshes didn't have a type.  lets make one.
                 if value == 'TYPE':
                     json_object[value] = json_object['_class'][1].lower()
