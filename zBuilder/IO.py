@@ -31,6 +31,18 @@ def wrap_data(data, type_):
 
 
 def dump_json(file_path, json_data):
+    """ Saves a json file to disk given a file path and data.
+
+    Args:
+        file_path: The location to save the json file.
+        json_data: The data to save in the json.
+
+    Returns:
+        file path if successful.
+
+    Raises:
+        IOError: If not able to write file.
+    """
     try:
         with open(file_path, 'w') as outfile:
             json.dump(json_data, outfile, cls=BaseNodeEncoder,
@@ -42,6 +54,17 @@ def dump_json(file_path, json_data):
 
 
 def load_json(file_path):
+    """ loads a json file from disk given a file path.
+
+    Args:
+        file_path: The location to save the json file.
+
+    Returns:
+        json data
+
+    Raises:
+        IOError: If not able to read file.
+    """
     try:
         with open(file_path, 'rb') as handle:
             json_data = json.load(handle, object_hook=load_base_node)

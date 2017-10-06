@@ -1,5 +1,4 @@
 from zBuilder.nodeCollection import NodeCollection
-from zBuilder.IO import IO
 
 import zBuilder.zMaya as mz
 import zBuilder.data
@@ -96,8 +95,6 @@ class Builder(NodeCollection):
                 objects.  Defaults to ``True``.
             component_data (bool, optional): Optionally suppress writing out of
                 data objects.  Defaults to ``True``.
-        Raises:
-            IOError: If not able to write file.
         """
 
         json_data = self.__get_json_data(component_data=component_data,
@@ -110,13 +107,11 @@ class Builder(NodeCollection):
             logger.info('Wrote File: {}'.format(file_path))
 
     def retrieve_from_file(self, file_path):
-        """ Reads data from a given file.
+        """ Reads data from a given file.  The data gets placed in the nodeCollection.
 
         Args:
             file_path (:obj:`str`): The file path to read from disk.
 
-        Raises:
-            IOError: If not able to read file.
         """
 
         before = datetime.datetime.now()
