@@ -49,15 +49,6 @@ zBuilder.setup.Ziva module
     :undoc-members:
     :show-inheritance:
 
-zBuilder.setup.Ziva2 module
----------------------------
-
-.. automodule:: zBuilder.setup.Ziva2
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 
 .. automodule:: zBuilder.setup
     :members:
