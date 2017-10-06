@@ -17,10 +17,10 @@ zBuilder.IO module
         :undoc-members:
         :show-inheritance:
 
-zBuilder.main module
+zBuilder.builder module
 --------------------
 
-.. automodule:: zBuilder.main
+.. automodule:: zBuilder.builder
         :members:
         :undoc-members:
         :show-inheritance:
