@@ -30,12 +30,14 @@ class Builder(IO, NodeCollection):
 
         Returns:
             obj: zBuilder node populated.
-
         """
         type_ = mz.get_type(node)
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
-                if type_ == obj.TYPE:
+                if obj.TYPES:
+                    if type_ in obj.TYPES:
+                        return obj(node, setup=self)
+                if type_ == obj.type:
                     return obj(node, setup=self)
         return zBuilder.nodes.BaseNode(node, setup=self)
 
@@ -54,7 +56,7 @@ class Builder(IO, NodeCollection):
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.data']):
             if inspect.isclass(obj):
-                if type_ == obj.TYPE:
+                if type_ == obj.type:
                     return obj(*args, setup=self)
 
     @staticmethod
@@ -72,4 +74,14 @@ class Builder(IO, NodeCollection):
 
         return new_function
 
+    def apply(self, *args, **kwargs):
+        """
+        must create a method to inherit this class
+        """
+        raise NotImplementedError("Subclass must implement abstract method")
 
+    def retrieve_from_scene(self, *args, **kwargs):
+        """
+        must create a method to inherit this class
+        """
+        raise NotImplementedError("Subclass must implement abstract method")

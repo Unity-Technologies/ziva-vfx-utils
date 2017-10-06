@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class TissueNode(ZivaBaseNode):
     """ This node for storing information related to zTissues.
     """
-    TYPE = 'zTissue'
+    type = 'zTissue'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

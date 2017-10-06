@@ -12,22 +12,27 @@ logger = logging.getLogger(__name__)
 class BaseNode(object):
     """ The base node for the node functionality of all nodes
     """
-    TYPE = None
+    type = None
+    TYPES = None
     """ The type of node. """
     MAP_LIST = []
     """ List of maps to store. """
-    SEARCH_EXCLUDE = ['_class', '_attrs']
+    SEARCH_EXCLUDE = ['_class', '_attrs', '_builder_type']
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
         self._name = None
-        self._attrs = {}
+        self.attrs = {}
         self._association = []
         self.__mobject = None
 
         self._class = (self.__class__.__module__, self.__class__.__name__)
+
+        self._builder_type = self.__class__.__module__.split('.')
+        self._builder_type = '{}.{}'.format(self._builder_type[0],
+                                            self._builder_type[1])
 
         self._setup = kwargs.get('setup', None)
 
@@ -36,6 +41,11 @@ class BaseNode(object):
 
         if args:
             self.populate(args[0])
+
+        # doing this seems to make a class attr part of __dict__.  This way
+        # I can save and load it and know what node type to instantiate.
+        # is there a better way to do it?
+        self.type = self.type
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -114,12 +124,11 @@ class BaseNode(object):
         selection = mz.parse_args_for_selection(args)
 
         self.name = selection[0]
-        self.type = mc.objectType(selection[0])
+        # self.type = mc.objectType(selection[0])
         attr_list = mz.build_attr_list(selection[0])
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
         attrs = mz.build_attr_key_values(selection[0], attr_list)
-
         self.attrs = attrs
         self.mobject = selection[0]
 
@@ -157,17 +166,20 @@ class BaseNode(object):
                 elif isinstance(self.__dict__[item], dict):
                     # TODO needs functionality (replace keys)
                     print 'DICT', item, self.__dict__[item], self.name
-                    # raise StandardError('HELP')
+                    # tmp = {}
+                    # for key in dictionary:
+                    #     new = mz.replace_long_name(search, replace, key)
+                    #     tmp[new] = dictionary[key]
 
-    @property
-    def attrs(self):
-        """ Stored attributes of node.
-        """
-        return self._attrs
-
-    @attrs.setter
-    def attrs(self, value):
-        self._attrs = value
+    # @property
+    # def attrs(self):
+    #     """ Stored attributes of node.
+    #     """
+    #     return self._attrs
+    #
+    # @attrs.setter
+    # def attrs(self, value):
+    #     self._attrs = value
 
     @property
     def long_name(self):
@@ -185,19 +197,19 @@ class BaseNode(object):
     def name(self, name):
         self._name = mc.ls(name, long=True)[0]
 
-    @property
-    def type(self):
-        """ Type of node.
-        """
-        try:
-            return self.TYPE
-        except AttributeError:
-            return None
-
-    @type.setter
-    def type(self, type_):
-
-        self.TYPE = type_
+    # @property
+    # def type(self):
+    #     """ Type of node.
+    #     """
+    #     try:
+    #         return self.TYPE
+    #     except AttributeError:
+    #         return None
+    #
+    # @type.setter
+    # def type(self, type_):
+    #
+    #     self.TYPE = type_
 
     # TODO instead of get_map* and get_mesh* should be more generic.
     # get_data*(type_filter)

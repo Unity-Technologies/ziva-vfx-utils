@@ -1,26 +1,28 @@
-from zBuilder.nodes.base import BaseNode
-from zBuilder.main import Builder
-import zBuilder.zMaya as mz
-
+from zBuilder.builder import Builder
 import maya.cmds as mc
 
 
 class SelectionSetup(Builder):
+    """
+    Storing maya selection.
+    """
     def __init__(self):
         Builder.__init__(self)
 
+    @Builder.time_this
     def retrieve_from_scene(self):
         selection = mc.ls(sl=True, l=True)
-        for sel in selection:
-            node = BaseNode()
-            node.set_name(sel)
-            node.set_type(mz.get_type(sel))
-            self.add_node(node)
 
+        for item in selection:
+            b_node = self.node_factory(item)
+            self.add_node(b_node)
+        self.stats()
+
+    @Builder.time_this
     def apply(self, select=True):
         tmp = []
-        for node in self.get_nodes():
-            tmp.append(node.get_name())
+        for node in self.nodes:
+            tmp.append(node.get_scene_name())
 
         if select:
             mc.select(tmp)

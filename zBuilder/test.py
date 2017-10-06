@@ -2,7 +2,7 @@ import misc_util as mu
 mu.hard_reload('zBuilder')
 
 mc.select('zSolver1')
-import zBuilder.setup.Ziva2 as zva
+import zBuilder.setup.Ziva as zva
 z = zva.ZivaSetup()
 z.retrieve_from_scene(mc.ls(sl=True)[0])
 # z.print_(type_filter='zBone')

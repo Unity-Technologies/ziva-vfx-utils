@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class Map(BaseComponent):
-    TYPE = 'map'
+    type = 'map'
 
     def __init__(self, *args, **kwargs):
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._name = None
         self._mesh = None
-        self._value = None
+        self.value = None
 
         BaseComponent.__init__(self, *args, **kwargs)
         if args:
@@ -120,16 +120,6 @@ class Map(BaseComponent):
                                          self.value)
         self.value = weight_list
         mc.delete(created_mesh)
-
-    @property
-    def value(self):
-        """ The map value.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = value
 
 
 def get_weights(map_name, mesh_name):

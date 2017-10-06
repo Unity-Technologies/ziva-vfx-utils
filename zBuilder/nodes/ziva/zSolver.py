@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class SolverNode(ZivaBaseNode):
     """ This node for storing information related to zSolver.
     """
-    TYPE = 'zSolver'
+    type = 'zSolver'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

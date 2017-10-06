@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class ClothNode(ZivaBaseNode):
     """ This node for storing information related to zCloth.
     """
-    TYPE = 'zCloth'
+    type = 'zCloth'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):

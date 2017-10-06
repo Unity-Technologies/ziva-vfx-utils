@@ -12,9 +12,9 @@ class BaseComponent(object):
     Args:
         deserialize (dict, optional): a dictionary to deserialize into node.
     """
-    TYPE = None
+    type = None
     """ The type of the node."""
-    SEARCH_EXCLUDE = ['_class']
+    SEARCH_EXCLUDE = ['_class','_builder_type']
     """ List of attributes to exclude with a string_replace"""
 
     def __init__(self, *args, **kwargs):
@@ -24,6 +24,12 @@ class BaseComponent(object):
 
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
+
+        self._builder_type = self.__class__.__module__.split('.')
+        self._builder_type = '{}.{}'.format(self._builder_type[0],
+                                            self._builder_type[1])
+
+        self.type = self.type
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -82,25 +88,6 @@ class BaseComponent(object):
             self._name = mc.ls(name, long=True)[0]
         except IndexError:
             self._name = name
-
-    @property
-    def type(self):
-        """ The type of node.
-        """
-        try:
-            return self.TYPE
-        except AttributeError:
-            return None
-
-    @type.setter
-    def type(self, type_):
-        """
-        Sets type of node
-
-        Args:
-            type_ (str): the type of node.
-        """
-        self.TYPE = type_
 
     def serialize(self):
         """  Makes node serializable.

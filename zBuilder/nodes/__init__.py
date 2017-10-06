@@ -22,10 +22,6 @@ from .ziva.zLineOfAction import LineOfActionNode
 from .deformers.deltaMush import DeltaMushNode
 from .deformers.blendShape import BlendShapeNode
 
-# zit nodes---------------------------------------------------------------------
-from .zit.zRelaxer import ZRelaxerNode
-from .zit.zItto import ZIttoNode
-from .zit.zPolyCombine import ZPolyCombineNode
-from .zit.zWrap import ZWrapNode
-
+# utils-------------------------------------------------------------------------
+from .utils.constraint import ConstraintNode
 

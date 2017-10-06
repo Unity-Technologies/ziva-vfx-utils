@@ -11,23 +11,13 @@ logger = logging.getLogger(__name__)
 class LineOfActionNode(ZivaBaseNode):
     """ This node for storing information related to zLineOfAction.
     """
-    TYPE = 'zLineOfAction'
+    type = 'zLineOfAction'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        self._zFiber = None
+        self.fiber = None
 
         ZivaBaseNode.__init__(self, *args, **kwargs)
-
-    @property
-    def fiber(self):
-        """ The associated fiber.
-        """
-        return self._zFiber
-
-    @fiber.setter
-    def fiber(self, fiber):
-        self._zFiber = fiber
 
     def populate(self, *args, **kwargs):
         """ This extends ZivaBase.populate()
