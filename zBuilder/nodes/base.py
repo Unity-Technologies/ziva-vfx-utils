@@ -247,10 +247,11 @@ class BaseNode(object):
 
     @association.setter
     def association(self, association):
-        if isinstance(association, str):
-            self._association = [association]
-        else:
-            self._association = association
+        self._association = mc.ls(association, long=True)
+        # if isinstance(association, str):
+        #     self._association = [association]
+        # else:
+        #     self._association = association
 
     @property
     def long_association(self):
