@@ -275,7 +275,7 @@ class BaseNode(object):
                     if scene_val != obj_val:
                         print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
 
-    def get_scene_name(self, long_name=True):
+    def get_scene_name(self, long_name=False):
         """
         This checks stored mObject and gets name of object in scene.  If no
         mObject it returns node name.
@@ -293,6 +293,8 @@ class BaseNode(object):
         if not name:
             name = self.long_name
 
+        if not long_name:
+            name = name.split('|')[-1]
         return name
 
     def set_maya_attrs(self, attr_filter=None):
