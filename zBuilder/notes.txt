@@ -12,7 +12,7 @@ for 1.0.0
 - see if class method is feasable for searching for nodes
 - tissue parent and child as tissue node instead of mesh
 - anim curves
-
+- multiple solvers
 
 #-------------------------------
 - zip json file
