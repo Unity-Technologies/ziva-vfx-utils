@@ -45,7 +45,7 @@ class BaseNode(object):
         # doing this seems to make a class attr part of __dict__.  This way
         # I can save and load it and know what node type to instantiate.
         # is there a better way to do it?
-        self.type = self.type
+        # self.type = self.type
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -124,7 +124,7 @@ class BaseNode(object):
         selection = mz.parse_args_for_selection(args)
 
         self.name = selection[0]
-        # self.type = mc.objectType(selection[0])
+        self.type = mc.objectType(selection[0])
         attr_list = mz.build_attr_list(selection[0])
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
