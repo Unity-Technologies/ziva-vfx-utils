@@ -137,7 +137,6 @@ class BaseNode(object):
         """
         raise NotImplementedError
 
-    # TODO clean this up.  could be more readable
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.
         Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
@@ -170,7 +169,6 @@ class BaseNode(object):
                 # for key in dictionary:
                 #     new = mz.replace_long_name(search, replace, key)
                 #     tmp[new] = dictionary[key]
-
 
     @property
     def long_name(self):

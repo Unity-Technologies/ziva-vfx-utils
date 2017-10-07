@@ -5,7 +5,7 @@ import maya.cmds as mc
 class ConstraintNode(BaseNode):
     """ The base node for the node functionality of all nodes
     """
-    TYPE = None
+    type = None
     TYPES = ['pointConstraint', 'orientConstraint']
     """ The type of node. """
 
@@ -23,7 +23,6 @@ class ConstraintNode(BaseNode):
 
         self.targets = list()
         self.constrained = list()
-
 
     def apply(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
