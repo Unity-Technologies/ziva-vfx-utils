@@ -75,16 +75,22 @@ class Builder(NodeCollection):
         return new_function
 
     def apply(self, *args, **kwargs):
-        """
-        must create a method to inherit this class
-        """
-        raise NotImplementedError("Subclass must implement abstract method")
+        logger.info('Building....')
+
+        b_nodes = self.get_nodes()
+        for b_node in b_nodes:
+            b_node.apply()
 
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
-        raise NotImplementedError("Subclass must implement abstract method")
+        selection = mz.parse_args_for_selection(args)
+        for item in selection:
+            b_solver = self.node_factory(item)
+            self.add_node(b_solver)
+
+        self.stats()
 
     def write(self, file_path, component_data=True, node_data=True):
         """ writes data to disk in json format.
