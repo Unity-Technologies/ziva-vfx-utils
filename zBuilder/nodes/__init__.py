@@ -21,6 +21,7 @@ from .ziva.zLineOfAction import LineOfActionNode
 # deformer----------------------------------------------------------------------
 from .deformers.deltaMush import DeltaMushNode
 from .deformers.blendShape import BlendShapeNode
+from .deformers.wrap import WrapNode
 
 # utils-------------------------------------------------------------------------
 from .utils.constraint import ConstraintNode
