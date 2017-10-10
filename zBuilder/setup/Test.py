@@ -26,7 +26,7 @@ class TestSetup(Builder):
         get_maps = kwargs.get('get_map_names', True)
 
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
-                   'blendShape']
+                   'blendShape', 'wrap']
         tmp = list()
         history = mc.listHistory(selection, f=True)
         history.extend(mc.listHistory(selection))

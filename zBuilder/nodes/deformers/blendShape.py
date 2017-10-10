@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 class BlendShapeNode(DeformerBaseNode):
-    TYPE = 'blendShape'
+    type = 'blendShape'
     MAP_LIST = ['inputTarget[0].inputTargetGroup[0].targetWeights']
     EXTEND_ATTR_LIST = ['origin']
 

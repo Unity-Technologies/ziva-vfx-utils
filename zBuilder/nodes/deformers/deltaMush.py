@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 class DeltaMushNode(DeformerBaseNode):
-    TYPE = 'deltaMush'
+    type = 'deltaMush'
     MAP_LIST = ['weightList[0].weights']
 
     def apply(self, *args, **kwargs):

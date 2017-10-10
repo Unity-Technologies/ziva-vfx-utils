@@ -17,7 +17,7 @@ class Map(BaseComponent):
 
         self._name = None
         self._mesh = None
-        self.value = None
+        self.values = None
 
         BaseComponent.__init__(self, *args, **kwargs)
         if args:
@@ -29,8 +29,8 @@ class Map(BaseComponent):
 
     def __str__(self):
         name = self.name
-        if self.value:
-            length = len(self.value)
+        if self.values:
+            length = len(self.values)
         else:
             length = 'null'
         output = ''
@@ -39,8 +39,8 @@ class Map(BaseComponent):
 
     def __repr__(self):
         name = self.name
-        if self.value:
-            length = len(self.value)
+        if self.values:
+            length = len(self.values)
         else:
             length = 'null'
         output = ''
@@ -60,7 +60,7 @@ class Map(BaseComponent):
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
-        self.value = weight_value
+        self.values = weight_value
 
         # logger.info('Retrieving Data : {}'.format(self))
 
@@ -117,8 +117,8 @@ class Map(BaseComponent):
         created_mesh = mesh_data.build()
         weight_list = interpolate_values(created_mesh,
                                          mesh_data.name,
-                                         self.value)
-        self.value = weight_list
+                                         self.values)
+        self.values = weight_list
         mc.delete(created_mesh)
 
 

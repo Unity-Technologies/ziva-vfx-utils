@@ -1,9 +1,9 @@
 from zBuilder.nodeCollection import NodeCollection
-from zBuilder.IO import IO
 
 import zBuilder.zMaya as mz
 import zBuilder.data
 import zBuilder.nodes
+import zBuilder.IO as io
 from functools import wraps
 import datetime
 import sys
@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Builder(IO, NodeCollection):
+class Builder(NodeCollection):
     """ The main class for using zBuilder.
 
     This inherits from nodeCollection which is a glorified list.
@@ -75,13 +75,109 @@ class Builder(IO, NodeCollection):
         return new_function
 
     def apply(self, *args, **kwargs):
-        """
-        must create a method to inherit this class
-        """
-        raise NotImplementedError("Subclass must implement abstract method")
+        logger.info('Building....')
+
+        b_nodes = self.get_nodes()
+        for b_node in b_nodes:
+            b_node.apply()
 
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
         """
-        raise NotImplementedError("Subclass must implement abstract method")
+        selection = mz.parse_args_for_selection(args)
+        for item in selection:
+            b_solver = self.node_factory(item)
+            self.add_node(b_solver)
+
+        self.stats()
+
+    def write(self, file_path, component_data=True, node_data=True):
+        """ writes data to disk in json format.
+
+        Args:
+            file_path (str): The file path to write to disk.
+            node_data (bool, optional): Optionally suppress writing out of node
+                objects.  Defaults to ``True``.
+            component_data (bool, optional): Optionally suppress writing out of
+                data objects.  Defaults to ``True``.
+        """
+
+        json_data = self.__get_json_data(component_data=component_data,
+                                         node_data=node_data)
+
+        if io.dump_json(file_path, json_data):
+            for b_node in self.nodes:
+                b_node.mobject = b_node.mobject
+            self.stats()
+            logger.info('Wrote File: {}'.format(file_path))
+
+    def retrieve_from_file(self, file_path):
+        """ Reads data from a given file.  The data gets placed in the nodeCollection.
+
+        Args:
+            file_path (:obj:`str`): The file path to read from disk.
+
+        """
+
+        before = datetime.datetime.now()
+
+        json_data = io.load_json(file_path)
+        self.__assign_json_data(json_data)
+        self.stats()
+        for b_node in self.nodes:
+            b_node.mobject = b_node.mobject
+        after = datetime.datetime.now()
+
+        logger.info('Read File: {} in {}'.format(file_path, after - before))
+
+    def __assign_json_data(self, json_data):
+        """ Gets data out of json serialization and assigns it to node collection
+        object.
+
+        Args:
+            json_data: Data to assign to builder object.
+        """
+        data = io.check_data(json_data)
+        for d in data:
+
+            if d['d_type'] == 'node_data':
+                self.nodes = d['data']
+                logger.info("reading node_data. {} nodes".format(len(d['data'])))
+            if d['d_type'] == 'component_data':
+                # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
+                if not isinstance(d['data'], list):
+                    for k, v in d['data'].iteritems():
+                        for k2 in d['data'][k]:
+                            self.data.append(d['data'][k][k2])
+                else:
+                    # saved as 1.0.0
+                    self.data = d['data']
+
+                logger.info("reading component_data. ")
+            if d['d_type'] == 'info':
+                logger.info("reading info")
+                self.info = d['data']
+
+    def __get_json_data(self, node_data=True, component_data=True):
+        """ Utility function to define data stored in json
+        Args:
+            node_data (bool, optional): Optionally suppress storing node data.
+            component_data (bool, optional): Optionally suppress storing
+                component data.
+        Returns:
+            list: List of items to save out.
+        """
+
+        tmp = []
+
+        if node_data:
+            logger.info("writing node_data")
+            tmp.append(io.wrap_data(self.nodes, 'node_data'))
+        if component_data:
+            logger.info("writing component_data")
+            tmp.append(io.wrap_data(self.data, 'component_data'))
+        logger.info("writing info")
+        tmp.append(io.wrap_data(self.info, 'info'))
+
+        return tmp

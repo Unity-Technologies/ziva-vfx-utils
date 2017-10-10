@@ -17,7 +17,7 @@ class BaseNode(object):
     """ The type of node. """
     MAP_LIST = []
     """ List of maps to store. """
-    SEARCH_EXCLUDE = ['_class', '_attrs', '_builder_type']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
@@ -45,7 +45,7 @@ class BaseNode(object):
         # doing this seems to make a class attr part of __dict__.  This way
         # I can save and load it and know what node type to instantiate.
         # is there a better way to do it?
-        self.type = self.type
+        # self.type = self.type
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -124,7 +124,7 @@ class BaseNode(object):
         selection = mz.parse_args_for_selection(args)
 
         self.name = selection[0]
-        # self.type = mc.objectType(selection[0])
+        self.type = mc.objectType(selection[0])
         attr_list = mz.build_attr_list(selection[0])
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
@@ -137,7 +137,6 @@ class BaseNode(object):
         """
         raise NotImplementedError
 
-    # TODO clean this up.  could be more readable
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.
         Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
@@ -149,37 +148,27 @@ class BaseNode(object):
             replace (str): string to replace it with.
 
         """
-        for item in self.__dict__:
-            if item not in self.SEARCH_EXCLUDE:
-                if isinstance(self.__dict__[item], (tuple, list)):
-                    if self.__dict__[item]:
-                        new_names = []
-                        for name in self.__dict__[item]:
-                            if isinstance(name, basestring):
-                                new_name = mz.replace_long_name(search, replace, name)
-                                new_names.append(new_name)
-                                self.__dict__[item] = new_names
-                elif isinstance(self.__dict__[item], basestring):
-                    if self.__dict__[item]:
-                        self.__dict__[item] = mz.replace_long_name(
-                            search, replace, self.__dict__[item])
-                elif isinstance(self.__dict__[item], dict):
-                    # TODO needs functionality (replace keys)
-                    print 'DICT', item, self.__dict__[item], self.name
-                    # tmp = {}
-                    # for key in dictionary:
-                    #     new = mz.replace_long_name(search, replace, key)
-                    #     tmp[new] = dictionary[key]
-
-    # @property
-    # def attrs(self):
-    #     """ Stored attributes of node.
-    #     """
-    #     return self._attrs
-    #
-    # @attrs.setter
-    # def attrs(self, value):
-    #     self._attrs = value
+        searchable = [x for x in self.__dict__ if x not in self.SEARCH_EXCLUDE]
+        print 'SEARCH: ', searchable
+        for item in searchable:
+            if isinstance(self.__dict__[item], (tuple, list)):
+                new_names = []
+                for name in self.__dict__[item]:
+                    if isinstance(name, basestring):
+                        new_name = mz.replace_long_name(search, replace, name)
+                        new_names.append(new_name)
+                        self.__dict__[item] = new_names
+            elif isinstance(self.__dict__[item], basestring):
+                self.__dict__[item] = mz.replace_long_name(search,
+                                                           replace,
+                                                           self.__dict__[item])
+            elif isinstance(self.__dict__[item], dict):
+                # TODO needs functionality (replace keys)
+                print 'DICT', item, self.__dict__[item], self.name
+                # tmp = {}
+                # for key in dictionary:
+                #     new = mz.replace_long_name(search, replace, key)
+                #     tmp[new] = dictionary[key]
 
     @property
     def long_name(self):
@@ -196,20 +185,6 @@ class BaseNode(object):
     @name.setter
     def name(self, name):
         self._name = mc.ls(name, long=True)[0]
-
-    # @property
-    # def type(self):
-    #     """ Type of node.
-    #     """
-    #     try:
-    #         return self.TYPE
-    #     except AttributeError:
-    #         return None
-    #
-    # @type.setter
-    # def type(self, type_):
-    #
-    #     self.TYPE = type_
 
     # TODO instead of get_map* and get_mesh* should be more generic.
     # get_data*(type_filter)
@@ -272,10 +247,11 @@ class BaseNode(object):
 
     @association.setter
     def association(self, association):
-        if isinstance(association, str):
-            self._association = [association]
-        else:
-            self._association = association
+        self._association = mc.ls(association, long=True)
+        # if isinstance(association, str):
+        #     self._association = [association]
+        # else:
+        #     self._association = association
 
     @property
     def long_association(self):
@@ -300,7 +276,7 @@ class BaseNode(object):
                     if scene_val != obj_val:
                         print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
 
-    def get_scene_name(self, long_name=True):
+    def get_scene_name(self, long_name=False):
         """
         This checks stored mObject and gets name of object in scene.  If no
         mObject it returns node name.
@@ -318,6 +294,8 @@ class BaseNode(object):
         if not name:
             name = self.long_name
 
+        if not long_name:
+            name = name.split('|')[-1]
         return name
 
     def set_maya_attrs(self, attr_filter=None):
@@ -457,6 +435,3 @@ class BaseNode(object):
                 mobject = om.MObject()
                 selection_list.getDependNode(0, mobject)
                 self.__mobject = mobject
-
-
-            # logger.info('{} - {}'.format(self.__mobject, maya_node))

@@ -12,6 +12,7 @@ Welcome to Ziva's VFX Utilities!
     contributing
     modules
 
+.. autosummary::
 
 Indices and tables
 ==================

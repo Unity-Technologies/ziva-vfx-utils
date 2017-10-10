@@ -1,5 +1,20 @@
 Todo
 
+for 1.0.0
+- search and replace dictionary
+- Embedded meshes
+- passing interp maps false
+- skinCluster
+- finish blendshape
+- transform
+- constraints
+- zit nodes
+- see if class method is feasable for searching for nodes
+- tissue parent and child as tissue node instead of mesh
+- anim curves
+- multiple solvers
+
+#-------------------------------
 - zip json file
 - utility to export node and each components separately
 - defining outputs for setups???
