@@ -44,13 +44,13 @@ class DeformerBaseNode(BaseNode):
                 map_data_object = self._setup.component_factory(map_name,
                                                                 mesh_name,
                                                                 type='map')
-                self._setup.add_data(map_data_object)
+                self._setup.add_component(map_data_object)
 
-                if not self._setup.get_data(type_filter='mesh',
-                                            name_filter=mesh_name):
+                if not self._setup.get_component(type_filter='mesh',
+                                                 name_filter=mesh_name):
                     mesh_data_object = self._setup.component_factory(mesh_name,
                                                                      type='mesh')
-                    self._setup.add_data(mesh_data_object)
+                    self._setup.add_component(mesh_data_object)
 
     @staticmethod
     def get_meshes(node):

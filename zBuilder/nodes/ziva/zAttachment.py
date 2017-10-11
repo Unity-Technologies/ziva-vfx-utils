@@ -104,8 +104,8 @@ class AttachmentNode(ZivaBaseNode):
             ValueError: If map doesn't pass check.
         """
         for map_name in self.get_map_names():
-            map_object = self._setup.get_data(type_filter='map',
-                                              name_filter=map_name)[0]
+            map_object = self._setup.get_component(type_filter='map',
+                                                   name_filter=map_name)[0]
             values = map_object.value
 
             if all(v == 0 for v in values):

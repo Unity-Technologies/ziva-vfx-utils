@@ -18,7 +18,7 @@ class Bundle(object):
         import zBuilder
 
         self.nodes = list()
-        self.data = list()
+        self.components = list()
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -42,7 +42,7 @@ class Bundle(object):
         """
         return len(self.nodes)
 
-    def print_(self, type_filter=list(), name_filter=list(), component_data=False):
+    def print_(self, type_filter=list(), name_filter=list(), components=False):
         """Prints info on each node.
 
         Args:
@@ -50,7 +50,7 @@ class Bundle(object):
                 Defaults to :obj:`list`
             name_filter (:obj:`list` or :obj:`str`): filter by node name.
                 Defaults to :obj:`list`
-            component_data (:obj:`bool`): prints name of data stored.  Defaults to ``False``
+            components (:obj:`bool`): prints name of data stored.  Defaults to ``False``
 
         """
 
@@ -60,8 +60,8 @@ class Bundle(object):
 
         print '----------------------------------------------------------------'
 
-        if component_data:
-            for item in self.data:
+        if components:
+            for item in self.components:
                  print item
 
     def compare(self, type_filter=list(), name_filter=list()):
@@ -108,26 +108,26 @@ class Bundle(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-        data_types = set([item.type for item in self.data])
+        data_types = set([item.type for item in self.components])
 
-        output = 'component data: '
+        output = 'components: '
         for data_type in data_types:
-            amount = len([x for x in self.data if x.type == data_type])
+            amount = len([x for x in self.components if x.type == data_type])
             output += '{} {}   '.format(data_type, amount)
 
         logger.info(output)
 
-    def add_data(self, data):
+    def add_component(self, component):
         """ appends a data obj to the data list.  Checks if data is already in
         list, if it is it overrides the previous one.
 
         Args:
-            data (:obj:`obj`) data object to append to list
+            component (:obj:`obj`) data object to append to list
         """
-        if data in self.data:
-            self.data = [data if item == data else item for item in self.data]
+        if component in self.components:
+            self.components = [component if item == component else item for item in self.components]
         else:
-            self.data.append(data)
+            self.components.append(component)
 
     def add_node(self, node):
         """
@@ -151,17 +151,17 @@ class Bundle(object):
         """
         self.nodes.remove(node)
 
-    def remove_data(self, data):
+    def remove_component(self, component):
         """
         Removes a data from the data list while keeping order.
         Args:
-            data (:obj:`obj`): The data obj to remove.
+            component (:obj:`obj`): The data obj to remove.
         """
-        self.data.remove(data)
+        self.components.remove(component)
 
-    def get_data(self, type_filter=list(),
-                 name_filter=list(),
-                 name_regex=None):
+    def get_component(self, type_filter=list(),
+                      name_filter=list(),
+                      name_regex=None):
         """
         Gets data objects from data list.
 
@@ -176,7 +176,7 @@ class Bundle(object):
             list: List of data objects.
         """
         if not type_filter and not name_filter and not name_regex:
-            return self.data
+            return self.components
 
         if not isinstance(type_filter, list):
             type_filter = [type_filter]
@@ -196,7 +196,7 @@ class Bundle(object):
                 return False
             return True
 
-        return [item for item in self.data if keep_me(item)]
+        return [item for item in self.components if keep_me(item)]
 
     def get_nodes(self, type_filter=list(),
                   name_filter=list(),
@@ -273,7 +273,7 @@ class Bundle(object):
         for node in self:
             node.string_replace(search, replace)
 
-        for item in self.data:
+        for item in self.components:
             item.string_replace(search, replace)
 
 

@@ -3,7 +3,7 @@ import maya.mel as mm
 import maya.OpenMaya as om
 
 import zBuilder.zMaya as mz
-from zBuilder.data import BaseComponent
+from zBuilder.components import BaseComponent
 import logging
 
 logger = logging.getLogger(__name__)
@@ -97,8 +97,8 @@ class Map(BaseComponent):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self._setup.get_data(type_filter='mesh',
-                                         name_filter=mesh_name)[0]
+        mesh_data = self._setup.get_component(type_filter='mesh',
+                                              name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):

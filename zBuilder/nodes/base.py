@@ -188,7 +188,7 @@ class BaseNode(object):
         self._name = mc.ls(name, long=True)[0]
 
     # TODO instead of get_map* and get_mesh* should be more generic.
-    # get_data*(type_filter)
+    # get_component*(type_filter)
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically

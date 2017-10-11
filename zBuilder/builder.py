@@ -1,7 +1,7 @@
 from zBuilder.bundle import Bundle
 
 import zBuilder.zMaya as mz
-import zBuilder.data
+import zBuilder.components
 import zBuilder.nodes
 import zBuilder.IO as io
 from functools import wraps
@@ -54,7 +54,7 @@ class Builder(Bundle):
         """
         type_ = kwargs.get('type', True)
 
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.data']):
+        for name, obj in inspect.getmembers(sys.modules['zBuilder.components']):
             if inspect.isclass(obj):
                 if type_ == obj.type:
                     return obj(*args, setup=self)

@@ -2,7 +2,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
-from zBuilder.data import BaseComponent
+from zBuilder.components import BaseComponent
 import logging
 
 logger = logging.getLogger(__name__)
