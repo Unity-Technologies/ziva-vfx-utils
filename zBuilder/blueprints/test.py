@@ -8,9 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DeltaMushSetup(Builder):
+class Test(Builder):
     """
-    To capture a ziva setup
+    Test setup to play with deformers and how they are ordered on a mesh.
     """
 
     def __init__(self):
@@ -25,25 +25,29 @@ class DeltaMushSetup(Builder):
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_map_names', True)
 
-        hist = mc.listHistory(selection)
-        delta_mushes = mc.ls(hist, type='deltaMush')[::-1]
+        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
+                   'blendShape', 'wrap']
+        tmp = list()
+        history = mc.listHistory(selection, f=True)
+        history.extend(mc.listHistory(selection))
+        history = list(set(history))[::-1]
 
-        if not delta_mushes:
-            raise StandardError('No delta mushes found, aborting!')
+        for hist in history:
+            if mc.objectType(hist) in acquire:
+                tmp.append(hist)
 
-        for delta_mush in delta_mushes:
-            b_node = self.node_factory(delta_mush)
+        for item in tmp:
+            b_node = self.node_factory(item)
             self.add_node(b_node)
         self.stats()
 
     @Builder.time_this
     def build(self, *args, **kwargs):
-        logger.info('Applying deltaMush....')
+        logger.info('Applying....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', None)
 
-        b_nodes = self.get_nodes(name_filter=name_filter,
-                                 type_filter='deltaMush')
+        b_nodes = self.get_nodes(name_filter=name_filter)
         for b_node in b_nodes:
             b_node.build(attr_filter=attr_filter, interp_maps=interp_maps)

@@ -9,7 +9,7 @@ from zBuilder.builder import Builder
 logger = logging.getLogger(__name__)
 
 
-class ZivaSetup(Builder):
+class Ziva(Builder):
     """
     To capture a ziva setup
     """

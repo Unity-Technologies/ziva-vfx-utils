@@ -6,9 +6,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class ConstraintsSetup(Builder):
+
+class Constraints(Builder):
     def __init__(self):
-        super(ConstraintsSetup, self).__init__()
+        Builder.__init__(self)
 
         self.acquire = ['pointConstraint',
                         'orientConstraint',
@@ -18,8 +19,7 @@ class ConstraintsSetup(Builder):
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
         selection = mz.parse_args_for_selection(args)
-
-
+        
         tmp = list()
         connections = list(set(mc.listConnections(selection)))
 

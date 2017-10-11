@@ -2,11 +2,10 @@ from zBuilder.builder import Builder
 import maya.cmds as mc
 
 
-class AttributesSetup(Builder):
+class Selection(Builder):
     """
-    Storing maya attributes
+    Storing maya selection.
     """
-
     def __init__(self):
         Builder.__init__(self)
 
@@ -20,7 +19,11 @@ class AttributesSetup(Builder):
         self.stats()
 
     @Builder.time_this
-    def build(self):
-        b_nodes = self.get_nodes()
-        for b_node in b_nodes:
-            b_node.set_maya_attrs()
+    def build(self, select=True):
+        tmp = []
+        for node in self.nodes:
+            tmp.append(node.get_scene_name())
+
+        if select:
+            mc.select(tmp)
+        return tmp
