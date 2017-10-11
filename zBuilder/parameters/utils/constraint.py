@@ -1,8 +1,8 @@
-from zBuilder.nodes.base import BaseNode
+from zBuilder.parameters.base import BaseParameter
 import maya.cmds as mc
 
 
-class ConstraintNode(BaseNode):
+class ConstraintParameter(BaseParameter):
     """ The base node for the node functionality of all nodes
     """
     type = None
@@ -15,7 +15,7 @@ class ConstraintNode(BaseNode):
     """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
-        BaseNode.__init__(self, *args, **kwargs)
+        BaseParameter.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
@@ -65,7 +65,7 @@ class ConstraintNode(BaseNode):
         return short[-1]
 
     def populate(self, *args, **kwargs):
-        super(ConstraintNode, self).populate(*args, **kwargs)
+        super(ConstraintParameter, self).populate(*args, **kwargs)
 
         targets = get_targets(self.get_scene_name())
         constrained = get_constrained(self.get_scene_name())

@@ -1,11 +1,11 @@
 import logging
 import maya.cmds as mc
-from zBuilder.nodes.deformerBase import DeformerBaseNode
+from zBuilder.parameters.deformerBase import DeformerBaseParameter
 
 logger = logging.getLogger(__name__)
 
 
-class BlendShapeNode(DeformerBaseNode):
+class BlendShapeNode(DeformerBaseParameter):
     type = 'blendShape'
     MAP_LIST = ['inputTarget[0].inputTargetGroup[0].targetWeights']
     EXTEND_ATTR_LIST = ['origin']
@@ -13,7 +13,7 @@ class BlendShapeNode(DeformerBaseNode):
     def __init__(self, *args, **kwargs):
         self._target = None
 
-        DeformerBaseNode.__init__(self, *args, **kwargs)
+        DeformerBaseParameter.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')

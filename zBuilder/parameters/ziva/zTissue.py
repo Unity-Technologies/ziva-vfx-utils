@@ -1,4 +1,4 @@
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 import zBuilder.zMaya as mz
 import maya.cmds as mc
@@ -7,7 +7,7 @@ import maya.mel as mm
 logger = logging.getLogger(__name__)
 
 
-class TissueNode(ZivaBaseNode):
+class TissueNode(ZivaBaseParameter):
     """ This node for storing information related to zTissues.
     """
     type = 'zTissue'
@@ -17,7 +17,7 @@ class TissueNode(ZivaBaseNode):
         self._children_tissues = None
         self._parent_tissue = None
 
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     # TODO property and store zTissue instead of mesh for parents and childs
     def set_children_tissues(self, children):
@@ -101,8 +101,8 @@ class TissueNode(ZivaBaseNode):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        b_nodes = self._setup.get_nodes(type_filter='zTissue',
-                                        name_filter=name_filter)
+        b_nodes = self._setup.get_parameters(type_filter='zTissue',
+                                             name_filter=name_filter)
 
         if self == b_nodes[0]:
             apply_multiple(b_nodes, attr_filter=attr_filter,

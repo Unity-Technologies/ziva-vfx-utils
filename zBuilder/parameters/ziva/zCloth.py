@@ -2,20 +2,20 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ClothNode(ZivaBaseNode):
+class ClothNode(ZivaBaseParameter):
     """ This node for storing information related to zCloth.
     """
     type = 'zCloth'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.

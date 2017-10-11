@@ -1,11 +1,11 @@
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
-from zBuilder.nodes.base import BaseNode
-from zBuilder.nodes.deformerBase import DeformerBaseNode
+from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.deformerBase import DeformerBaseParameter
 
 # ziva nodes--------------------------------------------------------------------
-from .ziva.zivaBase import ZivaBaseNode
+from .ziva.zivaBase import ZivaBaseParameter
 from .ziva.zSolver import SolverNode
 from .ziva.zSolverTransform import SolverTransformNode
 from .ziva.zBone import BoneNode
@@ -24,5 +24,5 @@ from .deformers.blendShape import BlendShapeNode
 from .deformers.wrap import WrapNode
 
 # utils-------------------------------------------------------------------------
-from .utils.constraint import ConstraintNode
+from .utils.constraint import ConstraintParameter
 

@@ -9,7 +9,7 @@ import json
 logger = logging.getLogger(__name__)
 
 
-class BaseNode(object):
+class BaseParameter(object):
     """ The base node for the node functionality of all nodes
     """
     type = None
@@ -50,7 +50,7 @@ class BaseNode(object):
     def __eq__(self, other):
         """ Are names == in node objects?
         """
-        if isinstance(other, BaseNode):
+        if isinstance(other, BaseParameter):
             return self.name == other.name
 
     def __ne__(self, other):

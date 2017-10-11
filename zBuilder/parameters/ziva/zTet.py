@@ -1,4 +1,4 @@
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import zBuilder.zMaya as mz
 import logging
 import maya.cmds as mc
@@ -7,7 +7,7 @@ import maya.mel as mm
 logger = logging.getLogger(__name__)
 
 
-class TetNode(ZivaBaseNode):
+class TetNode(ZivaBaseParameter):
     """ This node for storing information related to zTets.
     """
     type = 'zTet'
@@ -19,7 +19,7 @@ class TetNode(ZivaBaseNode):
     def __init__(self, *args, **kwargs):
         self._user_tet_mesh = None
 
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def set_user_tet_mesh(self, mesh):
         """ Setting of the user tet mesh.

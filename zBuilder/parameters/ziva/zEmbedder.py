@@ -1,4 +1,4 @@
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class EmbedderNode(ZivaBaseNode):
+class EmbedderNode(ZivaBaseParameter):
     """ This node for storing information related to zEmebedder.
     """
     type = 'zEmbedder'
@@ -17,7 +17,7 @@ class EmbedderNode(ZivaBaseNode):
         self.__embedded_meshes = None
         self.__collision_meshes = None
 
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def populate(self, *args, **kwargs):
         """ This extends ZivaBase.populate()

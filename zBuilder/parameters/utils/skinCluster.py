@@ -1,9 +1,9 @@
-from zBuilder.nodes.base import BaseNode
+from zBuilder.parameters.base import BaseParameter
 import re
 
-class SkinClusterNode(BaseNode):
+class SkinClusterParameter(BaseParameter):
     def __init__(self):
-        BaseNode.__init__(self)
+        BaseParameter.__init__(self)
         self.__influneces = []
 
     def set_influences(self,influences):
@@ -13,6 +13,6 @@ class SkinClusterNode(BaseNode):
         return self.__influneces
 
     def print_(self):
-        super(SkinClusterNode, self).print_()
+        super(SkinClusterParameter, self).print_()
         if self.get_influences(longName=True):
             print 'influences: ', self.get_influences(longName=True)

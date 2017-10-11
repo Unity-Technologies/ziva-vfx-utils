@@ -2,7 +2,7 @@ from zBuilder.bundle import Bundle
 
 import zBuilder.zMaya as mz
 import zBuilder.components
-import zBuilder.nodes
+import zBuilder.parameters
 import zBuilder.IO as io
 from functools import wraps
 import datetime
@@ -21,7 +21,7 @@ class Builder(Bundle):
     def __init__(self):
         Bundle.__init__(self)
 
-    def node_factory(self, node):
+    def parameter_factory(self, node):
         """Given a maya node, this checks objType and instantiats the proper
         zBuilder.node and populates it and returns it.
 
@@ -32,14 +32,14 @@ class Builder(Bundle):
             obj: zBuilder node populated.
         """
         type_ = mz.get_type(node)
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
+        for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
                         return obj(node, setup=self)
                 if type_ == obj.type:
                     return obj(node, setup=self)
-        return zBuilder.nodes.BaseNode(node, setup=self)
+        return zBuilder.parameters.BaseParameter(node, setup=self)
 
     def component_factory(self, *args, **kwargs):
         """ This instantiates and populates a zBuilder data node based on type.
@@ -77,7 +77,7 @@ class Builder(Bundle):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        b_nodes = self.get_nodes()
+        b_nodes = self.get_parameters()
         for b_node in b_nodes:
             b_node.apply()
 
@@ -92,8 +92,8 @@ class Builder(Bundle):
         """
         selection = mz.parse_args_for_selection(args)
         for item in selection:
-            b_solver = self.node_factory(item)
-            self.add_node(b_solver)
+            b_solver = self.parameter_factory(item)
+            self.add_parameter(b_solver)
 
         self.stats()
 

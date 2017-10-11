@@ -26,8 +26,8 @@ class Constraints(Builder):
         tmp.extend([x for x in connections if mc.objectType(x) in self.acquire])
 
         for item in tmp:
-            b_node = self.node_factory(item)
-            self.add_node(b_node)
+            b_node = self.parameter_factory(item)
+            self.add_parameter(b_node)
         self.stats()
 
     @Builder.time_this
@@ -36,7 +36,7 @@ class Constraints(Builder):
         attr_filter = kwargs.get('attr_filter', None)
         name_filter = kwargs.get('name_filter', list())
 
-        b_nodes = self.get_nodes(name_filter=name_filter,
-                                 type_filter=self.acquire)
+        b_nodes = self.get_parameters(name_filter=name_filter,
+                                      type_filter=self.acquire)
         for b_node in b_nodes:
             b_node.build(attr_filter=attr_filter)

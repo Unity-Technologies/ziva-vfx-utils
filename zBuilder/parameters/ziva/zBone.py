@@ -2,20 +2,20 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class BoneNode(ZivaBaseNode):
+class BoneNode(ZivaBaseParameter):
     """ This node for storing information related to zBones.
     """
     type = 'zBone'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
@@ -34,8 +34,8 @@ class BoneNode(ZivaBaseNode):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        b_nodes = self._setup.get_nodes(type_filter='zBone',
-                                        name_filter=name_filter)
+        b_nodes = self._setup.get_parameters(type_filter='zBone',
+                                             name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.

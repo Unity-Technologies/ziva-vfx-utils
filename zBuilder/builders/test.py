@@ -37,8 +37,8 @@ class Test(Builder):
                 tmp.append(hist)
 
         for item in tmp:
-            b_node = self.node_factory(item)
-            self.add_node(b_node)
+            b_node = self.parameter_factory(item)
+            self.add_parameter(b_node)
         self.stats()
 
     @Builder.time_this
@@ -48,6 +48,6 @@ class Test(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', None)
 
-        b_nodes = self.get_nodes(name_filter=name_filter)
+        b_nodes = self.get_parameters(name_filter=name_filter)
         for b_node in b_nodes:
             b_node.build(attr_filter=attr_filter, interp_maps=interp_maps)

@@ -17,7 +17,7 @@ class Bundle(object):
     def __init__(self):
         import zBuilder
 
-        self.nodes = list()
+        self.parameters = list()
         self.components = list()
         self.info = dict()
         self.info['version'] = zBuilder.__version__
@@ -26,37 +26,37 @@ class Bundle(object):
         self.info['operating_system'] = mc.about(os=True)
 
     def __iter__(self):
-        """ This iterates through the nodes.
+        """ This iterates through the parameters.
 
         Returns:
-            Iterator of nodes.
+            Iterator of parameters.
 
         """
-        return iter(self.nodes)
+        return iter(self.parameters)
 
     def __len__(self):
         """
 
-        Returns: Length of nodes.
+        Returns: Length of parameters.
 
         """
-        return len(self.nodes)
+        return len(self.parameters)
 
     def print_(self, type_filter=list(), name_filter=list(), components=False):
-        """Prints info on each node.
+        """Prints info on each parameter.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by node type.
+            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by node name.
+            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
                 Defaults to :obj:`list`
             components (:obj:`bool`): prints name of data stored.  Defaults to ``False``
 
         """
 
-        for node in self.get_nodes(type_filter=type_filter,
-                                   name_filter=name_filter):
-            print node
+        for parameter in self.get_parameters(type_filter=type_filter,
+                                             name_filter=name_filter):
+            print parameter
 
         print '----------------------------------------------------------------'
 
@@ -70,23 +70,23 @@ class Bundle(object):
         Compares info in memory with that which is in scene.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by node type.
+            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by node name.
+            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
                 Defaults to :obj:`list`
 
         """
 
-        for node in self.get_nodes(type_filter=type_filter,
-                                   name_filter=name_filter):
-            node.compare()
+        for parameter in self.get_parameters(type_filter=type_filter,
+                                             name_filter=name_filter):
+            parameter.compare()
 
     def stats(self, type_filter=str()):
         """
         prints out basic stats on data
 
         Args:
-            type_filter (:obj:`str`): filter by node type.
+            type_filter (:obj:`str`): filter by parameter type.
                 Defaults to :obj:`str`
         """
         tmp = {}
@@ -118,44 +118,44 @@ class Bundle(object):
         logger.info(output)
 
     def add_component(self, component):
-        """ appends a data obj to the data list.  Checks if data is already in
-        list, if it is it overrides the previous one.
+        """ appends a component to the component list.  Checks if component
+        is already in list, if it is it overrides the previous one.
 
         Args:
-            component (:obj:`obj`) data object to append to list
+            component (:obj:`obj`) component to append to list
         """
         if component in self.components:
             self.components = [component if item == component else item for item in self.components]
         else:
             self.components.append(component)
 
-    def add_node(self, node):
+    def add_parameter(self, parameter):
         """
-        appends a node to the node list.  Checks if node is already in list, if
-        it is it overrides the previous one.
+        appends a parameter to the parameter list.  Checks if parameter is
+        already in list, if it is it overrides the previous one.
 
         Args:
-            node (:obj:`obj`): the node obj to append to collection list.
+            parameter (:obj:`obj`): the parameter to append to collection list.
         """
 
-        if node in self.nodes:
-            self.nodes = [node if item == node else item for item in self.nodes]
+        if parameter in self.parameters:
+            self.parameters = [parameter if item == parameter else item for item in self.parameters]
         else:
-            self.nodes.append(node)
+            self.parameters.append(parameter)
 
-    def remove_node(self, node):
+    def remove_parameter(self, parameter):
         """
-        Removes a node from the node list while keeping order.
+        Removes a parameter from the parameter list while keeping order.
         Args:
-            node (:obj:`obj`): The node object to remove.
+            parameter (:obj:`obj`): The parameter object to remove.
         """
-        self.nodes.remove(node)
+        self.parameters.remove(parameter)
 
     def remove_component(self, component):
         """
-        Removes a data from the data list while keeping order.
+        Removes a component from the component list while keeping order.
         Args:
-            component (:obj:`obj`): The data obj to remove.
+            component (:obj:`obj`): The component to remove.
         """
         self.components.remove(component)
 
@@ -163,17 +163,17 @@ class Bundle(object):
                       name_filter=list(),
                       name_regex=None):
         """
-        Gets data objects from data list.
+        Gets component from component list.
 
         Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by data ``type``.
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by component ``type``.
                 Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by data ``name``.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by component ``name``.
                 Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by node name by regular expression.
+            name_regex (:obj:`str`): filter by component name by regular expression.
                 Defaults to ``None``.
         Returns:
-            list: List of data objects.
+            list: List of component objects.
         """
         if not type_filter and not name_filter and not name_regex:
             return self.components
@@ -198,31 +198,31 @@ class Bundle(object):
 
         return [item for item in self.components if keep_me(item)]
 
-    def get_nodes(self, type_filter=list(),
-                  name_filter=list(),
-                  name_regex=None,
-                  association_filter=list(),
-                  association_regex=None):
+    def get_parameters(self, type_filter=list(),
+                       name_filter=list(),
+                       name_regex=None,
+                       association_filter=list(),
+                       association_regex=None):
 
         """
-        Gets node objects from node list.
+        Gets parameters from parameter list.
 
         Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by node ``type``.
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
                 Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by node ``name``.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``name``.
                 Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by node name by regular expression.
+            name_regex (:obj:`str`): filter by parameter name by regular expression.
                 Defaults to ``None``.
-            association_filter (:obj:`str` or :obj:`list`, optional): filter by node ``association``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``association``.
                 Defaults to :obj:`list`.
-            association_regex (:obj:`str`): filter by node ``association`` by regular expression.
+            association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
                 Defaults to ``None``.
         Returns:
-            list: List of node objects.
+            list: List of parameters.
         """
         if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
-            return self.nodes
+            return self.parameters
 
         if not isinstance(type_filter, list):
             type_filter = [type_filter]
@@ -255,7 +255,8 @@ class Bundle(object):
 
     def string_replace(self, search, replace):
         """
-        searches and replaces with regular expressions items in data
+        searches and replaces with regular expressions items in parameters and
+        components
 
         Args:
             search (:obj:`str`): what to search for
@@ -270,8 +271,8 @@ class Bundle(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        for node in self:
-            node.string_replace(search, replace)
+        for item in self.parameters:
+            item.string_replace(search, replace)
 
         for item in self.components:
             item.string_replace(search, replace)

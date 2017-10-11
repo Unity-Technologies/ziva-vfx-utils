@@ -2,13 +2,13 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class AttachmentNode(ZivaBaseNode):
+class AttachmentNode(ZivaBaseParameter):
     """ This node for storing information related to zAttachments.
     """
     type = 'zAttachment'
@@ -17,7 +17,7 @@ class AttachmentNode(ZivaBaseNode):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
@@ -57,8 +57,8 @@ class AttachmentNode(ZivaBaseNode):
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self._setup.get_nodes(type_filter='zAttachment',
-                                                     association_filter=source_mesh)
+            data_attachments = self._setup.get_parameters(type_filter='zAttachment',
+                                                          association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.association[0]

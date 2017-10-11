@@ -2,16 +2,16 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.nodes.base import BaseNode
+from zBuilder.parameters.base import BaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class DeformerBaseNode(BaseNode):
+class DeformerBaseParameter(BaseParameter):
 
     def __init__(self, *args, **kwargs):
-        BaseNode.__init__(self, *args, **kwargs)
+        BaseParameter.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
@@ -29,7 +29,7 @@ class DeformerBaseNode(BaseNode):
             *args (str): The maya node to populate it with.
 
         """
-        super(DeformerBaseNode, self).populate(*args, **kwargs)
+        super(DeformerBaseParameter, self).populate(*args, **kwargs)
 
         selection = mz.parse_args_for_selection(args)
 

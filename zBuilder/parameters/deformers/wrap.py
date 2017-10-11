@@ -3,12 +3,12 @@ import logging
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.nodes.deformerBase import DeformerBaseNode
+from zBuilder.parameters.deformerBase import DeformerBaseParameter
 
 logger = logging.getLogger(__name__)
 
 
-class WrapNode(DeformerBaseNode):
+class WrapNode(DeformerBaseParameter):
     type = 'wrap'
     # MAP_LIST = ['weightList[0].weights']
 

@@ -2,13 +2,13 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.nodes.base import BaseNode
+from zBuilder.parameters.base import BaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ZivaBaseNode(BaseNode):
+class ZivaBaseParameter(BaseParameter):
     """Base node for Ziva type nodes.
 
     extended from base to deal with maps and meshes and storing the solver.
@@ -18,7 +18,7 @@ class ZivaBaseNode(BaseNode):
     def __init__(self, *args, **kwargs):
         self.solver = None
 
-        BaseNode.__init__(self, *args, **kwargs)
+        BaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """
@@ -39,7 +39,7 @@ class ZivaBaseNode(BaseNode):
         Args:
             *args: Maya node to populate with.
         """
-        super(ZivaBaseNode, self).populate(*args, **kwargs)
+        super(ZivaBaseParameter, self).populate(*args, **kwargs)
 
         selection = mz.parse_args_for_selection(args)
 

@@ -1,23 +1,24 @@
 import maya.cmds as mc
+import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class SolverNode(ZivaBaseNode):
-    """ This node for storing information related to zSolver.
+class SolverTransformNode(ZivaBaseParameter):
+    """ This node for storing information related to zSolverTransform.
     """
-    type = 'zSolver'
+    type = 'zSolverTransform'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
-        """ Builds the zSolver in maya scene.
+        """ Builds the zSolverTransform in maya scene.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get.
@@ -34,8 +35,8 @@ class SolverNode(ZivaBaseNode):
 
         if not mc.objExists(solver_name):
             results = mm.eval('ziva -s')
-            solver = mc.ls(results, type='zSolver')[0]
-            mc.rename(solver, solver_name.split('|')[-1])
+            solver = mc.ls(results, type='zSolverTransform')[0]
+            mc.rename(solver, solver_name)
             self.mobject = solver_name
 
         else:
@@ -43,3 +44,7 @@ class SolverNode(ZivaBaseNode):
             self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
+
+        # ----------------------------------------------------------------------
+        # turn off solver to speed up build
+        mc.setAttr(solver_name + '.enable', 0)

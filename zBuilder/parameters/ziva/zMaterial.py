@@ -2,13 +2,13 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class MaterialNode(ZivaBaseNode):
+class MaterialNode(ZivaBaseParameter):
     """ This node for storing information related to zMaterials.
     """
     type = 'zMaterial'
@@ -18,7 +18,7 @@ class MaterialNode(ZivaBaseNode):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def apply(self, *args, **kwargs):
         """ Builds the zMaterial in maya scene.
@@ -52,8 +52,8 @@ class MaterialNode(ZivaBaseNode):
             # get exsisting node names in scene on specific mesh and in data
             existing_materials = mm.eval(
                 'zQuery -t zMaterial {}'.format(mesh))
-            data_materials = self._setup.get_nodes(type_filter='zMaterial',
-                                                   association_filter=mesh)
+            data_materials = self._setup.get_parameters(type_filter='zMaterial',
+                                                        association_filter=mesh)
 
             d_index = data_materials.index(self)
 

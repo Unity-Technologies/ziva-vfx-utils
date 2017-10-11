@@ -1,4 +1,4 @@
-from zBuilder.nodes import ZivaBaseNode
+from zBuilder.parameters import ZivaBaseParameter
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FiberNode(ZivaBaseNode):
+class FiberNode(ZivaBaseParameter):
     """ This node for storing information related to zFibers.
     """
     type = 'zFiber'
@@ -16,7 +16,7 @@ class FiberNode(ZivaBaseNode):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseNode.__init__(self, *args, **kwargs)
+        ZivaBaseParameter.__init__(self, *args, **kwargs)
 
     def get_map_meshes(self):
         """
@@ -53,8 +53,8 @@ class FiberNode(ZivaBaseNode):
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
-            data_fibers = self._setup.get_nodes(type_filter='zFiber',
-                                                association_filter=mesh)
+            data_fibers = self._setup.get_parameters(type_filter='zFiber',
+                                                     association_filter=mesh)
 
             # self.interpolate_maps(interp_maps)
             # self.are_maps_valid()
