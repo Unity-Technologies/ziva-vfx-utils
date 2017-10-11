@@ -8,7 +8,7 @@ import os
 import maya.cmds as mc
 import maya.mel as mm
 from maya import OpenMaya as om
-import zBuilder.blueprints.ziva as zva
+import zBuilder.builders.ziva as zva
 import zBuilder.zMaya
 import zUI.util as util
 

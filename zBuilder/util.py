@@ -13,7 +13,7 @@ def copy_paste(*args, **kwargs):
     else:
         selection = mc.ls(sl=True, l=True)
 
-    import zBuilder.blueprints.ziva as zva
+    import zBuilder.builders.ziva as zva
     z = zva.ZivaSetup()
     z.retrieve_from_scene_selection(selection[0])
     z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
