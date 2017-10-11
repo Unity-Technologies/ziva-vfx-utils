@@ -47,11 +47,6 @@ class Bundle(object):
         logger.info("self.data deprecated, use self.components")
         return self.components
 
-    @property
-    def nodes(self):
-        logger.info("self.nodes deprecated, use self.parameters")
-        return self.parameters
-    
     def print_(self, type_filter=list(), name_filter=list(), components=False):
         """Prints info on each parameter.
 
