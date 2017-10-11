@@ -25,4 +25,4 @@ from .deformers.wrap import WrapNode
 
 # utils-------------------------------------------------------------------------
 from .utils.constraint import ConstraintParameter
-
+from .deformers.skinCluster import SkinClusterParameter

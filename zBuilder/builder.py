@@ -79,13 +79,14 @@ class Builder(Bundle):
 
         b_nodes = self.get_parameters()
         for b_node in b_nodes:
-            b_node.apply()
+            b_node.build()
 
     # def apply(self, *args, **kwargs):
     #
     #     self.build(args, kwargs)
     #     logger.info('.apply() DEPRECATED.  Use .build() instead.')
 
+    # @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
