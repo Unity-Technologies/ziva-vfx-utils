@@ -14,10 +14,10 @@ def copy_paste(*args, **kwargs):
         selection = mc.ls(sl=True, l=True)
 
     import zBuilder.builders.ziva as zva
-    z = zva.ZivaSetup()
+    z = zva.Ziva()
     z.retrieve_from_scene_selection(selection[0])
     z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
     z.stats()
-    z.apply(kwargs)
+    z.build(kwargs)
 
     mc.select(sel)

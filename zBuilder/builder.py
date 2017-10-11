@@ -97,19 +97,19 @@ class Builder(Bundle):
 
         self.stats()
 
-    def write(self, file_path, component_data=True, node_data=True):
+    def write(self, file_path, components=True, parameters=True):
         """ writes data to disk in json format.
 
         Args:
             file_path (str): The file path to write to disk.
-            node_data (bool, optional): Optionally suppress writing out of node
+            parameters (bool, optional): Optionally suppress writing out of node
                 objects.  Defaults to ``True``.
-            component_data (bool, optional): Optionally suppress writing out of
+            components (bool, optional): Optionally suppress writing out of
                 data objects.  Defaults to ``True``.
         """
 
-        json_data = self.__get_json_data(component_data=component_data,
-                                         node_data=node_data)
+        json_data = self.__get_json_data(component_data=components,
+                                         node_data=parameters)
 
         if io.dump_json(file_path, json_data):
             for b_node in self.nodes:
@@ -147,7 +147,7 @@ class Builder(Bundle):
         for d in data:
 
             if d['d_type'] == 'node_data':
-                self.nodes = d['data']
+                self.parameters = d['data']
                 logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
@@ -157,7 +157,7 @@ class Builder(Bundle):
                             self.data.append(d['data'][k][k2])
                 else:
                     # saved as 1.0.0
-                    self.data = d['data']
+                    self.components = d['data']
 
                 logger.info("reading component_data. ")
             if d['d_type'] == 'info':
@@ -177,10 +177,10 @@ class Builder(Bundle):
         tmp = []
 
         if node_data:
-            logger.info("writing node_data")
+            logger.info("writing parameters")
             tmp.append(io.wrap_data(self.nodes, 'node_data'))
         if component_data:
-            logger.info("writing component_data")
+            logger.info("writing components")
             tmp.append(io.wrap_data(self.data, 'component_data'))
         logger.info("writing info")
         tmp.append(io.wrap_data(self.info, 'info'))

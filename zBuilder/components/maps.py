@@ -90,7 +90,7 @@ class Map(BaseComponent):
         else:
             return None
 
-    def get_mesh_data(self):
+    def get_mesh_component(self):
         """ Gets the mesh data object.
 
         Returns:
@@ -107,12 +107,12 @@ class Map(BaseComponent):
         Returns:
             True if they are, else False.
         """
-        mesh_data = self.get_mesh_data()[0]
+        mesh_data = self.get_mesh_component()[0]
         return mesh_data.is_topologically_corresponding()
 
     def interpolate(self):
         """ Interpolates map against mesh in scene.  Re-sets value."""
-        mesh_data = self.get_mesh_data()
+        mesh_data = self.get_mesh_component()
         logger.info('interpolating map:  {}'.format(self.name))
         created_mesh = mesh_data.build()
         weight_list = interpolate_values(created_mesh,

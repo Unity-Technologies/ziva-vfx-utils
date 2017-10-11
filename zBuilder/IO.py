@@ -134,7 +134,8 @@ def update_json(json_object):
     replace_me['_type'] = 'TYPE'
     replace_me['_attrs'] = 'attrs'
     replace_me['_value'] = 'values'
-    replace_me['__collection'] = 'nodes'
+    replace_me['__collection'] = 'parameters'
+    replace_me['data'] = 'components'
     replace_me['_zFiber'] = 'fiber'
 
     if '_class' in json_object:
