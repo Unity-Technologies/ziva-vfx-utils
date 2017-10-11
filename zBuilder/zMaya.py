@@ -487,47 +487,6 @@ def select_tissue_meshes():
     mc.select(meshes)
 
 
-def get_tissue_children(ztissue):
-    """ This checks a zTissue if it has children.  Useful for sub-tissues.
-    Args:
-        ztissue (str): The zTissue object in the maya scene.
-
-    Returns:
-        (str) Children mesh of zTissue, or None if none found.
-    """
-    tmp = []
-    if mc.objectType(ztissue) == 'zTissue':
-        child_attr = '{}.oChildTissue'.format(ztissue)
-        if mc.objExists(child_attr):
-            children = mc.listConnections(child_attr)
-
-            if children:
-                sel = mc.ls(sl=True)
-                mc.select(children)
-                tmp.extend(mm.eval('zQuery -t zTissue -m -l'))
-                mc.select(sel)
-                return tmp
-    return None
-
-
-def get_tissue_parent(ztissue):
-    """ This checks a zTissue if it has a parent.  Useful for sub-tissues.
-    Args:
-        ztissue (str): The zTissue object in the maya scene.
-
-    Returns:
-        (str) Parent mesh of zTissue, or None if none found
-    """
-    if mc.objectType(ztissue) == 'zTissue':
-        parent_attr = '{}.iParentTissue'.format(ztissue)
-        if mc.objExists(parent_attr):
-            parent = mc.listConnections(parent_attr)
-            if parent:
-                parent = mm.eval('zQuery -t zTissue -m -l')
-                return parent[0]
-    return None
-
-
 def get_mdagpath_from_mesh(mesh_name):
     """ Maya stuff, getting the dagpath from a mesh name
 

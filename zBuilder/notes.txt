@@ -2,10 +2,7 @@ Todo
 
 for 1.0.0
 - search and replace dictionary
-- Embedded meshes
 - passing interp maps false
-- finish blendshape
-- tissue parent and child as tissue node instead of mesh
 - multiple solvers
 
 #-------------------------------
@@ -13,6 +10,7 @@ for 1.0.0
 - interpolate skinCluster weights.
 - transform
 - constraints
+- finish blendshape
 
 #-------------------------------
 - see if class method is feasable for searching for nodes
