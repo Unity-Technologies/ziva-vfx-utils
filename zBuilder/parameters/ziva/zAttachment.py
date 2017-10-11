@@ -19,7 +19,7 @@ class AttachmentNode(ZivaBaseParameter):
     def __init__(self, *args, **kwargs):
         ZivaBaseParameter.__init__(self, *args, **kwargs)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 
         Args:
@@ -104,9 +104,9 @@ class AttachmentNode(ZivaBaseParameter):
             ValueError: If map doesn't pass check.
         """
         for map_name in self.get_map_names():
-            map_object = self._setup.get_component(type_filter='map',
+            map_object = self._setup.get_components(type_filter='map',
                                                    name_filter=map_name)[0]
-            values = map_object.value
+            values = map_object.values
 
             if all(v == 0 for v in values):
                 raise ValueError('{} all 0s.  Check map.'.format(map_name))

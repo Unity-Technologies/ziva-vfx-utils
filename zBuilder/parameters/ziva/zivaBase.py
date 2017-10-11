@@ -20,7 +20,7 @@ class ZivaBaseParameter(BaseParameter):
 
         BaseParameter.__init__(self, *args, **kwargs)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """
 
         Args:
@@ -61,7 +61,7 @@ class ZivaBaseParameter(BaseParameter):
                                                                 type='map')
                 self._setup.add_component(map_data_object)
 
-                if not self._setup.get_component(type_filter='mesh',
+                if not self._setup.get_components(type_filter='mesh',
                                                  name_filter=mesh_name):
                     mesh_data_object = self._setup.component_factory(mesh_name,
                                                                      type='mesh'

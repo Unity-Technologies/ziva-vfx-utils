@@ -31,7 +31,7 @@ class FiberNode(ZivaBaseParameter):
         return [self.association[0],
                 self.association[0]]
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.
 
         Args:
@@ -97,9 +97,9 @@ class FiberNode(ZivaBaseParameter):
 
         """
         map_name = self.get_map_names()[1]
-        map_object = self._setup.get_component(type_filter='map',
+        map_object = self._setup.get_components(type_filter='map',
                                                name_filter=map_name)
-        values = map_object.value
+        values = map_object.values
 
         upper = False
         lower = False

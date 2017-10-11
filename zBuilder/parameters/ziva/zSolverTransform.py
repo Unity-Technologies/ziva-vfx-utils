@@ -17,7 +17,7 @@ class SolverTransformNode(ZivaBaseParameter):
     def __init__(self, *args, **kwargs):
         ZivaBaseParameter.__init__(self, *args, **kwargs)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zSolverTransform in maya scene.
 
         Args:

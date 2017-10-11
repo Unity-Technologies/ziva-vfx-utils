@@ -209,7 +209,7 @@ class BaseParameter(object):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self._setup.get_data(type_filter='mesh',
+            meshes.extend(self._setup.get_components(type_filter='mesh',
                                                name_filter=mesh_name))
         return meshes
 
@@ -221,7 +221,7 @@ class BaseParameter(object):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self._setup.get_data(type_filter='map',
+            maps_.extend(self._setup.get_components(type_filter='map',
                                               name_filter=map_name))
         return maps_
 
@@ -382,10 +382,10 @@ class BaseParameter(object):
         original_name = self.name
 
         for map_ in maps:
-            map_data = self._setup.get_data(type_filter='map',
-                                            name_filter=map_)[0]
+            map_data = self._setup.get_components(type_filter='map',
+                                                  name_filter=map_)[0]
             self.interpolate_maps(interp_maps)
-            weight_list = map_data.value
+            weight_list = map_data.values
 
             map_ = map_.replace(original_name, scene_name)
 

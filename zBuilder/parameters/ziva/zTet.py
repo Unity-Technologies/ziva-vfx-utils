@@ -59,7 +59,7 @@ class TetNode(ZivaBaseParameter):
                 print 'could not connect {}.worldMesh to {}.iTet'.format(
                     user_mesh, name)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zTets in maya scene.
 
         These get built after the tissues so it is assumed they are in scene.

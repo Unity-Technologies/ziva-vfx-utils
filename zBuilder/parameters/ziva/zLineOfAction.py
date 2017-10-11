@@ -31,7 +31,7 @@ class LineOfActionNode(ZivaBaseParameter):
 
         self.fiber = mz.get_lineOfAction_fiber(self.get_scene_name())
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the Line of Actions in maya scene.
 
         Args:

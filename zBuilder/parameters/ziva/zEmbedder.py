@@ -29,7 +29,10 @@ class EmbedderNode(ZivaBaseParameter):
         """
         super(EmbedderNode, self).populate(*args, **kwargs)
 
-        embedded_meshes = get_embedded_meshes([self.get_scene_name()])
+        tissues = self._setup.get_parameters(type_filter='zTissue')
+        tissue_meshes = [x.association[0] for x in tissues]
+        embedded_meshes = get_embedded_meshes(tissue_meshes)
+
         self.set_embedded_meshes(embedded_meshes[0])
         self.set_collision_meshes(embedded_meshes[1])
 
@@ -87,7 +90,7 @@ class EmbedderNode(ZivaBaseParameter):
                 tmp[name.split('|')[-1]] = msh
             return tmp
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zEmbedder in maya scene.
 
         Args:
@@ -103,17 +106,17 @@ class EmbedderNode(ZivaBaseParameter):
         collision_meshes = self.get_collision_meshes()
         embedded_meshes = self.get_embedded_meshes()
 
-        # if collision_meshes:
-        #     for mesh in collision_meshes:
-        #         for item in collision_meshes[mesh]:
-        #             mc.select(mesh, item, r=True)
-        #             mm.eval('ziva -tcm')
-        #
-        # if embedded_meshes:
-        #     for mesh in embedded_meshes:
-        #         for item in embedded_meshes[mesh]:
-        #             mc.select(mesh, item, r=True)
-        #             mm.eval('ziva -e')
+        if collision_meshes:
+            for mesh in collision_meshes:
+                for item in collision_meshes[mesh]:
+                    mc.select(mesh, item, r=True)
+                    mm.eval('ziva -tcm')
+
+        if embedded_meshes:
+            for mesh in embedded_meshes:
+                for item in embedded_meshes[mesh]:
+                    mc.select(mesh, item, r=True)
+                    mm.eval('ziva -e')
 
 
 def get_embedded_meshes(bodies):

@@ -97,8 +97,8 @@ class Map(BaseComponent):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self._setup.get_component(type_filter='mesh',
-                                              name_filter=mesh_name)[0]
+        mesh_data = self._setup.get_components(type_filter='mesh',
+                                               name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):
@@ -107,7 +107,7 @@ class Map(BaseComponent):
         Returns:
             True if they are, else False.
         """
-        mesh_data = self.get_mesh_component()[0]
+        mesh_data = self.get_mesh_component()
         return mesh_data.is_topologically_corresponding()
 
     def interpolate(self):

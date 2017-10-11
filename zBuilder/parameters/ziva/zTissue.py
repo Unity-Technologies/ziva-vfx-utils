@@ -84,7 +84,7 @@ class TissueNode(ZivaBaseParameter):
         self.set_children_tissues(mz.get_tissue_children(self.get_scene_name()))
         self.set_parent_tissue(mz.get_tissue_parent(self.get_scene_name()))
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
 
         Args:

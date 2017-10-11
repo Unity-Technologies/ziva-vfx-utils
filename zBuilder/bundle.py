@@ -169,9 +169,9 @@ class Bundle(object):
         """
         self.components.remove(component)
 
-    def get_component(self, type_filter=list(),
-                      name_filter=list(),
-                      name_regex=None):
+    def get_components(self, type_filter=list(),
+                       name_filter=list(),
+                       name_regex=None):
         """
         Gets component from component list.
 
