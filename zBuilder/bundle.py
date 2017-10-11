@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class NodeCollection(object):
+class Bundle(object):
     """Mixin class to deal with storing node data and component data.  meant to
     be inherited by main.
     """

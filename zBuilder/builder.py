@@ -1,4 +1,4 @@
-from zBuilder.nodeCollection import NodeCollection
+from zBuilder.bundle import Bundle
 
 import zBuilder.zMaya as mz
 import zBuilder.data
@@ -13,13 +13,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Builder(NodeCollection):
+class Builder(Bundle):
     """ The main class for using zBuilder.
 
     This inherits from nodeCollection which is a glorified list.
     """
     def __init__(self):
-        NodeCollection.__init__(self)
+        Bundle.__init__(self)
 
     def node_factory(self, node):
         """Given a maya node, this checks objType and instantiats the proper
