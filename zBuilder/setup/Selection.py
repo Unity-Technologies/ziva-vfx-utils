@@ -19,7 +19,7 @@ class SelectionSetup(Builder):
         self.stats()
 
     @Builder.time_this
-    def apply(self, select=True):
+    def build(self, select=True):
         tmp = []
         for node in self.nodes:
             tmp.append(node.get_scene_name())

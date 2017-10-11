@@ -20,7 +20,7 @@ class AttributesSetup(Builder):
         self.stats()
 
     @Builder.time_this
-    def apply(self):
+    def build(self):
         b_nodes = self.get_nodes()
         for b_node in b_nodes:
             b_node.set_maya_attrs()

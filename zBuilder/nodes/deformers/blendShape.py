@@ -15,7 +15,7 @@ class BlendShapeNode(DeformerBaseNode):
 
         DeformerBaseNode.__init__(self, *args, **kwargs)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 

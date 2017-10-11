@@ -42,7 +42,7 @@ class TestSetup(Builder):
         self.stats()
 
     @Builder.time_this
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         logger.info('Applying....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
@@ -50,4 +50,4 @@ class TestSetup(Builder):
 
         b_nodes = self.get_nodes(name_filter=name_filter)
         for b_node in b_nodes:
-            b_node.apply(attr_filter=attr_filter, interp_maps=interp_maps)
+            b_node.build(attr_filter=attr_filter, interp_maps=interp_maps)

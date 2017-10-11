@@ -132,10 +132,11 @@ class BaseNode(object):
         self.attrs = attrs
         self.mobject = selection[0]
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
         """
-        raise NotImplementedError
+        pass
+        # raise NotImplementedError
 
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.

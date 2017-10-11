@@ -74,12 +74,17 @@ class Builder(Bundle):
 
         return new_function
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         logger.info('Building....')
 
         b_nodes = self.get_nodes()
         for b_node in b_nodes:
             b_node.apply()
+
+    # def apply(self, *args, **kwargs):
+    #
+    #     self.build(args, kwargs)
+    #     logger.info('.apply() DEPRECATED.  Use .build() instead.')
 
     def retrieve_from_scene(self, *args, **kwargs):
         """

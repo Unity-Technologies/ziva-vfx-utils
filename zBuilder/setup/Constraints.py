@@ -31,7 +31,7 @@ class ConstraintsSetup(Builder):
         self.stats()
 
     @Builder.time_this
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         logger.info('Applying constraints....')
         attr_filter = kwargs.get('attr_filter', None)
         name_filter = kwargs.get('name_filter', list())
@@ -39,4 +39,4 @@ class ConstraintsSetup(Builder):
         b_nodes = self.get_nodes(name_filter=name_filter,
                                  type_filter=self.acquire)
         for b_node in b_nodes:
-            b_node.apply(attr_filter=attr_filter)
+            b_node.build(attr_filter=attr_filter)

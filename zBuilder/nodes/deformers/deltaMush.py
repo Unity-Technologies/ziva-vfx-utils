@@ -9,7 +9,7 @@ class DeltaMushNode(DeformerBaseNode):
     type = 'deltaMush'
     MAP_LIST = ['weightList[0].weights']
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 

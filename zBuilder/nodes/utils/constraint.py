@@ -17,7 +17,7 @@ class ConstraintNode(BaseNode):
     def __init__(self, *args, **kwargs):
         BaseNode.__init__(self, *args, **kwargs)
 
-    def apply(self, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
         Args:
