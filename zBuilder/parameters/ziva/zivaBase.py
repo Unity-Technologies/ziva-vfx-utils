@@ -2,13 +2,13 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.deformerBase import DeformerBaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ZivaBaseParameter(BaseParameter):
+class ZivaBaseParameter(DeformerBaseParameter):
     """Base node for Ziva type nodes.
 
     extended from base to deal with maps and meshes and storing the solver.
@@ -18,7 +18,7 @@ class ZivaBaseParameter(BaseParameter):
     def __init__(self, *args, **kwargs):
         self.solver = None
 
-        BaseParameter.__init__(self, *args, **kwargs)
+        DeformerBaseParameter.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         """
@@ -39,9 +39,17 @@ class ZivaBaseParameter(BaseParameter):
         Args:
             *args: Maya node to populate with.
         """
-        super(ZivaBaseParameter, self).populate(*args, **kwargs)
 
         selection = mz.parse_args_for_selection(args)
+
+        self.name = selection[0]
+        self.type = mc.objectType(selection[0])
+        attr_list = mz.build_attr_list(selection[0])
+        if self.EXTEND_ATTR_LIST:
+            attr_list.extend(self.EXTEND_ATTR_LIST)
+        attrs = mz.build_attr_key_values(selection[0], attr_list)
+        self.attrs = attrs
+        self.mobject = selection[0]
 
         mesh = mz.get_association(selection[0])
         self.association = mesh
