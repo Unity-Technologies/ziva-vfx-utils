@@ -97,7 +97,7 @@ class Map(BaseComponent):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self._setup.get_components(type_filter='mesh',
+        mesh_data = self._setup.bundle.get_components(type_filter='mesh',
                                                name_filter=mesh_name)[0]
         return mesh_data
 

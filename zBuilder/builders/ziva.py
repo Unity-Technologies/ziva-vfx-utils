@@ -58,7 +58,7 @@ class Ziva(Builder):
             raise StandardError('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.parameter_factory(solver)
-        self.add_parameter(b_solver)
+        self.bundle.add_parameter(b_solver)
 
         node_types = ['zSolverTransform',
                       'zBone',
@@ -86,7 +86,7 @@ class Ziva(Builder):
                                      get_mesh=get_mesh,
                                      get_maps=get_maps)
 
-        self.stats()
+        self.bundle.stats()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -178,7 +178,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes)
 
         mc.select(sel, r=True)
-        self.stats()
+        self.bundle.stats()
 
     def _populate_nodes(self, nodes, get_mesh=True, get_maps=True):
         """
@@ -192,7 +192,7 @@ class Ziva(Builder):
         """
         for node in nodes:
             b_node = self.parameter_factory(node)
-            self.add_parameter(b_node)
+            self.bundle.add_parameter(b_node)
 
     @Builder.time_this
     def build(self, name_filter=None, attr_filter=None, interp_maps='auto',
@@ -212,13 +212,13 @@ class Ziva(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            [item.mirror() for item in self.get_components(type_filter='mesh')]
+            [item.mirror() for item in self.bundle.get_components(type_filter='mesh')]
 
         logger.info('Building setup....')
         sel = mc.ls(sl=True)
 
         # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_parameters(type_filter='zSolverTransform')[0]
+        solver_transform = self.bundle.get_parameters(type_filter='zSolverTransform')[0]
         sn = solver_transform.name
         solver_value = solver_transform.attrs['enable']['value']
 
@@ -285,7 +285,7 @@ class Ziva(Builder):
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
-            for b_node in self.get_parameters(type_filter=node_type):
+            for b_node in self.bundle.get_parameters(type_filter=node_type):
                 b_node.build(attr_filter=attr_filter, permissive=permissive,
                              check_meshes=check_meshes, interp_maps=interp_maps)
 

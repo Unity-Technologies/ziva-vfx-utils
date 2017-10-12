@@ -53,7 +53,7 @@ class FiberNode(ZivaBaseParameter):
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
-            data_fibers = self._setup.get_parameters(type_filter='zFiber',
+            data_fibers = self._setup.bundle.get_parameters(type_filter='zFiber',
                                                      association_filter=mesh)
 
             # self.interpolate_maps(interp_maps)
@@ -97,7 +97,7 @@ class FiberNode(ZivaBaseParameter):
 
         """
         map_name = self.get_map_names()[1]
-        map_object = self._setup.get_components(type_filter='map',
+        map_object = self._setup.bundle.get_components(type_filter='map',
                                                name_filter=map_name)
         values = map_object.values
 

@@ -13,13 +13,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Builder(Bundle):
+class Builder(object):
     """ The main class for using zBuilder.
 
     This inherits from nodeCollection which is a glorified list.
     """
     def __init__(self):
-        Bundle.__init__(self)
+        # Bundle.__init__(self)
+        self.bundle = Bundle()
 
     def parameter_factory(self, node):
         """Given a maya node, this checks objType and instantiats the proper
@@ -77,7 +78,7 @@ class Builder(Bundle):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        b_nodes = self.get_parameters()
+        b_nodes = self.bundle.get_parameters()
         for b_node in b_nodes:
             b_node.build()
 
@@ -94,9 +95,9 @@ class Builder(Bundle):
         selection = mz.parse_args_for_selection(args)
         for item in selection:
             b_solver = self.parameter_factory(item)
-            self.add_parameter(b_solver)
+            self.bundle.add_parameter(b_solver)
 
-        self.stats()
+        self.bundle.stats()
 
     def write(self, file_path, components=True, parameters=True):
         """ writes data to disk in json format.
@@ -113,9 +114,9 @@ class Builder(Bundle):
                                          node_data=parameters)
 
         if io.dump_json(file_path, json_data):
-            for b_node in self.nodes:
+            for b_node in self.bundle.parameters:
                 b_node.mobject = b_node.mobject
-            self.stats()
+            self.bundle.stats()
             logger.info('Wrote File: {}'.format(file_path))
 
     def retrieve_from_file(self, file_path):
@@ -130,8 +131,8 @@ class Builder(Bundle):
 
         json_data = io.load_json(file_path)
         self.__assign_json_data(json_data)
-        self.stats()
-        for b_node in self.nodes:
+        self.bundle.stats()
+        for b_node in self.bundle.parameters:
             b_node.mobject = b_node.mobject
         after = datetime.datetime.now()
 
@@ -155,7 +156,7 @@ class Builder(Bundle):
                 if not isinstance(d['data'], list):
                     for k, v in d['data'].iteritems():
                         for k2 in d['data'][k]:
-                            self.data.append(d['data'][k][k2])
+                            self.bundle.components.append(d['data'][k][k2])
                 else:
                     # saved as 1.0.0
                     self.components = d['data']
@@ -179,10 +180,10 @@ class Builder(Bundle):
 
         if node_data:
             logger.info("writing parameters")
-            tmp.append(io.wrap_data(self.nodes, 'node_data'))
+            tmp.append(io.wrap_data(self.bundle.parameters, 'node_data'))
         if component_data:
             logger.info("writing components")
-            tmp.append(io.wrap_data(self.data, 'component_data'))
+            tmp.append(io.wrap_data(self.bundle.components, 'component_data'))
         logger.info("writing info")
         tmp.append(io.wrap_data(self.info, 'info'))
 

@@ -29,7 +29,7 @@ class EmbedderNode(ZivaBaseParameter):
         """
         super(EmbedderNode, self).populate(*args, **kwargs)
 
-        tissues = self._setup.get_parameters(type_filter='zTissue')
+        tissues = self._setup.bundle.get_parameters(type_filter='zTissue')
         tissue_meshes = [x.association[0] for x in tissues]
         embedded_meshes = get_embedded_meshes(tissue_meshes)
 

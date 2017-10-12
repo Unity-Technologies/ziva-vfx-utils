@@ -52,7 +52,7 @@ class MaterialNode(ZivaBaseParameter):
             # get exsisting node names in scene on specific mesh and in data
             existing_materials = mm.eval(
                 'zQuery -t zMaterial {}'.format(mesh))
-            data_materials = self._setup.get_parameters(type_filter='zMaterial',
+            data_materials = self._setup.bundle.get_parameters(type_filter='zMaterial',
                                                         association_filter=mesh)
 
             d_index = data_materials.index(self)

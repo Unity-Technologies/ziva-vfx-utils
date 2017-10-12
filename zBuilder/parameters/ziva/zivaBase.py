@@ -59,14 +59,14 @@ class ZivaBaseParameter(BaseParameter):
                 map_data_object = self._setup.component_factory(map_name,
                                                                 mesh_name,
                                                                 type='map')
-                self._setup.add_component(map_data_object)
+                self._setup.bundle.add_component(map_data_object)
 
-                if not self._setup.get_components(type_filter='mesh',
+                if not self._setup.bundle.get_components(type_filter='mesh',
                                                  name_filter=mesh_name):
                     mesh_data_object = self._setup.component_factory(mesh_name,
                                                                      type='mesh'
                                                                     )
-                    self._setup.add_component(mesh_data_object)
+                    self._setup.bundle.add_component(mesh_data_object)
 
     # @property
     # def solver(self):
