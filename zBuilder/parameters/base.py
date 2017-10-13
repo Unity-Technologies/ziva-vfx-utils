@@ -147,7 +147,7 @@ class BaseParameter(object):
 
         """
         searchable = [x for x in self.__dict__ if x not in self.SEARCH_EXCLUDE]
-        print 'SEARCH: ', searchable
+        # print 'SEARCH: ', searchable
         for item in searchable:
             if isinstance(self.__dict__[item], (tuple, list)):
                 new_names = []
