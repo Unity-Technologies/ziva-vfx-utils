@@ -13,7 +13,12 @@ class DeformerBaseParameter(BaseParameter):
     def __init__(self, *args, **kwargs):
         BaseParameter.__init__(self, *args, **kwargs)
 
-    def test(self):
+    def spawn_parameters(self):
+        """
+
+        Returns:
+
+        """
         objs = {}
 
         mesh_names = self.get_map_meshes()

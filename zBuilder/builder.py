@@ -53,8 +53,8 @@ class Builder(object):
             object_list.append(zBuilder.parameters.BaseParameter(node, setup=self))
 
         for obj__ in object_list:
-            if hasattr(obj__, 'test'):
-                others = obj__.test()
+            if hasattr(obj__, 'spawn_parameters'):
+                others = obj__.spawn_parameters()
                 for k, values in others.iteritems():
                     for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
                         if inspect.isclass(obj):
