@@ -97,8 +97,8 @@ class FiberNode(ZivaBaseParameter):
 
         """
         map_name = self.get_map_names()[1]
-        map_object = self._setup.bundle.get_components(type_filter='map',
-                                               name_filter=map_name)
+        map_object = self._setup.bundle.get_parameters(type_filter='map',
+                                                       name_filter=map_name)
         values = map_object.values
 
         upper = False

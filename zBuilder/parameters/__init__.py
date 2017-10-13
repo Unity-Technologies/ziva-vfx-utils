@@ -3,6 +3,8 @@ __path__ = extend_path(__path__, __name__)
 
 from zBuilder.parameters.base import BaseParameter
 from zBuilder.parameters.deformerBase import DeformerBaseParameter
+from zBuilder.parameters.maps import Map
+from zBuilder.parameters.mesh import Mesh
 
 # ziva nodes--------------------------------------------------------------------
 from .ziva.zivaBase import ZivaBaseParameter

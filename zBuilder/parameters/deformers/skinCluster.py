@@ -52,6 +52,7 @@ class SkinClusterParameter(BaseParameter):
         # self.set_maya_weights(interp_maps=interp_maps)
         apply_weights(self.name, self.association, self.influences, self.weights)
 
+
 def get_associations(skin_cluster):
     return mc.skinCluster(skin_cluster, g=True, q=True)
 

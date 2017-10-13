@@ -92,10 +92,13 @@ def load_base_node(json_object):
         module_ = json_object['_class'][0]
 
         type_ = json_object['type']
-        if 'zBuilder.data' in module_:
-            obj = find_class('zBuilder.data', type_)
-        elif 'zBuilder.nodes' in module_:
-            obj = find_class('zBuilder.nodes', type_)
+        # print json_object
+        builder_type = json_object['_builder_type']
+        obj = find_class(builder_type, type_)
+        # if 'zBuilder.data' in module_:
+        #     obj = find_class('zBuilder.data', type_)
+        # elif 'zBuilder.nodes' in module_:
+        #     obj = find_class('zBuilder.nodes', type_)
 
         b_node = obj(deserialize=json_object)
         return b_node
@@ -116,7 +119,7 @@ def find_class(module_, type_):
     for name, obj in inspect.getmembers(
             sys.modules[module_]):
         if inspect.isclass(obj):
-            print type_, obj.type
+
             if type_ == obj.type:
                 return obj
 

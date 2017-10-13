@@ -3,13 +3,13 @@ import maya.mel as mm
 import maya.OpenMaya as om
 
 import zBuilder.zMaya as mz
-from zBuilder.components import BaseComponent
+from zBuilder.parameters.base import BaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Map(BaseComponent):
+class Map(BaseParameter):
     type = 'map'
 
     def __init__(self, *args, **kwargs):
@@ -19,10 +19,11 @@ class Map(BaseComponent):
         self._mesh = None
         self.values = None
 
-        BaseComponent.__init__(self, *args, **kwargs)
+        BaseParameter.__init__(self, *args, **kwargs)
+
         if args:
-            map_name = args[0]
-            mesh_name = args[1]
+            map_name = args[0][0]
+            mesh_name = args[0][1]
 
             if map_name and mesh_name:
                 self.populate(map_name, mesh_name)
@@ -47,7 +48,7 @@ class Map(BaseComponent):
         output += '< MAP: {} -- length: {} >'.format(name, length)
         return output
 
-    def populate(self, map_name, mesh_name):
+    def populate(self, *args, **kwargs):
         """ Populate node with that from the maya scene.
 
         Args:
@@ -55,6 +56,8 @@ class Map(BaseComponent):
             mesh_name: Name of mesh to populate it with.
 
         """
+        map_name = args[0]
+        mesh_name = args[1]
         weight_value = get_weights(map_name, mesh_name)
 
         self.name = map_name
@@ -97,8 +100,8 @@ class Map(BaseComponent):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self._setup.bundle.get_components(type_filter='mesh',
-                                               name_filter=mesh_name)[0]
+        mesh_data = self._setup.bundle.get_parameters(type_filter='mesh',
+                                                      name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):

@@ -2,13 +2,13 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
-from zBuilder.components import BaseComponent
+from zBuilder.parameters.base import BaseParameter
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Mesh(BaseComponent):
+class Mesh(BaseParameter):
     type = 'mesh'
     """ Type of node. """
 
@@ -19,8 +19,9 @@ class Mesh(BaseComponent):
         self._pConnectList = []
         self._pointList = []
 
-        BaseComponent.__init__(self, *args, **kwargs)
+        BaseParameter.__init__(self, *args, **kwargs)
 
+        # print args,'args'
         if args:
             mesh_name = args[0]
             if mesh_name:

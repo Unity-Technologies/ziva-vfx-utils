@@ -20,6 +20,9 @@ class ZivaBaseParameter(DeformerBaseParameter):
 
         DeformerBaseParameter.__init__(self, *args, **kwargs)
 
+        if args:
+            self.populate(args[0])
+
     def build(self, *args, **kwargs):
         """
 
@@ -58,33 +61,46 @@ class ZivaBaseParameter(DeformerBaseParameter):
         if solver:
             self.solver = solver[0]
 
-        # get map component data------------------------------------------------
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
 
-        if map_names and mesh_names:
-            for map_name, mesh_name in zip(map_names, mesh_names):
-                map_data_object = self._setup.component_factory(map_name,
-                                                                mesh_name,
-                                                                type='map')
-                self._setup.bundle.add_component(map_data_object)
+        # if map_names and mesh_names:
+        #     for map_name, mesh_name in zip(map_names, mesh_names):
+        #         # map_data_object = self._setup.component_factory(map_name,
+        #         #                                                mesh_name,
+        #         #                                                type='map')
+        #         map_data_object = self._setup.parameter_factory([map_name,mesh_name],
+        #                                             type_='map')
+        #         # print map_name, mesh_name
+        #         self._setup.bundle.add_parameter(map_data_object)
 
-                if not self._setup.bundle.get_components(type_filter='mesh',
-                                                 name_filter=mesh_name):
-                    mesh_data_object = self._setup.component_factory(mesh_name,
-                                                                     type='mesh'
-                                                                    )
-                    self._setup.bundle.add_component(mesh_data_object)
+        # # get map component data------------------------------------------------
+        # mesh_names = self.get_map_meshes()
+        # map_names = self.get_map_names()
+        #
+        # if map_names and mesh_names:
+        #     for map_name, mesh_name in zip(map_names, mesh_names):
+        #         map_data_object = self._setup.component_factory(map_name,
+        #                                                         mesh_name,
+        #                                                         type='map')
+        #         self._setup.bundle.add_component(map_data_object)
+        #
+        #         if not self._setup.bundle.get_components(type_filter='mesh',
+        #                                          name_filter=mesh_name):
+        #             mesh_data_object = self._setup.component_factory(mesh_name,
+        #                                                              type='mesh'
+        #                                                             )
+        #             self._setup.bundle.add_component(mesh_data_object)
 
-    # @property
-    # def solver(self):
-    #     """ :obj:`str`: The solver name this node used.
-    #
-    #     Used for allowing multiple solvers in scene and building a setup on one
-    #     of them.
-    #     """
-    #     return self._solver
-    #
-    # @solver.setter
-    # def solver(self, value):
-    #     self._solver = value
+    @property
+    def solver(self):
+        """ :obj:`str`: The solver name this node used.
+
+        Used for allowing multiple solvers in scene and building a setup on one
+        of them.
+        """
+        return self._solver
+
+    @solver.setter
+    def solver(self, value):
+        self._solver = value

@@ -1,7 +1,6 @@
 from zBuilder.bundle import Bundle
 
 import zBuilder.zMaya as mz
-import zBuilder.components
 import zBuilder.parameters
 import zBuilder.IO as io
 from functools import wraps
@@ -9,6 +8,7 @@ import datetime
 import sys
 import inspect
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,13 @@ class Builder(object):
     def __init__(self):
         # Bundle.__init__(self)
         self.bundle = Bundle()
+        import zBuilder
+        import maya.cmds as mc
+        self.info = dict()
+        self.info['version'] = zBuilder.__version__
+        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
+        self.info['maya_version'] = mc.about(v=True)
+        self.info['operating_system'] = mc.about(os=True)
 
     def parameter_factory(self, node):
         """Given a maya node, this checks objType and instantiats the proper
@@ -28,37 +35,34 @@ class Builder(object):
 
         Args:
             node (:obj:`str`): Name of maya node.
-
+            type_
         Returns:
             obj: zBuilder node populated.
         """
         type_ = mz.get_type(node)
+
+        object_list = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        return obj(node, setup=self)
+                        object_list.append(obj(node, setup=self))
                 if type_ == obj.type:
-                    return obj(node, setup=self)
-        return zBuilder.parameters.BaseParameter(node, setup=self)
+                    object_list.append(obj(node, setup=self))
+        if not object_list:
+            object_list.append(zBuilder.parameters.BaseParameter(node, setup=self))
 
-    def component_factory(self, *args, **kwargs):
-        """ This instantiates and populates a zBuilder data node based on type.
-        Since we can't check type against what is passed we need to pass type
-        explicitly.  As of writing type is either map or mesh.
-        Args:
-            args: args get passed directly to node instantiation.
-            type (:obj:`str`): Type of data node to instantiate.
-
-        Returns:
-            obj: zBuilder data node populated.
-        """
-        type_ = kwargs.get('type', True)
-
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.components']):
-            if inspect.isclass(obj):
-                if type_ == obj.type:
-                    return obj(*args, setup=self)
+        for obj__ in object_list:
+            if hasattr(obj__, 'test'):
+                others = obj__.test()
+                for k, values in others.iteritems():
+                    for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
+                        if inspect.isclass(obj):
+                            if k == obj.type:
+                                for v in values:
+                                    if not self.bundle.get_parameters(type_filter=k, name_filter=v):
+                                        object_list.append(obj(v, setup=self))
+        return object_list
 
     @staticmethod
     def time_this(original_function):
@@ -115,7 +119,8 @@ class Builder(object):
 
         if io.dump_json(file_path, json_data):
             for b_node in self.bundle.parameters:
-                b_node.mobject = b_node.mobject
+                if hasattr(b_node, 'mobject'):
+                    b_node.mobject = b_node.mobject
             self.bundle.stats()
             logger.info('Wrote File: {}'.format(file_path))
 
@@ -149,7 +154,7 @@ class Builder(object):
         for d in data:
 
             if d['d_type'] == 'node_data':
-                self.parameters = d['data']
+                self.bundle.parameters = d['data']
                 logger.info("reading node_data. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
@@ -181,9 +186,9 @@ class Builder(object):
         if node_data:
             logger.info("writing parameters")
             tmp.append(io.wrap_data(self.bundle.parameters, 'node_data'))
-        if component_data:
-            logger.info("writing components")
-            tmp.append(io.wrap_data(self.bundle.components, 'component_data'))
+        # if component_data:
+        #    logger.info("writing components")
+        #    tmp.append(io.wrap_data(self.bundle.components, 'component_data'))
         logger.info("writing info")
         tmp.append(io.wrap_data(self.info, 'info'))
 

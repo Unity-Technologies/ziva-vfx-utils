@@ -13,6 +13,20 @@ class DeformerBaseParameter(BaseParameter):
     def __init__(self, *args, **kwargs):
         BaseParameter.__init__(self, *args, **kwargs)
 
+    def test(self):
+        objs = {}
+
+        mesh_names = self.get_map_meshes()
+        map_names = self.get_map_names()
+        if map_names and mesh_names:
+            objs['map'] = []
+            objs['mesh'] = []
+            for map_name, mesh_name in zip(map_names, mesh_names):
+                objs['map'].append([map_name, mesh_name])
+                objs['mesh'].append(mesh_name)
+
+        return objs
+
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
         """
@@ -35,22 +49,22 @@ class DeformerBaseParameter(BaseParameter):
 
         self.association = self.get_meshes(selection[0])
 
-        # get map component data------------------------------------------------
-        mesh_names = self.association
-        map_names = self.get_map_names()
-
-        if map_names and mesh_names:
-            for map_name, mesh_name in zip(map_names, mesh_names):
-                map_data_object = self._setup.component_factory(map_name,
-                                                                mesh_name,
-                                                                type='map')
-                self._setup.add_component(map_data_object)
-
-                if not self._setup.get_components(type_filter='mesh',
-                                                 name_filter=mesh_name):
-                    mesh_data_object = self._setup.component_factory(mesh_name,
-                                                                     type='mesh')
-                    self._setup.add_component(mesh_data_object)
+        # # get map component data------------------------------------------------
+        # mesh_names = self.association
+        # map_names = self.get_map_names()
+        #
+        # if map_names and mesh_names:
+        #     for map_name, mesh_name in zip(map_names, mesh_names):
+        #         map_data_object = self._setup.component_factory(map_name,
+        #                                                         mesh_name,
+        #                                                         type='map')
+        #         self._setup.add_component(map_data_object)
+        #
+        #         if not self._setup.get_components(type_filter='mesh',
+        #                                          name_filter=mesh_name):
+        #             mesh_data_object = self._setup.component_factory(mesh_name,
+        #                                                              type='mesh')
+        #             self._setup.add_component(mesh_data_object)
 
     # TODO instead of get_map* and get_mesh* should be more generic.
     # get_component*(type_filter)
@@ -74,7 +88,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self._setup.get_components(type_filter='mesh',
+            meshes.extend(self._setup.get_parameters(type_filter='mesh',
                                                      name_filter=mesh_name))
         return meshes
 
@@ -86,7 +100,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self._setup.bundle.get_components(type_filter='map',
+            maps_.extend(self._setup.bundle.get_parameters(type_filter='map',
                                                            name_filter=map_name))
         return maps_
 
@@ -139,7 +153,7 @@ class DeformerBaseParameter(BaseParameter):
         original_name = self.name
 
         for map_ in maps:
-            map_data = self._setup.bundle.get_components(type_filter='map',
+            map_data = self._setup.bundle.get_parameters(type_filter='map',
                                                          name_filter=map_)[0]
             self.interpolate_maps(interp_maps)
             weight_list = map_data.values

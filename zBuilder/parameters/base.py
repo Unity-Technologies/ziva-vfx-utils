@@ -39,13 +39,8 @@ class BaseParameter(object):
         if kwargs.get('deserialize', None):
             self.deserialize(kwargs.get('deserialize', None))
 
-        if args:
-            self.populate(args[0])
-
-        # doing this seems to make a class attr part of __dict__.  This way
-        # I can save and load it and know what node type to instantiate.
-        # is there a better way to do it?
-        # self.type = self.type
+        # if args:
+        #     self.populate(args[0])
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -85,8 +80,9 @@ class BaseParameter(object):
             dict: of serializable items
         """
         # removing and storing mobject as a string (object name)
-        if self.__mobject:
-            self.__mobject = mz.get_name_from_m_object(self.__mobject)
+        if hasattr(self, '__mobject'):
+            if self.__mobject:
+                self.__mobject = mz.get_name_from_m_object(self.__mobject)
 
         # culling __dict__ of any non-serializable items so we can save as json
         output = dict()
@@ -121,6 +117,7 @@ class BaseParameter(object):
             *args (str): The maya node to populate it with.
 
         """
+
         selection = mz.parse_args_for_selection(args)
 
         self.name = selection[0]

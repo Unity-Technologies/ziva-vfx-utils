@@ -1,8 +1,7 @@
-import maya.cmds as mc
 import zBuilder.zMaya as mz
 
 import re
-import time
+
 
 import logging
 
@@ -18,12 +17,6 @@ class Bundle(object):
         import zBuilder
 
         self.parameters = list()
-        self.components = list()
-        self.info = dict()
-        self.info['version'] = zBuilder.__version__
-        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = mc.about(v=True)
-        self.info['operating_system'] = mc.about(os=True)
 
     def __iter__(self):
         """ This iterates through the parameters.
@@ -64,10 +57,10 @@ class Bundle(object):
             print parameter
 
         print '----------------------------------------------------------------'
-
-        if components:
-            for item in self.components:
-                 print item
+        #
+        # if components:
+        #     for item in self.components:
+        #          print item
 
     def compare(self, type_filter=list(), name_filter=list()):
 
@@ -120,25 +113,6 @@ class Bundle(object):
             output += '{} {}   '.format(data_type, amount)
         logger.info(output)
 
-        data_types = set([item.type for item in self.components])
-        output = 'components: '
-        for data_type in data_types:
-            amount = len([x for x in self.components if x.type == data_type])
-            output += '{} {}   '.format(data_type, amount)
-        logger.info(output)
-
-    def add_component(self, component):
-        """ appends a component to the component list.  Checks if component
-        is already in list, if it is it overrides the previous one.
-
-        Args:
-            component (:obj:`obj`) component to append to list
-        """
-        if component in self.components:
-            self.components = [component if item == component else item for item in self.components]
-        else:
-            self.components.append(component)
-
     def add_parameter(self, parameter):
         """
         appends a parameter to the parameter list.  Checks if parameter is
@@ -148,10 +122,10 @@ class Bundle(object):
             parameter (:obj:`obj`): the parameter to append to collection list.
         """
 
-        if parameter in self.parameters:
-            self.parameters = [parameter if item == parameter else item for item in self.parameters]
-        else:
-            self.parameters.append(parameter)
+        #if parameter in self.parameters:
+        #    self.parameters = [parameter if item == parameter else item for item in self.parameters]
+        #else:
+        self.parameters.extend(parameter)
 
     def remove_parameter(self, parameter):
         """
@@ -160,53 +134,6 @@ class Bundle(object):
             parameter (:obj:`obj`): The parameter object to remove.
         """
         self.parameters.remove(parameter)
-
-    def remove_component(self, component):
-        """
-        Removes a component from the component list while keeping order.
-        Args:
-            component (:obj:`obj`): The component to remove.
-        """
-        self.components.remove(component)
-
-    def get_components(self, type_filter=list(),
-                       name_filter=list(),
-                       name_regex=None):
-        """
-        Gets component from component list.
-
-        Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by component ``type``.
-                Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by component ``name``.
-                Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by component name by regular expression.
-                Defaults to ``None``.
-        Returns:
-            list: List of component objects.
-        """
-        if not type_filter and not name_filter and not name_regex:
-            return self.components
-
-        if not isinstance(type_filter, list):
-            type_filter = [type_filter]
-
-        if not isinstance(name_filter, list):
-            name_filter = [name_filter]
-
-        type_set = set(type_filter)
-        name_set = set(name_filter)
-
-        def keep_me(item):
-            if type_set and item.type not in type_set:
-                return False
-            if name_set and item.name not in name_set:
-                return False
-            if name_regex and not re.search(name_regex, item.name):
-                return False
-            return True
-
-        return [item for item in self.components if keep_me(item)]
 
     def get_parameters(self, type_filter=list(),
                        name_filter=list(),
@@ -283,9 +210,9 @@ class Bundle(object):
         """
         for item in self.parameters:
             item.string_replace(search, replace)
-
-        for item in self.components:
-            item.string_replace(search, replace)
+        #
+        # for item in self.components:
+        #     item.string_replace(search, replace)
 
 
 def replace_dict_keys(search, replace, dictionary):
