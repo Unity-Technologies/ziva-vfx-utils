@@ -67,7 +67,7 @@ class AttachmentNode(ZivaBaseParameter):
                     data.append(data_attachment)
 
             d_index = data.index(self)
-            self.interpolate_maps(interp_maps)
+            # self.interpolate_maps(interp_maps)
 
             if existing:
                 if d_index < len(existing):
