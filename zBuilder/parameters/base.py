@@ -161,12 +161,20 @@ class BaseParameter(object):
                                                            replace,
                                                            self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
-                # TODO needs functionality (replace keys)
-                print 'DICT', item, self.__dict__[item], self.name
-                # tmp = {}
-                # for key in dictionary:
-                #     new = mz.replace_long_name(search, replace, key)
-                #     tmp[new] = dictionary[key]
+                self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
+                for key, v in self.__dict__[item].iteritems():
+                    if isinstance(v, basestring):
+                        new_name = mz.replace_long_name(search, replace, v)
+                        new_names.append(new_name)
+                        self.__dict__[item][key] = new_names
+                    if isinstance(v, (tuple, list)):
+                        new_names = []
+                        for name in self.__dict__[item][key]:
+                            if isinstance(item, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item][key] = new_names
+
 
     @property
     def long_name(self):

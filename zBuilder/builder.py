@@ -209,3 +209,6 @@ class Builder(object):
 
     def string_replace(self, search, replace):
         self.bundle.string_replace(search, replace)
+
+    def print_(self, type_filter=list(), name_filter=list()):
+        self.bundle.print_(type_filter=type_filter, name_filter=name_filter)

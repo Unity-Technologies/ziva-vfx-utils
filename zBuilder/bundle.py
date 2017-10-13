@@ -38,7 +38,7 @@ class Bundle(object):
     #     logger.info("self.data deprecated, use self.components")
     #     return self.components
 
-    def print_(self, type_filter=list(), name_filter=list(), components=False):
+    def print_(self, type_filter=list(), name_filter=list()):
         """Prints info on each parameter.
 
         Args:
@@ -55,10 +55,6 @@ class Bundle(object):
             print parameter
 
         print '----------------------------------------------------------------'
-        #
-        # if components:
-        #     for item in self.components:
-        #          print item
 
     def compare(self, type_filter=list(), name_filter=list()):
 
@@ -224,25 +220,6 @@ class Bundle(object):
         # for item in self.components:
         #     item.string_replace(search, replace)
 
-
-def replace_dict_keys(search, replace, dictionary):
-    """
-    Does a search and replace on dictionary keys
-
-    Args:
-        search (:obj:`str`): search term
-        replace (:obj:`str`): replace term
-        dictionary (:obj:`dict`): the dictionary to do search on
-
-    Returns:
-        :obj:`dict`: result of search and replace
-    """
-    tmp = {}
-    for key in dictionary:
-        new = mz.replace_long_name(search, replace, key)
-        tmp[new] = dictionary[key]
-
-    return tmp
 
 
 

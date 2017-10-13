@@ -675,11 +675,30 @@ def replace_long_name(search, replace, long_name):
             else:
                 new_name += i
 
-    if new_name != long_name:
-        logger.info('replacing name: {}  {}'.format(long_name, new_name))
+    #if new_name != long_name:
+    #    logger.info('replacing name: {}  {}'.format(long_name, new_name))
 
     return new_name
 
+
+def replace_dict_keys(search, replace, dictionary):
+    """
+    Does a search and replace on dictionary keys
+
+    Args:
+        search (:obj:`str`): search term
+        replace (:obj:`str`): replace term
+        dictionary (:obj:`dict`): the dictionary to do search on
+
+    Returns:
+        :obj:`dict`: result of search and replace
+    """
+    tmp = {}
+    for key in dictionary:
+        new = replace_long_name(search, replace, key)
+        tmp[new] = dictionary[key]
+
+    return tmp
 
 def cull_creation_nodes(b_nodes, permissive=True):
     """ To help speed up the build of a Ziva setup we are creating the bones and
