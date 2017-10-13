@@ -139,7 +139,11 @@ class BaseParameter(object):
         """ Search and replaces items in the node.  Uses regular expressions.
         Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
 
-        Goes through the dictionary and search and replace items.
+        Goes through the __dict__ and search and replace items.
+
+        Works with strings, lists of strings and dictionaries where the values
+        are either strings or list of strings.  More specific searches should be
+        overridden here.
 
         Args:
             search (str): string to search for.
