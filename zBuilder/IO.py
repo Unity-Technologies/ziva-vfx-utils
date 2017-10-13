@@ -134,7 +134,7 @@ def update_json(json_object):
 
     # replacing key attribute names with value.  A simple swap.
     replace_me = dict()
-    replace_me['_type'] = 'TYPE'
+    replace_me['_type'] = 'type'
     replace_me['_attrs'] = 'attrs'
     replace_me['_value'] = 'values'
     replace_me['__collection'] = 'parameters'
@@ -142,17 +142,36 @@ def update_json(json_object):
     replace_me['_zFiber'] = 'fiber'
 
     if '_class' in json_object:
-
-        for key, value in replace_me.iteritems():
-            if key in json_object:
-                json_object[value] = json_object[key]
+        #print 'BEFORE:', json_object['_class'], json_object
+        for key, value in json_object.iteritems():
+            if key in replace_me:
+                json_object[replace_me[key]] = json_object[key]
                 json_object.pop(key, None)
-            else:
-                # maps and meshes didn't have a type.  lets make one.
-                if value == 'TYPE':
-                    json_object[value] = json_object['_class'][1].lower()
 
+        if not 'type' in json_object:
+            json_object['type'] = json_object['_class'][1].lower()
+            #print 'TYPETYPE', json_object['type']
+
+        if not '_builder_type' in json_object:
+            json_object['_builder_type'] = 'zBuilder.parameters'
+
+        if '_maps' in json_object:
+            json_object.pop('_maps', None)
+
+        # for key, value in replace_me.iteritems():
+        #     if key in json_object:
+        #         json_object[value] = json_object[key]
+        #         json_object.pop(key, None)
+        #     else:
+        #         # maps and meshes didn't have a type.  lets make one.
+        #         if value == 'type':
+        #             json_object[value] = json_object['_class'][1].lower()
+
+
+
+        #print 'AFTER:', json_object
     return json_object
+
 
 
 def check_data(data):

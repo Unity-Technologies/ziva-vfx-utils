@@ -156,18 +156,18 @@ class Builder(object):
 
             if d['d_type'] == 'node_data':
                 self.bundle.parameters = d['data']
-                logger.info("reading node_data. {} nodes".format(len(d['data'])))
+                logger.info("reading parameters. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
                 if not isinstance(d['data'], list):
                     for k, v in d['data'].iteritems():
                         for k2 in d['data'][k]:
-                            self.bundle.components.append(d['data'][k][k2])
+                            self.bundle.parameters.append(d['data'][k][k2])
                 else:
                     # saved as 1.0.0
                     self.components = d['data']
 
-                logger.info("reading component_data. ")
+                # logger.info("reading component_data. ")
             if d['d_type'] == 'info':
                 logger.info("reading info")
                 self.info = d['data']
@@ -194,3 +194,18 @@ class Builder(object):
         tmp.append(io.wrap_data(self.info, 'info'))
 
         return tmp
+
+    def __assign_setup(self):
+        """
+
+        Returns:
+
+        """
+        for x in self.bundle:
+            x._setup = self
+
+    def stats(self):
+        self.bundle.stats()
+
+    def string_replace(self, search, replace):
+        self.bundle.string_replace(search, replace)
