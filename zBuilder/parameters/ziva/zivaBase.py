@@ -72,7 +72,7 @@ class ZivaBaseParameter(DeformerBaseParameter):
         #         map_data_object = self._setup.parameter_factory([map_name,mesh_name],
         #                                             type_='map')
         #         # print map_name, mesh_name
-        #         self._setup.bundle.add_parameter(map_data_object)
+        #         self._setup.bundle.append_parameter(map_data_object)
 
         # # get map component data------------------------------------------------
         # mesh_names = self.get_map_meshes()

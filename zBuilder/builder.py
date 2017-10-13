@@ -99,7 +99,7 @@ class Builder(object):
         selection = mz.parse_args_for_selection(args)
         for item in selection:
             b_solver = self.parameter_factory(item)
-            self.bundle.add_parameter(b_solver)
+            self.bundle.append_parameter(b_solver)
 
         self.bundle.stats()
 

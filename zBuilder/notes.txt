@@ -4,6 +4,7 @@ for 1.0.0
 - search and replace dictionary
 - passing interp maps false
 - multiple solvers
+- backwards compatibility
 
 #-------------------------------
 - anim curves

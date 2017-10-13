@@ -14,8 +14,6 @@ class Bundle(object):
     """
 
     def __init__(self):
-        import zBuilder
-
         self.parameters = list()
 
     def __iter__(self):
@@ -35,10 +33,10 @@ class Bundle(object):
         """
         return len(self.parameters)
 
-    @property
-    def data(self):
-        logger.info("self.data deprecated, use self.components")
-        return self.components
+    # @property
+    # def data(self):
+    #     logger.info("self.data deprecated, use self.components")
+    #     return self.components
 
     def print_(self, type_filter=list(), name_filter=list(), components=False):
         """Prints info on each parameter.
@@ -113,7 +111,7 @@ class Bundle(object):
             output += '{} {}   '.format(data_type, amount)
         logger.info(output)
 
-    def add_parameter(self, parameter):
+    def append_parameter(self, parameter):
         """
         appends a parameter to the parameter list.  Checks if parameter is
         already in list, if it is it overrides the previous one.
@@ -122,10 +120,22 @@ class Bundle(object):
             parameter (:obj:`obj`): the parameter to append to collection list.
         """
 
-        #if parameter in self.parameters:
-        #    self.parameters = [parameter if item == parameter else item for item in self.parameters]
-        #else:
-        self.parameters.extend(parameter)
+        if parameter in self.parameters:
+            self.parameters = [parameter if item == parameter else item for item in self.parameters]
+        else:
+            self.parameters.append(parameter)
+
+    def extend_parameters(self, parameters):
+        """
+
+        Args:
+            parameters:
+
+        Returns:
+
+        """
+        for parameter in parameters:
+            self.append_parameter(parameter)
 
     def remove_parameter(self, parameter):
         """

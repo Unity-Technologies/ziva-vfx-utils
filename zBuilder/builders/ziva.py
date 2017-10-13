@@ -58,7 +58,7 @@ class Ziva(Builder):
             raise StandardError('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.parameter_factory(solver)
-        self.bundle.add_parameter(b_solver)
+        self.bundle.extend_parameters(b_solver)
 
         node_types = ['zSolverTransform',
                       'zBone',
@@ -192,7 +192,7 @@ class Ziva(Builder):
         """
         for node in nodes:
             b_node = self.parameter_factory(node)
-            self.bundle.add_parameter(b_node)
+            self.bundle.extend_parameters(b_node)
 
     @Builder.time_this
     def build(self, name_filter=None, attr_filter=None, interp_maps='auto',
