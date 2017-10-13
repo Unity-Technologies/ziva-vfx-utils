@@ -136,6 +136,7 @@ class Builder(object):
 
         json_data = io.load_json(file_path)
         self.__assign_json_data(json_data)
+        self.__assign_setup()
         self.bundle.stats()
         for b_node in self.bundle.parameters:
             b_node.mobject = b_node.mobject
