@@ -64,8 +64,8 @@ class ConstraintParameter(BaseParameter):
         short = [x.split('|')[-1] for x in self.association]
         return short[-1]
 
-    def populate(self, *args, **kwargs):
-        super(ConstraintParameter, self).populate(*args, **kwargs)
+    def populate(self, maya_node=None):
+        super(ConstraintParameter, self).populate(maya_node=maya_node)
 
         targets = get_targets(self.get_scene_name())
         constrained = get_constrained(self.get_scene_name())

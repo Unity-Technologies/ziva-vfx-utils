@@ -18,7 +18,7 @@ class Constraints(Builder):
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
-        selection = mz.parse_args_for_selection(args)
+        selection = mz.parse_maya_node_for_selection(args)
         
         tmp = list()
         connections = list(set(mc.listConnections(selection)))

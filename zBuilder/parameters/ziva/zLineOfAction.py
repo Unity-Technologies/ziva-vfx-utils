@@ -19,15 +19,13 @@ class LineOfActionNode(ZivaBaseParameter):
 
         ZivaBaseParameter.__init__(self, *args, **kwargs)
 
-    def populate(self, *args, **kwargs):
-        """ This extends ZivaBase.populate()
-
-        Adds fiber storage.
+    def populate(self, maya_node=None):
+        """ This populates the node given a selection.
 
         Args:
-            *args: Maya node to populate with.
+            maya_node: Maya node to populate with.
         """
-        super(LineOfActionNode, self).populate(*args, **kwargs)
+        super(LineOfActionNode, self).populate(maya_node=maya_node)
 
         self.fiber = mz.get_lineOfAction_fiber(self.get_scene_name())
 

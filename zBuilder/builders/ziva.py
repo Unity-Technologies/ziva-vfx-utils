@@ -8,6 +8,8 @@ from zBuilder.builder import Builder
 
 logger = logging.getLogger(__name__)
 
+mc.loadPlugin('ziva', qt=True)
+
 
 class Ziva(Builder):
     """

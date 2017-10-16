@@ -549,7 +549,22 @@ def check_mesh_quality(meshes):
         mc.select(meshes)
 
 
-def parse_args_for_selection(args):
+def check_maya_node(maya_node):
+    """
+
+    Args:
+        maya_node:
+
+    Returns:
+
+    """
+    if isinstance(maya_node, list):
+        return maya_node[0]
+    else:
+        return maya_node
+
+
+def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid
     maya objects in the current scene.  If any of the passed names are not in

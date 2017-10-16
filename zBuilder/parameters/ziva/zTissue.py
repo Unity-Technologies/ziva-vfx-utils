@@ -19,15 +19,13 @@ class TissueNode(ZivaBaseParameter):
 
         ZivaBaseParameter.__init__(self, *args, **kwargs)
 
-    def populate(self, *args, **kwargs):
-        """ This extends ZivaBase.populate()
-
-        Adds parent and child storage.
+    def populate(self, maya_node=None):
+        """ This populates the node given a selection.
 
         Args:
-            *args: Maya node to populate with.
+            maya_node: Maya node to populate with.
         """
-        super(TissueNode, self).populate(*args, **kwargs)
+        super(TissueNode, self).populate(maya_node=maya_node)
 
         self.children_tissues = get_tissue_children(self.get_scene_name())
         self.parent_tissue = get_tissue_parent(self.get_scene_name())
@@ -44,21 +42,29 @@ class TissueNode(ZivaBaseParameter):
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
+        solver = None
+        if args:
+            solver = mm.eval('zQuery -t zSolver {}'.format(args[0]))
+
+        if not solver:
+            solver = self.solver
+
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        b_nodes = self._setup.bundle.get_parameters(type_filter='zTissue',
-                                             name_filter=name_filter)
+        b_nodes = self.setup.bundle.get_parameters(type_filter='zTissue',
+                                                    name_filter=name_filter)
 
         if self == b_nodes[0]:
             apply_multiple(b_nodes, attr_filter=attr_filter,
-                           permissive=permissive, check_meshes=check_meshes)
+                           permissive=permissive, check_meshes=check_meshes,
+                           solver=solver)
 
 
 def apply_multiple(parameters, attr_filter=None, permissive=True,
-                   check_meshes=True):
+                   check_meshes=True, solver=None):
     """
     Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
@@ -84,8 +90,11 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
     # build tissues all at once-------------------------------------------------
     results = None
     if culled['meshes']:
+
         mc.select(culled['meshes'], r=True)
-        results = mm.eval('ziva -t')
+        # if solver:
+        #     mc.select(solver, add=True)
+        results = mm.eval('ziva -t ')
 
     # rename zBones-------------------------------------------------------------
     if results:
@@ -101,7 +110,7 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
 
         # add subtissues--------------------------------------------------------
         if parameter.children_tissues:
-            children_parms = parameter._setup.bundle.get_parameters(name_filter=parameter.children_tissues)
+            children_parms = parameter.setup.bundle.get_parameters(name_filter=parameter.children_tissues)
             mc.select(parameter.association)
             mc.select([x.association[0] for x in children_parms], add=True)
             mm.eval('ziva -ast')

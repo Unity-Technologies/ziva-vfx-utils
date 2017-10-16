@@ -15,9 +15,10 @@ class Map(BaseParameter):
     def __init__(self, *args, **kwargs):
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
-        self._name = None
         self._mesh = None
+        #: list of str: Doc comment *before* attribute, with type specified
         self.values = None
+        """str: Docstring *after* attribute, with type specified."""
 
         BaseParameter.__init__(self, *args, **kwargs)
 
@@ -48,7 +49,7 @@ class Map(BaseParameter):
         output += '< MAP: {} -- length: {} >'.format(name, length)
         return output
 
-    def populate(self, *args, **kwargs):
+    def populate(self, map_name=None, mesh_name=None):
         """ Populate node with that from the maya scene.
 
         Args:
@@ -56,8 +57,8 @@ class Map(BaseParameter):
             mesh_name: Name of mesh to populate it with.
 
         """
-        map_name = args[0]
-        mesh_name = args[1]
+        # map_name = args[0]
+        # mesh_name = args[1]
         weight_value = get_weights(map_name, mesh_name)
 
         self.name = map_name
@@ -100,7 +101,7 @@ class Map(BaseParameter):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self._setup.bundle.get_parameters(type_filter='mesh',
+        mesh_data = self.setup.bundle.get_parameters(type_filter='mesh',
                                                       name_filter=mesh_name)[0]
         return mesh_data
 
@@ -214,9 +215,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list):
         bary_v = v_util.getFloat(v_util_ptr)
         bary_w = 1 - bary_u - bary_v
 
-        interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (
-            bary_w * weights[2])
-
+        interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (bary_w * weights[2])
         interpolated_weights.append(interp_weight)
 
         destination_mesh_m_it_mesh_vertex.next()

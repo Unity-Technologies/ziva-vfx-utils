@@ -11,18 +11,33 @@ logger = logging.getLogger(__name__)
 
 class BaseParameter(object):
     """ The base node for the node functionality of all nodes
+
+    Args:
+        maya_node (str, optional): maya node to populate parameter with.
+        setup (object, optional): The builder object for reference.
+        deserialize (dict, optional): if given a dictionary to deserialize it
+            fills hte parameter with contents of dictionary using the deserialize
+            method.
+
+    Attributes:
+        type (str): type of parameter.  Tied with maya node type.
+        attrs (dict): A place for the maya attributes dictionary.
+
     """
     type = None
     TYPES = None
-    """ The type of node. """
+    """ Types of maya nodes this parameter is aware of.  Only needed 
+        if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
-    """ List of maps to store. """
+    """ List of maya node attribute names that represent the paintable map. """
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
-    """ List of attributes to exclude with a string_replace"""
+    """ A list of attribute names in __dict__ to
+            exclude from the string_replace method. """
     EXTEND_ATTR_LIST = list()
-    """ List of maya attributes to add to attribute list when capturing."""
+    """ List of maya node attribute names to add
+            to the auto generated attribute list to include."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, maya_node=None, setup=None, deserialize=None):
         self._name = None
         self.attrs = {}
         self._association = []
@@ -34,13 +49,13 @@ class BaseParameter(object):
         self._builder_type = '{}.{}'.format(self._builder_type[0],
                                             self._builder_type[1])
 
-        self._setup = kwargs.get('setup', None)
+        self.setup = setup
 
-        if kwargs.get('deserialize', None):
-            self.deserialize(kwargs.get('deserialize', None))
+        if deserialize:
+            self.deserialize(deserialize)
 
-        # if args:
-        #     self.populate(args[0])
+        # if maya_node:
+        #    self.populate(maya_node=maya_node)
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -107,27 +122,27 @@ class BaseParameter(object):
             if key not in ['_setup', '_class']:
                 self.__dict__[key] = dictionary[key]
 
-    def populate(self, *args, **kwargs):
+    def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
         This is deals with basic stuff including attributes.  For other things it
         is meant to be overridden in inherited node.
 
         Args:
-            *args (str): The maya node to populate it with.
+            maya_node (str): The maya node to populate parameter with.
 
         """
 
-        selection = mz.parse_args_for_selection(args)
-
-        self.name = selection[0]
-        self.type = mc.objectType(selection[0])
-        attr_list = mz.build_attr_list(selection[0])
+        # selection = mz.parse_maya_node_for_selection(maya_node)
+        maya_node = mz.check_maya_node(maya_node)
+        self.name = maya_node
+        self.type = mc.objectType(maya_node)
+        attr_list = mz.build_attr_list(maya_node)
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
-        attrs = mz.build_attr_key_values(selection[0], attr_list)
+        attrs = mz.build_attr_key_values(maya_node, attr_list)
         self.attrs = attrs
-        self.mobject = selection[0]
+        self.mobject = maya_node
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
@@ -179,16 +194,18 @@ class BaseParameter(object):
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
 
-
     @property
     def long_name(self):
-        """ Long name of node.
+        """ Long name of parameter corresponding to long name of maya node.
+        This property is not settable.  To set it use self.name.
         """
         return self._name
 
     @property
     def name(self):
-        """ Name of node.
+        """ Name of parameter corresponding to maya node name.  Setting this
+        property will check for long name and store that.  self.name still
+        returns short name, self.long_name returns the stored long name.
         """
         return self._name.split('|')[-1]
 
@@ -220,7 +237,7 @@ class BaseParameter(object):
         return self._association
 
     def compare(self):
-        """ Compares node in memory with that which is in maya scene.
+        """ Compares populated parameter with that which is in maya scene.
 
         Returns:
             prints out items that are different.
@@ -238,8 +255,8 @@ class BaseParameter(object):
 
     def get_scene_name(self, long_name=False):
         """
-        This checks stored mObject and gets name of object in scene.  If no
-        mObject it returns node name.
+        This checks stored mObject and gets name of maya object in scene.  If no
+        mObject it returns parameter name.
 
         Args:
             long_name (bool): Return the fullpath or not.  Defaults to True.
@@ -306,7 +323,7 @@ class BaseParameter(object):
     @property
     def mobject(self):
         """
-        Gets mObject stored with node.
+        Gets mObject stored with parameter.
         Returns:
             mObject
 

@@ -19,7 +19,7 @@ class DeltaMush(Builder):
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
-        selection = mz.parse_args_for_selection(args)
+        selection = mz.parse_maya_node_for_selection(args)
 
         # kwargs----------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)

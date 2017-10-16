@@ -96,10 +96,10 @@ class Builder(object):
         """
         must create a method to inherit this class
         """
-        selection = mz.parse_args_for_selection(args)
+        selection = mz.parse_maya_node_for_selection(args)
         for item in selection:
             b_solver = self.parameter_factory(item)
-            self.bundle.append_parameter(b_solver)
+            self.bundle.extend_parameters(b_solver)
 
         self.bundle.stats()
 
