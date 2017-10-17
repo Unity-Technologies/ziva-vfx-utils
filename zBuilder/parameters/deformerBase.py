@@ -103,7 +103,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self._setup.bundle.get_parameters(type_filter='map',
+            maps_.extend(self.setup.bundle.get_parameters(type_filter='map',
                                                            name_filter=map_name))
         return maps_
 

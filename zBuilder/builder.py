@@ -202,7 +202,7 @@ class Builder(object):
 
         """
         for x in self.bundle:
-            x._setup = self
+            x.setup = self
 
     def stats(self):
         self.bundle.stats()
