@@ -9,6 +9,8 @@ Welcome to Ziva's VFX Utilities!
     installation
     release
     contributing
+    glossary
+
 
 .. currentmodule:: zBuilder
 
@@ -17,6 +19,8 @@ Welcome to Ziva's VFX Utilities!
     sphinx.environment.BuildEnvironment
     sphinx.util.relative_uri
     zBuilder.builder.Builder
+
+
 
 Indices and tables
 ==================
@@ -27,29 +31,26 @@ Indices and tables
 
 WHAT
 ====
+.. currentmodule:: zBuilder.parameters.base
 
-.. currentmodule:: zBuilder.builder
-
-.. autoclass:: Builder
-
+.. autoclass:: BaseParameter
 
    .. automethod:: __init__
-   .. automethod:: parameter_factory
+   .. automethod:: serialize
 
 
    .. rubric:: Methods
 
    .. autosummary::
 
-      ~Builder.__init__
-      ~Builder.parameter_factory
-      ~Builder.retrieve_from_scene
-      ~Builder.retrieve_from_file
+      ~BaseParameter.__init__
+      ~BaseParameter.serialize
+      ~BaseParameter.build
+      ~BaseParameter.write
 
    .. rubric:: Attributes
 
    .. autosummary::
 
-      ~Builder.info
-      ~Builder.bundle
-
+      ~BaseParameter.name
+      ~BaseParameter.type
