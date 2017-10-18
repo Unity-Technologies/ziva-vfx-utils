@@ -549,7 +549,22 @@ def check_mesh_quality(meshes):
         mc.select(meshes)
 
 
-def parse_args_for_selection(args):
+def check_maya_node(maya_node):
+    """
+
+    Args:
+        maya_node:
+
+    Returns:
+
+    """
+    if isinstance(maya_node, list):
+        return maya_node[0]
+    else:
+        return maya_node
+
+
+def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid
     maya objects in the current scene.  If any of the passed names are not in
@@ -700,7 +715,8 @@ def replace_dict_keys(search, replace, dictionary):
 
     return tmp
 
-def cull_creation_nodes(b_nodes, permissive=True):
+
+def cull_creation_nodes(parameters, permissive=True):
     """ To help speed up the build of a Ziva setup we are creating the bones and
     the tissues with one command.  Given a list of zBuilder nodes this checks
     if a given node needs to be created in scene.  Checks to see if it
@@ -709,7 +725,7 @@ def cull_creation_nodes(b_nodes, permissive=True):
 
     Args:
         permissive (bool):
-        b_nodes (object): the zBuilder nodes to check.
+        parameters (object): the zBuilder nodes to check.
     Returns:
         dict: Dictionary of non culled
     """
@@ -717,24 +733,24 @@ def cull_creation_nodes(b_nodes, permissive=True):
     results = dict()
     results['meshes'] = []
     results['names'] = []
-    results['b_nodes'] = []
+    results['parameters'] = []
 
     # -----------------------------------------------------------------------
     # check meshes for existing zBones or zTissue
-    for i, b_node in enumerate(b_nodes):
-        type_ = b_node.type
-        mesh = b_node.association[0]
-        name = b_node.name
+    for i, parameter in enumerate(parameters):
+        type_ = parameter.type
+        mesh = parameter.association[0]
+        name = parameter.name
 
         if mc.objExists(mesh):
             existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
                 out = mc.rename(existing, name)
-                b_node.mobject = out
+                parameter.mobject = out
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
-                results['b_nodes'].append(b_node)
+                results['parameters'].append(parameter)
         else:
             if not permissive:
                 raise StandardError('{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.format(mesh, type_))

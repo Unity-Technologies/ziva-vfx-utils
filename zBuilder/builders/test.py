@@ -46,7 +46,7 @@ class Test(Builder):
         logger.info('Applying....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
-        name_filter = kwargs.get('name_filter', None)
+        name_filter = kwargs.get('name_filter', list())
 
         b_nodes = self.get_parameters(name_filter=name_filter)
         for b_node in b_nodes:

@@ -37,7 +37,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         raise NotImplementedError
 
-    def populate(self, *args, **kwargs):
+    def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
         This is deals with basic stuff including attributes.  For other things it
@@ -45,14 +45,12 @@ class DeformerBaseParameter(BaseParameter):
 
         This is inherited from Base and extended to deal with maps and meshes.
         Args:
-            *args (str): The maya node to populate it with.
+            maya_node (str): The maya node to populate parameter with.
 
         """
-        super(DeformerBaseParameter, self).populate(*args, **kwargs)
+        super(DeformerBaseParameter, self).populate(maya_node=maya_node)
 
-        selection = mz.parse_args_for_selection(args)
-
-        self.association = self.get_meshes(selection[0])
+        self.association = self.get_meshes(maya_node)
 
         # # get map component data------------------------------------------------
         # mesh_names = self.association
@@ -60,16 +58,16 @@ class DeformerBaseParameter(BaseParameter):
         #
         # if map_names and mesh_names:
         #     for map_name, mesh_name in zip(map_names, mesh_names):
-        #         map_data_object = self._setup.component_factory(map_name,
+        #         map_data_object = self.setup.component_factory(map_name,
         #                                                         mesh_name,
         #                                                         type='map')
-        #         self._setup.add_component(map_data_object)
+        #         self.setup.add_component(map_data_object)
         #
-        #         if not self._setup.get_components(type_filter='mesh',
+        #         if not self.setup.get_components(type_filter='mesh',
         #                                          name_filter=mesh_name):
-        #             mesh_data_object = self._setup.component_factory(mesh_name,
+        #             mesh_data_object = self.setup.component_factory(mesh_name,
         #                                                              type='mesh')
-        #             self._setup.add_component(mesh_data_object)
+        #             self.setup.add_component(mesh_data_object)
 
     # TODO instead of get_map* and get_mesh* should be more generic.
     # get_component*(type_filter)
@@ -93,7 +91,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self._setup.get_parameters(type_filter='mesh',
+            meshes.extend(self.setup.get_parameters(type_filter='mesh',
                                                      name_filter=mesh_name))
         return meshes
 
@@ -105,7 +103,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self._setup.bundle.get_parameters(type_filter='map',
+            maps_.extend(self.setup.bundle.get_parameters(type_filter='map',
                                                            name_filter=map_name))
         return maps_
 
@@ -158,7 +156,7 @@ class DeformerBaseParameter(BaseParameter):
         original_name = self.name
 
         for map_ in maps:
-            map_data = self._setup.bundle.get_parameters(type_filter='map',
+            map_data = self.setup.bundle.get_parameters(type_filter='map',
                                                          name_filter=map_)[0]
             self.interpolate_maps(interp_maps)
             weight_list = map_data.values

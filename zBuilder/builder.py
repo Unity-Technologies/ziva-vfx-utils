@@ -19,7 +19,6 @@ class Builder(object):
     This inherits from nodeCollection which is a glorified list.
     """
     def __init__(self):
-        # Bundle.__init__(self)
         self.bundle = Bundle()
         import zBuilder
         import maya.cmds as mc
@@ -82,9 +81,9 @@ class Builder(object):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        b_nodes = self.bundle.get_parameters()
-        for b_node in b_nodes:
-            b_node.build()
+        parameters = self.bundle.get_parameters()
+        for parameter in parameters:
+            parameter.build()
 
     # def apply(self, *args, **kwargs):
     #
@@ -96,10 +95,10 @@ class Builder(object):
         """
         must create a method to inherit this class
         """
-        selection = mz.parse_args_for_selection(args)
+        selection = mz.parse_maya_node_for_selection(args)
         for item in selection:
             b_solver = self.parameter_factory(item)
-            self.bundle.append_parameter(b_solver)
+            self.bundle.extend_parameters(b_solver)
 
         self.bundle.stats()
 
@@ -118,9 +117,9 @@ class Builder(object):
                                          node_data=parameters)
 
         if io.dump_json(file_path, json_data):
-            for b_node in self.bundle.parameters:
-                if hasattr(b_node, 'mobject'):
-                    b_node.mobject = b_node.mobject
+            for parameter in self.bundle.parameters:
+                if hasattr(parameter, 'mobject'):
+                    parameter.mobject = parameter.mobject
             self.bundle.stats()
             logger.info('Wrote File: {}'.format(file_path))
 
@@ -138,8 +137,8 @@ class Builder(object):
         self.__assign_json_data(json_data)
         self.__assign_setup()
         self.bundle.stats()
-        for b_node in self.bundle.parameters:
-            b_node.mobject = b_node.mobject
+        for parameter in self.bundle.parameters:
+            parameter.mobject = parameter.mobject
         after = datetime.datetime.now()
 
         logger.info('Read File: {} in {}'.format(file_path, after - before))
@@ -202,7 +201,7 @@ class Builder(object):
 
         """
         for x in self.bundle:
-            x._setup = self
+            x.setup = self
 
     def stats(self):
         self.bundle.stats()

@@ -19,17 +19,15 @@ class EmbedderNode(ZivaBaseParameter):
 
         ZivaBaseParameter.__init__(self, *args, **kwargs)
 
-    def populate(self, *args, **kwargs):
-        """ This extends ZivaBase.populate()
-
-        Adds collision mesh and embedded mesh storage.
+    def populate(self, maya_node=None):
+        """ This populates the node given a selection.
 
         Args:
-            *args: Maya node to populate with.
+            maya_node: Maya node to populate with.
         """
-        super(EmbedderNode, self).populate(*args, **kwargs)
+        super(EmbedderNode, self).populate(maya_node=maya_node)
 
-        tissues = self._setup.bundle.get_parameters(type_filter='zTissue')
+        tissues = self.setup.bundle.get_parameters(type_filter='zTissue')
         tissue_meshes = [x.association[0] for x in tissues]
         embedded_meshes = get_embedded_meshes(tissue_meshes)
 

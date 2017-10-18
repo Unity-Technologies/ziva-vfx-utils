@@ -82,7 +82,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
+todo_include_todos = True
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -190,5 +190,5 @@ epub_copyright = copyright
 epub_exclude_files = ['search.html']
 
 
-autodoc_mock_imports = ['maya.cmds','maya.mel','maya.OpenMaya']
+autodoc_mock_imports = ['maya.cmds', 'maya.mel', 'maya.OpenMaya', 'maya.OpenMayaAnim']
 
