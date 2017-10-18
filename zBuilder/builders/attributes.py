@@ -15,12 +15,12 @@ class Attributes(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            b_node = self.parameter_factory(item)
-            self.add_parameter(b_node)
+            parameter = self.parameter_factory(item)
+            self.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
     def build(self):
-        b_nodes = self.get_parameters()
-        for b_node in b_nodes:
-            b_node.set_maya_attrs()
+        parameters = self.get_parameters()
+        for parameter in parameters:
+            parameter.set_maya_attrs()

@@ -14,8 +14,8 @@ class Selection(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            b_node = self.parameter_factory(item)
-            self.add_parameter(b_node)
+            parameter = self.parameter_factory(item)
+            self.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this

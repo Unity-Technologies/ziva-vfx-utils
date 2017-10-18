@@ -32,8 +32,8 @@ class DeltaMush(Builder):
             raise StandardError('No delta mushes found, aborting!')
 
         for delta_mush in delta_mushes:
-            b_node = self.parameter_factory(delta_mush)
-            self.add_parameter(b_node)
+            parameter = self.parameter_factory(delta_mush)
+            self.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
@@ -43,7 +43,7 @@ class DeltaMush(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        b_nodes = self.get_parameters(name_filter=name_filter,
+        parameters = self.get_parameters(name_filter=name_filter,
                                       type_filter='deltaMush')
-        for b_node in b_nodes:
-            b_node.build(attr_filter=attr_filter, interp_maps=interp_maps)
+        for parameter in parameters:
+            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)

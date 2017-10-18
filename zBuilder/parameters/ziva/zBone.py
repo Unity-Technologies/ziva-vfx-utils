@@ -34,26 +34,26 @@ class BoneNode(ZivaBaseParameter):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        b_nodes = self.setup.bundle.get_parameters(type_filter='zBone',
+        parameters = self.setup.bundle.get_parameters(type_filter='zBone',
                                                     name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.
         # This feels kinda sloppy to me.
 
-        if self == b_nodes[0]:
-            apply_multiple(b_nodes, attr_filter=attr_filter,
+        if self == parameters[0]:
+            apply_multiple(parameters, attr_filter=attr_filter,
                            permissive=permissive, check_meshes=check_meshes)
 
 
-def apply_multiple(b_nodes, attr_filter=None, permissive=False, check_meshes=True):
+def apply_multiple(parameters, attr_filter=None, permissive=False, check_meshes=True):
     """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
 
     Args:
         permissive (bool):
-        b_nodes:
+        parameters:
         attr_filter (obj):
 
     Returns:
@@ -61,7 +61,7 @@ def apply_multiple(b_nodes, attr_filter=None, permissive=False, check_meshes=Tru
     """
     sel = mc.ls(sl=True)
     # cull none buildable-------------------------------------------------------
-    culled = mz.cull_creation_nodes(b_nodes)
+    culled = mz.cull_creation_nodes(parameters)
 
     # check mesh quality--------------------------------------------------------
     if check_meshes:
@@ -76,12 +76,12 @@ def apply_multiple(b_nodes, attr_filter=None, permissive=False, check_meshes=Tru
     # rename zBones-------------------------------------------------------------
     if results:
         results = mc.ls(results, type='zBone')
-        for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
-            b_node.mobject = new
+        for new, name, parameter in zip(results, culled['names'], culled['parameters']):
+            parameter.mobject = new
             mc.rename(new, name)
 
     # set the attributes
-    for b_node in b_nodes:
-        b_node.set_maya_attrs(attr_filter=attr_filter)
+    for parameter in parameters:
+        parameter.set_maya_attrs(attr_filter=attr_filter)
 
     mc.select(sel)

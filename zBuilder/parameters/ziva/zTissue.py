@@ -54,11 +54,11 @@ class TissueNode(ZivaBaseParameter):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        b_nodes = self.setup.bundle.get_parameters(type_filter='zTissue',
+        parameters = self.setup.bundle.get_parameters(type_filter='zTissue',
                                                     name_filter=name_filter)
 
-        if self == b_nodes[0]:
-            apply_multiple(b_nodes, attr_filter=attr_filter,
+        if self == parameters[0]:
+            apply_multiple(parameters, attr_filter=attr_filter,
                            permissive=permissive, check_meshes=check_meshes,
                            solver=solver)
 
@@ -100,8 +100,8 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
     if results:
         results = mc.ls(results, type='zTissue')
 
-        for new, name, b_node in zip(results, culled['names'], culled['b_nodes']):
-            b_node.mobject = new
+        for new, name, parameter in zip(results, culled['names'], culled['parameters']):
+            parameter.mobject = new
             mc.rename(new, name)
 
     # set the attributes
