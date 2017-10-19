@@ -22,15 +22,15 @@ class SkinClusterParameter(BaseParameter):
 
         BaseParameter.__init__(self, *args, **kwargs)
 
-    def populate(self, *args, **kwargs):
+    def populate(self, maya_node=None):
         """ This extends ZivaBase.populate()
 
         Adds parent and child storage.
 
         Args:
-            *args: Maya node to populate with.
+            maya_node: Maya node to populate with.
         """
-        super(SkinClusterParameter, self).populate(*args, **kwargs)
+        super(SkinClusterParameter, self).populate(maya_node=maya_node)
 
         self.weights = get_weights(self.name)
         self.influences = get_influences(self.name)
@@ -41,6 +41,9 @@ class SkinClusterParameter(BaseParameter):
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.get_scene_name()
+        print 'NAME', name
+        print self.association
+        print self.influences
         if not mc.objExists(name):
             mc.select(self.influences, self.association, r=True)
             skin_cluster = mc.skinCluster(tsb=True, n=name)
@@ -50,7 +53,7 @@ class SkinClusterParameter(BaseParameter):
 
         self.set_maya_attrs(attr_filter=attr_filter)
         # self.set_maya_weights(interp_maps=interp_maps)
-        apply_weights(self.name, self.association, self.influences, self.weights)
+        # apply_weights(self.name, self.association, self.influences, self.weights)
 
 
 def get_associations(skin_cluster):
