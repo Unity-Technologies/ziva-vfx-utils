@@ -10,8 +10,11 @@ logger = logging.getLogger(__name__)
 
 class DeformerBaseParameter(BaseParameter):
 
-    def __init__(self, *args, **kwargs):
-        BaseParameter.__init__(self, *args, **kwargs)
+    def __init__(self, maya_node=None, builder=None, deserialize=None):
+        BaseParameter.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
+
+        if maya_node:
+            self.populate(maya_node=maya_node)
 
     def spawn_parameters(self):
         """
@@ -48,6 +51,7 @@ class DeformerBaseParameter(BaseParameter):
             maya_node (str): The maya node to populate parameter with.
 
         """
+
         super(DeformerBaseParameter, self).populate(maya_node=maya_node)
 
         self.association = self.get_meshes(maya_node)
@@ -115,7 +119,7 @@ class DeformerBaseParameter(BaseParameter):
         """
         map_names = []
         for map_ in self.MAP_LIST:
-            map_names.append('{}.{}'.format(self.get_scene_name(), map_))
+            map_names.extend(mc.ls('{}.{}'.format(self.get_scene_name(), map_)))
 
         return map_names
 

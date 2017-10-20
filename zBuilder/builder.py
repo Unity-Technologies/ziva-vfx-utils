@@ -45,11 +45,12 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        object_list.append(obj(node, builder=self))
+                        object_list.append(obj(maya_node=node, builder=self))
                 if type_ == obj.type:
-                    object_list.append(obj(node, builder=self))
+                    object_list.append(obj(maya_node=node, builder=self))
         if not object_list:
-            object_list.append(zBuilder.parameters.BaseParameter(node, builder=self))
+            object_list.append(zBuilder.parameters.BaseParameter(maya_node=node, builder=self))
+
 
         for obj__ in object_list:
             if hasattr(obj__, 'spawn_parameters'):

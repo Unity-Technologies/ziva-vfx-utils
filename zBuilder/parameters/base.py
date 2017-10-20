@@ -54,8 +54,11 @@ class BaseParameter(object):
         if deserialize:
             self.deserialize(deserialize)
 
+        # CANT DO THIS>
+        # map and mesh have a different populate interface :
         # if maya_node:
-        #    self.populate(maya_node=maya_node)
+        #     print 'OMG',maya_node
+        #     self.populate(maya_node=maya_node)
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -322,7 +325,6 @@ class BaseParameter(object):
 
             # check the alias
             if mc.objExists('{}.{}'.format(scene_name, attr)):
-                print attr
                 alias = self.attrs[attr].get('alias', None)
                 if alias:
                     try:

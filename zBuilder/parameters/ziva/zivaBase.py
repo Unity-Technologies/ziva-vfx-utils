@@ -17,15 +17,15 @@ class ZivaBaseParameter(DeformerBaseParameter):
 
     mc.loadPlugin('ziva', qt=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  maya_node=None, builder=None, deserialize=None):
         self.solver = None
 
-        DeformerBaseParameter.__init__(self, *args, **kwargs)
+        DeformerBaseParameter.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
 
-        if args:
-            self.populate(args[0])
+        if maya_node:
+            self.populate(maya_node=maya_node)
 
-    def build(self, *args, **kwargs):
+    def populate(self, maya_node=None):
         """
 
         Args:
