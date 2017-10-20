@@ -83,7 +83,7 @@ class Builder(object):
 
         parameters = self.bundle.get_parameters()
         for parameter in parameters:
-            parameter.build()
+            parameter.build(*args, **kwargs)
 
     # def apply(self, *args, **kwargs):
     #
