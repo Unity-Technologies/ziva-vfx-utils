@@ -17,7 +17,7 @@ class DeltaMushNode(DeformerBaseParameter):
         if not mc.objExists(name):
             mc.select(self.association, r=True)
             delta_mush = mc.deltaMush(name=name)
-            self.mobject = delta_mush
+            self.mobject = delta_mush[0]
         else:
             self.mobject = name
 
