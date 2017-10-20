@@ -91,7 +91,7 @@ class Mesh(BaseParameter):
         """ Get point List """
         return self._pointList
 
-    def build(self):
+    def build_mesh(self):
         """ Builds mesh in maya scene.
 
         Returns:

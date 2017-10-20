@@ -118,7 +118,7 @@ class Map(BaseParameter):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
         logger.info('interpolating map:  {}'.format(self.name))
-        created_mesh = mesh_data.build()
+        created_mesh = mesh_data.build_mesh()
         weight_list = interpolate_values(created_mesh,
                                          mesh_data.name,
                                          self.values)
