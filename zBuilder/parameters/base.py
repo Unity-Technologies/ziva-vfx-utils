@@ -320,6 +320,16 @@ class BaseParameter(object):
                     text = '{}.{} not found, skipping.'.format(scene_name, attr)
                     logger.info(text)
 
+            # check the alias
+            if mc.objExists('{}.{}'.format(scene_name, attr)):
+                print attr
+                alias = self.attrs[attr].get('alias', None)
+                if alias:
+                    try:
+                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr) )
+                    except RuntimeError:
+                        pass
+
     @property
     def mobject(self):
         """
