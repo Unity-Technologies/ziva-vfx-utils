@@ -91,8 +91,8 @@ class DeformerBaseParameter(BaseParameter):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self.setup.get_parameters(type_filter='mesh',
-                                                     name_filter=mesh_name))
+            meshes.extend(self.builder.get_parameters(type_filter='mesh',
+                                                      name_filter=mesh_name))
         return meshes
 
     def get_map_objects(self):
@@ -103,8 +103,8 @@ class DeformerBaseParameter(BaseParameter):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self.setup.bundle.get_parameters(type_filter='map',
-                                                           name_filter=map_name))
+            maps_.extend(self.builder.bundle.get_parameters(type_filter='map',
+                                                            name_filter=map_name))
         return maps_
 
     def get_map_names(self):
@@ -156,8 +156,8 @@ class DeformerBaseParameter(BaseParameter):
         original_name = self.name
 
         for map_ in maps:
-            map_data = self.setup.bundle.get_parameters(type_filter='map',
-                                                         name_filter=map_)[0]
+            map_data = self.builder.bundle.get_parameters(type_filter='map',
+                                                          name_filter=map_)[0]
             self.interpolate_maps(interp_maps)
             weight_list = map_data.values
 

@@ -27,7 +27,7 @@ class Constraints(Builder):
 
         for item in tmp:
             parameter = self.parameter_factory(item)
-            self.add_parameter(parameter)
+            self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
@@ -37,6 +37,6 @@ class Constraints(Builder):
         name_filter = kwargs.get('name_filter', list())
 
         parameters = self.get_parameters(name_filter=name_filter,
-                                      type_filter=self.acquire)
+                                         type_filter=self.acquire)
         for parameter in parameters:
             parameter.build(attr_filter=attr_filter)

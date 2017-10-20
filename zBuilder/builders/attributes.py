@@ -16,7 +16,7 @@ class Attributes(Builder):
 
         for item in selection:
             parameter = self.parameter_factory(item)
-            self.add_parameter(parameter)
+            self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this

@@ -33,7 +33,7 @@ class DeltaMush(Builder):
 
         for delta_mush in delta_mushes:
             parameter = self.parameter_factory(delta_mush)
-            self.add_parameter(parameter)
+            self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
@@ -44,6 +44,6 @@ class DeltaMush(Builder):
         name_filter = kwargs.get('name_filter', list())
 
         parameters = self.get_parameters(name_filter=name_filter,
-                                      type_filter='deltaMush')
+                                         type_filter='deltaMush')
         for parameter in parameters:
             parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
