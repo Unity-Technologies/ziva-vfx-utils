@@ -15,6 +15,8 @@ class ZivaBaseParameter(DeformerBaseParameter):
     """
     EXTEND_ATTR_LIST = list()
 
+    mc.loadPlugin('ziva', qt=True)
+
     def __init__(self, *args, **kwargs):
         self.solver = None
 

@@ -106,6 +106,7 @@ def load_base_node(json_object):
         return json_object
 
 
+# TODO builder and this use same method
 def find_class(module_, type_):
     """ Given a module and a type returns class object.
 
@@ -116,10 +117,11 @@ def find_class(module_, type_):
     Returns:
         obj: class object.
     """
-    for name, obj in inspect.getmembers(
-            sys.modules[module_]):
+    for name, obj in inspect.getmembers(sys.modules[module_]):
         if inspect.isclass(obj):
-
+            if obj.TYPES:
+                if type_ in obj.TYPES:
+                    return obj
             if type_ == obj.type:
                 return obj
 
@@ -140,19 +142,24 @@ def update_json(json_object):
     replace_me['__collection'] = 'parameters'
     replace_me['data'] = 'components'
     replace_me['_zFiber'] = 'fiber'
+    replace_me['_SkinClusterNode__influneces'] = 'influences'
+
 
     if '_class' in json_object:
-        #print 'BEFORE:', json_object['_class'], json_object
         for key, value in json_object.iteritems():
             if key in replace_me:
                 json_object[replace_me[key]] = json_object[key]
                 json_object.pop(key, None)
 
-        if not 'type' in json_object:
+        if 'type' not in json_object:
             json_object['type'] = json_object['_class'][1].lower()
             #print 'TYPETYPE', json_object['type']
 
-        if not '_builder_type' in json_object:
+        if json_object['type'] == 'skinCluster':
+            if '_maps' in json_object:
+                json_object['weights'] = json_object['_maps']
+
+        if '_builder_type' not in json_object:
             json_object['_builder_type'] = 'zBuilder.parameters'
 
         if '_maps' in json_object:
