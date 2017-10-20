@@ -218,7 +218,7 @@ class Builder(object):
                        association_filter=list(),
                        association_regex=None):
 
-        self.bundle.get_parameters(type_filter=type_filter,
+        return self.bundle.get_parameters(type_filter=type_filter,
                                    name_filter=name_filter,
                                    name_regex=name_regex,
                                    association_filter=association_filter,
