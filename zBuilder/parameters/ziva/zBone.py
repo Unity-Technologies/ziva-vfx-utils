@@ -34,8 +34,8 @@ class BoneNode(ZivaBaseParameter):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        parameters = self.setup.bundle.get_parameters(type_filter='zBone',
-                                                    name_filter=name_filter)
+        parameters = self.builder.bundle.get_parameters(type_filter='zBone',
+                                                        name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.

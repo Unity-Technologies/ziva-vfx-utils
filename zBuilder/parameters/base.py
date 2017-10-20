@@ -37,7 +37,7 @@ class BaseParameter(object):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, maya_node=None, setup=None, deserialize=None):
+    def __init__(self, maya_node=None, builder=None, deserialize=None):
         self._name = None
         self.attrs = {}
         self._association = []
@@ -49,7 +49,7 @@ class BaseParameter(object):
         self._builder_type = '{}.{}'.format(self._builder_type[0],
                                             self._builder_type[1])
 
-        self.setup = setup
+        self.builder = builder
 
         if deserialize:
             self.deserialize(deserialize)
