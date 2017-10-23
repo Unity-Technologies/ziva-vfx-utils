@@ -759,3 +759,51 @@ def cull_creation_nodes(parameters, permissive=True):
                 mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
 
     return results
+
+
+def check_map_validity(map_parameters):
+    """
+    This checks the map validity for zAttachments and zFibers.  For zAttachments
+    it checks if all the values are zero.  If so it failed and turns off the
+    associated zTissue node.  For zFibers it checks to make sure there are at least
+    1 value of 0 and 1 value of .5 within a .1 threshold.  If not that fails and
+    turns off the zTissue
+
+    Args:
+        map_parameters: map parameters to check.
+    Returns:
+        list of offending maps
+    """
+    sel = mc.ls(sl=True)
+
+    report = []
+    for parameter in map_parameters:
+        map_type = mc.objectType(parameter.name)
+        if map_type == 'zAttachment':
+            values = parameter.values
+            if all(v == 0 for v in values):
+                report.append(parameter.name)
+                dg_node = parameter.name.split('.')[0]
+                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+
+        if map_type == 'zFiber' and 'endPoints' in parameter.name:
+            values = parameter.values
+            upper = False
+            lower = False
+
+            if any(0 <= v <= .1 for v in values):
+                lower = True
+            if any(.9 <= v <= 1 for v in values):
+                upper = True
+
+            if not upper or not lower:
+                report.append(parameter.name)
+                dg_node = parameter.name.split('.')[0]
+                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+
+    logger.info('Check these maps: {}'.format(report))
+    mc.select(sel)
+    return report
+

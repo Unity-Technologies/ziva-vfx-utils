@@ -1,4 +1,10 @@
 import maya.cmds as mc
+import maya.mel as mm
+import zBuilder.zMaya as mz
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def copy_paste(*args, **kwargs):
@@ -21,3 +27,27 @@ def copy_paste(*args, **kwargs):
     z.build(kwargs)
 
     mc.select(sel)
+
+
+def check_map_validity():
+    """
+    This checks the map validity for zAttachments and zFibers.  For zAttachments
+    it checks if all the values are zero.  If so it failed and turns off the
+    associated zTissue node.  For zFibers it checks to make sure there are at least
+    1 value of 0 and 1 value of .5 within a .1 threshold.  If not that fails and
+    turns off the zTissue
+
+    Returns:
+        list of offending maps
+    """
+    sel = mc.ls(sl=True)
+    import zBuilder.builders.ziva as zva
+
+    # we are going to check fibers and attachments
+    mc.select(mc.ls(type=['zAttachment', 'zFiber']), r=True)
+
+    z = zva.Ziva()
+    z.retrieve_from_scene_selection(connections=False)
+
+    mz.check_map_validity(z.get_parameters(type_filter='map'))
+

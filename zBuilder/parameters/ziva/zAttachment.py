@@ -39,8 +39,8 @@ class AttachmentNode(ZivaBaseParameter):
         source_mesh = self.association[0]
         target_mesh = self.association[1]
 
-        self.interpolate_maps(interp_maps)
-        self.are_maps_valid()
+        # self.interpolate_maps(interp_maps)
+        # self.are_maps_valid()
 
         # logger.info('creating attachment {}'.format(name))
 
@@ -67,7 +67,7 @@ class AttachmentNode(ZivaBaseParameter):
                     data.append(data_attachment)
 
             d_index = data.index(self)
-            # self.interpolate_maps(interp_maps)
+            self.interpolate_maps(interp_maps)
 
             if existing:
                 if d_index < len(existing):
@@ -96,17 +96,17 @@ class AttachmentNode(ZivaBaseParameter):
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=False)
 
-    def are_maps_valid(self):
-        """ Checking maps to see if they are all zeros.  An attachment map with
-        only zero's fail.
-
-        Raises:
-            ValueError: If map doesn't pass check.
-        """
-        for map_name in self.get_map_names():
-            map_object = self.builder.bundle.get_parameters(type_filter='map',
-                                                            name_filter=map_name)[0]
-            values = map_object.values
-
-            if all(v == 0 for v in values):
-                raise ValueError('{} all 0s.  Check map.'.format(map_name))
+    # def are_maps_valid(self):
+    #     """ Checking maps to see if they are all zeros.  An attachment map with
+    #     only zero's fail.
+    #
+    #     Raises:
+    #         ValueError: If map doesn't pass check.
+    #     """
+    #     for map_name in self.get_map_names():
+    #         map_object = self.builder.bundle.get_parameters(type_filter='map',
+    #                                                         name_filter=map_name)[0]
+    #         values = map_object.values
+    #
+    #         if all(v == 0 for v in values):
+    #             raise ValueError('{} all 0s.  Check map.'.format(map_name))
