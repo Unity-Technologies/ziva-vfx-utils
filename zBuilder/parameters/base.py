@@ -37,7 +37,7 @@ class BaseParameter(object):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, maya_node=None, setup=None, deserialize=None):
+    def __init__(self, maya_node=None, builder=None, deserialize=None):
         self._name = None
         self.attrs = {}
         self._association = []
@@ -49,13 +49,16 @@ class BaseParameter(object):
         self._builder_type = '{}.{}'.format(self._builder_type[0],
                                             self._builder_type[1])
 
-        self.setup = setup
+        self.builder = builder
 
         if deserialize:
             self.deserialize(deserialize)
 
+        # CANT DO THIS>
+        # map and mesh have a different populate interface :
         # if maya_node:
-        #    self.populate(maya_node=maya_node)
+        #     print 'OMG',maya_node
+        #     self.populate(maya_node=maya_node)
 
     def __eq__(self, other):
         """ Are names == in node objects?
@@ -319,6 +322,15 @@ class BaseParameter(object):
                 else:
                     text = '{}.{} not found, skipping.'.format(scene_name, attr)
                     logger.info(text)
+
+            # check the alias
+            if mc.objExists('{}.{}'.format(scene_name, attr)):
+                alias = self.attrs[attr].get('alias', None)
+                if alias:
+                    try:
+                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr) )
+                    except RuntimeError:
+                        pass
 
     @property
     def mobject(self):

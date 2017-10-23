@@ -15,13 +15,13 @@ class Selection(Builder):
 
         for item in selection:
             parameter = self.parameter_factory(item)
-            self.add_parameter(parameter)
+            self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
     def build(self, select=True):
         tmp = []
-        for node in self.nodes:
+        for node in self.get_parameters():
             tmp.append(node.get_scene_name())
 
         if select:

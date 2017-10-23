@@ -657,13 +657,14 @@ def build_attr_key_values(selection, attr_list):
     attr_dict = {}
     for attr in attr_list:
         obj = '{}.{}'.format(selection, attr)
-        if mc.objExists(obj):
-            type_ = mc.getAttr(obj, type=True)
+        for item in mc.ls(obj):
+            type_ = mc.getAttr(item, type=True)
             if not type_ == 'TdataCompound':
                 attr_dict[attr] = {}
                 attr_dict[attr]['type'] = type_
-                attr_dict[attr]['value'] = mc.getAttr(obj)
-                attr_dict[attr]['locked'] = mc.getAttr(obj, lock=True)
+                attr_dict[attr]['value'] = mc.getAttr(item)
+                attr_dict[attr]['locked'] = mc.getAttr(item, lock=True)
+                attr_dict[attr]['alias'] = mc.aliasAttr(obj, q=True)
 
     return attr_dict
 

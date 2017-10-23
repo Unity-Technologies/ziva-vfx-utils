@@ -57,8 +57,8 @@ class AttachmentNode(ZivaBaseParameter):
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self.setup.bundle.get_parameters(type_filter='zAttachment',
-                                                          association_filter=source_mesh)
+            data_attachments = self.builder.bundle.get_parameters(type_filter='zAttachment',
+                                                                  association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.association[0]
@@ -104,8 +104,8 @@ class AttachmentNode(ZivaBaseParameter):
             ValueError: If map doesn't pass check.
         """
         for map_name in self.get_map_names():
-            map_object = self.setup.bundle.get_parameters(type_filter='map',
-                                                   name_filter=map_name)[0]
+            map_object = self.builder.bundle.get_parameters(type_filter='map',
+                                                            name_filter=map_name)[0]
             values = map_object.values
 
             if all(v == 0 for v in values):

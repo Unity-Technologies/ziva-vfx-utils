@@ -54,8 +54,8 @@ class TissueNode(ZivaBaseParameter):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        parameters = self.setup.bundle.get_parameters(type_filter='zTissue',
-                                                    name_filter=name_filter)
+        parameters = self.builder.bundle.get_parameters(type_filter='zTissue',
+                                                        name_filter=name_filter)
 
         if self == parameters[0]:
             apply_multiple(parameters, attr_filter=attr_filter,

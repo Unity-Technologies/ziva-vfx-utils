@@ -101,8 +101,8 @@ class Map(BaseParameter):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self.setup.bundle.get_parameters(type_filter='mesh',
-                                                      name_filter=mesh_name)[0]
+        mesh_data = self.builder.bundle.get_parameters(type_filter='mesh',
+                                                       name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):
@@ -118,7 +118,7 @@ class Map(BaseParameter):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
         logger.info('interpolating map:  {}'.format(self.name))
-        created_mesh = mesh_data.build()
+        created_mesh = mesh_data.build_mesh()
         weight_list = interpolate_values(created_mesh,
                                          mesh_data.name,
                                          self.values)

@@ -45,11 +45,12 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        object_list.append(obj(node, setup=self))
+                        object_list.append(obj(maya_node=node, builder=self))
                 if type_ == obj.type:
-                    object_list.append(obj(node, setup=self))
+                    object_list.append(obj(maya_node=node, builder=self))
         if not object_list:
-            object_list.append(zBuilder.parameters.BaseParameter(node, setup=self))
+            object_list.append(zBuilder.parameters.BaseParameter(maya_node=node, builder=self))
+
 
         for obj__ in object_list:
             if hasattr(obj__, 'spawn_parameters'):
@@ -60,7 +61,7 @@ class Builder(object):
                             if k == obj.type:
                                 for v in values:
                                     if not self.bundle.get_parameters(type_filter=k, name_filter=v):
-                                        object_list.append(obj(v, setup=self))
+                                        object_list.append(obj(v, builder=self))
         return object_list
 
     @staticmethod
@@ -201,7 +202,7 @@ class Builder(object):
 
         """
         for x in self.bundle:
-            x.setup = self
+            x.builder = self
 
     def stats(self):
         self.bundle.stats()
@@ -211,3 +212,15 @@ class Builder(object):
 
     def print_(self, type_filter=list(), name_filter=list()):
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
+
+    def get_parameters(self, type_filter=list(),
+                       name_filter=list(),
+                       name_regex=None,
+                       association_filter=list(),
+                       association_regex=None):
+
+        return self.bundle.get_parameters(type_filter=type_filter,
+                                   name_filter=name_filter,
+                                   name_regex=name_regex,
+                                   association_filter=association_filter,
+                                   association_regex=association_regex)

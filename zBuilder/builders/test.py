@@ -19,7 +19,7 @@ class Test(Builder):
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
-        selection = mz.parse_args_for_selection(args)
+        selection = mz.parse_maya_node_for_selection(args)
 
         # kwargs----------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)
@@ -37,8 +37,8 @@ class Test(Builder):
                 tmp.append(hist)
 
         for item in tmp:
-            b_node = self.parameter_factory(item)
-            self.add_parameter(b_node)
+            parameter = self.parameter_factory(item)
+            self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
@@ -48,6 +48,6 @@ class Test(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        b_nodes = self.get_parameters(name_filter=name_filter)
-        for b_node in b_nodes:
-            b_node.build(attr_filter=attr_filter, interp_maps=interp_maps)
+        parameters = self.get_parameters(name_filter=name_filter)
+        for parameter in parameters:
+            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
