@@ -56,8 +56,7 @@ class FiberNode(ZivaBaseParameter):
             data_fibers = self.builder.bundle.get_parameters(type_filter='zFiber',
                                                              association_filter=mesh)
 
-            # self.interpolate_maps(interp_maps)
-            # self.are_maps_valid()
+            self.interpolate_maps(interp_maps)
 
             d_index = data_fibers.index(self)
 
@@ -85,7 +84,7 @@ class FiberNode(ZivaBaseParameter):
 
     def are_maps_valid(self):
         """
-        Checking jsut fiber .endPoint maps.  These maps are mostly .5 and at
+        Checking just fiber .endPoint maps.  These maps are mostly .5 and at
         at least one vert needs to be between .9 and 1 and another needs to
         be between 0 and .1.  This is defining the direction of the fibers
         so things do not work if these requirements are not met.

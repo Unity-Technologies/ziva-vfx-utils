@@ -10,6 +10,7 @@ These are the docs for Ziva's VFX python utilities.  You can find the Bit Bucket
     :maxdepth: 1
     :caption: Contents
 
+    introduction
     installation
     packages
     release

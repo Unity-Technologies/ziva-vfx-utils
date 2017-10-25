@@ -138,7 +138,7 @@ class Ziva(Builder):
         lineOfAction = kwargs.get('lineOfAction', True)
         embedder = kwargs.get('embedder', True)
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_map_names', True)
+        get_maps = kwargs.get('get_map', True)
 
         print '\ngetting ziva......'
 
@@ -177,7 +177,7 @@ class Ziva(Builder):
             nodes = selection
 
         if nodes:
-            self._populate_nodes(nodes)
+            self._populate_nodes(nodes, get_mesh=get_mesh, get_maps=get_maps)
 
         mc.select(sel, r=True)
         self.bundle.stats()
@@ -292,5 +292,10 @@ class Ziva(Builder):
                              check_meshes=check_meshes, interp_maps=interp_maps)
 
         # turn on solver
-        mc.setAttr(sn + '.enable', solver_value)
+
         mc.select(sel, r=True)
+
+        mc.setAttr(sn + '.enable', solver_value)
+
+        # last ditch check of map validity for zAttachments and zFibers
+        mz.check_map_validity(self.bundle.get_parameters(type_filter='map'))

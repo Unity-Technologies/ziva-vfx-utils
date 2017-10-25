@@ -26,6 +26,9 @@ First thing is to run the demo arm.  You can find that in the 'Ziva Tools' menu.
 Examples/Run Demo/Anatomical Arm.  Now that we have that in our scene Lets start
 playing with zBuilder.
 
+Retrieving
+^^^^^^^^^^
+
 .. code-block:: python
 
     import zBuilder.builders.ziva as zva
@@ -71,6 +74,9 @@ we can continue working on arm and use it to restore the state or we can manipul
 information in the builder and re-apply it.  That is useful for mirroring and such
 which we will get into later.
 
+Building
+^^^^^^^^
+
 To restore the scene first we need to make a change to the arm so we can confirm
 it restored it.  So paint a muscle attachment to all white for example, just
 something that is easy to identify in viewport.  Once that is done, if you
@@ -88,6 +94,8 @@ when you retrieved it.
     When you .build() in maya on an existing scene it does a few things.  It checks
     if parameter in builder exists in scene.  If it doesn't exist it tries to build
     it in scene.  If it does exist, it updates the scene to what is in builder.
+
+
 
 extending
 ~~~~~~~~~
