@@ -67,7 +67,7 @@ class AttachmentNode(ZivaBaseParameter):
                     data.append(data_attachment)
 
             d_index = data.index(self)
-            self.interpolate_maps(interp_maps)
+            # self.interpolate_maps(interp_maps)
 
             if existing:
                 if d_index < len(existing):
@@ -94,7 +94,7 @@ class AttachmentNode(ZivaBaseParameter):
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=False)
+        self.set_maya_weights(interp_maps=interp_maps)
 
     # def are_maps_valid(self):
     #     """ Checking maps to see if they are all zeros.  An attachment map with

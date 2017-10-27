@@ -56,7 +56,7 @@ class FiberNode(ZivaBaseParameter):
             data_fibers = self.builder.bundle.get_parameters(type_filter='zFiber',
                                                              association_filter=mesh)
 
-            self.interpolate_maps(interp_maps)
+            # self.interpolate_maps(interp_maps)
 
             d_index = data_fibers.index(self)
 
@@ -80,36 +80,36 @@ class FiberNode(ZivaBaseParameter):
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=False)
+        self.set_maya_weights(interp_maps=interp_maps)
 
-    def are_maps_valid(self):
-        """
-        Checking just fiber .endPoint maps.  These maps are mostly .5 and at
-        at least one vert needs to be between .9 and 1 and another needs to
-        be between 0 and .1.  This is defining the direction of the fibers
-        so things do not work if these requirements are not met.
-
-        This checks for that case.
-
-        Raises:
-            ValueError: If map fails test.
-
-        """
-        map_name = self.get_map_names()[1]
-        map_object = self.builder.bundle.get_parameters(type_filter='map',
-                                                        name_filter=map_name)
-        values = map_object.values
-
-        upper = False
-        lower = False
-        if any(0 <= v <= .1 for v in values):
-            lower = True
-        if any(.9 <= v <= 1 for v in values):
-            upper = True
-
-        if not upper and not lower:
-            raise ValueError('{} map does not have a 1 or 0.  Please check map.'.format(map_name))
-        if not upper:
-            raise ValueError('{} map does not have a 1.  Please check map.'.format(map_name))
-        if not lower:
-            raise ValueError('{} map does not have a 0.  Please check map.'.format(map_name))
+    # def are_maps_valid(self):
+    #     """
+    #     Checking just fiber .endPoint maps.  These maps are mostly .5 and at
+    #     at least one vert needs to be between .9 and 1 and another needs to
+    #     be between 0 and .1.  This is defining the direction of the fibers
+    #     so things do not work if these requirements are not met.
+    #
+    #     This checks for that case.
+    #
+    #     Raises:
+    #         ValueError: If map fails test.
+    #
+    #     """
+    #     map_name = self.get_map_names()[1]
+    #     map_object = self.builder.bundle.get_parameters(type_filter='map',
+    #                                                     name_filter=map_name)
+    #     values = map_object.values
+    #
+    #     upper = False
+    #     lower = False
+    #     if any(0 <= v <= .1 for v in values):
+    #         lower = True
+    #     if any(.9 <= v <= 1 for v in values):
+    #         upper = True
+    #
+    #     if not upper and not lower:
+    #         raise ValueError('{} map does not have a 1 or 0.  Please check map.'.format(map_name))
+    #     if not upper:
+    #         raise ValueError('{} map does not have a 1.  Please check map.'.format(map_name))
+    #     if not lower:
+    #         raise ValueError('{} map does not have a 0.  Please check map.'.format(map_name))
