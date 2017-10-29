@@ -217,7 +217,7 @@ class Ziva(Builder):
             for item in self.bundle.get_parameters(type_filter='mesh'):
                 item.mirror()
 
-        logger.info('Building setup....')
+        logger.info('Building....')
         sel = mc.ls(sl=True)
 
         # get stored solver enable value to build later. The solver comes in OFF
