@@ -1,4 +1,4 @@
-from zBuilder.parameters import ZivaBaseParameter
+from zBuilder.parameters import Ziva
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FiberNode(ZivaBaseParameter):
+class FiberNode(Ziva):
     """ This node for storing information related to zFibers.
     """
     type = 'zFiber'
@@ -16,7 +16,7 @@ class FiberNode(ZivaBaseParameter):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseParameter.__init__(self, *args, **kwargs)
+        Ziva.__init__(self, *args, **kwargs)
 
     def get_map_meshes(self):
         """

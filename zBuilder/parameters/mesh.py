@@ -2,26 +2,23 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.base import Base
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Mesh(BaseParameter):
+class Mesh(Base):
     type = 'mesh'
     """ Type of node. """
 
     def __init__(self, *args, **kwargs):
-        self._class = (self.__class__.__module__, self.__class__.__name__)
-        self._name = None
+        Base.__init__(self)
+
         self._pCountList = []
         self._pConnectList = []
         self._pointList = []
 
-        BaseParameter.__init__(self, *args, **kwargs)
-
-        # print args,'args'
         if args:
             mesh_name = args[0]
             if mesh_name:

@@ -1,4 +1,4 @@
-from zBuilder.parameters import ZivaBaseParameter
+from zBuilder.parameters import Ziva
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc
@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class LineOfActionNode(ZivaBaseParameter):
+class LineOfActionNode(Ziva):
     """ This node for storing information related to zLineOfAction.
     """
     type = 'zLineOfAction'
@@ -17,7 +17,7 @@ class LineOfActionNode(ZivaBaseParameter):
     def __init__(self, *args, **kwargs):
         self.fiber = None
 
-        ZivaBaseParameter.__init__(self, *args, **kwargs)
+        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

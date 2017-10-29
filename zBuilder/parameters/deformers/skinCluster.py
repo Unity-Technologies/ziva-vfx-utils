@@ -1,10 +1,10 @@
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.dg_node import DGNode
 import maya.cmds as mc
 import maya.OpenMaya as OpenMaya
 import maya.OpenMayaAnim as OpenMayaAnim
 
 
-class SkinClusterParameter(BaseParameter):
+class SkinClusterParameter(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = 'skinCluster'
@@ -20,7 +20,7 @@ class SkinClusterParameter(BaseParameter):
         self.influences = list()
         self.weights = dict()
 
-        BaseParameter.__init__(self, *args, **kwargs)
+        DGNode.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This extends ZivaBase.populate()
