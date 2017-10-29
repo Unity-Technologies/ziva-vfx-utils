@@ -214,7 +214,8 @@ class Ziva(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            [item.mirror() for item in self.bundle.get_parameters(type_filter='mesh')]
+            for item in self.bundle.get_parameters(type_filter='mesh'):
+                item.mirror()
 
         logger.info('Building setup....')
         sel = mc.ls(sl=True)
