@@ -14,7 +14,7 @@ class Base(object):
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
 
-    def __init__(self, deserialize=None, builder=None):
+    def __init__(self, *args, **kwargs):
         self._name = None
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
@@ -22,7 +22,9 @@ class Base(object):
         self._builder_type = '{}.{}'.format(self._builder_type[0],
                                             self._builder_type[1])
 
-        self.builder = builder
+        self.builder = kwargs.get('builder', None)
+        deserialize = kwargs.get('deserialize', None)
+
         if deserialize:
             self.deserialize(deserialize)
 
