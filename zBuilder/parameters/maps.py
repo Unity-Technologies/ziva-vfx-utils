@@ -13,12 +13,12 @@ class Map(Base):
     type = 'map'
 
     def __init__(self, *args, **kwargs):
-        Base.__init__(self)
-
         self._mesh = None
         #: list of str: Doc comment *before* attribute, with type specified
         self.values = None
         """str: Docstring *after* attribute, with type specified."""
+
+        Base.__init__(self, *args, **kwargs)
 
         if args:
             map_name = args[0][0]

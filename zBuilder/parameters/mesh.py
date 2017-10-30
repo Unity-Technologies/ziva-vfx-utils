@@ -13,11 +13,11 @@ class Mesh(Base):
     """ Type of node. """
 
     def __init__(self, *args, **kwargs):
-        Base.__init__(self)
-
         self._pCountList = []
         self._pConnectList = []
         self._pointList = []
+
+        Base.__init__(self, *args, **kwargs)
 
         if args:
             mesh_name = args[0]
