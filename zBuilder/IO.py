@@ -92,13 +92,8 @@ def load_base_node(json_object):
         module_ = json_object['_class'][0]
 
         type_ = json_object['type']
-        # print json_object
         builder_type = json_object['_builder_type']
         obj = find_class(builder_type, type_)
-        # if 'zBuilder.data' in module_:
-        #     obj = find_class('zBuilder.data', type_)
-        # elif 'zBuilder.nodes' in module_:
-        #     obj = find_class('zBuilder.nodes', type_)
 
         parameter = obj(deserialize=json_object)
         return parameter
