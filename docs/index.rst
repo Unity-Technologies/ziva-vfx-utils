@@ -1,10 +1,4 @@
-Welcome to Ziva's VFX Utilities!
-================================
-
-These are the docs for Ziva's VFX python utilities.  You can find the Bit Bucket repo for these tools
-`here <https://bitbucket.org/zivadynamics/ziva-vfx-utils>`_.
-
-`Ziva Dynamics <http://zivadynamics.com>`_
+.. include:: introduction.rst
 
 .. toctree::
     :maxdepth: 1
