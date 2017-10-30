@@ -218,10 +218,12 @@ class Builder(object):
                        name_filter=list(),
                        name_regex=None,
                        association_filter=list(),
-                       association_regex=None):
+                       association_regex=None,
+                       invert_match=False):
 
         return self.bundle.get_parameters(type_filter=type_filter,
                                    name_filter=name_filter,
                                    name_regex=name_regex,
                                    association_filter=association_filter,
-                                   association_regex=association_regex)
+                                   association_regex=association_regex,
+                                   invert_match=invert_match)

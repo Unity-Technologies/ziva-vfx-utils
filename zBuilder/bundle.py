@@ -145,7 +145,8 @@ class Bundle(object):
                        name_filter=list(),
                        name_regex=None,
                        association_filter=list(),
-                       association_regex=None):
+                       association_regex=None,
+                       invert_match=False):
 
         """
         Gets parameters from parameter list.
@@ -161,18 +162,24 @@ class Bundle(object):
                 Defaults to :obj:`list`.
             association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
                 Defaults to ``None``.
+            invert_match (bool): Invert the sense of matching, to select non-matching items.
+                Defaults to ``False``
         Returns:
             list: List of parameters.
         """
+        # if no filters are used just return full list as it is faster
         if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
             return self.parameters
 
+        # put type filter in a list if it isn't
         if not isinstance(type_filter, list):
             type_filter = [type_filter]
 
+        # put association filter in a list if it isn't
         if not isinstance(association_filter, list):
             association_filter = [association_filter]
 
+        # put name filter in a list if it isn't
         if not isinstance(name_filter, list):
             name_filter = [name_filter]
 
@@ -180,21 +187,21 @@ class Bundle(object):
         name_set = set(name_filter)
         association_set = set(association_filter)
 
-        def keep_me(item):
+        def keep_me(item, invert):
             if type_set and item.type not in type_set:
-                return False
+                return invert
             if name_set and item.name not in name_set:
-                return False
+                return invert
             if association_set and association_set.isdisjoint(item.association):
-                return False
+                return invert
             if name_regex and not re.search(name_regex, item.name):
-                return False
+                return invert
             if association_regex and not re.search(association_regex,
                                                    item.association):
-                return False
-            return True
+                return invert
+            return not invert
 
-        return [item for item in self if keep_me(item)]
+        return [item for item in self if keep_me(item, invert_match)]
 
     def string_replace(self, search, replace):
         """
