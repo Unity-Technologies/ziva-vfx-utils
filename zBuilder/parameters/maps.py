@@ -28,14 +28,17 @@ class Map(Base):
                 self.populate(map_name, mesh_name)
 
     def __str__(self):
-        name = self.name
-        if self.values:
-            length = len(self.values)
-        else:
-            length = 'null'
-        output = ''
-        output += '< MAP: {} -- length: {} >'.format(name, length)
-        return output
+        if self.name:
+            name = self.name
+            output = ''
+            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
+            for key in self.__dict__:
+                if key == 'values':
+                    output += '\t{} - [{},....]\n'.format(key, self.__dict__[key][0])
+                else:
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key])
+            return output
+        return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)
 
     def __repr__(self):
         name = self.name
