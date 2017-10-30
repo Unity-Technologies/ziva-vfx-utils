@@ -2,13 +2,13 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.parameters import ZivaBaseParameter
+from zBuilder.parameters import Ziva
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class AttachmentNode(ZivaBaseParameter):
+class AttachmentNode(Ziva):
     """ This node for storing information related to zAttachments.
     """
     type = 'zAttachment'
@@ -17,7 +17,7 @@ class AttachmentNode(ZivaBaseParameter):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        ZivaBaseParameter.__init__(self, *args, **kwargs)
+        Ziva.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
@@ -38,11 +38,6 @@ class AttachmentNode(ZivaBaseParameter):
         name = self.get_scene_name()
         source_mesh = self.association[0]
         target_mesh = self.association[1]
-
-        # self.interpolate_maps(interp_maps)
-        # self.are_maps_valid()
-
-        # logger.info('creating attachment {}'.format(name))
 
         # check if both meshes exist
         if mz.check_body_type([source_mesh, target_mesh]):
@@ -67,7 +62,6 @@ class AttachmentNode(ZivaBaseParameter):
                     data.append(data_attachment)
 
             d_index = data.index(self)
-            self.interpolate_maps(interp_maps)
 
             if existing:
                 if d_index < len(existing):
@@ -94,19 +88,4 @@ class AttachmentNode(ZivaBaseParameter):
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=False)
-
-    # def are_maps_valid(self):
-    #     """ Checking maps to see if they are all zeros.  An attachment map with
-    #     only zero's fail.
-    #
-    #     Raises:
-    #         ValueError: If map doesn't pass check.
-    #     """
-    #     for map_name in self.get_map_names():
-    #         map_object = self.builder.bundle.get_parameters(type_filter='map',
-    #                                                         name_filter=map_name)[0]
-    #         values = map_object.values
-    #
-    #         if all(v == 0 for v in values):
-    #             raise ValueError('{} all 0s.  Check map.'.format(map_name))
+        self.set_maya_weights(interp_maps=interp_maps)

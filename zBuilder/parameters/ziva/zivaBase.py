@@ -2,13 +2,13 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.parameters.deformerBase import DeformerBaseParameter
+from zBuilder.parameters.deformer import Deformer
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ZivaBaseParameter(DeformerBaseParameter):
+class Ziva(Deformer):
     """Base node for Ziva type nodes.
 
     extended from base to deal with maps and meshes and storing the solver.
@@ -20,7 +20,7 @@ class ZivaBaseParameter(DeformerBaseParameter):
     def __init__(self,  maya_node=None, builder=None, deserialize=None):
         self.solver = None
 
-        DeformerBaseParameter.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
+        Deformer.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
 
         if maya_node:
             self.populate(maya_node=maya_node)

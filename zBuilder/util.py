@@ -51,3 +51,6 @@ def check_map_validity():
 
     mz.check_map_validity(z.get_parameters(type_filter='map'))
 
+    mc.select(sel, r=True)
+
+

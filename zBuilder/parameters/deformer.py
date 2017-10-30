@@ -2,16 +2,16 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.dg_node import DGNode
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class DeformerBaseParameter(BaseParameter):
+class Deformer(DGNode):
 
     def __init__(self, maya_node=None, builder=None, deserialize=None):
-        BaseParameter.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
+        DGNode.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
 
         if maya_node:
             self.populate(maya_node=maya_node)
@@ -52,7 +52,7 @@ class DeformerBaseParameter(BaseParameter):
 
         """
 
-        super(DeformerBaseParameter, self).populate(maya_node=maya_node)
+        super(Deformer, self).populate(maya_node=maya_node)
 
         self.association = self.get_meshes(maya_node)
 

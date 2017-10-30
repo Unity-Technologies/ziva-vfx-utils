@@ -1,13 +1,14 @@
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
-from zBuilder.parameters.base import BaseParameter
-from zBuilder.parameters.deformerBase import DeformerBaseParameter
+from zBuilder.parameters.dg_node import DGNode
+from zBuilder.parameters.deformer import Deformer
 from zBuilder.parameters.maps import Map
 from zBuilder.parameters.mesh import Mesh
+from zBuilder.parameters.transform import TransformNode
 
 # ziva nodes--------------------------------------------------------------------
-from .ziva.zivaBase import ZivaBaseParameter
+from .ziva.zivaBase import Ziva
 from .ziva.zSolver import SolverNode
 from .ziva.zSolverTransform import SolverTransformNode
 from .ziva.zBone import BoneNode

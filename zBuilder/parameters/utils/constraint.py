@@ -1,8 +1,8 @@
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.dg_node import DGNode
 import maya.cmds as mc
 
 
-class ConstraintParameter(BaseParameter):
+class ConstraintParameter(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = None
@@ -15,7 +15,7 @@ class ConstraintParameter(BaseParameter):
     """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
-        BaseParameter.__init__(self, *args, **kwargs)
+        DGNode.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.

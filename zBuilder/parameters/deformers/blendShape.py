@@ -1,12 +1,12 @@
 import logging
 import maya.cmds as mc
-from zBuilder.parameters.deformerBase import DeformerBaseParameter
+from zBuilder.parameters.deformer import Deformer
 import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
 
-class BlendShapeNode(DeformerBaseParameter):
+class BlendShapeNode(Deformer):
     type = 'blendShape'
     MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights',
                 'inputTarget[*].baseWeights']
@@ -15,7 +15,7 @@ class BlendShapeNode(DeformerBaseParameter):
     def __init__(self, *args, **kwargs):
         self._target = None
 
-        DeformerBaseParameter.__init__(self, *args, **kwargs)
+        Deformer.__init__(self, *args, **kwargs)
 
     def get_map_meshes(self):
         """

@@ -1,4 +1,4 @@
-from zBuilder.parameters import ZivaBaseParameter
+from zBuilder.parameters import Ziva
 import logging
 import zBuilder.zMaya as mz
 import maya.cmds as mc
@@ -7,7 +7,7 @@ import maya.mel as mm
 logger = logging.getLogger(__name__)
 
 
-class TissueNode(ZivaBaseParameter):
+class TissueNode(Ziva):
     """ This node for storing information related to zTissues.
     """
     type = 'zTissue'
@@ -17,7 +17,7 @@ class TissueNode(ZivaBaseParameter):
         self.children_tissues = None
         self.parent_tissue = None
 
-        ZivaBaseParameter.__init__(self, *args, **kwargs)
+        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

@@ -49,8 +49,7 @@ class Builder(object):
                 if type_ == obj.type:
                     object_list.append(obj(maya_node=node, builder=self))
         if not object_list:
-            object_list.append(zBuilder.parameters.BaseParameter(maya_node=node, builder=self))
-
+            object_list.append(zBuilder.parameters.DGNode(maya_node=node, builder=self))
 
         for obj__ in object_list:
             if hasattr(obj__, 'spawn_parameters'):

@@ -3,24 +3,22 @@ import maya.mel as mm
 import maya.OpenMaya as om
 
 import zBuilder.zMaya as mz
-from zBuilder.parameters.base import BaseParameter
+from zBuilder.parameters.base import Base
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class Map(BaseParameter):
+class Map(Base):
     type = 'map'
 
     def __init__(self, *args, **kwargs):
-        self._class = (self.__class__.__module__, self.__class__.__name__)
+        Base.__init__(self)
 
         self._mesh = None
         #: list of str: Doc comment *before* attribute, with type specified
         self.values = None
         """str: Docstring *after* attribute, with type specified."""
-
-        BaseParameter.__init__(self, *args, **kwargs)
 
         if args:
             map_name = args[0][0]
