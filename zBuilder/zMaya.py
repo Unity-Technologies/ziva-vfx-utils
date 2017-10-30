@@ -803,7 +803,8 @@ def check_map_validity(map_parameters):
                 tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
                 mc.setAttr('{}.enable'.format(tissue[0]), 0)
 
-    logger.info('Check these maps: {}'.format(report))
+    if report:
+        logger.info('Check these maps: {}'.format(report))
     mc.select(sel)
     return report
 
