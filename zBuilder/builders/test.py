@@ -49,6 +49,6 @@ class Test(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        parameters = self.get_parameters(name_filter=name_filter)
+        parameters = self.get_scene_items(name_filter=name_filter)
         for parameter in parameters:
             parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)

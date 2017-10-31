@@ -72,8 +72,6 @@ class Deformer(DGNode):
         #                                                              type='mesh')
         #             self.setup.add_component(mesh_data_object)
 
-    # TODO instead of get_map* and get_mesh* should be more generic.
-    # get_component*(type_filter)
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically
@@ -184,7 +182,6 @@ class Deformer(DGNode):
                 except:
                     pass
 
-    # TODO this level????  pass a false?  seriously??
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
         it isn't it will interpolate the map if the flag is True.  Once the map

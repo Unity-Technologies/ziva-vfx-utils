@@ -30,7 +30,7 @@ class SkinCluster(DGNode):
         Args:
             maya_node: Maya node to populate with.
         """
-        super(SkinClusterParameter, self).populate(maya_node=maya_node)
+        super(SkinCluster, self).populate(maya_node=maya_node)
 
         self.weights = get_weights(self.name)
         self.influences = get_influences(self.name)

@@ -21,7 +21,7 @@ class Selection(Builder):
     @Builder.time_this
     def build(self, select=True):
         tmp = []
-        for node in self.get_parameters():
+        for node in self.get_scene_items():
             tmp.append(node.get_scene_name())
 
         if select:
