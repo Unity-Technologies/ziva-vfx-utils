@@ -60,6 +60,7 @@ class Builder(object):
                             if k == obj.type:
                                 for v in values:
                                     if not self.bundle.get_parameters(type_filter=k, name_filter=v):
+
                                         object_list.append(obj(v, builder=self))
         return object_list
 
@@ -138,7 +139,8 @@ class Builder(object):
         self.__assign_setup()
         self.bundle.stats()
         for parameter in self.bundle.parameters:
-            parameter.mobject = parameter.mobject
+            if hasattr(parameter, 'mobject'):
+                parameter.mobject = parameter.mobject
         after = datetime.datetime.now()
 
         logger.info('Read File: {} in {}'.format(file_path, after - before))
@@ -216,10 +218,12 @@ class Builder(object):
                        name_filter=list(),
                        name_regex=None,
                        association_filter=list(),
-                       association_regex=None):
+                       association_regex=None,
+                       invert_match=False):
 
         return self.bundle.get_parameters(type_filter=type_filter,
                                    name_filter=name_filter,
                                    name_regex=name_regex,
                                    association_filter=association_filter,
-                                   association_regex=association_regex)
+                                   association_regex=association_regex,
+                                   invert_match=invert_match)

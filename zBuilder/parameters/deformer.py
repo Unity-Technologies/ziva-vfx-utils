@@ -159,10 +159,12 @@ class Deformer(DGNode):
         scene_name = self.get_scene_name()
         original_name = self.name
 
+        self.check_map_interpolation(interp_maps)
+
         for map_ in maps:
             map_data = self.builder.bundle.get_parameters(type_filter='map',
                                                           name_filter=map_)[0]
-            self.interpolate_maps(interp_maps)
+
             weight_list = map_data.values
 
             map_ = map_.replace(original_name, scene_name)
@@ -184,8 +186,11 @@ class Deformer(DGNode):
                     pass
 
     # TODO this level????  pass a false?  seriously??
-    def interpolate_maps(self, interp_maps):
-        """ Interpolates maps in node.
+    def check_map_interpolation(self, interp_maps):
+        """ For each map it checks if it is topologically corresponding and if
+        it isn't it will interpolate the map if the flag is True.  Once the map
+        has been interpolated it updates the stored value before it gets applied
+        in Maya.
 
         Args:
             interp_maps (bool): Do you want to do it?

@@ -214,10 +214,28 @@ class Ziva(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            [item.mirror() for item in self.bundle.get_parameters(type_filter='mesh')]
+            for item in self.bundle.get_parameters(type_filter='mesh'):
+                item.mirror()
 
-        logger.info('Building setup....')
+        logger.info('Building....')
         sel = mc.ls(sl=True)
+
+        # lets build the solver first so we can turn it off to build rest.
+        # speeds up the process
+        solvers = list()
+        if solver:
+            # logger.info('Building solver.')
+            # for node_type in ['zSolver', 'zSolverTransform']:
+            #     for parameter in self.get_parameters(type_filter=node_type):
+            #         parameter.apply(attr_filter=attr_filter, permissive=permissive,
+            #                      check_meshes=check_meshes, interp_maps=interp_maps)
+            solvers.append('zSolver')
+            solvers.append('zSolverTransform')
+
+        # build the nodes by calling build method on each one
+        for node_type in solvers:
+            for parameter in self.bundle.get_parameters(type_filter=node_type):
+                parameter.build(attr_filter=attr_filter, permissive=permissive)
 
         # get stored solver enable value to build later. The solver comes in OFF
         solver_transform = self.bundle.get_parameters(type_filter='zSolverTransform')[0]
@@ -226,14 +244,7 @@ class Ziva(Builder):
 
         # generate list of node types to build
         node_types_to_build = list()
-        if solver:
-            # logger.info('Building solver.')
-            # for node_type in ['zSolver', 'zSolverTransform']:
-            #     for parameter in self.get_parameters(type_filter=node_type):
-            #         parameter.apply(attr_filter=attr_filter, permissive=permissive,
-            #                      check_meshes=check_meshes, interp_maps=interp_maps)
-            node_types_to_build.append('zSolver')
-            node_types_to_build.append('zSolverTransform')
+
         if bones:
             # logger.info('Building bones.')
             # for parameter in self.get_parameters(type_filter='zBone'):

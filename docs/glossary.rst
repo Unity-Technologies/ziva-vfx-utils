@@ -7,6 +7,9 @@ Glossary
 .. glossary::
     :sorted:
 
+    zUi
+        A maya UI to help you navigate the scene.  Currently Beta.
+
     zBuilder
         A python package used to serialize and deserialize Maya scenes.
 

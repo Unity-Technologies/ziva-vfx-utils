@@ -38,23 +38,11 @@ class DGNode(Base):
             to the auto generated attribute list to include."""
 
     def __init__(self, maya_node=None, builder=None, deserialize=None):
-        Base.__init__(self)
-
         self.attrs = {}
         self._association = []
         self.__mobject = None
 
-        self._builder_type = self.__class__.__module__.split('.')
-        self._builder_type = '{}.{}'.format(self._builder_type[0],
-                                            self._builder_type[1])
-
-        self.builder = builder
-
-        if deserialize:
-            self.deserialize(deserialize)
-
-
-
+        Base.__init__(self, deserialize=deserialize, builder=builder)
         # CANT DO THIS>
         # map and mesh have a different populate interface :
         # if maya_node:

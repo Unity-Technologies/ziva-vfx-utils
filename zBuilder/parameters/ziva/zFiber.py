@@ -56,7 +56,6 @@ class FiberNode(Ziva):
             data_fibers = self.builder.bundle.get_parameters(type_filter='zFiber',
                                                              association_filter=mesh)
 
-            # self.interpolate_maps(interp_maps)
 
             d_index = data_fibers.index(self)
 
