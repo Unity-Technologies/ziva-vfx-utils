@@ -2,7 +2,7 @@ import zBuilder.zMaya as mz
 import maya.cmds as mc
 import maya.mel as mm
 
-from zBuilder.parameters.deformer import Deformer
+from zBuilder.nodes.deformer import Deformer
 import logging
 
 logger = logging.getLogger(__name__)

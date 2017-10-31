@@ -2,7 +2,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,8 +52,8 @@ class AttachmentNode(Ziva):
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self.builder.bundle.get_parameters(type_filter='zAttachment',
-                                                                  association_filter=source_mesh)
+            data_attachments = self.builder.bundle.get_scene_items(type_filter='zAttachment',
+                                                                   association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.association[0]

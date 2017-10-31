@@ -14,7 +14,7 @@ class Selection(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            parameter = self.parameter_factory(item)
+            parameter = self.node_factory(item)
             self.bundle.add_parameter(parameter)
         self.stats()
 

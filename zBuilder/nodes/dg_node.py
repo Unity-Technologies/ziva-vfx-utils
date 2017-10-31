@@ -4,7 +4,7 @@ import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
-from zBuilder.parameters.base import Base
+from zBuilder.nodes.base import Base
 
 logger = logging.getLogger(__name__)
 

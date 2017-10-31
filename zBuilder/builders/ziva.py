@@ -59,8 +59,8 @@ class Ziva(Builder):
         else:
             raise StandardError('zSolver not connected to selection.  Please try again.')
 
-        b_solver = self.parameter_factory(solver)
-        self.bundle.extend_parameters(b_solver)
+        b_solver = self.node_factory(solver)
+        self.bundle.extend_scene_item(b_solver)
 
         node_types = ['zSolverTransform',
                       'zBone',
@@ -193,8 +193,8 @@ class Ziva(Builder):
 
         """
         for node in nodes:
-            parameter = self.parameter_factory(node)
-            self.bundle.extend_parameters(parameter)
+            parameter = self.node_factory(node)
+            self.bundle.extend_scene_item(parameter)
 
     @Builder.time_this
     def build(self, name_filter=None, attr_filter=None, interp_maps='auto',
@@ -214,7 +214,7 @@ class Ziva(Builder):
             name_filter (str): filter by node name.  Defaults to **None**
         """
         if mirror:
-            for item in self.bundle.get_parameters(type_filter='mesh'):
+            for item in self.bundle.get_scene_items(type_filter='mesh'):
                 item.mirror()
 
         logger.info('Building....')
@@ -226,7 +226,7 @@ class Ziva(Builder):
         if solver:
             # logger.info('Building solver.')
             # for node_type in ['zSolver', 'zSolverTransform']:
-            #     for parameter in self.get_parameters(type_filter=node_type):
+            #     for parameter in self.get_scene_items(type_filter=node_type):
             #         parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                      check_meshes=check_meshes, interp_maps=interp_maps)
             solvers.append('zSolver')
@@ -234,11 +234,11 @@ class Ziva(Builder):
 
         # build the nodes by calling build method on each one
         for node_type in solvers:
-            for parameter in self.bundle.get_parameters(type_filter=node_type):
+            for parameter in self.bundle.get_scene_items(type_filter=node_type):
                 parameter.build(attr_filter=attr_filter, permissive=permissive)
 
         # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.bundle.get_parameters(type_filter='zSolverTransform')[0]
+        solver_transform = self.bundle.get_scene_items(type_filter='zSolverTransform')[0]
         sn = solver_transform.name
         solver_value = solver_transform.attrs['enable']['value']
 
@@ -247,58 +247,58 @@ class Ziva(Builder):
 
         if bones:
             # logger.info('Building bones.')
-            # for parameter in self.get_parameters(type_filter='zBone'):
+            # for parameter in self.get_scene_items(type_filter='zBone'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zBone')
         if tissues:
             # logger.info('Building tissues.')
             # for node_type in ['zTissue', 'zTet']:
-            #     for parameter in self.get_parameters(type_filter=node_type):
+            #     for parameter in self.get_scene_items(type_filter=node_type):
             #         parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                      check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zTissue')
             node_types_to_build.append('zTet')
         if cloth:
             # logger.info('Building cloth.')
-            # for parameter in self.get_parameters(type_filter='zCloth'):
+            # for parameter in self.get_scene_items(type_filter='zCloth'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zCloth')
         if materials:
             # logger.info('Building materials.')
-            # for parameter in self.get_parameters(type_filter='zMaterial'):
+            # for parameter in self.get_scene_items(type_filter='zMaterial'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zMaterial')
         if attachments:
             # logger.info('Building attachments.')
-            # for parameter in self.get_parameters(type_filter='zAttachment'):
+            # for parameter in self.get_scene_items(type_filter='zAttachment'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zAttachment')
         if fibers:
             # logger.info('Building fibers.')
-            # for parameter in self.get_parameters(type_filter='zFiber'):
+            # for parameter in self.get_scene_items(type_filter='zFiber'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zFiber')
         if lineOfActions:
             # logger.info('Building lines of action.')
-            # for parameter in self.get_parameters(type_filter='zLineOfAction'):
+            # for parameter in self.get_scene_items(type_filter='zLineOfAction'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zLineOfAction')
         if embedder:
             # logger.info('Building embedder.')
-            # for parameter in self.get_parameters(type_filter='zEmbedder'):
+            # for parameter in self.get_scene_items(type_filter='zEmbedder'):
             #     parameter.apply(attr_filter=attr_filter, permissive=permissive,
             #                  check_meshes=check_meshes, interp_maps=interp_maps)
             node_types_to_build.append('zEmbedder')
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
-            for parameter in self.bundle.get_parameters(type_filter=node_type):
+            for parameter in self.bundle.get_scene_items(type_filter=node_type):
                 parameter.build(attr_filter=attr_filter, permissive=permissive,
                              check_meshes=check_meshes, interp_maps=interp_maps)
 
@@ -309,4 +309,4 @@ class Ziva(Builder):
         mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
-        mz.check_map_validity(self.bundle.get_parameters(type_filter='map'))
+        mz.check_map_validity(self.bundle.get_scene_items(type_filter='map'))

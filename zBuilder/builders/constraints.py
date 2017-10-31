@@ -26,7 +26,7 @@ class Constraints(Builder):
         tmp.extend([x for x in connections if mc.objectType(x) in self.acquire])
 
         for item in tmp:
-            parameter = self.parameter_factory(item)
+            parameter = self.node_factory(item)
             self.bundle.add_parameter(parameter)
         self.stats()
 

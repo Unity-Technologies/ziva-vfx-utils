@@ -15,7 +15,7 @@
 #
 #
 #
-# # for node in z.get_parameters():
+# # for node in z.get_scene_items():
 # #     print node
 # #     print node.__dict__
 # #     break

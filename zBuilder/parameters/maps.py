@@ -3,7 +3,7 @@ import maya.mel as mm
 import maya.OpenMaya as om
 
 import zBuilder.zMaya as mz
-from zBuilder.parameters.base import Base
+from zBuilder.nodes.base import Base
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,9 @@ class Map(Base):
         """str: Docstring *after* attribute, with type specified."""
 
         Base.__init__(self, *args, **kwargs)
-
         if args:
-            map_name = args[0][0]
-            mesh_name = args[0][1]
+            map_name = args[0]
+            mesh_name = args[1]
 
             if map_name and mesh_name:
                 self.populate(map_name, mesh_name)
@@ -102,8 +101,8 @@ class Map(Base):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self.builder.bundle.get_parameters(type_filter='mesh',
-                                                       name_filter=mesh_name)[0]
+        mesh_data = self.builder.bundle.get_scene_items(type_filter='mesh',
+                                                        name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):

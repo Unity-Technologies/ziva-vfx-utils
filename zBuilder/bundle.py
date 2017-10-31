@@ -14,7 +14,7 @@ class Bundle(object):
     """
 
     def __init__(self):
-        self.parameters = list()
+        self.scene_items = list()
 
     def __iter__(self):
         """ This iterates through the parameters.
@@ -23,7 +23,7 @@ class Bundle(object):
             Iterator of parameters.
 
         """
-        return iter(self.parameters)
+        return iter(self.scene_items)
 
     def __len__(self):
         """
@@ -31,12 +31,7 @@ class Bundle(object):
         Returns: Length of parameters.
 
         """
-        return len(self.parameters)
-
-    # @property
-    # def data(self):
-    #     logger.info("self.data deprecated, use self.components")
-    #     return self.components
+        return len(self.scene_items)
 
     def print_(self, type_filter=list(), name_filter=list()):
         """Prints info on each parameter.
@@ -46,13 +41,11 @@ class Bundle(object):
                 Defaults to :obj:`list`
             name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
                 Defaults to :obj:`list`
-            components (:obj:`bool`): prints name of data stored.  Defaults to ``False``
-
         """
 
-        for parameter in self.get_parameters(type_filter=type_filter,
-                                             name_filter=name_filter):
-            print parameter
+        for scene_item in self.get_scene_items(type_filter=type_filter,
+                                              name_filter=name_filter):
+            print scene_item
 
         print '----------------------------------------------------------------'
 
@@ -69,9 +62,9 @@ class Bundle(object):
 
         """
 
-        for parameter in self.get_parameters(type_filter=type_filter,
-                                             name_filter=name_filter):
-            parameter.compare()
+        for scene_item in self.get_scene_items(type_filter=type_filter,
+                                              name_filter=name_filter):
+            scene_item.compare()
 
     def stats(self, type_filter=str()):
         """
@@ -107,49 +100,49 @@ class Bundle(object):
         #     output += '{} {}   '.format(data_type, amount)
         # logger.info(output)
 
-    def append_parameter(self, parameter):
+    def append_scene_item(self, scene_item):
         """
         appends a parameter to the parameter list.  Checks if parameter is
         already in list, if it is it overrides the previous one.
 
         Args:
-            parameter (:obj:`obj`): the parameter to append to collection list.
+            scene_item (:obj:`obj`): the parameter to append to collection list.
         """
 
-        if parameter in self.parameters:
-            self.parameters = [parameter if item == parameter else item for item in self.parameters]
+        if scene_item in self.scene_items:
+            self.scene_items = [scene_item if item == scene_item else item for item in self.scene_items]
         else:
-            self.parameters.append(parameter)
+            self.scene_items.append(scene_item)
 
-    def extend_parameters(self, parameters):
+    def extend_scene_item(self, scene_items):
         """
 
         Args:
-            parameters:
+            scene_items:
 
         Returns:
 
         """
-        for parameter in parameters:
-            self.append_parameter(parameter)
+        for scene_item in scene_items:
+            self.append_scene_item(scene_item)
 
-    def remove_parameter(self, parameter):
+    def remove_scene_item(self, scene_item):
         """
-        Removes a parameter from the parameter list while keeping order.
+        Removes a scene_item from the bundle list while keeping order.
         Args:
-            parameter (:obj:`obj`): The parameter object to remove.
+            scene_item (:obj:`obj`): The scene_item object to remove.
         """
-        self.parameters.remove(parameter)
+        self.scene_items.remove(scene_item)
 
-    def get_parameters(self, type_filter=list(),
-                       name_filter=list(),
-                       name_regex=None,
-                       association_filter=list(),
-                       association_regex=None,
-                       invert_match=False):
+    def get_scene_items(self, type_filter=list(),
+                        name_filter=list(),
+                        name_regex=None,
+                        association_filter=list(),
+                        association_regex=None,
+                        invert_match=False):
 
         """
-        Gets parameters from parameter list.
+        Gets the scene items from bundle.
 
         Args:
             type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
@@ -169,7 +162,7 @@ class Bundle(object):
         """
         # if no filters are used just return full list as it is faster
         if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
-            return self.parameters
+            return self.scene_items
 
         # put type filter in a list if it isn't
         if not isinstance(type_filter, list):
@@ -221,12 +214,7 @@ class Bundle(object):
 
             >>> z.string_replace('_r$','_l')
         """
-        for item in self.parameters:
+        for item in self.scene_items:
             item.string_replace(search, replace)
-        #
-        # for item in self.components:
-        #     item.string_replace(search, replace)
-
-
 
 

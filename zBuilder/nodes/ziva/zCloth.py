@@ -1,23 +1,24 @@
 import maya.cmds as mc
 import maya.mel as mm
+import zBuilder.zMaya as mz
 
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class SolverNode(Ziva):
-    """ This node for storing information related to zSolver.
+class ClothNode(Ziva):
+    """ This node for storing information related to zCloth.
     """
-    type = 'zSolver'
+    type = 'zCloth'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         Ziva.__init__(self, *args, **kwargs)
 
     def build(self, *args, **kwargs):
-        """ Builds the zSolver in maya scene.
+        """ Builds the zCloth in maya scene.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get.
@@ -30,14 +31,14 @@ class SolverNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        solver_name = self.get_scene_name()
+        name = self.get_scene_name()
 
-        if not mc.objExists(solver_name):
-            results = mm.eval('ziva -s')
-            solver = mc.ls(results, type='zSolver')[0]
-            mc.rename(solver, solver_name.split('|')[-1])
-            self.mobject = solver_name
-
+        if not mc.objExists(name):
+            mc.select(self.association)
+            results = mm.eval('ziva -c')
+            cloth = mc.ls(results, type='zCloth')[0]
+            mc.rename(cloth, name)
+            self.mobject = name
         else:
             new_name = mc.rename(self.get_scene_name(), self.name)
             self.mobject = new_name

@@ -1,6 +1,6 @@
 import logging
 import maya.cmds as mc
-from zBuilder.parameters.deformer import Deformer
+from zBuilder.nodes.deformer import Deformer
 
 logger = logging.getLogger(__name__)
 

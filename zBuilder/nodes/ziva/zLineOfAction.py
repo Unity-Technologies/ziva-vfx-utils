@@ -1,4 +1,4 @@
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
 
 import maya.cmds as mc

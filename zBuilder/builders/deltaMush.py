@@ -32,7 +32,7 @@ class DeltaMush(Builder):
             raise StandardError('No delta mushes found, aborting!')
 
         for delta_mush in delta_mushes:
-            parameter = self.parameter_factory(delta_mush)
+            parameter = self.node_factory(delta_mush)
             self.bundle.add_parameter(parameter)
         self.stats()
 
