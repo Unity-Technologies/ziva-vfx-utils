@@ -7,7 +7,7 @@ from zBuilder.nodes.deformer import Deformer
 logger = logging.getLogger(__name__)
 
 
-class WrapNode(Deformer):
+class Wrap(Deformer):
     type = 'wrap'
     # MAP_LIST = ['weightList[0].weights']
 

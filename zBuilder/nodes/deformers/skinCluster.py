@@ -4,7 +4,7 @@ import maya.OpenMaya as OpenMaya
 import maya.OpenMayaAnim as OpenMayaAnim
 
 
-class SkinClusterParameter(DGNode):
+class SkinCluster(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = 'skinCluster'

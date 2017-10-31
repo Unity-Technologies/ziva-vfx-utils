@@ -1,12 +1,13 @@
 import logging
 import maya.cmds as mc
-from zBuilder.nodes.deformer import Deformer
 import zBuilder.zMaya as mz
+
+from zBuilder.nodes.deformer import Deformer
 
 logger = logging.getLogger(__name__)
 
 
-class BlendShapeNode(Deformer):
+class BlendShape(Deformer):
     type = 'blendShape'
     MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights',
                 'inputTarget[*].baseWeights']
@@ -51,7 +52,7 @@ class BlendShapeNode(Deformer):
         self.set_maya_weights(interp_maps=interp_maps)
 
     def populate(self, maya_node=None):
-        super(BlendShapeNode, self).populate(maya_node=maya_node)
+        super(BlendShape, self).populate(maya_node=maya_node)
         self.target = get_target(self.name)
 
         num_weights = mc.blendShape(self.get_scene_name(), q=True, wc=True)

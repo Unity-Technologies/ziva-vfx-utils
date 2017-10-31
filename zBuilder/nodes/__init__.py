@@ -20,10 +20,10 @@ from .ziva.zFiber import FiberNode
 from .ziva.zLineOfAction import LineOfActionNode
 
 # deformer----------------------------------------------------------------------
-from .deformers.deltaMush import DeltaMushNode
-from .deformers.blendShape import BlendShapeNode
-from .deformers.wrap import WrapNode
+from .deformers.deltaMush import DeltaMush
+from .deformers.blendShape import BlendShape
+from .deformers.wrap import Wrap
 
 # utils-------------------------------------------------------------------------
-from .utils.constraint import ConstraintParameter
-from .deformers.skinCluster import SkinClusterParameter
+from .utils.constraint import Constraint
+from .deformers.skinCluster import SkinCluster
