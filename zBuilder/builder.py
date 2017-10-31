@@ -29,7 +29,7 @@ class Builder(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
-    def node_factory(self, node):
+    def node_factory(self, node, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
         zBuilder.node and populates it and returns it.
 
@@ -51,14 +51,15 @@ class Builder(object):
         if not item_list:
             item_list.append(zBuilder.nodes.DGNode(maya_node=node, builder=self))
 
-        for obj__ in item_list:
-            if hasattr(obj__, 'spawn_parameters'):
-                others = obj__.spawn_parameters()
-                for k, values in others.iteritems():
-                    for v in values:
-                        obj = self.parameter_factory(k, v)
-                        if obj:
-                            item_list.append(obj)
+        if get_parameters:
+            for obj__ in item_list:
+                if hasattr(obj__, 'spawn_parameters'):
+                    others = obj__.spawn_parameters()
+                    for k, values in others.iteritems():
+                        for v in values:
+                            obj = self.parameter_factory(k, v)
+                            if obj:
+                                item_list.append(obj)
 
         return item_list
 
