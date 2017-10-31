@@ -25,6 +25,7 @@ z.write(TEMP)
 mz.clean_scene()
 
 # retrieve from file
+z = zva.Ziva()
 z.retrieve_from_file(TEMP)
 
 # build
