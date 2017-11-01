@@ -237,3 +237,35 @@ be no map interpolation.
     # zBuilder.builders.ziva : Building.... #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:03.578000 #
 
+
+String Replacing
+^^^^^^^^^^^^^^^^
+
+You can do basic string replace operations on the information stored in the builder.  This is very useful
+if you have name changes on the geometry you are dealing with or even as a basic mirror.
+
+When you do a string replace you give it a search and replace term.  It looks for all the references of the
+search term and does a replace.  In the context of Ziva it will search and replace
+node names, map names (zAttachment1.weights for example), curve names for zLineOfAction, any mesh name (embedded, user tet).
+
+This works with regular expressions as well.  With that you can say search for only a 'r_' at beginning
+of name.
+
+Lets build the Anatomical Arm demo from the Ziva menu. Then we can retrieve the setup into builder.
+
+.. code-block:: python
+
+    import zBuilder.builders.ziva as zva
+    z = zva.Ziva()
+    z.retrieve_from_scene()
+
+To represent a model name change lets clean the scene and change the name of a muscle.
+
+.. code-block:: python
+
+    import zBuilder.zMaya as mz
+    mz.clean_scene()
+
+    mc.rename('r_bicep_muscle', 'r_biceps_muscle')
+
+Now the information in the builder is out of sync.  We can update it by doing the following

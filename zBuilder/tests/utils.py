@@ -3,7 +3,8 @@ import maya.mel as mm
 import sys
 
 '''
-These are small utilities to help with testing zBuilder.  
+These are small utilities to help with testing zBuilder.  Probably no real value
+outside of testing. 
 '''
 
 
