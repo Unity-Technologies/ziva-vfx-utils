@@ -162,7 +162,9 @@ class Ziva(Builder):
                 nodes.extend(mz.get_zCloth(selection))
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
-                    nodes.append(mz.get_fiber_lineofaction(fiber))
+                    loas = mz.get_fiber_lineofaction(fiber)
+                    if loas:
+                        nodes.append(loas)
             if embedder:
                 mc.select(selection)
                 embedder = mm.eval('zQuery -t "zEmbedder"')
@@ -172,6 +174,7 @@ class Ziva(Builder):
             nodes = selection
 
         if nodes:
+            print nodes
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
