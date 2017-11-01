@@ -1,5 +1,5 @@
-Tutorials
-~~~~~~~~~
+Tutorials I
+~~~~~~~~~~~
 
 I'll bring you through some example usage of this in terms of Ziva and I will be
 doing it on the demo arm that ships with the plugin so if you want to follow along
@@ -11,6 +11,9 @@ playing with zBuilder.
 
 Retrieving
 ^^^^^^^^^^
+
+Retrieving whole setup
+**********************
 
 .. code-block:: python
 
@@ -69,6 +72,40 @@ Items captured in this case are:
 * Relevant zSolver for each node.
 * Mesh information used for world space lookup to interpolate maps if needed.
 
+Retrieving parts of a setup
+***************************
+
+Above example shows how to retrieve the whole scene.  If you wanted to grab a part of it you can select what you want and run retrieve_from_scene_selection()
+
+.. code-block:: python
+
+    import maya.cmds as mc
+    mc.select('r_bicep_muscle')
+    import zBuilder.builders.ziva as zva
+    z = zva.Ziva()
+    z.retrieve_from_scene_selection()
+
+By default retrieve from scene selection grabs everything that is connected to what is selected.  So it grabs the fibers and attachments as well.
+Your script editor output should have looked something like this:
+
+.. code-block:: python
+
+    # zBuilder.bundle : zTissue 1 #
+    # zBuilder.bundle : map 12 #
+    # zBuilder.bundle : zAttachment 4 #
+    # zBuilder.bundle : zMaterial 1 #
+    # zBuilder.bundle : zEmbedder 1 #
+    # zBuilder.bundle : zBone 3 #
+    # zBuilder.bundle : zTet 1 #
+    # zBuilder.bundle : mesh 5 #
+    # zBuilder.bundle : zSolver 1 #
+    # zBuilder.bundle : zSolverTransform 1 #
+    # zBuilder.bundle : zFiber 1 #
+    # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.166000 #
+
+Notice now we are only grabbing 1 tissue.
+
+
 Building
 ^^^^^^^^
 
@@ -78,6 +115,14 @@ not re-create the geometry.  The geometry can have a Ziva setup on it already or
 
 Building to restore scene to previous state
 *******************************************
+
+Lets re-capture whole scene now so we can restore it.
+
+.. code-block:: python
+
+    import zBuilder.builders.ziva as zva
+    z = zva.Ziva()
+    z.retrieve_from_scene()
 
 To restore the scene first we need to make a change to the arm so we can confirm
 it restored it.  So paint a muscle attachment to all white for example, just
@@ -251,6 +296,9 @@ node names, map names (zAttachment1.weights for example), curve names for zLineO
 This works with regular expressions as well.  With that you can say search for only a 'r_' at beginning
 of name.
 
+String replacing to change geometry name
+****************************************
+
 Lets build the Anatomical Arm demo from the Ziva menu. Then we can retrieve the setup into builder.
 
 .. code-block:: python
@@ -269,3 +317,51 @@ To represent a model name change lets clean the scene and change the name of a m
     mc.rename('r_bicep_muscle', 'r_biceps_muscle')
 
 Now the information in the builder is out of sync.  We can update it by doing the following
+
+.. code-block:: python
+
+    z.string_replace('r_bicep_muscle','r_biceps_muscle')
+
+Now if you build you will see it builds on the muscles new name and all the map names
+have changed as well.
+
+.. code-block:: python
+
+    z.build()
+
+String replacing to mirror a setup
+**********************************
+
+Same way we string replaced to change name of geometry we can do it to mirror a setup.  In order for this to work
+the geometry needs to be mirrored to begin with as all this is doing is replacing names.  You are telling builder to replace
+r_muscle with l_muscle and it expects l_muscle to be in scene.
+
+With that, you can run a little test scene that sets up 2 spheres and a cube with 1 attachment.
+
+.. code-block:: python
+
+    import zBuilder.tests.utils as utl
+
+    utl.build_mirror_sample_geo()
+    utl.ziva_mirror_sample_geo()
+
+You should see a cube and 2 spheres in your scene.  The sphere are a tissue and the cube is a bone.  There is 1 attachment
+on the "r_muscle" going to bone.  We want to mirror this so the "l_muscle" gets the tissue
+and attachment as well.  Now just retrieve setup and perform a string replace.
+
+.. code-block:: python
+
+    import zBuilder.builders.ziva as zva
+
+    z = zva.Ziva()
+    z.retrieve_from_scene(get_parameters=True)
+    z.string_replace('^r_','l_')
+
+You will notice a *^* in the search field.  That is a regular expression to tell it to search just for
+an r_ that begins on the name.  Now when you build you should have a mirrored setup.
+
+.. code-block:: python
+
+    z.build()
+
+
