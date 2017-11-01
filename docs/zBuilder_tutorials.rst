@@ -57,8 +57,24 @@ we can continue working on arm and use it to restore the state or we can manipul
 information in the builder and re-apply it.  That is useful for mirroring and such
 which we will get into later.
 
+Items captured in this case are:
+
+* All the Ziva nodes. (zTissue, zTet, zAttachment, etc..)
+* Order of the nodes so we can re-create material layers reliably.
+* Attributes and values of the nodes. (Including weight maps)
+* Sub-tissue information.
+* User defined tet mesh reference.  (Not the actual mesh)
+* Any embedded mesh reference. (Not the actual mesh)
+* Curve reference to drive zLineOfAction. (Not actual curve)
+* Relevant zSolver for each node.
+* Mesh information used for world space lookup to interpolate maps if needed.
+
 Building
 ^^^^^^^^
+
+Building takes the information from retrieving and applying it back into the scene.
+The expectation is that you have a scene with geometry in it and it builds with that geo.  zBuilder will
+not re-create the geometry.  The geometry can have a Ziva setup on it already or not, just as long as the geo is already in scene.
 
 Building to restore scene to previous state
 *******************************************
