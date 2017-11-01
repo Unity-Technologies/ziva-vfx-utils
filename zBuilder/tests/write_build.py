@@ -10,7 +10,6 @@ TEMP = 'C:\\Temp\\retrieve_build_test.ziva'
 """ Where to save temp builder file """
 
 # This builds the Zivas anatomical arm demo with no pop up dialog.
-import zBuilder.tests.utils as utl
 utl.build_arm()
 
 mc.select(cl=True)
