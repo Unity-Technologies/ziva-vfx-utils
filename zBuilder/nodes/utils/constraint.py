@@ -1,8 +1,8 @@
-from zBuilder.parameters.dg_node import DGNode
+from zBuilder.nodes.dg_node import DGNode
 import maya.cmds as mc
 
 
-class ConstraintParameter(DGNode):
+class Constraint(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = None

@@ -15,12 +15,12 @@ class Attributes(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            parameter = self.parameter_factory(item)
+            parameter = self.node_factory(item)
             self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
     def build(self):
-        parameters = self.get_parameters()
+        parameters = self.get_scene_items()
         for parameter in parameters:
             parameter.set_maya_attrs()

@@ -2,7 +2,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
-from zBuilder.parameters.base import Base
+from zBuilder.nodes.base import Base
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,6 @@ class Mesh(Base):
         self._pointList = []
 
         Base.__init__(self, *args, **kwargs)
-
         if args:
             mesh_name = args[0]
             if mesh_name:

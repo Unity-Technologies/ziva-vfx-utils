@@ -1,10 +1,10 @@
-from zBuilder.parameters.dg_node import DGNode
+from zBuilder.nodes.dg_node import DGNode
 import maya.cmds as mc
 import maya.OpenMaya as OpenMaya
 import maya.OpenMayaAnim as OpenMayaAnim
 
 
-class SkinClusterParameter(DGNode):
+class SkinCluster(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = 'skinCluster'
@@ -30,7 +30,7 @@ class SkinClusterParameter(DGNode):
         Args:
             maya_node: Maya node to populate with.
         """
-        super(SkinClusterParameter, self).populate(maya_node=maya_node)
+        super(SkinCluster, self).populate(maya_node=maya_node)
 
         self.weights = get_weights(self.name)
         self.influences = get_influences(self.name)

@@ -1,11 +1,11 @@
 import logging
 import maya.cmds as mc
-from zBuilder.parameters.deformer import Deformer
+from zBuilder.nodes.deformer import Deformer
 
 logger = logging.getLogger(__name__)
 
 
-class DeltaMushNode(Deformer):
+class DeltaMush(Deformer):
     type = 'deltaMush'
     MAP_LIST = ['weightList[0].weights']
 

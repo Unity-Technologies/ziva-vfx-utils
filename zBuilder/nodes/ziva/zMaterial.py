@@ -2,7 +2,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,8 +52,8 @@ class MaterialNode(Ziva):
             # get exsisting node names in scene on specific mesh and in data
             existing_materials = mm.eval(
                 'zQuery -t zMaterial {}'.format(mesh))
-            data_materials = self.builder.bundle.get_parameters(type_filter='zMaterial',
-                                                                association_filter=mesh)
+            data_materials = self.builder.bundle.get_scene_items(type_filter='zMaterial',
+                                                                 association_filter=mesh)
 
             d_index = data_materials.index(self)
 

@@ -1,6 +1,7 @@
 from zBuilder.bundle import Bundle
 
 import zBuilder.zMaya as mz
+import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
 from functools import wraps
@@ -28,41 +29,51 @@ class Builder(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
-    def parameter_factory(self, node):
-        """Given a maya node, this checks objType and instantiats the proper
+    def node_factory(self, node, get_parameters=True):
+        """Given a maya node, this checks objType and instantiates the proper
         zBuilder.node and populates it and returns it.
 
         Args:
             node (:obj:`str`): Name of maya node.
-            type_
         Returns:
             obj: zBuilder node populated.
         """
         type_ = mz.get_type(node)
 
-        object_list = []
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
+        item_list = []
+        for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        object_list.append(obj(maya_node=node, builder=self))
+                        item_list.append(obj(maya_node=node, builder=self))
                 if type_ == obj.type:
-                    object_list.append(obj(maya_node=node, builder=self))
-        if not object_list:
-            object_list.append(zBuilder.parameters.DGNode(maya_node=node, builder=self))
+                    item_list.append(obj(maya_node=node, builder=self))
+        if not item_list:
+            item_list.append(zBuilder.nodes.DGNode(maya_node=node, builder=self))
 
-        for obj__ in object_list:
-            if hasattr(obj__, 'spawn_parameters'):
-                others = obj__.spawn_parameters()
-                for k, values in others.iteritems():
-                    for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
-                        if inspect.isclass(obj):
-                            if k == obj.type:
-                                for v in values:
-                                    if not self.bundle.get_parameters(type_filter=k, name_filter=v):
+        if get_parameters:
+            for obj__ in item_list:
+                if hasattr(obj__, 'spawn_parameters'):
+                    others = obj__.spawn_parameters()
+                    for k, values in others.iteritems():
+                        for v in values:
+                            obj = self.parameter_factory(k, v)
+                            if obj:
+                                item_list.append(obj)
 
-                                        object_list.append(obj(v, builder=self))
-        return object_list
+        return item_list
+
+    def parameter_factory(self, type_, stuff):
+        # put association filter in a list if it isn't
+        if not isinstance(stuff, list):
+            stuff = [stuff]
+
+        for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
+            if inspect.isclass(obj):
+                if type_ == obj.type:
+                    if not self.bundle.get_scene_items(type_filter=type_,
+                                                       name_filter=stuff):
+                        return obj(*stuff, builder=self)
 
     @staticmethod
     def time_this(original_function):
@@ -82,7 +93,7 @@ class Builder(object):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        parameters = self.bundle.get_parameters()
+        parameters = self.bundle.get_scene_items()
         for parameter in parameters:
             parameter.build(*args, **kwargs)
 
@@ -98,8 +109,8 @@ class Builder(object):
         """
         selection = mz.parse_maya_node_for_selection(args)
         for item in selection:
-            b_solver = self.parameter_factory(item)
-            self.bundle.extend_parameters(b_solver)
+            b_solver = self.node_factory(item)
+            self.bundle.extend_scene_item(b_solver)
 
         self.bundle.stats()
 
@@ -118,7 +129,7 @@ class Builder(object):
                                          node_data=parameters)
 
         if io.dump_json(file_path, json_data):
-            for parameter in self.bundle.parameters:
+            for parameter in self.bundle.scene_items:
                 if hasattr(parameter, 'mobject'):
                     parameter.mobject = parameter.mobject
             self.bundle.stats()
@@ -138,7 +149,7 @@ class Builder(object):
         self.__assign_json_data(json_data)
         self.__assign_setup()
         self.bundle.stats()
-        for parameter in self.bundle.parameters:
+        for parameter in self.bundle.scene_items:
             if hasattr(parameter, 'mobject'):
                 parameter.mobject = parameter.mobject
         after = datetime.datetime.now()
@@ -156,14 +167,14 @@ class Builder(object):
         for d in data:
 
             if d['d_type'] == 'node_data':
-                self.bundle.parameters = d['data']
+                self.bundle.scene_items = d['data']
                 logger.info("reading parameters. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
                 if not isinstance(d['data'], list):
                     for k, v in d['data'].iteritems():
                         for k2 in d['data'][k]:
-                            self.bundle.parameters.append(d['data'][k][k2])
+                            self.bundle.scene_items.append(d['data'][k][k2])
                 else:
                     # saved as 1.0.0
                     self.components = d['data']
@@ -187,7 +198,7 @@ class Builder(object):
 
         if node_data:
             logger.info("writing parameters")
-            tmp.append(io.wrap_data(self.bundle.parameters, 'node_data'))
+            tmp.append(io.wrap_data(self.bundle.scene_items, 'node_data'))
         # if component_data:
         #    logger.info("writing components")
         #    tmp.append(io.wrap_data(self.bundle.components, 'component_data'))
@@ -214,16 +225,16 @@ class Builder(object):
     def print_(self, type_filter=list(), name_filter=list()):
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
 
-    def get_parameters(self, type_filter=list(),
-                       name_filter=list(),
-                       name_regex=None,
-                       association_filter=list(),
-                       association_regex=None,
-                       invert_match=False):
+    def get_scene_items(self, type_filter=list(),
+                        name_filter=list(),
+                        name_regex=None,
+                        association_filter=list(),
+                        association_regex=None,
+                        invert_match=False):
 
-        return self.bundle.get_parameters(type_filter=type_filter,
-                                   name_filter=name_filter,
-                                   name_regex=name_regex,
-                                   association_filter=association_filter,
-                                   association_regex=association_regex,
-                                   invert_match=invert_match)
+        return self.bundle.get_scene_items(type_filter=type_filter,
+                                           name_filter=name_filter,
+                                           name_regex=name_regex,
+                                           association_filter=association_filter,
+                                           association_regex=association_regex,
+                                           invert_match=invert_match)

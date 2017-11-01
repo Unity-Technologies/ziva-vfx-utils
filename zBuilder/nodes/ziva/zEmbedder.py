@@ -1,4 +1,4 @@
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
@@ -27,7 +27,7 @@ class EmbedderNode(Ziva):
         """
         super(EmbedderNode, self).populate(maya_node=maya_node)
 
-        tissues = self.builder.bundle.get_parameters(type_filter='zTissue')
+        tissues = self.builder.bundle.get_scene_items(type_filter='zTissue')
         tissue_meshes = [x.association[0] for x in tissues]
         embedded_meshes = get_embedded_meshes(tissue_meshes)
 

@@ -1,4 +1,4 @@
-from zBuilder.parameters import Ziva
+from zBuilder.nodes import Ziva
 import logging
 import zBuilder.zMaya as mz
 import maya.cmds as mc
@@ -54,8 +54,8 @@ class TissueNode(Ziva):
         permissive = kwargs.get('permissive', True)
         check_meshes = kwargs.get('check_meshes', True)
 
-        parameters = self.builder.bundle.get_parameters(type_filter='zTissue',
-                                                        name_filter=name_filter)
+        parameters = self.builder.bundle.get_scene_items(type_filter='zTissue',
+                                                         name_filter=name_filter)
 
         if self == parameters[0]:
             apply_multiple(parameters, attr_filter=attr_filter,
@@ -110,7 +110,7 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
 
         # add subtissues--------------------------------------------------------
         if parameter.children_tissues:
-            children_parms = parameter.setup.bundle.get_parameters(name_filter=parameter.children_tissues)
+            children_parms = parameter.setup.bundle.get_scene_items(name_filter=parameter.children_tissues)
             mc.select(parameter.association)
             mc.select([x.association[0] for x in children_parms], add=True)
             mm.eval('ziva -ast')

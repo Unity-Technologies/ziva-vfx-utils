@@ -32,7 +32,7 @@ class DeltaMush(Builder):
             raise StandardError('No delta mushes found, aborting!')
 
         for delta_mush in delta_mushes:
-            parameter = self.parameter_factory(delta_mush)
+            parameter = self.node_factory(delta_mush)
             self.bundle.add_parameter(parameter)
         self.stats()
 
@@ -43,7 +43,7 @@ class DeltaMush(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        parameters = self.get_parameters(name_filter=name_filter,
+        parameters = self.get_scene_items(name_filter=name_filter,
                                          type_filter='deltaMush')
         for parameter in parameters:
             parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)

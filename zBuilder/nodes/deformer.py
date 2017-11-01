@@ -2,7 +2,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 
-from zBuilder.parameters.dg_node import DGNode
+from zBuilder.nodes.dg_node import DGNode
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,16 +23,15 @@ class Deformer(DGNode):
 
         """
         objs = {}
+        if self.association:
+            objs['mesh'] = self.association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
         if map_names and mesh_names:
             objs['map'] = []
-            objs['mesh'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
                 objs['map'].append([map_name, mesh_name])
-                objs['mesh'].append(mesh_name)
-
         return objs
 
     def build(self, *args, **kwargs):
@@ -73,8 +72,6 @@ class Deformer(DGNode):
         #                                                              type='mesh')
         #             self.setup.add_component(mesh_data_object)
 
-    # TODO instead of get_map* and get_mesh* should be more generic.
-    # get_component*(type_filter)
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically
@@ -95,8 +92,8 @@ class Deformer(DGNode):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self.builder.get_parameters(type_filter='mesh',
-                                                      name_filter=mesh_name))
+            meshes.extend(self.builder.get_scene_items(type_filter='mesh',
+                                                       name_filter=mesh_name))
         return meshes
 
     def get_map_objects(self):
@@ -107,8 +104,8 @@ class Deformer(DGNode):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self.builder.bundle.get_parameters(type_filter='map',
-                                                            name_filter=map_name))
+            maps_.extend(self.builder.bundle.get_scene_items(type_filter='map',
+                                                             name_filter=map_name))
         return maps_
 
     def get_map_names(self):
@@ -162,8 +159,8 @@ class Deformer(DGNode):
         self.check_map_interpolation(interp_maps)
 
         for map_ in maps:
-            map_data = self.builder.bundle.get_parameters(type_filter='map',
-                                                          name_filter=map_)[0]
+            map_data = self.builder.bundle.get_scene_items(type_filter='map',
+                                                           name_filter=map_)[0]
 
             weight_list = map_data.values
 
@@ -185,7 +182,6 @@ class Deformer(DGNode):
                 except:
                     pass
 
-    # TODO this level????  pass a false?  seriously??
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
         it isn't it will interpolate the map if the flag is True.  Once the map

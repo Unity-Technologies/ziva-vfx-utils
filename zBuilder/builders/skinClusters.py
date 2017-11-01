@@ -1,9 +1,9 @@
-import zBuilder.nodes.base as base
-import zBuilder.nodes.skinCluster as sc
-import zBuilder.nodeCollection as nc
+import zBuilder.parameters.base as base
+import zBuilder.parameters.skinCluster as sc
+# import zBuilder.nodeCollection as nc
 import zBuilder.zMaya as mz
-import zBuilder.data.mesh as msh
-from zBuilder.main import Builder
+
+from zBuilder.builder import Builder
 
 import maya.OpenMaya as OpenMaya
 import maya.OpenMayaAnim as OpenMayaAnim

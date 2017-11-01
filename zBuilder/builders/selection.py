@@ -14,14 +14,14 @@ class Selection(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            parameter = self.parameter_factory(item)
+            parameter = self.node_factory(item)
             self.bundle.add_parameter(parameter)
         self.stats()
 
     @Builder.time_this
     def build(self, select=True):
         tmp = []
-        for node in self.get_parameters():
+        for node in self.get_scene_items():
             tmp.append(node.get_scene_name())
 
         if select:

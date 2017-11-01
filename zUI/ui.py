@@ -521,7 +521,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
             z.apply_solver()
             #turn off solver to speed up build
-            zSolverTransform = z.get_parameters(_type='zSolverTransform')[0]
+            zSolverTransform = z.get_scene_items(_type='zSolverTransform')[0]
             sn = zSolverTransform.get_name()
             solver_value = zSolverTransform.attr['enable']['value']
             mc.setAttr(sn+'.enable',0)
