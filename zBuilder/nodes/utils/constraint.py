@@ -65,7 +65,7 @@ class Constraint(DGNode):
         return short[-1]
 
     def populate(self, maya_node=None):
-        super(ConstraintParameter, self).populate(maya_node=maya_node)
+        super(Constraint, self).populate(maya_node=maya_node)
 
         targets = get_targets(self.get_scene_name())
         constrained = get_constrained(self.get_scene_name())
