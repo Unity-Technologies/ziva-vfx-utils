@@ -15,8 +15,12 @@ def build_mirror_sample_geo():
     mc.setAttr(sph + '.t', -10, 5, 0)
     sph = mc.polySphere(name='l_muscle')[0]
     mc.setAttr(sph + '.t', 10, 5, 0)
+    mc.setAttr(sph + '.s', -1, 1, 1)
     cub = mc.polyCube(name='bone')[0]
     mc.setAttr(cub + '.s', 15, 15, 3)
+    mc.polyNormal('l_muscle', normalMode=0, userNormalMode=0, ch=0)
+    mc.delete('r_muscle', 'l_muscle', 'bone', ch=True)
+    mc.makeIdentity('r_muscle', 'l_muscle', 'bone', apply=True)
 
 
 def ziva_mirror_sample_geo():
@@ -27,7 +31,8 @@ def ziva_mirror_sample_geo():
     mc.select('r_muscle')
     mm.eval('ziva -t')
 
-    mm.eval('select -r r_muscle.vtx[60] r_muscle.vtx[78:81] r_muscle.vtx[97:101] r_muscle.vtx[117:122] r_muscle.vtx[137:142] r_muscle.vtx[157:162] r_muscle.vtx[177:179] r_muscle.vtx[197:199]')
+    mm.eval(
+        'select -r r_muscle.vtx[60] r_muscle.vtx[78:81] r_muscle.vtx[97:101] r_muscle.vtx[117:122] r_muscle.vtx[137:142] r_muscle.vtx[157:162] r_muscle.vtx[177:179] r_muscle.vtx[197:199]')
     mc.select('bone', add=True)
     mm.eval('ziva -a')
 
