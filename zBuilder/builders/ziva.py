@@ -22,10 +22,9 @@ class Ziva(Builder):
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
             if cmds and 'ziva' in cmds:
-                # self.info['plugin_name'] = plug
-                # self.info['plugin_version'] = mc.pluginInfo(plug,
-                #   q=True,v=True)
-                plug = plugin.split('/')[-1]
+                self.info['plugin_name'] = plugin
+                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, v=True)
+                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
 
     @Builder.time_this
@@ -262,7 +261,8 @@ class Ziva(Builder):
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
             for parameter in self.get_scene_items(type_filter=node_type):
-                parameter.build(attr_filter=attr_filter, permissive=permissive,
+                parameter.build(attr_filter=attr_filter,
+                                permissive=permissive,
                                 check_meshes=check_meshes,
                                 interp_maps=interp_maps)
 
