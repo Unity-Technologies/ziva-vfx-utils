@@ -9,15 +9,13 @@ import maya.cmds as mc
 import maya.mel as mm
 from maya import OpenMaya as om
 import zBuilder.builders.ziva as zva
-import zBuilder.zMaya
 import zUI.util as util
 
 import zBuilder.zMaya as mz
 import widgets.Properties as prop
 import widgets.ButtonLineEdit as line
-import zConstants as con
 
-import zBuilder.parameters.base as bse
+
 
 import logging
 
@@ -989,8 +987,8 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
     def get_properties_wrapper(self,zNode):
 
         # get base attributes and values for nodes------------------------------
-        attrList = bse.build_attr_list(zNode)
-        attrs = zBuilder.zMaya.build_attr_key_values(zNode, attrList)
+        attrList = mz.build_attr_list(zNode)
+        attrs = mz.build_attr_key_values(zNode, attrList)
 
         #add maps if needed-----------------------------------------------------
         maps = maplist.get(mc.objectType(zNode),[])
