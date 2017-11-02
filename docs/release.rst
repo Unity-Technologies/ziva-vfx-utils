@@ -1,5 +1,15 @@
 Release Notes
 =============
+1.0.0
+------
+* major refactor
+* file backwards compatibility
+* support for multiple solvers
+* easier to extend
+*
+
+
+
 0.11.2
 ------
 * Restructure of class hierarchy
