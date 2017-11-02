@@ -15,6 +15,7 @@ build a new rig.  If the geometry is of differing topology you could interpolate
 maps to work on new geo.
 
 .. include:: zBuilder_tutorials.rst
+.. include:: zBuilder_api_reference.rst
 
 extending
 ~~~~~~~~~

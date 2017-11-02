@@ -15,9 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class Builder(object):
-    """ The main class for using zBuilder.
+    """ The main entry point for using zBuilder.
 
-    This inherits from nodeCollection which is a glorified list.
     """
     def __init__(self):
         self.bundle = Bundle()
@@ -114,19 +113,18 @@ class Builder(object):
 
         self.bundle.stats()
 
-    def write(self, file_path, components=True, parameters=True):
-        """ writes data to disk in json format.
+    def write(self, file_path, type_filter=list(), invert_match=False):
+        """ Writes out the scene items to a json file given a file path.
 
         Args:
             file_path (str): The file path to write to disk.
-            parameters (bool, optional): Optionally suppress writing out of node
-                objects.  Defaults to ``True``.
-            components (bool, optional): Optionally suppress writing out of
-                data objects.  Defaults to ``True``.
+            type_filter (list, optional): Types of scene items to write.
+            invert_match (bool): Invert the sense of matching, to select non-matching items.
+                Defaults to ``False``
         """
 
-        json_data = self.__get_json_data(component_data=components,
-                                         node_data=parameters)
+        json_data = self.__get_json_data(type_filter=type_filter,
+                                         invert_match=invert_match)
 
         if io.dump_json(file_path, json_data):
             for parameter in self.bundle.scene_items:
@@ -136,7 +134,7 @@ class Builder(object):
             logger.info('Wrote File: {}'.format(file_path))
 
     def retrieve_from_file(self, file_path):
-        """ Reads data from a given file.  The data gets placed in the nodeCollection.
+        """ Reads scene items from a given file.  The items get placed in the bundle.
 
         Args:
             file_path (:obj:`str`): The file path to read from disk.
@@ -184,24 +182,20 @@ class Builder(object):
                 logger.info("reading info")
                 self.info = d['data']
 
-    def __get_json_data(self, node_data=True, component_data=True):
+    def __get_json_data(self, type_filter=[], invert_match=False):
         """ Utility function to define data stored in json
         Args:
-            node_data (bool, optional): Optionally suppress storing node data.
-            component_data (bool, optional): Optionally suppress storing
-                component data.
+            type_filter (list, optional): Types of scene items to write.
+            invert_match (bool): Invert the sense of matching, to select non-matching items.
+                Defaults to ``False``
         Returns:
             list: List of items to save out.
         """
 
         tmp = []
 
-        if node_data:
-            logger.info("writing parameters")
-            tmp.append(io.wrap_data(self.bundle.scene_items, 'node_data'))
-        # if component_data:
-        #    logger.info("writing components")
-        #    tmp.append(io.wrap_data(self.bundle.components, 'component_data'))
+        logger.info("writing Scene Items")
+        tmp.append(io.wrap_data(self.bundle.get_scene_items(type_filter=type_filter, invert_match=invert_match), 'node_data'))
         logger.info("writing info")
         tmp.append(io.wrap_data(self.info, 'info'))
 
@@ -217,12 +211,41 @@ class Builder(object):
             x.builder = self
 
     def stats(self):
+        """
+        Prints out basic information in Maya script editor.  Information is scene item types and counts.
+        """
         self.bundle.stats()
 
     def string_replace(self, search, replace):
+        """
+        Searches and replaces with regular expressions scene items in the builder.
+
+        Args:
+            search (:obj:`str`): what to search for
+            replace (:obj:`str`): what to replace it with
+
+        Example:
+            replace `r_` at front of item with `l_`:
+
+            >>> z.string_replace('^r_','l_')
+
+            replace `_r` at end of line with `_l`:
+
+            >>> z.string_replace('_r$','_l')
+        """
         self.bundle.string_replace(search, replace)
 
     def print_(self, type_filter=list(), name_filter=list()):
+        """
+        Prints out basic information for each scene item in the Builder.  Information is all
+        information that is stored in the __dict__.  Useful for trouble shooting.
+
+        Args:
+            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
+                Defaults to :obj:`list`
+            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
+                Defaults to :obj:`list`
+        """
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
 
     def get_scene_items(self, type_filter=list(),
@@ -231,6 +254,8 @@ class Builder(object):
                         association_filter=list(),
                         association_regex=None,
                         invert_match=False):
+
+        self.get_scene_items.__doc__ = self.bundle.get_scene_items.__doc__
 
         return self.bundle.get_scene_items(type_filter=type_filter,
                                            name_filter=name_filter,

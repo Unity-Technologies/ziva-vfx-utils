@@ -7,7 +7,9 @@ Subpackages
 .. toctree::
 
     zBuilder.builders
+    zBuilder.nodes
     zBuilder.parameters
+    zBuilder.tests
 
 Submodules
 ----------
@@ -32,14 +34,6 @@ zBuilder.bundle module
 ----------------------
 
 .. automodule:: zBuilder.bundle
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-zBuilder.test module
---------------------
-
-.. automodule:: zBuilder.test
     :members:
     :undoc-members:
     :show-inheritance:
