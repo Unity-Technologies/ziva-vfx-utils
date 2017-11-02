@@ -254,8 +254,26 @@ class Builder(object):
                         association_filter=list(),
                         association_regex=None,
                         invert_match=False):
+        """
+        Gets the scene items from builder for further inspection or modification.
 
-        self.get_scene_items.__doc__ = self.bundle.get_scene_items.__doc__
+        Args:
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
+                Defaults to :obj:`list`.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``name``.
+                Defaults to :obj:`list`.
+            name_regex (:obj:`str`): filter by parameter name by regular expression.
+                Defaults to ``None``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``association``.
+                Defaults to :obj:`list`.
+            association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
+                Defaults to ``None``.
+            invert_match (bool): Invert the sense of matching, to select non-matching items.
+                Defaults to ``False``
+        Returns:
+            list: List of scene items.
+        """
+        # self.get_scene_items.__doc__ = self.bundle.get_scene_items.__doc__
 
         return self.bundle.get_scene_items(type_filter=type_filter,
                                            name_filter=name_filter,

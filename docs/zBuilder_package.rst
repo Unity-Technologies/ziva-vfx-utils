@@ -1,5 +1,0 @@
-packages
-========
-
-Ziva Setup
-----------

@@ -144,7 +144,7 @@ class Bundle(object):
                         invert_match=False):
 
         """
-        Gets the scene items from bundle.
+        Gets the scene items from builder for further inspection or modification.
 
         Args:
             type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
