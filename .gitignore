@@ -1,5 +1,6 @@
 # python             #
 ######################
 *.pyc
-.idea
 _build
+docs/_build/
+.idea
