@@ -6,7 +6,8 @@
 
     introduction
     installation
-    packages
+    zBuilder_menu
+    zUI_menu
     release
     contributing
     glossary

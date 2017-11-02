@@ -75,7 +75,8 @@ Items captured in this case are:
 Retrieving parts of a setup
 ***************************
 
-Above example shows how to retrieve the whole scene.  If you wanted to grab a part of it you can select what you want and run retrieve_from_scene_selection()
+Above example shows how to retrieve the whole scene.  If you wanted to grab a part of it you can select what you want and run retrieve_from_scene_selection(). This comes in handy if you want
+to mirror the setup.
 
 .. code-block:: python
 
@@ -354,7 +355,7 @@ and attachment as well.  Now just retrieve setup and perform a string replace.
     import zBuilder.builders.ziva as zva
 
     z = zva.Ziva()
-    z.retrieve_from_scene(get_parameters=True)
+    z.retrieve_from_scene()
     z.string_replace('^r_','l_')
 
 You will notice a *^* in the search field.  That is a regular expression to tell it to search just for
@@ -363,5 +364,72 @@ an r_ that begins on the name.  Now when you build you should have a mirrored se
 .. code-block:: python
 
     z.build()
+
+
+
+Tutorials II
+~~~~~~~~~~~~
+
+Here I will cover some of the more involved concepts.
+
+Changing values before building
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Its possible with zBuilder to to inspect and modify the contents of the builder before you actually build.
+Maybe it was saved on disk at a different value and you are in a shot and want to build it
+with another value.  A common use case is to change the start frame of the Ziva solver before the build based
+on the shot environment.  Lets try that.
+
+So build the Anatomical Arm demo again and retrieve the scene.
+
+.. code-block:: python
+
+    import zBuilder.builders.ziva as zva
+
+    z = zva.Ziva()
+    z.retrieve_from_scene()
+
+Now we need to find the proper scene item, in this case it is the solver.  You can do that by doing this.
+
+.. code-block:: python
+
+    scene_item = z.get_scene_items(name_filter='zSolver1')
+    print scene_item[0]
+
+I am using the name filter to get the specific item I am interested in and printing
+results.  You should have seen something like this in script editor.
+
+.. code-block:: python
+
+    = zSolver1 <zBuilder.nodes.ziva.zSolverTransform SolverTransformNode> ==================================
+        _builder_type - zBuilder.nodes
+        solver - zSolver1Shape
+        _DGNode__mobject - <maya.OpenMaya.MObject; proxy of <Swig Object of type 'MObject *' at 0x000001E90F8E9690> >
+        _name - |zSolver1
+        _association - []
+        attrs - {u'enable': {'locked': False, 'type': u'bool', 'value': True, 'alias': None}, u'translateX': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'translateY': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'translateZ': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'scaleX': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'scaleY': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'visibility': {'locked': False, 'type': u'bool', 'value': True, 'alias': None}, u'rotateX': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'rotateY': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'rotateZ': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'scaleZ': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'startFrame': {'locked': False, 'type': u'double', 'value': 1.0, 'alias': None}}
+        _class - ('zBuilder.nodes.ziva.zSolverTransform', 'SolverTransformNode')
+        type - zSolverTransform
+        builder - <zBuilder.builders.ziva.Ziva object at 0x000001E90FDB97B8>
+
+That is all the information stored with the solver.  To query and change the attributes you go through the ``attrs`` dictionary like so:
+
+.. code-block:: python
+
+    print 'Before', scene_item[0].attrs['startFrame']['value']
+    # set it to 10
+    scene_item[0].attrs['startFrame']['value'] = 10
+    print 'After', scene_item[0].attrs['startFrame']['value']
+
+In the above example I am printing the value of start frame before and after I change it.
+Now if you build the value will be changed in your scene.  If you built on an existing setup
+it will still change or if you built on a clean scene.
+
+.. code-block:: python
+
+    z.build()
+
+
+
 
 

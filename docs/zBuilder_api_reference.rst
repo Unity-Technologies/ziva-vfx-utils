@@ -3,6 +3,14 @@ API Reference
 
 .. currentmodule:: zBuilder.builders.ziva
 
+.. autoclass:: Ziva
+
+    .. automethod:: retrieve_from_scene(get_parameters)
+
+    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True, check_meshes=True)
+
+.. currentmodule:: zBuilder.builders.ziva
+
 .. autoclass:: Builder
 
     .. automethod:: write(file_path, type_filter=list(), invert_match=False)
@@ -15,12 +23,4 @@ API Reference
 
     .. automethod:: print_(type_filter=[], name_filter=[])
 
-.. currentmodule:: zBuilder.builders.ziva
-
-.. autoclass:: Ziva
-
-    .. automethod:: retrieve_from_scene
-
-    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True, check_meshes=True)
-
-
+    .. automethod:: get_scene_items
