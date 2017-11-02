@@ -22,21 +22,33 @@ class Ziva(Builder):
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
             if cmds and 'ziva' in cmds:
-                # self.info['plugin_name'] = plug
-                # self.info['plugin_version'] = mc.pluginInfo(plug,
-                #   q=True,v=True)
-                plug = plugin.split('/')[-1]
+                self.info['plugin_name'] = plugin
+                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, v=True)
+                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
+        This gets the scene items from the scene for further manipulation or saving.
+        It works on selection or something passed in args.  If nothing is selected
+        it looks for a zSolver in the scene.  If something is selected or passed it uses
+        that specific solver to retrieve.
+
+        Items captured in this case are:
+
+        * All the Ziva nodes. (zTissue, zTet, zAttachment, etc..)
+        * Order of the nodes so we can re-create material layers reliably.
+        * Attributes and values of the nodes. (Including weight maps)
+        * Sub-tissue information.
+        * User defined tet mesh reference. (Not the actual mesh)
+        * Any embedded mesh reference. (Not the actual mesh)
+        * Curve reference to drive zLineOfAction. (Not actual curve)
+        * Relevant zSolver for each node.
+        * Mesh information used for world space lookup to interpolate maps if needed.
 
         Args:
-            *args:
-            **kwargs:
-
-        Returns:
+            get_parameters (bool): To get parameters or not.
 
         """
         # ----------------------------------------------------------------------
@@ -90,7 +102,7 @@ class Ziva(Builder):
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
         """
-        Gets data based on selection
+        Gets scene items based on selection.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get.
@@ -163,7 +175,9 @@ class Ziva(Builder):
                 nodes.extend(mz.get_zCloth(selection))
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
-                    nodes.append(mz.get_fiber_lineofaction(fiber))
+                    loas = mz.get_fiber_lineofaction(fiber)
+                    if loas:
+                        nodes.append(loas)
             if embedder:
                 mc.select(selection)
                 embedder = mm.eval('zQuery -t "zEmbedder"')
@@ -173,6 +187,7 @@ class Ziva(Builder):
             nodes = selection
 
         if nodes:
+            print nodes
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
@@ -200,7 +215,25 @@ class Ziva(Builder):
               check_meshes=True):
 
         """
+        This builds the setup in the Maya scene.  It does not build geometry as the expectation is
+        that the geometry is in the scene.
+
         Args:
+            solver (bool): Build the solver.
+            bones (bool): Build the bones.
+            tissues (bool): Build the tissue and tets.
+            attachments (bool): Build the attachments.
+            materials (bool): Build the materials.
+            fibers (bool): build the fibers.
+            embedder (bool): Build the embedder.
+            cloth (bool): Build the cloth.
+            lineOfActions (bool): Build the line of actions.
+            interp_maps (str): Option to interpolate maps.
+                True: Yes interpolate
+                False: No
+                auto: Interpolate if it needs it (vert check)
+            mirror (bool): This mirrors the geometry in bundle.
+            check_meshes (bool): Wether to perform the check mesh before building.
             permissive (bool): False raises errors if something is wrong. Defaults to True
             attr_filter (dict):  Attribute filter on what attributes to get.
                 dictionary is key value where key is node type and value is
@@ -208,6 +241,7 @@ class Ziva(Builder):
 
                 tmp = {'zSolver':['substeps']}
             name_filter (str): filter by node name.  Defaults to **None**
+
         """
         if mirror:
             for item in self.get_scene_items(type_filter='mesh'):
@@ -262,7 +296,8 @@ class Ziva(Builder):
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
             for parameter in self.get_scene_items(type_filter=node_type):
-                parameter.build(attr_filter=attr_filter, permissive=permissive,
+                parameter.build(attr_filter=attr_filter,
+                                permissive=permissive,
                                 check_meshes=check_meshes,
                                 interp_maps=interp_maps)
 

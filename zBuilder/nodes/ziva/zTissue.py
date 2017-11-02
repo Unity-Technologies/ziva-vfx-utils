@@ -92,8 +92,8 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
     if culled['meshes']:
 
         mc.select(culled['meshes'], r=True)
-        # if solver:
-        #     mc.select(solver, add=True)
+        if solver:
+            mc.select(solver, add=True)
         results = mm.eval('ziva -t ')
 
     # rename zBones-------------------------------------------------------------

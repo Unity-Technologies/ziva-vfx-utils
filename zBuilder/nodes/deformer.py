@@ -113,10 +113,11 @@ class Deformer(DGNode):
         This builds the map names.  maps from MAP_LIST with the object name
         in front
 
+        For this we want to get the .name and not scene name.
         """
         map_names = []
         for map_ in self.MAP_LIST:
-            map_names.extend(mc.ls('{}.{}'.format(self.get_scene_name(), map_)))
+            map_names.extend(mc.ls('{}.{}'.format(self.name, map_)))
 
         return map_names
 

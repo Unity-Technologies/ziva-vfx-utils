@@ -157,6 +157,8 @@ class DGNode(Base):
         name = None
         if self.mobject:
             name = mz.get_name_from_m_object(self.mobject)
+            if not mc.objExists(name):
+                name = self.name
 
         if not name:
             name = self.long_name

@@ -6,45 +6,26 @@ import maya.cmds as mc
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 
-TEMP = 'C:\\Temp\\retrieve_build_test.ziva'
-""" Where to save temp builder file """
 
-# This builds the Zivas anatomical arm demo with no pop up dialog.
-utl.build_arm()
+# ------------------------------------------------------------------------------
+mc.file(new=True, f=True)
+
+# Build a basic setup
+utl.build_mirror_sample_geo()
+utl.ziva_mirror_sample_geo()
+
 
 mc.select(cl=True)
+
 # use builder to retrieve from scene--------------------------------------------
 z = zva.Ziva()
 z.retrieve_from_scene()
 
-# write out---------------------------------------------------------------------
-z.write(TEMP)
+# string replace
+z.string_replace('^r_', 'l_')
 
 # remove ziva nodes from scene so all we have left is geo
 mz.clean_scene()
 
-# retrieve from file
-z = zva.Ziva()
-z.retrieve_from_file(TEMP)
-
-# build
-z.build(check_meshes=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# build it on live scene
+z.build()

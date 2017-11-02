@@ -31,9 +31,9 @@ Indices and tables
 
 WHAT
 ====
-.. currentmodule:: zBuilder.parameters.base
+.. currentmodule:: zBuilder.nodes.base
 
-.. autoclass:: BaseParameter
+.. autoclass:: Base
 
    .. automethod:: __init__
    .. automethod:: serialize
@@ -43,14 +43,16 @@ WHAT
 
    .. autosummary::
 
-      ~BaseParameter.__init__
-      ~BaseParameter.serialize
-      ~BaseParameter.build
-      ~BaseParameter.write
+      ~Base.__init__
+      ~Base.serialize
+      ~Base.build
+      ~Base.write
 
    .. rubric:: Attributes
 
    .. autosummary::
 
-      ~BaseParameter.name
-      ~BaseParameter.type
+      ~Base.name
+      ~Base.type
+
+.. automodule:: SomeModuleName

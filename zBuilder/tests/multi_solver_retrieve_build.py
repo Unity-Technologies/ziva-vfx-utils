@@ -8,31 +8,31 @@ import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 
 
-# This builds the Zivas anatomical arm demo with no pop up dialog.  Use this as solver 1
+# This builds the Zivas anatomical arm demo with no pop up dialog.--------------
+# Use this as solver 1
 import zBuilder.tests.utils as utl
 utl.build_arm()
 
 mc.select(cl=True)
 
-# build another solver and add a tissue to it
-# mm.eval('ziva -s')
+# build another solver and add a tissue to it-----------------------------------
 sss = mc.ziva(s=True)
 sphere = mc.polySphere()
 mc.select(sphere[0], sss[0])
 mc.ziva(t=True)
 
-#
-# use builder to retrieve from scene--------------------------------------------
+
+# use builder to retrieve each from scene---------------------------------------
 z1 = zva.Ziva()
 z1.retrieve_from_scene('zSolver1')
 
 z2 = zva.Ziva()
 z2.retrieve_from_scene('zSolver2')
 
-# remove ziva nodes from scene so all we have left is geo
+# remove ziva nodes from scene so all we have left is geo-----------------------
 mz.clean_scene()
-#
-# build
-z1.build(check_meshes=False)
 
-z2.build(check_meshes=False)
+# build each solver-------------------------------------------------------------
+z1.build()
+
+z2.build()

@@ -34,7 +34,9 @@ class Bundle(object):
         return len(self.scene_items)
 
     def print_(self, type_filter=list(), name_filter=list()):
-        """Prints info on each parameter.
+        """
+        Prints out basic information for each scene item in the Builder.  Information is all
+        information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
             type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
@@ -68,7 +70,7 @@ class Bundle(object):
 
     def stats(self, type_filter=str()):
         """
-        prints out basic stats on data
+        Prints out basic information in Maya script editor.  Information is scene item types and counts.
 
         Args:
             type_filter (:obj:`str`): filter by parameter type.
@@ -158,7 +160,7 @@ class Bundle(object):
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
         Returns:
-            list: List of parameters.
+            list: List of scene items.
         """
         # if no filters are used just return full list as it is faster
         if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
@@ -198,8 +200,7 @@ class Bundle(object):
 
     def string_replace(self, search, replace):
         """
-        searches and replaces with regular expressions items in parameters and
-        components
+        Searches and replaces with regular expressions scene items in the builder.
 
         Args:
             search (:obj:`str`): what to search for

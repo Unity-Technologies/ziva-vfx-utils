@@ -7,8 +7,13 @@ import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 
 
-# This builds the Zivas anatomical arm demo with no pop up dialog.
-utl.build_arm()
+# ------------------------------------------------------------------------------
+mc.file(new=True, f=True)
+
+# Build a basic setup
+utl.build_mirror_sample_geo()
+utl.ziva_mirror_sample_geo()
+
 
 mc.select(cl=True)
 
@@ -16,8 +21,8 @@ mc.select(cl=True)
 z = zva.Ziva()
 z.retrieve_from_scene()
 
-# remove ziva nodes from scene so all we have left is geo
-mz.clean_scene()
+# string replace
+z.string_replace('^r_', 'l_')
 
-# build
-z.build(check_meshes=False)
+# build it on live scene
+z.build()
