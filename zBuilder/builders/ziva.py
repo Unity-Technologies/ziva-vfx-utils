@@ -74,7 +74,7 @@ class Ziva(Builder):
             raise StandardError('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.node_factory(solver)
-        self.bundle.extend_scene_item(b_solver)
+        self.bundle.extend_scene_items(b_solver)
 
         node_types = ['zSolverTransform',
                       'zBone',
@@ -207,7 +207,7 @@ class Ziva(Builder):
         """
         for node in nodes:
             parameter = self.node_factory(node, get_parameters=get_parameters)
-            self.bundle.extend_scene_item(parameter)
+            self.bundle.extend_scene_items(parameter)
 
     @Builder.time_this
     def build(self, name_filter=None, attr_filter=None, interp_maps='auto',

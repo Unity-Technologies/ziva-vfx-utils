@@ -46,7 +46,9 @@ class Builder(object):
                     if type_ in obj.TYPES:
                         item_list.append(obj(maya_node=node, builder=self))
                 if type_ == obj.type:
-                    item_list.append(obj(maya_node=node, builder=self))
+
+                    objct = obj(maya_node=node, builder=self)
+                    item_list.append(objct)
         if not item_list:
             item_list.append(zBuilder.nodes.DGNode(maya_node=node, builder=self))
 
@@ -109,7 +111,7 @@ class Builder(object):
         selection = mz.parse_maya_node_for_selection(args)
         for item in selection:
             b_solver = self.node_factory(item)
-            self.bundle.extend_scene_item(b_solver)
+            self.bundle.extend_scene_items(b_solver)
 
         self.bundle.stats()
 

@@ -112,7 +112,7 @@ class Bundle(object):
         else:
             self.scene_items.append(scene_item)
 
-    def extend_scene_item(self, scene_items):
+    def extend_scene_items(self, scene_items):
         """
 
         Args:

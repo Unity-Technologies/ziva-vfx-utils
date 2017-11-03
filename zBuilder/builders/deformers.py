@@ -39,7 +39,7 @@ class Test(Builder):
         for item in tmp:
             parameter = self.node_factory(item)
             # print parameter
-            self.bundle.extend_scene_item(parameter)
+            self.bundle.extend_scene_items(parameter)
         self.stats()
 
     @Builder.time_this
