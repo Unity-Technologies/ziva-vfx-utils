@@ -19,11 +19,9 @@ class Ziva(Deformer):
 
     def __init__(self,  maya_node=None, builder=None, deserialize=None):
         self.solver = None
-
-        Deformer.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
-
-        if maya_node:
-            self.populate(maya_node=maya_node)
+        Deformer.__init__(self, maya_node=maya_node,
+                          builder=builder,
+                          deserialize=deserialize)
 
     def populate(self, maya_node=None):
         """

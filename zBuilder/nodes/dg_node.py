@@ -43,11 +43,9 @@ class DGNode(Base):
         self.__mobject = None
 
         Base.__init__(self, deserialize=deserialize, builder=builder)
-        # CANT DO THIS>
-        # map and mesh have a different populate interface :
-        # if maya_node:
-        #     print 'OMG',maya_node
-        #     self.populate(maya_node=maya_node)
+
+        if maya_node:
+            self.populate(maya_node=maya_node)
 
     def __eq__(self, other):
         """ Are names == in node objects?
