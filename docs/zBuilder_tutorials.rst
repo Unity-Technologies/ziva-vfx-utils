@@ -324,7 +324,7 @@ In the context of the Ziva builder it will search and replace:
 * any mesh name (embedded, user tet)
 
 This works with regular expressions as well.
-For example you can search for occurrences of 'r_' at the beginning of a name.
+For example you can search for occurrences of "r_" at the beginning of a name.
 
 Changing geometry name
 **********************
@@ -395,7 +395,7 @@ To do this we can just create and initialize a builder, perform a string replace
     z.string_replace('^r_','l_')
 
 Notice the *^* in the search field.
-This is a regular expression to tell it to search just for an r_ at the beginning of a name.
+This is a regular expression to tell it to search just for an "r_" at the beginning of a name.
 
 Now when you build you should have a mirrored setup:
 
