@@ -6,9 +6,6 @@ Release Notes
 * file backwards compatibility
 * support for multiple solvers
 * easier to extend
-*
-
-
 
 0.11.2
 ------
