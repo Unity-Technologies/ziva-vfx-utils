@@ -130,7 +130,6 @@ class Ziva(Builder):
         sel = mc.ls(sl=True)
 
         # args
-        selection = None
         if args:
             selection = mc.ls(args[0], l=True)
         else:
