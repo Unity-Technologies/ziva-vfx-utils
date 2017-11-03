@@ -10,16 +10,10 @@ That file would contain the nodes and attribute values and some basic informatio
 zBuilder then gives you the ability to load that file into a scene with new geometry and re-build the rig there.
 If the new geometry's topology (ie: triangles, number of vertices) is different from the original rig, zBuilder allows you to interpolate data (eg: maps) to work on the new geometry.
 
-.. include:: zBuilder_tutorials.rst
-.. include:: zBuilder_api_reference.rst
+.. toctree::
+	:maxdepth: 2
 
-extending
-~~~~~~~~~
-
-zBuilder is designed to be easily extended.  Through adding nodes and parameters and more specialized
-builders.  We will go into the explanation of those here.
-
-Python Path
-^^^^^^^^^^^
-
-First thing you probably want to extend your python path.
+	zBuilder_tutorials
+	zBuilder_api_reference
+	zBuilder_extensions
+	
