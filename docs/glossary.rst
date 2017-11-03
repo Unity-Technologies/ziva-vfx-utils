@@ -35,3 +35,9 @@ Glossary
 
     zNode
         A Maya DG node specific to Ziva. Examples include zTet, zTissue, zAttachment, etc.
+
+    rig
+        The set of all components that go into creating an animatable character in Maya. A typical Ziva rig includes geometry defining the shape of the anatomy, and a suite of dependency graph nodes that define the physical characteristics of all the simulation :term:`bodies<body>`. Often used interchangeably with :term:`setup`.
+
+    setup
+        Used as a synonym for :term:`rig` in the context of creating characters in Maya with ZivaVFX.
