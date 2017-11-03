@@ -9,15 +9,13 @@ import maya.cmds as mc
 import maya.mel as mm
 from maya import OpenMaya as om
 import zBuilder.builders.ziva as zva
-import zBuilder.zMaya
 import zUI.util as util
 
 import zBuilder.zMaya as mz
 import widgets.Properties as prop
 import widgets.ButtonLineEdit as line
-import zConstants as con
 
-import zBuilder.parameters.base as bse
+
 
 import logging
 
@@ -57,6 +55,9 @@ icons['zCache']=            'icons\\zFiber.png'
 icons['zCacheTransform']=            'icons\\zFiber.png'
 icons['zCloth']=            'icons\\zFiber.png'
 
+#Ken Added
+icons['zImport']=         'icons\\zivaImport.png'
+icons['zExport']=            'icons\\zivaExport.png'
 
 # todo share resource for zNodeCapture
 maplist = {}
@@ -285,12 +286,12 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
     def setup_actions(self):
 
-        self.ziva_save_ac = QtGui.QAction(QtGui.QIcon(), 'Export Ziva Setup...', self)
+        self.ziva_save_ac = QtGui.QAction(QtGui.QIcon(icons['zExport']), 'Export Ziva Setup...', self)
         #self.ziva_save_ac.setShortcut('s')
         self.ziva_save_ac.setStatusTip('Export Ziva Setup')
         self.ziva_save_ac.triggered.connect(self._save_solver)
 
-        self.ziva_import_ac = QtGui.QAction(QtGui.QIcon(), 'Import Ziva Setup...', self)
+        self.ziva_import_ac = QtGui.QAction(QtGui.QIcon(icons['zImport']), 'Import Ziva Setup...', self)
         #self.ziva_save_ac.setShortcut('s')
         self.ziva_import_ac.setStatusTip('Import Ziva Setup')
         self.ziva_import_ac.triggered.connect(self._import_solver)
@@ -373,35 +374,36 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.bone_ac.setChecked(False)
         self.bone_ac.triggered.connect(self.tool_button_clicked)
 
-        self.attachment_ac = QtGui.QAction(QtGui.QIcon(icons['zAttachment']), 'Bones', self)
+        self.attachment_ac = QtGui.QAction(QtGui.QIcon(icons['zAttachment']), 'Attachment', self)
         self.attachment_ac.setShortcut('5')
         self.attachment_ac.setStatusTip('Toggle Attachment Visibility')
         self.attachment_ac.setCheckable(True)
         self.attachment_ac.setChecked(False)
         self.attachment_ac.triggered.connect(self.tool_button_clicked)
 
-        self.material_ac = QtGui.QAction(QtGui.QIcon(icons['zMaterial']), 'Bones', self)
+        self.material_ac = QtGui.QAction(QtGui.QIcon(icons['zMaterial']), 'Material', self)
         self.material_ac.setShortcut('6')
         self.material_ac.setStatusTip('Toggle Material Visibility')
         self.material_ac.setCheckable(True)
         self.material_ac.setChecked(False)
         self.material_ac.triggered.connect(self.tool_button_clicked)
 
-        self.fiber_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Bones', self)
+        self.fiber_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
         self.fiber_ac.setShortcut('7')
         self.fiber_ac.setStatusTip('Toggle Fiber Visibility')
         self.fiber_ac.setCheckable(True)
         self.fiber_ac.setChecked(False)
         self.fiber_ac.triggered.connect(self.tool_button_clicked)
-
-        self.paint_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Bones', self)
+		
+		#not sure what self.paint_ac does KC
+        self.paint_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
 
         self.find_ac = QtGui.QAction(QtGui.QIcon(), 'Find', self)
         self.find_ac.setShortcut('f')
         self.find_ac.setStatusTip('find')
         self.find_ac.triggered.connect(self._find_items)
 
-        self.enable_toggle_ac = QtGui.QAction(QtGui.QIcon(), 'Enable Togge', self)
+        self.enable_toggle_ac = QtGui.QAction(QtGui.QIcon(), 'Enable Toggle', self)
         self.enable_toggle_ac.setShortcut('e')
         self.enable_toggle_ac.setStatusTip('Toggle enable status of selected items')
         self.enable_toggle_ac.triggered.connect(self._enable_items)
@@ -611,21 +613,38 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         return tmp
 
     def create_popup_menu(self):
-        '''
-        the pop-up menu for the tree widget
-        '''
-        self.popup_menu = QtGui.QMenu()
-
-        # menu item
-        self.item_add_act = QtGui.QAction("Open in Attribute Spread Sheet", self)
-        
-        self.item_add_act.triggered.connect(self.open_spreadsheet)
-        self.item_add_act.setShortcut("s")
-        self.popup_menu.addAction(self.item_add_act)
-
-
-        self.treeWidget.customContextMenuRequested.connect(self._ctx_menu_cb)
-
+		'''
+		the pop-up menu for the tree widget
+		'''
+		
+		self.popup_menu = QtGui.QMenu()
+		# menu item
+		self.item_add_act = QtGui.QAction("Open in Attribute Spread Sheet", self)
+		
+		self.item_add_paintBoth = QtGui.QAction("Both maps", self)
+		self.item_add_act.triggered.connect(self.open_spreadsheet)
+		self.item_add_act.setShortcut("s")
+				
+		#paint sel object Menu
+		self.item_add_paintBoth.triggered.connect(self.paintBothMaps)
+		
+		self.popup_menu.addAction(self.item_add_act)
+		self.popup_menu.addSeparator().setText(("Paintable Objects"))
+		self.popup_menu.addAction(self.item_add_paintBoth)
+		
+		
+		self.treeWidget.customContextMenuRequested.connect(self._ctx_menu_cb)
+    
+    def paintBothMaps(self):
+		treeSelection =  self.treeWidget.selectedItems()[0]
+		treeSelectionNiceName = treeSelection.text(0)
+		treeSelected = treeSelectionNiceName
+		treeSelectedType = mc.objectType(treeSelected)
+		extractMeshData = mz.get_association(treeSelected)
+		if len(extractMeshData) == 2:
+			mc.select(extractMeshData)
+			mm.eval( 'artSetToolAndSelectAttr( "artAttrCtx", "' + treeSelectedType + "." + treeSelected + '.weights")')
+		
 
     def open_spreadsheet(self):
         '''
@@ -968,8 +987,8 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
     def get_properties_wrapper(self,zNode):
 
         # get base attributes and values for nodes------------------------------
-        attrList = bse.build_attr_list(zNode)
-        attrs = zBuilder.zMaya.build_attr_key_values(zNode, attrList)
+        attrList = mz.build_attr_list(zNode)
+        attrs = mz.build_attr_key_values(zNode, attrList)
 
         #add maps if needed-----------------------------------------------------
         maps = maplist.get(mc.objectType(zNode),[])
