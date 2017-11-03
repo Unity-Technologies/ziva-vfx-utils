@@ -19,6 +19,9 @@ class LineOfActionNode(Ziva):
 
         Ziva.__init__(self, *args, **kwargs)
 
+    def spawn_parameters(self):
+        return {}
+
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
 
