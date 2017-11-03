@@ -9,14 +9,5 @@
     zBuilder_menu
     zUI_menu
     release
-    contributing
     glossary
-
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    zBuilder
