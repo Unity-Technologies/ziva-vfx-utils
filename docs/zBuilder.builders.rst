@@ -36,22 +36,6 @@ zBuilder.builders.selection module
     :undoc-members:
     :show-inheritance:
 
-zBuilder.builders.skinClusters module
--------------------------------------
-
-.. automodule:: zBuilder.builders.skinClusters
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-zBuilder.builders.test module
------------------------------
-
-.. automodule:: zBuilder.builders.test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 zBuilder.builders.ziva module
 -----------------------------
 

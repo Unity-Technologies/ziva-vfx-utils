@@ -172,11 +172,11 @@ class DGNode(Base):
         Given a Builder node this set the attributes of the object in the maya
         scene.  It first does a mObject check to see if it has been tracked, if
         it has it uses that instead of stored name.
+
         Args:
             attr_filter (dict):  Attribute filter on what attributes to set.
                 dictionary is key value where key is node type and value is
                 list of attributes to use.
-
                 af = {'zSolver':['substeps']}
         Returns:
             nothing.
