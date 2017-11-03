@@ -1,306 +1,131 @@
-import re
-import maya.cmds as mc
 import logging
+import zBuilder.zMaya as mz
+import maya.cmds as mc
 
-
+import json
 
 logger = logging.getLogger(__name__)
 
 
-class BaseNode(object):
-    def __init__(self):
+class Base(object):
+
+    TYPES = None
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
+    """ A list of attribute names in __dict__ to
+            exclude from the string_replace method. """
+
+    def __init__(self, *args, **kwargs):
         self._name = None
-        self._attrs = {}
-        self._maps = {}
-        self._association = []
-        self._type = None
-        self._class = (self.__class__.__module__,self.__class__.__name__)
-        #print self._class
+        self._class = (self.__class__.__module__, self.__class__.__name__)
 
-    def __str__(self):
-        if self.get_name():
-            return '<%s.%s "%s">' % (self.__class__.__module__,self.__class__.__name__, self.get_name())
-        return '<%s.%s>' % (self.__class__.__module__,self.__class__.__name__)
+        self._builder_type = self.__class__.__module__.split('.')
+        self._builder_type = '{}.{}'.format(self._builder_type[0],
+                                            self._builder_type[1])
 
-    def __repr__(self):
-        return self.__str__()
+        self.builder = kwargs.get('builder', None)
+        deserialize = kwargs.get('deserialize', None)
 
-    def print_(self):
-        #logger.info('{}'.format(current_material[0],name))
-        print '----------------------------------------------------'
-        #print 'index: \t',i
-        print 'python node: \t',self
-        print 'name: \t',self.get_name(longName=True)
-        print 'type: \t',self.get_type()
-        
-        attrList =  self.get_attr_list()
-        if attrList:
-            print 'attrs: ',
-            for attr in attrList:   
-                print '\t\t',attr,self.get_attr_key_value(attr,'type'),self.get_attr_key_value(attr,'value')
-        
-        maps = self.get_maps()
-        if maps:
-            print 'maps: ',maps
-            #for key in maps:
-            #    print '\t\t',key,maps[key]['mesh'],maps[key]['value']
-        associations = self.get_association(longName=True)
-        if associations:
-            print 'association: ',associations
+        if deserialize:
+            self.deserialize(deserialize)
 
-    def string_replace(self,search,replace):
-        # name replace----------------------------------------------------------
-        name = self.get_name(longName=True)
-        newName = self.replace_longname(search,replace,name)
-        self.set_name(newName)
+    @property
+    def long_name(self):
+        """ Long name of parameter corresponding to long name of maya node.
+        This property is not settable.  To set it use self.name.
+        """
+        return self._name
 
+    @property
+    def name(self):
+        """ Name of parameter corresponding to maya node name.  Setting this
+        property will check for long name and store that.  self.name still
+        returns short name, self.long_name returns the stored long name.
+        """
+        return self._name.split('|')[-1]
 
+    @name.setter
+    def name(self, name):
+        self._name = mc.ls(name, long=True)[0]
 
-        # association replace---------------------------------------------------
-        assNames = self.get_association(longName=True)
-        newNames = []
-        if assNames:
-            for name in assNames:
-                newName = self.replace_longname(search,replace,name)
-                newNames.append(newName)
-            self.set_association(newNames)
+    def serialize(self):
+        """  Makes node serializable.
 
-        #maps-------------------------------------------------------------------
-
-        maps = self.get_maps()
-        tmp = []
-        if maps:
-            for item in maps:
-                tmp.append(self.replace_longname(search,replace,item))
-            self.set_maps(tmp)
-
-        #for key in maps:
-        #    if maps[key].get('mesh',None):
-        #        maps[key]['mesh'] = self.replace_longname(search,replace,maps[key]['mesh'])
-        #        #print 'hmm',self.get_name(),maps[key]
-
-
-    def get_attr_value(self,attr):
-        '''
-        gets value of an attribute in node
-
-        Args:
-            attr (str): The attribute to get value of
+        This replaces an mObject with the name of the object in scene to make it
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
 
         Returns:
-            value of attribute
-        '''
-        return self._attrs[attr]['value']
+            dict: of serializable items
+        """
+        # removing and storing mobject as a string (object name)
+        if hasattr(self, '__mobject'):
+            if self.__mobject:
+                self.__mobject = mz.get_name_from_m_object(self.__mobject)
 
-    def set_attr_value(self,attr,value):
-        '''
-        sets value of an attribute in node
+        # culling __dict__ of any non-serializable items so we can save as json
+        output = dict()
+        for key in self.__dict__:
+            if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
+                output[key] = self.__dict__[key].serialize()
+            try:
+                json.dumps(self.__dict__[key])
+                output[key] = self.__dict__[key]
+            except TypeError:
+                pass
+        return output
 
-        Args:
-            attr (str): The attribute to get value of
-            value : the value to set
-        '''
-        self._attrs[attr]['value'] = value
+    def deserialize(self, dictionary):
+        """ Deserializes a node with given dict.
 
-    def get_attr_list(self):
-        '''
-        gets list of attribute names stored with node
+        Takes a dictionary and goes through keys and fills up __dict__.
 
-        Returns:
-            [] of attribute names
-        '''
-        return self._attrs.keys()
+        Args (dict): The given dict.
+        """
+        for key in dictionary:
+            if key not in ['_setup', '_class']:
+                self.__dict__[key] = dictionary[key]
 
-    def get_attr_key(self,key):
-        return self._attrs.get(key)
+    def string_replace(self, search, replace):
+        """ Search and replaces items in the node.  Uses regular expressions.
+        Uses SEARCH_EXCLUDE to define attributes to exclude from this process.
 
-    def get_attr_key_value(self,attr,key):
-        return self._attrs[attr][key]
+        Goes through the __dict__ and search and replace items.
 
-    def set_attr_key_value(self,attr,key,value):
-        self._attrs[attr][key] = value
-
-    def get_name(self,longName=False):
-        '''
-        get name of node
-
-        Args:
-            longName (bool): If True returns the long name of node.  Defaults to **False**
-
-        Returns:
-            (str) of node name
-        '''
-        if self._name:
-            if longName:
-                return self._name
-            else:
-                return self._name.split('|')[-1]
-        else:
-            return None
-        
-
-    def set_name(self,name):
-        '''
-        Sets name of node
+        Works with strings, lists of strings and dictionaries where the values
+        are either strings or list of strings.  More specific searches should be
+        overridden here.
 
         Args:
-            name (str): the name of node.
-        '''
-        self._name = name   
+            search (str): string to search for.
+            replace (str): string to replace it with.
 
-    def get_type(self):
-        '''
-        get type of node
+        """
+        searchable = [x for x in self.__dict__ if x not in self.SEARCH_EXCLUDE]
+        for item in searchable:
+            if isinstance(self.__dict__[item], (tuple, list)):
+                new_names = []
+                for name in self.__dict__[item]:
+                    if isinstance(name, basestring):
+                        new_name = mz.replace_long_name(search, replace, name)
+                        new_names.append(new_name)
+                        self.__dict__[item] = new_names
+            elif isinstance(self.__dict__[item], basestring):
+                self.__dict__[item] = mz.replace_long_name(search,
+                                                           replace,
+                                                           self.__dict__[item])
+            elif isinstance(self.__dict__[item], dict):
+                self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
+                for key, v in self.__dict__[item].iteritems():
+                    if isinstance(v, basestring):
+                        new_name = mz.replace_long_name(search, replace, v)
+                        new_names.append(new_name)
+                        self.__dict__[item][key] = new_names
+                    if isinstance(v, (tuple, list)):
+                        new_names = []
+                        for name in self.__dict__[item][key]:
+                            if isinstance(item, basestring):
+                                new_name = mz.replace_long_name(search, replace, name)
+                                new_names.append(new_name)
+                                self.__dict__[item][key] = new_names
 
-        Returns:
-            (str) of node name
-        '''
-        return self._type
-
-    def set_type(self,type_):
-        '''
-        Sets type of node
-
-        Args:
-            type_ (str): the type of node.
-        '''
-        self._type = type_
-
-    def get_maps(self):
-        return self._maps
-
-    def set_maps(self,maps):
-        self._maps = maps
-
-
-    def set_attrs(self,attrs):
-        # TODO explicit set 
-        self._attrs = attrs
-
-    def get_association(self,longName=False):
-        if not longName:
-            tmp = []
-            for item in self._association:
-                tmp.append(item.split('|')[-1])
-            return tmp
-        else:
-            return self._association
-
-    def set_association(self,association):
-
-        if isinstance(association, str):
-            self._association =[association]
-        else:
-            self._association =association
-
-    def compare(self):
-        name = self.get_name(longName=False)
-        
-        attrList =  self.get_attr_list()
-        if mc.objExists(name):
-            if attrList:
-                for attr in attrList:
-                    sceneVal = mc.getAttr(name+'.'+attr)
-                    objVal = self.get_attr_key_value(attr,'value')
-                    if sceneVal != objVal:
-                        print 'DIFF:',name+'.'+attr, '\tobject value:',objVal, '\tscene value:',sceneVal
-
-    def replace_longname(self, search, replace, longName):
-        '''
-        does a search and replace on a long name.  It splits it up by ('|') then
-        performs it on each piece
-
-        Args:
-            search (str): search term
-            replace (str): replace term
-            longName (str): the long name to perform action on
-
-        returns:
-            str: result of search and replace
-        '''
-        items = longName.split('|')
-        newName = ''
-        for i in items:
-            if i:
-                i = re.sub(search, replace,i)
-                if '|' in longName:
-                    newName+='|'+i
-                else:
-                    newName += i
-
-        if newName != longName:
-            logger.info('replacing name: {}  {}'.format(longName,newName))
-
-        return newName
-
-
-def build_attr_list(selection,attr_filter=None):
-    '''
-    Builds a list of attributes to store values for.  It is looking at keyable
-    attributes and if they are in channelBox.  
-
-    Args:
-        selection (str): maya object to find attributes
-
-    returns:
-        list: list of attributes names
-    '''
-    exclude = ['controlPoints','uvSet','colorSet','weightList','pnts',
-        'vertexColor','target']
-
-    tmps = mc.listAttr(selection,k=True)
-    cb = mc.listAttr(selection,cb=True)
-    if cb:
-        tmps.extend(mc.listAttr(selection,cb=True))
-    attrs = []
-    for attr in tmps:
-        if not attr.split('.')[0] in exclude:
-            attrs.append(attr)
-
-    if attr_filter:
-        #attrs = list(set(attrs).intersection(attr_filter))
-        attrs = attr_filter
-        
-    return attrs
-
-
-def build_attr_key_values(selection,attrList):
-    tmp = {}
-    for attr in attrList:
-        tmp[attr] = {}
-        tmp[attr]['type'] = mc.getAttr(selection+'.'+attr,type=True)
-        tmp[attr]['value'] = mc.getAttr(selection+'.'+attr)
-        tmp[attr]['locked'] = mc.getAttr(selection+'.'+attr,l=True)
-
-    return tmp
-
-def set_attrs(nodes,attr_filter=None):
-    logger.info('DEPRACATED: Use .set_maya_attrs_for_builder_node')
-
-    for node in nodes:
-        name = node.get_name()
-        type_ = node.get_type()
-        nodeAttrs = node.get_attr_list()
-        if attr_filter:
-            if attr_filter.get(type_,None):
-                nodeAttrs = list(set(nodeAttrs).intersection(attr_filter[type_]))
-
-
-        for attr in nodeAttrs:
-            if node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
-                        mc.setAttr(name+'.'+attr,node.get_attr_value(attr),
-                            type='doubleArray')
-                else:
-                    print name+'.'+attr + ' not found, skipping'
-            else:
-                if mc.objExists(name+'.'+attr):
-                    if not mc.getAttr(name+'.'+attr,l=True):
-                        try:
-                            mc.setAttr(name+'.'+attr,node.get_attr_value(attr))
-                        except:
-                            #print 'tried...',attr
-                            pass
-                else:
-                    print name+'.'+attr + ' not found, skipping'

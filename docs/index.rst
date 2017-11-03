@@ -1,26 +1,13 @@
-.. zBuilder documentation master file, created by
-   sphinx-quickstart on Thu Dec 08 13:48:32 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to Ziva's VFX Utilities!
-================================
-
+.. include:: introduction.rst
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+    :maxdepth: 1
+    :caption: Contents
 
-   zBuilder
-   installation
-   release
-   modules
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+    introduction
+    installation
+    zBuilder_menu
+    zUI_menu
+    release
+    glossary
+    zBuilder

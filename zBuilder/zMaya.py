@@ -1,3 +1,5 @@
+import re
+
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
@@ -23,336 +25,73 @@ ZNODES = [
     'zMaterial',
     'zFiber',
     'zCacheTransform']
-
-
-class MayaMixin(object):
-    """
-    A Mixin class to deal with Maya specific functionality
-    """
-
-    def __init__(self):
-        self.__mobjects = list()
-
-    def clear_m_objects(self):
-        """
-        Clears the mObject list associated with the builder nodes.
-        """
-        self.__mobjects = [None] * len(self.get_nodes())
-
-    def track_m_object(self, maya_node, b_node):
-        """
-        Tracks an mObject with a builder node.  Given a maya node it looks up
-        its mobject and stores that in a list that corresponds with the
-        builder node list.
-        Args:
-            maya_node (str): The maya node to track.
-            b_node (object): The builder node to store it against.
-
-        Returns:
-            Nothing
-
-        """
-        index = self.get_nodes().index(b_node)
-
-        if mc.objExists(maya_node):
-            selection_list = om.MSelectionList()
-            selection_list.add(maya_node)
-            mobject = om.MObject()
-            selection_list.getDependNode(0, mobject)
-
-            self.__mobjects[index] = mobject
-            # logger.info(mObject)
-        else:
-            self.__mobjects[index] = None
-
-    def get_scene_name_for_builder_node(self, b_node, fullpath=True):
-        """
-        Given a Builder node this looks up the mObject list and checks if the
-        maya node is in the scene.  If it fails the mObject lookup it defaults
-        to the builder node name.
-
-        Args:
-            b_node (object): The builder node.
-            fullpath (bool): Return the fullpath or not.  Defaults to True.
-
-        Returns:
-            (str) Name of maya object.
-        """
-        index = self.get_nodes().index(b_node)
-        mobject = None
-        if self.__mobjects:
-            mobject = self.__mobjects[index]
-
-        if mobject:
-            if mobject.hasFn(om.MFn.kDagNode):
-                dagpath = om.MDagPath()
-                om.MFnDagNode(mobject).getPath(dagpath)
-                if fullpath:
-                    name = dagpath.fullPathName()
-                else:
-                    name = dagpath.partialPathName()
-            else:
-                name = om.MFnDependencyNode(mobject).name()
-        else:
-            name = None
-
-        if not name:
-            # if we have a mObject stored for node use it.  Ir else use the name
-            name = b_node.get_name()
-
-        return name
-
-    # ---------------------------------------------------------------------------
-    def set_maya_attrs_for_builder_node(self, b_node, attr_filter=None):
-        """
-        Given a Builder node this set the attributes of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored name.
-        Args:
-            b_node (object): The builder node with the stored attributes to be
-                set.
-            attr_filter (dict):  Attribute filter on what attributes to set.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                af = {'zSolver':['substeps']}
-        Returns:
-            nothing.
-        """
-        scene_name = self.get_scene_name_for_builder_node(b_node)
-
-        type_ = b_node.get_type()
-        node_attrs = b_node.get_attr_list()
-        if attr_filter:
-            if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
-
-        for attr in node_attrs:
-            if b_node.get_attr_key('type') == 'doubleArray':
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
-                        mc.setAttr(scene_name + '.' + attr, b_node.get_attr_value(attr),
-                                   type='doubleArray')
-                else:
-                    print scene_name + '.' + attr + ' not found, skipping'
-            else:
-                if mc.objExists(scene_name + '.' + attr):
-                    if not mc.getAttr(scene_name + '.' + attr, l=True):
-                        try:
-                            mc.setAttr(scene_name + '.' + attr,
-                                       b_node.get_attr_value(attr))
-                        except:
-                            pass
-                else:
-                    print scene_name + '.' + attr + ' not found, skipping'
-
-    def set_maya_weights_for_builder_node(self, b_node, interp_maps=False):
-        """
-        Given a Builder node this set the map values of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored scene_name.
-
-        Args:
-            b_node (object):  The Builder node with the stored map to be applied
-                in scene.
-            interp_maps (str): Do you want maps interpolated?
-                True forces interpolation.
-                False cancels it.
-                auto checks if it needs to.  Default = "auto"
-
-        Returns:
-            nothing.
-        """
-        maps = b_node.get_maps()
-        scene_name = self.get_scene_name_for_builder_node(b_node)
-        original_name = b_node.get_name()
-        created_mesh = None
-
-        for MAP in maps:
-
-            map_data = self.get_data_by_key_name('map', MAP)
-            mesh_data = self.get_data_by_key_name('mesh', map_data.get_mesh(
-                longName=True))
-            mesh_name_short = mesh_data.get_name(longName=False)
-            weight_list = map_data.get_value()
-
-            if mc.objExists(mesh_name_short):
-                if interp_maps == 'auto':
-
-                    cur_conn = get_mesh_connectivity(mesh_name_short)
-
-                    if len(cur_conn['points']) != len(
-                            mesh_data.get_point_list()):
-                        interp_maps = True
-
-                if interp_maps == True or interp_maps == 'True' or interp_maps == 'true':
-                    logger.info('interpolating maps...{}'.format(MAP))
-                    created_mesh = mesh_data.build()
-                    weight_list = interpolateValues(created_mesh, mesh_name_short, weight_list)
-
-                MAP = MAP.replace(original_name, scene_name)
-
-                if mc.objExists('%s[0]' % (MAP)):
-                    if not mc.getAttr('%s[0]' % (MAP), l=True):
-                        tmp = []
-                        for w in weight_list:
-                            tmp.append(str(w))
-                        val = ' '.join(tmp)
-                        cmd = "setAttr " + '%s[0:%d] ' % (
-                        MAP, len(weight_list) - 1) + val
-                        # print 'setting',cmd
-                        mm.eval(cmd)
-
-                else:
-                    try:
-                        mc.setAttr(MAP, weight_list, type='doubleArray')
-                    except:
-                        pass
-                if created_mesh:
-                    mc.delete(created_mesh)
+""" All available ziva nodes to be able to cleanup. """
 
 
 def get_mesh_connectivity(mesh_name):
+    """ Gets mesh connectivity for given mesh.
+
+    Args:
+        mesh_name: Name of mesh to process.
+
+    Returns:
+        dict: Dictionary of polygonCounts, polygonConnects, and points.
+    """
     space = om.MSpace.kWorld
-    meshToRebuild_mDagPath = getMDagPathFromMeshName(mesh_name)
-    meshToRebuild_mDagPath.extendToShape()
+    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
+    mesh_to_rebuild_m_dag_path.extendToShape()
 
-    meshToRebuild_polyIter = om.MItMeshPolygon(meshToRebuild_mDagPath)
-    meshToRebuild_vertIter = om.MItMeshVertex(meshToRebuild_mDagPath)
+    mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
+    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
 
-    numPolygons = 0
-    numVertices = 0
+    num_polygons = 0
+    num_vertices = 0
     # vertexArray_mFloatPointArray = om.MFloatPointArray()
     # polygonCounts_mIntArray = om.MIntArray()
-    polygonCountsList = list()
-    polygonConnectsList = list()
-    pointList = list()
+    polygon_counts_list = list()
+    polygon_connects_list = list()
+    point_list = list()
 
-    while not meshToRebuild_vertIter.isDone():
-        numVertices += 1
-        pos_mPoint = meshToRebuild_vertIter.position(space)
-        pos_mFloatPoint = om.MFloatPoint(pos_mPoint.x, pos_mPoint.y,
-                                         pos_mPoint.z)
+    while not mesh_to_rebuild_vert_iter.isDone():
+        num_vertices += 1
+        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
+        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y,
+                                         pos_m_point.z)
 
-        pointList.append([
-            pos_mFloatPoint[0],
-            pos_mFloatPoint[1],
-            pos_mFloatPoint[2]
+        point_list.append([
+            pos_m_float_point[0],
+            pos_m_float_point[1],
+            pos_m_float_point[2]
         ])
-        meshToRebuild_vertIter.next()
+        mesh_to_rebuild_vert_iter.next()
 
-    while not meshToRebuild_polyIter.isDone():
-        numPolygons += 1
-        polygonVertices_mIntArray = om.MIntArray()
-        meshToRebuild_polyIter.getVertices(polygonVertices_mIntArray)
-        for vertexIndex in polygonVertices_mIntArray:
-            polygonConnectsList.append(vertexIndex)
+    while not mesh_to_rebuild_poly_iter.isDone():
+        num_polygons += 1
+        polygon_vertices_m_int_array = om.MIntArray()
+        mesh_to_rebuild_poly_iter.getVertices(polygon_vertices_m_int_array)
+        for vertexIndex in polygon_vertices_m_int_array:
+            polygon_connects_list.append(vertexIndex)
 
-        polygonCountsList.append(polygonVertices_mIntArray.length())
+        polygon_counts_list.append(polygon_vertices_m_int_array.length())
 
-        meshToRebuild_polyIter.next()
-    tmp = {}
-    tmp['polygonCounts'] = polygonCountsList
-    tmp['polygonConnects'] = polygonConnectsList
-    tmp['points'] = pointList
+        mesh_to_rebuild_poly_iter.next()
+    tmp = dict()
+    tmp['polygonCounts'] = polygon_counts_list
+    tmp['polygonConnects'] = polygon_connects_list
+    tmp['points'] = point_list
 
     return tmp
 
 
-def interpolateValues(sourceMeshName, destinationMeshName, wList):
-    """
-    Description: 
-        Will transfer values between similar meshes with differing topology. 
-        Lerps values from triangleIndex of closest point on mesh. 
-      
-    Accepts: 
-        sourceMeshName, destinationMeshName - strings for each mesh transform
-      
-    Returns: 
-      
-    """
-    sourceMesh_mDagPath = getMDagPathFromMeshName(sourceMeshName)
-    destinationMesh_mDagPath = getMDagPathFromMeshName(destinationMeshName)
-    sourceMeshShape_mDagPath = om.MDagPath(sourceMesh_mDagPath)
-    sourceMeshShape_mDagPath.extendToShape()
-
-    sourceMesh_mMeshIntersector = om.MMeshIntersector()
-    sourceMesh_mMeshIntersector.create(sourceMeshShape_mDagPath.node())
-
-    destinationMesh_mItMeshVertex = om.MItMeshVertex(destinationMesh_mDagPath)
-    sourceMesh_mItMeshPolygon = om.MItMeshPolygon(sourceMesh_mDagPath)
-
-    u_util = om.MScriptUtil()
-    v_util = om.MScriptUtil()
-    u_util_ptr = u_util.asFloatPtr()
-    v_util_ptr = v_util.asFloatPtr()
-
-    int_util = om.MScriptUtil()
-
-    interpolatedWeights = list()
-
-    while not destinationMesh_mItMeshVertex.isDone():
-
-        closest_mPointOnMesh = om.MPointOnMesh()
-        sourceMesh_mMeshIntersector.getClosestPoint(
-            destinationMesh_mItMeshVertex.position(om.MSpace.kWorld),
-            closest_mPointOnMesh
-        )
-
-        sourceMesh_mItMeshPolygon.setIndex(
-            closest_mPointOnMesh.faceIndex(),
-            int_util.asIntPtr()
-        )
-        vertices_mIntArray = om.MIntArray()
-
-        triangle_mPointArray = om.MPointArray()
-        triangle_mIntArray = om.MIntArray()
-
-        sourceMesh_mItMeshPolygon.getTriangle(
-            closest_mPointOnMesh.triangleIndex(),
-            triangle_mPointArray,
-            triangle_mIntArray,
-            om.MSpace.kWorld
-        )
-
-        closest_mPointOnMesh.getBarycentricCoords(
-            u_util_ptr,
-            v_util_ptr
-        )
-
-        # -----  COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP --------------- #
-        weights = list()
-        for i in xrange(3):
-            vertexId_int = triangle_mIntArray[i]
-            weights.append(wList[vertexId_int])
-        # --------- COLOUR PER VERTEX STUFF - CHANGE TO WEIGHT MAP ------------ #
-        # print 'weights',weights
-
-        bary_u = u_util.getFloat(u_util_ptr)
-        bary_v = v_util.getFloat(v_util_ptr)
-        bary_w = 1 - bary_u - bary_v
-
-        interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (
-        bary_w * weights[2])
-
-        interpolatedWeights.append(interp_weight)
-
-        destinationMesh_mItMeshVertex.next()
-
-    return interpolatedWeights
-
-
 def check_body_type(bodies):
-    """
-    Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
-    used to see if we can create a zAttachment before we try.  Additionaly
+    """ Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
+    used to see if we can create a zAttachment before we try.  Additionally
     does a check if all objects exist in scene.
 
     Args:
         bodies (list):  List of bodies we want to check type of.  
 
-    Rerturns:
+    Returns:
         (bool): True if all bodies pass test, else False.
     """
     sel = mc.ls(sl=True)
@@ -370,6 +109,15 @@ def check_body_type(bodies):
 
 
 def get_type(body):
+    """ Really light wrapper for getting type of maya node.  Ya, I know.
+
+    Args:
+        body (str): Maya node to get type of
+
+    Returns:
+        str: String of node type.
+
+    """
     try:
         return mc.objectType(body)
     except:
@@ -377,6 +125,8 @@ def get_type(body):
 
 
 def clean_scene():
+    """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
+    """
     for node in ZNODES:
         in_scene = mc.ls(type=node)
         if len(in_scene) > 0:
@@ -384,6 +134,13 @@ def clean_scene():
 
 
 def get_zSolver(body):
+    """ Gets zSolver in scene.
+    Args:
+        body: Maya node to find associated solver.
+
+    Returns:
+        returns long name of zSolver.
+    """
     sel = mc.ls(sl=True)
     mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolver" -l')
@@ -392,6 +149,13 @@ def get_zSolver(body):
 
 
 def get_zSolverTransform(body):
+    """ Gets zSolverTransform in scene.
+    Args:
+        body: Maya node to find associated solverTransform.
+
+    Returns:
+        returns long name of zSolverTransform.
+    """
     sel = mc.ls(sl=True)
     mc.select(body, r=True)
     solver = mm.eval('zQuery -t "zSolverTransform" -l')
@@ -400,18 +164,31 @@ def get_zSolverTransform(body):
 
 
 def get_zAttachments(bodies):
+    """ Gets zAttachments in scene.
+    Args:
+        body: Maya node to find associated zAttachments.
+
+    Returns:
+        string of name of zAttachments.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     attachments = mm.eval('zQuery -t zAttachment')
     mc.select(sel, r=True)
     if attachments:
-        # todo remove duplicates while mainiting order
         return list(set(attachments))
     else:
         return []
 
 
 def isSolver(selection):
+    """ Checks if passed is zSolver or zSolverTransform.
+    Args:
+        selection: Item of interest.
+
+    Returns:
+        True if it is solver, else false.
+    """
     isSolver = False
     for s in selection:
         if mc.objectType(s) == 'zSolver' or mc.objectType(
@@ -422,6 +199,13 @@ def isSolver(selection):
 
 
 def get_zBones(bodies):
+    """ Gets zBones in scene.
+    Args:
+        body: Maya node to find associated zBones.
+
+    Returns:
+        string of name of zBones.
+    """
     sel = mc.ls(sl=True)
 
     if isSolver(sel):
@@ -451,6 +235,13 @@ def get_zBones(bodies):
 
 
 def get_zTets(bodies):
+    """ Gets zTets in scene.
+    Args:
+        body: Maya node to find associated zTets.
+
+    Returns:
+        string of name of zTets.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zTets = mm.eval('zQuery -t "zTet"')
@@ -462,6 +253,13 @@ def get_zTets(bodies):
 
 
 def get_zTissues(bodies):
+    """ Gets zTissues in scene.
+    Args:
+        body: Maya node to find associated zTissues.
+
+    Returns:
+        string of name of zTissues.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zTissues = mm.eval('zQuery -t "zTissue"')
@@ -473,8 +271,12 @@ def get_zTissues(bodies):
 
 
 def get_zMaterials(bodies):
-    """
-    Gets zMaterial nodes given a mesh
+    """ Gets zmaterials in scene.
+    Args:
+        body: Maya node to find associated zMaterials.
+
+    Returns:
+        string of name of zmaterials.
     """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
@@ -487,6 +289,13 @@ def get_zMaterials(bodies):
 
 
 def get_zFibers(bodies):
+    """ Gets zFibers in scene.
+    Args:
+        body: Maya node to find associated zFibers.
+
+    Returns:
+        string of name of zFibers.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zFibers = mm.eval('zQuery -t "zFiber"')
@@ -498,6 +307,13 @@ def get_zFibers(bodies):
 
 
 def get_zCloth(bodies):
+    """ Gets zCloth in scene.
+    Args:
+        body: Maya node to find associated zCloth.
+
+    Returns:
+        string of name of zCloth.
+    """
     sel = mc.ls(sl=True)
     mc.select(bodies, r=True)
     zCloth = mm.eval('zQuery -t "zCloth"')
@@ -509,11 +325,13 @@ def get_zCloth(bodies):
 
 
 def get_zTet_user_mesh(zTet):
-    """
-    Gets the user tet mesh hooked up to a given zTet in any.
+    """ Gets the user tet mesh hooked up to a given zTet in any.
 
-    args:
+    Args:
         zTet (string): the zTet to query.
+
+    Returns:
+        str: User tet mesh.
     """
     if mc.objExists(zTet + '.iTet'):
         mesh = mc.listConnections(zTet + '.iTet')
@@ -523,12 +341,15 @@ def get_zTet_user_mesh(zTet):
             return mesh
     return None
 
-def get_fiber_lineofaction(zFiber):
-    """
-    Gets the zLineOfAction node hooked up to a given zFiber in any.
 
-    args:
+def get_fiber_lineofaction(zFiber):
+    """ Gets the zLineOfAction node hooked up to a given zFiber in any.
+
+    Args:
         zFiber (string): the zFiber to query.
+
+    Returns:
+        str: zLineOfAction
     """
     if mc.objExists(zFiber + '.iLineOfActionData'):
         conn = mc.listConnections(zFiber + '.iLineOfActionData')
@@ -541,11 +362,13 @@ def get_fiber_lineofaction(zFiber):
 
 
 def get_lineOfAction_fiber(zlineofaction):
-    """
-    Gets the zFiber node hooked up to a given zLineOfAction in any.
+    """ Gets the zFiber node hooked up to a given zLineOfAction in any.
 
-    args:
+    Args:
         zlineofaction (string): the zLineOfAction to query.
+
+    Returns:
+        str: Name of zFiber hooked up to lineOfAction
     """
     if mc.objExists(zlineofaction + '.oLineOfActionData'):
         conn = mc.listConnections(zlineofaction + '.oLineOfActionData')
@@ -558,8 +381,7 @@ def get_lineOfAction_fiber(zlineofaction):
 
 
 def get_association(zNode):
-    """
-    Gets an association of given zNode
+    """ Gets an association of given zNode
 
     args:
         zNode (string): the zNode to find association of.
@@ -578,21 +400,22 @@ def get_association(zNode):
         tmp = mc.listConnections(zNode + '.curves')
         return tmp
 
+    elif _type == 'zEmbedder':
+        # empty list for embedder
+        return list()
 
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
 
-        nope = ['zSolverTransform', 'zSolver']
-        if _type in nope:
-            return None
+        if _type in ['zSolverTransform', 'zSolver']:
+            return []
         else:
             mesh = mm.eval(cmd)
             return mesh
 
 
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
-    """
-    Renames zNodes based on mesh it's connected to.
+    """ Renames zNodes based on mesh it's connected to.
 
     args:
         replace (list): subset of mesh name to replace with zNode name
@@ -653,73 +476,56 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 print 'rename: ', attachment, '{}__{}_{}'.format(s, t,
                                                                  'zAttachment')
 
-    print 'finished renaming.... '
+    logger.info('finished renaming.... ')
 
 
 def select_tissue_meshes():
-    """
-    Selects all zTissues in scene
+    """ Selects all zTissues in scene
     """
     mc.select(cl=True)
     meshes = mm.eval('zQuery -t "zTissue" -m')
     mc.select(meshes)
 
 
-def get_tissue_children(ztissue):
-    """
-    This checks a zTissue if it has children.  Useful for sub-tissues.
+def get_mdagpath_from_mesh(mesh_name):
+    """ Maya stuff, getting the dagpath from a mesh name
+
     Args:
-        ztissue (str): The zTissue object in the maya scene.
+        mesh_name: The mesh to get dagpath from.
+    """
+    mesh_m_dag_path = om.MDagPath()
+    sel_list = om.MSelectionList()
+    sel_list.add(mesh_name)
+    sel_list.getDagPath(0, mesh_m_dag_path)
+
+    return mesh_m_dag_path
+
+
+def get_name_from_m_object(m_object, long_name=True):
+    """ Gets maya scene name from given mObject.
+    Args:
+        m_object: The m_object to get name from.
+        long_name: Returns long name. Default = ``True``
 
     Returns:
-        (str) Children mesh of zTissue, or None if none found.
+        str: Maya object name.
+
     """
-    tmp = []
-    if mc.objectType(ztissue) == 'zTissue':
-        child_attr = '{}.oChildTissue'.format(ztissue)
-        if mc.objExists(child_attr):
-            children = mc.listConnections(child_attr)
+    if m_object.hasFn(om.MFn.kDagNode):
 
-            if children:
-                sel = mc.ls(sl=True)
-                mc.select(children)
-                tmp.extend(mm.eval('zQuery -t zTissue -m -l'))
-                mc.select(sel)
-                return tmp
-    return None
-
-
-def get_tissue_parent(ztissue):
-    """
-    This checks a zTissue if it has a parent.  Useful for sub-tissues.
-    Args:
-        ztissue (str): The zTissue object in the maya scene.
-
-    Returns:
-        (str) Parent mesh of zTissue, or None if none found
-    """
-    if mc.objectType(ztissue) == 'zTissue':
-        parent_attr = '{}.iParentTissue'.format(ztissue)
-        if mc.objExists(parent_attr):
-            parent = mc.listConnections(parent_attr)
-            if parent:
-                parent = mm.eval('zQuery -t zTissue -m -l')
-                return parent[0]
-    return None
-
-
-def getMDagPathFromMeshName(meshName):
-    mesh_mDagPath = om.MDagPath()
-    selList = om.MSelectionList()
-    selList.add(meshName)
-    selList.getDagPath(0, mesh_mDagPath)
-
-    return mesh_mDagPath
+        dagpath = om.MDagPath()
+        om.MFnDagNode(m_object).getPath(dagpath)
+        if long_name:
+            name = dagpath.fullPathName()
+        else:
+            name = dagpath.partialPathName()
+    else:
+        name = om.MFnDependencyNode(m_object).name()
+    return name
 
 
 def check_mesh_quality(meshes):
-    """
-    Light wrapper around checking mesh quality.
+    """ Light wrapper around checking mesh quality.
 
     args:
         meshes (list): A list of meshes you want to check
@@ -743,7 +549,22 @@ def check_mesh_quality(meshes):
         mc.select(meshes)
 
 
-def parse_args_for_selection(args):
+def check_maya_node(maya_node):
+    """
+
+    Args:
+        maya_node:
+
+    Returns:
+
+    """
+    if isinstance(maya_node, list):
+        return maya_node[0]
+    else:
+        return maya_node
+
+
+def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid
     maya objects in the current scene.  If any of the passed names are not in
@@ -769,9 +590,10 @@ def parse_args_for_selection(args):
         # check if it exists and get long name----------------------------------
         for sel in selection:
             if mc.objExists(sel):
-                tmp.extend(mc.ls(sel,l=True))
+                tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError, '{} does not exist in scene, stopping!'.format(sel)
+                raise StandardError, '{} does not exist in scene, stopping!'.format(
+                    sel)
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -782,3 +604,207 @@ def parse_args_for_selection(args):
         if not selection:
             raise StandardError, 'Nothing selected or passed, please select something and try again.'
     return selection
+
+
+def build_attr_list(selection, attr_filter=None):
+    """
+    Builds a list of attributes to store values for.  It is looking at keyable
+    attributes and if they are in channelBox.
+
+    Args:
+        attr_filter:
+        selection (str): maya object to find attributes
+
+    returns:
+        list: list of attributes names
+    """
+    # exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
+    #          'vertexColor', 'target']
+
+    tmps = mc.listAttr(selection, k=True)
+    cb = mc.listAttr(selection, cb=True)
+    if cb:
+        tmps.extend(mc.listAttr(selection, cb=True))
+    attrs = []
+    if tmps:
+        for attr in tmps:
+            obj = '{}.{}'.format(selection, attr)
+            if mc.objExists(obj):
+                type_ = mc.getAttr(obj, type=True)
+                if not type_ == 'TdataCompound':
+                    attrs.append(attr)
+            # if not attr.split('.')[0] in exclude:
+            #    attrs.append(attr)
+
+    if attr_filter:
+        # attrs = list(set(attrs).intersection(attr_filter))
+        attrs = attr_filter
+
+    return attrs
+
+
+def build_attr_key_values(selection, attr_list):
+    """ Builds a dictionary of attribute key/values.  Stores the value, type, and
+    locked status.
+    Args:
+        selection: Items to save attrbutes for.
+        attr_list: List of attributes to save.
+
+    Returns:
+        dict: of attribute values.
+
+    """
+    attr_dict = {}
+    for attr in attr_list:
+        obj = '{}.{}'.format(selection, attr)
+        for item in mc.ls(obj):
+            type_ = mc.getAttr(item, type=True)
+            if not type_ == 'TdataCompound':
+                attr_dict[attr] = {}
+                attr_dict[attr]['type'] = type_
+                attr_dict[attr]['value'] = mc.getAttr(item)
+                attr_dict[attr]['locked'] = mc.getAttr(item, lock=True)
+                attr_dict[attr]['alias'] = mc.aliasAttr(obj, q=True)
+
+    return attr_dict
+
+
+def replace_long_name(search, replace, long_name):
+    """ does a search and replace on a long name.  It splits it up by ('|') then
+    performs it on each piece
+
+    Args:
+        search (str): search term
+        replace (str): replace term
+        long_name (str): the long name to perform action on
+
+    returns:
+        str: result of search and replace
+    """
+    items = long_name.split('|')
+    new_name = ''
+    for i in items:
+        if i:
+            i = re.sub(search, replace, i)
+            if '|' in long_name:
+                new_name += '|' + i
+            else:
+                new_name += i
+
+    #if new_name != long_name:
+    #    logger.info('replacing name: {}  {}'.format(long_name, new_name))
+
+    return new_name
+
+
+def replace_dict_keys(search, replace, dictionary):
+    """
+    Does a search and replace on dictionary keys
+
+    Args:
+        search (:obj:`str`): search term
+        replace (:obj:`str`): replace term
+        dictionary (:obj:`dict`): the dictionary to do search on
+
+    Returns:
+        :obj:`dict`: result of search and replace
+    """
+    tmp = {}
+    for key in dictionary:
+        new = replace_long_name(search, replace, key)
+        tmp[new] = dictionary[key]
+
+    return tmp
+
+
+def cull_creation_nodes(parameters, permissive=True):
+    """ To help speed up the build of a Ziva setup we are creating the bones and
+    the tissues with one command.  Given a list of zBuilder nodes this checks
+    if a given node needs to be created in scene.  Checks to see if it
+    already exists or if associated mesh is missing.  Either case it culls
+    it from list.
+
+    Args:
+        permissive (bool):
+        parameters (object): the zBuilder nodes to check.
+    Returns:
+        dict: Dictionary of non culled
+    """
+
+    results = dict()
+    results['meshes'] = []
+    results['names'] = []
+    results['parameters'] = []
+
+    # -----------------------------------------------------------------------
+    # check meshes for existing zBones or zTissue
+    for i, parameter in enumerate(parameters):
+        type_ = parameter.type
+        mesh = parameter.association[0]
+        name = parameter.name
+
+        if mc.objExists(mesh):
+            existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
+            if existing:
+                out = mc.rename(existing, name)
+                parameter.mobject = out
+            else:
+                results['meshes'].append(mesh)
+                results['names'].append(name)
+                results['parameters'].append(parameter)
+        else:
+            if not permissive:
+                raise StandardError('{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.format(mesh, type_))
+            logger.warning(
+                mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
+
+    return results
+
+
+def check_map_validity(map_parameters):
+    """
+    This checks the map validity for zAttachments and zFibers.  For zAttachments
+    it checks if all the values are zero.  If so it failed and turns off the
+    associated zTissue node.  For zFibers it checks to make sure there are at least
+    1 value of 0 and 1 value of .5 within a .1 threshold.  If not that fails and
+    turns off the zTissue
+
+    Args:
+        map_parameters: map parameters to check.
+    Returns:
+        list of offending maps
+    """
+    sel = mc.ls(sl=True)
+
+    report = []
+    for parameter in map_parameters:
+        map_type = mc.objectType(parameter.name)
+        if map_type == 'zAttachment':
+            values = parameter.values
+            if all(v == 0 for v in values):
+                report.append(parameter.name)
+                dg_node = parameter.name.split('.')[0]
+                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+
+        if map_type == 'zFiber' and 'endPoints' in parameter.name:
+            values = parameter.values
+            upper = False
+            lower = False
+
+            if any(0 <= v <= .1 for v in values):
+                lower = True
+            if any(.9 <= v <= 1 for v in values):
+                upper = True
+
+            if not upper or not lower:
+                report.append(parameter.name)
+                dg_node = parameter.name.split('.')[0]
+                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+
+    if report:
+        logger.info('Check these maps: {}'.format(report))
+    mc.select(sel)
+    return report
+

@@ -1,30 +1,55 @@
-zBuilder.nodes
-==============
+zBuilder.nodes package
+======================
 
+Subpackages
+-----------
 
+.. toctree::
 
-zBuilder.nodes.base 
--------------------
+    zBuilder.nodes.deformers
+    zBuilder.nodes.utils
+    zBuilder.nodes.ziva
+
+Submodules
+----------
+
+zBuilder.nodes.base module
+--------------------------
 
 .. automodule:: zBuilder.nodes.base
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder.nodes.zEmbedder
-------------------------
+zBuilder.nodes.deformer module
+------------------------------
 
-.. automodule:: zBuilder.nodes.zEmbedder
+.. automodule:: zBuilder.nodes.deformer
     :members:
     :undoc-members:
     :show-inheritance:
 
-zBuilder.nodes.zTet
--------------------
+zBuilder.nodes.dg_node module
+-----------------------------
 
-.. automodule:: zBuilder.nodes.zTet
+.. automodule:: zBuilder.nodes.dg_node
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+zBuilder.nodes.transform module
+-------------------------------
+
+.. automodule:: zBuilder.nodes.transform
     :members:
     :undoc-members:
     :show-inheritance:
 
 
+Module contents
+---------------
+
+.. automodule:: zBuilder.nodes
+    :members:
+    :undoc-members:
+    :show-inheritance:
