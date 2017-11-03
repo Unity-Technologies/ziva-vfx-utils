@@ -9,7 +9,6 @@ Subpackages
     zBuilder.builders
     zBuilder.nodes
     zBuilder.parameters
-    zBuilder.tests
 
 Submodules
 ----------
