@@ -1,5 +1,5 @@
-zBuilder package
-================
+Module index
+============
 
 Subpackages
 -----------
