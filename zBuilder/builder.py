@@ -167,7 +167,7 @@ class Builder(object):
         for d in data:
 
             if d['d_type'] == 'node_data':
-                self.bundle.scene_items = d['data']
+                self.bundle.extend_scene_items(d['data'])
                 logger.info("reading parameters. {} nodes".format(len(d['data'])))
             if d['d_type'] == 'component_data':
                 # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
