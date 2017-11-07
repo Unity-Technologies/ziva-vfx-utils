@@ -106,7 +106,8 @@ def get_constrained(constraint_name):
            'constraintRotateX',
            'constraintRotateY',
            'constraintRotateZ']
-    constrained = [mc.listConnections('{}.{}'.format(constraint_name, c)[0]) for c in con if mc.objExists('{}.{}'.format(constraint_name, c))]
+
+    constrained = [mc.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con if mc.objExists('{}.{}'.format(constraint_name, c))]
     constrained = list(set(constrained))
     return constrained
 
