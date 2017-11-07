@@ -28,6 +28,17 @@ class Base(object):
         if deserialize:
             self.deserialize(deserialize)
 
+    def __eq__(self, other):
+        """ Are names == in node objects?
+        """
+        if isinstance(other, Base):
+            return self.name == other.name
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self.__eq__(other)
+
     @property
     def long_name(self):
         """ Long name of parameter corresponding to long name of maya node.

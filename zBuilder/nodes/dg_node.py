@@ -47,17 +47,6 @@ class DGNode(Base):
         if maya_node:
             self.populate(maya_node=maya_node)
 
-    def __eq__(self, other):
-        """ Are names == in node objects?
-        """
-        if isinstance(other, DGNode):
-            return self.name == other.name
-
-    def __ne__(self, other):
-        """ Define a non-equality test
-        """
-        return not self.__eq__(other)
-
     def __str__(self):
         if self.name:
             name = self.name
