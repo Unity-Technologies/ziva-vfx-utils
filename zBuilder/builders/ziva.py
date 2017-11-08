@@ -13,7 +13,7 @@ mc.loadPlugin('ziva', qt=True)
 
 class Ziva(Builder):
     """
-    To capture a ziva setup
+    To capture a Ziva rig
     """
 
     def __init__(self):
@@ -217,7 +217,7 @@ class Ziva(Builder):
               check_meshes=True):
 
         """
-        This builds the setup in the Maya scene.  It does not build geometry as the expectation is
+        This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
         that the geometry is in the scene.
 
         Args:

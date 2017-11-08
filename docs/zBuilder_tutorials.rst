@@ -5,17 +5,18 @@ Tutorial -- Basics
 ~~~~~~~~~~~~~~~~~~
 
 Let's explore some example usage of zBuilder by trying it out on the anatomical
-arm demo that ships with the ZivaVFX Maya plugin.
+arm demo that ships with the ZivaVFX Maya plugin. First, set the Python path 
+to zBuilder as explained in the :doc:`installation` section.
 
 First, run the anatomical arm demo, which can be found in the 'Ziva Tools' menu:
 Ziva Tool > Examples > Run Demo > Anatomical Arm.
 Now that you have the arm :term:`setup` in your scene, let's start playing with zBuilder.
 
-Retrieving
-^^^^^^^^^^
+Retrieving the Ziva rig from the Maya scene
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Retrieving a whole Ziva setup
-*****************************
+Retrieving a whole Ziva rig
+***************************
 
 In order to interact with a Ziva scene with zBuilder, we first need to create a 
 Ziva :term:`builder` object:
@@ -25,13 +26,13 @@ Ziva :term:`builder` object:
     import zBuilder.builders.ziva as zva
     z = zva.Ziva()
 
-You can call help to get some information about the Ziva builder.
+You can use the help command to get some information about the Ziva builder.
 
 .. code-block:: python
 
     help(z)
 
-We can use our builder to capture the Ziva arm setup by running a method to retrieve the current state of the scene:
+We can use our builder to capture the Ziva arm rig by running a method to retrieve the current state of the Ziva Maya scene:
 
 .. code-block:: python
 
@@ -79,12 +80,12 @@ You can then save it out to a text file, and/or restore the rig to the captured 
 You can also manipulate the information in the builder before re-applying it.
 This is useful for mirroring, for example, which we'll describe later.
 
-Retrieving parts of a setup
-***************************
+Retrieving parts of a Ziva rig
+******************************
 
-Above we retrieved Ziva builder data from the entire Maya scene.
-However, if you only want to capture part of the scene, you can select the items
-youre interested in and call retrieve_from_scene_selection().
+Above, we retrieved Ziva builder data from the entire Maya scene.
+However, if you only want to capture a part of the scene, you can select the items
+you are interested in and call retrieve_from_scene_selection().
 This comes in handy if you want to mirror the setup, for example.
 
 .. code-block:: python
@@ -119,7 +120,7 @@ Notice now we are only retrieving 1 tissue.
 Building
 ^^^^^^^^
 
-Building takes the scene item data stored in a builder object and applies it back into the scene.
+Building takes the data stored in a builder object, and applies it to the Maya scene, equipping it with the Ziva rig stored in the builder object.
 
 .. note::
 
@@ -129,10 +130,11 @@ Building takes the scene item data stored in a builder object and applies it bac
 
 With the exception of geometry, building restores the state of all the nodes and parameters in the builder. Each scene item is first checked to see if it exists in the Maya scene. If it doesn't exist, it is created. If it does exist, its data values are set to what is stored in the builder.
 
-Restoring a scene to previous state
-*******************************************
+Restoring a Ziva rig to a previous state
+****************************************
 
-Let's re-capture the whole scene now so we can restore it.
+This simple example demonstrates how to revert the Ziva rig to a previous state.
+First, load the Anatomical Arm Demo. Then, let's capture the whole scene, so that we can later restore it.
 
 .. code-block:: python
 
@@ -140,18 +142,18 @@ Let's re-capture the whole scene now so we can restore it.
     z = zva.Ziva()
     z.retrieve_from_scene()
 
-Before we restore the scene, let's make a change to the arm so we can confirm
-that it gets restored to its previous state.
+Now, the builder object "z" contains the Ziva rig.
+Let's make a change to the arm. 
 For example, paint a muscle attachment to all white,
 something that is easy to identify in viewport.
-Now apply our builder to it.
+Now let's apply our builder to it, to revert the rig to the previous state.
 
 .. code-block:: python
 
     z.build()
 
-You should see in the viewport the state of the arm setup jump back to the way it 
-was when you retrieved it, as well as this output in script editor:
+In the viewport, you should see that the state of the arm rig jumped back to the way it 
+was when you retrieved it, as well as this output in the script editor:
 
 .. code-block:: python
 
@@ -159,12 +161,13 @@ was when you retrieved it, as well as this output in script editor:
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:01.139000 #
 
 
-Building a Ziva setup from scratch
-**********************************
-It is also possible to build a Ziva setup into a Maya scene that doesn't contain any Ziva nodes or data.
+Building a Ziva rig from scratch
+********************************
+
+It is also possible to build a Ziva rig into a Maya scene that doesn't contain any Ziva nodes or data.
 The command is exactly the same as before, but we'll start from a "clean" scene containing only geometry.
 
-First, clean out all of the Ziva setup with the following command:
+First, clean out the entire Ziva rig with the following command:
 
 .. code-block:: python
 
@@ -181,7 +184,7 @@ we apply that same builder.
 
     z.build()
 
-The full Ziva setup should now be restored and acting on the scene's geometry.
+The full Ziva rig should now be restored and acting on the scene's geometry.
 zBuilder built all of the Ziva maya nodes for us.
 
 Building with differing topologies
@@ -191,7 +194,7 @@ In production a common occurrence (unfortunately) is the geometry that goes into
 
 Let's show how zBuilder can accommodate changes to geometry.
 
-First thing, lets clean the scene to represent brand new geometry coming in.
+First thing, let's clean the scene to represent brand new geometry coming in.
 
 .. code-block:: python
 
@@ -226,7 +229,7 @@ This time your script editor output will be slightly different.  It should be as
 
 You will notice above that it listed out a bunch of maps that got interpolated.
 This shows that zBuilder noticed the change in topology between the mesh in the
-original setup and the new setup.
+original rig and the new rig.
 Furthermore, the call to build() modified all the maps painted onto the old
 mesh and re-applied them to the new mesh by interpolation.
 
@@ -248,7 +251,7 @@ Reading/Writing Files
 Writing to disk
 ***************
 
-Once we have the arm setup saved into a builder object in memory, we can write it out to disk.  All we need to do is:
+Once we have the arm Ziva rig saved into a builder object in memory, we can write it out to disk.  All we need to do is:
 
 .. code-block:: python
 
@@ -264,7 +267,7 @@ Reading from disk
 To test that writing worked properly let's setup the scene with just the geometry again.
 Run the Anatomical Arm demo again, then run mz.clean_scene().
 
-Once we have a scene with just arm geometry, let's retrieve the Ziva rig from the file on disk.
+Once we have a scene with just the arm geometry, let's retrieve the Ziva rig from the file on disk.
 
 .. code-block:: python
 
@@ -329,7 +332,7 @@ For example you can search for occurrences of "r_" at the beginning of a name.
 Changing geometry name
 **********************
 
-As before, let's build the Anatomical Arm demo from the Ziva menu and retrieve the Ziva setup into a builder.
+As before, let's build the Anatomical Arm demo from the Ziva menu and retrieve the Ziva rig into a builder object.
 
 .. code-block:: python
 
@@ -337,7 +340,7 @@ As before, let's build the Anatomical Arm demo from the Ziva menu and retrieve t
     z = zva.Ziva()
     z.retrieve_from_scene()
 
-To represent a model name change lets clean the scene and change the name of one of the muscles.
+To represent a model name change let's clean the scene and change the name of one of the muscles.
 
 .. code-block:: python
 
@@ -362,7 +365,7 @@ Now when we build you see that the newly-named muscle is correctly integrated in
 Mirroring a setup
 *****************
 
-We can also use string replace to mirror half of a setup into a full symmetric setup.
+We can also use string replace to mirror half of a Ziva rig into a full symmetric Ziva rig.
 
 In order for this to work the geometry needs to be already-mirrored,
 with r_* and l_* prefixes used to distinguish between each pair of mirrored meshes.
@@ -413,10 +416,10 @@ Here we'll cover some of the more involved concepts.
 Changing values before building
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Its possible with zBuilder to to inspect and modify the contents of the builder before you actually build.
-For example, maybe you are in a specific shot and want to build a setup with a
+It's possible to inspect and modify the contents of the builder before you actually build.
+For example, maybe you are in a specific shot and want to build a Ziva rig with a
 value different than what was saved on disk.
-A common use case is to change the start frame of the Ziva solver based on the shot environment.  Lets try doing that.
+A common use case is to change the start frame of the Ziva solver based on the shot environment. Let's try doing that.
 
 Build the Anatomical Arm demo again and retrieve the scene.
 
