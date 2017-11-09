@@ -98,11 +98,6 @@ class Builder(object):
         for parameter in parameters:
             parameter.build(*args, **kwargs)
 
-    # def apply(self, *args, **kwargs):
-    #
-    #     self.build(args, kwargs)
-    #     logger.info('.apply() DEPRECATED.  Use .build() instead.')
-
     # @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
