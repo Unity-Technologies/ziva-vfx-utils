@@ -34,10 +34,8 @@ class SolverTransformNode(Ziva):
         solver_name = self.get_scene_name()
 
         if not mc.objExists(solver_name):
-            results = mm.eval('ziva -s')
-            solver = mc.ls(results, type='zSolverTransform')[0]
-            mc.rename(solver, solver_name)
-            self.mobject = solver_name
+            if not permissive:
+                raise StandardError('zSolverTransform not in scene.  please check.')
 
         else:
             new_name = mc.rename(self.get_scene_name(), self.name)
