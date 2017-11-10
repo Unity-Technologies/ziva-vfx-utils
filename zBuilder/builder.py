@@ -34,6 +34,7 @@ class Builder(object):
 
         Args:
             node (:obj:`str`): Name of maya node.
+            get_parameters (bool):
         Returns:
             obj: zBuilder node populated.
         """

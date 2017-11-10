@@ -49,7 +49,7 @@ def check_map_validity():
     z = zva.Ziva()
     z.retrieve_from_scene_selection(connections=False)
 
-    mz.check_map_validity(z.get_parameters(type_filter='map'))
+    mz.check_map_validity(z.get_scene_items(type_filter='map'))
 
     mc.select(sel, r=True)
 
