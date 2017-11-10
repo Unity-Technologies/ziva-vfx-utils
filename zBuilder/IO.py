@@ -90,9 +90,10 @@ def load_base_node(json_object):
 
     if '_class' in json_object:
         module_ = json_object['_class'][0]
-
         type_ = json_object['type']
+
         builder_type = json_object['_builder_type']
+
         obj = find_class(builder_type, type_)
 
         parameter = obj(deserialize=json_object)
@@ -148,32 +149,21 @@ def update_json(json_object):
 
         if 'type' not in json_object:
             json_object['type'] = json_object['_class'][1].lower()
-            #print 'TYPETYPE', json_object['type']
 
         if json_object['type'] == 'skinCluster':
             if '_maps' in json_object:
                 json_object['weights'] = json_object['_maps']
 
         if '_builder_type' not in json_object:
-            json_object['_builder_type'] = 'zBuilder.parameters'
-
+            module_ = json_object['_class'][0]
+            if 'zBuilder.nodes' in module_:
+                json_object['_builder_type'] = 'zBuilder.nodes'
+            if 'zBuilder.data' in module_:
+                json_object['_builder_type'] = 'zBuilder.parameters'
         if '_maps' in json_object:
             json_object.pop('_maps', None)
 
-        # for key, value in replace_me.iteritems():
-        #     if key in json_object:
-        #         json_object[value] = json_object[key]
-        #         json_object.pop(key, None)
-        #     else:
-        #         # maps and meshes didn't have a type.  lets make one.
-        #         if value == 'type':
-        #             json_object[value] = json_object['_class'][1].lower()
-
-
-
-        #print 'AFTER:', json_object
     return json_object
-
 
 
 def check_data(data):
