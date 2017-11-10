@@ -81,7 +81,8 @@ class TetNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        name = self.get_scene_name()
+        #name = self.get_scene_name()
+        name = self.name
         if not mc.objExists(name):
             mesh = self.association[0]
             if mc.objExists(mesh):

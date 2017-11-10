@@ -35,9 +35,10 @@ class AttachmentNode(Ziva):
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
 
-        name = self.get_scene_name()
+        name = self.name
         source_mesh = self.association[0]
         target_mesh = self.association[1]
+
 
         # check if both meshes exist
         if mz.check_body_type([source_mesh, target_mesh]):

@@ -47,7 +47,7 @@ class FiberNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        name = self.get_scene_name()
+        name = self.name
         mesh = self.association[0]
 
         if mc.objExists(mesh):
@@ -55,7 +55,6 @@ class FiberNode(Ziva):
             existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
             data_fibers = self.builder.bundle.get_scene_items(type_filter='zFiber',
                                                               association_filter=mesh)
-
 
             d_index = data_fibers.index(self)
 
