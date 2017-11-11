@@ -214,7 +214,7 @@ class Ziva(Builder):
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
               lineOfActions=True, mirror=False, permissive=True,
-              check_meshes=True):
+              check_meshes=False):
 
         """
         This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
