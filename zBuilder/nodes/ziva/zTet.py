@@ -90,9 +90,14 @@ class TetNode(Ziva):
                     name = mm.eval('zQuery -t zTet ' + mesh)[0]
                 else:
                     raise StandardError('{} does not exist in scene.  Check meshes.'.format(mesh))
+
         if name:
-            new_name = mc.rename(name, self.name)
-            self.mobject = new_name
+            if not mc.objExists(name):
+                if permissive:
+                    logger.info('{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.format(mesh))
+            else:
+                new_name = mc.rename(name, self.name)
+                self.mobject = new_name
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)
