@@ -778,30 +778,31 @@ def check_map_validity(map_parameters):
 
     report = []
     for parameter in map_parameters:
-        map_type = mc.objectType(parameter.name)
-        if map_type == 'zAttachment':
-            values = parameter.values
-            if all(v == 0 for v in values):
-                report.append(parameter.name)
-                dg_node = parameter.name.split('.')[0]
-                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
-                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+        if mc.objExists(parameter.name):
+            map_type = mc.objectType(parameter.name)
+            if map_type == 'zAttachment':
+                values = parameter.values
+                if all(v == 0 for v in values):
+                    report.append(parameter.name)
+                    dg_node = parameter.name.split('.')[0]
+                    tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                    mc.setAttr('{}.enable'.format(tissue[0]), 0)
 
-        if map_type == 'zFiber' and 'endPoints' in parameter.name:
-            values = parameter.values
-            upper = False
-            lower = False
+            if map_type == 'zFiber' and 'endPoints' in parameter.name:
+                values = parameter.values
+                upper = False
+                lower = False
 
-            if any(0 <= v <= .1 for v in values):
-                lower = True
-            if any(.9 <= v <= 1 for v in values):
-                upper = True
+                if any(0 <= v <= .1 for v in values):
+                    lower = True
+                if any(.9 <= v <= 1 for v in values):
+                    upper = True
 
-            if not upper or not lower:
-                report.append(parameter.name)
-                dg_node = parameter.name.split('.')[0]
-                tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
-                mc.setAttr('{}.enable'.format(tissue[0]), 0)
+                if not upper or not lower:
+                    report.append(parameter.name)
+                    dg_node = parameter.name.split('.')[0]
+                    tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
+                    mc.setAttr('{}.enable'.format(tissue[0]), 0)
 
     if report:
         logger.info('Check these maps: {}'.format(report))
