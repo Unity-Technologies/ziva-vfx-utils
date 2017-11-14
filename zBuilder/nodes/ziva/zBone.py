@@ -32,7 +32,6 @@ class BoneNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
-        check_meshes = kwargs.get('check_meshes', True)
 
         parameters = self.builder.bundle.get_scene_items(type_filter='zBone',
                                                          name_filter=name_filter)
@@ -43,10 +42,10 @@ class BoneNode(Ziva):
 
         if self == parameters[0]:
             apply_multiple(parameters, attr_filter=attr_filter,
-                           permissive=permissive, check_meshes=check_meshes)
+                           permissive=permissive)
 
 
-def apply_multiple(parameters, attr_filter=None, permissive=False, check_meshes=True):
+def apply_multiple(parameters, attr_filter=None, permissive=False ):
     """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
@@ -62,10 +61,6 @@ def apply_multiple(parameters, attr_filter=None, permissive=False, check_meshes=
     sel = mc.ls(sl=True)
     # cull none buildable-------------------------------------------------------
     culled = mz.cull_creation_nodes(parameters)
-
-    # check mesh quality--------------------------------------------------------
-    if check_meshes:
-        mz.check_mesh_quality(culled['meshes'])
 
     # build bones all at once---------------------------------------------------
     results = None

@@ -52,26 +52,23 @@ class TissueNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
-        check_meshes = kwargs.get('check_meshes', True)
 
         parameters = self.builder.bundle.get_scene_items(type_filter='zTissue',
                                                          name_filter=name_filter)
 
         if self == parameters[0]:
             apply_multiple(parameters, attr_filter=attr_filter,
-                           permissive=permissive, check_meshes=check_meshes,
+                           permissive=permissive,
                            solver=solver)
 
 
-def apply_multiple(parameters, attr_filter=None, permissive=True,
-                   check_meshes=True, solver=None):
+def apply_multiple(parameters, attr_filter=None, permissive=True, solver=None):
     """
     Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
 
     Args:
-        check_meshes:
         permissive (bool):
         parameters:
         attr_filter (obj):
@@ -82,10 +79,6 @@ def apply_multiple(parameters, attr_filter=None, permissive=True,
     sel = mc.ls(sl=True)
     # cull none buildable-------------------------------------------------------
     culled = mz.cull_creation_nodes(parameters, permissive=permissive)
-
-    # check mesh quality--------------------------------------------------------
-    if check_meshes:
-        mz.check_mesh_quality(culled['meshes'])
 
     # build tissues all at once-------------------------------------------------
     results = None

@@ -235,7 +235,6 @@ class Ziva(Builder):
                 False: No
                 auto: Interpolate if it needs it (vert check)
             mirror (bool): This mirrors the geometry in bundle.
-            check_meshes (bool): Wether to perform the check mesh before building.
             permissive (bool): False raises errors if something is wrong. Defaults to True
             attr_filter (dict):  Attribute filter on what attributes to get.
                 dictionary is key value where key is node type and value is
@@ -249,6 +248,9 @@ class Ziva(Builder):
             for item in self.get_scene_items(type_filter='mesh'):
                 item.mirror()
 
+        if check_meshes:
+            logger.info('DEPRECATED FLAG:check_meshes not used.  Use ziva -mq.')
+
         logger.info('Building....')
         sel = mc.ls(sl=True)
 
@@ -256,11 +258,6 @@ class Ziva(Builder):
         # speeds up the process
         solvers = list()
         if solver:
-            # logger.info('Building solver.')
-            # for node_type in ['zSolver', 'zSolverTransform']:
-            #     for parameter in self.get_scene_items(type_filter=node_type):
-            #         parameter.apply(attr_filter=attr_filter, permissive=permissive,
-            #                      check_meshes=check_meshes, interp_maps=interp_maps)
             solvers.append('zSolver')
             solvers.append('zSolverTransform')
 
@@ -300,7 +297,6 @@ class Ziva(Builder):
             for parameter in self.get_scene_items(type_filter=node_type):
                 parameter.build(attr_filter=attr_filter,
                                 permissive=permissive,
-                                check_meshes=check_meshes,
                                 interp_maps=interp_maps)
 
         # turn on solver
