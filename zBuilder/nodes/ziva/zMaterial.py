@@ -43,7 +43,7 @@ class MaterialNode(Ziva):
         # - set attrs and weights
 
         # get mesh name and node name from data
-        name = self.get_scene_name()
+        name = self.name
         mesh = self.association[0]
 
         # logger.info('creating material {}'.format(name))

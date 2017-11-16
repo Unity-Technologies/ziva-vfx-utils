@@ -46,11 +46,15 @@ class LineOfActionNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        name = self.get_scene_name()
+        name = self.name
         association = self.association
         fiber = self.fiber
+
         if mc.objExists(association[0]) and mc.objExists(fiber):
-            if not mc.objExists(name):
+            # check if the zFiber has a lineOf Action on it, if it does that is
+            # what we want to use.  If not lets create a new one
+            existing = mc.listConnections(fiber, type='zLineOfAction')
+            if not existing:
                 mc.select(fiber, association[0])
                 results_ = mm.eval('ziva -lineOfAction')
                 clt = mc.ls(results_, type='zLineOfAction')[0]
@@ -58,7 +62,7 @@ class LineOfActionNode(Ziva):
                 mc.rename(clt, name)
 
             else:
-                self.mobject = name
+                self.mobject = existing[0]
                 mc.rename(name, self.name)
 
         else:

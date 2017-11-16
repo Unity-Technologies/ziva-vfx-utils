@@ -31,7 +31,7 @@ class ClothNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        name = self.get_scene_name()
+        name = self.name
 
         if not mc.objExists(name):
             mc.select(self.association)
