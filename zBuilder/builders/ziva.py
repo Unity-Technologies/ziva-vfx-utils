@@ -12,8 +12,7 @@ mc.loadPlugin('ziva', qt=True)
 
 
 class Ziva(Builder):
-    """
-    To capture a Ziva rig
+    """ To capture a Ziva rig.
     """
 
     def __init__(self):
