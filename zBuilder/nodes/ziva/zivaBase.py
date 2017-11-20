@@ -15,7 +15,10 @@ class Ziva(Deformer):
     """
     EXTEND_ATTR_LIST = list()
 
-    mc.loadPlugin('ziva', qt=True)
+    try:
+        mc.loadPlugin('ziva', qt=True)
+    except RuntimeError:
+        pass
 
     def __init__(self,  maya_node=None, builder=None, deserialize=None):
         self.solver = None
