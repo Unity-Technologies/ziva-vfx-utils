@@ -37,13 +37,13 @@ class Constraint(DGNode):
             mc.select(self.association)
             constraint = None
             if self.type == 'parentConstraint':
-                results = mc.parentConstraint()
+                results = mc.parentConstraint(mo=True)
                 constraint = mc.ls(results, type='parentConstraint')[0]
             if self.type == 'pointConstraint':
-                results = mc.pointConstraint()
+                results = mc.pointConstraint(mo=True)
                 constraint = mc.ls(results, type='pointConstraint')[0]
             if self.type == 'orientConstraint':
-                results = mc.orientConstraint()
+                results = mc.orientConstraint(mo=True)
                 constraint = mc.ls(results, type='orientConstraint')[0]
 
             mc.rename(constraint, name)
