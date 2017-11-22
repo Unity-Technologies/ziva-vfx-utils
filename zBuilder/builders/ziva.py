@@ -8,8 +8,10 @@ from zBuilder.builder import Builder
 
 logger = logging.getLogger(__name__)
 
-mc.loadPlugin('ziva', qt=True)
-
+try:
+    mc.loadPlugin('ziva', qt=True)
+except RuntimeError:
+    pass
 
 class Ziva(Builder):
     """ To capture a Ziva rig.
