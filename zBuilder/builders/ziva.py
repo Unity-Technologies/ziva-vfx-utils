@@ -150,7 +150,6 @@ class Ziva(Builder):
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
-
         print '\ngetting ziva......'
 
         if not attr_filter:
@@ -190,7 +189,6 @@ class Ziva(Builder):
             nodes = selection
 
         if nodes:
-            print nodes
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
