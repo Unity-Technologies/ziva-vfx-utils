@@ -24,7 +24,7 @@ def copy_paste(*args, **kwargs):
     z.retrieve_from_scene_selection(selection[0])
     z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
     z.stats()
-    z.build(kwargs)
+    z.build(**kwargs)
 
     mc.select(sel)
 
