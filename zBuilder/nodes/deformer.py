@@ -55,26 +55,8 @@ class Deformer(DGNode):
 
         self.association = self.get_meshes(maya_node)
 
-        # # get map component data------------------------------------------------
-        # mesh_names = self.association
-        # map_names = self.get_map_names()
-        #
-        # if map_names and mesh_names:
-        #     for map_name, mesh_name in zip(map_names, mesh_names):
-        #         map_data_object = self.setup.component_factory(map_name,
-        #                                                         mesh_name,
-        #                                                         type='map')
-        #         self.setup.add_component(map_data_object)
-        #
-        #         if not self.setup.get_components(type_filter='mesh',
-        #                                          name_filter=mesh_name):
-        #             mesh_data_object = self.setup.component_factory(mesh_name,
-        #                                                              type='mesh')
-        #             self.setup.add_component(mesh_data_object)
-
     def get_map_meshes(self):
-        """
-        This is the mesh associated with each map in obj.MAP_LIST.  Typically
+        """ This is the mesh associated with each map in obj.MAP_LIST.  Typically
         it seems to coincide with mesh store in get_association.  Sometimes
         it deviates, so you can override this method to define your own
         list of meshes against the map list.
@@ -109,8 +91,7 @@ class Deformer(DGNode):
         return maps_
 
     def get_map_names(self):
-        """
-        This builds the map names.  maps from MAP_LIST with the object name
+        """ This builds the map names.  maps from MAP_LIST with the object name
         in front
 
         For this we want to get the .name and not scene name.
@@ -139,8 +120,7 @@ class Deformer(DGNode):
         return tmp
 
     def set_maya_weights(self, interp_maps=False):
-        """
-        Given a Builder node this set the map values of the object in the maya
+        """ Given a Builder node this set the map values of the object in the maya
         scene.  It first does a mObject check to see if it has been tracked, if
         it has it uses that instead of stored scene_name.
 
