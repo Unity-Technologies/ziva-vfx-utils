@@ -18,6 +18,8 @@ class Map(Base):
         self.values = None
         """str: Docstring *after* attribute, with type specified."""
 
+        self.map_type = None
+
         Base.__init__(self, *args, **kwargs)
         if args:
             map_name = args[0]
@@ -57,14 +59,14 @@ class Map(Base):
             mesh_name: Name of mesh to populate it with.
 
         """
-        # map_name = args[0]
-        # mesh_name = args[1]
+        map_type = mc.objectType(map_name)
         weight_value = get_weights(map_name, mesh_name)
 
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
         self.values = weight_value
+        self.map_type = map_type
 
         # logger.info('Retrieving Data : {}'.format(self))
 
