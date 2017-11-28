@@ -103,8 +103,8 @@ class Map(Base):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self.builder.bundle.get_scene_items(type_filter='mesh',
-                                                        name_filter=mesh_name)[0]
+        mesh_data = self.builder.get_scene_items(type_filter='mesh',
+                                                 name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):
