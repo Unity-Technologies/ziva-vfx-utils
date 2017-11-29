@@ -250,7 +250,7 @@ class Ziva(Builder):
         if check_meshes:
             logger.info('DEPRECATED FLAG:check_meshes not used.  Use ziva -mq.')
 
-        logger.info('Building....')
+        logger.info('Building Ziva Rig.')
         sel = mc.ls(sl=True)
 
         # lets build the solver first so we can turn it off to build rest.
@@ -262,6 +262,7 @@ class Ziva(Builder):
 
         # build the nodes by calling build method on each one
         for node_type in solvers:
+            logger.info('Building: {}'.format(node_type))
             for parameter in self.get_scene_items(type_filter=node_type):
                 parameter.build(attr_filter=attr_filter, permissive=permissive)
 
@@ -293,14 +294,14 @@ class Ziva(Builder):
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
-            for parameter in self.get_scene_items(type_filter=node_type):
-                parameter.build(attr_filter=attr_filter,
+            logger.info('Building: {}'.format(node_type))
+            for scene_item in self.get_scene_items(type_filter=node_type):
+                scene_item.build(attr_filter=attr_filter,
                                 permissive=permissive,
                                 interp_maps=interp_maps)
 
         # turn on solver
         mc.select(sel, r=True)
-
         mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
