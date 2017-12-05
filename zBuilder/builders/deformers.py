@@ -8,9 +8,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Test(Builder):
-    """
-    Test setup to play with deformers and how they are ordered on a mesh.
+class Deformers(Builder):
+    """Test setup to play with deformers and how they are ordered on a mesh.
     """
 
     def __init__(self):

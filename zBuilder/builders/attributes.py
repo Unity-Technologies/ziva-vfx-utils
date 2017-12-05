@@ -3,8 +3,7 @@ import maya.cmds as mc
 
 
 class Attributes(Builder):
-    """
-    Storing maya attributes
+    """Storing maya attributes
     """
 
     def __init__(self):

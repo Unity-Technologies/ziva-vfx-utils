@@ -3,8 +3,7 @@ import maya.cmds as mc
 
 
 class Selection(Builder):
-    """
-    Storing maya selection.
+    """Storing maya selection.
     """
     def __init__(self):
         Builder.__init__(self)
@@ -14,8 +13,8 @@ class Selection(Builder):
         selection = mc.ls(sl=True, l=True)
 
         for item in selection:
-            parameter = self.node_factory(item)
-            self.bundle.add_parameter(parameter)
+            scene_item = self.node_factory(item)
+            self.bundle.extend_scene_items(scene_item)
         self.stats()
 
     @Builder.time_this

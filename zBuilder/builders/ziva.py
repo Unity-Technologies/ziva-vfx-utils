@@ -14,7 +14,7 @@ except RuntimeError:
     pass
 
 class Ziva(Builder):
-    """ To capture a Ziva rig.
+    """To capture a Ziva rig.
     """
 
     def __init__(self):
