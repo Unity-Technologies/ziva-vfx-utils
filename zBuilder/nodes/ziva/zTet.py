@@ -101,5 +101,5 @@ class TetNode(Ziva):
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=interp_maps)
+        self.set_maya_weights(interp_maps=False)
 
