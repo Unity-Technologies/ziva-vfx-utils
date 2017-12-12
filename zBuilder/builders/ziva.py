@@ -209,11 +209,10 @@ class Ziva(Builder):
             self.bundle.extend_scene_items(parameter)
 
     @Builder.time_this
-    def build(self, name_filter=None, attr_filter=None, interp_maps='auto',
+    def build(self, association_filter=None, attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
-              lineOfActions=True, mirror=False, permissive=True,
-              check_meshes=False):
+              lineOfActions=True, mirror=False, permissive=True, check_meshes=False):
 
         """
         This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
@@ -240,7 +239,7 @@ class Ziva(Builder):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            name_filter (str): filter by node name.  Defaults to **None**
+            association_filter (str): filter by node association.  Defaults to **None**
 
         """
         if mirror:
@@ -295,7 +294,8 @@ class Ziva(Builder):
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
             logger.info('Building: {}'.format(node_type))
-            for scene_item in self.get_scene_items(type_filter=node_type):
+            for scene_item in self.get_scene_items(association_filter=association_filter,
+                                                   type_filter=node_type):
                 scene_item.build(attr_filter=attr_filter,
                                 permissive=permissive,
                                 interp_maps=interp_maps)
