@@ -116,10 +116,19 @@ def build_multiple(tissue_items, tet_items, interp_maps='auto',
             ztet.apply_user_tet_mesh()
 
             if ztissue.children_tissues:
-                    children_parms = ztissue.builder.get_scene_items(name_filter=ztissue.children_tissues)
-                    mc.select(ztissue.association)
-                    mc.select([x.association[0] for x in children_parms], add=True)
-                    mm.eval('ziva -ast')
+                """ If there are children lets check if there are parameters for
+                them.  If there are none, then lets check scene.
+                """
+                children_parms = ztissue.builder.get_scene_items(name_filter=ztissue.children_tissues)
+                if children_parms:
+                    children = [x.association[0] for x in children_parms]
+                else:
+                    mc.select(ztissue.children_tissues, r=True)
+                    children = mm.eval('zQuery -type zTissue -m ')
+
+                mc.select(ztissue.association)
+                mc.select(children, add=True)
+                mm.eval('ziva -ast')
 
     mc.select(sel)
 
