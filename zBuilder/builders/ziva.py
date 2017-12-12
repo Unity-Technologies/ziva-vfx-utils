@@ -209,7 +209,7 @@ class Ziva(Builder):
             self.bundle.extend_scene_items(parameter)
 
     @Builder.time_this
-    def build(self, association_filter=None, attr_filter=None, interp_maps='auto',
+    def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True,
               lineOfActions=True, mirror=False, permissive=True, check_meshes=False):
@@ -239,7 +239,7 @@ class Ziva(Builder):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            association_filter (str): filter by node association.  Defaults to **None**
+            association_filter (str): filter by node association.  Defaults to list()
 
         """
         if mirror:
@@ -294,8 +294,8 @@ class Ziva(Builder):
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
             logger.info('Building: {}'.format(node_type))
-            for scene_item in self.get_scene_items(association_filter=association_filter,
-                                                   type_filter=node_type):
+            for scene_item in self.get_scene_items(type_filter=node_type,
+                                                   association_filter=association_filter):
                 scene_item.build(attr_filter=attr_filter,
                                 permissive=permissive,
                                 interp_maps=interp_maps)
