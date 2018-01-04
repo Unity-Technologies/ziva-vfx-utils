@@ -1,8 +1,13 @@
-from shiboken import wrapInstance
-from PySide import QtGui, QtCore
+try:
+    from shiboken import wrapInstance
+except ImportError:
+    from shiboken2 import wrapInstance
+# from PySide import QtGui, QtCore
 from maya import OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya.OpenMayaUI import MQtUtil
+from zUI.Qt import QtGui, QtWidgets, QtCore  # https://github.com/mottosso/Qt.py by Marcus Ottosson
+
 import functools
 import os
 import maya.cmds as mc
@@ -121,7 +126,7 @@ class MCallbackIdWrapper(object):
         return 'MCallbackIdWrapper(%r)'%self.callbackId
 
 
-class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
+class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
     toolName = 'zivaWidget'
 
     def __init__(self, parent=None):
@@ -138,7 +143,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.settings = QtCore.QSettings("Ziva Dynamics", "zUi")
 
 
-        self.mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtGui.QMainWindow)
+        self.mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtWidgets.QMainWindow)
         self.setObjectName(self.__class__.toolName) # Make this unique enough if using it to clear previous instance!
 
         # Setup window's properties
@@ -149,7 +154,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         # Delete UI on close to avoid winEvent error
         #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
-        self.progressBar = QtGui.QProgressBar()
+        self.progressBar = QtWidgets.QProgressBar()
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(0)
         self.progressBar.hide()
@@ -163,7 +168,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.create_popup_menu()
         self._populate()
         
-        self.script_job()
+        #self.script_job()
         mc.select(cl=True)
         #mc.select(sel,r=True)
 
@@ -192,9 +197,9 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.line_edit = line.ButtonLineEdit(icons['close'])
 
 
-        self.treeWidget = QtGui.QTreeWidget()
+        self.treeWidget = QtWidgets.QTreeWidget()
         self.treeWidget.setColumnCount(1)
-        self.treeWidget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeWidget.header().close()
         self.treeWidget.setAutoFillBackground(True)
 
@@ -211,12 +216,12 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
         self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
-        main_layout = QtGui.QVBoxLayout()
+        main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(2)
         
         # tool------------------------------------------------------------------\
-        h_layout = QtGui.QHBoxLayout()
+        h_layout = QtWidgets.QHBoxLayout()
         h_layout.setStretch(0,True)
 
 
@@ -227,12 +232,12 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         main_layout.addLayout(h_layout)
         
 
-        self.cw = QtGui.QWidget()
+        self.cw = QtWidgets.QWidget()
         self.setCentralWidget(self.cw)
         self.cw.setLayout(main_layout)
 
 
-        self.splitter1 = QtGui.QSplitter(self.cw)
+        self.splitter1 = QtWidgets.QSplitter(self.cw)
         self.splitter1.addWidget(self.treeWidget)
         self.splitter1.addWidget(self.prop)
         h_layout.addWidget(self.splitter1)
@@ -286,125 +291,125 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
     def setup_actions(self):
 
-        self.ziva_save_ac = QtGui.QAction(QtGui.QIcon(icons['zExport']), 'Export Ziva Setup...', self)
+        self.ziva_save_ac = QtWidgets.QAction(QtGui.QIcon(icons['zExport']), 'Export Ziva Setup...', self)
         #self.ziva_save_ac.setShortcut('s')
         self.ziva_save_ac.setStatusTip('Export Ziva Setup')
         self.ziva_save_ac.triggered.connect(self._save_solver)
 
-        self.ziva_import_ac = QtGui.QAction(QtGui.QIcon(icons['zImport']), 'Import Ziva Setup...', self)
+        self.ziva_import_ac = QtWidgets.QAction(QtGui.QIcon(icons['zImport']), 'Import Ziva Setup...', self)
         #self.ziva_save_ac.setShortcut('s')
         self.ziva_import_ac.setStatusTip('Import Ziva Setup')
         self.ziva_import_ac.triggered.connect(self._import_solver)
 
 
-        self.c_solver_ac = QtGui.QAction(QtGui.QIcon(icons['zSolver']), 'Solver', self)
-        self.c_solver_ac.setShortcut('s')
+        self.c_solver_ac = QtWidgets.QAction(QtGui.QIcon(icons['zSolver']), 'Solver', self)
+        #self.c_solver_ac.setShortcut('s')
         self.c_solver_ac.setStatusTip('Create Solver')
         self.c_solver_ac.triggered.connect(self._create_solver)
 
-        self.c_tissue_ac = QtGui.QAction(QtGui.QIcon(icons['zTissue']), 'Tissue', self)
-        self.c_tissue_ac.setShortcut('t')
+        self.c_tissue_ac = QtWidgets.QAction(QtGui.QIcon(icons['zTissue']), 'Tissue', self)
+        #self.c_tissue_ac.setShortcut('t')
         self.c_tissue_ac.setStatusTip('Create Tissue')
         self.c_tissue_ac.triggered.connect(self._create_tissue)
 
-        self.c_bone_ac = QtGui.QAction(QtGui.QIcon(icons['zBone']), 'Bone', self)
-        self.c_bone_ac.setShortcut('b')
+        self.c_bone_ac = QtWidgets.QAction(QtGui.QIcon(icons['zBone']), 'Bone', self)
+        #self.c_bone_ac.setShortcut('b')
         self.c_bone_ac.setStatusTip('Create Bone')
         self.c_bone_ac.triggered.connect(self._create_bone)
 
-        self.c_material_ac = QtGui.QAction(QtGui.QIcon(icons['zMaterial']), 'Material', self)
-        self.c_material_ac.setShortcut('m')
+        self.c_material_ac = QtWidgets.QAction(QtGui.QIcon(icons['zMaterial']), 'Material', self)
+        #self.c_material_ac.setShortcut('m')
         self.c_material_ac.setStatusTip('Create material')
         self.c_material_ac.triggered.connect(self._create_material)
 
-        self.c_fiber_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
+        self.c_fiber_ac = QtWidgets.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
         #self.c_fiber_ac.setShortcut('F5')
         self.c_fiber_ac.setStatusTip('Create Fiber')
         self.c_fiber_ac.triggered.connect(self._create_fiber)
 
-        self.c_att_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Attachment', self)
-        self.c_att_ac.setShortcut('a')
+        self.c_att_ac = QtWidgets.QAction(QtGui.QIcon(icons['zFiber']), 'Attachment', self)
+        #self.c_att_ac.setShortcut('a')
         self.c_att_ac.setStatusTip('Create Attachment')
         self.c_att_ac.triggered.connect(self._create_attachment)
 
 
 
-        self.delete_ac = QtGui.QAction( 'Remove Ziva Node', self)
-        shortcuts = [
-            QtGui.QKeySequence(QtCore.Qt.Key_Delete),
-            QtGui.QKeySequence(QtCore.Qt.Key_Backspace)
-                    ]
-        self.delete_ac.setShortcuts(shortcuts)
+        self.delete_ac = QtWidgets.QAction( 'Remove Ziva Node', self)
+        #shortcuts = [
+        #    QtGui.QKeySequence(QtCore.Qt.Key_Delete),
+        #    QtGui.QKeySequence(QtCore.Qt.Key_Backspace)
+        #            ]
+        #self.delete_ac.setShortcuts(shortcuts)
         self.delete_ac.setStatusTip('Remove Ziva Node')
         self.delete_ac.triggered.connect(self._delete_nodes)
 
 
-        self.refresh_ac = QtGui.QAction(QtGui.QIcon(icons['zSolver']), 'Refresh', self)
-        self.refresh_ac.setShortcut('F5')
+        self.refresh_ac = QtWidgets.QAction(QtGui.QIcon(icons['zSolver']), 'Refresh', self)
+        #self.refresh_ac.setShortcut('F5')
         self.refresh_ac.setStatusTip('Refresh Ui')
         self.refresh_ac.triggered.connect(self._refresh_ui)
 
-        self.solvers_ac = QtGui.QAction(QtGui.QIcon(icons['zSolver']), 'Solvers', self)
+        self.solvers_ac = QtWidgets.QAction(QtGui.QIcon(icons['zSolver']), 'Solvers', self)
 
-        self.solvers_ac.setShortcut('1')
+        #self.solvers_ac.setShortcut('1')
         #self.solvers_ac.setShortcutContext(QtCore.Qt.WidgetWithChildrenShortcut)
         self.solvers_ac.setStatusTip('Toggle Solver Visibility')
         self.solvers_ac.setCheckable(True)
         self.solvers_ac.setChecked(False)
         self.solvers_ac.triggered.connect(self.tool_button_clicked)
 
-        self.tissue_ac = QtGui.QAction(QtGui.QIcon(icons['zTissue']), 'Tissues', self)
-        self.tissue_ac.setShortcut('2')
+        self.tissue_ac = QtWidgets.QAction(QtGui.QIcon(icons['zTissue']), 'Tissues', self)
+        #self.tissue_ac.setShortcut('2')
         self.tissue_ac.setStatusTip('Toggle Tissue Visibility')
         self.tissue_ac.setCheckable(True)
         self.tissue_ac.setChecked(False)
         self.tissue_ac.triggered.connect(self.tool_button_clicked)
 
-        self.tet_ac = QtGui.QAction(QtGui.QIcon(icons['zTet']), 'Tets', self)
-        self.tet_ac.setShortcut('3')
+        self.tet_ac = QtWidgets.QAction(QtGui.QIcon(icons['zTet']), 'Tets', self)
+        #self.tet_ac.setShortcut('3')
         self.tet_ac.setStatusTip('Toggle Tet Visibility')
         self.tet_ac.setCheckable(True)
         self.tet_ac.setChecked(False)
         self.tet_ac.triggered.connect(self.tool_button_clicked)
 
-        self.bone_ac = QtGui.QAction(QtGui.QIcon(icons['zBone']), 'Bones', self)
-        self.bone_ac.setShortcut('4')
+        self.bone_ac = QtWidgets.QAction(QtGui.QIcon(icons['zBone']), 'Bones', self)
+        #self.bone_ac.setShortcut('4')
         self.bone_ac.setStatusTip('Toggle Bone Visibility')
         self.bone_ac.setCheckable(True)
         self.bone_ac.setChecked(False)
         self.bone_ac.triggered.connect(self.tool_button_clicked)
 
-        self.attachment_ac = QtGui.QAction(QtGui.QIcon(icons['zAttachment']), 'Attachment', self)
-        self.attachment_ac.setShortcut('5')
+        self.attachment_ac = QtWidgets.QAction(QtGui.QIcon(icons['zAttachment']), 'Attachment', self)
+        #self.attachment_ac.setShortcut('5')
         self.attachment_ac.setStatusTip('Toggle Attachment Visibility')
         self.attachment_ac.setCheckable(True)
         self.attachment_ac.setChecked(False)
         self.attachment_ac.triggered.connect(self.tool_button_clicked)
 
-        self.material_ac = QtGui.QAction(QtGui.QIcon(icons['zMaterial']), 'Material', self)
-        self.material_ac.setShortcut('6')
+        self.material_ac = QtWidgets.QAction(QtGui.QIcon(icons['zMaterial']), 'Material', self)
+        #self.material_ac.setShortcut('6')
         self.material_ac.setStatusTip('Toggle Material Visibility')
         self.material_ac.setCheckable(True)
         self.material_ac.setChecked(False)
         self.material_ac.triggered.connect(self.tool_button_clicked)
 
-        self.fiber_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
-        self.fiber_ac.setShortcut('7')
+        self.fiber_ac = QtWidgets.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
+        #self.fiber_ac.setShortcut('7')
         self.fiber_ac.setStatusTip('Toggle Fiber Visibility')
         self.fiber_ac.setCheckable(True)
         self.fiber_ac.setChecked(False)
         self.fiber_ac.triggered.connect(self.tool_button_clicked)
 		
 		#not sure what self.paint_ac does KC
-        self.paint_ac = QtGui.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
+        self.paint_ac = QtWidgets.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
 
-        self.find_ac = QtGui.QAction(QtGui.QIcon(), 'Find', self)
-        self.find_ac.setShortcut('f')
+        self.find_ac = QtWidgets.QAction(QtGui.QIcon(), 'Find', self)
+        #self.find_ac.setShortcut('f')
         self.find_ac.setStatusTip('find')
         self.find_ac.triggered.connect(self._find_items)
 
-        self.enable_toggle_ac = QtGui.QAction(QtGui.QIcon(), 'Enable Toggle', self)
-        self.enable_toggle_ac.setShortcut('e')
+        self.enable_toggle_ac = QtWidgets.QAction(QtGui.QIcon(), 'Enable Toggle', self)
+        #self.enable_toggle_ac.setShortcut('e')
         self.enable_toggle_ac.setStatusTip('Toggle enable status of selected items')
         self.enable_toggle_ac.triggered.connect(self._enable_items)
 
@@ -496,7 +501,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
             self.progressBar.show()
             
 
-            fileName = QtGui.QFileDialog.getSaveFileName(self, 'Save Ziva Setup', 'c:\\Temp\\', filter='*.ziva')
+            fileName = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Ziva Setup', 'c:\\Temp\\', filter='*.zBuilder')
             if fileName[0]:
 
                 z = zva.ZivaSetup()
@@ -510,7 +515,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
     def _import_solver(self):
 
-        fileName = QtGui.QFileDialog.getOpenFileName(self, 'Import Ziva Setup', 'c:\\Temp\\', filter='*.ziva')
+        fileName = QtWidgets.QFileDialog.getOpenFileName(self, 'Import Ziva Setup', 'c:\\Temp\\', filter='*..zBuilder')
         if fileName[0]:
             self.progressBar.setValue(0)
             self.progressBar.setFormat('loading...')
@@ -617,13 +622,13 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 		the pop-up menu for the tree widget
 		'''
 		
-		self.popup_menu = QtGui.QMenu()
+		self.popup_menu = QtWidgets.QMenu()
 		# menu item
-		self.item_add_act = QtGui.QAction("Open in Attribute Spread Sheet", self)
+		self.item_add_act = QtWidgets.QAction("Open in Attribute Spread Sheet", self)
 		
-		self.item_add_paintBoth = QtGui.QAction("Both maps", self)
+		self.item_add_paintBoth = QtWidgets.QAction("Both maps", self)
 		self.item_add_act.triggered.connect(self.open_spreadsheet)
-		self.item_add_act.setShortcut("s")
+		#self.item_add_act.setShortcut("s")
 				
 		#paint sel object Menu
 		self.item_add_paintBoth.triggered.connect(self.paintBothMaps)
@@ -670,7 +675,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         fiber = self.fiber_ac.isChecked()
         material = self.material_ac.isChecked()
 
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
 
@@ -712,7 +717,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         for selected in getSelected:
             name = self._get_name_from_item_data(selected,fullPath=False)
 
-            iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+            iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
             while iterator.value():
                 item = iterator.value()
                 other = self._get_name_from_item_data(item,fullPath=False)
@@ -751,7 +756,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
 
-                s_item = QtGui.QTreeWidgetItem(1)
+                s_item = QtWidgets.QTreeWidgetItem(1)
                 s_item.setText(0,solverTransform)
                 s_item.setIcon(0,QtGui.QIcon(icons['zSolver']))
 
@@ -765,7 +770,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                     if zNode:
                         _type = mc.objectType(zNode)
 
-                        st_item = QtGui.QTreeWidgetItem(s_item,1)
+                        st_item = QtWidgets.QTreeWidgetItem(s_item,1)
                         st_item.setText(0,zNode)
                         st_item.setIcon(0,QtGui.QIcon(icons[_type]))
                         st_item.setData(0,QtCore.Qt.UserRole, util.getDependNode(zNode))
@@ -783,7 +788,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                 tissue_items = []
                 if tissue_meshes:
                     for mesh in tissue_meshes:
-                        item = QtGui.QTreeWidgetItem(s_item,0)
+                        item = QtWidgets.QTreeWidgetItem(s_item,0)
                         item.setText(0,mesh)
                         item.setIcon(0,QtGui.QIcon(icons['zTissue']))
                         item.setData(0,QtCore.Qt.UserRole, util.getDependNode(mesh))
@@ -795,7 +800,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                             nodes = mm.eval('zQuery -t %s %s' % (zNode,mesh))
                             if nodes:
                                 for node in nodes:
-                                    c_item = QtGui.QTreeWidgetItem(item,1)
+                                    c_item = QtWidgets.QTreeWidgetItem(item,1)
                                     c_item.setText(0,node)
                                     c_item.setIcon(0,QtGui.QIcon(icons[zNode]))
                                     c_item.setData(0,QtCore.Qt.UserRole, util.getDependNode(node))
@@ -815,7 +820,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                 bone_meshes = self.get_bone_meshes(solver)
                 if bone_meshes:
                     for mesh in bone_meshes:
-                        item3 = QtGui.QTreeWidgetItem(s_item,0)
+                        item3 = QtWidgets.QTreeWidgetItem(s_item,0)
                         item3.setText(0,mesh)
                         item3.setIcon(0,QtGui.QIcon(icons['zBone']))
                         item3.setData(0,QtCore.Qt.UserRole, util.getDependNode(mesh))
@@ -823,7 +828,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                         item3.attr_order = []
 
                         zBone = mm.eval('zQuery -t zBone '+mesh)[0]
-                        b_item = QtGui.QTreeWidgetItem(item3,1)
+                        b_item = QtWidgets.QTreeWidgetItem(item3,1)
                         b_item.setText(0,zBone)
                         b_item.setIcon(0,QtGui.QIcon(icons['zBone']))
                         b_item.setData(0,QtCore.Qt.UserRole, util.getDependNode(zBone))
@@ -839,7 +844,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                             nodes = mm.eval('zQuery -t %s %s' % (zNode,zBone))
                             if nodes:
                                 for node in nodes:
-                                    c_item = QtGui.QTreeWidgetItem(item3,1)
+                                    c_item = QtWidgets.QTreeWidgetItem(item3,1)
                                     c_item.setText(0,node)
                                     if zNode == 'zAttachment':
                                         source = mm.eval('zQuery -as %s' % node)[0]
@@ -863,7 +868,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                 cloth_items = []
                 if cloth_meshes:
                     for mesh in cloth_meshes:
-                        item = QtGui.QTreeWidgetItem(s_item,0)
+                        item = QtWidgets.QTreeWidgetItem(s_item,0)
                         item.setText(0,mesh)
                         item.setIcon(0,QtGui.QIcon(icons['zTissue']))
                         item.setData(0,QtCore.Qt.UserRole, util.getDependNode(mesh))
@@ -875,7 +880,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                             nodes = mm.eval('zQuery -t %s %s' % (zNode,mesh))
                             if nodes:
                                 for node in nodes:
-                                    c_item = QtGui.QTreeWidgetItem(item,1)
+                                    c_item = QtWidgets.QTreeWidgetItem(item,1)
                                     c_item.setText(0,node)
                                     c_item.setIcon(0,QtGui.QIcon(icons[zNode]))
                                     c_item.setData(0,QtCore.Qt.UserRole, util.getDependNode(node))
@@ -926,7 +931,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
             
     def _foreground_item_enable_color(self):
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             name = self._get_name_from_item_data(item)
@@ -1015,7 +1020,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
     def search_tree(self):
         search_text = self.line_edit.text()
 
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             item_text = item.text(0)
@@ -1031,7 +1036,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
     def _selection_changed(self,*args, **kwargs):
-        logger.info( 'SJ: refresh deferred: ' ) 
+        #logger.info( 'SJ: refresh deferred: ' )
         self.treeWidget.blockSignals(True)
         self.treeWidget.clearSelection()
 
@@ -1044,12 +1049,13 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
 
         self.treeWidget.blockSignals(False)
-        self.update_properties()
+
 
 
 
     def tree_changed(self):
         #print 'ui:tree_changed'
+
         self.blockSignals(True)
         self.prop.blockSignals(True)
 
@@ -1067,6 +1073,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.blockSignals(False)
         
         #print 'ui:tree_changed-finished'
+        # self.update_properties()
 
     def _highlight_parent(self):
         '''
@@ -1077,7 +1084,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
 
         getSelected = self.treeWidget.selectedItems()
         # color back to original
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             item.setBackground(0,QtGui.QBrush(QtGui.QColor("#2C2B2B")))
@@ -1094,7 +1101,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         for selected in getSelected:
             names.append(self._get_name_from_item_data(selected,fullPath=True))
 
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             other = self._get_name_from_item_data(item,fullPath=True)
@@ -1154,17 +1161,17 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         self.jobNum.append(mc.scriptJob( event= ["SceneOpened",self._refresh_ui_deferred], protected=True))
 
     def _refresh_ui_deferred(self,*args,**kwargs):
-        logger.info( 'SJ: refresh deferred: ' ) 
+        #logger.info( 'SJ: refresh deferred: ' )
         mc.evalDeferred(self._refresh_ui, low=True)
 
 
 
     def _name_changed(self,*args, **kwargs):
-        logger.info( 'SJ: name changed: ' ) 
+        # logger.info( 'SJ: name changed: ' )
         #print 'ui:_name_changed'
         self.treeWidget.blockSignals(True)
         #iterate through all items in tree
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             name = self._get_name_from_item_data(item,fullPath=False)
@@ -1199,14 +1206,17 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
     # Delete any instances of this class
     def deleteInstances(self):
         mayaMainWindowPtr = omui.MQtUtil.mainWindow() 
-        mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtGui.QMainWindow) # Important that it's QMainWindow, and not QWidget/QDialog
+        mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtWidgets.QMainWindow) # Important that it's QMainWindow, and not QWidget/QDialog
 
         # Go through main window's children to find any previous instances
+
         for obj in mayaMainWindow.children():
             #print  str(type(obj))
             #if type( obj ) == "<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
             #print 'DFDDDDDDDDDDDDDDDDDDD'
             #if obj.widget().__class__ == self.__class__: # Alternatively we can check with this, but it will fail if we re-evaluate the class
+
+
             try:
                 #print 'on ',obj.widget().objectName() 
                 if obj.widget().objectName() == self.__class__.toolName: # Compare object names
@@ -1220,12 +1230,14 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
                 pass
 
 
+
+
     def onDirtyPlug(self, node, plug, *args, **kwargs):
         '''Add to the self._deferredUpdateRequest member variable that is then 
         deferred processed by self._processDeferredUpdateRequest(). 
         '''
         self._deferredUpdateRequest = {}
-        iterator = QtGui.QTreeWidgetItemIterator(self.treeWidget)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.treeWidget)
         while iterator.value():
             item = iterator.value()
             mobject = item.data(0,QtCore.Qt.UserRole)
@@ -1270,8 +1282,16 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
         
     # Show window with docking ability
     def run(self):
+        try:
+            workspaceControlName = 'zivaWidgetWorkspaceControl'
+            if mc.workspaceControl(workspaceControlName, q=True, exists=True):
+                mc.workspaceControl(workspaceControlName, e=True, close=True)
+                mc.deleteUI(workspaceControlName, control=True)
+        except:
+            pass
+
         mayaMainWindowPtr = omui.MQtUtil.mainWindow() 
-        mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtGui.QMainWindow) # Important that it's QMainWindow, and not QWidget/QDialog
+        mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtWidgets.QMainWindow) # Important that it's QMainWindow, and not QWidget/QDialog
         test = True
         for obj in mayaMainWindow.children():
             try:
@@ -1281,7 +1301,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtGui.QMainWindow):
             except:
                 pass
         if test:
-            self.show(dockable = True)
+            self.show(dockable = False)
         
         #self.show()
 

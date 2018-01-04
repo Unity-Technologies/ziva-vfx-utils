@@ -1,4 +1,7 @@
-from PySide import QtGui, QtCore
+# from PySide import QtGui, QtCore
+from Qt import QtGui, QtWidgets, QtCore # https://github.com/mottosso/Qt.py by Marcus Ottosson
+from Qt import __binding__
+
 import functools
 import os
 
@@ -9,8 +12,6 @@ from maya import OpenMaya as om
 import logging
 
 logger = logging.getLogger(__name__)
-
-
 
 icons = {}
 icons['zBone'] =            'icons\\zBone.xpm'
@@ -26,7 +27,6 @@ icons['zEmbedder']=            'icons\\out_zSolver.xpm'
 icons['zCache']=            'icons\\zFiber.xpm'
 
 
-
 class MCallbackIdWrapper(object):
     '''Wrapper class to handle cleaning up of MCallbackIds from registered MMessage
     '''
@@ -38,13 +38,12 @@ class MCallbackIdWrapper(object):
     def __del__(self):
         #logger.info( 'deleting callback: {}'.format(self.callbackId) )  
         om.MMessage.removeCallback(self.callbackId)
-        
 
     def __repr__(self):
         return 'MCallbackIdWrapper(%r)'%self.callbackId
 
 
-class Properties(QtGui.QTableWidget):
+class Properties(QtWidgets.QTableWidget):
     def __init__(self, parent=None):
         super(Properties, self).__init__(parent)
         logger.info( 'instantiated: {}'.format(self) )    
@@ -58,7 +57,7 @@ class Properties(QtGui.QTableWidget):
         self.setColumnCount(2)
         self.setColumnWidth(0, 120)
         self.setColumnWidth(1, 80)
-        self.setEditTriggers(QtGui.QAbstractItemView.CurrentChanged)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.CurrentChanged)
 
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.contextMenuEvent)
@@ -73,8 +72,15 @@ class Properties(QtGui.QTableWidget):
         h_header = self.horizontalHeader()
         h_header.setStretchLastSection(False)
         h_header.setVisible(False)
-        h_header.setResizeMode(0, QtGui.QHeaderView.Stretch)
-        h_header.setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+        if __binding__ == "PySide":
+            h_header.setResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            h_header.setResizeMode(1, QtWidgets.QHeaderView.Fixed)
+        elif __binding__ == "PySide2":
+            h_header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            h_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed)
+
+
         #self.resizeRowsToContents()
 
         # Use functools.partial() to dynamically constructing a function
@@ -134,11 +140,11 @@ class Properties(QtGui.QTableWidget):
             #print name
             fullname = self.parent._get_name_from_item_data(i,fullPath=True)
             #print fullname
-            item = QtGui.QTableWidgetItem(name)
+            item = QtWidgets.QTableWidgetItem(name)
             item.setBackground(QtGui.QColor(60,60,60))
             item.setData(QtCore.Qt.UserRole, getDependNode(fullname))
             #print mc.objectType(fullName)
-            #icon = QtGui.QIcon(icons[mc.objectType(fullName)])
+            #icon = QtWidgets.QIcon(icons[mc.objectType(fullName)])
             #item.setIcon(icon) 
 
             self.setItem(row,0,item)
@@ -157,7 +163,7 @@ class Properties(QtGui.QTableWidget):
                 _type=attrs[attr]['type']
 
                 if _type == 'weight':
-                    p_item = QtGui.QTableWidgetItem(attrs[attr]['niceName'])
+                    p_item = QtWidgets.QTableWidgetItem(attrs[attr]['niceName'])
                     p_item.setTextAlignment(QtCore.Qt.AlignRight)
                     p_item.setBackground(QtGui.QColor(68,68,68))
                     p_item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
@@ -165,7 +171,7 @@ class Properties(QtGui.QTableWidget):
                     self.setItem(row,0,p_item)
 
                     p_item.setBackground(QtGui.QColor(100,100,100))
-                    self.button = QtGui.QToolButton(self)
+                    self.button = QtWidgets.QToolButton(self)
                     self.button.setIcon(QtGui.QIcon(icons['zCache']))
                     self.button.setStyleSheet('border: 0px; padding: 0px;')
                     self.button.setCursor(QtCore.Qt.PointingHandCursor)
@@ -175,14 +181,14 @@ class Properties(QtGui.QTableWidget):
                     onButPressFunc = functools.partial(self._weight_button_clicked,attr=attr,name=name,_type=_type)
                     self.button.clicked.connect(onButPressFunc)
                 else:
-                    p_item = QtGui.QTableWidgetItem(attr)
+                    p_item = QtWidgets.QTableWidgetItem(attr)
                     p_item.setTextAlignment(QtCore.Qt.AlignRight)
                     p_item.setBackground(QtGui.QColor(68,68,68))
                     p_item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     #p_item.node_name = name
                     self.setItem(row,0,p_item)
 
-                    v_item = QtGui.QTableWidgetItem()
+                    v_item = QtWidgets.QTableWidgetItem()
                     v_item.node_name = name
                     v_item.attr_type = attrs[attr]['type']
                     if v_item.attr_type == 'enum':
@@ -256,21 +262,21 @@ class Properties(QtGui.QTableWidget):
         if _type == 'bool':
             if value == True:
                 widget.setCheckState(QtCore.Qt.Checked)
-                logger.info( 'setting widget {} {}'.format(widget,value) ) 
+                #logger.info( 'setting widget {} {}'.format(widget,value) )
             else:
                 widget.setCheckState(QtCore.Qt.Unchecked)
-                logger.info( 'setting widget {} {}'.format(widget,value) ) 
+                #logger.info( 'setting widget {} {}'.format(widget,value) )
         elif _type == 'enum':
             value = mc.getAttr(nodeAttr,asString=True)
             widget.setText(str(value))
-            logger.info( 'setting widget {} {}'.format(widget,value) ) 
+            #logger.info( 'setting widget {} {}'.format(widget,value) )
             #print 'setting widget enum: ',value
         elif _type == 'weight':
             print 'passing weight'
             pass
         else:
             widget.setText(str(value))
-            logger.info( 'setting widget {} {}'.format(widget,value) ) 
+            #logger.info( 'setting widget {} {}'.format(widget,value) )
 
         #self.blockSignals(False)
         #self.__block = False
@@ -288,18 +294,18 @@ class Properties(QtGui.QTableWidget):
             nodeName = item.node_name
             enum_list = self._get_enum_list(nodeName,attrName)
 
-            self.menu = QtGui.QMenu(self)
+            self.menu = QtWidgets.QMenu(self)
             for el in enum_list:
                 onButPressFunc = functools.partial(
                     self.renameSlot,
                     item=item,
                     new=el)
          
-                action = QtGui.QAction(el, self)
+                action = QtWidgets.QAction(el, self)
                 action.triggered.connect(onButPressFunc)
                 self.menu.addAction(action)
             # add other required actions
-            self.menu.popup(QtGui.QCursor.pos())
+            self.menu.popup(QtWidgets.QCursor.pos())
 
 
            
