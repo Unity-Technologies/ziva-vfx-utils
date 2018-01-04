@@ -1,5 +1,10 @@
 Release Notes
 =============
+1.0.3
+------
+* zUI support on maya 2017 and 2018
+* bug fixes
+
 1.0.0
 ------
 * major refactor
