@@ -1,6 +1,6 @@
 # from PySide import QtGui, QtCore
-from Qt import QtGui, QtWidgets, QtCore # https://github.com/mottosso/Qt.py by Marcus Ottosson
-from Qt import __binding__
+from zUI.Qt import QtGui, QtWidgets, QtCore # https://github.com/mottosso/Qt.py by Marcus Ottosson
+from zUI.Qt import __binding__
 
 import functools
 import os
