@@ -504,7 +504,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
             fileName = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Ziva Setup', 'c:\\Temp\\', filter='*.zBuilder')
             if fileName[0]:
 
-                z = zva.ZivaSetup()
+                z = zva.Ziva()
                 z.retrieve_from_scene(solver)
                 self.progressBar.setValue(50)
                 z.write(fileName[0])
@@ -515,7 +515,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
 
     def _import_solver(self):
 
-        fileName = QtWidgets.QFileDialog.getOpenFileName(self, 'Import Ziva Setup', 'c:\\Temp\\', filter='*..zBuilder')
+        fileName = QtWidgets.QFileDialog.getOpenFileName(self, 'Import Ziva Setup', 'c:\\Temp\\', filter='*.zBuilder')
         if fileName[0]:
             self.progressBar.setValue(0)
             self.progressBar.setFormat('loading...')
@@ -523,31 +523,32 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
             
             sel = mc.ls(sl=True)
 
-            z = zva.ZivaSetup()
+            z = zva.Ziva()
             z.retrieve_from_file(fileName[0])
-
-            z.apply_solver()
-            #turn off solver to speed up build
-            zSolverTransform = z.get_scene_items(_type='zSolverTransform')[0]
-            sn = zSolverTransform.get_name()
-            solver_value = zSolverTransform.attr['enable']['value']
-            mc.setAttr(sn+'.enable',0)
-            self.progressBar.setValue(20)
-            z.apply_bones()
-            self.progressBar.setValue(40)
-            z.apply_tissues(interp_maps='auto')
-            self.progressBar.setValue(60)
-            z.apply_attachments(interp_maps='auto')
-            self.progressBar.setValue(80)
-            z.apply_materials(interp_maps='auto')
-            self.progressBar.setValue(90)
-            z.apply_fibers(interp_maps='auto')
-            self.progressBar.setValue(100)
-            z.apply_embedded()
-            self.progressBar.setFormat('finished importing')
-            # set solver back to whatever it was in data
-            mc.setAttr(sn+'.enable',solver_value)
-            mc.select(sel,r=True)
+            z.build()
+            self.progressBar.setValue(0)
+            # z.apply_solver()
+            # #turn off solver to speed up build
+            # zSolverTransform = z.get_scene_items(_type='zSolverTransform')[0]
+            # sn = zSolverTransform.get_name()
+            # solver_value = zSolverTransform.attr['enable']['value']
+            # mc.setAttr(sn+'.enable',0)
+            # self.progressBar.setValue(20)
+            # z.apply_bones()
+            # self.progressBar.setValue(40)
+            # z.apply_tissues(interp_maps='auto')
+            # self.progressBar.setValue(60)
+            # z.apply_attachments(interp_maps='auto')
+            # self.progressBar.setValue(80)
+            # z.apply_materials(interp_maps='auto')
+            # self.progressBar.setValue(90)
+            # z.apply_fibers(interp_maps='auto')
+            # self.progressBar.setValue(100)
+            # z.apply_embedded()
+            # self.progressBar.setFormat('finished importing')
+            # # set solver back to whatever it was in data
+            # mc.setAttr(sn+'.enable',solver_value)
+            # mc.select(sel,r=True)
 
             self._refresh_ui()
 
