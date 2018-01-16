@@ -44,13 +44,6 @@ zBuilder.builders.skinClusters module
     :undoc-members:
     :show-inheritance:
 
-zBuilder.builders.test module
------------------------------
-
-.. automodule:: zBuilder.builders.test
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 zBuilder.builders.ziva module
 -----------------------------

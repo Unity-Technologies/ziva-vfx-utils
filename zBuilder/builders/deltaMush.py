@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class DeltaMush(Builder):
-    """To capture a Ziva rig
+    """To capture a deltaMush
     """
 
     def __init__(self):

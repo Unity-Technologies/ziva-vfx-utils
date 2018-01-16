@@ -274,13 +274,13 @@ Once we have a scene with just the arm geometry, let's retrieve the Ziva rig fro
     import zBuilder.builders.ziva as zva
     z = zva.Ziva()
     # Use the same path here that you used above.
-    z.retrieve_from_file('C:\\Temp\\test.ziva')
+    z.retrieve_from_file('C:\\Temp\\test.zBuilder')
 
 You should see something like this in your script editor:
 
 .. code-block:: python
 
-    z.retrieve_from_file('C:\\Temp\\test.ziva')
+    z.retrieve_from_file('C:\\Temp\\test.zBuilder')
     # zBuilder.builder : reading parameters. 134 nodes #
     # zBuilder.builder : reading info #
     # zBuilder.bundle : zTissue 7 #
@@ -294,7 +294,7 @@ You should see something like this in your script editor:
     # zBuilder.bundle : zSolver 1 #
     # zBuilder.bundle : zSolverTransform 1 #
     # zBuilder.bundle : zFiber 6 #
-    # zBuilder.builder : Read File: C:\Temp\test.ziva in 0:00:00.052000 #
+    # zBuilder.builder : Read File: C:\Temp\test.zBuilder in 0:00:00.052000 #
 
 Like before, this is a simple printout to give you a hint of what has been loaded from the file.  Now we can build:
 
@@ -306,7 +306,7 @@ If you have been following along the output should look like this again as there
 
 .. code-block:: python
 
-    # zBuilder.builders.ziva : Building.... #
+    # zBuilder.builders.zBuilder : Building.... #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:03.578000 #
 
 The Anatomical Arm rig should now be completely restored back to its original state.

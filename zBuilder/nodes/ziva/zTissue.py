@@ -39,6 +39,7 @@ class TissueNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
+
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
