@@ -96,8 +96,11 @@ def load_base_node(json_object):
 
         obj = find_class(builder_type, type_)
 
-        parameter = obj(deserialize=json_object)
-        return parameter
+        if json_object['type'] != 'base':
+            parameter = obj(deserialize=json_object)
+            return parameter
+        else:
+            return json_object
     else:
         return json_object
 

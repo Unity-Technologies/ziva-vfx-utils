@@ -399,7 +399,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
         self.fiber_ac.setCheckable(True)
         self.fiber_ac.setChecked(False)
         self.fiber_ac.triggered.connect(self.tool_button_clicked)
-		
+
 		#not sure what self.paint_ac does KC
         self.paint_ac = QtWidgets.QAction(QtGui.QIcon(icons['zFiber']), 'Fiber', self)
 
@@ -619,37 +619,37 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
         return tmp
 
     def create_popup_menu(self):
-		'''
-		the pop-up menu for the tree widget
-		'''
-		
-		self.popup_menu = QtWidgets.QMenu()
-		# menu item
-		self.item_add_act = QtWidgets.QAction("Open in Attribute Spread Sheet", self)
-		
-		self.item_add_paintBoth = QtWidgets.QAction("Both maps", self)
-		self.item_add_act.triggered.connect(self.open_spreadsheet)
-		#self.item_add_act.setShortcut("s")
-				
-		#paint sel object Menu
-		self.item_add_paintBoth.triggered.connect(self.paintBothMaps)
-		
-		self.popup_menu.addAction(self.item_add_act)
-		self.popup_menu.addSeparator().setText(("Paintable Objects"))
-		self.popup_menu.addAction(self.item_add_paintBoth)
-		
-		
-		self.treeWidget.customContextMenuRequested.connect(self._ctx_menu_cb)
-    
+        '''
+        the pop-up menu for the tree widget
+        '''
+
+        self.popup_menu = QtWidgets.QMenu()
+        # menu item
+        self.item_add_act = QtWidgets.QAction("Open in Attribute Spread Sheet", self)
+
+        self.item_add_paintBoth = QtWidgets.QAction("Both maps", self)
+        self.item_add_act.triggered.connect(self.open_spreadsheet)
+        #self.item_add_act.setShortcut("s")
+
+        #paint sel object Menu
+        self.item_add_paintBoth.triggered.connect(self.paintBothMaps)
+
+        self.popup_menu.addAction(self.item_add_act)
+        self.popup_menu.addSeparator().setText(("Paintable Objects"))
+        self.popup_menu.addAction(self.item_add_paintBoth)
+
+
+        self.treeWidget.customContextMenuRequested.connect(self._ctx_menu_cb)
+
     def paintBothMaps(self):
-		treeSelection =  self.treeWidget.selectedItems()[0]
-		treeSelectionNiceName = treeSelection.text(0)
-		treeSelected = treeSelectionNiceName
-		treeSelectedType = mc.objectType(treeSelected)
-		extractMeshData = mz.get_association(treeSelected)
-		if len(extractMeshData) == 2:
-			mc.select(extractMeshData)
-			mm.eval( 'artSetToolAndSelectAttr( "artAttrCtx", "' + treeSelectedType + "." + treeSelected + '.weights")')
+        treeSelection =  self.treeWidget.selectedItems()[0]
+        treeSelectionNiceName = treeSelection.text(0)
+        treeSelected = treeSelectionNiceName
+        treeSelectedType = mc.objectType(treeSelected)
+        extractMeshData = mz.get_association(treeSelected)
+        if len(extractMeshData) == 2:
+            mc.select(extractMeshData)
+            mm.eval( 'artSetToolAndSelectAttr( "artAttrCtx", "' + treeSelectedType + "." + treeSelected + '.weights")')
 		
 
     def open_spreadsheet(self):
@@ -1074,7 +1074,7 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
         self.blockSignals(False)
         
         #print 'ui:tree_changed-finished'
-        # self.update_properties()
+        self.update_properties()
 
     def _highlight_parent(self):
         '''
@@ -1148,7 +1148,6 @@ class ZivaUi( MayaQWidgetDockableMixin,QtWidgets.QMainWindow):
     def get_bone_meshes(self,solver):
         meshes = mm.eval('zQuery -t zBone -m ' + solver)
         return meshes
-
 
     def script_job(self):
         self.jobNum = []
