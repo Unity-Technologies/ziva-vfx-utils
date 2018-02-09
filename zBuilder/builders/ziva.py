@@ -40,6 +40,7 @@ class Ziva(Builder):
         # solvers
         for item in self.get_scene_items(type_filter=['zSolverTransform', 'zTissue', 'zBone', 'zCloth']):
             parent_node = self.get_scene_items(name_filter=item.solver)[0]
+            print 'KKKKK', parent_node
             parent_node.add_child(item)
             item._parent = parent_node
 
@@ -65,43 +66,35 @@ class Ziva(Builder):
             bt = mm.eval('zQuery -bt {}'.format(item.name))[0]
             body = mm.eval('zQuery -t {} {}'.format(bt, item.name))
 
-            parent_node = self.get_scene_items(name_filter=body)[0]
+            parent_node = self.get_scene_items(name_filter=body)
+            if parent_node:
+                parent_node = parent_node[0]
+            else:
+                parent_node = self.root_node
+
             parent_node.add_child(item)
             item._parent = parent_node
 
-        # for item in self.get_scene_items(type_filter=['zSolverTransform', 'map', 'mesh'], invert_match=True):
-        #
-        #     st.add_child(item)
-        #     item._parent = st
-        # for item in self.get_scene_items(type_filter=['zTissue', 'zBone', 'zCloth']):
-        #     print item.solver
-        #     parent_node = self.get_scene_items(name_filter=item.solver)[0]
-        #     print item, parent_node._parent
-        #     parent_node.add_child(item)
+        from zBuilder.nodes.base import Base
 
+        mesh_grp = Base()
+        mesh_grp.name = 'MESHES'
+        mesh_grp._parent = self.root_node
+        self.root_node.add_child(mesh_grp)
 
-        # type_ = mc.objectType(maya_node)
-        # temp = None
-        #
-        # if type_ in ['zTissue', 'zBone', 'zCloth', 'zSolverTransform', 'zEmbedder']:
-        #     temp = mm.eval('zQuery -t zSolver {}'.format(maya_node))
-        #     if temp:
-        #         temp = temp[0]
-        #
-        # if type_ in ['zTet', 'zFiber', 'zMaterial', 'zAttachment']:
-        #     temp = mm.eval('zQuery -t zTissue {}'.format(maya_node))
-        #     if temp:
-        #         temp = temp[0]
-        #     # print type_, temp
-        # if type_ == 'zLineOfAction':
-        #     temp = mz.get_lineOfAction_fiber(maya_node)
-        #
-        # parent_node = self.get_scene_items(name_filter=temp)
-        #
-        # if parent_node:
-        #     return parent_node[0]
-        # else:
-        #     return self.root_node
+        map_grp = Base()
+        map_grp.name = 'MAPS'
+        map_grp._parent = self.root_node
+        self.root_node.add_child(map_grp)
+
+        for item in self.get_scene_items(type_filter='mesh'):
+            mesh_grp.add_child(item)
+            item._parent = mesh_grp
+
+        for item in self.get_scene_items(type_filter='map'):
+            map_grp.add_child(item)
+            item._parent = map_grp
+
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
@@ -268,6 +261,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
+        self.get_parent()
         self.stats()
 
     def _populate_nodes(self, nodes, get_parameters=True):

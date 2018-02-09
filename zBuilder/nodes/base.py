@@ -63,7 +63,7 @@ class Base(object):
             return self._parent._children.index(self)
 
     def log(self, tab_level=-1):
-
+        print 'daasddasasd'
         output = ""
         tab_level += 1
 
@@ -71,6 +71,8 @@ class Base(object):
             output += "\t"
         output += "|-----" + self._name + "\n"
 
+        print self._children
+        print self._parent
         for child in self._children:
             output += child.log(tab_level)
 
@@ -99,7 +101,10 @@ class Base(object):
 
     @name.setter
     def name(self, name):
-        self._name = mc.ls(name, long=True)[0]
+        if mc.ls(name, long=True):
+            self._name = mc.ls(name, long=True)[0]
+        else:
+            self._name = name
 
     def serialize(self):
         """  Makes node serializable.

@@ -25,11 +25,16 @@ class Builder(object):
         from zBuilder.nodes.base import Base
 
         self.root_node = Base()
+        self.root_node.name = 'ROOT'
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
+
+    def log(self):
+        self.root_node.log()
+
 
     def view(self):
         import zBuilder.ui.test3 as tt
