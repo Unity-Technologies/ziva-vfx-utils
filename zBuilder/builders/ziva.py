@@ -13,7 +13,6 @@ try:
 except RuntimeError:
     pass
 
-
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
@@ -209,6 +208,22 @@ class Ziva(Builder):
             parameter = self.node_factory(node, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
 
+    def reset_solvers(self):
+        """
+         This resets the solvers stored in the zBuilder. Specifically, it removes
+         any stored MObjects from the solvers.
+        """
+
+        solvers = list()
+        solvers.append('zSolver')
+        solvers.append('zSolverTransform')
+
+        # reset the solver nodes' mobjects
+        for node_type in solvers:
+            logger.info('Resetting: {}'.format(node_type))
+            for parameter in self.get_scene_items(type_filter=node_type):
+                parameter.mobject_reset()
+    
     @Builder.time_this
     def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
@@ -225,7 +240,7 @@ class Ziva(Builder):
             tissues (bool): Build the tissue and tets.
             attachments (bool): Build the attachments.
             materials (bool): Build the materials.
-            fibers (bool): build the fibers.
+            fibers (bool): Build the fibers.
             embedder (bool): Build the embedder.
             cloth (bool): Build the cloth.
             lineOfActions (bool): Build the line of actions.
@@ -253,8 +268,8 @@ class Ziva(Builder):
         logger.info('Building Ziva Rig.')
         sel = mc.ls(sl=True)
 
-        # lets build the solver first so we can turn it off to build rest.
-        # speeds up the process
+        # Let's build the solver first, so we can turn it off to build the rest of the scene.
+        # This speeds up the process.
         solvers = list()
         if solver:
             solvers.append('zSolver')

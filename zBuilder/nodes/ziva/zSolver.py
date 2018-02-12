@@ -6,16 +6,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class SolverNode(Ziva):
-    """ This node for storing information related to zSolver.
+    """ This node is for storing information related to zSolver.
     """
     type = 'zSolver'
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
         Ziva.__init__(self, *args, **kwargs)
-
+        
     def build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 
@@ -40,10 +39,6 @@ class SolverNode(Ziva):
             self.mobject = solver_name
             st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
             mc.rename(solverTransform, st.name)
-
-
-
-
         else:
             new_name = mc.rename(self.get_scene_name(), self.name)
             self.mobject = new_name

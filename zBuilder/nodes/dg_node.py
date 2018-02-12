@@ -136,7 +136,7 @@ class DGNode(Base):
         mObject it returns parameter name.
 
         Args:
-            long_name (bool): Return the fullpath or not.  Defaults to True.
+            long_name (bool): Return the fullpath or not. Defaults to False.
 
         Returns:
             (str) Name of maya object.
@@ -240,3 +240,7 @@ class DGNode(Base):
                 mobject = om.MObject()
                 selection_list.getDependNode(0, mobject)
                 self.__mobject = mobject
+ 
+    def mobject_reset(self):
+        self.__mobject = None
+        

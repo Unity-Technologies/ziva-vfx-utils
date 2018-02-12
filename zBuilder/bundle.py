@@ -198,7 +198,7 @@ class Bundle(object):
 
     def string_replace(self, search, replace):
         """
-        Searches and replaces with regular expressions scene items in the builder.
+        Searches and replaces with regular expressions the scene items in the builder.
 
         Args:
             search (:obj:`str`): what to search for

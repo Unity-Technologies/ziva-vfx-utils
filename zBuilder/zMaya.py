@@ -512,7 +512,6 @@ def get_name_from_m_object(m_object, long_name=True):
 
     """
     if m_object.hasFn(om.MFn.kDagNode):
-
         dagpath = om.MDagPath()
         om.MFnDagNode(m_object).getPath(dagpath)
         if long_name:
