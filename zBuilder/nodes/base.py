@@ -63,7 +63,6 @@ class Base(object):
             return self._parent._children.index(self)
 
     def log(self, tab_level=-1):
-        print 'daasddasasd'
         output = ""
         tab_level += 1
 
@@ -174,7 +173,9 @@ class Base(object):
                                                            replace,
                                                            self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
+                new_names = []
                 self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
+
                 for key, v in self.__dict__[item].iteritems():
                     if isinstance(v, basestring):
                         new_name = mz.replace_long_name(search, replace, v)

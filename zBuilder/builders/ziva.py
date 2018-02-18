@@ -32,68 +32,68 @@ class Ziva(Builder):
 
 
     def get_parent(self):
+        from zBuilder.nodes.base import Base
+
+        # reset stuff............
+        for item in self.get_scene_items():
+            self.root_node._children = []
+            item._parent = None
+            item._children = []
+
         # solver transforms
         for item in self.get_scene_items(type_filter='zSolver'):
             self.root_node.add_child(item)
             item._parent = self.root_node
 
         # solvers
-        for item in self.get_scene_items(type_filter=['zSolverTransform', 'zTissue', 'zBone', 'zCloth']):
+        for item in self.get_scene_items(type_filter=['zSolverTransform']):
             parent_node = self.get_scene_items(name_filter=item.solver)[0]
-            print 'KKKKK', parent_node
             parent_node.add_child(item)
             item._parent = parent_node
 
-        for item in self.get_scene_items(type_filter=['zMaterial']):
-            bt = mm.eval('zQuery -bt {}'.format(item.name))[0]
-            body = mm.eval('zQuery -t {} {}'.format(bt, item.name))
-            parent_node = self.get_scene_items(name_filter=body)[0]
+        # get bodies......
+        bodies = {}
+        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+            grp = Base()
+            grp.name = item.association[0]
+            grp.type = 'ui_{}_body'.format(item.type)
+            bodies[item.association[0]] = grp
+
+        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+            if item.type == 'zTissue':
+                if item.parent_tissue:
+                    bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
+                    parent_node = bodies.get(bd, self.root_node)
+                else:
+                    parent_node = self.get_scene_items(name_filter=item.solver)[0]
+            else:
+                parent_node = self.get_scene_items(name_filter=item.solver)[0]
+
+            bodies[item.association[0]]._parent = parent_node
+            parent_node.add_child(bodies[item.association[0]])
+
+            bodies[item.association[0]].add_child(item)
+            item._parent = bodies[item.association[0]]
+
+        for item in self.get_scene_items(type_filter=['zTet']):
+            print bodies.keys()
+            parent_node = bodies[item.association[0]]
             parent_node.add_child(item)
             item._parent = parent_node
 
-        for item in self.get_scene_items(type_filter=['zTet', 'zFiber']):
-            tissue = mm.eval('zQuery -t zTissue {}'.format(item.name))
-            parent_node = self.get_scene_items(name_filter=tissue)[0]
+        for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
+            parent_node = bodies.get(item.association[0], self.root_node)
             parent_node.add_child(item)
             item._parent = parent_node
+
+            if item.type == 'zAttachment':
+                parent_node = bodies.get(item.association[1], self.root_node)
+                parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
             parent_node.add_child(item)
             item._parent = parent_node
-
-        for item in self.get_scene_items(type_filter=['zAttachment']):
-            bt = mm.eval('zQuery -bt {}'.format(item.name))[0]
-            body = mm.eval('zQuery -t {} {}'.format(bt, item.name))
-
-            parent_node = self.get_scene_items(name_filter=body)
-            if parent_node:
-                parent_node = parent_node[0]
-            else:
-                parent_node = self.root_node
-
-            parent_node.add_child(item)
-            item._parent = parent_node
-
-        from zBuilder.nodes.base import Base
-
-        mesh_grp = Base()
-        mesh_grp.name = 'MESHES'
-        mesh_grp._parent = self.root_node
-        self.root_node.add_child(mesh_grp)
-
-        map_grp = Base()
-        map_grp.name = 'MAPS'
-        map_grp._parent = self.root_node
-        self.root_node.add_child(map_grp)
-
-        for item in self.get_scene_items(type_filter='mesh'):
-            mesh_grp.add_child(item)
-            item._parent = mesh_grp
-
-        for item in self.get_scene_items(type_filter='map'):
-            map_grp.add_child(item)
-            item._parent = map_grp
 
 
     @Builder.time_this
@@ -168,7 +168,6 @@ class Ziva(Builder):
 
             if nodes:
                 self._populate_nodes(nodes, get_parameters=get_parameters)
-
         self.get_parent()
         self.stats()
 
@@ -278,6 +277,7 @@ class Ziva(Builder):
             # parent = self.get_parent(node)
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
+
 
     @Builder.time_this
     def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',

@@ -133,6 +133,7 @@ class ZivaUi():
 
     def run(self):
         if self.__version in ['2017', '2018']:
+            print 'QT%'
             import ui_qt5 as ui
             ui.dock_window(ui.MyDockingUI)
             # this is where we call the window

@@ -1,5 +1,5 @@
 import logging
-
+import inspect
 import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
@@ -53,7 +53,10 @@ class DGNode(Base):
             output = ''
             output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
-                output += '\t{} - {}\n'.format(key, self.__dict__[key])
+                try:
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
+                except:
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
             return output
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)

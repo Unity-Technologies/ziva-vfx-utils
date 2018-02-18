@@ -129,10 +129,12 @@ def dock_window(dialog_class):
     cmds.evalDeferred(lambda *args: cmds.workspaceControl(main_control, e=True, rs=True))
 
     # will return the class of the dock content.
+    # print dir(win)
+    # print win.minimumSize()
     return win.run()
 
 
-class MyDockingUI(QtWidgets.QMainWindow):
+class MyDockingUI(QtWidgets.QWidget):
 
     instances = list()
     CONTROL_NAME = 'Ziva VFX'
@@ -152,11 +154,13 @@ class MyDockingUI(QtWidgets.QMainWindow):
         # let's keep track of our docks so we only have one at a time.
         MyDockingUI.delete_instances()
         self.__class__.instances.append(weakref.proxy(self))
+        self.__class__.instances.append(weakref.proxy(self))
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        #print 'nnn', self.main_layout.setMinimumSize(0,0)
 
         # here we can start coding our UI
         self.settings = QtCore.QSettings("Ziva Dynamics", "zUi")
@@ -172,9 +176,9 @@ class MyDockingUI(QtWidgets.QMainWindow):
         self.create_layout()
         # self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setup_toolbars()
-        self.statusBar().addPermanentWidget(self.progressBar)
+        # self.statusBar().addPermanentWidget(self.progressBar)
 
-        self.create_popup_menu()
+        # self.create_popup_menu()
         self._populate()
 
         # self.script_job()
@@ -184,7 +188,7 @@ class MyDockingUI(QtWidgets.QMainWindow):
         # restore settings------------------------------------------------------
         self.resize(self.settings.value('mw:size', QtCore.QSize(550, 470)))
         self.move(self.settings.value('mw:pos', QtCore.QPoint(250, 250)))
-        self.restoreState(self.settings.value("mw:state", self.saveState()))
+        #self.restoreState(self.settings.value("mw:state", self.saveState()))
     def save_settings(self):
         self.settings.setValue('mw:size', self.size())
         self.settings.setValue('mw:pos', self.mapToGlobal(self.pos()))
@@ -198,6 +202,30 @@ class MyDockingUI(QtWidgets.QMainWindow):
             icons[zNode] = os.path.join(path,icons[zNode])
         #print icons
     def create_layout(self):
+        # main_window = QtWidgets.QMainWindow()
+        # toolBar = QtWidgets.QToolBar()
+        # main_window.addToolBar(toolBar)
+        #
+        # toolBar.addAction(self.solvers_ac)
+        #
+        # self.treeWidget = QtWidgets.QTreeWidget()
+        #
+        # main_layout = QtWidgets.QVBoxLayout()
+        # main_layout.setContentsMargins(2, 2, 2, 2)
+        # main_layout.setSpacing(2)
+        # main_layout.addWidget(main_window)
+        # main_layout.addWidget( self.treeWidget)
+        # main_layout.addWidget(QtWidgets.QPushButton())
+        # main_layout.addWidget(QtWidgets.QPushButton())
+        # main_layout.addWidget(QtWidgets.QPushButton())
+        # main_layout.addWidget(QtWidgets.QPushButton())
+        #
+        # self.setLayout(main_layout)
+        # print 'ddd'
+
+        self.vis_toolbar = QtWidgets.QToolBar(self)
+        self.search_toolbar = QtWidgets.QToolBar(self)
+
         self.line_edit = line.ButtonLineEdit(icons['close'])
 
         self.treeWidget = QtWidgets.QTreeWidget()
@@ -205,41 +233,34 @@ class MyDockingUI(QtWidgets.QMainWindow):
         self.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeWidget.header().close()
         self.treeWidget.setAutoFillBackground(True)
-
         self.treeWidget.setStyleSheet(tree_style)
-        # self.treeWidget.setStyleSheet("QTreeView::branch { border-image: none; }")
-        # self.treeWidget.setStyleSheet("background-color:black;")
-        # self.treeWidget.setStyleSheet("QTreeView::item:has-children{background: palette(base);}")
-        # self.treeWidget.setStyleSheet("QTreeView::item:has-children{background: palette(base);}")
-        # self.treeWidget.setStyleSheet("QTreeView::item:hover {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);border: 1px solid #bfcde4;}")
-
-        # self.treeWidget.setStyleSheet("QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-children:has-siblings  {border-image: none;image: url(branch-open.png);}")
-        # =self.treeWidget.setStyleSheet("QTreeWidget::item:has-children:selected {background: cyan;}")
-
         self.treeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
-        #main_layout = QtWidgets.QVBoxLayout()
-        #main_layout.setContentsMargins(2, 2, 2, 2)
-        #main_layout.setSpacing(2)
-
         # tool------------------------------------------------------------------\
+        v_layout = QtWidgets.QVBoxLayout()
+        v_layout.setStretch(0, True)
+
         h_layout = QtWidgets.QHBoxLayout()
         h_layout.setStretch(0, True)
 
+        h_layout.addWidget(self.vis_toolbar)
+        h_layout.addWidget(self.search_toolbar)
+
         self.prop = prop.Properties(self)
         # -----------------------------------------------------------------------
-        # main_layout.addWidget(self.line_edit)
-        # main_layout.addLayout(tool_layout)
-        self.main_layout.addLayout(h_layout)
 
-        #self.cw = QtWidgets.QWidget()
-        ##self.setCentralWidget(self.cw)
-        #self.cw.setLayout(self.main_layout)
+        self.main_layout.addLayout(v_layout)
+
 
         self.splitter1 = QtWidgets.QSplitter()
         self.splitter1.addWidget(self.treeWidget)
         self.splitter1.addWidget(self.prop)
-        h_layout.addWidget(self.splitter1)
+
+        self.menu_bar = QtWidgets.QMenuBar()
+        v_layout.addWidget(self.menu_bar)
+        v_layout.addLayout(h_layout)
+        v_layout.addWidget(self.splitter1)
+
 
         self.splitter1.restoreState(self.settings.value('splitter:state', self.splitter1.saveState()))
         # connect treewidget
@@ -249,21 +270,23 @@ class MyDockingUI(QtWidgets.QMainWindow):
         self.line_edit.textChanged.connect(self.search_tree)
 
         self.setup_menuBar()
+        self.menu_bar.setMaximumHeight(18)
+
 
     def setup_menuBar(self):
-        menubar = self.menuBar()
+        #menubar = self.menuBar()
 
-        fileMenu = menubar.addMenu('&File')
+        fileMenu = self.menu_bar.addMenu('&File')
         fileMenu.setTearOffEnabled(True)
         fileMenu.addAction(self.ziva_import_ac)
         fileMenu.addAction(self.ziva_save_ac)
 
-        editMenu = menubar.addMenu('&Edit')
+        editMenu = self.menu_bar.addMenu('&Edit')
         editMenu.setTearOffEnabled(True)
         editMenu.addAction(self.delete_ac)
         editMenu.addAction(self.enable_toggle_ac)
 
-        createMenu = menubar.addMenu('&Create')
+        createMenu = self.menu_bar.addMenu('&Create')
         createMenu.setTearOffEnabled(True)
         createMenu.addSeparator().setText(("One"))
         createMenu.addAction(self.c_solver_ac)
@@ -274,7 +297,7 @@ class MyDockingUI(QtWidgets.QMainWindow):
         createMenu.addAction(self.c_material_ac)
         createMenu.addAction(self.c_fiber_ac)
 
-        viewMenu = menubar.addMenu('&View')
+        viewMenu = self.menu_bar.addMenu('&View')
         viewMenu.setTearOffEnabled(True)
         viewMenu.addAction(self.refresh_ac)
         viewMenu.addAction(self.find_ac)
@@ -401,28 +424,19 @@ class MyDockingUI(QtWidgets.QMainWindow):
 
     def setup_toolbars(self):
         # vis toolbar-----------------------------------------------------------
-        self.toolbar = self.addToolBar('Vis')
-        self.toolbar.setIconSize(QtCore.QSize(16, 16))
-        self.toolbar.addAction(self.solvers_ac)
-        self.toolbar.addAction(self.tissue_ac)
-        self.toolbar.addAction(self.tet_ac)
-        self.toolbar.addAction(self.bone_ac)
-        self.toolbar.addAction(self.attachment_ac)
-        self.toolbar.addAction(self.material_ac)
-        self.toolbar.addAction(self.fiber_ac)
-
-        self.toolbar.addSeparator()
-
-        # self.addToolBarBreak()
-        # # tools-----------------------------------------------------------------
-        # self.tool_toolbar = self.addToolBar('Tools')
-        # self.tool_toolbar.setIconSize(QtCore.QSize(16, 16))
-        # self.tool_toolbar.addAction(self.material_ac)
-        # self.tool_toolbar.addAction(self.fiber_ac)
+        #self.toolbar = self.addToolBar('Vis')
+        self.vis_toolbar.setIconSize(QtCore.QSize(16, 16))
+        self.vis_toolbar.addAction(self.solvers_ac)
+        self.vis_toolbar.addAction(self.tissue_ac)
+        self.vis_toolbar.addAction(self.tet_ac)
+        self.vis_toolbar.addAction(self.bone_ac)
+        self.vis_toolbar.addAction(self.attachment_ac)
+        self.vis_toolbar.addAction(self.material_ac)
+        self.vis_toolbar.addAction(self.fiber_ac)
+        self.vis_toolbar.addSeparator()
 
         # serach toolbar--------------------------------------------------------
-        self.search_toolbar = self.addToolBar('Search')
-
+        #self.search_toolbar = self.addToolBar('Search')
         self.search_toolbar.addWidget(self.line_edit)
 
     def _enable_items(self):
@@ -569,9 +583,9 @@ class MyDockingUI(QtWidgets.QMainWindow):
         for item in items:
             # if item.type():
             tmp.append(item)
-            if not item.isHidden():
-                if item.childCount() > 0:
-                    tmp.extend(self._get_child_properties(item))
+            # if not item.isHidden():
+            #     if item.childCount() > 0:
+            #         tmp.extend(self._get_child_properties(item))
 
         # remove duplicates before we load UI
         # attachments can be in Ui twice, thus removing dup from prop window

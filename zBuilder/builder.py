@@ -26,6 +26,7 @@ class Builder(object):
 
         self.root_node = Base()
         self.root_node.name = 'ROOT'
+
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
@@ -51,13 +52,15 @@ class Builder(object):
             obj: zBuilder node populated.
         """
         type_ = mz.get_type(node)
+        if not parent:
+            parent = self.root_node
 
         item_list = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(maya_node=node, builder=self))
+                        item_list.append(obj(parent=parent,maya_node=node, builder=self))
                 if type_ == obj.type:
 
                     objct = obj(parent=parent, maya_node=node, builder=self)
