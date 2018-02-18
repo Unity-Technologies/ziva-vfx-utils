@@ -11,7 +11,7 @@ class SkinCluster(DGNode):
     TYPES = []
     """ The type of node. """
 
-    SEARCH_EXCLUDE = ['_class', '_attrs']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
@@ -40,10 +40,7 @@ class SkinCluster(DGNode):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_scene_name()
-        print 'NAME', name
-        print self.association
-        print self.influences
+        name = self.name
         if not mc.objExists(name):
             mc.select(self.influences, self.association, r=True)
             skin_cluster = mc.skinCluster(tsb=True, n=name)
