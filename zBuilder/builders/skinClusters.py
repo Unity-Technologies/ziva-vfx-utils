@@ -12,6 +12,7 @@ class SkinCluster(Builder):
     """Capturing Maya skinClusters
     """
 
+
     def __init__(self):
         Builder.__init__(self)
 
@@ -33,7 +34,7 @@ class SkinCluster(Builder):
 
     @Builder.time_this
     def build(self, *args, **kwargs):
-        logger.info('Applying deltaMush....')
+        logger.info('Applying skinCLuster....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
@@ -41,4 +42,5 @@ class SkinCluster(Builder):
         parameters = self.get_scene_items(name_filter=name_filter,
                                           type_filter='skinCluster')
         for parameter in parameters:
+            parameter.mobject = None
             parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
