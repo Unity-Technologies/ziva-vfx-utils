@@ -38,7 +38,7 @@ class Builder(object):
 
 
     def view(self):
-        import zBuilder.ui.test3 as tt
+        import zBuilder.ui.tree as tt
         tt.go(root_node=self.root_node)
 
     def node_factory(self, node, parent=None, get_parameters=True):
