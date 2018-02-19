@@ -1,5 +1,5 @@
 import logging
-
+import inspect
 import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
@@ -37,12 +37,12 @@ class DGNode(Base):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
         self.attrs = {}
         self._association = []
         self.__mobject = None
 
-        Base.__init__(self, deserialize=deserialize, builder=builder)
+        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
 
         if maya_node:
             self.populate(maya_node=maya_node)
@@ -53,7 +53,10 @@ class DGNode(Base):
             output = ''
             output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
-                output += '\t{} - {}\n'.format(key, self.__dict__[key])
+                try:
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
+                except:
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
             return output
         return '<%s.%s>' % (self.__class__.__module__, self.__class__.__name__)

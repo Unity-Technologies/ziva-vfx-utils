@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class Deformer(DGNode):
 
-    def __init__(self, maya_node=None, builder=None, deserialize=None):
-        DGNode.__init__(self, maya_node=maya_node, builder=builder, deserialize=deserialize)
+    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
+        DGNode.__init__(self, parent=parent, maya_node=maya_node, builder=builder, deserialize=deserialize)
 
         if maya_node:
             self.populate(maya_node=maya_node)

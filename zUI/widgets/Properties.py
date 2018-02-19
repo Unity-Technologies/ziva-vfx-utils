@@ -305,7 +305,7 @@ class Properties(QtWidgets.QTableWidget):
                 action.triggered.connect(onButPressFunc)
                 self.menu.addAction(action)
             # add other required actions
-            self.menu.popup(QtWidgets.QCursor.pos())
+            self.menu.popup(QtGui.QCursor.pos())
 
 
            

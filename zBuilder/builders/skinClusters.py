@@ -34,7 +34,7 @@ class SkinCluster(Builder):
 
     @Builder.time_this
     def build(self, *args, **kwargs):
-        logger.info('Applying skinCLuster....')
+        logger.info('Applying skinCluster....')
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())

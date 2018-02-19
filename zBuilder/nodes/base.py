@@ -25,6 +25,13 @@ class Base(object):
         self.builder = kwargs.get('builder', None)
         deserialize = kwargs.get('deserialize', None)
 
+        self._children = []
+        self._parent = kwargs.get('parent', None)
+
+        if self._parent is not None:
+            # print 'ASSING CHILD', self._parent
+            self._parent.add_child(self)
+
         if deserialize:
             self.deserialize(deserialize)
 
@@ -39,6 +46,40 @@ class Base(object):
         """
         return not self.__eq__(other)
 
+    def add_child(self, child):
+        self._children.append(child)
+
+    def child(self, row):
+        return self._children[row]
+
+    def child_count(self):
+        return len(self._children)
+
+    def parent(self):
+        return self._parent
+
+    def row(self):
+        if self._parent is not None:
+            return self._parent._children.index(self)
+
+    def log(self, tab_level=-1):
+        output = ""
+        tab_level += 1
+
+        for i in range(tab_level):
+            output += "\t"
+        output += "|-----" + self._name + "\n"
+
+        print self._children
+        print self._parent
+        for child in self._children:
+            output += child.log(tab_level)
+
+        tab_level -= 1
+        output += "\n"
+
+        return output
+
     @property
     def long_name(self):
         """ Long name of parameter corresponding to long name of maya node.
@@ -52,11 +93,17 @@ class Base(object):
         property will check for long name and store that.  self.name still
         returns short name, self.long_name returns the stored long name.
         """
-        return self._name.split('|')[-1]
+        if self._name:
+            return self._name.split('|')[-1]
+        else:
+            return None
 
     @name.setter
     def name(self, name):
-        self._name = mc.ls(name, long=True)[0]
+        if mc.ls(name, long=True):
+            self._name = mc.ls(name, long=True)[0]
+        else:
+            self._name = name
 
     def serialize(self):
         """  Makes node serializable.
@@ -126,7 +173,9 @@ class Base(object):
                                                            replace,
                                                            self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
+                new_names = []
                 self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
+
                 for key, v in self.__dict__[item].iteritems():
                     if isinstance(v, basestring):
                         new_name = mz.replace_long_name(search, replace, v)

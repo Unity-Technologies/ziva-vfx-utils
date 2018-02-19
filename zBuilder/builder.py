@@ -22,13 +22,29 @@ class Builder(object):
         self.bundle = Bundle()
         import zBuilder
         import maya.cmds as mc
+        from zBuilder.nodes.base import Base
+
+        self.root_node = Base()
+        self.root_node.name = 'ROOT'
+
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
-    def node_factory(self, node, get_parameters=True):
+    def log(self):
+        self.root_node.log()
+
+
+    def view(self):
+        try:
+            import zBuilder.ui.tree as tt
+            tt.go(root_node=self.root_node)
+        except:
+            pass
+
+    def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
         zBuilder.node and populates it and returns it.
 
@@ -39,19 +55,21 @@ class Builder(object):
             obj: zBuilder node populated.
         """
         type_ = mz.get_type(node)
+        if not parent:
+            parent = self.root_node
 
         item_list = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(maya_node=node, builder=self))
+                        item_list.append(obj(parent=parent,maya_node=node, builder=self))
                 if type_ == obj.type:
 
-                    objct = obj(maya_node=node, builder=self)
+                    objct = obj(parent=parent, maya_node=node, builder=self)
                     item_list.append(objct)
         if not item_list:
-            item_list.append(zBuilder.nodes.DGNode(maya_node=node, builder=self))
+            item_list.append(zBuilder.nodes.DGNode(parent=parent, maya_node=node, builder=self))
 
         if get_parameters:
             for obj__ in item_list:

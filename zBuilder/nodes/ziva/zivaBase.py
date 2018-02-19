@@ -20,11 +20,12 @@ class Ziva(Deformer):
     except RuntimeError:
         pass
 
-    def __init__(self,  maya_node=None, builder=None, deserialize=None):
+    def __init__(self,  parent=None, maya_node=None, builder=None, deserialize=None):
         self.solver = None
         Deformer.__init__(self, maya_node=maya_node,
                           builder=builder,
-                          deserialize=deserialize)
+                          deserialize=deserialize,
+                          parent=parent)
 
     def populate(self, maya_node=None):
         """

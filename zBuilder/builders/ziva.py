@@ -20,6 +20,7 @@ class Ziva(Builder):
     def __init__(self):
         Builder.__init__(self)
 
+
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
             if cmds and 'ziva' in cmds:
@@ -27,6 +28,72 @@ class Ziva(Builder):
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, v=True)
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
+
+
+    def get_parent(self):
+        from zBuilder.nodes.base import Base
+
+        # reset stuff............
+        for item in self.get_scene_items():
+            self.root_node._children = []
+            item._parent = None
+            item._children = []
+
+        # solver transforms
+        for item in self.get_scene_items(type_filter='zSolver'):
+            self.root_node.add_child(item)
+            item._parent = self.root_node
+
+        # solvers
+        for item in self.get_scene_items(type_filter=['zSolverTransform']):
+            parent_node = self.get_scene_items(name_filter=item.solver)[0]
+            parent_node.add_child(item)
+            item._parent = parent_node
+
+        # get bodies......
+        bodies = {}
+        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+            grp = Base()
+            grp.name = item.association[0]
+            grp.type = 'ui_{}_body'.format(item.type)
+            bodies[item.association[0]] = grp
+
+        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+            if item.type == 'zTissue':
+                if item.parent_tissue:
+                    bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
+                    parent_node = bodies.get(bd, self.root_node)
+                else:
+                    parent_node = self.get_scene_items(name_filter=item.solver)[0]
+            else:
+                parent_node = self.get_scene_items(name_filter=item.solver)[0]
+
+            bodies[item.association[0]]._parent = parent_node
+            parent_node.add_child(bodies[item.association[0]])
+
+            bodies[item.association[0]].add_child(item)
+            item._parent = bodies[item.association[0]]
+
+        for item in self.get_scene_items(type_filter=['zTet']):
+            print bodies.keys()
+            parent_node = bodies[item.association[0]]
+            parent_node.add_child(item)
+            item._parent = parent_node
+
+        for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
+            parent_node = bodies.get(item.association[0], self.root_node)
+            parent_node.add_child(item)
+            item._parent = parent_node
+
+            if item.type == 'zAttachment':
+                parent_node = bodies.get(item.association[1], self.root_node)
+                parent_node.add_child(item)
+
+        for item in self.get_scene_items(type_filter=['zLineOfAction']):
+            parent_node = self.get_scene_items(name_filter=item.fiber)[0]
+            parent_node.add_child(item)
+            item._parent = parent_node
+
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
@@ -74,7 +141,7 @@ class Ziva(Builder):
         else:
             raise StandardError('zSolver not connected to selection.  Please try again.')
 
-        b_solver = self.node_factory(solver)
+        b_solver = self.node_factory(solver, parent=None)
         self.bundle.extend_scene_items(b_solver)
 
         node_types = ['zSolverTransform',
@@ -100,7 +167,7 @@ class Ziva(Builder):
 
             if nodes:
                 self._populate_nodes(nodes, get_parameters=get_parameters)
-
+        self.get_parent()
         self.stats()
 
     @Builder.time_this
@@ -192,6 +259,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
+        self.get_parent()
         self.stats()
 
     def _populate_nodes(self, nodes, get_parameters=True):
@@ -205,7 +273,8 @@ class Ziva(Builder):
 
         """
         for node in nodes:
-            parameter = self.node_factory(node, get_parameters=get_parameters)
+            # parent = self.get_parent(node)
+            parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
 
     def reset_solvers(self):
@@ -322,3 +391,4 @@ class Ziva(Builder):
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
+
