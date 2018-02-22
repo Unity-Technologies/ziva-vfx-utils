@@ -28,19 +28,6 @@ class Ziva(Deformer):
                           parent=parent)
 
     def populate(self, maya_node=None):
-        """
-
-        Args:
-            *args:
-            **kwargs:
-
-        Raises:
-            NotImplementedError: if not implemented
-
-        """
-        raise NotImplementedError
-
-    def populate(self, maya_node=None):
         """ This populates the node given a selection.
 
         Args:
