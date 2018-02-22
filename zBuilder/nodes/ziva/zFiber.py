@@ -28,8 +28,8 @@ class FiberNode(Ziva):
         Returns:
             list(): of long mesh names.
         """
-        return [self.association[0],
-                self.association[0]]
+        return [self.long_association[0],
+                self.long_association[0]]
 
     def build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.

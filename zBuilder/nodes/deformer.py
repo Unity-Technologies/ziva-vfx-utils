@@ -23,8 +23,8 @@ class Deformer(DGNode):
 
         """
         objs = {}
-        if self.association:
-            objs['mesh'] = self.association
+        if self.long_association:
+            objs['mesh'] = self.long_association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
@@ -64,7 +64,7 @@ class Deformer(DGNode):
         Returns:
             list: List of long mesh names.
         """
-        return self.association
+        return self.long_association
 
     def get_mesh_objects(self):
         """
