@@ -96,11 +96,13 @@ def load_base_node(json_object):
 
         obj = find_class(builder_type, type_)
 
-        if json_object['type'] != 'base':
+        # this catches the scene items for ui that slip in.
+        try:
             parameter = obj(deserialize=json_object)
             return parameter
-        else:
+        except:
             return json_object
+
     else:
         return json_object
 
