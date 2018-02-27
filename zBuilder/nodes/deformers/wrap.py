@@ -17,7 +17,7 @@ class Wrap(Deformer):
 
         name = self.get_scene_name()
         if not mc.objExists(name):
-            mc.select(self.association, r=True)
+            mc.select(self.long_association, r=True)
             version = 7
             operation = 1 # create
             threshold = 0
@@ -31,7 +31,6 @@ class Wrap(Deformer):
             cmd = ('doWrapArgList "{}" {}"{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"{}').format(version, '{',operation, threshold, maxDist, inflType, exclusiveBind, autoWeightThreshold, renderInfl, fallOffMode,'}')
 
             results = mm.eval(cmd)
-            print results
 
             # print cmd
             #self.mobject = delta_mush
@@ -41,21 +40,7 @@ class Wrap(Deformer):
         self.set_maya_attrs(attr_filter=attr_filter)
         # self.set_maya_weights(interp_maps=interp_maps)
 
-    # proc
-    # string[]
-    # createWrap(
-    #     float $threshold, float $maxDistance, int $inflType, int $exclusiveBind, int $autoWeightThreshold, int $renderInfl, int $falloffMode)
-    # //
-    # doWrapArgList
-    # "7"
-    # {"1", "0", "1", "2", "0", "1", "0", "0"} //
 
-    # def populate(self, *args, **kwargs):
-    #     super(WrapNode, self).populate(*args, **kwargs)
-    #
-    #     # self.target = get_target(self.name)
-    #     self.association = self.get_meshes(self.get_scene_name())
-    #     print 'ddd'
     @staticmethod
     def get_meshes(node):
         """ Queries the deformer and returns the meshes associated with it.
@@ -67,9 +52,11 @@ class Wrap(Deformer):
             list od strings: list of strings of mesh names.
         """
         driver_points = mc.listConnections('{}.driverPoints'.format(node))
-        output_geometry = mc.listConnections('{}.outputGeometry'.format(node))
+        output_geometry = mc.listConnections('{}.geomMatrix'.format(node))
+        #output_geometry = mc.listConnections('{}.outputGeometry'.format(node))
 
         out = list()
         out.extend(output_geometry)
         out.extend(driver_points)
+        print 'FYUFSF', node, out
         return out
