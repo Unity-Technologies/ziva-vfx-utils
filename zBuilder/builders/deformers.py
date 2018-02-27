@@ -50,4 +50,7 @@ class Deformers(Builder):
 
         parameters = self.get_scene_items(name_filter=name_filter)
         for parameter in parameters:
-            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
+            try:
+                parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
+            except:
+                pass
