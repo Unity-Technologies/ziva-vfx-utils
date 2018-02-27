@@ -75,8 +75,7 @@ class Ziva(Builder):
             item._parent = bodies[item.association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
-            print bodies.keys()
-            parent_node = bodies[item.association[0]]
+            parent_node = bodies.get(item.association[0], self.root_node)
             parent_node.add_child(item)
             item._parent = parent_node
 
@@ -223,7 +222,8 @@ class Ziva(Builder):
             attr_filter = {}
 
         nodes = list()
-        if connections:
+
+        if connections and selection:
             if solver:
                 sol = mz.get_zSolver(selection[0])
                 if sol:
@@ -273,7 +273,6 @@ class Ziva(Builder):
 
         """
         for node in nodes:
-            # parent = self.get_parent(node)
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
 
