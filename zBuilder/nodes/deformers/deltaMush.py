@@ -15,7 +15,7 @@ class DeltaMush(Deformer):
 
         name = self.get_scene_name()
         if not mc.objExists(name):
-            mc.select(self.association, r=True)
+            mc.select(self.long_association, r=True)
             delta_mush = mc.deltaMush(name=name)
             self.mobject = delta_mush[0]
         else:
