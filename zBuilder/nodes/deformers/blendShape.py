@@ -43,7 +43,7 @@ class BlendShape(Deformer):
             mc.select(self.target, r=True)
             mc.select(self.association, add=True)
 
-            results = mc.blendShape()
+            results = mc.blendShape(name=self.name)
             self.mobject = results[0]
         else:
             self.mobject = name
