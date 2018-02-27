@@ -115,6 +115,7 @@ class EmbedderNode(Ziva):
         if embedded_meshes:
             for mesh in embedded_meshes:
                 for item in embedded_meshes[mesh]:
+                    history = mc.listHistory(item)
                     if not mc.ls(history, type='zEmbedder'):
                         mc.select(mesh, item, r=True)
                         mm.eval('ziva -e')
