@@ -1,5 +1,11 @@
 Release Notes
 =============
+
+1.0.4
+------
+* QT tree view for builder data
+* bug fixes
+
 1.0.3
 ------
 * zUI support on maya 2017 and 2018
