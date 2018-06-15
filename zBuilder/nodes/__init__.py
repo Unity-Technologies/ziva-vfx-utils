@@ -26,4 +26,6 @@ from .deformers.wrap import Wrap
 
 # utils-------------------------------------------------------------------------
 from .utils.constraint import Constraint
+from .utils.fields import Field
 from .deformers.skinCluster import SkinCluster
+
