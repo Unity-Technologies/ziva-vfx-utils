@@ -15,7 +15,7 @@ class Attributes(Builder):
 
         for item in selection:
             parameter = self.node_factory(item)
-            self.bundle.add_parameter(parameter)
+            self.bundle.extend_scene_items(parameter)
         self.stats()
 
     @Builder.time_this
