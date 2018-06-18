@@ -32,24 +32,18 @@ class Field(DGNode):
             # clearing the selection before we create anything as the 
             # selection is used to assign it to something.
             mc.select(cl=True)
-            if self.type == 'airField':
-                results = mc.air(n=name)
-            elif self.type == 'dragField':
-                results = mc.drag(n=name)
-            elif self.type == 'gravityField':
-                results = mc.gravity(n=name)
-            elif self.type == 'newtonField':
-                results = mc.newton(n=name)
-            elif self.type == 'radialField':
-                results = mc.radial(n=name)
-            elif self.type == 'turbulenceField':
-                results = mc.turbulence(n=name)
-            elif self.type == 'uniformField':
-                results = mc.uniform(n=name)
-            elif self.type == 'vortexField':
-                results = mc.vortex(n=name)
-                
+            factory = {
+                'airField' : mc.air,
+                'dragField': mc.drag,
+                'gravityField': mc.gravity,
+                'newtonField': mc.newton,
+                'radialField': mc.radial,
+                'turbulenceField': mc.turbulence,
+                'uniformField': mc.uniform,
+                'vortexField': mc.vortex}
+            results = factory[self.type](n=name);
             self.mobject = name
+            
         else:
             new_name = mc.rename(self.get_scene_name(), self.name)
             self.mobject = new_name
