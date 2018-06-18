@@ -16,10 +16,9 @@ class Fields(Builder):
     def retrieve_from_scene(self, *args, **kwargs):
         selection = mz.parse_maya_node_for_selection(args)
         
-        tmp = list()
-        tmp.extend([x for x in selection if mc.objectType(x) in self.acquire])
+        nodes_to_acquire = [x for x in selection if mc.objectType(x) in self.acquire]
 
-        for item in tmp:
+        for item in nodes_to_acquire:
             parameter = self.node_factory(item)
             self.bundle.extend_scene_items(parameter)
         self.stats()
