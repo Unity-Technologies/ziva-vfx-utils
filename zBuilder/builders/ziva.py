@@ -40,13 +40,18 @@ class Ziva(Builder):
             item._children = []
 
         # solver transforms
-        for item in self.get_scene_items(type_filter='zSolver'):
+        for item in self.get_scene_items(type_filter='zSolverTransform'):
             self.root_node.add_child(item)
             item._parent = self.root_node
 
         # solvers
-        for item in self.get_scene_items(type_filter=['zSolverTransform']):
-            parent_node = self.get_scene_items(name_filter=item.solver)[0]
+        solver = {}
+        for item in self.get_scene_items(type_filter=['zSolver']):
+            for x in self.get_scene_items(type_filter='zSolverTransform'):
+                if x.solver == item.solver:
+                    parent_node = x
+                    solver[item.name] = x
+  
             parent_node.add_child(item)
             item._parent = parent_node
 
@@ -64,9 +69,9 @@ class Ziva(Builder):
                     bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
                     parent_node = bodies.get(bd, self.root_node)
                 else:
-                    parent_node = self.get_scene_items(name_filter=item.solver)[0]
+                    parent_node = solver[item.solver]
             else:
-                parent_node = self.get_scene_items(name_filter=item.solver)[0]
+                parent_node = solver[item.solver]
 
             bodies[item.association[0]]._parent = parent_node
             parent_node.add_child(bodies[item.association[0]])
@@ -80,13 +85,15 @@ class Ziva(Builder):
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.association[0], self.root_node)
-            parent_node.add_child(item)
-            item._parent = parent_node
+            parent_node = bodies.get(item.association[0], None)
+            if parent_node:
+                parent_node.add_child(item)
+                item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.association[1], self.root_node)
-                parent_node.add_child(item)
+                parent_node = bodies.get(item.association[1], None)
+                if parent_node:
+                    parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
