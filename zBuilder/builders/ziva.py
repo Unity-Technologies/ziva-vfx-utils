@@ -93,6 +93,43 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item._parent = parent_node
 
+    @Builder.time_this
+    def retrieve_connections(self, *args, **kwargs):
+        """ This retrieves the scene items from the scene based on connections to
+        selection and does not get parameters for speed.  This is main call to 
+        check scene for loading into a ui.
+
+        Args:
+            get_parameters (bool): To get parameters or not. Default False
+        """
+        # ----------------------------------------------------------------------
+        # KWARG PARSING---------------------------------------------------------
+        # ----------------------------------------------------------------------
+        get_parameters = kwargs.get('get_parameters', False)
+
+        # ----------------------------------------------------------------------
+        # ARG PARSING-----------------------------------------------------------
+        # ----------------------------------------------------------------------
+        selection = []
+        if args:
+            selection = args[0]
+            mc.select(selection)
+        else:
+            selection = mc.ls(sl=True)
+
+        #-----------------------------------------------------------------------
+        # this gets the selected and what is connected to it by attachments.
+        attachments = mm.eval('zQuery -type zAttachment')
+        mc.select(attachments)
+        source = mm.eval('zQuery -as')
+        target = mm.eval('zQuery -at')
+        mc.select(source,target)
+        nodes = mm.eval('zQuery -a')
+        self._populate_nodes(nodes, get_parameters=get_parameters)
+        self.get_parent()
+        #self.stats()
+
+        mc.select(selection)
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
