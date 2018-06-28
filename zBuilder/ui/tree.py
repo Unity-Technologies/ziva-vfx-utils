@@ -82,6 +82,13 @@ class MyDockingUI(QtWidgets.QWidget):
         self.filter_line_edit.textChanged.connect(self._proxy_model.setFilterRegExp)
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
+        # expand top items by default
+        proxy = self.treeView.model()
+        for row in range(proxy.rowCount()):
+            index = proxy.index(row, 0)
+            self.treeView.expand(index)
+
+
         sel = mc.ls(sl=True)
 
     def tree_changed(self):
