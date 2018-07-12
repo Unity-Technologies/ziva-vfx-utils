@@ -76,7 +76,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = self.getNode(index)
         parentNode = node.parent()
 
-        if parentNode == self.root_node:
+        if parentNode == self.root_node or parentNode == None:
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
