@@ -117,6 +117,7 @@ class Ziva(Builder):
         # ----------------------------------------------------------------------
         # ARG PARSING-----------------------------------------------------------
         # ----------------------------------------------------------------------
+        scene_selection = mc.ls(sl=True)
         selection = []
         if args:
             selection = args[0]
@@ -134,9 +135,8 @@ class Ziva(Builder):
         nodes = mm.eval('zQuery -a')
         self._populate_nodes(nodes, get_parameters=get_parameters)
         self.get_parent()
-        #self.stats()
 
-        mc.select(selection)
+        mc.select(scene_selection)
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
