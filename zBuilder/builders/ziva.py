@@ -100,7 +100,6 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item._parent = parent_node
 
-    @Builder.time_this
     def retrieve_connections(self, *args, **kwargs):
         """ This retrieves the scene items from the scene based on connections to
         selection and does not get parameters for speed.  This is main call to 
