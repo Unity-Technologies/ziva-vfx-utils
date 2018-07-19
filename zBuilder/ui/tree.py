@@ -1,6 +1,7 @@
 import weakref
 
 import maya.cmds as mc
+import maya.mel as mm
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 
@@ -47,6 +48,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def __init__(self, parent=None, root_node=None):
         super(MyDockingUI, self).__init__(parent)
 
+        self.__copy_buffer = None
         # let's keep track of our docks so we only have one at a time.
         MyDockingUI.delete_instances()
         self.__class__.instances.append(weakref.proxy(self))
@@ -57,6 +59,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
         self.treeView = QtWidgets.QTreeView()
+        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.open_menu)
+
         self._proxy_model = QtCore.QSortFilterProxyModel()
 
         self.reset_tree(root_node=root_node)
@@ -76,16 +81,103 @@ class MyDockingUI(QtWidgets.QWidget):
         # self.filter_line_edit.textChanged.connect(self._proxy_model.setFilterRegExp)
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
+        self._setup_actions()
+
+        self.tool_bar.addAction(self.actionRefresh)
+
+    def _setup_actions(self):
+
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
                                QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
+        self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionUndo")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
-        self.tool_bar.addAction(self.actionRefresh)
+        self.actionCopy = QtWidgets.QAction(self)
+        self.actionCopy.setText('Copy')
+        self.actionCopy.setObjectName("actionCopy")
+        self.actionCopy.triggered.connect(self.copy)
+
+        self.actionPaste = QtWidgets.QAction(self)
+        self.actionPaste.setText('Paste')
+        self.actionPaste.setObjectName("actionCopy")
+        self.actionPaste.triggered.connect(self.paste)
+        
+        self.actionRemoveSolver = QtWidgets.QAction(self)
+        self.actionRemoveSolver.setText('Remove Solver')
+        self.actionRemoveSolver.setObjectName("actionRemove")
+        self.actionRemoveSolver.triggered.connect(self.reset_tree)
+
+        self.actionPaintByProx = QtWidgets.QAction(self)
+        self.actionPaintByProx.setText('Paint By Proximity')
+        self.actionPaintByProx.setObjectName("actionPaint")
+        self.actionPaintByProx.triggered.connect(paint_by_prox)
+
+    def copy(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        name = indexes.data(QtCore.Qt.DisplayRole)
+
+        
+        import zBuilder.builders.ziva as zva
+        z = zva.Ziva()
+        z.retrieve_from_scene_selection(name,connections=False)
+        #z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
+        z.stats()
+        # z.build(**kwargs)
+        self.__copy_buffer = {}
+        self.__copy_buffer[name] = z
+        # mc.select(sel)
+
+    def paste(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        name = indexes.data(QtCore.Qt.DisplayRole)
+
+        if self.__copy_buffer:
+            old_name = self.__copy_buffer.keys()[0]
+            z = self.__copy_buffer[old_name]
+            for parameter in z.get_scene_items(type_filter='zAttachment'):
+                parameter.mobject_reset()
+            z.string_replace(old_name, name)
+            z.build()
+
+    def open_menu(self,position):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(QtCore.Qt.UserRole+2)
+        
+        # name = self._proxy_model.data(indexes[0], QtCore.Qt.DisplayRole)
+        #node = self._proxy_model.getNode(indexes[0])
+        #print indexes.isValid()
+        #node = self._proxy_model.data(indexes[0], QtCore.Qt.UserRole)
+        
+        # if indexes.isValid():
+        #     #pass
+        #     node = indexes.internalPointer()
+        #     print node.name
+        #     #print dir(indexes), indexes, indexes.internalPointer()
+       
+        menu = QtWidgets.QMenu()
+        menu.addAction(self.actionCopy)
+        menu.addAction(self.actionPaste)
+        if node.type == 'zSolver' or node.type == 'zSolverTransform':
+            menu.addSection(node.type)
+            menu.addAction(self.actionRemoveSolver)
+
+        if node.type == 'zAttachment':
+            menu.addSection(node.type)
+            menu.addAction(self.actionPaintByProx)
+        
+        # if level == 0:
+        #     menu.addAction(self.tr("Edit person"))
+        # elif level == 1:
+        #     menu.addAction(self.tr("Edit object/container"))
+        # elif level == 2:
+        #     menu.addAction(self.tr("Edit object"))
+        
+        menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self):
         index = self.treeView.selectedIndexes()[0]
@@ -111,17 +203,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setModel(self._proxy_model)
 
         # expand top items by default ------------------------------------------
-        proxy = self.treeView.model()
-        for row in range(proxy.rowCount()):
-            index = proxy.index(row, 0)
+        proxy_model = self.treeView.model()
+        for row in range(proxy_model.rowCount()):
+            index = proxy_model.index(row, 0)
             self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
 
         # select item in treeview that is selected in maya to begin with--------
-        mod = self.treeView.model()
         if sel:
-            checked = mod.match(mod.index(0, 0), QtCore.Qt.DisplayRole, sel[0],
+            checked = proxy_model.match(proxy_model.index(0, 0), QtCore.Qt.DisplayRole, sel[0],
                                 -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index,
@@ -146,6 +237,9 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
+
+def paint_by_prox():
+    mm.eval('ZivaPaintAttachmentsByProximityOptions;')
 
 def go(root_node=None):
     dock_window(MyDockingUI, root_node=root_node)
