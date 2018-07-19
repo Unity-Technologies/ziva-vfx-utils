@@ -5,6 +5,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
+    nodeRole = QtCore.Qt.UserRole + 2
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -66,7 +67,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if hasattr(node, 'type'):
                 return node.type
 
-
+        if role == SceneGraphModel.nodeRole:
+            if index.column() == 0:
+                if hasattr(node, 'type'):
+                    return node
         # if role == SceneGraphModel.filterRole:
         #     if hasattr(node, 'type'):
         #         return node.type
