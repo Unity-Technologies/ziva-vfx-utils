@@ -131,8 +131,9 @@ class Ziva(Builder):
         target = mm.eval('zQuery -at')
         mc.select(source,target)
         nodes = mm.eval('zQuery -a')
-        self._populate_nodes(nodes, get_parameters=get_parameters)
-        self.get_parent()
+        if nodes:
+            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self.get_parent()
         #self.stats()
 
         mc.select(selection)
