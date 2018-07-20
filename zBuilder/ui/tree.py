@@ -3,8 +3,7 @@ import weakref
 import maya.cmds as mc
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
-
-from Qt import QtGui, QtWidgets, QtCore  # https://github.com/mottosso/Qt.py by Marcus Ottosson
+from PySide2 import QtGui, QtWidgets, QtCore
 
 import zBuilder.ui.model as model
 import zBuilder.ui.icons as icons
