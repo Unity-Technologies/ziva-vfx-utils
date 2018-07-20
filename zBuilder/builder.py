@@ -38,11 +38,9 @@ class Builder(object):
 
 
     def view(self):
-        try:
-            import zBuilder.ui.tree as tt
-            tt.go(root_node=self.root_node)
-        except:
-            pass
+        import zBuilder.ui.tree as tree
+        tree.go(root_node=self.root_node)
+
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper

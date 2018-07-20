@@ -1,5 +1,5 @@
 from Qt import QtGui, QtWidgets, QtCore, QtCompat
-from icons import get_icon_path
+from icons import get_icon_path_from_node
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
 
@@ -60,7 +60,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 if hasattr(node, 'type'):
-                    return QtGui.QIcon(QtGui.QPixmap(get_icon_path(node)))
+                    return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
 
         if role == SceneGraphModel.sortRole:
             if hasattr(node, 'type'):
@@ -76,7 +76,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = self.getNode(index)
         parentNode = node.parent()
 
-        if parentNode == self.root_node:
+        if parentNode == self.root_node or parentNode == None:
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
