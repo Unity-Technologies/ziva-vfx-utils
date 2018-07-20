@@ -4,8 +4,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
-
-from Qt import QtGui, QtWidgets, QtCore  # https://github.com/mottosso/Qt.py by Marcus Ottosson
+from PySide2 import QtGui, QtWidgets, QtCore
 
 import zBuilder.ui.model as model
 import zBuilder.ui.icons as icons
@@ -186,6 +185,16 @@ class MyDockingUI(QtWidgets.QWidget):
             mc.select(name)
 
     def reset_tree(self, root_node=None):
+        """This builds and/or resets the tree given a root_node.  The root_node
+        is a zBuilder object that the tree is built from.  If None is passed 
+        it uses the scene selection to build a new root_node.
+
+        This forces a complete redraw of the ui tree.
+        
+            root_node (:obj:`obj`, optional): The zBuilder root_node to build 
+                tree from.  Defaults to None.
+        """
+
         if not root_node:
             import zBuilder.builders.ziva as zva
             z = zva.Ziva()

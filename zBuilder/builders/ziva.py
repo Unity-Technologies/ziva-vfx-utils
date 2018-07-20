@@ -100,6 +100,7 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item._parent = parent_node
 
+    @Builder.time_this
     def retrieve_connections(self, *args, **kwargs):
         """ This retrieves the scene items from the scene based on connections to
         selection and does not get parameters for speed.  This is main call to 
@@ -116,6 +117,7 @@ class Ziva(Builder):
         # ----------------------------------------------------------------------
         # ARG PARSING-----------------------------------------------------------
         # ----------------------------------------------------------------------
+        scene_selection = mc.ls(sl=True)
         selection = []
         if args:
             selection = args[0]
@@ -131,12 +133,10 @@ class Ziva(Builder):
         target = mm.eval('zQuery -at')
         mc.select(source,target)
         nodes = mm.eval('zQuery -a')
-        if nodes:
-            self._populate_nodes(nodes, get_parameters=get_parameters)
-            self.get_parent()
-        #self.stats()
+        self._populate_nodes(nodes, get_parameters=get_parameters)
+        self.get_parent()
 
-        mc.select(selection)
+        mc.select(scene_selection)
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
@@ -394,12 +394,9 @@ class Ziva(Builder):
                 parameter.build(attr_filter=attr_filter, permissive=permissive)
 
         # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
-        sn = None
-        if solver_transform:
-            sn = solver_transform[0].name
-        
-            solver_value = solver_transform.attrs['enable']['value']
+        solver_transform = self.get_scene_items(type_filter='zSolverTransform')[0]
+        sn = solver_transform.name
+        solver_value = solver_transform.attrs['enable']['value']
 
         # generate list of node types to build
         node_types_to_build = list()
@@ -427,15 +424,13 @@ class Ziva(Builder):
             logger.info('Building: {}'.format(node_type))
             for scene_item in self.get_scene_items(type_filter=node_type,
                                                    association_filter=association_filter):
-                print scene_item, 'build'
                 scene_item.build(attr_filter=attr_filter,
                                 permissive=permissive,
                                 interp_maps=interp_maps)
 
         # turn on solver
         mc.select(sel, r=True)
-        if sn:
-            mc.setAttr(sn + '.enable', solver_value)
+        mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
