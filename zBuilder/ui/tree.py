@@ -41,8 +41,8 @@ def dock_window(dialog_class, root_node=None):
 
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
-    CONTROL_NAME = 'zBuilderView'
-    DOCK_LABEL_NAME = 'zBuilderView'
+    CONTROL_NAME = 'zivaVfxView'
+    DOCK_LABEL_NAME = 'Ziva VFX'
 
     def __init__(self, parent=None, root_node=None):
         super(MyDockingUI, self).__init__(parent)
