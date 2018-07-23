@@ -211,14 +211,15 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.treeView.setModel(self._proxy_model)
 
-        # expand top items by default ------------------------------------------
+        # Expand all zSolverTransform tree items--------------------------------
         proxy_model = self.treeView.model()
         for row in range(proxy_model.rowCount()):
             index = proxy_model.index(row, 0)
-            self.treeView.expand(index)
+            node = index.data(QtCore.Qt.UserRole+2)
+            if node.type == 'zSolverTransform':
+                self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
-
         # select item in treeview that is selected in maya to begin with--------
         if sel:
             checked = proxy_model.match(proxy_model.index(0, 0), QtCore.Qt.DisplayRole, sel[0],
