@@ -24,7 +24,8 @@ ZNODES = [
     'zAttachment',
     'zMaterial',
     'zFiber',
-    'zCacheTransform']
+    'zCacheTransform',
+    'zFieldAdaptor']
 """ All available ziva nodes to be able to cleanup. """
 
 
