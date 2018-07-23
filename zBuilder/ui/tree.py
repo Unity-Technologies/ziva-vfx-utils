@@ -220,7 +220,8 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with--------
+        # select item in treeview that is selected in maya to begin with and 
+        # expand item in view.
         if sel:
             checked = proxy_model.match(proxy_model.index(0, 0), QtCore.Qt.DisplayRole, sel[0],
                                 -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
