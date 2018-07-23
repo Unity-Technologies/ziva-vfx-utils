@@ -5,6 +5,7 @@ import maya.mel as mm
 
 import zBuilder.zMaya as mz
 from zBuilder.builder import Builder
+from zBuilder.nodes.utils.fields import Field
 
 logger = logging.getLogger(__name__)
 
@@ -85,22 +86,30 @@ class Ziva(Builder):
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.association[0], None)
-            if parent_node:
-                parent_node.add_child(item)
-                item._parent = parent_node
+            parent_node = bodies.get(item.association[0], self.root_node)
+            parent_node.add_child(item)
+            item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.association[1], None)
-                if parent_node:
-                    parent_node.add_child(item)
+                parent_node = bodies.get(item.association[1], self.root_node)
+                parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
             parent_node.add_child(item)
             item._parent = parent_node
 
-    @Builder.time_this
+        for item in self.get_scene_items(type_filter=Field.TYPES):
+            self.root_node.add_child(item)
+            item._parent = self.root_node
+
+        # assign zFieldAdapter to solver
+        for item in self.get_scene_items(type_filter=['zFieldAdaptor']):
+            print item.input_field
+            parent_node = self.get_scene_items(name_filter=item.input_field)[0]
+            parent_node.add_child(item)
+            item._parent = parent_node
+
     def retrieve_connections(self, *args, **kwargs):
         """ This retrieves the scene items from the scene based on connections to
         selection and does not get parameters for speed.  This is main call to 
@@ -196,22 +205,18 @@ class Ziva(Builder):
                       'zAttachment',
                       'zFiber',
                       'zEmbedder',
-                      'zLineOfAction'
+                      'zLineOfAction',
+                      'zFieldAdaptor',
                       ]
+        
+        node_types.extend(Field.TYPES)
+        
+        nodes = zQuery(node_types, solver)
+        if nodes:
+            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self.get_parent()
 
-        for node_type in node_types:
-            if node_type == 'zLineOfAction':
-                fibers = mm.eval('zQuery -t "{}" {}'.format('zFiber', solver))
-                if fibers:
-                    fiber_history = mc.listHistory(fibers)
-                    nodes = mc.ls(fiber_history, type='zLineOfAction')
-            else:
-                nodes = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
-
-            if nodes:
-                self._populate_nodes(nodes, get_parameters=get_parameters)
-        self.get_parent()
-        self.stats()
+        #self.stats()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -316,6 +321,7 @@ class Ziva(Builder):
         Returns:
 
         """
+
         for node in nodes:
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
@@ -339,8 +345,9 @@ class Ziva(Builder):
     @Builder.time_this
     def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
-              materials=True, fibers=True, embedder=True, cloth=True,
-              lineOfActions=True, mirror=False, permissive=True, check_meshes=False):
+              materials=True, fibers=True, embedder=True, cloth=True, 
+              fields=True, lineOfActions=True, mirror=False, permissive=True, 
+              check_meshes=False):
 
         """
         This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
@@ -368,6 +375,7 @@ class Ziva(Builder):
 
                 tmp = {'zSolver':['substeps']}
             association_filter (str): filter by node association.  Defaults to list()
+            fields
 
         """
         if mirror:
@@ -418,6 +426,9 @@ class Ziva(Builder):
             node_types_to_build.append('zLineOfAction')
         if embedder:
             node_types_to_build.append('zEmbedder')
+        if fields:
+            node_types_to_build.extend(Field.TYPES)
+            node_types_to_build.append('zFieldAdaptor')
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
@@ -434,4 +445,13 @@ class Ziva(Builder):
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
+
+
+def zQuery(types,solver):
+    hist = mc.listHistory(solver)
+    
+    nodes = []
+    nodes = [x for x in hist if mc.objectType(x) in types]
+    return nodes
+
 
