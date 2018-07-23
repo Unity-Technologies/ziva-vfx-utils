@@ -397,6 +397,9 @@ def get_association(zNode):
 
         return tmp
 
+    elif _type == 'zFieldAdaptor':
+        return []
+
     elif _type == 'zLineOfAction':
         tmp = mc.listConnections(zNode + '.curves')
         return tmp
