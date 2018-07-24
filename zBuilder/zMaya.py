@@ -621,9 +621,6 @@ def build_attr_list(selection, attr_filter=None):
     returns:
         list: list of attributes names
     """
-    # exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
-    #          'vertexColor', 'target']
-    
     attributes = []
     keyable = mc.listAttr(selection, k=True)
     channel_box = mc.listAttr(selection, cb=True)
@@ -639,11 +636,8 @@ def build_attr_list(selection, attr_filter=None):
             type_ = mc.getAttr(obj, type=True)
             if not type_ == 'TdataCompound':
                 attribute_names.append(attr)
-        # if not attr.split('.')[0] in exclude:
-        #    attrs.append(attr)
 
     if attr_filter:
-        # attrs = list(set(attrs).intersection(attr_filter))
         attrs = attr_filter
 
     return attribute_names
