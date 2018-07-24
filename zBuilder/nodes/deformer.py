@@ -155,12 +155,11 @@ class Deformer(DGNode):
                         cmd = "setAttr " + '%s[0:%d] ' % (
                             map_, len(weight_list) - 1) + val
                         mm.eval(cmd)
-
                 else:
-                    try:
+                    # applying doubleArray maps
+                    if mc.objExists(map_):
                         mc.setAttr(map_, weight_list, type='doubleArray')
-                    except:
-                        pass
+
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
