@@ -105,7 +105,6 @@ class Ziva(Builder):
 
         # assign zFieldAdapter to solver
         for item in self.get_scene_items(type_filter=['zFieldAdaptor']):
-            print item.input_field
             parent_node = self.get_scene_items(name_filter=item.input_field)[0]
             parent_node.add_child(item)
             item._parent = parent_node
@@ -217,7 +216,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.get_parent()
 
-        #self.stats()
+        self.stats()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
