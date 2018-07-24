@@ -362,6 +362,7 @@ class Ziva(Builder):
             fibers (bool): Build the fibers.
             embedder (bool): Build the embedder.
             cloth (bool): Build the cloth.
+            fields (bool): Build the fields.
             lineOfActions (bool): Build the line of actions.
             interp_maps (str): Option to interpolate maps.
                 True: Yes interpolate
@@ -375,7 +376,7 @@ class Ziva(Builder):
 
                 tmp = {'zSolver':['substeps']}
             association_filter (str): filter by node association.  Defaults to list()
-            fields
+            
 
         """
         if mirror:
