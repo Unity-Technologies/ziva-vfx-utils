@@ -148,7 +148,7 @@ class Ziva(Builder):
         line_of_actions = mc.listHistory(fiber_names)
         line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
         nodes.extend(line_of_actions)
-        
+
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.get_parent()
@@ -411,9 +411,11 @@ class Ziva(Builder):
                 parameter.build(attr_filter=attr_filter, permissive=permissive)
 
         # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_scene_items(type_filter='zSolverTransform')[0]
-        sn = solver_transform.name
-        solver_value = solver_transform.attrs['enable']['value']
+        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
+        sn = None
+        if solver_transform:
+            sn = solver_transform[0].name
+            solver_value = solver_transform.attrs['enable']['value']
 
         # generate list of node types to build
         node_types_to_build = list()
@@ -450,7 +452,8 @@ class Ziva(Builder):
 
         # turn on solver
         mc.select(sel, r=True)
-        mc.setAttr(sn + '.enable', solver_value)
+        if sn:
+            mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
