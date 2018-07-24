@@ -143,6 +143,12 @@ class Ziva(Builder):
         target = mm.eval('zQuery -at')
         mc.select(source,target)
         nodes = mm.eval('zQuery -a')
+
+        fiber_names = [x for x in mc.ls(nodes)if mc.objectType(x) == 'zFiber']
+        line_of_actions = mc.listHistory(fiber_names)
+        line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
+        nodes.extend(line_of_actions)
+        
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.get_parent()
