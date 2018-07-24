@@ -24,7 +24,8 @@ ZNODES = [
     'zAttachment',
     'zMaterial',
     'zFiber',
-    'zCacheTransform']
+    'zCacheTransform',
+    'zFieldAdaptor']
 """ All available ziva nodes to be able to cleanup. """
 
 
@@ -396,6 +397,9 @@ def get_association(zNode):
 
         return tmp
 
+    elif _type == 'zFieldAdaptor':
+        return []
+
     elif _type == 'zLineOfAction':
         tmp = mc.listConnections(zNode + '.curves')
         return tmp
@@ -617,29 +621,26 @@ def build_attr_list(selection, attr_filter=None):
     returns:
         list: list of attributes names
     """
-    # exclude = ['controlPoints', 'uvSet', 'colorSet', 'weightList', 'pnts',
-    #          'vertexColor', 'target']
-
-    tmps = mc.listAttr(selection, k=True)
-    cb = mc.listAttr(selection, cb=True)
-    if cb:
-        tmps.extend(mc.listAttr(selection, cb=True))
-    attrs = []
-    if tmps:
-        for attr in tmps:
-            obj = '{}.{}'.format(selection, attr)
-            if mc.objExists(obj):
-                type_ = mc.getAttr(obj, type=True)
-                if not type_ == 'TdataCompound':
-                    attrs.append(attr)
-            # if not attr.split('.')[0] in exclude:
-            #    attrs.append(attr)
+    attributes = []
+    keyable = mc.listAttr(selection, k=True)
+    channel_box = mc.listAttr(selection, cb=True)
+    if channel_box:
+        attributes.extend(channel_box)
+    if keyable:
+        attributes.extend(keyable)
+ 
+    attribute_names = []
+    for attr in attributes:
+        obj = '{}.{}'.format(selection, attr)
+        if mc.objExists(obj):
+            type_ = mc.getAttr(obj, type=True)
+            if not type_ == 'TdataCompound':
+                attribute_names.append(attr)
 
     if attr_filter:
-        # attrs = list(set(attrs).intersection(attr_filter))
         attrs = attr_filter
 
-    return attrs
+    return attribute_names
 
 
 def build_attr_key_values(selection, attr_list):
