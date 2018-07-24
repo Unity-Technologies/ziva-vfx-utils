@@ -86,13 +86,15 @@ class Ziva(Builder):
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.association[0], self.root_node)
-            parent_node.add_child(item)
-            item._parent = parent_node
+            parent_node = bodies.get(item.association[0], None)
+            if parent_node:
+                parent_node.add_child(item)
+                item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.association[1], self.root_node)
-                parent_node.add_child(item)
+                parent_node = bodies.get(item.association[1], None)
+                if parent_node:
+                    parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
