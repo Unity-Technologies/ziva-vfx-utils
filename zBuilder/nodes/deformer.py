@@ -12,9 +12,7 @@ class Deformer(DGNode):
 
     def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
         DGNode.__init__(self, parent=parent, maya_node=maya_node, builder=builder, deserialize=deserialize)
-
-        if maya_node:
-            self.populate(maya_node=maya_node)
+        
 
     def spawn_parameters(self):
         """
@@ -138,30 +136,30 @@ class Deformer(DGNode):
         original_name = self.name
 
         self.check_map_interpolation(interp_maps)
-
         for map_ in maps:
             map_data = self.builder.bundle.get_scene_items(type_filter='map',
-                                                           name_filter=map_)[0]
+                                                           name_filter=map_)
+            if map_data:
+                map_data = map_data[0]
 
-            weight_list = map_data.values
+                weight_list = map_data.values
 
-            map_ = map_.replace(original_name, scene_name)
+                map_ = map_.replace(original_name, scene_name)
 
-            if mc.objExists('%s[0]' % map_):
-                if not mc.getAttr('%s[0]' % map_, l=True):
-                    tmp = []
-                    for w in weight_list:
-                        tmp.append(str(w))
-                    val = ' '.join(tmp)
-                    cmd = "setAttr " + '%s[0:%d] ' % (
-                        map_, len(weight_list) - 1) + val
-                    mm.eval(cmd)
+                if mc.objExists('%s[0]' % map_):
+                    if not mc.getAttr('%s[0]' % map_, l=True):
+                        tmp = []
+                        for w in weight_list:
+                            tmp.append(str(w))
+                        val = ' '.join(tmp)
+                        cmd = "setAttr " + '%s[0:%d] ' % (
+                            map_, len(weight_list) - 1) + val
+                        mm.eval(cmd)
+                else:
+                    # applying doubleArray maps
+                    if mc.objExists(map_):
+                        mc.setAttr(map_, weight_list, type='doubleArray')
 
-            else:
-                try:
-                    mc.setAttr(map_, weight_list, type='doubleArray')
-                except:
-                    pass
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
