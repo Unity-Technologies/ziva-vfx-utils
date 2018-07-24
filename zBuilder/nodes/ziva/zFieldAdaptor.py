@@ -55,7 +55,10 @@ class FieldAdaptorNode(Ziva):
         return self._input_field
 
     def build(self, *args, **kwargs):
-        """ Builds the Line of Actions in maya scene.
+        """ Builds the zFieldAdaptor in maya scene.
+
+        This keeps track of inputs and outputs of zFieldadaptor (field nodes and
+        zCloth, zTissue respecitvely) and re-connects them.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get.
