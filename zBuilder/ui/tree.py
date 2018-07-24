@@ -103,8 +103,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.actionPaste = QtWidgets.QAction(self)
         self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionCopy")
+        self.actionPaste.setObjectName("actionPaste")
         self.actionPaste.triggered.connect(self.paste)
+
+        self.actionPasteSansMaps = QtWidgets.QAction(self)
+        self.actionPasteSansMaps.setText('Paste without maps')
+        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
+        self.actionPasteSansMaps.triggered.connect(self.paste_sans_maps)
         
         self.actionRemoveSolver = QtWidgets.QAction(self)
         self.actionRemoveSolver.setText('Remove Solver')
@@ -143,24 +148,26 @@ class MyDockingUI(QtWidgets.QWidget):
             z.string_replace(old_name, name)
             z.build()
 
+    def paste_sans_maps(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        name = indexes.data(QtCore.Qt.DisplayRole)
+
+        if self.__copy_buffer:
+            old_name = self.__copy_buffer.keys()[0]
+            z = self.__copy_buffer[old_name]
+            for parameter in z.get_scene_items(type_filter='zAttachment'):
+                parameter.mobject_reset()
+            z.string_replace(old_name, name)
+            z.build()
+
     def open_menu(self,position):
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(QtCore.Qt.UserRole+2)
         
-        # name = self._proxy_model.data(indexes[0], QtCore.Qt.DisplayRole)
-        #node = self._proxy_model.getNode(indexes[0])
-        #print indexes.isValid()
-        #node = self._proxy_model.data(indexes[0], QtCore.Qt.UserRole)
-        
-        # if indexes.isValid():
-        #     #pass
-        #     node = indexes.internalPointer()
-        #     print node.name
-        #     #print dir(indexes), indexes, indexes.internalPointer()
-       
         menu = QtWidgets.QMenu()
         menu.addAction(self.actionCopy)
         menu.addAction(self.actionPaste)
+        menu.addAction(self.actionPasteSansMaps)
         if node.type == 'zSolver' or node.type == 'zSolverTransform':
             menu.addSection(node.type)
             menu.addAction(self.actionRemoveSolver)
@@ -168,13 +175,6 @@ class MyDockingUI(QtWidgets.QWidget):
         if node.type == 'zAttachment':
             menu.addSection(node.type)
             menu.addAction(self.actionPaintByProx)
-        
-        # if level == 0:
-        #     menu.addAction(self.tr("Edit person"))
-        # elif level == 1:
-        #     menu.addAction(self.tr("Edit object/container"))
-        # elif level == 2:
-        #     menu.addAction(self.tr("Edit object"))
         
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
