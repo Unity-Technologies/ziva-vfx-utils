@@ -229,7 +229,12 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.selectionModel().select(index,
                                                       QtCore.QItemSelectionModel.SelectCurrent)
 
-                self.treeView.expand(index)
+            # this works for a zBuilder view.  This is expanding the item selected
+            # and it's parent if any.  This makes it possible if you have a 
+            # material or attachment selected, it will become visable in UI
+            self.treeView.expand(checked[-1])
+            self.treeView.expand(checked[-1].parent())
+
 
     @staticmethod
     def delete_instances():
