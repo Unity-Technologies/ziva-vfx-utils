@@ -23,7 +23,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -71,9 +71,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if index.column() == 0:
                 if hasattr(node, 'type'):
                     return node
-        # if role == SceneGraphModel.filterRole:
-        #     if hasattr(node, 'type'):
-        #         return node.type
 
     def parent(self, index):
 
