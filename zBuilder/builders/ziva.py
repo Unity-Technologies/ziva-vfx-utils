@@ -156,7 +156,6 @@ class Ziva(Builder):
             types = []
             types.append('zFieldAdaptor')
             types.extend(Field.TYPES)
-            #types.append('zFieldAdaptor')
             fields = mc.ls(history,type=types)
             nodes.extend(fields)
 
