@@ -70,9 +70,9 @@ class Ziva(Builder):
                     bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
                     parent_node = bodies.get(bd, self.root_node)
                 else:
-                    parent_node = solver[item.solver]
+                    parent_node = solver.get(item.solver,self.root_node)
             else:
-                parent_node = solver[item.solver]
+                parent_node = solver.get(item.solver,self.root_node)
 
             bodies[item.association[0]]._parent = parent_node
             parent_node.add_child(bodies[item.association[0]])
@@ -145,9 +145,20 @@ class Ziva(Builder):
         nodes = mm.eval('zQuery -a')
 
         fiber_names = [x for x in mc.ls(nodes)if mc.objectType(x) == 'zFiber']
-        line_of_actions = mc.listHistory(fiber_names)
-        line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
-        nodes.extend(line_of_actions)
+        if fiber_names:
+            line_of_actions = mc.listHistory(fiber_names)
+            line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
+            nodes.extend(line_of_actions)
+
+        body_names = [x for x in mc.ls(nodes)if mc.objectType(x) in ['zCloth','zTissue']]
+        if body_names:
+            history = mc.listHistory(body_names)
+            types = []
+            types.append('zFieldAdaptor')
+            types.extend(Field.TYPES)
+            #types.append('zFieldAdaptor')
+            fields = mc.ls(history,type=types)
+            nodes.extend(fields)
 
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)

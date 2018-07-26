@@ -62,22 +62,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.customContextMenuRequested.connect(self.open_menu)
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
-
-        self.reset_tree(root_node=root_node)
-        # self.treeView.setSortingEnabled(True)
-
-        # self.filter_line_edit = QtWidgets.QLineEdit(self)
+        self.root_node = root_node
+        self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(32, 32));
-        # self.tool_bar.setContentsMargins(0,0,0,0)
         self.tool_bar.setObjectName("toolBar")
 
-        # self.main_layout.addWidget(self.filter_line_edit)
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        # self.filter_line_edit.textChanged.connect(self._proxy_model.setFilterRegExp)
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
         self._setup_actions()
@@ -116,73 +110,82 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRemoveSolver.setObjectName("actionRemove")
         self.actionRemoveSolver.triggered.connect(self.reset_tree)
 
+        self.actionSelectST = QtWidgets.QAction(self)
+        self.actionSelectST.setText('Select Source and Target')
+        self.actionSelectST.setObjectName("actionSelectST")
+        self.actionSelectST.triggered.connect(self.select_source_and_target)
+
+        self.actionSelectFiberCurve = QtWidgets.QAction(self)
+        self.actionSelectFiberCurve.setText('Select Curve')
+        self.actionSelectFiberCurve.setObjectName("selectCurve")
+        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
+
         self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity')
+        self.actionPaintByProx.setText('Paint By Proximity UI')
         self.actionPaintByProx.setObjectName("actionPaint")
         self.actionPaintByProx.triggered.connect(paint_by_prox)
 
-    def copy(self):
+        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
+        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
+        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
+        self.actionPaintByProx_1_2.triggered.connect(paint_by_prox_1_2)
+
+        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
+        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
+        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
+        self.actionPaintByProx_1_10.triggered.connect(paint_by_prox_1_10)
+
+
+    def select_source_and_target(self):
+        """Selects the source and target mesh of an attachment.  This is a menu 
+        command.
+        """
+
         indexes = self.treeView.selectedIndexes()[0]
-        name = indexes.data(QtCore.Qt.DisplayRole)
+        node = indexes.data(QtCore.Qt.UserRole+2)
+        mc.select(node.association)
 
-        
-        import zBuilder.builders.ziva as zva
-        z = zva.Ziva()
-        z.retrieve_from_scene_selection(name,connections=False)
-        #z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
-        z.stats()
-        # z.build(**kwargs)
-        self.__copy_buffer = {}
-        self.__copy_buffer[name] = z
-        # mc.select(sel)
+    def select_fiber_curve(self):
+        """Selects fiber curve based on item selected in tree.  This is a menu 
+        command.
+        """
 
-    def paste(self):
         indexes = self.treeView.selectedIndexes()[0]
-        name = indexes.data(QtCore.Qt.DisplayRole)
-
-        if self.__copy_buffer:
-            old_name = self.__copy_buffer.keys()[0]
-            z = self.__copy_buffer[old_name]
-            for parameter in z.get_scene_items(type_filter='zAttachment'):
-                parameter.mobject_reset()
-            z.string_replace(old_name, name)
-            z.build()
-
-    def paste_sans_maps(self):
-        indexes = self.treeView.selectedIndexes()[0]
-        name = indexes.data(QtCore.Qt.DisplayRole)
-
-        if self.__copy_buffer:
-            old_name = self.__copy_buffer.keys()[0]
-            z = self.__copy_buffer[old_name]
-            for parameter in z.get_scene_items(type_filter='zAttachment'):
-                parameter.mobject_reset()
-            z.string_replace(old_name, name)
-            z.build()
+        node = indexes.data(QtCore.Qt.UserRole+2)
+        mc.select(node.curve)
 
     def open_menu(self,position):
+        """Generates menu for tree items
+        """
+
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(QtCore.Qt.UserRole+2)
         
         menu = QtWidgets.QMenu()
-        menu.addAction(self.actionCopy)
-        menu.addAction(self.actionPaste)
-        menu.addAction(self.actionPasteSansMaps)
-        if node.type == 'zSolver' or node.type == 'zSolverTransform':
-            menu.addSection(node.type)
-            menu.addAction(self.actionRemoveSolver)
 
         if node.type == 'zAttachment':
             menu.addSection(node.type)
             menu.addAction(self.actionPaintByProx)
+            menu.addAction(self.actionPaintByProx_1_2)
+            menu.addAction(self.actionPaintByProx_1_10)
+            menu.addAction(self.actionSelectST)
         
+        if node.type == 'zLineOfAction':
+            menu.addSection(node.type)
+            menu.addAction(self.actionSelectFiberCurve)
+
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self):
+        """When the tree selection changes this gets executed to select
+        corrisponding item in Maya scene.
+        """
         index = self.treeView.selectedIndexes()[0]
+        node = index.data(QtCore.Qt.UserRole+2)
         name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
         if mc.objExists(name):
             mc.select(name)
+
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -206,9 +209,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        # self._proxy_model.setSortRole(model.SceneGraphModel.sortRole)
-        # self._proxy_model.setFilterRole(model.SceneGraphModel.filterRole)
-
         self.treeView.setModel(self._proxy_model)
 
         # Expand all zSolverTransform tree items--------------------------------
@@ -239,7 +239,6 @@ class MyDockingUI(QtWidgets.QWidget):
     @staticmethod
     def delete_instances():
         for ins in MyDockingUI.instances:
-            # logger.info('Delete {}'.format(ins))
             try:
                 ins.setParent(None)
                 ins.deleteLater()
@@ -256,6 +255,12 @@ class MyDockingUI(QtWidgets.QWidget):
 
 def paint_by_prox():
     mm.eval('ZivaPaintAttachmentsByProximityOptions;')
+    
+def paint_by_prox_1_2():
+    mm.eval('zPaintAttachmentsByProximity -min .1 -max .2')
+
+def paint_by_prox_1_10():
+    mm.eval('zPaintAttachmentsByProximity -min .1 -max 1.0')
 
 def go(root_node=None):
     dock_window(MyDockingUI, root_node=root_node)
