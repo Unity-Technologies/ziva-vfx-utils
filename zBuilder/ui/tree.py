@@ -2,47 +2,17 @@ import weakref
 
 import maya.cmds as mc
 import maya.mel as mm
-import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
 
 import zBuilder.ui.model as model
 import zBuilder.ui.icons as icons
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-def dock_window(dialog_class, root_node=None):
-    try:
-        mc.deleteUI(dialog_class.CONTROL_NAME)
-        logger.info('removed workspace {}'.format(dialog_class.CONTROL_NAME))
-    except:
-        pass
-
-    # building the workspace control with maya.cmds
-    main_control = mc.workspaceControl(dialog_class.CONTROL_NAME, ttc=["AttributeEditor", -1], iw=300, mw=100,
-                                       wp='preferred', label=dialog_class.DOCK_LABEL_NAME)
-
-    # now lets get a C++ pointer to it using OpenMaya
-    control_widget = omui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
-    # conver the C++ pointer to Qt object we can use
-    control_wrap = wrapInstance(long(control_widget), QtWidgets.QWidget)
-
-    # control_wrap is the widget of the docking window and now we can start working with it:
-    control_wrap.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-    win = dialog_class(control_wrap, root_node=root_node)
-    # after maya is ready we should restore the window since it may not be visible
-    mc.evalDeferred(lambda *args: mc.workspaceControl(main_control, e=True, rs=True))
-
-    win.run()
-
+from zBuilder.ui.utils import dock_window
 
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
-    CONTROL_NAME = 'zivaVfxView'
-    DOCK_LABEL_NAME = 'Ziva VFX'
+    CONTROL_NAME = 'zBuilderView'
+    DOCK_LABEL_NAME = 'zBuilder View'
 
     def __init__(self, parent=None, root_node=None):
         super(MyDockingUI, self).__init__(parent)
@@ -58,134 +28,13 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
         self.treeView = QtWidgets.QTreeView()
-        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeView.customContextMenuRequested.connect(self.open_menu)
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self.root_node = root_node
         self.reset_tree(root_node=self.root_node)
 
-        self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32));
-        self.tool_bar.setObjectName("toolBar")
-
-        self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
-
-        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-
-        self._setup_actions()
-
-        self.tool_bar.addAction(self.actionRefresh)
-
-    def _setup_actions(self):
-
-        refresh_path = icons.get_icon_path_from_name('refresh')
-        refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
-                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionRefresh = QtWidgets.QAction(self)
-        self.actionRefresh.setText('Refresh')
-        self.actionRefresh.setIcon(refresh_icon)
-        self.actionRefresh.setObjectName("actionUndo")
-        self.actionRefresh.triggered.connect(self.reset_tree)
-
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-        self.actionCopy.triggered.connect(self.copy)
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-        self.actionPaste.triggered.connect(self.paste)
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-        self.actionPasteSansMaps.triggered.connect(self.paste_sans_maps)
         
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
-
-        self.actionSelectST = QtWidgets.QAction(self)
-        self.actionSelectST.setText('Select Source and Target')
-        self.actionSelectST.setObjectName("actionSelectST")
-        self.actionSelectST.triggered.connect(self.select_source_and_target)
-
-        self.actionSelectFiberCurve = QtWidgets.QAction(self)
-        self.actionSelectFiberCurve.setText('Select Curve')
-        self.actionSelectFiberCurve.setObjectName("selectCurve")
-        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
-
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(paint_by_prox)
-
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(paint_by_prox_1_2)
-
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(paint_by_prox_1_10)
-
-
-    def select_source_and_target(self):
-        """Selects the source and target mesh of an attachment.  This is a menu 
-        command.
-        """
-
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
-        mc.select(node.association)
-
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu 
-        command.
-        """
-
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
-        mc.select(node.curve)
-
-    def open_menu(self,position):
-        """Generates menu for tree items
-        """
-
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
-        
-        menu = QtWidgets.QMenu()
-
-        if node.type == 'zAttachment':
-            menu.addSection(node.type)
-            menu.addAction(self.actionPaintByProx)
-            menu.addAction(self.actionPaintByProx_1_2)
-            menu.addAction(self.actionPaintByProx_1_10)
-            menu.addAction(self.actionSelectST)
-        
-        if node.type == 'zLineOfAction':
-            menu.addSection(node.type)
-            menu.addAction(self.actionSelectFiberCurve)
-
-        menu.exec_(self.treeView.viewport().mapToGlobal(position))
-
-    def tree_changed(self):
-        """When the tree selection changes this gets executed to select
-        corrisponding item in Maya scene.
-        """
-        index = self.treeView.selectedIndexes()[0]
-        node = index.data(QtCore.Qt.UserRole+2)
-        name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
-        if mc.objExists(name):
-            mc.select(name)
-
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -251,16 +100,6 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-
-
-def paint_by_prox():
-    mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-    
-def paint_by_prox_1_2():
-    mm.eval('zPaintAttachmentsByProximity -min .1 -max .2')
-
-def paint_by_prox_1_10():
-    mm.eval('zPaintAttachmentsByProximity -min .1 -max 1.0')
 
 def go(root_node=None):
     dock_window(MyDockingUI, root_node=root_node)
