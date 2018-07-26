@@ -70,9 +70,9 @@ class Ziva(Builder):
                     bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
                     parent_node = bodies.get(bd, self.root_node)
                 else:
-                    parent_node = solver[item.solver]
+                    parent_node = solver.get(item.solver,self.root_node)
             else:
-                parent_node = solver[item.solver]
+                parent_node = solver.get(item.solver,self.root_node)
 
             bodies[item.association[0]]._parent = parent_node
             parent_node.add_child(bodies[item.association[0]])
@@ -86,13 +86,15 @@ class Ziva(Builder):
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.association[0], self.root_node)
-            parent_node.add_child(item)
-            item._parent = parent_node
+            parent_node = bodies.get(item.association[0], None)
+            if parent_node:
+                parent_node.add_child(item)
+                item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.association[1], self.root_node)
-                parent_node.add_child(item)
+                parent_node = bodies.get(item.association[1], None)
+                if parent_node:
+                    parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
@@ -105,7 +107,6 @@ class Ziva(Builder):
 
         # assign zFieldAdapter to solver
         for item in self.get_scene_items(type_filter=['zFieldAdaptor']):
-            print item.input_field
             parent_node = self.get_scene_items(name_filter=item.input_field)[0]
             parent_node.add_child(item)
             item._parent = parent_node
@@ -142,8 +143,25 @@ class Ziva(Builder):
         target = mm.eval('zQuery -at')
         mc.select(source,target)
         nodes = mm.eval('zQuery -a')
-        self._populate_nodes(nodes, get_parameters=get_parameters)
-        self.get_parent()
+
+        fiber_names = [x for x in mc.ls(nodes)if mc.objectType(x) == 'zFiber']
+        if fiber_names:
+            line_of_actions = mc.listHistory(fiber_names)
+            line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
+            nodes.extend(line_of_actions)
+
+        body_names = [x for x in mc.ls(nodes)if mc.objectType(x) in ['zCloth','zTissue']]
+        if body_names:
+            history = mc.listHistory(body_names)
+            types = []
+            types.append('zFieldAdaptor')
+            types.extend(Field.TYPES)
+            fields = mc.ls(history,type=types)
+            nodes.extend(fields)
+
+        if nodes:
+            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self.get_parent()
 
         mc.select(scene_selection)
 
@@ -216,7 +234,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.get_parent()
 
-        #self.stats()
+        self.stats()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -403,9 +421,11 @@ class Ziva(Builder):
                 parameter.build(attr_filter=attr_filter, permissive=permissive)
 
         # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_scene_items(type_filter='zSolverTransform')[0]
-        sn = solver_transform.name
-        solver_value = solver_transform.attrs['enable']['value']
+        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
+        sn = None
+        if solver_transform:
+            sn = solver_transform[0].name
+            solver_value = solver_transform.attrs['enable']['value']
 
         # generate list of node types to build
         node_types_to_build = list()
@@ -442,7 +462,8 @@ class Ziva(Builder):
 
         # turn on solver
         mc.select(sel, r=True)
-        mc.setAttr(sn + '.enable', solver_value)
+        if sn:
+            mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
