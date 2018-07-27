@@ -2,13 +2,18 @@ import weakref
 
 import maya.cmds as mc
 import maya.mel as mm
-from shiboken2 import wrapInstance
+try:
+    from shiboken2 import wrapInstance
+except ImportError:
+    raise StandardError("Ziva VFX Panel supported on Maya 2017+")
+
 from PySide2 import QtGui, QtWidgets, QtCore
+from zBuilder.ui.utils import dock_window
 
 import zBuilder.ui.model as model
 import zBuilder.ui.icons as icons
 import zBuilder.builders.ziva as zva
-from zBuilder.ui.utils import dock_window
+
 
 class ZivaUi():
 
@@ -18,7 +23,6 @@ class ZivaUi():
         z.retrieve_connections()
 
         dock_window(MyDockingUI, root_node=z.root_node)
-
 
 
 class MyDockingUI(QtWidgets.QWidget):

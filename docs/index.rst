@@ -7,7 +7,6 @@
     introduction
     installation
     zBuilder_menu
-    zUI_menu
     release
     glossary
     zBuilder
