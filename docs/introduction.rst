@@ -15,6 +15,3 @@ It’s designed to be used by Technical Directors who are rigging characters wit
 It supports use cases such as updating a rig when new geometry is published and
 transferring a Ziva rig from one character to another.
 
-:doc:`zUI_menu` is a beta UI to help navigate the Ziva setup in Maya.
-Among other things, it can help list objects in the simulation, find their attachments,
-quickly navigate and select Ziva DG nodes, and drop into painting maps.
