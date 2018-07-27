@@ -1,18 +1,24 @@
 Release Notes
 =============
+1.0.5
+-----
+* Support for Maya fields
+* Support for zFieldAdaptor node
+* UI overhaul (Launch from Ziva menu)
+* various bug fixes
 
 1.0.4
-------
+-----
 * QT tree view for builder data
 * bug fixes
 
 1.0.3
-------
+-----
 * zUI support on maya 2017 and 2018
 * bug fixes
 
 1.0.0
-------
+-----
 * major refactor
 * file backwards compatibility
 * support for multiple solvers
