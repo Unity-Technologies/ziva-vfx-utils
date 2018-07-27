@@ -50,6 +50,7 @@ zBuilder.builders.ziva module
 
 .. automodule:: zBuilder.builders.ziva
     :members:
+    :noindex:
     :undoc-members:
     :show-inheritance:
 
