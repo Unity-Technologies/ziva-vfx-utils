@@ -5,7 +5,7 @@ import maya.mel as mm
 try:
     from shiboken2 import wrapInstance
 except ImportError:
-    raise StandardError("Ziva VFX Panel supported on Maya 2017+")
+    raise StandardError("Ziva Scene Panel supported on Maya 2017+")
 
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
@@ -27,8 +27,8 @@ class ZivaUi():
 
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
-    CONTROL_NAME = 'zivaVfxView'
-    DOCK_LABEL_NAME = 'Ziva VFX'
+    CONTROL_NAME = 'zivaScenePanel'
+    DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
     def __init__(self, parent=None, root_node=None):
         super(MyDockingUI, self).__init__(parent)
