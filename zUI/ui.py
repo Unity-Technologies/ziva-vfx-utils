@@ -219,7 +219,6 @@ class MyDockingUI(QtWidgets.QWidget):
             menu.addAction(self.actionSelectST)
 
         if node.type == 'zLineOfAction':
-            menu.addSection(node.type)
             menu.addAction(self.actionSelectFiberCurve)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
