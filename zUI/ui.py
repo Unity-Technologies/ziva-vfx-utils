@@ -1,4 +1,5 @@
 import weakref
+from functools import partial
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -13,6 +14,7 @@ from zBuilder.ui.utils import dock_window
 import zBuilder.ui.model as model
 import zBuilder.ui.icons as icons
 import zBuilder.builders.ziva as zva
+
 
 
 class ZivaUi():
@@ -121,6 +123,44 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintByProx_1_10.setObjectName("actionPaint110")
         self.actionPaintByProx_1_10.triggered.connect(paint_by_prox_1_10)
 
+        self.actionPaintSource = QtWidgets.QAction(self)
+        self.actionPaintSource.setText('Paint - source weights')
+        self.actionPaintSource.setObjectName("paintSource")
+        self.actionPaintSource.triggered.connect(partial(self.paint_weights,0,'weights'))
+
+        self.actionPaintTarget = QtWidgets.QAction(self)
+        self.actionPaintTarget.setText('Paint - target weights')
+        self.actionPaintTarget.setObjectName("paintTarget")
+        self.actionPaintTarget.triggered.connect(partial(self.paint_weights,1,'weights'))
+
+
+        self.actionPaintWeight = QtWidgets.QAction(self)
+        self.actionPaintWeight.setText('Paint - weights')
+        self.actionPaintWeight.setObjectName("paintWeight")
+        self.actionPaintWeight.triggered.connect(partial(self.paint_weights,0,'weights'))
+
+        self.actionPaintEndPoints = QtWidgets.QAction(self)
+        self.actionPaintEndPoints.setText('Paint - endPoints')
+        self.actionPaintEndPoints.setObjectName("paintEndPoints")
+        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,0,'endPoints'))
+
+
+    def paint_weights(self,association_idx,attribute):
+        """Paint weights menu command.
+        
+        This is checking item selected in treeView to get zBuilder node.
+        
+        Args:
+            association_idx (int): The index of mesh to use in node association.
+            attribute (string): The name of the attribute to paint.
+        """
+
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mesh = node.association[association_idx]
+        mc.select(mesh,r=True)
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type,node.name,attribute)
+        mm.eval(cmd)
 
     def select_source_and_target(self):
         """Selects the source and target mesh of an attachment.  This is a menu 
@@ -128,7 +168,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.association)
 
     def select_fiber_curve(self):
@@ -137,37 +177,59 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.curve)
 
     def open_menu(self,position):
         """Generates menu for tree items
+
+        We are getting the zBuilder node in the tree item and checking type.
+        With that we can build a custom menu per type.
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         
         menu = QtWidgets.QMenu()
 
+        if node.type == 'zTet':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
+
+        if node.type == 'zFiber':
+            menu.addAction(self.actionPaintWeight)
+            menu.addAction(self.actionPaintEndPoints)
+            menu.addSection('')
+
+        if node.type == 'zMaterial':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
+
+        if node.type == 'zEmbedder':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
+
         if node.type == 'zAttachment':
-            menu.addSection(node.type)
+            menu.addAction(self.actionPaintSource)
+            menu.addAction(self.actionPaintTarget)
+            menu.addSection('')
             menu.addAction(self.actionPaintByProx)
             menu.addAction(self.actionPaintByProx_1_2)
             menu.addAction(self.actionPaintByProx_1_10)
             menu.addAction(self.actionSelectST)
-        
+
         if node.type == 'zLineOfAction':
-            menu.addSection(node.type)
             menu.addAction(self.actionSelectFiberCurve)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
+
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
         index = self.treeView.selectedIndexes()[0]
-        node = index.data(QtCore.Qt.UserRole+2)
+        node = index.data(model.SceneGraphModel.nodeRole)
         name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
         if mc.objExists(name):
             mc.select(name)
@@ -201,7 +263,7 @@ class MyDockingUI(QtWidgets.QWidget):
         proxy_model = self.treeView.model()
         for row in range(proxy_model.rowCount()):
             index = proxy_model.index(row, 0)
-            node = index.data(QtCore.Qt.UserRole+2)
+            node = index.data(model.SceneGraphModel.nodeRole)
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
