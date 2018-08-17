@@ -156,7 +156,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         mesh = node.association[association_idx]
         mc.select(mesh,r=True)
         cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type,node.name,attribute)
@@ -168,7 +168,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.association)
 
     def select_fiber_curve(self):
@@ -177,7 +177,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.curve)
 
     def open_menu(self,position):
@@ -188,7 +188,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(QtCore.Qt.UserRole+2)
+        node = indexes.data(model.SceneGraphModel.nodeRole)
         
         menu = QtWidgets.QMenu()
 
@@ -229,7 +229,7 @@ class MyDockingUI(QtWidgets.QWidget):
         corrisponding item in Maya scene.
         """
         index = self.treeView.selectedIndexes()[0]
-        node = index.data(QtCore.Qt.UserRole+2)
+        node = index.data(model.SceneGraphModel.nodeRole)
         name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
         if mc.objExists(name):
             mc.select(name)
@@ -263,7 +263,7 @@ class MyDockingUI(QtWidgets.QWidget):
         proxy_model = self.treeView.model()
         for row in range(proxy_model.rowCount()):
             index = proxy_model.index(row, 0)
-            node = index.data(QtCore.Qt.UserRole+2)
+            node = index.data(model.SceneGraphModel.nodeRole)
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
