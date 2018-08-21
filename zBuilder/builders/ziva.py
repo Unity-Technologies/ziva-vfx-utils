@@ -425,7 +425,7 @@ class Ziva(Builder):
         sn = None
         if solver_transform:
             sn = solver_transform[0].name
-            solver_value = solver_transform.attrs['enable']['value']
+            solver_value = solver_transform[0].attrs['enable']['value']
 
         # generate list of node types to build
         node_types_to_build = list()
