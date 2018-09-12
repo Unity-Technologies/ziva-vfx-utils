@@ -470,7 +470,7 @@ class Ziva(Builder):
 
 
 def zQuery(types,solver):
-    hist = mc.listHistory(solver)
+    hist = reversed(mc.listHistory(solver))
     nodes = [x for x in hist if mc.objectType(x) in types]
     return nodes
 
