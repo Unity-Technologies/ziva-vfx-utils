@@ -325,6 +325,46 @@ def get_zCloth(bodies):
         return []
 
 
+def get_soft_bodies(selection):
+    """
+    Get all the soft bodies (tissue and cloth).
+    This is a wrapper around get_zCloth and getzTissue.
+    """
+    soft_bodies = get_zTissues(selection)
+    soft_bodies.extend(get_zCloth(selection))
+    return soft_bodies
+
+
+def get_zFieldAdaptors(bodies):
+    """ Gets zFieldAdaptors connected into some bodies.
+    Args:
+        bodies: List of names of Maya zTissue or zCloth nodes to get zFieldAdaptors for.
+
+    Returns:
+        list of names of zFieldAdaptor nodes.
+    """
+    field_adapters = []
+    for body in bodies:
+        fields = mc.listConnections(body + '.fields')
+        fields = none_to_empty(fields)
+        field_adapters.extend(fields)
+    return field_adapters
+
+
+def get_fields_on_zFieldAdaptors(adaptors):
+    """ Gets Maya fields connected into some zFieldAdaptors.
+    Args:
+        adaptors: list of names of Maya zFieldAdaptor nodes
+
+    Returns:
+        list of names of fields plugged into those.
+    """
+    fields = []
+    for adaptor in adaptors:
+        fields.extend(mc.listConnections(adaptor + '.field'))
+    return fields
+
+
 def get_zTet_user_mesh(zTet):
     """ Gets the user tet mesh hooked up to a given zTet in any.
 
