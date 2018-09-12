@@ -325,6 +325,46 @@ def get_zCloth(bodies):
         return []
 
 
+def get_soft_bodies(selection):
+    """
+    Get all the soft bodies (tissue and cloth).
+    This is a wrapper around get_zCloth and get_zTissues.
+    """
+    soft_bodies = get_zTissues(selection)
+    soft_bodies.extend(get_zCloth(selection))
+    return soft_bodies
+
+
+def get_zFieldAdaptors(bodies):
+    """ Gets zFieldAdaptors connected into some bodies.
+    Args:
+        bodies: List of names of Maya zTissue or zCloth nodes to get zFieldAdaptors for.
+
+    Returns:
+        list of names of zFieldAdaptor nodes.
+    """
+    field_adapters = []
+    for body in bodies:
+        fields = mc.listConnections(body + '.fields')
+        fields = none_to_empty(fields)
+        field_adapters.extend(fields)
+    return field_adapters
+
+
+def get_fields_on_zFieldAdaptors(adaptors):
+    """ Gets Maya fields connected into some zFieldAdaptors.
+    Args:
+        adaptors: list of names of Maya zFieldAdaptor nodes
+
+    Returns:
+        list of names of fields plugged into the adaptors.
+    """
+    fields = []
+    for adaptor in adaptors:
+        fields.extend(mc.listConnections(adaptor + '.field'))
+    return fields
+
+
 def get_zTet_user_mesh(zTet):
     """ Gets the user tet mesh hooked up to a given zTet in any.
 
@@ -809,3 +849,20 @@ def check_map_validity(map_parameters):
     mc.select(sel)
     return report
 
+
+def none_to_empty(x):
+    """
+    Turn None into empty list, else just return the input as-is.
+
+    This is a utility to work with Maya's Python API which returns
+    None instead of empty list when no results are found.
+    That non-uniformity is annoying. Use this to fix it.
+
+    Args:
+        x: anything
+    Returns:
+        [] if x is None else x
+    """
+    # Note, this could be x or [], but that would return empty
+    # list for anything that evaluates to false, not just None.
+    return [] if x is None else x
