@@ -328,7 +328,7 @@ def get_zCloth(bodies):
 def get_soft_bodies(selection):
     """
     Get all the soft bodies (tissue and cloth).
-    This is a wrapper around get_zCloth and getzTissue.
+    This is a wrapper around get_zCloth and get_zTissues.
     """
     soft_bodies = get_zTissues(selection)
     soft_bodies.extend(get_zCloth(selection))
@@ -357,7 +357,7 @@ def get_fields_on_zFieldAdaptors(adaptors):
         adaptors: list of names of Maya zFieldAdaptor nodes
 
     Returns:
-        list of names of fields plugged into those.
+        list of names of fields plugged into the adaptors.
     """
     fields = []
     for adaptor in adaptors:
