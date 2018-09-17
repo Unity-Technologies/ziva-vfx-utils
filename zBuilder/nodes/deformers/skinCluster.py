@@ -49,8 +49,7 @@ class SkinCluster(DGNode):
             self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
-        # self.set_maya_weights(interp_maps=interp_maps)
-        # apply_weights(self.name, self.association, self.influences, self.weights)
+        apply_weights(self.name, self.association, self.influences, self.weights)
 
 
 def get_associations(skin_cluster):
