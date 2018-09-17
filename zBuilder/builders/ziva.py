@@ -255,6 +255,7 @@ class Ziva(Builder):
             materials (bool): Gets materials data.  Defaults to True
             fibers (bool): Gets fibers data.  Defaults to True
             cloth (bool): Gets cloth data.  Defaults to True
+            fields (bool): Gets field data.  Defaults to True
             lineOfAction (bool): Gets line of action data.  Defaults to True
             embedder (bool): Gets embedder data.  Defaults to True
             get_parameters (bool): get mesh info. Defaults to True
@@ -279,6 +280,7 @@ class Ziva(Builder):
         materials = kwargs.get('materials', True)
         fibers = kwargs.get('fibers', True)
         cloth = kwargs.get('cloth', True)
+        fields = kwargs.get('fields', True)
         lineOfAction = kwargs.get('lineOfAction', True)
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
@@ -309,6 +311,14 @@ class Ziva(Builder):
                 nodes.extend(mz.get_zFibers(selection))
             if cloth:
                 nodes.extend(mz.get_zCloth(selection))
+            if fields:
+                soft_bodies = mz.get_soft_bodies(selection)
+                adaptors = mz.get_zFieldAdaptors(soft_bodies)
+                fields = mz.get_fields_on_zFieldAdaptors(adaptors)
+                # fields needs to come before adaptors, so that
+                # they are created first when applying to scene.
+                nodes.extend(fields)
+                nodes.extend(adaptors)
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
@@ -470,7 +480,7 @@ class Ziva(Builder):
 
 
 def zQuery(types,solver):
-    hist = mc.listHistory(solver)
+    hist = reversed(mc.listHistory(solver))
     nodes = [x for x in hist if mc.objectType(x) in types]
     return nodes
 
