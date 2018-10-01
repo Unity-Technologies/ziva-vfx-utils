@@ -17,10 +17,10 @@ class Deformers(Builder):
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
-        # parse args------------------------------------------------------------
+        # parse args-----------------------------------------------------------
         selection = mz.parse_maya_node_for_selection(args)
 
-        # kwargs----------------------------------------------------------------
+        # kwargs---------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_map_names', True)
 
@@ -37,7 +37,6 @@ class Deformers(Builder):
 
         for item in tmp:
             parameter = self.node_factory(item)
-            # print parameter
             self.bundle.extend_scene_items(parameter)
         self.stats()
 
@@ -47,10 +46,9 @@ class Deformers(Builder):
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
-
-        parameters = self.get_scene_items(name_filter=name_filter)
+        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
+                   'blendShape', 'wrap']
+        parameters = self.get_scene_items(name_filter=name_filter,
+                                          type_filter=acquire)
         for parameter in parameters:
-            try:
-                parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
-            except:
-                pass
+            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
