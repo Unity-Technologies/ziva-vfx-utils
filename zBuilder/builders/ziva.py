@@ -14,13 +14,27 @@ try:
 except RuntimeError:
     pass
 
+ZNODES = [
+    'zSolver',
+    'zSolverTransform',
+    'zTet',
+    'zTissue',
+    'zBone',
+    'zCloth',
+    'zSolver',
+    'zEmbedder',
+    'zAttachment',
+    'zMaterial',
+    'zFiber'
+    ]
+
+
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
 
     def __init__(self):
         Builder.__init__(self)
-
 
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
@@ -29,7 +43,6 @@ class Ziva(Builder):
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, v=True)
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
-
 
     def get_parent(self):
         from zBuilder.nodes.base import Base
@@ -58,7 +71,7 @@ class Ziva(Builder):
 
         # get bodies......
         bodies = {}
-        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+        for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             grp = Base()
             grp.name = item.association[0]
             grp.type = 'ui_{}_body'.format(item.type)
@@ -119,14 +132,14 @@ class Ziva(Builder):
         Args:
             get_parameters (bool): To get parameters or not. Default False
         """
-        # ----------------------------------------------------------------------
-        # KWARG PARSING---------------------------------------------------------
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # KWARG PARSING--------------------------------------------------------
+        # ---------------------------------------------------------------------
         get_parameters = kwargs.get('get_parameters', False)
 
-        # ----------------------------------------------------------------------
-        # ARG PARSING-----------------------------------------------------------
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # ARG PARSING----------------------------------------------------------
+        # ---------------------------------------------------------------------
         scene_selection = mc.ls(sl=True)
         selection = []
         if args:
@@ -135,28 +148,28 @@ class Ziva(Builder):
         else:
             selection = mc.ls(sl=True)
 
-        #-----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # this gets the selected and what is connected to it by attachments.
         attachments = mm.eval('zQuery -type zAttachment')
         mc.select(attachments)
         source = mm.eval('zQuery -as')
         target = mm.eval('zQuery -at')
-        mc.select(source,target)
+        mc.select(source, target)
         nodes = mm.eval('zQuery -a')
 
         fiber_names = [x for x in mc.ls(nodes)if mc.objectType(x) == 'zFiber']
         if fiber_names:
             line_of_actions = mc.listHistory(fiber_names)
-            line_of_actions = mc.ls(line_of_actions,type='zLineOfAction')
+            line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
             nodes.extend(line_of_actions)
 
-        body_names = [x for x in mc.ls(nodes)if mc.objectType(x) in ['zCloth','zTissue']]
+        body_names = [x for x in mc.ls(nodes)if mc.objectType(x) in ['zCloth', 'zTissue']]
         if body_names:
             history = mc.listHistory(body_names)
             types = []
             types.append('zFieldAdaptor')
             types.extend(Field.TYPES)
-            fields = mc.ls(history,type=types)
+            fields = mc.ls(history, type=types)
             nodes.extend(fields)
 
         if nodes:
@@ -189,23 +202,23 @@ class Ziva(Builder):
             get_parameters (bool): To get parameters or not.
 
         """
-        # ----------------------------------------------------------------------
-        # KWARG PARSING---------------------------------------------------------
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # KWARG PARSING--------------------------------------------------------
+        # ---------------------------------------------------------------------
         get_parameters = kwargs.get('get_parameters', True)
 
-        # ----------------------------------------------------------------------
-        # ARG PARSING-----------------------------------------------------------
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # ARG PARSING----------------------------------------------------------
+        # ---------------------------------------------------------------------
         solver = None
         if args:
             solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))
         else:
             solver = mm.eval('zQuery -t "zSolver"')
 
-        # ----------------------------------------------------------------------
-        # NODE STORING----------------------------------------------------------
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # NODE STORING---------------------------------------------------------
+        # ---------------------------------------------------------------------
         if solver:
             solver = solver[0]
         else:
@@ -226,7 +239,7 @@ class Ziva(Builder):
                       'zLineOfAction',
                       'zFieldAdaptor',
                       ]
-        
+
         node_types.extend(Field.TYPES)
         
         nodes = zQuery(node_types, solver)
@@ -235,6 +248,9 @@ class Ziva(Builder):
             self.get_parent()
 
         self.stats()
+
+
+
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -467,8 +483,8 @@ class Ziva(Builder):
             for scene_item in self.get_scene_items(type_filter=node_type,
                                                    association_filter=association_filter):
                 scene_item.build(attr_filter=attr_filter,
-                                permissive=permissive,
-                                interp_maps=interp_maps)
+                                 permissive=permissive,
+                                 interp_maps=interp_maps)
 
         # turn on solver
         mc.select(sel, r=True)
@@ -479,9 +495,15 @@ class Ziva(Builder):
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
 
 
-def zQuery(types,solver):
-    hist = reversed(mc.listHistory(solver))
-    nodes = [x for x in hist if mc.objectType(x) in types]
+def zQuery(types, solver):
+    types_not_in_znodes = list(set(types)-set(ZNODES))
+    types_in_znodes = list(set(ZNODES) & set(types))
+    hist = mc.listHistory(solver)
+    nodes = [x for x in hist if mc.objectType(x) in types_not_in_znodes]
+
+    for node_type in types_in_znodes:
+        tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
+        if tmp:
+            nodes.extend(tmp)
+
     return nodes
-
-
