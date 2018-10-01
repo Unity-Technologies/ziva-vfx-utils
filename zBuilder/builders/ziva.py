@@ -69,15 +69,19 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item._parent = parent_node
 
-        # get bodies......
+        # get bodies-----------------------------------------------------------
         bodies = {}
-        for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
+        for item in self.get_scene_items(type_filter=['zBone',
+                                                      'zTissue',
+                                                      'zCloth']):
             grp = Base()
-            grp.name = item.association[0]
+            grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            bodies[item.association[0]] = grp
+            bodies[item.long_association[0]] = grp
 
-        for item in self.get_scene_items(type_filter=['zBone','zTissue','zCloth']):
+        for item in self.get_scene_items(type_filter=['zBone',
+                                                      'zTissue',
+                                                      'zCloth']):
             if item.type == 'zTissue':
                 if item.parent_tissue:
                     bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
@@ -87,25 +91,25 @@ class Ziva(Builder):
             else:
                 parent_node = solver.get(item.solver,self.root_node)
 
-            bodies[item.association[0]]._parent = parent_node
-            parent_node.add_child(bodies[item.association[0]])
+            bodies[item.long_association[0]]._parent = parent_node
+            parent_node.add_child(bodies[item.long_association[0]])
 
-            bodies[item.association[0]].add_child(item)
-            item._parent = bodies[item.association[0]]
+            bodies[item.long_association[0]].add_child(item)
+            item._parent = bodies[item.long_association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
-            parent_node = bodies.get(item.association[0], self.root_node)
+            parent_node = bodies.get(item.long_association[0], self.root_node)
             parent_node.add_child(item)
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.association[0], None)
+            parent_node = bodies.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
                 item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.association[1], None)
+                parent_node = bodies.get(item.long_association[1], None)
                 if parent_node:
                     parent_node.add_child(item)
 
@@ -152,8 +156,8 @@ class Ziva(Builder):
         # this gets the selected and what is connected to it by attachments.
         attachments = mm.eval('zQuery -type zAttachment')
         mc.select(attachments)
-        source = mm.eval('zQuery -as')
-        target = mm.eval('zQuery -at')
+        source = mm.eval('zQuery -as -l')
+        target = mm.eval('zQuery -at -l')
         mc.select(source, target)
         nodes = mm.eval('zQuery -a')
 
@@ -163,7 +167,8 @@ class Ziva(Builder):
             line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
             nodes.extend(line_of_actions)
 
-        body_names = [x for x in mc.ls(nodes)if mc.objectType(x) in ['zCloth', 'zTissue']]
+        body_names = [x for x in mc.ls(nodes) if mc.objectType(x) in ['zCloth',
+                                                                      'zTissue']]
         if body_names:
             history = mc.listHistory(body_names)
             types = []
