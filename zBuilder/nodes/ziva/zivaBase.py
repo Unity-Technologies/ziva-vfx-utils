@@ -47,6 +47,7 @@ class Ziva(Deformer):
 
         mesh = mz.get_association(maya_node)
         self.association = mesh
+        
 
         solver = mm.eval('zQuery -t zSolver {}'.format(self.name))
         if solver:
