@@ -128,6 +128,22 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item._parent = parent_node
 
+    def __add_body(self, bodies):
+
+        # query all the ziva nodes--------------------------------------------- 
+        mc.select(bodies)
+        nodes = mm.eval('zQuery -a')
+
+        # find line of actions-------------------------------------------------
+        fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
+        if fiber_names:
+            line_of_actions = mc.listHistory(fiber_names)
+            line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
+            nodes.extend(line_of_actions)
+
+        return nodes 
+
+
     def retrieve_connections(self, *args, **kwargs):
         """ This retrieves the scene items from the scene based on connections to
         selection and does not get parameters for speed.  This is main call to 
@@ -152,23 +168,30 @@ class Ziva(Builder):
         else:
             selection = mc.ls(sl=True)
 
-        # ---------------------------------------------------------------------
-        # this gets the selected and what is connected to it by attachments.
-        attachments = mm.eval('zQuery -type zAttachment')
-        mc.select(attachments)
-        source = mm.eval('zQuery -as -l')
-        target = mm.eval('zQuery -at -l')
-        mc.select(source, target)
-        nodes = mm.eval('zQuery -a')
+        nodes = []
+        nodes.extend(self.__add_body(selection))
 
-        fiber_names = [x for x in mc.ls(nodes)if mc.objectType(x) == 'zFiber']
-        if fiber_names:
-            line_of_actions = mc.listHistory(fiber_names)
-            line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
-            nodes.extend(line_of_actions)
+        # find attahment source and or targets to add to nodes.................
+        attachment_names = [x for x in nodes if mc.objectType(x) == 'zAttachment']
+        meshes = []
+        if attachment_names:
+            for attachment in attachment_names:
+                meshes.extend(mm.eval('zQuery -as -l {}'.format(attachment)))
+                meshes.extend(mm.eval('zQuery -at -l {}'.format(attachment)))
+        nodes.extend(self.__add_body(meshes))
 
-        body_names = [x for x in mc.ls(nodes) if mc.objectType(x) in ['zCloth',
-                                                                      'zTissue']]
+        # # find attahment source and or targets to add to nodes.................
+        tissue_names = [x for x in nodes if mc.objectType(x) == 'zTissue']
+
+        children = []
+        for tissue in tissue_names:
+            children.extend(mz.none_to_empty(mc.listConnections(tissue+'.oChildTissue')))
+
+        if children:
+            nodes.extend(self.__add_body(children))
+
+        body_names = [x for x in nodes if mc.objectType(x) in ['zCloth',
+                                                               'zTissue']]
         if body_names:
             history = mc.listHistory(body_names)
             types = []
@@ -182,6 +205,7 @@ class Ziva(Builder):
             self.get_parent()
 
         mc.select(scene_selection)
+
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
