@@ -65,7 +65,7 @@ class Ziva(Builder):
                 if x.solver == item.solver:
                     parent_node = x
                     solver[item.name] = x
-  
+
             parent_node.add_child(item)
             item._parent = parent_node
 
@@ -84,7 +84,7 @@ class Ziva(Builder):
                                                       'zCloth']):
             if item.type == 'zTissue':
                 if item.parent_tissue:
-                    bd = mm.eval('zQuery -t zTissue -m {}'.format(item.parent_tissue))[0]
+                    bd = mm.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
                     parent_node = bodies.get(bd, self.root_node)
                 else:
                     parent_node = solver.get(item.solver,self.root_node)
@@ -246,7 +246,6 @@ class Ziva(Builder):
                       ]
 
         node_types.extend(Field.TYPES)
-        
         nodes = zQuery(node_types, solver)
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
