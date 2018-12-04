@@ -152,13 +152,15 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
-        
+
         This is checking item selected in treeView to get zBuilder node.
-        
+
         Args:
             association_idx (int): The index of mesh to use in node association
             attribute (string): The name of the attribute to paint.
         """
+        # sourcing the mel command so we have access to it
+        mm.eval('source "artAttrCreateMenuItems"')
 
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
@@ -244,7 +246,7 @@ class MyDockingUI(QtWidgets.QWidget):
         it uses the scene selection to build a new root_node.
 
         This forces a complete redraw of the ui tree.
-        
+
         Args:
             root_node (:obj:`obj`, optional): The zBuilder root_node to build
                 tree from.  Defaults to None.
@@ -277,7 +279,7 @@ class MyDockingUI(QtWidgets.QWidget):
         if sel:
             checked = proxy_model.match(proxy_model.index(0, 0),
                                         QtCore.Qt.DisplayRole,
-                                        sel[0],
+                                        sel[0].split('|')[-1],
                                         -1,
                                         QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
@@ -288,8 +290,9 @@ class MyDockingUI(QtWidgets.QWidget):
             # selected and it's parent if any.  This makes it possible if you 
             # have a material or attachment selected, it will become visable in 
             # UI
-            self.treeView.expand(checked[-1])
-            self.treeView.expand(checked[-1].parent())
+            if checked:
+                self.treeView.expand(checked[-1])
+                self.treeView.expand(checked[-1].parent())
 
 
     @staticmethod
