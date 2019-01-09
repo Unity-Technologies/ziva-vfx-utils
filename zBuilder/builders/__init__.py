@@ -9,4 +9,4 @@ from zBuilder.builders.fields import Fields
 from zBuilder.builders.selection import Selection
 from zBuilder.builders.skinClusters import SkinCluster
 from zBuilder.builders.ziva import Ziva
-
+from zBuilder.builder import Builder
