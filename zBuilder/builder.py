@@ -36,11 +36,9 @@ class Builder(object):
     def log(self):
         self.root_node.log()
 
-
     def view(self):
         import zBuilder.ui.tree as tree
         tree.go(root_node=self.root_node)
-
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
@@ -295,3 +293,21 @@ class Builder(object):
                                            association_filter=association_filter,
                                            association_regex=association_regex,
                                            invert_match=invert_match)
+
+
+def builder_factory(type_):
+    """A factory node to return the correct Builder given class name.
+
+    If it cannot find a class it uses the base Builder class.
+
+    Args:
+        type_ ([:obj:`str`]):  The class name to search for.
+
+    Returns:
+        [:obj:`obj`]: Builder object.
+    """
+    for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
+        if inspect.isclass(obj):
+            if type_ == obj.__name__:
+                return obj()
+    return Builder()
