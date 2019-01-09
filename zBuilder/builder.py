@@ -306,6 +306,7 @@ def builder_factory(type_):
     Returns:
         [:obj:`obj`]: Builder object.
     """
+    import zBuilder.builders
     for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
         if inspect.isclass(obj):
             if type_ == obj.__name__:
