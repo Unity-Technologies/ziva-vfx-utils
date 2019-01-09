@@ -295,7 +295,7 @@ class Builder(object):
                                            invert_match=invert_match)
 
 
-def builder_factory(type_):
+def builder_factory(class_name):
     """A factory node to return the correct Builder given class name.
 
     If it cannot find a class it uses the base Builder class.
@@ -305,10 +305,15 @@ def builder_factory(type_):
 
     Returns:
         [:obj:`obj`]: Builder object.
+
+    Raises:
+        [Error]: if class_name cannot be found.
     """
     import zBuilder.builders
     for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
         if inspect.isclass(obj):
-            if type_ == obj.__name__:
+            if class_name == obj.__name__:
                 return obj()
-    return Builder()
+
+    raise StandardError, 'Cannot find class in zBuilder.builders '
+
