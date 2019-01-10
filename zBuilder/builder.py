@@ -328,4 +328,4 @@ def builder_factory(class_name):
             if class_name == obj.__name__:
                 return obj()
 
-    raise StandardError, 'Cannot find class in zBuilder.builders '
+    raise StandardError('Cannot find class in zBuilder.builders')
