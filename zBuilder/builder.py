@@ -306,7 +306,6 @@ from zBuilder.builders.deltaMush import DeltaMush
 from zBuilder.builders.fields import Fields
 from zBuilder.builders.selection import Selection
 from zBuilder.builders.ziva import Ziva
-import zBuilder.builders
 
 
 def builder_factory(class_name):
