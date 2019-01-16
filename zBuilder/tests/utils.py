@@ -38,26 +38,6 @@ def ziva_mirror_sample_geo():
     mm.eval('ziva -a')
 
 
-def hard_reload(package):
-    """This removes references to a package in the sys.module.  Useful for re-loading
-    a module without having to restart maya.
-
-    note:
-        You should do a hard_reload then re-import what you need.
-    Args:
-        package:  The package you want to remove.
-
-    Returns:
-        nothing
-    """
-    tmp = []
-    for item in sys.modules:
-        if item.startswith(package):
-            tmp.append(item)
-    for i in tmp:
-        del (sys.modules[i])
-
-
 def build_arm():
     """This simply builds Ziva's anatomical arm demo for testing purposes.
 
