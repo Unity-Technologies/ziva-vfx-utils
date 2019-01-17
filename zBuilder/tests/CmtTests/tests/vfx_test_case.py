@@ -6,7 +6,7 @@ from cmt.test import TestCase
 
 class VfxTestCase(TestCase):
     """Base class for unit test cases run for ZivaVFX plugin."""
-    
+
     pluginPath = None
 
     def setUp(self):
@@ -34,12 +34,14 @@ class VfxTestCase(TestCase):
         if not (a>=b-eps) or not (a<=b+eps):
             raise AssertionError("{} and {} are not approximately equal, with tolerance {}".format(a,b,eps))
 
+
 def get_plugin_path():
     with open(os.path.dirname(__file__) + '/../settings.yaml', 'r') as stream:
         try:
             data = yaml.load(stream)
         except yaml.YAMLError as exc:
-            exc
+            print exc
+            raise StandardError('Error reading yaml file.')
 
     return data['settings']['plugin_path']
 
