@@ -9,10 +9,10 @@ import zBuilder.builders.ziva as zva
 import zBuilder.tests.utils as utl
 import zBuilder.util as utility
 
-from zmaya_test_case import ZMayaTestCase
+from vfx_test_case import VfxTestCase
 
 
-class UtilTestCase(ZMayaTestCase):
+class UtilTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
