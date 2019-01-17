@@ -4,7 +4,7 @@ import maya.cmds as cmds
 
 from cmt.test import TestCase
 
-class ZMayaTestCase(TestCase):
+class VfxTestCase(TestCase):
     """Base class for unit test cases run for ZivaVFX plugin."""
     
     pluginPath = None

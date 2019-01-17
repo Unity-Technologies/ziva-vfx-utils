@@ -12,14 +12,14 @@ import zBuilder.util as utility
 from zmaya_test_case import ZMayaTestCase
 
 
-class ZivaBuildTestCase(ZMayaTestCase):
+class ZivaMirrorTestCase(ZMayaTestCase):
 
     @classmethod
     def setUpClass(cls):
         pass
 
     def setUp(self):
-        super(ZivaBuildTestCase, self).setUp()
+        super(ZivaMirrorTestCase, self).setUp()
         # Build a basic setup
         utl.build_mirror_sample_geo()
         utl.ziva_mirror_sample_geo()
@@ -35,7 +35,7 @@ class ZivaBuildTestCase(ZMayaTestCase):
 
 
     def tearDown(self):
-        super(ZivaBuildTestCase, self).tearDown()
+        super(ZivaMirrorTestCase, self).tearDown()
 
     def test_mirror_clean_scene(self):
         # remove ziva nodes from scene so all we have left is geo
