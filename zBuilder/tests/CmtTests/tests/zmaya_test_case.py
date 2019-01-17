@@ -1,4 +1,5 @@
 import os
+import yaml
 import maya.cmds as cmds
 
 from cmt.test import TestCase
@@ -34,31 +35,11 @@ class ZMayaTestCase(TestCase):
             raise AssertionError("{} and {} are not approximately equal, with tolerance {}".format(a,b,eps))
 
 def get_plugin_path():
-    # zMayaRootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+    with open(os.path.dirname(__file__) + '/../settings.yaml', 'r') as stream:
+        try:
+            data = yaml.load(stream)
+        except yaml.YAMLError as exc:
+            exc
 
-    # mayaYear = get_maya_year()
-    # paths = [
-    #     os.path.join(zMayaRootDir, 'x64', 'Debug' + mayaYear, 'ziva_debug.mll'),
-    #     os.path.join(zMayaRootDir, 'x64', 'Develop' + mayaYear, 'ziva_devel.mll'),
-    #     os.path.join(zMayaRootDir, 'x64', 'Release' + mayaYear, 'ziva.mll'),
-    #     os.path.join(zMayaRootDir, 'ziva-maya{year}.so'.format(year=mayaYear)),
-    # ]
+    return data['settings']['plugin_path']
 
-    # pathsExist = [x for x in paths if os.path.isfile(x)]
-    # if not pathsExist:
-    #     raise RuntimeError('None of the ZivaVFX plugins were found. The following paths were examined: ' + str(paths))
-
-    #return pathsExist[0] # return the first one that exists
-    return r'C:\Users\lonniek.ZIVADYNAMICS\Documents\plugins\2018\20181128-5ba1175-win2018-devel\ziva.mll'
-
-def get_maya_year():
-    """This function makes sure that version can be safely used in a file path, 
-       as cmds.about(v=True) does not guarantee that for all maya versions"""
-
-    ver = cmds.about(v=True)
-    ver = ver.replace(" x64", "")
-    ver = ver.replace(" x86", "")
-    ver = ver.replace(' Extension 2', '.5')
-    ver = ver.strip()
-    
-    return ver
