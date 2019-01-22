@@ -108,8 +108,7 @@ def main():
         raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
 
     # adding python path
-    python_path = 'PYTHONPATH'
-    if python_path not in os.environ:
+    if "PYTHONPATH" not in os.environ:
         os.environ["PYTHONPATH"] = {}
         os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..')
     else:
