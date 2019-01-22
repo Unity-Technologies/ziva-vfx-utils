@@ -109,7 +109,6 @@ def main():
 
     # adding python path
     if "PYTHONPATH" not in os.environ:
-        os.environ["PYTHONPATH"] = {}
         os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..')
     else:
         os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..') + os.pathsep + os.environ["PYTHONPATH"]
