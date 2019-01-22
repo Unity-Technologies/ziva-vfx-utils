@@ -108,12 +108,18 @@ def main():
         raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
 
     # adding python path
-    os.environ["PYTHONPATH"] = os.path.abspath('..\..\..') + os.pathsep + os.environ["PYTHONPATH"]
+    python_path = 'PYTHONPATH'
+    if python_path not in os.environ:
+        os.environ["PYTHONPATH"] = {}
+        os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..')
+    else:
+        os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..') + os.pathsep + os.environ["PYTHONPATH"]
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)
     if app_directory:
         return
+
     # Create clean prefs
     os.environ['MAYA_APP_DIR'] = maya_app_dir
     # Clear out any MAYA_SCRIPT_PATH value so we know we're in a clean env.
