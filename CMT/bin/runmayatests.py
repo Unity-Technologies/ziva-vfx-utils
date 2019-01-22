@@ -98,7 +98,7 @@ def main():
     cmd = []
     cmd.append(mayapy(pargs.maya))
     cmd.append(mayaunittest)
-    
+
     # passing through "--path" argument so that it can be used in mayaunittest.py module
     if pargs.path:
         cmd.append('--path')
@@ -108,10 +108,13 @@ def main():
         raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
 
     # adding python path
+    module_dir = os.path.dirname(os.path.abspath(__file__)) 
+    python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
+
     if "PYTHONPATH" not in os.environ:
-        os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..')
+        os.environ["PYTHONPATH"] = python_path
     else:
-        os.environ["PYTHONPATH"] = os.path.abspath(r'..\..\..') + os.pathsep + os.environ["PYTHONPATH"]
+        os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)
