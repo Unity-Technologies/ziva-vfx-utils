@@ -49,7 +49,7 @@ class Constraint(DGNode):
             mc.rename(constraint, name)
             self.mobject = name
         else:
-            new_name = mc.rename(self.get_scene_name(), self.name)
+            new_name = mc.rename(self.name, self.name)
             self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
@@ -67,8 +67,9 @@ class Constraint(DGNode):
     def populate(self, maya_node=None):
         super(Constraint, self).populate(maya_node=maya_node)
 
-        targets = get_targets(self.get_scene_name())
-        constrained = get_constrained(self.get_scene_name())
+        name = self.get_scene_name()
+        targets = get_targets(name)
+        constrained = get_constrained(name)
 
         association = targets
         association.extend(constrained)

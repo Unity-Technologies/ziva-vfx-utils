@@ -27,8 +27,9 @@ class TissueNode(Ziva):
         """
         super(TissueNode, self).populate(maya_node=maya_node)
 
-        self.children_tissues = get_tissue_children(self.get_scene_name())
-        self.parent_tissue = get_tissue_parent(self.get_scene_name())
+        scene_name = self.get_scene_name()
+        self.children_tissues = get_tissue_children(scene_name)
+        self.parent_tissue = get_tissue_parent(scene_name)
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.

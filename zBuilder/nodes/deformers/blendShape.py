@@ -55,9 +55,11 @@ class BlendShape(Deformer):
         super(BlendShape, self).populate(maya_node=maya_node)
         self.target = get_target(self.name)
 
-        num_weights = mc.blendShape(self.get_scene_name(), q=True, wc=True)
+        name = self.get_scene_name()
+
+        num_weights = mc.blendShape(name, q=True, wc=True)
         attr_list = ['weight['+str(i)+']' for i in range(0, num_weights)]
-        attrs = mz.build_attr_key_values(self.get_scene_name(), attr_list)
+        attrs = mz.build_attr_key_values(name, attr_list)
         self.attrs.update(attrs)
 
     @property
