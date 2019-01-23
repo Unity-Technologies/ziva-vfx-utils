@@ -110,11 +110,13 @@ def main():
     # adding python path
     module_dir = os.path.dirname(os.path.abspath(__file__)) 
     python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
+    virtualenv_path = os.path.join(python_path, 'zBuilder', 'tests', 'CmtTests', 'env2', 'Lib', 'site-packages')
 
     if "PYTHONPATH" not in os.environ:
-        os.environ["PYTHONPATH"] = python_path
+        os.environ["PYTHONPATH"] = python_path + os.pathsep + virtualenv_path
     else:
         os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
+        os.environ["PYTHONPATH"] = virtualenv_path + os.pathsep + os.environ["PYTHONPATH"]
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)

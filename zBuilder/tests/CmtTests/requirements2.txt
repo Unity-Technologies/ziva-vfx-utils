@@ -1,0 +1,4 @@
+--index-url https://pypi.anaconda.org/carlkl/simple
+--extra-index-url https://pypi.org/simple
+
+PyYAML==3.12
