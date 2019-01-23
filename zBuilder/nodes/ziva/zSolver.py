@@ -36,11 +36,12 @@ class SolverNode(Ziva):
             solver = mc.ls(results, type='zSolver')[0]
             solverTransform = mc.ls(results, type='zSolverTransform')[0]
             mc.rename(solver, solver_name.split('|')[-1])
-            self.mobject = solver_name
+            self.mobject = solver_name.split('|')[-1]
             st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
             mc.rename(solverTransform, st.name)
+            st.mobject = st.name
         else:
-            new_name = mc.rename(self.get_scene_name(), self.name)
+            new_name = mc.rename(solver_name, self.name)
             self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
