@@ -49,12 +49,12 @@ class TetNode(Ziva):
         """ Applies the user tet mesh if any.
         """
         if self.get_user_tet_mesh():
+            name =  self.get_scene_name()
             try:
                 mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
-                               self.get_scene_name() + '.iTet', f=True)
+                               name + '.iTet', f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
-                name = self.get_scene_name()
                 # TODO permissive check
                 print 'could not connect {}.worldMesh to {}.iTet'.format(
                     user_mesh, name)
@@ -81,7 +81,6 @@ class TetNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        #name = self.get_scene_name()
         name = self.name
         if not mc.objExists(name):
             mesh = self.association[0]
