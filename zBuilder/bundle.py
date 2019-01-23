@@ -215,5 +215,3 @@ class Bundle(object):
         """
         for item in self.scene_items:
             item.string_replace(search, replace)
-
-
