@@ -211,8 +211,8 @@ class Base(object):
         json_data.append(io.wrap_data([self], 'node_data'))
         json_data.append(io.wrap_data(self.info, 'info'))
 
-        if io.dump_json(file_path, json_data):
-            if hasattr(self, 'mobject'):
-                self.mobject = self.mobject
+        io.dump_json(file_path, json_data)
+        if hasattr(self, 'mobject'):
+            self.mobject = self.mobject
 
-            logger.info('Wrote File: {}'.format(file_path))
+        logger.info('Wrote File: {}'.format(file_path))
