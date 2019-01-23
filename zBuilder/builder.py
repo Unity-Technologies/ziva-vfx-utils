@@ -298,16 +298,6 @@ class Builder(object):
                                            invert_match=invert_match)
 
 
-from zBuilder.builders.skinClusters import SkinCluster
-from zBuilder.builders.attributes import Attributes
-from zBuilder.builders.constraints import Constraints
-from zBuilder.builders.deformers import Deformers
-from zBuilder.builders.deltaMush import DeltaMush
-from zBuilder.builders.fields import Fields
-from zBuilder.builders.selection import Selection
-from zBuilder.builders.ziva import Ziva
-
-
 def builder_factory(class_name):
     """A factory node to return the correct Builder given class name.
 
@@ -323,7 +313,7 @@ def builder_factory(class_name):
         [Error]: if class_name cannot be found.
     """
 
-    for name, obj in inspect.getmembers(sys.modules['zBuilder.builder']):
+    for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
         if inspect.isclass(obj):
             if class_name == obj.__name__:
                 return obj()
