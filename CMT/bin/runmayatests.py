@@ -129,6 +129,9 @@ def main():
     os.environ['MAYA_SCRIPT_PATH'] = ''
     # Run the tests in this module.
     os.environ['MAYA_MODULE_PATH'] = CMT_ROOT_DIR
+    # Make sure that we're not picking up things accidentally from MAYA_PLUG_IN_PATH on local dev machine
+    os.environ['MAYA_PLUG_IN_PATH'] = ''
+    
     exitCode = 0
     try:
         subprocess.check_call(cmd)
