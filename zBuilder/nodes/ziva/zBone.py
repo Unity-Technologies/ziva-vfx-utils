@@ -59,16 +59,17 @@ def apply_multiple(parameters, attr_filter=None, permissive=False ):
 
     """
     sel = mc.ls(sl=True)
-    # cull none buildable-------------------------------------------------------
+    # cull none buildable------------------------------------------------------
     culled = mz.cull_creation_nodes(parameters)
-
-    # build bones all at once---------------------------------------------------
+    
+    # build bones all at once--------------------------------------------------
     results = None
     if culled['meshes']:
+        Ziva.check_meshes(culled['meshes'])
         mc.select(culled['meshes'], r=True)
         results = mm.eval('ziva -b')
 
-    # rename zBones-------------------------------------------------------------
+    # rename zBones------------------------------------------------------------
     if results:
         results = mc.ls(results, type='zBone')
         for new, name, parameter in zip(results, culled['names'], culled['parameters']):

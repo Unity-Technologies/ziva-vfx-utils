@@ -88,12 +88,15 @@ def build_multiple(tissue_items, tet_items, interp_maps='auto',
 
     """
     sel = mc.ls(sl=True)
-    # cull none buildable-------------------------------------------------------
+    # cull none buildable------------------------------------------------------
     tet_results = mz.cull_creation_nodes(tet_items, permissive=permissive)
     tissue_results = mz.cull_creation_nodes(tissue_items, permissive=permissive)
 
     # build tissues all at once---------------------------------------------
     if tissue_results['meshes']:
+
+        Ziva.check_meshes(tissue_results['meshes'])
+
         mc.select(tissue_results['meshes'], r=True)
         outs = mm.eval('ziva -t')
 

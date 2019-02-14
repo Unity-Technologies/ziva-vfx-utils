@@ -34,6 +34,9 @@ class ClothNode(Ziva):
         name = self.name
 
         if not mc.objExists(name):
+
+            Ziva.check_meshes(self.association)
+
             mc.select(self.association)
             results = mm.eval('ziva -c')
             cloth = mc.ls(results, type='zCloth')[0]
