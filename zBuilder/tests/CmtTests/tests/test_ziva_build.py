@@ -85,3 +85,16 @@ class ZivaBuildTestCase(VfxTestCase):
         with self.assertRaises(StandardError):
             self.z.build(permissive=False)
 
+    def test_bad_mesh_error(self):
+        # make sure we get an error if mesh fails a check
+        mz.clean_scene()
+
+        # now lets scale muscle to make it invalid
+        mc.setAttr('r_bicep_muscle.scaleX', l=False)
+        mc.setAttr('r_bicep_muscle.scaleY', l=False)
+        mc.setAttr('r_bicep_muscle.scaleX', 0)
+        mc.setAttr('r_bicep_muscle.scaleY', 0)
+
+        # now build should raise a standard error
+        with self.assertRaises(StandardError):
+            self.z.build()

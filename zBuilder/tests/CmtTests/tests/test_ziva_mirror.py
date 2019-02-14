@@ -39,7 +39,7 @@ class ZivaMirrorTestCase(VfxTestCase):
 
     def test_mirror_clean_scene(self):
         # remove ziva nodes from scene so all we have left is geo
-        mz.clean_scene()
+        # mz.clean_scene()
 
         # # build it on live scene
         self.z.build()
