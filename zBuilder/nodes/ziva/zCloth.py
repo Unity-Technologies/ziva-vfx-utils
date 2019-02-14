@@ -26,10 +26,8 @@ class ClothNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         name = self.name
 
