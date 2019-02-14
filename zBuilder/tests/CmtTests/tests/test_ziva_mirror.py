@@ -33,18 +33,8 @@ class ZivaMirrorTestCase(VfxTestCase):
         # string replace
         self.z.string_replace('^r_', 'l_')
 
-
     def tearDown(self):
         super(ZivaMirrorTestCase, self).tearDown()
-
-    def test_mirror_clean_scene(self):
-        # remove ziva nodes from scene so all we have left is geo
-        # mz.clean_scene()
-
-        # # build it on live scene
-        self.z.build()
-        # check if left muscle is connected to zGeo
-        self.assertTrue(len(mc.listConnections('l_muscle', type='zGeo')))
 
     def test_mirror_existing_scene(self):
         # # build it on live scene
