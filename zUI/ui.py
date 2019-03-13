@@ -234,11 +234,18 @@ class MyDockingUI(QtWidgets.QWidget):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
-        index = self.treeView.selectedIndexes()[0]
-        node = index.data(model.SceneGraphModel.nodeRole)
-        # name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
-        if mc.objExists(node.long_name):
-            mc.select(node.long_name)
+        index = self.treeView.selectedIndexes()
+        if index:
+            index = index[0]
+            node = index.data(model.SceneGraphModel.nodeRole)
+            if mc.objExists(node.long_name):
+                modifiers = QtWidgets.QApplication.keyboardModifiers()
+                if modifiers == QtCore.Qt.ShiftModifier:
+                    mc.select(node.long_name, add=True)
+                elif modifiers == QtCore.Qt.ControlModifier:
+                    mc.select(node.long_name, deselect=True)
+                else:
+                    mc.select(node.long_name, replace=True)
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
