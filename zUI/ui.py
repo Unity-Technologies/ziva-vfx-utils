@@ -107,19 +107,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintByProx = QtWidgets.QAction(self)
         self.actionPaintByProx.setText('Paint By Proximity UI')
         self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(paint_by_prox_options)
+        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
 
         self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
         self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(paint_by_prox,
+        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
                                                              .1,
                                                              .2))
 
         self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
         self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(paint_by_prox,
+        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
                                                               .1,
                                                               10))
         self.actionPaintSource = QtWidgets.QAction(self)
@@ -149,6 +149,28 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
                                                             0,
                                                             'endPoints'))
+
+    def paint_by_prox_options(self):
+        """Brings up UI for painting by proximity.
+        """
+
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mc.select(node.name, r=True)
+        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
+
+    def paint_by_prox(self, minimum, maximum):
+        """Paints attachment map by proximity.
+        
+        Args:
+            minimum ([float]): minimum
+            maximum ([float]): maximum
+        """
+
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mc.select(node.name, r=True)
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum), str(maximum)))
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -319,11 +341,3 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
-
-def paint_by_prox_options():
-    mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-
-
-def paint_by_prox(minimum, maximum):
-    mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum),
-                                                                  str(maximum)))
