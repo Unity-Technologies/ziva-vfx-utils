@@ -134,13 +134,16 @@ class Ziva(Builder):
         nodes = mm.eval('zQuery -a')
 
         # find line of actions-------------------------------------------------
-        fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
-        if fiber_names:
-            line_of_actions = mc.listHistory(fiber_names)
-            line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
-            nodes.extend(line_of_actions)
+        if nodes:
+            fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
+            if fiber_names:
+                line_of_actions = mc.listHistory(fiber_names)
+                line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
+                nodes.extend(line_of_actions)
 
-        return nodes
+            return nodes
+        else:
+            return []
 
     def retrieve_connections(self, *args, **kwargs):
         """ This retrieves the scene items from the scene based on connections to
