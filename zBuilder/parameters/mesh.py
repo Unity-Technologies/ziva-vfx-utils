@@ -117,11 +117,14 @@ class Mesh(Base):
             True if topologically corresponding, else False
 
         """
-        cur_conn = mz.get_mesh_connectivity(self.name)
+        if mc.objExists(self.name):
+            cur_conn = mz.get_mesh_connectivity(self.name)
 
-        if len(cur_conn['points']) == len(self.get_point_list()):
-            return True
-        return False
+            if len(cur_conn['points']) == len(self.get_point_list()):
+                return True
+            return False
+        else:
+            return None
 
 
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):

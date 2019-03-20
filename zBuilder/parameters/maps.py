@@ -119,13 +119,15 @@ class Map(Base):
     def interpolate(self):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
-        logger.info('interpolating map:  {}'.format(self.name))
-        created_mesh = mesh_data.build_mesh()
-        weight_list = interpolate_values(created_mesh,
-                                         mesh_data.name,
-                                         self.values)
-        self.values = weight_list
-        mc.delete(created_mesh)
+        
+        if mc.objExists(mesh_data.name):
+            logger.info('interpolating map:  {}'.format(self.name))
+            created_mesh = mesh_data.build_mesh()
+            weight_list = interpolate_values(created_mesh,
+                                             mesh_data.name,
+                                             self.values)
+            self.values = weight_list
+            mc.delete(created_mesh)
 
 
 def get_weights(map_name, mesh_name):
