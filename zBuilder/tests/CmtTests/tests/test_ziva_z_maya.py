@@ -68,7 +68,7 @@ class ZivaMayaTestCase(VfxTestCase):
                    '|muscle_geo|r_bicep',
                    'rr_bicep',
                    '|r_bicep',
-                   'r_bicep_r'
+                   'r_bicep_r',
                    '|muscles_geo|bicep_r|muscle_r']
 
         outputs = ['l_bicep',
