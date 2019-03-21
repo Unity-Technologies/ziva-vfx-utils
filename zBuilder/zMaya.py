@@ -57,7 +57,7 @@ def get_mesh_connectivity(mesh_name):
         num_vertices += 1
         pos_m_point = mesh_to_rebuild_vert_iter.position(space)
         pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y,
-                                         pos_m_point.z)
+                                           pos_m_point.z)
 
         point_list.append([
             pos_m_float_point[0],
@@ -90,7 +90,7 @@ def check_body_type(bodies):
     does a check if all objects exist in scene.
 
     Args:
-        bodies (list):  List of bodies we want to check type of.  
+        bodies (list):  List of bodies we want to check type of.
 
     Returns:
         (bool): True if all bodies pass test, else False.
@@ -723,16 +723,20 @@ def replace_long_name(search, replace, long_name):
     """
     items = long_name.split('|')
     new_name = ''
-    for i in items:
-        if i:
-            i = re.sub(search, replace, i)
-            if '|' in long_name:
-                new_name += '|' + i
+    for item in items:
+        matches = re.finditer(search, item)
+        for match_num, match in enumerate(matches):
+            if match.groups():
+                with_this = item[match.span(1)[0]:match.span(1)[1]]+replace+item[match.span(2)[0]:match.span(2)[1]]
+                item = item[:match.start()]+with_this+item[match.end():]
             else:
-                new_name += i
+                item = re.sub(search, replace, item)
 
-    #if new_name != long_name:
-    #    logger.info('replacing name: {}  {}'.format(long_name, new_name))
+        # reconstruct long name if applicable
+        if '|' in long_name and item != '':
+            new_name += '|' + item
+        else:
+            new_name += item
 
     return new_name
 
