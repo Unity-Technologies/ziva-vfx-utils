@@ -32,10 +32,7 @@ class ZivaMayaTestCase(VfxTestCase):
         for case in strings:
             results.append(mz.replace_long_name('^r_', 'l_', case))
 
-        print 'This should match: ', outputs
-        print '             this: ', results
-
-        self.assertTrue(results == outputs)
+        self.assertEqual(results, outputs)
 
     def test_replace_long_name_usecase2(self):
         strings = ['r_bicep',
@@ -57,10 +54,7 @@ class ZivaMayaTestCase(VfxTestCase):
         for case in strings:
             results.append(mz.replace_long_name('_r_', '_l_', case))
 
-        print 'This should match: ', outputs
-        print '             this: ', results
-
-        self.assertTrue(results == outputs)
+        self.assertEqual(results, outputs)
 
     def test_replace_long_name_usecase3(self):
         strings = ['r_bicep',
@@ -84,7 +78,4 @@ class ZivaMayaTestCase(VfxTestCase):
         for case in strings:
             results.append(mz.replace_long_name('(^|_)r($|_)', 'l', case))
 
-        print 'This should match: ', outputs
-        print '             this: ', results
-
-        self.assertTrue(results == outputs)
+        self.assertEqual(results, outputs)
