@@ -535,8 +535,7 @@ def zQuery(types, solver):
     types_in_znodes = list(set(ZNODES) & set(types))
     hist = mc.listHistory(solver)
     nodes = [x for x in hist if mc.objectType(x) in types_not_in_znodes]
-    print types_not_in_znodes, nodes
-    print types_in_znodes
+
     for node_type in types_in_znodes:
         tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
         if tmp:
