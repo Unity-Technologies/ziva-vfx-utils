@@ -20,6 +20,7 @@ from .ziva.zFiber import FiberNode
 from .ziva.zLineOfAction import LineOfActionNode
 from .ziva.zFieldAdaptor import FieldAdaptorNode
 from .ziva.zRelaxer import ZRelaxerNode
+from .ziva.zRivetToBone import RivetToBoneNode
 
 # deformer----------------------------------------------------------------------
 from .deformers.deltaMush import DeltaMush
