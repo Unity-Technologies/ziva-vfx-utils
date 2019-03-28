@@ -267,6 +267,7 @@ class Ziva(Builder):
                       'zEmbedder',
                       'zLineOfAction',
                       'zFieldAdaptor',
+                      'zRivetToBone',
                       ]
 
         node_types.extend(Field.TYPES)
@@ -415,7 +416,7 @@ class Ziva(Builder):
     def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True, 
-              fields=True, lineOfActions=True, mirror=False, permissive=True, 
+              fields=True, lineOfActions=True, rivetToBone=True, mirror=False, permissive=True, 
               check_meshes=False):
 
         """
@@ -494,11 +495,14 @@ class Ziva(Builder):
             node_types_to_build.append('zFiber')
         if lineOfActions:
             node_types_to_build.append('zLineOfAction')
+        if rivetToBone:
+            node_types_to_build.append('zRivetToBone')
         if embedder:
             node_types_to_build.append('zEmbedder')
         if fields:
             node_types_to_build.extend(Field.TYPES)
             node_types_to_build.append('zFieldAdaptor')
+        
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:
@@ -523,7 +527,8 @@ def zQuery(types, solver):
     types_in_znodes = list(set(ZNODES) & set(types))
     hist = mc.listHistory(solver)
     nodes = [x for x in hist if mc.objectType(x) in types_not_in_znodes]
-
+    print types_not_in_znodes, nodes
+    print types_in_znodes
     for node_type in types_in_znodes:
         tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
         if tmp:
