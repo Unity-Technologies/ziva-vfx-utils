@@ -324,6 +324,7 @@ class Ziva(Builder):
         cloth = kwargs.get('cloth', True)
         fields = kwargs.get('fields', True)
         lineOfAction = kwargs.get('lineOfAction', True)
+        rivetToBone = kwargs.get('lineOfAction', True)
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
@@ -361,6 +362,11 @@ class Ziva(Builder):
                 # they are created first when applying to scene.
                 nodes.extend(fields)
                 nodes.extend(adaptors)
+            if rivetToBone:
+                hist = mc.listHistory(selection)
+                rivets = mc.ls(hist, type='zRivetToBone')
+                nodes.extend(rivets)
+
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
@@ -374,8 +380,10 @@ class Ziva(Builder):
         else:
             nodes = selection
 
+        
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
+
 
         mc.select(sel, r=True)
         self.get_parent()
