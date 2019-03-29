@@ -69,3 +69,41 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # should be 2 in scene
         self.assertTrue(len(mc.ls(type='zRivetToBone')) == 2)
+
+    def test_retrieve_rivet_scene_multiple_cvs(self):
+        # create a rivetToBone driving 2 cv's
+        mc.select('r_bicep_muscle')
+        crv = mm.eval('zLineOfActionUtil')[0]
+        mc.select(crv+'.cv[0]', crv+'.cv[1]', 'r_humerus_bone')
+        riv2 = mm.eval('zRivetToBone')
+        mc.select('r_bicep_muscle', crv)
+        mm.eval('ziva -loa;')
+
+        mc.select(cl=True)
+        z = zva.Ziva()
+        z.retrieve_from_scene()
+
+        # check that 3 rivets are in zBuilder
+        rivets = z.get_scene_items(type_filter='zRivetToBone')
+        self.assertTrue(len(rivets) == 3)
+
+    def test_build_rivet_multiple_cvs(self):
+        # create a rivetToBone driving 2 cv's
+        mc.select('r_bicep_muscle')
+        crv = mm.eval('zLineOfActionUtil')[0]
+        mc.select(crv+'.cv[0]', crv+'.cv[1]', 'r_humerus_bone')
+        riv2 = mm.eval('zRivetToBone')
+        mc.select('r_bicep_muscle', crv)
+        mm.eval('ziva -loa;')
+
+        # use builder to retrieve from scene-----------------------------------
+        mc.select(cl=True)
+        z = zva.Ziva()
+        z.retrieve_from_scene()
+
+        mz.clean_scene()
+
+        z.build()
+
+        # should be 2 in scene
+        self.assertTrue(len(mc.ls(type='zRivetToBone')) == 3)
