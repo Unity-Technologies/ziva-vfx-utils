@@ -267,6 +267,7 @@ class Ziva(Builder):
                       'zEmbedder',
                       'zLineOfAction',
                       'zFieldAdaptor',
+                      'zRivetToBone',
                       ]
 
         node_types.extend(Field.TYPES)
@@ -323,6 +324,7 @@ class Ziva(Builder):
         cloth = kwargs.get('cloth', True)
         fields = kwargs.get('fields', True)
         lineOfAction = kwargs.get('lineOfAction', True)
+        rivetToBone = kwargs.get('rivetToBone', True)
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
@@ -360,6 +362,11 @@ class Ziva(Builder):
                 # they are created first when applying to scene.
                 nodes.extend(fields)
                 nodes.extend(adaptors)
+            if rivetToBone:
+                hist = mc.listHistory(selection)
+                rivets = mc.ls(hist, type='zRivetToBone')
+                nodes.extend(rivets)
+
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
@@ -373,8 +380,10 @@ class Ziva(Builder):
         else:
             nodes = selection
 
+        
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
+
 
         mc.select(sel, r=True)
         self.get_parent()
@@ -415,7 +424,7 @@ class Ziva(Builder):
     def build(self, association_filter=list(), attr_filter=None, interp_maps='auto',
               solver=True, bones=True, tissues=True, attachments=True,
               materials=True, fibers=True, embedder=True, cloth=True, 
-              fields=True, lineOfActions=True, mirror=False, permissive=True, 
+              fields=True, lineOfActions=True, rivetToBone=True, mirror=False, permissive=True, 
               check_meshes=False):
 
         """
@@ -494,11 +503,14 @@ class Ziva(Builder):
             node_types_to_build.append('zFiber')
         if lineOfActions:
             node_types_to_build.append('zLineOfAction')
+        if rivetToBone:
+            node_types_to_build.append('zRivetToBone')
         if embedder:
             node_types_to_build.append('zEmbedder')
         if fields:
             node_types_to_build.extend(Field.TYPES)
             node_types_to_build.append('zFieldAdaptor')
+        
 
         # build the nodes by calling build method on each one
         for node_type in node_types_to_build:

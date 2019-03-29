@@ -25,7 +25,8 @@ ZNODES = [
     'zMaterial',
     'zFiber',
     'zCacheTransform',
-    'zFieldAdaptor']
+    'zFieldAdaptor',
+    'zRivetToBone']
 """ All available ziva nodes to be able to cleanup. """
 
 
@@ -448,6 +449,9 @@ def get_association(zNode):
         # empty list for embedder
         return list()
 
+    elif _type == 'zRivetToBone':
+        tmp = mc.listConnections(zNode+'.rivetMesh')
+        return tmp
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
 
