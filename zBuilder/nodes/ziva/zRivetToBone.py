@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class RivetToBoneNode(Ziva):
-    """ This node for storing information related to zTissues.
+    """ This node for storing information related to zRivetToBone.
     """
     type = 'zRivetToBone'
     """ The type of node. """
@@ -55,7 +55,7 @@ class RivetToBoneNode(Ziva):
             self._curve = curve_name
 
     def build(self, *args, **kwargs):
-        """ Builds the zTissue in maya scene.
+        """ Builds the zRivetToBone in maya scene.
 
         Kwargs:
             attr_filter (dict):  Attribute filter on what attributes to get.
