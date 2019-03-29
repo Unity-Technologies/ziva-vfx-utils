@@ -82,9 +82,10 @@ class RivetToBoneNode(Ziva):
             self.mobject = results[0]
             mc.rename(results[0], self.name)
         else:
+            message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
             if permissive:
-                logger.warning(crv + ' does not exist in scene, skipping zRivetToBone creation')
+                logger.warning(message)
             else:
-                raise StandardError('Missing items from scene: check for existance of {} and {}'.format(crv, bone))
+                raise StandardError(message)
 
         self.set_maya_attrs(attr_filter=attr_filter)
