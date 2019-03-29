@@ -218,6 +218,9 @@ def get_zBones(bodies):
             return []
     else:
         bones = mm.eval('zQuery -t zBone')
+        if not bones:
+            bones = list()
+
         attachments = get_zAttachments(bodies)
 
         if attachments:
@@ -227,8 +230,9 @@ def get_zBones(bodies):
                 mc.select(mesh1, mesh2, r=True)
                 tmp = mm.eval('zQuery -t "zBone"')
                 if tmp:
+
                     bones.extend(tmp)
-                    
+
         mc.select(sel, r=True)
         if len(bones) > 0:
             return list(set(bones))
