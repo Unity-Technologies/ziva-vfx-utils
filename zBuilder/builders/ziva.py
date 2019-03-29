@@ -324,7 +324,7 @@ class Ziva(Builder):
         cloth = kwargs.get('cloth', True)
         fields = kwargs.get('fields', True)
         lineOfAction = kwargs.get('lineOfAction', True)
-        rivetToBone = kwargs.get('lineOfAction', True)
+        rivetToBone = kwargs.get('rivetToBone', True)
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
