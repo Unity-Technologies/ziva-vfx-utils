@@ -20,7 +20,8 @@ class DGNode(Base):
             method.
 
     Attributes:
-        type (str): type of parameter.  Tied with maya node type.
+        
+        :rtype: :func:`type` (str): type of parameter.  Tied with maya node type.
         attrs (dict): A place for the maya attributes dictionary.
 
     """
