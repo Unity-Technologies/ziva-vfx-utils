@@ -1,3 +1,11 @@
+
+# install sphinx
+pip install -U sphinx
+
+# install sphinx rtd theme
+pip install sphinx_rtd_theme
+
+
 # using napoleaon extension for docstrings, this may come with sphinx now.  I used pip to get it.
 pip install sphinxcontrib-napoleon
 
