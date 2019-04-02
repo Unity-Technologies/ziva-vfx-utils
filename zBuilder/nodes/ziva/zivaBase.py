@@ -53,6 +53,41 @@ class Ziva(Deformer):
         if solver:
             self.solver = solver[0]
 
+    @staticmethod
+    def check_meshes(meshes):
+        '''Checks meshes for potential problems
+
+        This checks meshes for known problems that would prevent a body from 
+        being created and raises an error if found.  This does not check
+        problems that would cause a warning.
+
+        Args:
+            meshes (list): list of meshes to check
+
+        Raises:
+            StandardError: if any mesh fails a check
+        '''
+        mc.select(meshes, r=True)
+
+        # this is all the required checks for a body.  If any of these fail the 
+        # check it will not create body.
+        mc.select(meshes,r=True)
+        bad_meshes = mm.eval('zMeshCheck -iso -vb -me -mv -st -la -oe')
+        if bad_meshes:
+            bad_meshes = [x.split('.')[0] for x in bad_meshes]
+            bad_meshes = list(set(bad_meshes))
+
+            if bad_meshes:
+                error_message = ''':\n
+                Meshes failed some required checks.
+                Offending meshes: {}.
+                Please Run Mesh Analysis in Ziva Tools menu on selected meshes.
+                '''.format(str(bad_meshes))
+
+                mc.select(bad_meshes)
+                raise StandardError(error_message)
+        else:
+            return None
 
 
 

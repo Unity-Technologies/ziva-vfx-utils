@@ -20,7 +20,8 @@ class DGNode(Base):
             method.
 
     Attributes:
-        type (str): type of parameter.  Tied with maya node type.
+        
+        :rtype: :func:`type` (str): type of parameter.  Tied with maya node type.
         attrs (dict): A place for the maya attributes dictionary.
 
     """
@@ -134,8 +135,7 @@ class DGNode(Base):
                         print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
 
     def get_scene_name(self, long_name=False):
-        """
-        This checks stored mObject and gets name of maya object in scene.  If no
+        """This checks stored mObject and gets name of maya object in scene.  If no
         mObject it returns parameter name.
 
         Args:
@@ -145,7 +145,7 @@ class DGNode(Base):
             (str) Name of maya object.
         """
         name = None
-        if self.mobject:
+        if self.is_m_object_valid():
             name = mz.get_name_from_m_object(self.mobject)
             if not mc.objExists(name):
                 name = self.name
@@ -156,6 +156,21 @@ class DGNode(Base):
         if not long_name:
             name = name.split('|')[-1]
         return name
+
+    def is_m_object_valid(self):
+        """This checks if stored MObject is valid.  Querying an invalid one
+        (if node has been deleted from scene for example) will cause maya to
+        crash.
+
+        Returns:
+            [bool]: True if MObject still valid
+        """
+
+        if self.mobject:
+            handle = om.MObjectHandle(self.mobject)
+            if handle.isValid():
+                return True
+        return False
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya

@@ -27,8 +27,9 @@ class TissueNode(Ziva):
         """
         super(TissueNode, self).populate(maya_node=maya_node)
 
-        self.children_tissues = get_tissue_children(self.get_scene_name())
-        self.parent_tissue = get_tissue_parent(self.get_scene_name())
+        scene_name = self.get_scene_name()
+        self.children_tissues = get_tissue_children(scene_name)
+        self.parent_tissue = get_tissue_parent(scene_name)
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
@@ -87,12 +88,15 @@ def build_multiple(tissue_items, tet_items, interp_maps='auto',
 
     """
     sel = mc.ls(sl=True)
-    # cull none buildable-------------------------------------------------------
+    # cull none buildable------------------------------------------------------
     tet_results = mz.cull_creation_nodes(tet_items, permissive=permissive)
     tissue_results = mz.cull_creation_nodes(tissue_items, permissive=permissive)
 
     # build tissues all at once---------------------------------------------
     if tissue_results['meshes']:
+
+        Ziva.check_meshes(tissue_results['meshes'])
+
         mc.select(tissue_results['meshes'], r=True)
         outs = mm.eval('ziva -t')
 

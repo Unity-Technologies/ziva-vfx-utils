@@ -1,8 +1,14 @@
 import logging
+
+import zBuilder
+import zBuilder.IO as io
 import zBuilder.zMaya as mz
+
 import maya.cmds as mc
 
+import time
 import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +33,12 @@ class Base(object):
 
         self._children = []
         self._parent = kwargs.get('parent', None)
+
+        self.info = dict()
+        self.info['version'] = zBuilder.__version__
+        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
+        self.info['maya_version'] = mc.about(v=True)
+        self.info['operating_system'] = mc.about(os=True)
 
         if self._parent is not None:
             # print 'ASSING CHILD', self._parent
@@ -189,3 +201,18 @@ class Base(object):
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
 
+    def write(self, file_path):
+        """ Writes out individual item to a json file given a file path.
+
+        Args:
+            file_path (str): The file path to write to disk.
+        """
+        json_data = []
+        json_data.append(io.wrap_data([self], 'node_data'))
+        json_data.append(io.wrap_data(self.info, 'info'))
+
+        io.dump_json(file_path, json_data)
+        if hasattr(self, 'mobject'):
+            self.mobject = self.mobject
+
+        logger.info('Wrote File: {}'.format(file_path))

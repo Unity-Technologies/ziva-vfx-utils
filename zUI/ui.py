@@ -107,19 +107,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintByProx = QtWidgets.QAction(self)
         self.actionPaintByProx.setText('Paint By Proximity UI')
         self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(paint_by_prox_options)
+        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
 
         self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
         self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(paint_by_prox,
+        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
                                                              .1,
                                                              .2))
 
         self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
         self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(paint_by_prox,
+        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
                                                               .1,
                                                               10))
         self.actionPaintSource = QtWidgets.QAction(self)
@@ -149,6 +149,28 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
                                                             0,
                                                             'endPoints'))
+
+    def paint_by_prox_options(self):
+        """Brings up UI for painting by proximity.
+        """
+
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mc.select(node.name, r=True)
+        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
+
+    def paint_by_prox(self, minimum, maximum):
+        """Paints attachment map by proximity.
+        
+        Args:
+            minimum ([float]): minimum
+            maximum ([float]): maximum
+        """
+
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mc.select(node.name, r=True)
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum), str(maximum)))
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -234,11 +256,18 @@ class MyDockingUI(QtWidgets.QWidget):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
-        index = self.treeView.selectedIndexes()[0]
-        node = index.data(model.SceneGraphModel.nodeRole)
-        # name = self._proxy_model.data(index, QtCore.Qt.DisplayRole)
-        if mc.objExists(node.long_name):
-            mc.select(node.long_name)
+        index = self.treeView.selectedIndexes()
+        if index:
+            index = index[0]
+            node = index.data(model.SceneGraphModel.nodeRole)
+            if mc.objExists(node.long_name):
+                modifiers = QtWidgets.QApplication.keyboardModifiers()
+                if modifiers == QtCore.Qt.ShiftModifier:
+                    mc.select(node.long_name, add=True)
+                elif modifiers == QtCore.Qt.ControlModifier:
+                    mc.select(node.long_name, deselect=True)
+                else:
+                    mc.select(node.long_name, replace=True)
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -312,11 +341,3 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
-
-def paint_by_prox_options():
-    mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-
-
-def paint_by_prox(minimum, maximum):
-    mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum),
-                                                                  str(maximum)))

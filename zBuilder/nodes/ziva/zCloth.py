@@ -26,14 +26,15 @@ class ClothNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         name = self.name
 
         if not mc.objExists(name):
+
+            Ziva.check_meshes(self.association)
+
             mc.select(self.association)
             results = mm.eval('ziva -c')
             cloth = mc.ls(results, type='zCloth')[0]

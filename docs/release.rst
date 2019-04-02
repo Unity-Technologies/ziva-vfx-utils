@@ -1,5 +1,13 @@
 Release Notes
 =============
+1.0.7
+-----
+* Adding unit tests (CMT tools)
+* Adding support for zRivetToBone
+* Added ability to use groups in regular expressions
+* multi select items in maya scene through Scene Panel
+* various bug fixes
+
 1.0.5
 -----
 * Support for Maya fields
