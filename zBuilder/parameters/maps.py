@@ -127,6 +127,7 @@ class Map(Base):
                                              mesh_data.name,
                                              self.values)
             self.values = weight_list
+
             mc.delete(created_mesh)
 
 
@@ -150,7 +151,7 @@ def get_weights(map_name, mesh_name):
     return value
 
 
-def interpolate_values(source_mesh, destination_mesh, weight_list):
+def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
     """
     Description:
         Will transfer values between similar meshes with differing topology.
@@ -224,6 +225,8 @@ def interpolate_values(source_mesh, destination_mesh, weight_list):
 
         destination_mesh_m_it_mesh_vertex.next()
 
+    # clamp the values if needed
+    if clamp:
+        interpolated_weights = [max(min(x, clamp[1]), clamp[0]) for x in interpolated_weights]
+
     return interpolated_weights
-
-
