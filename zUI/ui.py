@@ -47,6 +47,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView = QtWidgets.QTreeView()
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
+        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self.root_node = root_node
@@ -60,7 +61,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.treeView)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-
+        
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
@@ -153,7 +154,6 @@ class MyDockingUI(QtWidgets.QWidget):
     def paint_by_prox_options(self):
         """Brings up UI for painting by proximity.
         """
-
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.name, r=True)
@@ -166,7 +166,6 @@ class MyDockingUI(QtWidgets.QWidget):
             minimum ([float]): minimum
             maximum ([float]): maximum
         """
-
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.name, r=True)
@@ -201,10 +200,9 @@ class MyDockingUI(QtWidgets.QWidget):
         mc.select(node.long_association)
 
     def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu 
+        """Selects fiber curve based on item selected in tree.  This is a menu
         command.
         """
-
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.curve)
@@ -213,61 +211,55 @@ class MyDockingUI(QtWidgets.QWidget):
         """Generates menu for tree items
 
         We are getting the zBuilder node in the tree item and checking type.
-        With that we can build a custom menu per type.
+        With that we can build a custom menu per type.  If there are more then 
+        one object selected in UI a menu does not appear as items in menu work
+        on a single selection.
         """
+        indexes = self.treeView.selectedIndexes()
+        if len(indexes) == 1:
+            node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
+            menu = QtWidgets.QMenu()
 
-        menu = QtWidgets.QMenu()
+            if node.type == 'zTet':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zTet':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zFiber':
+                menu.addAction(self.actionPaintWeight)
+                menu.addAction(self.actionPaintEndPoints)
+                menu.addSection('')
 
-        if node.type == 'zFiber':
-            menu.addAction(self.actionPaintWeight)
-            menu.addAction(self.actionPaintEndPoints)
-            menu.addSection('')
+            if node.type == 'zMaterial':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zMaterial':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zEmbedder':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zEmbedder':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zAttachment':
+                menu.addAction(self.actionPaintSource)
+                menu.addAction(self.actionPaintTarget)
+                menu.addSection('')
+                menu.addAction(self.actionPaintByProx)
+                menu.addAction(self.actionPaintByProx_1_2)
+                menu.addAction(self.actionPaintByProx_1_10)
+                menu.addAction(self.actionSelectST)
 
-        if node.type == 'zAttachment':
-            menu.addAction(self.actionPaintSource)
-            menu.addAction(self.actionPaintTarget)
-            menu.addSection('')
-            menu.addAction(self.actionPaintByProx)
-            menu.addAction(self.actionPaintByProx_1_2)
-            menu.addAction(self.actionPaintByProx_1_10)
-            menu.addAction(self.actionSelectST)
+            if node.type == 'zLineOfAction':
+                menu.addAction(self.actionSelectFiberCurve)
 
-        if node.type == 'zLineOfAction':
-            menu.addAction(self.actionSelectFiberCurve)
-
-        menu.exec_(self.treeView.viewport().mapToGlobal(position))
+            menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
-        index = self.treeView.selectedIndexes()
-        if index:
-            index = index[0]
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if mc.objExists(node.long_name):
-                modifiers = QtWidgets.QApplication.keyboardModifiers()
-                if modifiers == QtCore.Qt.ShiftModifier:
-                    mc.select(node.long_name, add=True)
-                elif modifiers == QtCore.Qt.ControlModifier:
-                    mc.select(node.long_name, deselect=True)
-                else:
-                    mc.select(node.long_name, replace=True)
+        indexes = self.treeView.selectedIndexes()
+        if indexes:
+            nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
+            mc.select(nodes)
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -312,8 +304,7 @@ class MyDockingUI(QtWidgets.QWidget):
                                         -1,
                                         QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
-                self.treeView.selectionModel().select(index,
-                                                      QtCore.QItemSelectionModel.SelectCurrent)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
 
             # this works for a zBuilder view.  This is expanding the item 
             # selected and it's parent if any.  This makes it possible if you 
