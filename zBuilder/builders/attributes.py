@@ -20,6 +20,6 @@ class Attributes(Builder):
 
     @Builder.time_this
     def build(self):
-        parameters = self.get_scene_items()
-        for parameter in parameters:
-            parameter.set_maya_attrs()
+        scene_items = self.get_scene_items()
+        for item in scene_items:
+            item.set_maya_attrs()
