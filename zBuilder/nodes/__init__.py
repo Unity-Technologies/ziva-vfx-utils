@@ -3,7 +3,6 @@ __path__ = extend_path(__path__, __name__)
 
 from zBuilder.nodes.dg_node import DGNode
 from zBuilder.nodes.deformer import Deformer
-from zBuilder.nodes.transform import TransformNode
 
 # ziva nodes--------------------------------------------------------------------
 from .ziva.zivaBase import Ziva
