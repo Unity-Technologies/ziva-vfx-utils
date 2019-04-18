@@ -12,6 +12,7 @@ from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
 import zBuilder.ui.model as model
+import zBuilder.ui.view as view
 import zBuilder.ui.icons as icons
 import zBuilder.builders.ziva as zva
 
@@ -44,12 +45,12 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.treeView = QtWidgets.QTreeView()
+        self.treeView = view.SceneTreeView()
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self._proxy_model = QtCore.QSortFilterProxyModel()
+        self._proxy_model = model.SceneSortFilterProxyModel()
         self.root_node = root_node
         self.reset_tree(root_node=self.root_node)
 
@@ -274,7 +275,6 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            import zBuilder.builders.ziva as zva
             z = zva.Ziva()
             z.retrieve_connections()
             root_node = z.root_node
