@@ -11,20 +11,17 @@ except ImportError:
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
-import zBuilder.ui.model as model
-import zBuilder.ui.view as view
-import zBuilder.ui.icons as icons
+import model
+import view
+import icons
 import zBuilder.builders.ziva as zva
 
 
-class ZivaUi():
+def run():
+    z = zva.Ziva()
+    z.retrieve_connections()
 
-    # Show window with docking ability
-    def run(self):
-        z = zva.Ziva()
-        z.retrieve_connections()
-
-        dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, root_node=z.root_node)
 
 
 class MyDockingUI(QtWidgets.QWidget):
