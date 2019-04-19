@@ -42,13 +42,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.treeView = view.SceneTreeView()
+        self.root_node = root_node
+        self._model = model.SceneGraphModel(root_node)
+        self._proxy_model = model.SceneSortFilterProxyModel()
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.treeView.setModel(self._proxy_model)
 
-        self._proxy_model = model.SceneSortFilterProxyModel()
-        self.root_node = root_node
         self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -276,17 +282,15 @@ class MyDockingUI(QtWidgets.QWidget):
             z.retrieve_connections()
             root_node = z.root_node
 
-        self._model = model.SceneGraphModel(root_node)
+        self.root_node = root_node
 
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self.treeView.setModel(self._proxy_model)
+        self._model.beginResetModel()
+        self._model.root_node = root_node
+        self._model.endResetModel()
 
         # Expand all zSolverTransform tree items-------------------------------
-        proxy_model = self.treeView.model()
-        for row in range(proxy_model.rowCount()):
-            index = proxy_model.index(row, 0)
+        for row in range(self._proxy_model.rowCount()):
+            index = self._proxy_model.index(row, 0)
             node = index.data(model.SceneGraphModel.nodeRole)
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
@@ -295,7 +299,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
-            checked = proxy_model.match(proxy_model.index(0, 0),
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
                                         QtCore.Qt.DisplayRole,
                                         sel[0].split('|')[-1],
                                         -1,
@@ -305,7 +309,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
             # this works for a zBuilder view.  This is expanding the item 
             # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visable in 
+            # have a material or attachment selected, it will become visible in
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
