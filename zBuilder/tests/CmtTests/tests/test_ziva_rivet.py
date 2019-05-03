@@ -63,7 +63,7 @@ class ZivaRivetTestCase(VfxTestCase):
         z = zva.Ziva()
         z.retrieve_from_scene_selection()
 
-        # check that 2 rivets are in zBuilder
+        # check that there are 0 rivets in scene (based on selection)
         rivets = z.get_scene_items(type_filter='zRivetToBone')
         self.assertTrue(len(rivets) == 0)
         
