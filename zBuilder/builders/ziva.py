@@ -364,8 +364,9 @@ class Ziva(Builder):
                 nodes.extend(adaptors)
             if rivetToBone:
                 fibers = mz.get_zFibers(selection)
-                hist = mc.listHistory(fibers)
-                nodes.extend(mc.ls(hist, type='zRivetToBone'))
+                if fibers:
+                    hist = mc.listHistory(fibers)
+                    nodes.extend(mc.ls(hist, type='zRivetToBone'))
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
