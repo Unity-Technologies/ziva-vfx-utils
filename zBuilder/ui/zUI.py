@@ -60,8 +60,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
         self.delegate = model.TreeItemDelegate()
-        root_index = self._proxy_model.mapToSource(self.treeView.rootIndex())
-        self.refactorData(root_index)
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
