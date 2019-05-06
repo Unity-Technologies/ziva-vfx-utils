@@ -323,9 +323,6 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
 
-        root_index = self._proxy_model.mapToSource(self.treeView.rootIndex())
-        self.refactorData(root_index)
-
 
     @staticmethod
     def delete_instances():
