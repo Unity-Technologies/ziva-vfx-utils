@@ -2,6 +2,9 @@ import maya.cmds as mc
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def dock_window(dialog_class, root_node=None):

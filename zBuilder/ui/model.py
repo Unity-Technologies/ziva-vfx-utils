@@ -7,6 +7,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
+    envRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -30,18 +31,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole:
             return "Scene Items"
 
-    def setData(self, index, value, role=QtCore.Qt.EditRole):
-
-        if index.isValid():
-
-            if role == QtCore.Qt.EditRole:
-
-                node = index.internalPointer()
-                node.name = value
-
-                return True
-
-        return False
+    # This method is not taking part in displaying the tree
+    # def setData(self, index, value, role=QtCore.Qt.EditRole):
+    #
+    #     if index.isValid():
+    #
+    #         if role == QtCore.Qt.EditRole:
+    #
+    #             node = index.internalPointer()
+    #             node.name = value
+    #
+    #             return True
+    #
+    #     return False
 
     def data(self, index, role):
 
@@ -72,12 +74,28 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 if hasattr(node, 'type'):
                     return node
 
+        if role == SceneGraphModel.envRole:
+            env = True
+            if index.column() == 0:
+                node = index.internalPointer()
+                if hasattr(node, 'depends_on'):
+                    node = node.depends_on
+                if hasattr(node, 'attrs'):
+                    attrs = node.attrs
+                    if "envelope" in attrs:
+                        if not attrs["envelope"]["value"]:
+                            env = False
+                    elif "enable" in attrs:
+                        if not attrs["enable"]["value"]:
+                            env = False
+            return env
+
     def parent(self, index):
 
         node = self.getNode(index)
         parentNode = node.parent()
 
-        if parentNode == self.root_node or parentNode == None:
+        if parentNode in (self.root_node, None):
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
@@ -105,3 +123,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
         super(SceneSortFilterProxyModel, self).__init__(parent)
+
+
+class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super(TreeItemDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        proxy_model = index.model()
+        index_model = proxy_model.mapToSource(index)
+
+        if index_model.isValid():
+            model = index_model.model()
+            env = model.data(index_model, model.envRole)
+            if not env:
+                option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
+        QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

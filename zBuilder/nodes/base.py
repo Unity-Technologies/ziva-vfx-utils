@@ -73,6 +73,8 @@ class Base(object):
     def row(self):
         if self._parent is not None:
             return self._parent._children.index(self)
+        else:
+            return 0
 
     def log(self, tab_level=-1):
         output = ""

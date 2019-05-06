@@ -14,7 +14,11 @@ from zBuilder.ui.utils import dock_window
 import model
 import view
 import icons
+import os
 import zBuilder.builders.ziva as zva
+
+dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
+os.chdir(dir_path)
 
 
 def run():
@@ -39,6 +43,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
+        self.ui.setStyleSheet(open(dir_path + "/style.css", "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
@@ -54,6 +59,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
+        self.delegate = model.TreeItemDelegate()
+        root_index = self._proxy_model.mapToSource(self.treeView.rootIndex())
+        self.refactorData(root_index)
+        self.treeView.setItemDelegate(self.delegate)
+        self.treeView.setIndentation(15)
 
         self.reset_tree(root_node=self.root_node)
 
@@ -314,6 +324,9 @@ class MyDockingUI(QtWidgets.QWidget):
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
+
+        root_index = self._proxy_model.mapToSource(self.treeView.rootIndex())
+        self.refactorData(root_index)
 
 
     @staticmethod
