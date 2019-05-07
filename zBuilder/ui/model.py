@@ -137,5 +137,9 @@ class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
             model = index_model.model()
             env = model.data(index_model, model.envRole)
             if not env:
-                option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
+                if option.state & QtWidgets.QStyle.State_Selected:
+                    option.state &= ~ QtWidgets.QStyle.State_Selected
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
+                else:
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)
