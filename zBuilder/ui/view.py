@@ -1,4 +1,5 @@
 from PySide2 import QtGui, QtWidgets, QtCore
+import icons
 
 
 class SceneTreeView(QtWidgets.QTreeView):
@@ -6,12 +7,12 @@ class SceneTreeView(QtWidgets.QTreeView):
         super(SceneTreeView, self).__init__(parent)
 
     def drawBranches(self, painter, rect, index):
-        image_line = QtGui.QImage("./icons/vline.png")
-        image_opened = QtGui.QImage("./icons/branch-opened.png")
-        image_closed = QtGui.QImage("./icons/branch-closed.png")
-        image_more = QtGui.QImage("./icons/branch-more.png")
-        image_child = QtGui.QImage("./icons/branch-child.png")
-        image_end = QtGui.QImage("./icons/branch-end.png")
+        image_line = QtGui.QImage(icons.get_icon_path_from_name('vline'))
+        image_opened = QtGui.QImage(icons.get_icon_path_from_name('branch-opened'))
+        image_closed = QtGui.QImage(icons.get_icon_path_from_name('branch-closed'))
+        image_more = QtGui.QImage(icons.get_icon_path_from_name('branch-more'))
+        image_child = QtGui.QImage(icons.get_icon_path_from_name('branch-child'))
+        image_end = QtGui.QImage(icons.get_icon_path_from_name('branch-end'))
 
         column_count = rect.width()/self.indentation()
         model_index = self.model().mapToSource(index)
