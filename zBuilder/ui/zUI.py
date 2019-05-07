@@ -43,7 +43,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
-        self.ui.setStyleSheet(open(dir_path + "/style.css", "r").read())
+        self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
