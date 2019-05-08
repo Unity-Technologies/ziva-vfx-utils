@@ -457,10 +457,10 @@ To query and change the attributes you go through the ``attrs`` dictionary like 
 
 .. code-block:: python
 
-    print 'Before:', scene_item[0].attrs['startFrame']['value']
+    print 'Before:', scene_items[0].attrs['startFrame']['value']
     # set the value of startFrame to 10
-    scene_item[0].attrs['startFrame']['value'] = 10
-    print 'After:', scene_item[0].attrs['startFrame']['value']
+    scene_items[0].attrs['startFrame']['value'] = 10
+    print 'After:', scene_items[0].attrs['startFrame']['value']
 
 In the above example we're printing the value of start frame before and after we change it.
 
