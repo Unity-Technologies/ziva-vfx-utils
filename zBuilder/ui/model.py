@@ -31,20 +31,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole:
             return "Scene Items"
 
-    # This method is not taking part in displaying the tree
-    # def setData(self, index, value, role=QtCore.Qt.EditRole):
-    #
-    #     if index.isValid():
-    #
-    #         if role == QtCore.Qt.EditRole:
-    #
-    #             node = index.internalPointer()
-    #             node.name = value
-    #
-    #             return True
-    #
-    #     return False
-
     def data(self, index, role):
 
         if not index.isValid():
