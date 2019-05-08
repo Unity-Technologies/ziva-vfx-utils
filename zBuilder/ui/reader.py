@@ -5,8 +5,8 @@ import maya.mel as mm
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
 
-import zBuilder.ui.model as model
-import zBuilder.ui.icons as icons
+import model
+import icons
 from zBuilder.ui.utils import dock_window
 
 
@@ -51,8 +51,8 @@ class MyDockingUI(QtWidgets.QWidget):
             import zBuilder.builders.ziva as zva
             z = zva.Ziva()
             z.retrieve_connections()
-            root_node = z.root_node
 
+            root_node = z.root_node
         self._model = model.SceneGraphModel(root_node)
 
         self._proxy_model.setSourceModel(self._model)

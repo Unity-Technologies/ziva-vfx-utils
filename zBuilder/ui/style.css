@@ -1,0 +1,15 @@
+QTreeView
+{
+    selection-color: rgb(68, 136, 204);
+    selection-background-color: transparent;
+    outline: 0;
+    font-size: 12px;
+    icon-size: 18px;
+    font-family: "Verdana";
+}
+
+QTreeView::item
+{
+    border: none;
+    height: 19px;
+}
