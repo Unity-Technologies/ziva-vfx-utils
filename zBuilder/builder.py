@@ -79,17 +79,19 @@ class Builder(object):
 
         return item_list
 
-    def parameter_factory(self, type_, stuff):
+    def parameter_factory(self, type_, names):
         # put association filter in a list if it isn't
-        if not isinstance(stuff, list):
-            stuff = [stuff]
+        if not isinstance(names, list):
+            names = [names]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if type_ == obj.type:
-                    if not self.bundle.get_scene_items(type_filter=type_,
-                                                       name_filter=stuff):
-                        return obj(*stuff, builder=self)
+                    parameters = self.bundle.get_scene_items(type_filter=type_)
+                    parameters = [x.long_name for x in parameters]
+                    for name in names:
+                        if name not in parameters:
+                            return obj(*names, builder=self)
 
     @staticmethod
     def time_this(original_function):
