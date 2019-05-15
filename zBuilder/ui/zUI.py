@@ -3,6 +3,7 @@ from functools import partial
 
 import maya.cmds as mc
 import maya.mel as mm
+import maya.OpenMaya as om
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -72,11 +73,20 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-        
+        self.treeView.selectionModel().currentChanged.connect(self.tree_changed)
+
+        self.callback_ids = {}
+        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
+        self.callback_ids["SelectionChanged"] = event_id
+        self.destroyed.connect(lambda: self.unregister_callbacks())
+
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
+
+    def unregister_callbacks(self):
+        for name in self.callback_ids:
+            om.MMessage.removeCallback(self.callback_ids[name])
 
     def _setup_actions(self):
 
@@ -264,14 +274,17 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def tree_changed(self):
+    def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
+        om.MMessage.removeCallback(self.callback_ids["SelectionChanged"])
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
+        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
+        self.callback_ids["SelectionChanged"] = event_id
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -307,13 +320,15 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = []
+            for s in sel:
+                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                   QtCore.Qt.DisplayRole,
+                                                   s.split('|')[-1],
+                                                   -1,
+                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
             # this works for a zBuilder view.  This is expanding the item 
             # selected and it's parent if any.  This makes it possible if you 
@@ -323,6 +338,20 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
 
+    def selection_callback(self, *args):
+        self.treeView.selectionModel().clearSelection()
+        print 'exec !'
+        sel = mc.ls(sl=True)
+        if sel:
+            checked = []
+            for s in sel:
+                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                   QtCore.Qt.DisplayRole,
+                                                   s.split('|')[-1],
+                                                   -1,
+                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in checked:
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
     @staticmethod
     def delete_instances():
