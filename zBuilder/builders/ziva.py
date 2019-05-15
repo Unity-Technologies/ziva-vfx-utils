@@ -117,8 +117,21 @@ class Ziva(Builder):
 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
+
+            grp = Base()
+            grp.name = item.long_association[0]
+            grp.type = 'ui_{}_body'.format('curve')
+            grp.depends_on = item
+            parent_node.add_child(grp)
+            grp._parent = parent_node
+
             parent_node.add_child(item)
             item._parent = parent_node
+
+            for r_item in self.get_scene_items(type_filter='zRivetToBone'):
+                if r_item.long_curve_name == item.long_association[0]:
+                    grp.add_child(r_item)
+                    r_item._parent = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
@@ -203,11 +216,17 @@ class Ziva(Builder):
             fields = mc.ls(history, type=types)
             nodes.extend(fields)
 
+        fibers = mz.get_zFibers(selection)
+        if fibers:
+            hist = mc.listHistory(fibers)
+            nodes.extend(mc.ls(hist, type='zRivetToBone'))
+
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.get_parent()
 
         mc.select(scene_selection)
+        self.stats()
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
