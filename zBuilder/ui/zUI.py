@@ -78,6 +78,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
+        self.weights = []
+
     def _setup_actions(self):
 
         refresh_path = icons.get_icon_path_from_name('refresh')
@@ -116,6 +118,21 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectFiberCurve.setText('Select Curve')
         self.actionSelectFiberCurve.setObjectName("selectCurve")
         self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
+
+        self.actionCopyWeight = QtWidgets.QAction(self)
+        self.actionCopyWeight.setText('Copy Weight')
+        self.actionCopyWeight.setObjectName("actionCopyWeight")
+        self.actionCopyWeight.triggered.connect(self.copy_weight)
+
+        self.actionInvertWeight = QtWidgets.QAction(self)
+        self.actionInvertWeight.setText('Invert Weight')
+        self.actionInvertWeight.setObjectName("actionCopyWeight")
+        self.actionInvertWeight.triggered.connect(self.invert_weight)
+
+        self.actionPasteWeight = QtWidgets.QAction(self)
+        self.actionPasteWeight.setText('Paste Weight')
+        self.actionPasteWeight.setObjectName("actionPasteWeight")
+        self.actionPasteWeight.triggered.connect(self.paste_weight)
 
         self.actionPaintByProx = QtWidgets.QAction(self)
         self.actionPaintByProx.setText('Paint By Proximity UI')
@@ -228,41 +245,44 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-        if len(indexes) == 1:
-            node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        #if len(indexes) == 1:
+        node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+        menu = QtWidgets.QMenu()
 
-            if node.type == 'zTet':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+        if node.type == 'zTet':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
 
-            if node.type == 'zFiber':
-                menu.addAction(self.actionPaintWeight)
-                menu.addAction(self.actionPaintEndPoints)
-                menu.addSection('')
+        if node.type == 'zFiber':
+            menu.addAction(self.actionPaintWeight)
+            menu.addAction(self.actionPaintEndPoints)
+            menu.addSection('')
+            menu.addAction(self.actionCopyWeight)
+            menu.addAction(self.actionPasteWeight)
+            menu.addAction(self.actionInvertWeight)
 
-            if node.type == 'zMaterial':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+        if node.type == 'zMaterial':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
 
-            if node.type == 'zEmbedder':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+        if node.type == 'zEmbedder':
+            menu.addAction(self.actionPaintWeight)
+            menu.addSection('')
 
-            if node.type == 'zAttachment':
-                menu.addAction(self.actionPaintSource)
-                menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
-                menu.addAction(self.actionSelectST)
+        if node.type == 'zAttachment':
+            menu.addAction(self.actionPaintSource)
+            menu.addAction(self.actionPaintTarget)
+            menu.addSection('')
+            menu.addAction(self.actionPaintByProx)
+            menu.addAction(self.actionPaintByProx_1_2)
+            menu.addAction(self.actionPaintByProx_1_10)
+            menu.addAction(self.actionSelectST)
 
-            if node.type == 'zLineOfAction':
-                menu.addAction(self.actionSelectFiberCurve)
+        if node.type == 'zLineOfAction':
+            menu.addAction(self.actionSelectFiberCurve)
 
-            menu.exec_(self.treeView.viewport().mapToGlobal(position))
+        menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
@@ -272,6 +292,48 @@ class MyDockingUI(QtWidgets.QWidget):
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
+
+    def copy_weight(self):
+        
+        indexes = self.treeView.selectedIndexes()
+        tmp = []
+        for i in indexes:
+            node = i.data(model.SceneGraphModel.nodeRole)
+            mesh = node.association[0]
+            vert_count = mc.polyEvaluate(mesh, v=True)
+            tmp.append(mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1)))
+
+        self.weights = [sum(i) for i in zip(*tmp)]
+        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
+        print mesh, self.weights
+
+    def invert_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mesh = node.association[0]
+        vert_count = mc.polyEvaluate(mesh, v=True)
+        weights = mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1))
+        weights = [1-x for x in weights]
+
+        map_ = node.name+'.weightList[0].weights'
+        tmp = []
+        for w in weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
+        mm.eval(cmd)
+
+    def paste_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        map_ = node.name+'.weightList[0].weights'
+        tmp = []
+        for w in self.weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
+        mm.eval(cmd)
+       
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
