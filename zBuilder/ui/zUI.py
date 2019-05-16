@@ -73,12 +73,12 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        self.treeView.selectionModel().currentChanged.connect(self.tree_changed)
-
         self.callback_ids = {}
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
         self.callback_ids["SelectionChanged"] = event_id
         self.destroyed.connect(lambda: self.unregister_callbacks())
+
+        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
         self._setup_actions()
 
