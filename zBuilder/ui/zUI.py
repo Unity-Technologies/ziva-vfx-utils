@@ -339,8 +339,8 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(checked[-1].parent())
 
     def selection_callback(self, *args):
+        self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
         self.treeView.selectionModel().clearSelection()
-        print 'exec !'
         sel = mc.ls(sl=True)
         if sel:
             checked = []
@@ -352,6 +352,7 @@ class MyDockingUI(QtWidgets.QWidget):
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
     def delete_instances():
