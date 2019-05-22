@@ -1,7 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 
-
 class SceneGraphModel(QtCore.QAbstractItemModel):
 
     sortRole = QtCore.Qt.UserRole
@@ -42,6 +41,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return True
 
         return False
+
 
     def data(self, index, role):
 
@@ -100,8 +100,3 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return node
 
         return self.root_node
-
-
-class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
-    def __init__(self, parent=None):
-        super(SceneSortFilterProxyModel, self).__init__(parent)

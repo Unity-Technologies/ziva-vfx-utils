@@ -3,7 +3,6 @@ import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
-import zBuilder.ui.reader as reader
 
 from functools import wraps
 import datetime
@@ -11,6 +10,9 @@ import sys
 import inspect
 import logging
 import time
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,8 @@ class Builder(object):
         self.root_node.log()
 
     def view(self):
-        reader.view(root_node=self.root_node)
+        import zBuilder.ui.tree as tree
+        tree.go(root_node=self.root_node)
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
