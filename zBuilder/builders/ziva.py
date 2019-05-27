@@ -77,7 +77,9 @@ class Ziva(Builder):
             grp = Base()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = item
+           
+            grp_2 = Base(deserialize=item.serialize())
+            grp.depends_on = grp_2
 
             bodies[item.long_association[0]] = grp
 
