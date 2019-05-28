@@ -26,7 +26,7 @@ def run():
     z = zva.Ziva()
     z.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, root_node=z.root_node, builder=z)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -34,7 +34,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None):
+    def __init__(self, parent=None, root_node=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -47,6 +47,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        self.builder = builder
 
         self.root_node = root_node
         self._model = model.SceneGraphModel(root_node)
@@ -64,6 +65,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
+        self.callback_ids = {}
+        self.callback_ids["AttributeChanged"] = []
+
         self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -73,9 +77,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        self.callback_ids = {}
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = event_id
+        self.callback_ids["SelectionChanged"] = [event_id]
         self.destroyed.connect(lambda: self.unregister_callbacks())
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
@@ -84,9 +87,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
-    def unregister_callbacks(self):
-        for name in self.callback_ids:
-            om.MMessage.removeCallback(self.callback_ids[name])
+    def unregister_callbacks(self, callbacks=None):
+        if not callbacks:
+            callbacks = self.callback_ids.keys()
+        for name in callbacks:
+            for _id in self.callback_ids[name]:
+                om.MMessage.removeCallback(_id)
+            self.callback_ids[name] = []
 
     def _setup_actions(self):
 
@@ -278,35 +285,51 @@ class MyDockingUI(QtWidgets.QWidget):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
-        om.MMessage.removeCallback(self.callback_ids["SelectionChanged"])
+        om.MMessage.removeCallback(self.callback_ids["SelectionChanged"][-1])
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = event_id
+        self.callback_ids["SelectionChanged"] = [event_id]
 
-    def reset_tree(self, root_node=None):
-        """This builds and/or resets the tree given a root_node.  The root_node
-        is a zBuilder object that the tree is built from.  If None is passed
-        it uses the scene selection to build a new root_node.
+    def get_maya_attr_from_plug(self, plug):
+        attr = plug.attribute()
 
-        This forces a complete redraw of the ui tree.
+        if attr.hasFn(om.MFn.kNumericAttribute):
+            fnAttr = om.MFnNumericAttribute(attr)
+            real_type = fnAttr.unitType()
 
-        Args:
-            root_node (:obj:`obj`, optional): The zBuilder root_node to build
-                tree from.  Defaults to None.
-        """
+            if real_type == om.MFnNumericData.kBoolean:
+                return plug.asBool()
+            elif real_type == om.MFnNumericData.kInt:
+                return plug.kInt()
+            else:
+                return plug.asDouble()
 
-        if not root_node:
-            z = zva.Ziva()
-            z.retrieve_connections()
-            root_node = z.root_node
+        elif attr.hasFn(om.MFn.kTypedAttribute):
+            fnAttr = om.MFnTypedAttribute(attr)
+            real_type = fnAttr.attrType()
 
-        self.root_node = root_node
+            if real_type == om.MFnData.kString:
+                return plug.asString()
 
+        elif attr.hasFn(om.MFn.kEnumAttribute):
+            return plug.asInt()
+
+    def attribute_changed(self, msg, plug, other_plug, *clientData):
+        if msg & om.MNodeMessage.kAttributeSet:
+            name = plug.name()
+            attr_name = name.split(".")[-1]
+            node_name = name.split(".")[0]
+            attr = self.get_maya_attr_from_plug(plug)
+            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
+            if attr_name in z_node.attrs:
+                z_node.attrs[attr_name]["value"] = attr
+            self.update_tree()
+
+    def update_tree(self):
         self._model.beginResetModel()
-        self._model.root_node = root_node
         self._model.endResetModel()
 
         # Expand all zSolverTransform tree items-------------------------------
@@ -317,7 +340,7 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and 
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
             checked = []
@@ -330,13 +353,44 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
             # have a material or attachment selected, it will become visible in
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
+
+    def reset_tree(self, root_node=None):
+        """This builds and/or resets the tree given a root_node.  The root_node
+        is a zBuilder object that the tree is built from.  If None is passed
+        it uses the scene selection to build a new root_node.
+
+        This forces a complete redraw of the ui tree.
+
+        Args:
+            root_node (:obj:`obj`, optional): The zBuilder root_node to build
+                tree from.  Defaults to None.
+        """
+        if not root_node:
+            self.builder = zva.Ziva()
+            self.builder.retrieve_connections()
+            root_node = self.builder.root_node
+
+        scene_items = self.builder.get_scene_items()
+
+        self.root_node = root_node
+
+        self._model.root_node = root_node
+
+        self.unregister_callbacks(["AttributeChanged"])
+
+        for item in scene_items:
+            obj = item.mobject
+            _id = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(_id)
+
+        self.update_tree()
 
     def selection_callback(self, *args):
         self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)

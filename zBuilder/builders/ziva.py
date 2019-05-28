@@ -74,7 +74,7 @@ class Ziva(Builder):
         for item in self.get_scene_items(type_filter=['zBone',
                                                       'zTissue',
                                                       'zCloth']):
-            grp = Base()
+            grp = Base(builder=self)
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
             grp.depends_on = item
