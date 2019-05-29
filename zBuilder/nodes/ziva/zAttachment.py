@@ -81,12 +81,13 @@ class AttachmentNode(Ziva):
                 self.mobject = new_att[0]
                 mc.rename(new_att[0], name)
 
+            # set the attributes
+            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_weights(interp_maps=interp_maps)
+
         else:
             if permissive:
                 logger.info('skipping attachment creation...' + name)
             else:
                 raise StandardError('Cannot create attachment between {} and {}.  Check meshes.'.format(source_mesh,target_mesh))
 
-        # set the attributes
-        self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=interp_maps)

@@ -77,7 +77,7 @@ class Ziva(Builder):
             grp = Base(builder=self)
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = item
+            grp.depends_on = Base(deserialize=item.serialize())
 
             bodies[item.long_association[0]] = grp
 
@@ -365,10 +365,10 @@ class Ziva(Builder):
                 nodes.extend(fields)
                 nodes.extend(adaptors)
             if rivetToBone:
-                hist = mc.listHistory(selection)
-                rivets = mc.ls(hist, type='zRivetToBone')
-                nodes.extend(rivets)
-
+                fibers = mz.get_zFibers(selection)
+                if fibers:
+                    hist = mc.listHistory(fibers)
+                    nodes.extend(mc.ls(hist, type='zRivetToBone'))
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
