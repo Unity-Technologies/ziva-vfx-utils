@@ -303,7 +303,7 @@ class MyDockingUI(QtWidgets.QWidget):
             if real_type == om.MFnNumericData.kBoolean:
                 return plug.asBool()
             elif real_type == om.MFnNumericData.kInt:
-                return plug.kInt()
+                return plug.asInt()
             else:
                 return plug.asDouble()
 
