@@ -87,10 +87,10 @@ class Builder(object):
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if type_ == obj.type:
-                    parameters = self.bundle.get_scene_items(type_filter=type_)
-                    parameters = [x.long_name for x in parameters]
+                    scene_items = self.bundle.get_scene_items(type_filter=type_)
+                    scene_items = [x.long_name for x in scene_items]
                     for name in names:
-                        if name not in parameters:
+                        if name not in scene_items:
                             return obj(*names, builder=self)
 
     @staticmethod
