@@ -80,6 +80,18 @@ class Builder(object):
         return item_list
 
     def parameter_factory(self, type_, names):
+        ''' This looks for zBuilder objects in sys.modules and instantiates
+        desired one based on arguments.
+        
+        Args:
+            type_ (str): The type of parameter to instentiate (map or mesh)
+            names (str): The name of parameter to instentiate.  This should be 
+                a node in the maya scene.  Either a mesh or a map name.
+        
+        Returns:
+            object: zBuilder parameter object
+        '''
+
         # put association filter in a list if it isn't
         if not isinstance(names, list):
             names = [names]
