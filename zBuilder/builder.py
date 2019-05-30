@@ -79,17 +79,33 @@ class Builder(object):
 
         return item_list
 
-    def parameter_factory(self, type_, stuff):
+    def parameter_factory(self, parameter_type, parameter_names):
+        ''' This looks for zBuilder objects in sys.modules and instantiates
+        desired one based on arguments.
+        
+        Args:
+            type_ (str): The type of parameter to instentiate (map or mesh)
+            names (str or list): The name of parameter to instentiate.  This should be 
+                a node in the maya scene.  Either a mesh or a map name.
+
+                Currently sometimes parameter_names could be a list.  It is a list
+                when dealing with a map.  The second element is the payload 
+                whereas the first is the name.
+        
+        Returns:
+            object: zBuilder parameter object
+        '''
         # put association filter in a list if it isn't
-        if not isinstance(stuff, list):
-            stuff = [stuff]
+        if not isinstance(parameter_names, list):
+            parameter_names = [parameter_names]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
-                if type_ == obj.type:
-                    if not self.bundle.get_scene_items(type_filter=type_,
-                                                       name_filter=stuff):
-                        return obj(*stuff, builder=self)
+                if parameter_type == obj.type:
+                    scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
+                    scene_items = [x.long_name for x in scene_items]
+                    if any(x not in scene_items for x in parameter_names):
+                        return obj(*parameter_names, builder=self)
 
     @staticmethod
     def time_this(original_function):
