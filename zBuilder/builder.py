@@ -101,9 +101,8 @@ class Builder(object):
                 if type_ == obj.type:
                     scene_items = self.bundle.get_scene_items(type_filter=type_)
                     scene_items = [x.long_name for x in scene_items]
-                    for name in names:
-                        if name not in scene_items:
-                            return obj(*names, builder=self)
+                    if any(x not in scene_items for x in names):
+                        return obj(*names, builder=self)
 
     @staticmethod
     def time_this(original_function):
