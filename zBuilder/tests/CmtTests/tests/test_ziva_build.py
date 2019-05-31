@@ -13,7 +13,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaBuildTestCase(VfxTestCase):
-
     @classmethod
     def setUpClass(cls):
         pass
@@ -98,3 +97,18 @@ class ZivaBuildTestCase(VfxTestCase):
         # now build should raise a standard error
         with self.assertRaises(StandardError):
             self.z.build()
+
+    def test_tissue_attrs_not_updating(self):
+        # this tests an issue of zTissues not updating attributes if the
+        # tissue is not created.  In that case it would skip over the attr
+        # changing.  As seen in VFXACT-89
+
+        # to test this lets change an attribute on a tissue
+        mc.setAttr("r_bicep_muscle_zTissue.inertialDamping", .5)
+
+        # now build from the zBuilder
+        self.z.build()
+
+        # if the attribute is 0 we know it worked
+        self.assertTrue(
+            mc.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
