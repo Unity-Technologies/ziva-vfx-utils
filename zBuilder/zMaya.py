@@ -16,56 +16,6 @@ ZNODES = [
 """ All available ziva nodes to be able to cleanup. """
 
 
-def get_mesh_connectivity(mesh_name):
-    """ Gets mesh connectivity for given mesh.
-
-    Args:
-        mesh_name: Name of mesh to process.
-
-    Returns:
-        dict: Dictionary of polygonCounts, polygonConnects, and points.
-    """
-    space = om.MSpace.kWorld
-    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
-    mesh_to_rebuild_m_dag_path.extendToShape()
-
-    mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
-    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
-
-    num_polygons = 0
-    num_vertices = 0
-    # vertexArray_mFloatPointArray = om.MFloatPointArray()
-    # polygonCounts_mIntArray = om.MIntArray()
-    polygon_counts_list = list()
-    polygon_connects_list = list()
-    point_list = list()
-
-    while not mesh_to_rebuild_vert_iter.isDone():
-        num_vertices += 1
-        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
-        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y, pos_m_point.z)
-
-        point_list.append([pos_m_float_point[0], pos_m_float_point[1], pos_m_float_point[2]])
-        mesh_to_rebuild_vert_iter.next()
-
-    while not mesh_to_rebuild_poly_iter.isDone():
-        num_polygons += 1
-        polygon_vertices_m_int_array = om.MIntArray()
-        mesh_to_rebuild_poly_iter.getVertices(polygon_vertices_m_int_array)
-        for vertexIndex in polygon_vertices_m_int_array:
-            polygon_connects_list.append(vertexIndex)
-
-        polygon_counts_list.append(polygon_vertices_m_int_array.length())
-
-        mesh_to_rebuild_poly_iter.next()
-    tmp = dict()
-    tmp['polygonCounts'] = polygon_counts_list
-    tmp['polygonConnects'] = polygon_connects_list
-    tmp['points'] = point_list
-
-    return tmp
-
-
 def check_body_type(bodies):
     """ Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
     used to see if we can create a zAttachment before we try.  Additionally
