@@ -127,6 +127,27 @@ class Mesh(Base):
             return None
 
 
+def get_intermediate(dagPath):
+    '''finds the intermediate shape given a dagpath for mesh transform
+
+    Args:
+        dagPath (MFnDagPath): dag path for mesh to search for intermediate shape
+    
+    Returns:
+        mObject: mObject of intermediate shape or None if none found.
+    '''
+
+    dag_node = om.MFnDagNode(dagPath)
+    for i in range(dag_node.childCount()):
+        child = dag_node.child(i)
+        if child.apiType() == om.MFn.kMesh:
+            node = om.MFnDependencyNode(child)
+            intermediate_plug = om.MPlug(node.findPlug("intermediateObject"))
+            if intermediate_plug.asBool():
+                return child
+    return None
+
+
 def get_mesh_info(mesh_name):
     """ Gets mesh connectivity for given mesh.
 
@@ -138,15 +159,18 @@ def get_mesh_info(mesh_name):
     """
     space = om.MSpace.kWorld
     mesh_to_rebuild_m_dag_path = mz.get_mdagpath_from_mesh(mesh_name)
-    mesh_to_rebuild_m_dag_path.extendToShape()
+    intermediate_shape = get_intermediate(mesh_to_rebuild_m_dag_path)
+    if intermediate_shape:
+        om.MDagPath.getAPathTo(intermediate_shape, mesh_to_rebuild_m_dag_path)
+    else:
+        mesh_to_rebuild_m_dag_path.extendToShape()
 
     mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
     mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
 
     num_polygons = 0
     num_vertices = 0
-    # vertexArray_mFloatPointArray = om.MFloatPointArray()
-    # polygonCounts_mIntArray = om.MIntArray()
+
     polygon_counts_list = list()
     polygon_connects_list = list()
     point_list = list()
