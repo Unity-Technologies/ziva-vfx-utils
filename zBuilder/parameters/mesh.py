@@ -40,14 +40,14 @@ class Mesh(Base):
          Args:
              mesh_name: Name of mesh to populate it with.
 
-         """
-        connectivity = get_mesh_connectivity(mesh_name)
+        """
+        polygon_counts, polygon_connects, points = get_mesh_info(mesh_name)
 
         self.name = mesh_name
         self.type = 'mesh'
-        self.set_polygon_counts(connectivity['polygonCounts'])
-        self.set_polygon_connects(connectivity['polygonConnects'])
-        self.set_point_list(connectivity['points'])
+        self.set_polygon_counts(polygon_counts)
+        self.set_polygon_connects(polygon_connects)
+        self.set_point_list(points)
 
         # logger.info('Retrieving Data : {}'.format(self))
 
@@ -118,16 +118,16 @@ class Mesh(Base):
 
         """
         if mc.objExists(self.name):
-            cur_conn = get_mesh_connectivity(self.name)
+            points = get_mesh_info(self.name)[2]
 
-            if len(cur_conn['points']) == len(self.get_point_list()):
+            if len(points) == len(self.get_point_list()):
                 return True
             return False
         else:
             return None
 
 
-def get_mesh_connectivity(mesh_name):
+def get_mesh_info(mesh_name):
     """ Gets mesh connectivity for given mesh.
 
     Args:
@@ -169,12 +169,8 @@ def get_mesh_connectivity(mesh_name):
         polygon_counts_list.append(polygon_vertices_m_int_array.length())
 
         mesh_to_rebuild_poly_iter.next()
-    tmp = dict()
-    tmp['polygonCounts'] = polygon_counts_list
-    tmp['polygonConnects'] = polygon_connects_list
-    tmp['points'] = point_list
 
-    return tmp
+    return polygon_counts_list, polygon_connects_list, point_list
 
 
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
