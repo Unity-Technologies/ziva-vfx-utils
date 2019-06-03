@@ -156,15 +156,13 @@ def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
         newPointArray.append(newPoint)
 
     newMesh_mfnMesh = om.MFnMesh()
-    returned = newMesh_mfnMesh.create(newPointArray.length(),
-                                      polygonCounts_mIntArray.length(),
-                                      newPointArray,
-                                      polygonCounts_mIntArray,
+    returned = newMesh_mfnMesh.create(newPointArray.length(), polygonCounts_mIntArray.length(),
+                                      newPointArray, polygonCounts_mIntArray,
                                       polygonConnects_mIntArray)
 
     returned_mfnDependencyNode = om.MFnDependencyNode(returned)
 
-    # do housekeeping. 
+    # do housekeeping.
     returnedName = returned_mfnDependencyNode.name()
 
     rebuiltMesh = mc.rename(returnedName, name + '_rebuilt')
@@ -172,4 +170,3 @@ def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
     # mc.sets( rebuiltMesh, e=True, addElement='initialShadingGroup' )
 
     return rebuiltMesh
-
