@@ -118,7 +118,7 @@ class Mesh(Base):
 
         """
         if mc.objExists(self.name):
-            cur_conn = mz.get_mesh_connectivity(self.name)
+            cur_conn = get_mesh_connectivity(self.name)
 
             if len(cur_conn['points']) == len(self.get_point_list()):
                 return True
