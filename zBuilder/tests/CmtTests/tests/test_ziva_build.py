@@ -110,5 +110,31 @@ class ZivaBuildTestCase(VfxTestCase):
         self.z.build()
 
         # if the attribute is 0 we know it worked
-        self.assertTrue(
-            mc.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
+        self.assertTrue(mc.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
+
+    def test_getting_intermediate_shape(self):
+        # this tests getting intermediate shape if there is one instead
+        # of deformed shape
+
+        # This builds the Zivas anatomical arm demo with no pop up dialog.
+        utl.build_arm()
+
+        # capture point position of first vert at rest
+        rest_point_position = mc.pointPosition('r_bicep_muscle.vtx[0]')
+
+        # advance a few frames to change it
+        mc.currentTime(2)
+        mc.currentTime(3)
+
+        # retrrieve from scene
+        mc.select('zSolver1')
+        import zBuilder.builders.ziva as zva
+        z = zva.Ziva()
+        z.retrieve_from_scene()
+
+        # now check value of vert position.  Should be saem as rest
+        mesh = z.get_scene_items(type_filter='mesh', name_filter='r_bicep_muscle')[0]
+
+        print mesh.get_point_list()[0], rest_point_position
+
+        self.assertTrue(mesh.get_point_list()[0] == rest_point_position)
