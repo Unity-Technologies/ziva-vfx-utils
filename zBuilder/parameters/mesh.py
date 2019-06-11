@@ -155,7 +155,7 @@ def get_mesh_info(mesh_name):
         mesh_name: Name of mesh to process.
 
     Returns:
-        dict: Dictionary of polygonCounts, polygonConnects, and points.
+        tuple: tuple of polygonCounts, polygonConnects, and points.
     """
     space = om.MSpace.kWorld
     mesh_to_rebuild_m_dag_path = mz.get_mdagpath_from_mesh(mesh_name)
