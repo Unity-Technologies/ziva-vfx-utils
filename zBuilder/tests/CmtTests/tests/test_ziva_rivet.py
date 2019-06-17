@@ -57,6 +57,16 @@ class ZivaRivetTestCase(VfxTestCase):
         rivets = z.get_scene_items(type_filter='zRivetToBone')
         self.assertTrue(len(rivets) == 2)
         
+    def test_retrieve_rivet_selection_none(self):
+        # use builder to retrieve from scene-----------------------------------
+        mc.select('r_bicep_muscle')
+        z = zva.Ziva()
+        z.retrieve_from_scene_selection()
+
+        # check that there are 0 rivets in scene (based on selection)
+        rivets = z.get_scene_items(type_filter='zRivetToBone')
+        self.assertTrue(len(rivets) == 0)
+        
     def test_build_rivet(self):
         # use builder to retrieve from scene-----------------------------------
         mc.select('r_tricepsLong_muscle')
