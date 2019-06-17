@@ -9,80 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 ZNODES = [
-    'zGeo',
-    'zSolver',
-    'zSolverTransform',
-    'zIsoMesh',
-    'zDelaunayTetMesh',
-    'zTet',
-    'zTissue',
-    'zBone',
-    'zCloth',
-    'zSolver',
-    'zCache',
-    'zEmbedder',
-    'zAttachment',
-    'zMaterial',
-    'zFiber',
-    'zCacheTransform',
-    'zFieldAdaptor',
-    'zRivetToBone']
+    'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
+    'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
+    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone'
+]
 """ All available ziva nodes to be able to cleanup. """
-
-
-def get_mesh_connectivity(mesh_name):
-    """ Gets mesh connectivity for given mesh.
-
-    Args:
-        mesh_name: Name of mesh to process.
-
-    Returns:
-        dict: Dictionary of polygonCounts, polygonConnects, and points.
-    """
-    space = om.MSpace.kWorld
-    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
-    mesh_to_rebuild_m_dag_path.extendToShape()
-
-    mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
-    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
-
-    num_polygons = 0
-    num_vertices = 0
-    # vertexArray_mFloatPointArray = om.MFloatPointArray()
-    # polygonCounts_mIntArray = om.MIntArray()
-    polygon_counts_list = list()
-    polygon_connects_list = list()
-    point_list = list()
-
-    while not mesh_to_rebuild_vert_iter.isDone():
-        num_vertices += 1
-        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
-        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y,
-                                           pos_m_point.z)
-
-        point_list.append([
-            pos_m_float_point[0],
-            pos_m_float_point[1],
-            pos_m_float_point[2]
-        ])
-        mesh_to_rebuild_vert_iter.next()
-
-    while not mesh_to_rebuild_poly_iter.isDone():
-        num_polygons += 1
-        polygon_vertices_m_int_array = om.MIntArray()
-        mesh_to_rebuild_poly_iter.getVertices(polygon_vertices_m_int_array)
-        for vertexIndex in polygon_vertices_m_int_array:
-            polygon_connects_list.append(vertexIndex)
-
-        polygon_counts_list.append(polygon_vertices_m_int_array.length())
-
-        mesh_to_rebuild_poly_iter.next()
-    tmp = dict()
-    tmp['polygonCounts'] = polygon_counts_list
-    tmp['polygonConnects'] = polygon_connects_list
-    tmp['points'] = point_list
-
-    return tmp
 
 
 def check_body_type(bodies):
@@ -193,8 +124,7 @@ def isSolver(selection):
     """
     isSolver = False
     for s in selection:
-        if mc.objectType(s) == 'zSolver' or mc.objectType(
-                s) == 'zSolverTransform':
+        if mc.objectType(s) == 'zSolver' or mc.objectType(s) == 'zSolverTransform':
             isSolver = True
             continue
     return isSolver
@@ -454,7 +384,7 @@ def get_association(zNode):
         return list()
 
     elif _type == 'zRivetToBone':
-        tmp = mc.listConnections(zNode+'.rivetMesh')
+        tmp = mc.listConnections(zNode + '.rivetMesh')
         return tmp
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
@@ -525,8 +455,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 t = t.replace(r, '')
             if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
                 mc.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print 'rename: ', attachment, '{}__{}_{}'.format(s, t,
-                                                                 'zAttachment')
+                print 'rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment')
 
     logger.info('finished renaming.... ')
 
@@ -643,8 +572,7 @@ def parse_maya_node_for_selection(args):
             if mc.objExists(sel):
                 tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError, '{} does not exist in scene, stopping!'.format(
-                    sel)
+                raise StandardError, '{} does not exist in scene, stopping!'.format(sel)
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -676,7 +604,7 @@ def build_attr_list(selection, attr_filter=None):
         attributes.extend(channel_box)
     if keyable:
         attributes.extend(keyable)
- 
+
     attribute_names = []
     for attr in attributes:
         obj = '{}.{}'.format(selection, attr)
@@ -735,8 +663,9 @@ def replace_long_name(search, replace, long_name):
         matches = re.finditer(search, item)
         for match_num, match in enumerate(matches):
             if match.groups():
-                with_this = item[match.span(1)[0]:match.span(1)[1]]+replace+item[match.span(2)[0]:match.span(2)[1]]
-                item = item[:match.start()]+with_this+item[match.end():]
+                with_this = item[match.span(1)[0]:match.
+                                 span(1)[1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                item = item[:match.start()] + with_this + item[match.end():]
             else:
                 item = re.sub(search, replace, item)
 
@@ -806,9 +735,10 @@ def cull_creation_nodes(parameters, permissive=True):
                 results['parameters'].append(parameter)
         else:
             if not permissive:
-                raise StandardError('{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.format(mesh, type_))
-            logger.warning(
-                mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
+                raise StandardError(
+                    '{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.
+                    format(mesh, type_))
+            logger.warning(mesh + ' does not exist in scene, skipping ' + type_ + ' creation')
 
     return results
 
