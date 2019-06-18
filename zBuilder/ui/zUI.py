@@ -74,6 +74,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.treeView)
 
         self.callback_ids = {}
+        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
+        # you making selection by code, to prevent that make sure to remove one of them before making selection
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
         self.callback_ids["SelectionChanged"] = event_id
         self.destroyed.connect(lambda: self.unregister_callbacks())
@@ -85,8 +87,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def unregister_callbacks(self):
-        for name in self.callback_ids:
-            om.MMessage.removeCallback(self.callback_ids[name])
+        for _id in self.callback_ids.values():
+            om.MMessage.removeCallback(_id)
 
     def _setup_actions(self):
 
@@ -278,6 +280,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
         om.MMessage.removeCallback(self.callback_ids["SelectionChanged"])
         indexes = self.treeView.selectedIndexes()
         if indexes:
@@ -317,31 +320,18 @@ class MyDockingUI(QtWidgets.QWidget):
                 self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and 
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = []
-            for s in sel:
-                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.DisplayRole,
-                                                   s.split('|')[-1],
-                                                   -1,
-                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+            checked = self.find_and_select(sel)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visible in
-            # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
 
-    def selection_callback(self, *args):
-        self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
-        self.treeView.selectionModel().clearSelection()
-        sel = mc.ls(sl=True)
+    def find_and_select(self, sel=None):
+        if not sel:
+            sel = mc.ls(sl=True)
         if sel:
             checked = []
             for s in sel:
@@ -352,6 +342,14 @@ class MyDockingUI(QtWidgets.QWidget):
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+
+            return checked
+
+    def selection_callback(self, *args):
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
+        self.treeView.selectionModel().clearSelection()
+        self.select_current()
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
