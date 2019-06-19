@@ -73,12 +73,14 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        self.callback_ids = {}
+        self.callback_ids = []
         # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
-        # you making selection by code, to prevent that make sure to remove one of them before making selection
+        # you making selection by code, to prevent that make sure to break the loop by using variable
+        # self.is_selection_callback_active = False
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = event_id
+        self.callback_ids.append(event_id)
         self.destroyed.connect(lambda: self.unregister_callbacks())
+        self.is_selection_callback_active = True
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
@@ -87,7 +89,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def unregister_callbacks(self):
-        for _id in self.callback_ids.values():
+        for _id in self.callback_ids:
             om.MMessage.removeCallback(_id)
 
     def _setup_actions(self):
@@ -281,13 +283,12 @@ class MyDockingUI(QtWidgets.QWidget):
         corrisponding item in Maya scene.
         """
         # To exclude cycle caused by selection we need to break the loop before manually making selection
-        om.MMessage.removeCallback(self.callback_ids["SelectionChanged"])
+        self.is_selection_callback_active = False
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
-        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = event_id
+        self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -347,10 +348,11 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def selection_callback(self, *args):
         # To exclude cycle caused by selection we need to break the loop before manually making selection
-        self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
-        self.treeView.selectionModel().clearSelection()
-        self.find_and_select()
-        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
+        if self.is_selection_callback_active:
+            self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
+            self.treeView.selectionModel().clearSelection()
+            self.find_and_select()
+            self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
     def delete_instances():
