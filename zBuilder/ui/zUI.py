@@ -349,7 +349,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # To exclude cycle caused by selection we need to break the loop before manually making selection
         self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
         self.treeView.selectionModel().clearSelection()
-        self.select_current()
+        self.find_and_select()
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
