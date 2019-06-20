@@ -288,7 +288,10 @@ class MyDockingUI(QtWidgets.QWidget):
         mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            if mc.ls(nodes):
+                mc.select(nodes)
+            else:
+                mc.warning('Current selection is not found in the scene ! ')
         self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
