@@ -333,13 +333,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def find_and_select(self, sel=None):
         if not sel:
-            sel = mc.ls(sl=True)
+            sel = mc.ls(sl=True, long=True)
         if sel:
             checked = []
             for s in sel:
                 checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.DisplayRole,
-                                                   s.split('|')[-1],
+                                                   QtCore.Qt.UserRole + 4,
+                                                   s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
