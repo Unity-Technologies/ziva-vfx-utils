@@ -89,8 +89,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def unregister_callbacks(self):
-        for _id in self.callback_ids:
-            om.MMessage.removeCallback(_id)
+        for id_ in self.callback_ids:
+            om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
 
@@ -285,6 +285,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # To exclude cycle caused by selection we need to break the loop before manually making selection
         self.is_selection_callback_active = False
         indexes = self.treeView.selectedIndexes()
+        mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
