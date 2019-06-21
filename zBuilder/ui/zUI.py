@@ -341,7 +341,7 @@ class MyDockingUI(QtWidgets.QWidget):
             checked = []
             for s in sel:
                 checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.UserRole + 4,
+                                                   model.SceneGraphModel.fullNameRole,
                                                    s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
