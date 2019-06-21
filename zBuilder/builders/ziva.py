@@ -181,7 +181,9 @@ class Ziva(Builder):
             for attachment in attachment_names:
                 meshes.extend(mm.eval('zQuery -as -l {}'.format(attachment)))
                 meshes.extend(mm.eval('zQuery -at -l {}'.format(attachment)))
-        nodes.extend(self.__add_bodies(meshes))
+
+        if meshes:
+            nodes.extend(self.__add_bodies(meshes))
 
         # # find attahment source and or targets to add to nodes.................
         tissue_names = [x for x in nodes if mc.objectType(x) == 'zTissue']
