@@ -153,4 +153,4 @@ class ZivaBuildTestCase(VfxTestCase):
         z = zva.Ziva()
         z.retrieve_connections()
 
-        self.assertTrue(len(z.get_scene_items(type_filter='zTissue')))
+        self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
