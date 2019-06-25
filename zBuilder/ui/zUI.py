@@ -288,7 +288,12 @@ class MyDockingUI(QtWidgets.QWidget):
         mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            existing_nodes = mc.ls(nodes, long=True)
+            if len(existing_nodes) == len(nodes):
+                mc.select(nodes)
+            else:
+                missing_objs = list(set(nodes) - set(existing_nodes))
+                mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
         self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
@@ -321,7 +326,7 @@ class MyDockingUI(QtWidgets.QWidget):
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
+        sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
@@ -333,13 +338,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def find_and_select(self, sel=None):
         if not sel:
-            sel = mc.ls(sl=True)
+            sel = mc.ls(sl=True, long=True)
         if sel:
             checked = []
             for s in sel:
                 checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.DisplayRole,
-                                                   s.split('|')[-1],
+                                                   model.SceneGraphModel.fullNameRole,
+                                                   s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:

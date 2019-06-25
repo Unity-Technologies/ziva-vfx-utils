@@ -8,6 +8,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
     envRole = QtCore.Qt.UserRole + 3
+    fullNameRole = QtCore.Qt.UserRole + 4
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -75,6 +76,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                         if not attrs["enable"]["value"]:
                             env = False
             return env
+
+        if role == SceneGraphModel.fullNameRole:
+            return node.long_name
 
     def parent(self, index):
 
