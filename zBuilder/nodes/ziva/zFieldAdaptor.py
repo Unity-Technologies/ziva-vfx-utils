@@ -29,7 +29,6 @@ class FieldAdaptorNode(Ziva):
         self.input_field = get_field(scene_name)
         self.output_bodies = get_bodies(scene_name)
 
-
     @property
     def input_field(self):
         """ Name of parameter corresponding to maya node name.  Setting this
@@ -73,15 +72,15 @@ class FieldAdaptorNode(Ziva):
         permissive = kwargs.get('permissive', True)
 
         name = self.name
-        
+
         if not mc.objExists(name):
-            # the field adaptor node does not exist in scene, lets create it 
+            # the field adaptor node does not exist in scene, lets create it
             # then hook it up.
-            results_ = mc.createNode('zFieldAdaptor',name=name)
+            results_ = mc.createNode('zFieldAdaptor', name=name)
             clt = mc.ls(results_, type='zFieldAdaptor')[0]
             self.mobject = clt
             mc.rename(clt, name)
-            
+
         # check if field exists and if it does hook it up
         if mc.objExists(self.input_field):
             if not mc.isConnected('{}.message'.format(self.input_field), '{}.field'.format(name)):
@@ -90,7 +89,7 @@ class FieldAdaptorNode(Ziva):
         # check if bodies exist, if they do hook them up
         for output_body in self.output_bodies:
             # find exisiting connections on the bodies to adaptors as we
-            # can have multiple adaptors connected to a single body.  In this 
+            # can have multiple adaptors connected to a single body.  In this
             # case we need to hook it up to first availbale slot.
             exisiting = mc.listConnections('{}.fields'.format(output_body))
             exisiting_size = 0
@@ -98,13 +97,15 @@ class FieldAdaptorNode(Ziva):
                 exisiting_size = len(exisiting)
             else:
                 exisiting = []
-            
-            #if not mc.listConnections('{}.outField'.format(name)):    
+
+            #if not mc.listConnections('{}.outField'.format(name)):
             if name not in exisiting:
-                mc.connectAttr('{}.outField'.format(name),'{}.fields[{}]'.format(output_body,str(exisiting_size)))
+                mc.connectAttr('{}.outField'.format(name),
+                               '{}.fields[{}]'.format(output_body, str(exisiting_size)))
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)
+
 
 def get_bodies(zFieldAdaptor):
     """This gets the output bodies associated with a zFieldAdaptor.
@@ -115,9 +116,8 @@ def get_bodies(zFieldAdaptor):
     if mc.objExists('{}.outField'.format(zFieldAdaptor)):
         body = mc.listConnections('{}.outField'.format(zFieldAdaptor))
 
-    convert_to_long = mc.ls(body,l=True)
+    convert_to_long = mc.ls(body, l=True)
     return convert_to_long
-
 
 
 def get_field(zFieldAdaptor):
@@ -129,5 +129,5 @@ def get_field(zFieldAdaptor):
     if mc.objExists('{}.field'.format(zFieldAdaptor)):
         field = mc.listConnections('{}.field'.format(zFieldAdaptor))[0]
 
-    convert_to_long = mc.ls(field,l=True)[0]
+    convert_to_long = mc.ls(field, l=True)[0]
     return convert_to_long

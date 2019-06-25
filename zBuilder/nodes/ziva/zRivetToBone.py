@@ -27,7 +27,7 @@ class RivetToBoneNode(Ziva):
         scene_name = self.get_scene_name()
         curve_shape = mc.deformer(scene_name, q=True, g=True)[0]
         self.curve = mc.listRelatives(curve_shape, p=True, f=True)[0]
-        self.cv_indices = mc.getAttr(scene_name+'.cvIndices')
+        self.cv_indices = mc.getAttr(scene_name + '.cvIndices')
 
     @property
     def long_curve_name(self):
@@ -97,6 +97,6 @@ def is_cv_connected_to_rivet(crv, cv):
     hist = mc.listHistory(shape)
     rivets = mc.ls(hist, type='zRivetToBone')
     for rivet in rivets:
-        if mc.getAttr(rivet+'.cvIndices') == cv:
+        if mc.getAttr(rivet + '.cvIndices') == cv:
             return True
     return False

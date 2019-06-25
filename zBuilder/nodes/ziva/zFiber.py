@@ -28,8 +28,7 @@ class FiberNode(Ziva):
         Returns:
             list(): of long mesh names.
         """
-        return [self.long_association[0],
-                self.long_association[0]]
+        return [self.long_association[0], self.long_association[0]]
 
     def build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.
@@ -73,8 +72,7 @@ class FiberNode(Ziva):
                 self.mobject = results[0]
                 mc.rename(results[0], name)
         else:
-            logger.warning(
-                mesh + ' does not exist in scene, skipping zFiber creation')
+            logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
