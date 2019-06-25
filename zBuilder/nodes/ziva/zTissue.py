@@ -56,21 +56,30 @@ class TissueNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        tissue_items = self.builder.get_scene_items(type_filter='zTissue',
-                                                    name_filter=name_filter)
-        tet_items = self.builder.get_scene_items(type_filter='zTet',
-                                                 name_filter=name_filter)
+        tissue_items = self.builder.get_scene_items(type_filter='zTissue', name_filter=name_filter)
+        tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
 
         if self == tissue_items[0]:
-            build_multiple(tissue_items, tet_items,
+            build_multiple(tissue_items,
+                           tet_items,
                            attr_filter=attr_filter,
                            permissive=permissive,
                            solver=solver,
                            interp_maps=interp_maps)
 
+        # set the attributes in maya
+        for ztet, ztissue in zip(tet_items, tissue_items):
+            ztet.set_maya_attrs(attr_filter=attr_filter)
+            ztissue.set_maya_attrs(attr_filter=attr_filter)
+            ztet.set_maya_weights(interp_maps=interp_maps)
 
-def build_multiple(tissue_items, tet_items, interp_maps='auto',
-                   attr_filter=None, permissive=True, solver=None):
+
+def build_multiple(tissue_items,
+                   tet_items,
+                   interp_maps='auto',
+                   attr_filter=None,
+                   permissive=True,
+                   solver=None):
     """
     Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
@@ -106,25 +115,19 @@ def build_multiple(tissue_items, tet_items, interp_maps='auto',
             node.mobject = new
             mc.rename(new, name)
 
-        for new, name, node in zip(outs[2::4], tet_results['names'],
-                                   tet_results['parameters']):
+        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['parameters']):
             node.mobject = new
             mc.rename(new, name)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
-
-            # set the attributes in maya
-            ztet.set_maya_attrs(attr_filter=attr_filter)
-            ztissue.set_maya_attrs(attr_filter=attr_filter)
-            ztet.set_maya_weights(interp_maps=interp_maps)
-
             ztet.apply_user_tet_mesh()
 
             if ztissue.children_tissues:
                 """ If there are children lets check if there are parameters for
                 them.  If there are none, then lets check scene.
                 """
-                children_parms = ztissue.builder.get_scene_items(name_filter=ztissue.children_tissues)
+                children_parms = ztissue.builder.get_scene_items(
+                    name_filter=ztissue.children_tissues)
                 if children_parms:
                     children = [x.association[0] for x in children_parms]
                 else:

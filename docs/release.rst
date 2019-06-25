@@ -1,5 +1,11 @@
 Release Notes
 =============
+1.0.8
+-----
+* clamping values when interpolating maps
+* fix mirroring rivet issue
+* bug fixes
+
 1.0.7
 -----
 * Adding unit tests (CMT tools)

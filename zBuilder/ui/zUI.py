@@ -3,6 +3,7 @@ from functools import partial
 
 import maya.cmds as mc
 import maya.mel as mm
+import maya.OpenMaya as om
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -72,11 +73,24 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
+        self.callback_ids = []
+        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
+        # you making selection by code, to prevent that make sure to break the loop by using variable
+        # self.is_selection_callback_active = False
+        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
+        self.callback_ids.append(event_id)
+        self.destroyed.connect(lambda: self.unregister_callbacks())
+        self.is_selection_callback_active = True
+
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-        
+
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
+
+    def unregister_callbacks(self):
+        for id_ in self.callback_ids:
+            om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
 
@@ -264,14 +278,23 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def tree_changed(self):
+    def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        self.is_selection_callback_active = False
         indexes = self.treeView.selectedIndexes()
+        mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            existing_nodes = mc.ls(nodes, long=True)
+            if len(existing_nodes) == len(nodes):
+                mc.select(nodes)
+            else:
+                missing_objs = list(set(nodes) - set(existing_nodes))
+                mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
+        self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -303,26 +326,39 @@ class MyDockingUI(QtWidgets.QWidget):
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and 
+        sel = mc.ls(sl=True, long=True)
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+            checked = self.find_and_select(sel)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visible in
-            # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
 
+    def find_and_select(self, sel=None):
+        if not sel:
+            sel = mc.ls(sl=True, long=True)
+        if sel:
+            checked = []
+            for s in sel:
+                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                   model.SceneGraphModel.fullNameRole,
+                                                   s,
+                                                   -1,
+                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in checked:
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+
+            return checked
+
+    def selection_callback(self, *args):
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        if self.is_selection_callback_active:
+            self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
+            self.treeView.selectionModel().clearSelection()
+            self.find_and_select()
+            self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
     def delete_instances():

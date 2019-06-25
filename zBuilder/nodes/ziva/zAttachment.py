@@ -39,7 +39,6 @@ class AttachmentNode(Ziva):
         source_mesh = self.association[0]
         target_mesh = self.association[1]
 
-
         # check if both meshes exist
         if mz.check_body_type([source_mesh, target_mesh]):
             # check existing attachments in scene
@@ -89,5 +88,6 @@ class AttachmentNode(Ziva):
             if permissive:
                 logger.info('skipping attachment creation...' + name)
             else:
-                raise StandardError('Cannot create attachment between {} and {}.  Check meshes.'.format(source_mesh,target_mesh))
-
+                raise StandardError(
+                    'Cannot create attachment between {} and {}.  Check meshes.'.format(
+                        source_mesh, target_mesh))

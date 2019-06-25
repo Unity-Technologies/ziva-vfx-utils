@@ -66,9 +66,7 @@ class LineOfActionNode(Ziva):
                 mc.rename(name, self.name)
 
         else:
-            mc.warning(association[
-                           0] + ' mesh does not exists in scene, skippings line of action')
+            mc.warning(association[0] + ' mesh does not exists in scene, skippings line of action')
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-
