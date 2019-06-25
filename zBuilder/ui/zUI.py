@@ -26,7 +26,7 @@ def run():
     z = zva.Ziva()
     z.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node, builder=z)
+    dock_window(MyDockingUI, root_node=z.root_node)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -34,7 +34,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None, builder=None):
+    def __init__(self, parent=None, root_node=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -47,7 +47,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
-        self.builder = builder
 
         self.root_node = root_node
         self._model = model.SceneGraphModel(root_node)
@@ -65,9 +64,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
-        self.callback_ids = {}
-        self.callback_ids["AttributeChanged"] = []
-
         self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -77,9 +73,14 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
+        self.callback_ids = []
+        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
+        # you making selection by code, to prevent that make sure to break the loop by using variable
+        # self.is_selection_callback_active = False
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = [event_id]
+        self.callback_ids.append(event_id)
         self.destroyed.connect(lambda: self.unregister_callbacks())
+        self.is_selection_callback_active = True
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
@@ -87,13 +88,9 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
-    def unregister_callbacks(self, callbacks=None):
-        if not callbacks:
-            callbacks = self.callback_ids.keys()
-        for name in callbacks:
-            for _id in self.callback_ids[name]:
-                om.MMessage.removeCallback(_id)
-            self.callback_ids[name] = []
+    def unregister_callbacks(self):
+        for id_ in self.callback_ids:
+            om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
 
@@ -285,81 +282,19 @@ class MyDockingUI(QtWidgets.QWidget):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
-        om.MMessage.removeCallback(self.callback_ids["SelectionChanged"][-1])
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        self.is_selection_callback_active = False
         indexes = self.treeView.selectedIndexes()
+        mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
-        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionChanged"] = [event_id]
-
-    def get_maya_attr_from_plug(self, plug):
-        attr = plug.attribute()
-
-        if attr.hasFn(om.MFn.kNumericAttribute):
-            fnAttr = om.MFnNumericAttribute(attr)
-            real_type = fnAttr.unitType()
-
-            if real_type == om.MFnNumericData.kBoolean:
-                return plug.asBool()
-            elif real_type == om.MFnNumericData.kInt:
-                return plug.asInt()
+            existing_nodes = mc.ls(nodes, long=True)
+            if len(existing_nodes) == len(nodes):
+                mc.select(nodes)
             else:
-                return plug.asDouble()
-
-        elif attr.hasFn(om.MFn.kTypedAttribute):
-            fnAttr = om.MFnTypedAttribute(attr)
-            real_type = fnAttr.attrType()
-
-            if real_type == om.MFnData.kString:
-                return plug.asString()
-
-        elif attr.hasFn(om.MFn.kEnumAttribute):
-            return plug.asInt()
-
-    def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & om.MNodeMessage.kAttributeSet:
-            name = plug.name()
-            attr_name = name.split(".")[-1]
-            node_name = name.split(".")[0]
-            attr = self.get_maya_attr_from_plug(plug)
-            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
-            if attr_name in z_node.attrs:
-                z_node.attrs[attr_name]["value"] = attr
-            self.update_tree()
-
-    def update_tree(self):
-        self._model.beginResetModel()
-        self._model.endResetModel()
-
-        # Expand all zSolverTransform tree items-------------------------------
-        for row in range(self._proxy_model.rowCount()):
-            index = self._proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
-                self.treeView.expand(index)
-
-        sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and
-        # expand item in view.
-        if sel:
-            checked = []
-            for s in sel:
-                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.DisplayRole,
-                                                   s.split('|')[-1],
-                                                   -1,
-                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
-
-            # this works for a zBuilder view.  This is expanding the item
-            # selected and it's parent if any.  This makes it possible if you
-            # have a material or attachment selected, it will become visible in
-            # UI
-            if checked:
-                self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent())
+                missing_objs = list(set(nodes) - set(existing_nodes))
+                mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
+        self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -372,41 +307,58 @@ class MyDockingUI(QtWidgets.QWidget):
             root_node (:obj:`obj`, optional): The zBuilder root_node to build
                 tree from.  Defaults to None.
         """
-        if not root_node:
-            self.builder = zva.Ziva()
-            self.builder.retrieve_connections()
-            root_node = self.builder.root_node
 
-        scene_items = self.builder.get_scene_items()
+        if not root_node:
+            z = zva.Ziva()
+            z.retrieve_connections()
+            root_node = z.root_node
 
         self.root_node = root_node
 
+        self._model.beginResetModel()
         self._model.root_node = root_node
+        self._model.endResetModel()
 
-        self.unregister_callbacks(["AttributeChanged"])
+        # Expand all zSolverTransform tree items-------------------------------
+        for row in range(self._proxy_model.rowCount()):
+            index = self._proxy_model.index(row, 0)
+            node = index.data(model.SceneGraphModel.nodeRole)
+            if node.type == 'zSolverTransform':
+                self.treeView.expand(index)
 
-        for item in scene_items:
-            obj = item.mobject
-            _id = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(_id)
+        sel = mc.ls(sl=True, long=True)
+        # select item in treeview that is selected in maya to begin with and
+        # expand item in view.
+        if sel:
+            checked = self.find_and_select(sel)
 
-        self.update_tree()
+            if checked:
+                self.treeView.expand(checked[-1])
+                self.treeView.expand(checked[-1].parent())
 
-    def selection_callback(self, *args):
-        self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
-        self.treeView.selectionModel().clearSelection()
-        sel = mc.ls(sl=True)
+    def find_and_select(self, sel=None):
+        if not sel:
+            sel = mc.ls(sl=True, long=True)
         if sel:
             checked = []
             for s in sel:
                 checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   QtCore.Qt.DisplayRole,
-                                                   s.split('|')[-1],
+                                                   model.SceneGraphModel.fullNameRole,
+                                                   s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
-        self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
+
+            return checked
+
+    def selection_callback(self, *args):
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        if self.is_selection_callback_active:
+            self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
+            self.treeView.selectionModel().clearSelection()
+            self.find_and_select()
+            self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
     def delete_instances():
