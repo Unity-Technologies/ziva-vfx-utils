@@ -59,7 +59,7 @@ def build_multiple(scene_items, attr_filter=None, permissive=False):
     # cull none buildable------------------------------------------------------
     culled = mz.cull_creation_nodes(scene_items)
 
-    # build bones all at once--------------------------------------------------
+    # build all cloth at once--------------------------------------------------
     results = None
     if culled['meshes']:
         Ziva.check_meshes(culled['meshes'])
