@@ -288,10 +288,12 @@ class MyDockingUI(QtWidgets.QWidget):
         mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            if mc.ls(nodes):
+            existing_nodes = mc.ls(nodes, long=True)
+            if len(existing_nodes) == len(nodes):
                 mc.select(nodes)
             else:
-                mc.warning('Current selection is not found in the scene ! ')
+                missing_objs = list(set(nodes) - set(existing_nodes))
+                mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
         self.is_selection_callback_active = True
 
     def reset_tree(self, root_node=None):
@@ -324,7 +326,7 @@ class MyDockingUI(QtWidgets.QWidget):
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
+        sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
