@@ -12,13 +12,13 @@ import zBuilder.util as utility
 from vfx_test_case import VfxTestCase
 
 
-class ZivaBuildTestCase(VfxTestCase):
+class ZivaClothTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         pass
 
     def setUp(self):
-        super(ZivaBuildTestCase, self).setUp()
+        super(ZivaClothTestCase, self).setUp()
 
         # build a simple cloth scene
         a_cloth = mc.polySphere(n='l_arm')[0]
@@ -29,7 +29,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mm.eval('ziva -c')
 
     def tearDown(self):
-        super(ZivaBuildTestCase, self).tearDown()
+        super(ZivaClothTestCase, self).tearDown()
 
     def test_mirror_cloth(self):
         # this is a test for a bug in VFXACT-120
@@ -37,8 +37,6 @@ class ZivaBuildTestCase(VfxTestCase):
         # confused and assert.  This should not assert now and result in a mirror
         # there should be 2 zCloth nodes in scene when done.
         mc.select('l_arm')
-
-        import zBuilder.builders.ziva as zva
 
         z = zva.Ziva()
 
