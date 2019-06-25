@@ -122,7 +122,7 @@ class Ziva(Builder):
         If bodies is an empty list then it returns contents of whole scene.
         
         Args:
-            bodies (list()): The bodies to query.  Note this is 
+            bodies (list()): The bodies to query.
         
         Returns:
             list(): list of Ziva VFX nodes associated with bodies.  If nothing returns an empty list
