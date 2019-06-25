@@ -138,3 +138,19 @@ class ZivaBuildTestCase(VfxTestCase):
         print mesh.get_point_list()[0], rest_point_position
 
         self.assertTrue(mesh.get_point_list()[0] == rest_point_position)
+
+    def test_retrieve_connections_single(self):
+        # this tests retrieve_connections on a a full setup where you have 1 tissue
+        # selected with no attachments.  This was a bug fix.  The expected result
+        # is there should be 1 tissue in object.  What was happening is it was
+        # getting whole scene.
+
+        # the arm is built in scene so all we need to do is create sphere and retrieve
+        sph = mc.polySphere()
+        mm.eval('ziva -t')
+        mc.select(sph)
+
+        z = zva.Ziva()
+        z.retrieve_connections()
+
+        self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
