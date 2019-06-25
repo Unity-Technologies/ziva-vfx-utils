@@ -118,6 +118,16 @@ class Ziva(Builder):
             item._parent = parent_node
 
     def __add_bodies(self, bodies):
+        '''This is using zQuery -a under the hood.  It queries everything connected to bodies.  
+        If bodies is an empty list then it returns contents of whole scene.
+        
+        Args:
+            bodies (list()): The bodies to query.  Note this is 
+        
+        Returns:
+            list(): list of Ziva VFX nodes associated with bodies.  If nothing returns an empty list
+        '''
+
         # query all the ziva nodes---------------------------------------------
         mc.select(bodies)
         nodes = mm.eval('zQuery -a')
