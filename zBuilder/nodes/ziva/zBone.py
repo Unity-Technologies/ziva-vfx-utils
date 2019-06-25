@@ -41,10 +41,10 @@ class BoneNode(Ziva):
         # This feels kinda sloppy to me.
 
         if self == parameters[0]:
-            apply_multiple(parameters, attr_filter=attr_filter, permissive=permissive)
+            build_multiple(parameters, attr_filter=attr_filter, permissive=permissive)
 
 
-def apply_multiple(parameters, attr_filter=None, permissive=False):
+def build_multiple(parameters, attr_filter=None, permissive=False):
     """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
