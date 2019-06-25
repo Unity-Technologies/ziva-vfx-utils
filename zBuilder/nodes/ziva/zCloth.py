@@ -26,10 +26,11 @@ class ClothNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
+            name_filter (string OR list): name of zCloth objects to work with.  Defaults to all avaliable
+            
         """
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         scene_items = self.builder.bundle.get_scene_items(type_filter='zCloth',
                                                           name_filter=name_filter)
@@ -39,21 +40,21 @@ class ClothNode(Ziva):
         # This feels kinda sloppy to me.
 
         if self == scene_items[0]:
-            build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
+            build_multiple(scene_items, attr_filter=attr_filter)
 
 
-def build_multiple(scene_items, attr_filter=None, permissive=False):
+def build_multiple(scene_items, attr_filter=None):
     """ Each node can deal with it's own building.  Though, with zCLoth it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zCloth at once.
 
     Args:
-        permissive (bool):
-        parameters:
-        attr_filter (obj):
+        scene_items (list of obj): List of zBuilder objects to work with.
+        attr_filter (dict):  Attribute filter on what attributes to get.
+            dictionary is key value where key is node type and value is
+            list of attributes to use.
 
-    Returns:
-
+            tmp = {'zSolver':['substeps']}
     """
     sel = mc.ls(sl=True)
     # cull none buildable------------------------------------------------------
