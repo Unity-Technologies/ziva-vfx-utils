@@ -361,7 +361,8 @@ class MyDockingUI(QtWidgets.QWidget):
                 node = index.data(model.SceneGraphModel.nodeRole)
                 for prev_node in self.previous_selection:
                     if node.long_name == prev_node.long_name and node.parent().long_name == prev_node.parent().long_name:
-                        expand.append(index)
+                        if self.treeView.isExpanded(index):
+                            expand.append(index)
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
                 previous_selection.append(index.data(model.SceneGraphModel.nodeRole))
             self.previous_selection = previous_selection
