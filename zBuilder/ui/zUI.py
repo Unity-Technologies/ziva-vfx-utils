@@ -64,6 +64,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
+        self.previous_selection = []
+
         self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -330,16 +332,22 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = self.find_and_select(sel)
+            checked, expand = self.find_and_select(sel)
 
             if checked:
-                self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent())
+                if expand:
+                    for index in expand:
+                        self.treeView.expand(index)
+                        self.treeView.expand(index.parent())
+                else:
+                    self.treeView.expand(checked[0])
+                    self.treeView.expand(checked[0].parent())
 
     def find_and_select(self, sel=None):
         if not sel:
             sel = mc.ls(sl=True, long=True)
         if sel:
+            expand = []
             checked = []
             for s in sel:
                 checked += self._proxy_model.match(self._proxy_model.index(0, 0),
@@ -347,10 +355,17 @@ class MyDockingUI(QtWidgets.QWidget):
                                                    s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
-            return checked
+            previous_selection = []
+            for index in checked:
+                node = index.data(model.SceneGraphModel.nodeRole)
+                for prev_node in self.previous_selection:
+                    if node.long_name == prev_node.long_name and node.parent().long_name == prev_node.parent().long_name:
+                        expand.append(index)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+                previous_selection.append(index.data(model.SceneGraphModel.nodeRole))
+            self.previous_selection = previous_selection
+            return checked, expand
 
     def selection_callback(self, *args):
         # To exclude cycle caused by selection we need to break the loop before manually making selection
