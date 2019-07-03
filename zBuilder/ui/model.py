@@ -9,10 +9,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     nodeRole = QtCore.Qt.UserRole + 2
     envRole = QtCore.Qt.UserRole + 3
     fullNameRole = QtCore.Qt.UserRole + 4
+    expandedRole = QtCore.Qt.UserRole + 5
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         self.root_node = root
+        self.parent_ = parent
+        self.tree = parent.parent()
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -79,6 +82,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == SceneGraphModel.fullNameRole:
             return node.long_name
+
+        if role == SceneGraphModel.expandedRole:
+            index = self.parent_.mapFromSource(index)
+            if index.isValid():
+                return self.tree.isExpanded(index)
+            else:
+                return False
 
     def parent(self, index):
 
