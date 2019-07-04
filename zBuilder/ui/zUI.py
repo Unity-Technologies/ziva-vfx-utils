@@ -359,11 +359,11 @@ class MyDockingUI(QtWidgets.QWidget):
                                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
                         for index in indices:
                             self.treeView.expand(index)
-                else:
-                    self.treeView.expand(checked[0])
-                    parent = checked[0].parent()
-                    if parent.isValid():
-                        self.treeView.expand(parent)
+
+                self.treeView.expand(checked[0])
+                parent = checked[0].parent()
+                if parent.isValid():
+                    self.treeView.expand(parent)
 
     def find_and_select(self, sel=None):
         """
@@ -371,7 +371,6 @@ class MyDockingUI(QtWidgets.QWidget):
         :param sel: maya selection
         :return:
         checked - indices that match selection ( QModelIndex )
-        expand - indices that to expand ( QModelIndex )
         """
         if not sel:
             sel = mc.ls(sl=True, long=True)
