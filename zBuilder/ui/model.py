@@ -15,7 +15,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         super(SceneGraphModel, self).__init__(parent)
         self.root_node = root
         self.parent_ = parent
-        self.tree = parent.parent()
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -84,11 +83,21 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return node.long_name
 
         if role == SceneGraphModel.expandedRole:
-            index = self.parent_.mapFromSource(index)
+            # return if index is expanded if possible
+            # otherwise return None instead of False to simplify debugging
             if index.isValid():
-                return self.tree.isExpanded(index)
-            else:
-                return False
+                tree = None
+                if isinstance(self.parent_, QtWidgets.QTreeView):
+                    tree = self.parent_
+                elif self.parent_:
+                    if isinstance(self.parent_.parent(), QtWidgets.QTreeView):
+                        tree = self.parent_.parent()
+
+                if tree:
+                    index = self.parent_.mapFromSource(index)
+                    if index.isValid():
+                        return tree.isExpanded(index)
+            return None
 
     def parent(self, index):
 
