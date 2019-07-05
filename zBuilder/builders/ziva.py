@@ -102,23 +102,29 @@ class Ziva(Builder):
                 if parent_node:
                     parent_node.add_child(item)
 
+        rivets = {}
+        for x in self.get_scene_items(type_filter='zRivetToBone'):
+            if x.long_curve_name not in rivets:
+                rivets[x.long_curve_name] = []
+            rivets[x.long_curve_name].append(x)
+
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
 
             grp = Base()
             grp.name = item.long_association[0]
-            grp.type = 'ui_{}_body'.format('curve')
+            grp.type = 'ui_curve_body'
             grp.depends_on = item
             parent_node.add_child(grp)
             grp._parent = parent_node
 
             parent_node.add_child(item)
             item._parent = parent_node
-
-            for r_item in self.get_scene_items(type_filter='zRivetToBone'):
-                if r_item.long_curve_name == item.long_association[0]:
-                    grp.add_child(r_item)
-                    r_item._parent = grp
+            rivet_items = rivets.get(item.long_association[0], None)
+            if rivet_items:
+                for rivet in rivet_items:
+                    grp.add_child(rivet)
+                    rivet._parent = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
@@ -131,7 +137,7 @@ class Ziva(Builder):
             item._parent = parent_node
 
     def __add_bodies(self, bodies):
-        '''This is using zQuery -a under the hood.  It queries everything connected to bodies.  
+        '''This is using zQuery -a under the hood.  It queries everything connected to bodies.
         If bodies is an empty list then it returns contents of whole scene.
         
         Args:
