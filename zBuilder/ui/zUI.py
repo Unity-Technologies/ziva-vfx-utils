@@ -49,16 +49,18 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
         self.root_node = root_node
-        self._model = model.SceneGraphModel(root_node)
-        self._proxy_model = model.SceneSortFilterProxyModel()
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
         self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+
+        self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
         self.treeView.setModel(self._proxy_model)
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
@@ -313,6 +315,19 @@ class MyDockingUI(QtWidgets.QWidget):
             z.retrieve_connections()
             root_node = z.root_node
 
+        # currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole,
+                                           True,
+                                           -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+        # remember names of items to expand
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+
         self.root_node = root_node
 
         self._model.beginResetModel()
@@ -320,11 +335,12 @@ class MyDockingUI(QtWidgets.QWidget):
         self._model.endResetModel()
 
         # Expand all zSolverTransform tree items-------------------------------
-        for row in range(self._proxy_model.rowCount()):
-            index = self._proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
-                self.treeView.expand(index)
+        if not expanded:
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
 
         sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
@@ -333,10 +349,29 @@ class MyDockingUI(QtWidgets.QWidget):
             checked = self.find_and_select(sel)
 
             if checked:
-                self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent())
+                # keeps previous expansion if TreeView was updated
+                if expanded:
+                    for name in names_to_expand:
+                        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                          model.SceneGraphModel.fullNameRole,
+                                                          name,
+                                                          -1,
+                                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                        for index in indices:
+                            self.treeView.expand(index)
+
+                self.treeView.expand(checked[0])
+                parent = checked[0].parent()
+                if parent.isValid():
+                    self.treeView.expand(parent)
 
     def find_and_select(self, sel=None):
+        """
+        find and select items in the Tree View based on maya selection
+        :param sel: maya selection
+        :return:
+        checked - indices that match selection ( QModelIndex )
+        """
         if not sel:
             sel = mc.ls(sl=True, long=True)
         if sel:
@@ -347,9 +382,9 @@ class MyDockingUI(QtWidgets.QWidget):
                                                    s,
                                                    -1,
                                                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
-
             return checked
 
     def selection_callback(self, *args):
