@@ -13,6 +13,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
+        '''
+        expandedRole is not supported if parent == None
+        '''
         self.root_node = root
         self.parent_ = parent
 
@@ -85,19 +88,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.expandedRole:
             # return if index is expanded if possible
             # otherwise return None instead of False to simplify debugging
-            if index.isValid():
-                tree = None
-                if isinstance(self.parent_, QtWidgets.QTreeView):
-                    tree = self.parent_
-                elif self.parent_:
-                    if isinstance(self.parent_.parent(), QtWidgets.QTreeView):
-                        tree = self.parent_.parent()
+            tree = None
+            if isinstance(self.parent_, QtWidgets.QTreeView):
+                tree = self.parent_
+            elif self.parent_:
+                if isinstance(self.parent_.parent(), QtWidgets.QTreeView):
+                    tree = self.parent_.parent()
 
-                if tree:
-                    index = self.parent_.mapFromSource(index)
-                    if index.isValid():
-                        return tree.isExpanded(index)
-            return None
+            if tree:
+                index = self.parent_.mapFromSource(index)
+                if index.isValid():
+                    return tree.isExpanded(index)
+            else:
+                raise Exception("Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
 
     def parent(self, index):
 
