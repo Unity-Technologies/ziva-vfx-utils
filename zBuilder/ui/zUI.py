@@ -26,7 +26,7 @@ def run():
     z = zva.Ziva()
     z.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node, builder=z)
+    dock_window(MyDockingUI, builder=z)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -34,7 +34,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None, builder=None):
+    def __init__(self, parent=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -49,7 +49,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
 
-        self.root_node = root_node
+        self.root_node = None
+
+        if builder:
+            self.root_node = builder.root_node
 
         self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -57,7 +60,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
-        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._model = model.SceneGraphModel(self.root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
