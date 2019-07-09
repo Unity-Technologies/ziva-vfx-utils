@@ -17,16 +17,17 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
+import zBuilder.zMaya as mz
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
 
 
 def run():
-    z = zva.Ziva()
-    z.retrieve_connections()
+    builder = zva.Ziva()
+    builder.retrieve_connections()
 
-    dock_window(MyDockingUI, builder=z)
+    dock_window(MyDockingUI, builder=builder)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -49,10 +50,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
 
-        self.root_node = None
+        root_node = None
 
         if builder:
-            self.root_node = builder.root_node
+            root_node = builder.root_node
 
         self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -60,7 +61,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
-        self._model = model.SceneGraphModel(self.root_node, self._proxy_model)
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -72,7 +73,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.callback_ids = {}
 
-        self.reset_tree(root_node=self.root_node)
+        self.reset_tree(root_node=root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(32, 32))
@@ -310,39 +311,16 @@ class MyDockingUI(QtWidgets.QWidget):
                 mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
         self.is_selection_callback_active = True
 
-    def get_maya_attr_from_plug(self, plug):
-        attr = plug.attribute()
-
-        if attr.hasFn(om.MFn.kNumericAttribute):
-            fnAttr = om.MFnNumericAttribute(attr)
-            real_type = fnAttr.unitType()
-
-            if real_type == om.MFnNumericData.kBoolean:
-                return plug.asBool()
-            elif real_type == om.MFnNumericData.kInt:
-                return plug.asInt()
-            else:
-                return plug.asDouble()
-
-        elif attr.hasFn(om.MFn.kTypedAttribute):
-            fnAttr = om.MFnTypedAttribute(attr)
-            real_type = fnAttr.attrType()
-
-            if real_type == om.MFnData.kString:
-                return plug.asString()
-
-        elif attr.hasFn(om.MFn.kEnumAttribute):
-            return plug.asInt()
-
     def attribute_changed(self, msg, plug, other_plug, *clientData):
         if msg & om.MNodeMessage.kAttributeSet:
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
-            attr = self.get_maya_attr_from_plug(plug)
             z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
             if attr_name in z_node.attrs:
-                z_node.attrs[attr_name]["value"] = attr
+                attr_dict = mz.build_attr_key_values(node_name, [attr_name])
+                if attr_name in attr_dict:
+                    z_node.attrs[attr_name] = attr_dict[attr_name]
 
             # This updates TreeView UI ones attribute changed
             # without that it will be updated only when focus is moved to this widget
@@ -382,8 +360,6 @@ class MyDockingUI(QtWidgets.QWidget):
         for index in expanded:
             node = index.data(model.SceneGraphModel.nodeRole)
             names_to_expand.append(node.long_name)
-
-        self.root_node = root_node
 
         self.unregister_callbacks(["AttributeChanged"])
         self.callback_ids["AttributeChanged"] = []
