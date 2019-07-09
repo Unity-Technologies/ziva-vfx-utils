@@ -26,7 +26,7 @@ def run():
     z = zva.Ziva()
     z.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, root_node=z.root_node, builder=z)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -34,7 +34,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None):
+    def __init__(self, parent=None, root_node=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -47,6 +47,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        self.builder = builder
 
         self.root_node = root_node
 
@@ -66,6 +67,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
+        self.callback_ids = {}
+
         self.reset_tree(root_node=self.root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -75,12 +78,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
-        self.callback_ids = []
         # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
         # you making selection by code, to prevent that make sure to break the loop by using variable
         # self.is_selection_callback_active = False
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids.append(event_id)
+        self.callback_ids["SelectionCallback"] = [event_id]
         self.destroyed.connect(lambda: self.unregister_callbacks())
         self.is_selection_callback_active = True
 
@@ -90,9 +92,16 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
-    def unregister_callbacks(self):
-        for id_ in self.callback_ids:
-            om.MMessage.removeCallback(id_)
+    def unregister_callbacks(self, callback_names=None):
+        if callback_names:
+            for callback in callback_names:
+                if callback in self.callback_ids:
+                    for id_ in self.callback_ids[callback]:
+                        om.MMessage.removeCallback(id_)
+        else:
+            for ids in self.callback_ids.values():
+                for id_ in ids:
+                    om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
 
@@ -298,6 +307,47 @@ class MyDockingUI(QtWidgets.QWidget):
                 mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
         self.is_selection_callback_active = True
 
+    def get_maya_attr_from_plug(self, plug):
+        attr = plug.attribute()
+
+        if attr.hasFn(om.MFn.kNumericAttribute):
+            fnAttr = om.MFnNumericAttribute(attr)
+            real_type = fnAttr.unitType()
+
+            if real_type == om.MFnNumericData.kBoolean:
+                return plug.asBool()
+            elif real_type == om.MFnNumericData.kInt:
+                return plug.asInt()
+            else:
+                return plug.asDouble()
+
+        elif attr.hasFn(om.MFn.kTypedAttribute):
+            fnAttr = om.MFnTypedAttribute(attr)
+            real_type = fnAttr.attrType()
+
+            if real_type == om.MFnData.kString:
+                return plug.asString()
+
+        elif attr.hasFn(om.MFn.kEnumAttribute):
+            return plug.asInt()
+
+    def attribute_changed(self, msg, plug, other_plug, *clientData):
+        if msg & om.MNodeMessage.kAttributeSet:
+            name = plug.name()
+            attr_name = name.split(".")[-1]
+            node_name = name.split(".")[0]
+            attr = self.get_maya_attr_from_plug(plug)
+            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
+            if attr_name in z_node.attrs:
+                z_node.attrs[attr_name]["value"] = attr
+
+            # This updates TreeView UI ones attribute changed
+            # without that it will be updated only when focus is moved to this widget
+            # not the best solution and has be to revisited if better one found
+            # works faster then rebuilding TreeView
+            self.treeView.hide()
+            self.treeView.show()
+
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
@@ -311,9 +361,11 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            z = zva.Ziva()
-            z.retrieve_connections()
-            root_node = z.root_node
+            self.builder = zva.Ziva()
+            self.builder.retrieve_connections()
+            root_node = self.builder.root_node
+
+        scene_items = self.builder.get_scene_items()
 
         # currently expanded items
         expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
@@ -329,6 +381,14 @@ class MyDockingUI(QtWidgets.QWidget):
             names_to_expand.append(node.long_name)
 
         self.root_node = root_node
+
+        self.unregister_callbacks(["AttributeChanged"])
+        self.callback_ids["AttributeChanged"] = []
+
+        for item in scene_items:
+            obj = item.mobject
+            _id = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(_id)
 
         self._model.beginResetModel()
         self._model.root_node = root_node
@@ -348,6 +408,10 @@ class MyDockingUI(QtWidgets.QWidget):
         if sel:
             checked = self.find_and_select(sel)
 
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
+            # have a material or attachment selected, it will become visible in
+            # UI
             if checked:
                 # keeps previous expansion if TreeView was updated
                 if expanded:
