@@ -37,6 +37,7 @@ class Ziva(Builder):
 
     def get_parent(self):
         from zBuilder.nodes.base import Base
+        from zBuilder.nodes.dg_node import DGNode
 
         # reset stuff............
         for item in self.get_scene_items():
@@ -61,44 +62,46 @@ class Ziva(Builder):
             item._parent = parent_node
 
         # get bodies-----------------------------------------------------------
-        bodies = {}
+        self.bodies = {}
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
-            grp = Base()
+            grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = Base(deserialize=item.serialize())
+            grp.depends_on = DGNode(deserialize=item.serialize())
 
-            bodies[item.long_association[0]] = grp
+            grp.mobject = item.long_association[0]
+            self.bodies[item.long_association[0]] = grp
+            # add mobject
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             if item.type == 'zTissue':
                 if item.parent_tissue:
                     bd = mm.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
-                    parent_node = bodies.get(bd, self.root_node)
+                    parent_node = self.bodies.get(bd, self.root_node)
                 else:
                     parent_node = solver.get(item.solver, self.root_node)
             else:
                 parent_node = solver.get(item.solver, self.root_node)
 
-            bodies[item.long_association[0]]._parent = parent_node
-            parent_node.add_child(bodies[item.long_association[0]])
+            self.bodies[item.long_association[0]]._parent = parent_node
+            parent_node.add_child(self.bodies[item.long_association[0]])
 
-            bodies[item.long_association[0]].add_child(item)
-            item._parent = bodies[item.long_association[0]]
+            self.bodies[item.long_association[0]].add_child(item)
+            item._parent = self.bodies[item.long_association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
-            parent_node = bodies.get(item.long_association[0], self.root_node)
+            parent_node = self.bodies.get(item.long_association[0], self.root_node)
             parent_node.add_child(item)
             item._parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = bodies.get(item.long_association[0], None)
+            parent_node = self.bodies.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
                 item._parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = bodies.get(item.long_association[1], None)
+                parent_node = self.bodies.get(item.long_association[1], None)
                 if parent_node:
                     parent_node.add_child(item)
 
