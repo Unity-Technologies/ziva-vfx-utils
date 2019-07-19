@@ -329,6 +329,38 @@ class MyDockingUI(QtWidgets.QWidget):
             self.treeView.hide()
             self.treeView.show()
 
+    def node_renamed(self, msg, prev_name, *clientData):
+        '''
+        This triggers when node renamed in maya
+        Renames corresponding node in Scene Panel
+        :param msg: MObject
+        :param prev_name: previous name
+        :param clientData: custom data
+        :return: None
+        '''
+        m_dag_path = om.MDagPath()
+        if msg.hasFn(om.MFn.kDagNode):
+            om.MDagPath.getAPathTo(msg, m_dag_path)
+            current_full_name = m_dag_path.fullPathName()
+            name_split = current_full_name.split("|")
+            name_split[-1] = prev_name
+            prev_full_name = "|".join(name_split)
+        else:
+            prev_full_name = prev_name
+            dep_node = om.MFnDependencyNode(msg)
+            current_full_name = dep_node.name()
+        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                          model.SceneGraphModel.fullNameRole,
+                                          prev_full_name,
+                                          -1,
+                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        for index in indices:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            node.name = current_full_name
+
+        self.treeView.hide()
+        self.treeView.show()
+
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
@@ -361,13 +393,23 @@ class MyDockingUI(QtWidgets.QWidget):
             node = index.data(model.SceneGraphModel.nodeRole)
             names_to_expand.append(node.long_name)
 
-        self.unregister_callbacks(["AttributeChanged"])
+        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
         self.callback_ids["AttributeChanged"] = []
+        self.callback_ids["NameChanged"] = []
 
+        # connect callbacks from Ziva objects
         for item in scene_items:
             obj = item.mobject
             _id = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
             self.callback_ids["AttributeChanged"].append(_id)
+            _id = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(_id)
+
+        # connect callbacks for Maya meshes
+        for item in self.builder.bodies.values():
+            obj = item.mobject
+            _id = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(_id)
 
         self._model.beginResetModel()
         self._model.root_node = root_node
