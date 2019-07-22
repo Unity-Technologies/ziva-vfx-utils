@@ -311,6 +311,14 @@ class MyDockingUI(QtWidgets.QWidget):
                 mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
         self.is_selection_callback_active = True
 
+    def redraw_tree_view(self):
+        # This updates TreeView UI ones attribute changed
+        # without that it will be updated only when focus is moved to this widget
+        # not the best solution and has be to revisited if better one found
+        # works faster then rebuilding TreeView
+        self.treeView.hide()
+        self.treeView.show()
+
     def attribute_changed(self, msg, plug, other_plug, *clientData):
         if msg & om.MNodeMessage.kAttributeSet:
             name = plug.name()
@@ -322,12 +330,40 @@ class MyDockingUI(QtWidgets.QWidget):
                 if attr_name in attr_dict:
                     z_node.attrs[attr_name] = attr_dict[attr_name]
 
-            # This updates TreeView UI ones attribute changed
-            # without that it will be updated only when focus is moved to this widget
-            # not the best solution and has be to revisited if better one found
-            # works faster then rebuilding TreeView
-            self.treeView.hide()
-            self.treeView.show()
+        self.redraw_tree_view()
+
+    def node_renamed(self, msg, prev_name, *clientData):
+        '''
+        This triggers when node renamed in maya
+        Renames corresponding node in Scene Panel
+        :param msg: MObject
+        :param prev_name: previous name
+        :param clientData: custom data
+        :return: None
+        '''
+        if msg.hasFn(om.MFn.kDagNode):
+            m_dag_path = om.MDagPath()
+            om.MDagPath.getAPathTo(msg, m_dag_path)
+            full_path_name = m_dag_path.fullPathName()
+            name_split = full_path_name.split("|")
+            name_split[-1] = prev_name
+            current_full_name = full_path_name
+            prev_full_name = "|".join(name_split)
+        else:
+            dep_node = om.MFnDependencyNode(msg)
+            current_full_name = dep_node.name()
+            prev_full_name = prev_name
+
+        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                          model.SceneGraphModel.fullNameRole,
+                                          prev_full_name,
+                                          -1,
+                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        for index in indices:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            node.name = current_full_name
+
+        self.redraw_tree_view()
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -361,13 +397,23 @@ class MyDockingUI(QtWidgets.QWidget):
             node = index.data(model.SceneGraphModel.nodeRole)
             names_to_expand.append(node.long_name)
 
-        self.unregister_callbacks(["AttributeChanged"])
+        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
         self.callback_ids["AttributeChanged"] = []
+        self.callback_ids["NameChanged"] = []
 
+        # connect callbacks from Ziva objects
         for item in scene_items:
             obj = item.mobject
-            _id = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(_id)
+            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(id_)
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
+        # connect callbacks for Maya meshes
+        for item in self.builder.bodies.values():
+            obj = item.mobject
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
 
         self._model.beginResetModel()
         self._model.root_node = root_node
