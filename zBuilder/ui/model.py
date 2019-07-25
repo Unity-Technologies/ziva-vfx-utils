@@ -42,9 +42,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.EditRole:
             node = index.internalPointer()
             long_name = node.long_name
-            if value != long_name.split('|')[-1]:
-                mc.rename(long_name, value)
-                node.name = value
+            if value and value != long_name.split('|')[-1]:
+                name = mc.rename(long_name, value)
+                node.name = name
         super(SceneGraphModel, self).setData(index, value, role)
 
     def data(self, index, role):
