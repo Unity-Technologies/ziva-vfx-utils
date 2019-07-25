@@ -13,3 +13,13 @@ QTreeView::item
     border: none;
     height: 19px;
 }
+
+QTreeView QLineEdit
+{
+    font-size: 12px;
+    border: 2px solid rgb(77, 117, 144);
+    border-radius: 3px;
+    padding: 0 2px;
+    selection-background-color: rgb(81, 81, 81);
+    font-family: "Verdana";
+}

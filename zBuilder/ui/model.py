@@ -1,5 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
+import maya.cmds as mc
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -31,11 +32,20 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             return "Scene Items"
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            node = index.internalPointer()
+            long_name = node.long_name
+            if value and value != long_name.split('|')[-1]:
+                name = mc.rename(long_name, value)
+                node.name = name
+        super(SceneGraphModel, self).setData(index, value, role)
 
     def data(self, index, role):
 
