@@ -49,15 +49,13 @@ class TetNode(Ziva):
         """ Applies the user tet mesh if any.
         """
         if self.get_user_tet_mesh():
-            name =  self.get_scene_name()
+            name = self.get_scene_name()
             try:
-                mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
-                               name + '.iTet', f=True)
+                mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh', name + '.iTet', f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
-                print 'could not connect {}.worldMesh to {}.iTet'.format(
-                    user_mesh, name)
+                print 'could not connect {}.worldMesh to {}.iTet'.format(user_mesh, name)
 
     def build(self, *args, **kwargs):
         """ Builds the zTets in maya scene.
@@ -93,7 +91,9 @@ class TetNode(Ziva):
         if name:
             if not mc.objExists(name):
                 if permissive:
-                    logger.info('{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.format(mesh))
+                    logger.info(
+                        '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
+                        format(mesh))
             else:
                 new_name = mc.rename(name, self.name)
                 self.mobject = new_name
@@ -101,4 +101,3 @@ class TetNode(Ziva):
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=False)
-

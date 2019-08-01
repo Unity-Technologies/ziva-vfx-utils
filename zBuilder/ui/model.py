@@ -1,5 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
+import maya.cmds as mc
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -8,10 +9,16 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
     envRole = QtCore.Qt.UserRole + 3
+    fullNameRole = QtCore.Qt.UserRole + 4
+    expandedRole = QtCore.Qt.UserRole + 5
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
+        '''
+        expandedRole is not supported if parent == None
+        '''
         self.root_node = root
+        self.parent_ = parent
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -25,11 +32,20 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             return "Scene Items"
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            node = index.internalPointer()
+            long_name = node.long_name
+            if value and value != long_name.split('|')[-1]:
+                name = mc.rename(long_name, value)
+                node.name = name
+        super(SceneGraphModel, self).setData(index, value, role)
 
     def data(self, index, role):
 
@@ -75,6 +91,26 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                         if not attrs["enable"]["value"]:
                             env = False
             return env
+
+        if role == SceneGraphModel.fullNameRole:
+            return node.long_name
+
+        if role == SceneGraphModel.expandedRole:
+            # return if index is expanded if possible
+            # otherwise return None instead of False to simplify debugging
+            tree = None
+            if isinstance(self.parent_, QtWidgets.QTreeView):
+                tree = self.parent_
+            elif self.parent_:
+                if isinstance(self.parent_.parent(), QtWidgets.QTreeView):
+                    tree = self.parent_.parent()
+
+            if tree:
+                index = self.parent_.mapFromSource(index)
+                if index.isValid():
+                    return tree.isExpanded(index)
+            else:
+                raise Exception("Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
 
     def parent(self, index):
 

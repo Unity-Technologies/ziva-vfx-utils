@@ -3,6 +3,7 @@ from functools import partial
 
 import maya.cmds as mc
 import maya.mel as mm
+import maya.OpenMaya as om
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -16,16 +17,17 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
+import zBuilder.zMaya as mz
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
 
 
 def run():
-    z = zva.Ziva()
-    z.retrieve_connections()
+    builder = zva.Ziva()
+    builder.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, builder=builder)
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -33,7 +35,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None):
+    def __init__(self, parent=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -46,24 +48,32 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        self.builder = builder
 
-        self.root_node = root_node
-        self._model = model.SceneGraphModel(root_node)
-        self._proxy_model = model.SceneSortFilterProxyModel()
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        root_node = None
+
+        if builder:
+            root_node = builder.root_node
 
         self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+
+        self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
         self.treeView.setModel(self._proxy_model)
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
-        self.reset_tree(root_node=self.root_node)
+        self.callback_ids = {}
+
+        self.reset_tree(root_node=root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(32, 32))
@@ -72,13 +82,30 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tool_bar)
         self.main_layout.addWidget(self.treeView)
 
+        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
+        # you making selection by code, to prevent that make sure to break the loop by using variable
+        # self.is_selection_callback_active = False
+        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
+        self.callback_ids["SelectionCallback"] = [event_id]
+        self.destroyed.connect(lambda: self.unregister_callbacks())
+        self.is_selection_callback_active = True
+
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-        
+
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
 
-        self.weights = []
+    def unregister_callbacks(self, callback_names=None):
+        if callback_names:
+            for callback in callback_names:
+                if callback in self.callback_ids:
+                    for id_ in self.callback_ids[callback]:
+                        om.MMessage.removeCallback(id_)
+        else:
+            for ids in self.callback_ids.values():
+                for id_ in ids:
+                    om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
 
@@ -118,21 +145,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectFiberCurve.setText('Select Curve')
         self.actionSelectFiberCurve.setObjectName("selectCurve")
         self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
-
-        self.actionCopyWeight = QtWidgets.QAction(self)
-        self.actionCopyWeight.setText('Copy Weight')
-        self.actionCopyWeight.setObjectName("actionCopyWeight")
-        self.actionCopyWeight.triggered.connect(self.copy_weight)
-
-        self.actionInvertWeight = QtWidgets.QAction(self)
-        self.actionInvertWeight.setText('Invert Weight')
-        self.actionInvertWeight.setObjectName("actionCopyWeight")
-        self.actionInvertWeight.triggered.connect(self.invert_weight)
-
-        self.actionPasteWeight = QtWidgets.QAction(self)
-        self.actionPasteWeight.setText('Paste Weight')
-        self.actionPasteWeight.setObjectName("actionPasteWeight")
-        self.actionPasteWeight.triggered.connect(self.paste_weight)
 
         self.actionPaintByProx = QtWidgets.QAction(self)
         self.actionPaintByProx.setText('Paint By Proximity UI')
@@ -245,95 +257,113 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-        #if len(indexes) == 1:
-        node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if len(indexes) == 1:
+            node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-        menu = QtWidgets.QMenu()
+            menu = QtWidgets.QMenu()
 
-        if node.type == 'zTet':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zTet':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zFiber':
-            menu.addAction(self.actionPaintWeight)
-            menu.addAction(self.actionPaintEndPoints)
-            menu.addSection('')
-            menu.addAction(self.actionCopyWeight)
-            menu.addAction(self.actionPasteWeight)
-            menu.addAction(self.actionInvertWeight)
+            if node.type == 'zFiber':
+                menu.addAction(self.actionPaintWeight)
+                menu.addAction(self.actionPaintEndPoints)
+                menu.addSection('')
 
-        if node.type == 'zMaterial':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zMaterial':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zEmbedder':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
+            if node.type == 'zEmbedder':
+                menu.addAction(self.actionPaintWeight)
+                menu.addSection('')
 
-        if node.type == 'zAttachment':
-            menu.addAction(self.actionPaintSource)
-            menu.addAction(self.actionPaintTarget)
-            menu.addSection('')
-            menu.addAction(self.actionPaintByProx)
-            menu.addAction(self.actionPaintByProx_1_2)
-            menu.addAction(self.actionPaintByProx_1_10)
-            menu.addAction(self.actionSelectST)
+            if node.type == 'zAttachment':
+                menu.addAction(self.actionPaintSource)
+                menu.addAction(self.actionPaintTarget)
+                menu.addSection('')
+                menu.addAction(self.actionPaintByProx)
+                menu.addAction(self.actionPaintByProx_1_2)
+                menu.addAction(self.actionPaintByProx_1_10)
+                menu.addAction(self.actionSelectST)
 
-        if node.type == 'zLineOfAction':
-            menu.addAction(self.actionSelectFiberCurve)
+            if node.type == 'zLineOfAction':
+                menu.addAction(self.actionSelectFiberCurve)
 
-        menu.exec_(self.treeView.viewport().mapToGlobal(position))
+            menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def tree_changed(self):
+    def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
         corrisponding item in Maya scene.
         """
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        self.is_selection_callback_active = False
         indexes = self.treeView.selectedIndexes()
+        mc.select(clear=True)
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            existing_nodes = mc.ls(nodes, long=True)
+            if len(existing_nodes) == len(nodes):
+                mc.select(nodes)
+            else:
+                missing_objs = list(set(nodes) - set(existing_nodes))
+                mc.warning('These objects are not found in the scene: ' + ', '.join(missing_objs))
+        self.is_selection_callback_active = True
 
-    def copy_weight(self):
-        
-        indexes = self.treeView.selectedIndexes()
-        tmp = []
-        for i in indexes:
-            node = i.data(model.SceneGraphModel.nodeRole)
-            mesh = node.association[0]
-            vert_count = mc.polyEvaluate(mesh, v=True)
-            tmp.append(mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1)))
+    def redraw_tree_view(self):
+        # This updates TreeView UI ones attribute changed
+        # without that it will be updated only when focus is moved to this widget
+        # not the best solution and has be to revisited if better one found
+        # works faster then rebuilding TreeView
+        self.treeView.hide()
+        self.treeView.show()
 
-        self.weights = [sum(i) for i in zip(*tmp)]
-        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
-        print mesh, self.weights
+    def attribute_changed(self, msg, plug, other_plug, *clientData):
+        if msg & om.MNodeMessage.kAttributeSet:
+            name = plug.name()
+            attr_name = name.split(".")[-1]
+            node_name = name.split(".")[0]
+            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
+            if attr_name in z_node.attrs:
+                attr_dict = mz.build_attr_key_values(node_name, [attr_name])
+                if attr_name in attr_dict:
+                    z_node.attrs[attr_name] = attr_dict[attr_name]
 
-    def invert_weight(self):
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mesh = node.association[0]
-        vert_count = mc.polyEvaluate(mesh, v=True)
-        weights = mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1))
-        weights = [1-x for x in weights]
+        self.redraw_tree_view()
 
-        map_ = node.name+'.weightList[0].weights'
-        tmp = []
-        for w in weights:
-            tmp.append(str(w))
-        val = ' '.join(tmp)
-        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
-        mm.eval(cmd)
+    def node_renamed(self, msg, prev_name, *clientData):
+        '''
+        This triggers when node renamed in maya
+        Renames corresponding node in Scene Panel
+        :param msg: MObject
+        :param prev_name: previous name
+        :param clientData: custom data
+        :return: None
+        '''
+        if msg.hasFn(om.MFn.kDagNode):
+            m_dag_path = om.MDagPath()
+            om.MDagPath.getAPathTo(msg, m_dag_path)
+            full_path_name = m_dag_path.fullPathName()
+            name_split = full_path_name.split("|")
+            name_split[-1] = prev_name
+            current_full_name = full_path_name
+            prev_full_name = "|".join(name_split)
+        else:
+            dep_node = om.MFnDependencyNode(msg)
+            current_full_name = dep_node.name()
+            prev_full_name = prev_name
 
-    def paste_weight(self):
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        map_ = node.name+'.weightList[0].weights'
-        tmp = []
-        for w in self.weights:
-            tmp.append(str(w))
-        val = ' '.join(tmp)
-        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
-        mm.eval(cmd)
-       
+        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                          model.SceneGraphModel.fullNameRole,
+                                          prev_full_name,
+                                          -1,
+                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        for index in indices:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            node.name = current_full_name
+
+        self.redraw_tree_view()
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -348,43 +378,111 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            z = zva.Ziva()
-            z.retrieve_connections()
-            root_node = z.root_node
+            self.builder = zva.Ziva()
+            self.builder.retrieve_connections()
+            root_node = self.builder.root_node
 
-        self.root_node = root_node
+        scene_items = self.builder.get_scene_items()
+
+        # currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole,
+                                           True,
+                                           -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+        # remember names of items to expand
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+
+        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+        self.callback_ids["AttributeChanged"] = []
+        self.callback_ids["NameChanged"] = []
+
+        # connect callbacks from Ziva objects
+        for item in scene_items:
+            obj = item.mobject
+            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(id_)
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
+        # connect callbacks for Maya meshes
+        for item in self.builder.bodies.values():
+            obj = item.mobject
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
 
         self._model.beginResetModel()
         self._model.root_node = root_node
         self._model.endResetModel()
 
         # Expand all zSolverTransform tree items-------------------------------
-        for row in range(self._proxy_model.rowCount()):
-            index = self._proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
-                self.treeView.expand(index)
+        if not expanded:
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and 
+        sel = mc.ls(sl=True, long=True)
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+            checked = self.find_and_select(sel)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
             # have a material or attachment selected, it will become visible in
             # UI
             if checked:
-                self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent())
+                # keeps previous expansion if TreeView was updated
+                if expanded:
+                    for name in names_to_expand:
+                        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                          model.SceneGraphModel.fullNameRole,
+                                                          name,
+                                                          -1,
+                                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                        for index in indices:
+                            self.treeView.expand(index)
 
+                self.treeView.expand(checked[0])
+                parent = checked[0].parent()
+                if parent.isValid():
+                    self.treeView.expand(parent)
+
+    def find_and_select(self, sel=None):
+        """
+        find and select items in the Tree View based on maya selection
+        :param sel: maya selection
+        :return:
+        checked - indices that match selection ( QModelIndex )
+        """
+        if not sel:
+            sel = mc.ls(sl=True, long=True)
+        if sel:
+            checked = []
+            for s in sel:
+                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                   model.SceneGraphModel.fullNameRole,
+                                                   s,
+                                                   -1,
+                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+            for index in checked:
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+            return checked
+
+    def selection_callback(self, *args):
+        # To exclude cycle caused by selection we need to break the loop before manually making selection
+        if self.is_selection_callback_active:
+            self.treeView.selectionModel().selectionChanged.disconnect(self.tree_changed)
+            self.treeView.selectionModel().clearSelection()
+            self.find_and_select()
+            self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
     @staticmethod
     def delete_instances():
