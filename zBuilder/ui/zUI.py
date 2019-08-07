@@ -345,8 +345,6 @@ class MyDockingUI(QtWidgets.QWidget):
             m_dag_path = om.MDagPath()
             om.MDagPath.getAPathTo(msg, m_dag_path)
             full_path_name = m_dag_path.fullPathName()
-            name_split = full_path_name.split("|")
-            name_split[-1] = prev_name
             current_full_name = full_path_name
         else:
             dep_node = om.MFnDependencyNode(msg)
