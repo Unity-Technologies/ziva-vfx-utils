@@ -348,20 +348,16 @@ class MyDockingUI(QtWidgets.QWidget):
             name_split = full_path_name.split("|")
             name_split[-1] = prev_name
             current_full_name = full_path_name
-            prev_full_name = "|".join(name_split)
         else:
             dep_node = om.MFnDependencyNode(msg)
             current_full_name = dep_node.name()
-            prev_full_name = prev_name
 
-        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                          model.SceneGraphModel.fullNameRole,
-                                          prev_full_name,
-                                          -1,
-                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-        for index in indices:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            node.name = current_full_name
+        scene_items = self.builder.get_scene_items()
+
+        for item in scene_items:
+            if msg == item.mobject:
+                item.name = current_full_name
+                break
 
         self.redraw_tree_view()
 
