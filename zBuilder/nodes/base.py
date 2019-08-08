@@ -129,9 +129,12 @@ class Base(object):
             dict: of serializable items
         """
         # removing and storing mobject as a string (object name)
-        if hasattr(self, '__mobject'):
-            if self.__mobject:
-                self.__mobject = mz.get_name_from_m_object(self.__mobject)
+        if hasattr(self, '__mobjectHandle'):
+            if self.__mobject_handle:
+                if self.mobject:
+                    self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+                else:
+                    self.__mobject_handle = None
 
         # culling __dict__ of any non-serializable items so we can save as json
         output = dict()
