@@ -25,7 +25,9 @@ class Ziva(Builder):
     """
 
     def __init__(self):
-        Builder.__init__(self)
+        super(Ziva, self).__init__()
+
+        self.bodies = {}
 
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
@@ -62,7 +64,6 @@ class Ziva(Builder):
             item._parent = parent_node
 
         # get bodies-----------------------------------------------------------
-        self.bodies = {}
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             grp = DGNode()
             grp.name = item.long_association[0]
