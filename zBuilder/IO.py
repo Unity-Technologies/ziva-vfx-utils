@@ -45,8 +45,12 @@ def dump_json(file_path, json_data):
     """
     try:
         with open(file_path, 'w') as outfile:
-            json.dump(json_data, outfile, cls=BaseNodeEncoder,
-                      sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(json_data,
+                      outfile,
+                      cls=BaseNodeEncoder,
+                      sort_keys=True,
+                      indent=4,
+                      separators=(',', ': '))
     except IOError:
         logger.error("Error: can\'t find file or write data")
     else:
@@ -145,7 +149,6 @@ def update_json(json_object):
     replace_me['_zFiber'] = 'fiber'
     replace_me['_SkinClusterNode__influneces'] = 'influences'
 
-
     if '_class' in json_object:
         for key, value in json_object.iteritems():
             if key in replace_me:
@@ -191,5 +194,3 @@ def check_data(data):
         if len(data) == 3:
             tmp.append(wrap_data(data[2], 'info'))
         return tmp
-
-

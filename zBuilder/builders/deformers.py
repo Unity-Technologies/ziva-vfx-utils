@@ -24,8 +24,7 @@ class Deformers(Builder):
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_map_names', True)
 
-        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
-                   'blendShape', 'wrap']
+        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
         tmp = list()
         history = mc.listHistory(selection, f=True)
         history.extend(mc.listHistory(selection))
@@ -46,9 +45,7 @@ class Deformers(Builder):
         attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
-        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine',
-                   'blendShape', 'wrap']
-        parameters = self.get_scene_items(name_filter=name_filter,
-                                          type_filter=acquire)
+        acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
+        parameters = self.get_scene_items(name_filter=name_filter, type_filter=acquire)
         for parameter in parameters:
             parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
