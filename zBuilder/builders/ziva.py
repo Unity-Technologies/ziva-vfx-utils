@@ -25,7 +25,7 @@ class Ziva(Builder):
     """
 
     def __init__(self):
-        Builder.__init__(self)
+        super(Ziva, self).__init__()
 
         self.bodies = {}
 
