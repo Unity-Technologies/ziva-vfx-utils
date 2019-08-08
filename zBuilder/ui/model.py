@@ -45,7 +45,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if value and value != long_name.split('|')[-1]:
                 name = mc.rename(long_name, value)
                 node.name = name
-        super(SceneGraphModel, self).setData(index, value, role)
+        return super(SceneGraphModel, self).setData(index, value, role)
 
     def data(self, index, role):
 
