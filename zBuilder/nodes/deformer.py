@@ -9,10 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class Deformer(DGNode):
-
     def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
-        DGNode.__init__(self, parent=parent, maya_node=maya_node, builder=builder, deserialize=deserialize)
-        
+        DGNode.__init__(self,
+                        parent=parent,
+                        maya_node=maya_node,
+                        builder=builder,
+                        deserialize=deserialize)
 
     def spawn_parameters(self):
         """
@@ -72,8 +74,7 @@ class Deformer(DGNode):
         """
         meshes = list()
         for mesh_name in self.get_map_meshes():
-            meshes.extend(self.builder.get_scene_items(type_filter='mesh',
-                                                       name_filter=mesh_name))
+            meshes.extend(self.builder.get_scene_items(type_filter='mesh', name_filter=mesh_name))
         return meshes
 
     def get_map_objects(self):
@@ -84,8 +85,8 @@ class Deformer(DGNode):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(self.builder.bundle.get_scene_items(type_filter='map',
-                                                             name_filter=map_name))
+            maps_.extend(
+                self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_name))
         return maps_
 
     def get_map_names(self):
@@ -137,8 +138,7 @@ class Deformer(DGNode):
 
         self.check_map_interpolation(interp_maps)
         for map_ in maps:
-            map_data = self.builder.bundle.get_scene_items(type_filter='map',
-                                                           name_filter=map_)
+            map_data = self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_)
             if map_data:
                 map_data = map_data[0]
 
@@ -152,14 +152,12 @@ class Deformer(DGNode):
                         for w in weight_list:
                             tmp.append(str(w))
                         val = ' '.join(tmp)
-                        cmd = "setAttr " + '%s[0:%d] ' % (
-                            map_, len(weight_list) - 1) + val
+                        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weight_list) - 1) + val
                         mm.eval(cmd)
                 else:
                     # applying doubleArray maps
                     if mc.objExists(map_):
                         mc.setAttr(map_, weight_list, type='doubleArray')
-
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if

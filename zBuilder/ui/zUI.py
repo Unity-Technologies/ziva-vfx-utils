@@ -111,8 +111,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
-                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
@@ -154,43 +153,31 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
         self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
-                                                             .1,
-                                                             .2))
+        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox, .1, .2))
 
         self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
         self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
-                                                              .1,
-                                                              10))
+        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox, .1, 10))
         self.actionPaintSource = QtWidgets.QAction(self)
         self.actionPaintSource.setText('Paint - source weights')
         self.actionPaintSource.setObjectName("paintSource")
-        self.actionPaintSource.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintSource.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintTarget = QtWidgets.QAction(self)
         self.actionPaintTarget.setText('Paint - target weights')
         self.actionPaintTarget.setObjectName("paintTarget")
-        self.actionPaintTarget.triggered.connect(partial(self.paint_weights,
-                                                         1,
-                                                         'weights'))
+        self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
 
         self.actionPaintWeight = QtWidgets.QAction(self)
         self.actionPaintWeight.setText('Paint - weights')
         self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintWeight.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintEndPoints = QtWidgets.QAction(self)
         self.actionPaintEndPoints.setText('Paint - endPoints')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
-        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
-                                                            0,
-                                                            'endPoints'))
+        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
     def paint_by_prox_options(self):
         """Brings up UI for painting by proximity.
@@ -228,7 +215,8 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mesh = node.long_association[association_idx]
         mc.select(mesh, r=True)
-        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type, node.long_name, attribute)
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
+            node.type, node.long_name, attribute)
         mm.eval(cmd)
 
     def select_source_and_target(self):
@@ -380,9 +368,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         # currently expanded items
         expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                           model.SceneGraphModel.expandedRole,
-                                           True,
-                                           -1,
+                                           model.SceneGraphModel.expandedRole, True, -1,
                                            QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
 
         # remember names of items to expand
@@ -435,11 +421,9 @@ class MyDockingUI(QtWidgets.QWidget):
                 # keeps previous expansion if TreeView was updated
                 if expanded:
                     for name in names_to_expand:
-                        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                          model.SceneGraphModel.fullNameRole,
-                                                          name,
-                                                          -1,
-                                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                        indices = self._proxy_model.match(
+                            self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                            -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
                         for index in indices:
                             self.treeView.expand(index)
 
@@ -460,11 +444,9 @@ class MyDockingUI(QtWidgets.QWidget):
         if sel:
             checked = []
             for s in sel:
-                checked += self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   model.SceneGraphModel.fullNameRole,
-                                                   s,
-                                                   -1,
-                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                checked += self._proxy_model.match(
+                    self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, s, -1,
+                    QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
 
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
@@ -485,7 +467,7 @@ class MyDockingUI(QtWidgets.QWidget):
                 ins.setParent(None)
                 ins.deleteLater()
             except:
-                # ignore the fact that the actual parent has already been 
+                # ignore the fact that the actual parent has already been
                 # deleted by Maya...
                 pass
 
@@ -494,4 +476,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-

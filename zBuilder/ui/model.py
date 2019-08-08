@@ -110,7 +110,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 if index.isValid():
                     return tree.isExpanded(index)
             else:
-                raise Exception("Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
+                raise Exception(
+                    "Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
 
     def parent(self, index):
 
@@ -160,7 +161,7 @@ class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
             env = model.data(index_model, model.envRole)
             if not env:
                 if option.state & QtWidgets.QStyle.State_Selected:
-                    option.state &= ~ QtWidgets.QStyle.State_Selected
+                    option.state &= ~QtWidgets.QStyle.State_Selected
                     option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
                 else:
                     option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))

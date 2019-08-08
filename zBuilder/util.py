@@ -52,5 +52,3 @@ def check_map_validity():
     mz.check_map_validity(z.get_scene_items(type_filter='map'))
 
     mc.select(sel, r=True)
-
-

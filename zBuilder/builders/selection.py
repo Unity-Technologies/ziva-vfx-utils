@@ -5,6 +5,7 @@ import maya.cmds as mc
 class Selection(Builder):
     """Storing maya selection.
     """
+
     def __init__(self):
         Builder.__init__(self)
 

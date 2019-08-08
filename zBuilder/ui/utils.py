@@ -15,8 +15,12 @@ def dock_window(dialog_class, *args, **kwargs):
         pass
 
     # building the workspace control with maya.cmds
-    main_control = mc.workspaceControl(dialog_class.CONTROL_NAME, ttc=["AttributeEditor", -1], iw=300, mw=100,
-                                       wp='preferred', label=dialog_class.DOCK_LABEL_NAME)
+    main_control = mc.workspaceControl(dialog_class.CONTROL_NAME,
+                                       ttc=["AttributeEditor", -1],
+                                       iw=300,
+                                       mw=100,
+                                       wp='preferred',
+                                       label=dialog_class.DOCK_LABEL_NAME)
 
     # now lets get a C++ pointer to it using OpenMaya
     control_widget = omui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
@@ -31,5 +35,3 @@ def dock_window(dialog_class, *args, **kwargs):
     mc.evalDeferred(lambda *args: mc.workspaceControl(main_control, e=True, rs=True))
 
     win.run()
-
-

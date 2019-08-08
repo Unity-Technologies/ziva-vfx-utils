@@ -9,7 +9,6 @@ import maya.cmds as mc
 import time
 import json
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,8 +24,7 @@ class Base(object):
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._builder_type = self.__class__.__module__.split('.')
-        self._builder_type = '{}.{}'.format(self._builder_type[0],
-                                            self._builder_type[1])
+        self._builder_type = '{}.{}'.format(self._builder_type[0], self._builder_type[1])
 
         self.builder = kwargs.get('builder', None)
         deserialize = kwargs.get('deserialize', None)
@@ -183,9 +181,7 @@ class Base(object):
                         new_names.append(new_name)
                         self.__dict__[item] = new_names
             elif isinstance(self.__dict__[item], basestring):
-                self.__dict__[item] = mz.replace_long_name(search,
-                                                           replace,
-                                                           self.__dict__[item])
+                self.__dict__[item] = mz.replace_long_name(search, replace, self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
                 new_names = []
                 self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])

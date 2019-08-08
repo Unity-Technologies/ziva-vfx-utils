@@ -41,14 +41,12 @@ class Bundle(object):
                 Defaults to :obj:`list`
         """
 
-        for scene_item in self.get_scene_items(type_filter=type_filter,
-                                              name_filter=name_filter):
+        for scene_item in self.get_scene_items(type_filter=type_filter, name_filter=name_filter):
             print scene_item
 
         print '----------------------------------------------------------------'
 
     def compare(self, type_filter=list(), name_filter=list()):
-
         """
         Compares info in memory with that which is in scene.
 
@@ -60,8 +58,7 @@ class Bundle(object):
 
         """
 
-        for scene_item in self.get_scene_items(type_filter=type_filter,
-                                              name_filter=name_filter):
+        for scene_item in self.get_scene_items(type_filter=type_filter, name_filter=name_filter):
             scene_item.compare()
 
     def stats(self, type_filter=str()):
@@ -108,7 +105,9 @@ class Bundle(object):
         """
 
         if scene_item in self.scene_items:
-            self.scene_items = [scene_item if item == scene_item else item for item in self.scene_items]
+            self.scene_items = [
+                scene_item if item == scene_item else item for item in self.scene_items
+            ]
         else:
             self.scene_items.append(scene_item)
 
@@ -132,13 +131,13 @@ class Bundle(object):
         """
         self.scene_items.remove(scene_item)
 
-    def get_scene_items(self, type_filter=list(),
+    def get_scene_items(self,
+                        type_filter=list(),
                         name_filter=list(),
                         name_regex=None,
                         association_filter=list(),
                         association_regex=None,
                         invert_match=False):
-
         """
         Gets the scene items from builder for further inspection or modification.
 
@@ -186,8 +185,7 @@ class Bundle(object):
             if hasattr(item, 'association'):
                 if association_set and association_set.isdisjoint(item.association):
                     return invert
-                if association_regex and not re.search(association_regex,
-                                                       item.association):
+                if association_regex and not re.search(association_regex, item.association):
                     return invert
 
             if name_regex and not re.search(name_regex, item.name):

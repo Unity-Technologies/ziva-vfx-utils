@@ -52,7 +52,8 @@ class DGNode(Base):
         if self.name:
             name = self.name
             output = ''
-            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
+            output += '= {} <{} {}> ==================================\n'.format(
+                name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 try:
                     output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
@@ -193,8 +194,7 @@ class DGNode(Base):
         node_attrs = self.attrs.keys()
         if attr_filter:
             if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
+                node_attrs = list(set(node_attrs).intersection(attr_filter[type_]))
 
         for attr in node_attrs:
             if self.attrs[attr]['type'] == 'doubleArray':
@@ -210,8 +210,7 @@ class DGNode(Base):
                 if mc.objExists('{}.{}'.format(scene_name, attr)):
                     if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
                         try:
-                            mc.setAttr('{}.{}'.format(scene_name, attr),
-                                       self.attrs[attr]['value'])
+                            mc.setAttr('{}.{}'.format(scene_name, attr), self.attrs[attr]['value'])
                         except:
                             pass
                 else:
@@ -223,7 +222,7 @@ class DGNode(Base):
                 alias = self.attrs[attr].get('alias', None)
                 if alias:
                     try:
-                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr) )
+                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
                     except RuntimeError:
                         pass
 
@@ -258,7 +257,6 @@ class DGNode(Base):
                 mobject = om.MObject()
                 selection_list.getDependNode(0, mobject)
                 self.__mobject = mobject
- 
+
     def mobject_reset(self):
         self.__mobject = None
-        

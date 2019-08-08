@@ -4,7 +4,6 @@ import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
 
-
 from functools import wraps
 import datetime
 import sys
@@ -19,6 +18,7 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
+
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -42,7 +42,7 @@ class Builder(object):
             import zBuilder.ui.reader as reader
         except ImportError:
             raise StandardError("Ziva Scene Panel supported on Maya 2017+")
-            
+
         reader.view(root_node=self.root_node)
 
     def node_factory(self, node, parent=None, get_parameters=True):
@@ -64,7 +64,7 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(parent=parent,maya_node=node, builder=self))
+                        item_list.append(obj(parent=parent, maya_node=node, builder=self))
                 if type_ == obj.type:
 
                     objct = obj(parent=parent, maya_node=node, builder=self)
@@ -117,6 +117,7 @@ class Builder(object):
         """
         A decorator to time functions.
         """
+
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -156,8 +157,7 @@ class Builder(object):
                 Defaults to ``False``
         """
 
-        json_data = self.__get_json_data(type_filter=type_filter,
-                                         invert_match=invert_match)
+        json_data = self.__get_json_data(type_filter=type_filter, invert_match=invert_match)
 
         if io.dump_json(file_path, json_data):
             for parameter in self.bundle.scene_items:
@@ -228,7 +228,10 @@ class Builder(object):
         tmp = []
 
         logger.info("writing Scene Items")
-        tmp.append(io.wrap_data(self.bundle.get_scene_items(type_filter=type_filter, invert_match=invert_match), 'node_data'))
+        tmp.append(
+            io.wrap_data(
+                self.bundle.get_scene_items(type_filter=type_filter, invert_match=invert_match),
+                'node_data'))
         logger.info("writing info")
         tmp.append(io.wrap_data(self.info, 'info'))
 
@@ -281,7 +284,8 @@ class Builder(object):
         """
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
 
-    def get_scene_items(self, type_filter=list(),
+    def get_scene_items(self,
+                        type_filter=list(),
                         name_filter=list(),
                         name_regex=None,
                         association_filter=list(),

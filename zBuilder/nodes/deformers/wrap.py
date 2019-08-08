@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class Wrap(Deformer):
     type = 'wrap'
+
     # MAP_LIST = ['weightList[0].weights']
 
     def build(self, *args, **kwargs):
@@ -19,28 +20,28 @@ class Wrap(Deformer):
         if not mc.objExists(name):
             mc.select(self.long_association, r=True)
             version = 7
-            operation = 1 # create
+            operation = 1  # create
             threshold = 0
             maxDist = 1
-            inflType = 2 # 1, poitn 2 face
-            exclusiveBind = 1 # bind algorythem(1-smooth,2-exclusive)
+            inflType = 2  # 1, poitn 2 face
+            exclusiveBind = 1  # bind algorythem(1-smooth,2-exclusive)
             autoWeightThreshold = 1
-            renderInfl = 0 # render influence objects
-            fallOffMode = 0 # distanceFalloff alg
+            renderInfl = 0  # render influence objects
+            fallOffMode = 0  # distanceFalloff alg
 
-            cmd = ('doWrapArgList "{}" {}"{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"{}').format(version, '{',operation, threshold, maxDist, inflType, exclusiveBind, autoWeightThreshold, renderInfl, fallOffMode,'}')
+            cmd = ('doWrapArgList "{}" {}"{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"{}').format(
+                version, '{', operation, threshold, maxDist, inflType, exclusiveBind,
+                autoWeightThreshold, renderInfl, fallOffMode, '}')
 
             results = mm.eval(cmd)
-            mc.rename(results[0],self.name)
+            mc.rename(results[0], self.name)
             # print cmd
             #self.mobject = delta_mush
         else:
             self.mobject = name
-            
 
         self.set_maya_attrs(attr_filter=attr_filter)
         # self.set_maya_weights(interp_maps=interp_maps)
-
 
     @staticmethod
     def get_meshes(node):

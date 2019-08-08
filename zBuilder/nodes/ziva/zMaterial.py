@@ -50,8 +50,7 @@ class MaterialNode(Ziva):
 
         if mc.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_materials = mm.eval(
-                'zQuery -t zMaterial {}'.format(mesh))
+            existing_materials = mm.eval('zQuery -t zMaterial {}'.format(mesh))
             data_materials = self.builder.bundle.get_scene_items(type_filter='zMaterial',
                                                                  association_filter=mesh)
 
@@ -68,8 +67,7 @@ class MaterialNode(Ziva):
                 self.mobject = results[0]
                 mc.rename(results[0], name)
         else:
-            logger.warning(
-                mesh + ' does not exist in scene, skipping zMaterial creation')
+            logger.warning(mesh + ' does not exist in scene, skipping zMaterial creation')
 
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
