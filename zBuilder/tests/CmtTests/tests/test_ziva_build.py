@@ -154,3 +154,16 @@ class ZivaBuildTestCase(VfxTestCase):
         z.retrieve_connections()
 
         self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
+
+    def test_retrieving_invalid_mobjects(self):
+        # remove ziva nodes from scene so all we have left is geo
+        mz.clean_scene()
+
+        mobjects = []
+        # return mobjects from items, lets do all zAttachments
+        # since the scene has been cleaned this should return no mobjects
+        for item in self.z.get_scene_items(type_filter='zAttachment'):
+            mobjects.append(item.mobject)
+
+        # this list should all be None
+        self.assertTrue(all(x is None for x in mobjects))

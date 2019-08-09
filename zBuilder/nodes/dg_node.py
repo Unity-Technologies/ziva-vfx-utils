@@ -41,7 +41,7 @@ class DGNode(Base):
     def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
         self.attrs = {}
         self._association = []
-        self.__mobject = None
+        self.__mobject_handle = None
 
         Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
 
@@ -145,33 +145,15 @@ class DGNode(Base):
         Returns:
             (str) Name of maya object.
         """
-        name = None
-        if self.is_m_object_valid():
-            name = mz.get_name_from_m_object(self.mobject)
-            if not mc.objExists(name):
-                name = self.name
+        name = self.long_name
 
-        if not name:
-            name = self.long_name
+        if self.mobject:
+            name = mz.get_name_from_m_object(self.mobject, long_name=True)
 
         if not long_name:
             name = name.split('|')[-1]
+            
         return name
-
-    def is_m_object_valid(self):
-        """This checks if stored MObject is valid.  Querying an invalid one
-        (if node has been deleted from scene for example) will cause maya to
-        crash.
-
-        Returns:
-            [bool]: True if MObject still valid
-        """
-
-        if self.mobject:
-            handle = om.MObjectHandle(self.mobject)
-            if handle.isValid():
-                return True
-        return False
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
@@ -229,12 +211,14 @@ class DGNode(Base):
     @property
     def mobject(self):
         """
-        Gets mObject stored with parameter.
+        Gets mObject out of mObjectHandle.  Checks if it is valid before releasing it.
         Returns:
             mObject
 
         """
-        return self.__mobject
+        if self.__mobject_handle.isValid():
+            return self.__mobject_handle.object()
+        return None
 
     @mobject.setter
     def mobject(self, maya_node):
@@ -249,14 +233,14 @@ class DGNode(Base):
             Nothing
 
         """
-        self.__mobject = None
+        self.__mobject_handle = None
         if maya_node:
             if mc.objExists(maya_node):
                 selection_list = om.MSelectionList()
                 selection_list.add(maya_node)
                 mobject = om.MObject()
                 selection_list.getDependNode(0, mobject)
-                self.__mobject = mobject
+                self.__mobject_handle = om.MObjectHandle(mobject)
 
     def mobject_reset(self):
-        self.__mobject = None
+        self.__mobject_handle = None
