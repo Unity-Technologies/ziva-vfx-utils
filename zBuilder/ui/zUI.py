@@ -268,6 +268,11 @@ class MyDockingUI(QtWidgets.QWidget):
                 menu.addSection('')
 
             if node.type == 'zAttachment':
+                wid = QtWidgets.QWidgetAction(menu)
+                label = QtWidgets.QLabel()
+                wid.setDefaultWidget(label)
+                menu.addAction(wid)
+                menu.addSection('zAttachment1_name')
                 menu.addAction(self.actionPaintByProx)
                 menu.addAction(self.actionPaintByProx)
                 menu.addAction(self.actionPaintByProx_1_2)
