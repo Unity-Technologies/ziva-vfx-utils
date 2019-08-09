@@ -106,12 +106,14 @@ class Ziva(Builder):
                 if parent_node:
                     parent_node.add_child(item)
 
+        # rivets ------
         rivets = {}
         for x in self.get_scene_items(type_filter='zRivetToBone'):
             if x.long_curve_name not in rivets:
                 rivets[x.long_curve_name] = []
             rivets[x.long_curve_name].append(x)
 
+        # 
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
 
