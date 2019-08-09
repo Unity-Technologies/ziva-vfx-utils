@@ -159,6 +159,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
         self.actionPaintByProx_1_10.setObjectName("actionPaint110")
         self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox, .1, 10))
+
         self.actionPaintSource = QtWidgets.QAction(self)
         self.actionPaintSource.setText('Paint - source weights')
         self.actionPaintSource.setObjectName("paintSource")
@@ -178,6 +179,21 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setText('Paint - endPoints')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
+
+        self.actionCopyWeight = QtWidgets.QAction(self)
+        self.actionCopyWeight.setText('Copy Weight')
+        self.actionCopyWeight.setObjectName("actionCopyWeight")
+        self.actionCopyWeight.triggered.connect(self.copy_weight)
+
+        self.actionInvertWeight = QtWidgets.QAction(self)
+        self.actionInvertWeight.setText('Invert Weight')
+        self.actionInvertWeight.setObjectName("actionCopyWeight")
+        self.actionInvertWeight.triggered.connect(self.invert_weight)
+
+        self.actionPasteWeight = QtWidgets.QAction(self)
+        self.actionPasteWeight.setText('Paste Weight')
+        self.actionPasteWeight.setObjectName("actionPasteWeight")
+        self.actionPasteWeight.triggered.connect(self.paste_weight)
 
     def paint_by_prox_options(self):
         """Brings up UI for painting by proximity.
@@ -258,6 +274,9 @@ class MyDockingUI(QtWidgets.QWidget):
                 menu.addAction(self.actionPaintWeight)
                 menu.addAction(self.actionPaintEndPoints)
                 menu.addSection('')
+                menu.addAction(self.actionCopyWeight)
+                menu.addAction(self.actionPasteWeight)
+                menu.addAction(self.actionInvertWeight)
 
             if node.type == 'zMaterial':
                 menu.addAction(self.actionPaintWeight)
@@ -489,3 +508,45 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
+
+    def copy_weight(self):
+
+        indexes = self.treeView.selectedIndexes()
+        tmp = []
+        for i in indexes:
+            node = i.data(model.SceneGraphModel.nodeRole)
+            mesh = node.association[0]
+            vert_count = mc.polyEvaluate(mesh, v=True)
+            tmp.append(
+                mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1)))
+
+        self.weights = [sum(i) for i in zip(*tmp)]
+        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
+        print mesh, self.weights
+
+    def invert_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mesh = node.association[0]
+        vert_count = mc.polyEvaluate(mesh, v=True)
+        weights = mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1))
+        weights = [1 - x for x in weights]
+
+        map_ = node.name + '.weightList[0].weights'
+        tmp = []
+        for w in weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
+        mm.eval(cmd)
+
+    def paste_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        map_ = node.name + '.weightList[0].weights'
+        tmp = []
+        for w in self.weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
+        mm.eval(cmd)
