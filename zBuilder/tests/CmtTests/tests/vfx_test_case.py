@@ -8,18 +8,18 @@ class VfxTestCase(TestCase):
     pluginPath = None
 
     def setUp(self):
-        if not os.environ.get('ZIVAVFX_PLUGIN_LOADED'):
+        if not cmds.pluginInfo('ziva', query=True, loaded=True):
             print('loading plugin ...')
             self.pluginPath = get_plugin_path()
             cmds.loadPlugin(self.pluginPath)        
             print('plugin loaded: '+self.pluginPath)
 
     def tearDown(self):
-        if not os.environ.get('ZIVAVFX_PLUGIN_LOADED'):
-            print('unloading plugin ...')
-            cmds.file(f=True, new=True)        # this trick releases a plugin so that it could be safely unloaded
-            cmds.unloadPlugin(os.path.basename(self.pluginPath))   # plugin gets unloaded by file name only
-            print('plugin unloaded')
+        # We do not unload the plugin here on purpose.
+        # because Maya goes wrong when load/unload plugin repeatedly.
+        # We only clear the scene here.
+        cmds.file(f=True, new=True)
+
 
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
