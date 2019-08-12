@@ -1,6 +1,45 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import maya.cmds as mc
+import maya.mel as mm
+from functools import partial
+
+
+class CustomMenu(QtWidgets.QMenu):
+
+    def __init__(self, parent=None):
+        super(CustomMenu, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+    def addMenu(self, *args, **kwargs):
+        menu = super(CustomMenu, self).addMenu(*args, **kwargs)
+        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+        menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        return menu
+
+
+class ProximityWidget(QtWidgets.QWidget):
+
+    def __init__(self, parent=None):
+        super(ProximityWidget, self).__init__(parent)
+        self.layout = QtWidgets.QHBoxLayout(self)
+        self.from_edit = QtWidgets.QLineEdit()
+        self.from_edit.setPlaceholderText("From")
+        self.to_edit = QtWidgets.QLineEdit()
+        self.to_edit.setPlaceholderText("To")
+        self.ok_button = QtWidgets.QPushButton()
+        self.ok_button.setText("Ok")
+        self.layout.addWidget(self.from_edit)
+        self.layout.addWidget(self.to_edit)
+        self.layout.addWidget(self.ok_button)
+        self.ok_button.clicked.connect(self.paint_by_prox)
+
+    def paint_by_prox(self):
+        """Paints attachment map by proximity.
+        """
+
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(), self.to_edit.text()))
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):

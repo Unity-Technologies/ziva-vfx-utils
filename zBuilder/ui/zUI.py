@@ -145,10 +145,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectFiberCurve.setObjectName("selectCurve")
         self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
 
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
+        # self.actionPaintByProx = QtWidgets.QAction(self)
+        # self.actionPaintByProx.setText('Paint By Proximity UI')
+        # self.actionPaintByProx.setObjectName("actionPaint")
+        # self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
 
         self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
@@ -248,7 +248,9 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+            menu = model.CustomMenu(self)
+            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
             if node.type == 'zTet':
                 menu.addAction(self.actionPaintWeight)
@@ -271,9 +273,14 @@ class MyDockingUI(QtWidgets.QWidget):
                 menu.addAction(self.actionPaintSource)
                 menu.addAction(self.actionPaintTarget)
                 menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
+                sub = menu.addMenu('Paint By Proximity')
+                #menu.addAction(self.actionPaintByProx)
+                sub.addAction(self.actionPaintByProx_1_2)
+                sub.addAction(self.actionPaintByProx_1_10)
+                prox_widget = model.ProximityWidget()
+                actionPaintByProx = QtWidgets.QWidgetAction(sub)
+                actionPaintByProx.setDefaultWidget(prox_widget)
+                sub.addAction(actionPaintByProx)
                 menu.addAction(self.actionSelectST)
 
             if node.type == 'zLineOfAction':
