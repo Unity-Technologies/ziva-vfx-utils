@@ -18,7 +18,6 @@ class SceneTreeView(QtWidgets.QTreeView):
         model_index = self.model().mapToSource(index)
         node = model_index.internalPointer()
         row_count = self.model().rowCount(index.parent())
-        row_count_parent = self.model().rowCount(index.parent().parent())
 
         for column in xrange(column_count):
             rect = QtCore.QRect(column * self.indentation(), rect.top(), self.indentation(),
@@ -37,5 +36,12 @@ class SceneTreeView(QtWidgets.QTreeView):
                 else:
                     painter.drawImage(rect, image_more)
             else:
-                if index.parent().row() != row_count_parent - 1:
+                all_parents = []
+                parent = index.parent()
+                while parent.isValid():
+                    all_parents.append(parent)
+                    parent = parent.parent()
+                column_parent_row_count = self.model().rowCount(all_parents[-(column + 1)])
+                column_row_count = all_parents[-(column + 2)].row()
+                if column_parent_row_count - 1 != column_row_count:
                     painter.drawImage(rect, image_line)
