@@ -1,3 +1,7 @@
+QWidget
+{
+    font-family: "Verdana";
+}
 QTreeView
 {
     selection-color: rgb(68, 136, 204);
@@ -26,7 +30,7 @@ QTreeView QLineEdit
 
 QMenu
 {
-    background: rgba(31, 31, 31, 85%);
+    background: rgba(31, 31, 31, 75%);
     color: rgb(255, 255, 255);
     border-radius: 10px;
     border-top-left-radius: 0;
@@ -37,7 +41,7 @@ QMenu::item
 {
     height: 25px;
     margin: 2px 24px 2px 5px;
-    font-size: 10pt;
+    font-size: 9pt;
 }
 
 QMenu::item:selected
@@ -51,4 +55,54 @@ QMenu::separator
     height: 1px;
     margin-left: 5px;
     margin-right: 5px;
+}
+
+QLabel
+{
+    color: rgb(255, 255, 255);
+    background: transparent;
+    font-size: 8pt;
+}
+
+QSlider::groove:horizontal {
+    background: transparent;
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: rgb(200, 200, 200);
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: rgb(200, 200, 200);
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: rgb(100, 100, 100);
+    width: 8px;
+    margin-top: -4px;
+    margin-bottom: -4px;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: rgb(120, 120, 120);
+    border-radius: 3px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+    background: rgb(100, 100, 100);
+}
+
+QSlider::add-page:horizontal:disabled {
+    background: rgb(100, 100, 100);
+}
+
+QSlider::handle:horizontal:disabled {
+    background: rgb(68, 68, 68);
 }
