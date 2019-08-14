@@ -140,11 +140,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionSelectFiberCurve = QtWidgets.QAction(self)
-        self.actionSelectFiberCurve.setText('Select Curve')
-        self.actionSelectFiberCurve.setObjectName("selectCurve")
-        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
-
         self.actionPaintByProx = QtWidgets.QAction(self)
         self.actionPaintByProx.setText('Paint By Proximity UI')
         self.actionPaintByProx.setObjectName("actionPaint")
@@ -275,9 +270,6 @@ class MyDockingUI(QtWidgets.QWidget):
                 menu.addAction(self.actionPaintByProx_1_2)
                 menu.addAction(self.actionPaintByProx_1_10)
                 menu.addAction(self.actionSelectST)
-
-            if node.type == 'zLineOfAction':
-                menu.addAction(self.actionSelectFiberCurve)
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
