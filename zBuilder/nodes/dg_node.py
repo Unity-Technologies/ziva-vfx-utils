@@ -93,7 +93,6 @@ class DGNode(Base):
         """ Builds the node in maya.  meant to be overwritten.
         """
         pass
-        # raise NotImplementedError
 
     @property
     def association(self):
@@ -107,10 +106,6 @@ class DGNode(Base):
     @association.setter
     def association(self, association):
         self._association = mc.ls(association, long=True)
-        # if isinstance(association, str):
-        #     self._association = [association]
-        # else:
-        #     self._association = association
 
     @property
     def long_association(self):
