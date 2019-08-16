@@ -240,6 +240,8 @@ class DGNode(Base):
                 self.__mobject_handle = om.MObjectHandle(mobject)
 
     def mobject_reset(self):
+        """Resets the mObject in object by setting it to None
+        """
         self.__mobject_handle = None
 
     def replace_mobject_with_string(self):

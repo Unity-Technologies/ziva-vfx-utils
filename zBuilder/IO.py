@@ -18,10 +18,7 @@ class BaseNodeEncoder(json.JSONEncoder):
 
 
 def pack_zbuilder_contents(json_data, type_filter=[], invert_match=False):
-    """ Utility wrapper to identify data.
-
-    Args:
-    json_data:
+    """ Utility to package the data in a dictionary.
     """
     logger.info("packing zBuilder contents for json.")
 
