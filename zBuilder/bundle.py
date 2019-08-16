@@ -88,13 +88,6 @@ class Bundle(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-        # data_types = set([item.type for item in self.parameters])
-        # output = 'parameters: '
-        # for data_type in data_types:
-        #     amount = len([x for x in self.parameters if x.type == data_type])
-        #     output += '{} {}   '.format(data_type, amount)
-        # logger.info(output)
-
     def append_scene_item(self, scene_item):
         """
         appends a parameter to the parameter list.  Checks if parameter is
@@ -213,3 +206,11 @@ class Bundle(object):
         """
         for item in self.scene_items:
             item.string_replace(search, replace)
+
+    def find_mobject_from_string(self):
+        """Runs 'find_mobject_from_string' on all objects in bundle.  First it checks
+        if it exists.
+        """
+        for item in self.scene_items:
+            if 'find_mobject_from_string' in dir(item):
+                item.find_mobject_from_string()

@@ -216,6 +216,8 @@ class DGNode(Base):
             mObject
 
         """
+        if isinstance(self.__mobject_handle, unicode) or isinstance(self.__mobject_handle, str):
+            return str(self.__mobject_handle)
         if self.__mobject_handle.isValid():
             return self.__mobject_handle.object()
         return None
@@ -244,3 +246,13 @@ class DGNode(Base):
 
     def mobject_reset(self):
         self.__mobject_handle = None
+
+    def replace_mobject_with_string(self):
+        """This takes the mObject stored in zBuilder and converts it to a string
+        name.  This is useful if you need to serialize the object.
+        """
+        if not isinstance(self.__mobject_handle, str) and self.__mobject_handle:
+            self.__mobject_handle = str(mz.get_name_from_m_object(self.mobject))
+
+    def find_mobject_from_string(self):
+        self.mobject = self.mobject

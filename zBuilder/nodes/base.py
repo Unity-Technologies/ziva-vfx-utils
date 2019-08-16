@@ -128,17 +128,13 @@ class Base(object):
         Returns:
             dict: of serializable items
         """
-        # removing and storing mobject as a string (object name)
-        if hasattr(self, '__mobjectHandle'):
-            if self.__mobject_handle:
-                if self.mobject:
-                    self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
-                else:
-                    self.__mobject_handle = None
 
-        # culling __dict__ of any non-serializable items so we can save as json
+        if 'replace_mobject_with_string' in dir(self):
+            self.replace_mobject_with_string()
+
         output = dict()
         for key in self.__dict__:
+
             if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
                 output[key] = self.__dict__[key].serialize()
             try:
@@ -202,19 +198,3 @@ class Base(object):
                                 new_name = mz.replace_long_name(search, replace, name)
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
-
-    def write(self, file_path):
-        """ Writes out individual item to a json file given a file path.
-
-        Args:
-            file_path (str): The file path to write to disk.
-        """
-        json_data = []
-        json_data.append(io.wrap_data([self], 'node_data'))
-        json_data.append(io.wrap_data(self.info, 'info'))
-
-        io.dump_json(file_path, json_data)
-        if hasattr(self, 'mobject'):
-            self.mobject = self.mobject
-
-        logger.info('Wrote File: {}'.format(file_path))
