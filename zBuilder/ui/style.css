@@ -10,12 +10,13 @@ QTreeView
     font-size: 12px;
     icon-size: 18px;
     font-family: "Verdana";
+    background: #313131;
 }
 
 QTreeView::item
 {
     border: none;
-    height: 19px;
+    height: 21px;
 }
 
 QTreeView QLineEdit
@@ -60,7 +61,7 @@ QMenu::separator
 
 QFrame#line
 {
-    background: rgb(200, 200, 200);
+    background: rgb(150, 150, 150);
 }
 
 QMenu::section
@@ -71,9 +72,15 @@ QMenu::section
 
 QLabel
 {
-    color: rgb(255, 255, 255);
+    color: rgb(150, 150, 150);
     background: transparent;
     font-size: 8pt;
+}
+
+QHeaderView
+{
+    background: #313131;
+    color: transparent;
 }
 
 QSlider::groove:horizontal {

@@ -7,12 +7,12 @@ class SceneTreeView(QtWidgets.QTreeView):
         super(SceneTreeView, self).__init__(parent)
 
     def drawBranches(self, painter, rect, index):
-        image_line = QtGui.QImage(icons.get_icon_path_from_name('vline'))
-        image_opened = QtGui.QImage(icons.get_icon_path_from_name('branch-opened'))
-        image_closed = QtGui.QImage(icons.get_icon_path_from_name('branch-closed'))
-        image_more = QtGui.QImage(icons.get_icon_path_from_name('branch-more'))
-        image_child = QtGui.QImage(icons.get_icon_path_from_name('branch-child'))
-        image_end = QtGui.QImage(icons.get_icon_path_from_name('branch-end'))
+        image_line = QtGui.QImage(icons.get_icon_path_from_name('vline-2'))
+        image_opened = QtGui.QImage(icons.get_icon_path_from_name('branch-opened-2'))
+        image_closed = QtGui.QImage(icons.get_icon_path_from_name('branch-closed-2'))
+        image_more = QtGui.QImage(icons.get_icon_path_from_name('branch-more-2'))
+        image_child = QtGui.QImage(icons.get_icon_path_from_name('branch-child-2'))
+        image_end = QtGui.QImage(icons.get_icon_path_from_name('branch-end-2'))
 
         column_count = rect.width() / self.indentation()
         model_index = self.model().mapToSource(index)
@@ -20,7 +20,10 @@ class SceneTreeView(QtWidgets.QTreeView):
         row_count = self.model().rowCount(index.parent())
 
         for column in xrange(column_count):
-            rect = QtCore.QRect(column * self.indentation(), rect.top(), self.indentation(),
+            x_1 = column * self.indentation()
+            x_2 = self.indentation()
+
+            rect = QtCore.QRect(x_1 + 20, rect.top(), x_2,
                                 rect.height())
             if column == column_count - 1:
                 if node.child_count():

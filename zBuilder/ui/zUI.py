@@ -70,16 +70,26 @@ class MyDockingUI(QtWidgets.QWidget):
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
+        # self.treeView.setHeaderHidden(True)
+        header = self.treeView.header()
+        header.setOffset(-20)
+        header.setOffsetToSectionPosition(20)
+        header.setFixedHeight(10)
 
         self.callback_ids = {}
 
         self.reset_tree(root_node=root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32))
+        self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
+        self.setFixedHeight(27)
+        self.setFixedWidth(27)
 
-        self.main_layout.addWidget(self.tool_bar)
+        self.top_layout = QtWidgets.QHBoxLayout()
+        self.top_layout.addWidget(self.tool_bar)
+        self.top_layout.setContentsMargins(20, 0, 0, 0)
+        self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
         # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
@@ -296,7 +306,6 @@ class MyDockingUI(QtWidgets.QWidget):
             menu.addSection('')
 
         if node.type == 'zAttachment':
-            menu.addLabel('zAttachment1_name')
             menu.addAction(self.actionSelectST)
 
             menu.addLabel('Maps')
@@ -440,17 +449,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        # Expand all zSolverTransform tree items-------------------------------
-        if not expanded:
-            for row in range(self._proxy_model.rowCount()):
-                index = self._proxy_model.index(row, 0)
-                node = index.data(model.SceneGraphModel.nodeRole)
-                if node.type == 'zSolverTransform':
-                    self.treeView.expand(index)
-
         sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
+        if expanded:
+            for name in names_to_expand:
+                indices = self._proxy_model.match(
+                    self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                    -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                for index in indices:
+                    self.treeView.expand(index)
         if sel:
             checked = self.find_and_select(sel)
 
@@ -460,18 +468,19 @@ class MyDockingUI(QtWidgets.QWidget):
             # UI
             if checked:
                 # keeps previous expansion if TreeView was updated
-                if expanded:
-                    for name in names_to_expand:
-                        indices = self._proxy_model.match(
-                            self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                            -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                        for index in indices:
-                            self.treeView.expand(index)
-
                 self.treeView.expand(checked[0])
                 parent = checked[0].parent()
                 if parent.isValid():
                     self.treeView.expand(parent)
+
+        # Expand all zSolverTransform tree items-------------------------------
+        if not expanded:
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
+                    break
 
     def find_and_select(self, sel=None):
         """

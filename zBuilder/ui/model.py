@@ -51,6 +51,7 @@ class ProximityWidget(QtWidgets.QWidget):
         super(ProximityWidget, self).__init__(parent)
         # self.v_layout = QtWidgets.QVBoxLayout(self)
         self.h_layout = QtWidgets.QHBoxLayout(self)
+        self.h_layout.setContentsMargins(15, 15, 15, 15)
         # self.label = QtWidgets.QLabel("Interactive 0.0 - 5.0 :")
         # self.from_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         # self.from_slider.setFixedHeight(16)
@@ -65,10 +66,12 @@ class ProximityWidget(QtWidgets.QWidget):
         # self.to_slider.setSingleStep(1)
         # self.to_slider.setValue(100)
         self.from_edit = QtWidgets.QLineEdit()
+        self.from_edit.setFixedHeight(24)
         self.from_edit.setPlaceholderText("From")
         self.from_edit.setText("0.1")
         self.from_edit.setFixedWidth(40)
         self.to_edit = QtWidgets.QLineEdit()
+        self.to_edit.setFixedHeight(24)
         self.to_edit.setPlaceholderText("To")
         self.to_edit.setText("0.2")
         self.to_edit.setFixedWidth(40)
@@ -82,7 +85,6 @@ class ProximityWidget(QtWidgets.QWidget):
         self.ok_button.clicked.connect(self.paint_by_prox)
         # self.from_slider.valueChanged.connect(self.paint_by_prox)
         # self.to_slider.valueChanged.connect(self.paint_by_prox)
-
 
     def paint_by_prox(self):
         """Paints attachment map by proximity.
