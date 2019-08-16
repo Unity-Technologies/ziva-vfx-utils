@@ -140,15 +140,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionSelectFiberCurve = QtWidgets.QAction(self)
-        self.actionSelectFiberCurve.setText('Select Curve')
-        self.actionSelectFiberCurve.setObjectName("selectCurve")
-        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
-
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
+        # self.actionPaintByProx = QtWidgets.QAction(self)
+        # self.actionPaintByProx.setText('Paint By Proximity UI')
+        # self.actionPaintByProx.setObjectName("actionPaint")
+        # self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
 
         self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
         self.actionPaintByProx_1_2.setText('By Proximity .1 - .2')
@@ -244,14 +239,6 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu
-        command.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.curve)
-
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -263,14 +250,13 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-        menu = QtWidgets.QMenu()
+        menu = model.CustomMenu(self)
+        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+        menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         if node.type == 'zTet':
-            wid = QtWidgets.QWidgetAction(menu)
-            label = QtWidgets.QLabel()
-            wid.setDefaultWidget(label)
-            menu.addAction(wid)
-            menu.addSection('Maps')
+            menu.addLabel('Maps')
+            menu.setFixedWidth(100)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -279,11 +265,8 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu.addAction(self.actionInvertWeight)
 
         if node.type == 'zFiber':
-            wid = QtWidgets.QWidgetAction(menu)
-            label = QtWidgets.QLabel()
-            wid.setDefaultWidget(label)
-            menu.addAction(wid)
-            menu.addSection('Maps')
+            menu.addLabel('Maps')
+            menu.setFixedWidth(120)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -299,11 +282,8 @@ class MyDockingUI(QtWidgets.QWidget):
             target_map_menu.addAction(self.actionInvertWeight)
 
         if node.type == 'zMaterial':
-            wid = QtWidgets.QWidgetAction(menu)
-            label = QtWidgets.QLabel()
-            wid.setDefaultWidget(label)
-            menu.addAction(wid)
-            menu.addSection('Maps')
+            menu.addLabel('Maps')
+            menu.setFixedWidth(100)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -316,14 +296,10 @@ class MyDockingUI(QtWidgets.QWidget):
             menu.addSection('')
 
         if node.type == 'zAttachment':
-            wid = QtWidgets.QWidgetAction(menu)
-            label = QtWidgets.QLabel()
-            wid.setDefaultWidget(label)
-            menu.addAction(wid)
-            menu.addSection('zAttachment1_name')
+            menu.addLabel('zAttachment1_name')
             menu.addAction(self.actionSelectST)
 
-            menu.addSection('Maps')
+            menu.addLabel('Maps')
             source_map_menu = menu.addMenu('source')
             source_map_menu.addAction(self.actionPaintSource)
             source_map_menu.addSection('')
@@ -331,22 +307,18 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
             source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionPaintByProx_1_2)
-            source_map_menu.addAction(self.actionPaintByProx_1_10)
-            source_map_menu.addAction(self.actionPaintByProx)
             target_map_menu = menu.addMenu('target')
             target_map_menu.addAction(self.actionPaintTarget)
             target_map_menu.addSection('')
             target_map_menu.addAction(self.actionCopyWeight)
             target_map_menu.addAction(self.actionPasteWeight)
             target_map_menu.addAction(self.actionInvertWeight)
-            target_map_menu.addSection('')
-            target_map_menu.addAction(self.actionPaintByProx_1_2)
-            target_map_menu.addAction(self.actionPaintByProx_1_10)
-            target_map_menu.addAction(self.actionPaintByProx)
-
-        if node.type == 'zLineOfAction':
-            menu.addAction(self.actionSelectFiberCurve)
+            menu.addSection('')
+            sub = menu.addMenu('Paint By Proximity')
+            prox_widget = model.ProximityWidget()
+            actionPaintByProx = QtWidgets.QWidgetAction(sub)
+            actionPaintByProx.setDefaultWidget(prox_widget)
+            sub.addAction(actionPaintByProx)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
@@ -402,21 +374,17 @@ class MyDockingUI(QtWidgets.QWidget):
             m_dag_path = om.MDagPath()
             om.MDagPath.getAPathTo(msg, m_dag_path)
             full_path_name = m_dag_path.fullPathName()
-            name_split = full_path_name.split("|")
-            name_split[-1] = prev_name
             current_full_name = full_path_name
-            prev_full_name = "|".join(name_split)
         else:
             dep_node = om.MFnDependencyNode(msg)
             current_full_name = dep_node.name()
-            prev_full_name = prev_name
 
-        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                          model.SceneGraphModel.fullNameRole, prev_full_name, -1,
-                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-        for index in indices:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            node.name = current_full_name
+        scene_items = self.builder.get_scene_items()
+
+        for item in scene_items:
+            if msg == item.mobject:
+                item.name = current_full_name
+                break
 
         self.redraw_tree_view()
 

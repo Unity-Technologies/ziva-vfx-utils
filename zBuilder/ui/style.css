@@ -32,7 +32,7 @@ QMenu
 {
     background: rgba(31, 31, 31, 75%);
     color: rgb(255, 255, 255);
-    border-radius: 10px;
+    /*border-radius: 10px;*/
     border-top-left-radius: 0;
     border: 1px solid rgb(88, 156, 224);
 }
@@ -40,7 +40,7 @@ QMenu
 QMenu::item
 {
     height: 25px;
-    margin: 2px 24px 2px 5px;
+    margin: 0px 24px 2px 10px;
     font-size: 9pt;
 }
 
@@ -53,8 +53,20 @@ QMenu::separator
 {
     background: rgb(77, 117, 144);
     height: 1px;
+    font-size:10pt;
     margin-left: 5px;
     margin-right: 5px;
+}
+
+QFrame#line
+{
+    background: rgb(200, 200, 200);
+}
+
+QMenu::section
+{
+    font-size:10px;
+    height: 10px;
 }
 
 QLabel
