@@ -152,7 +152,7 @@ class DGNode(Base):
 
         if not long_name:
             name = name.split('|')[-1]
-            
+
         return name
 
     def set_maya_attrs(self, attr_filter=None):

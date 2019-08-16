@@ -135,7 +135,6 @@ class Builder(object):
         for parameter in parameters:
             parameter.build(*args, **kwargs)
 
-    # @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
@@ -147,7 +146,7 @@ class Builder(object):
 
         self.bundle.stats()
 
-    def write(self, file_path, type_filter=list(), invert_match=False):
+    def write(self, file_path, type_filter=[], invert_match=False):
         """ Writes out the scene items to a json file given a file path.
 
         Args:

@@ -146,6 +146,7 @@ class Base(object):
                 output[key] = self.__dict__[key]
             except TypeError:
                 pass
+
         return output
 
     def deserialize(self, dictionary):

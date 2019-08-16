@@ -69,9 +69,9 @@ class Bundle(object):
             type_filter (:obj:`str`): filter by parameter type.
                 Defaults to :obj:`str`
         """
+
         tmp = {}
         for i, d in enumerate(self):
-
             t = d.type
             if type_filter:
                 if type_filter == t:
