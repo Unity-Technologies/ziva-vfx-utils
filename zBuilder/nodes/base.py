@@ -198,3 +198,24 @@ class Base(object):
                                 new_name = mz.replace_long_name(search, replace, name)
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
+
+    def write(self, file_path):
+        """ Writes out the scene item to a json file given a file path.
+
+        Args:
+            file_path (str): The file path to write to disk.
+        """
+        # json_data = io.pack_zbuilder_contents(self)
+        node_data = dict()
+        node_data['d_type'] = 'node_data'
+        node_data['data'] = self
+
+        info = dict()
+        info['d_type'] = 'info'
+        info['data'] = self.builder.info
+
+        json_data = [node_data, info]
+
+        if io.dump_json(file_path, json_data):
+            self.find_mobject_from_string()
+            logger.info('Wrote File: %s' % file_path)
