@@ -128,13 +128,11 @@ class Base(object):
         Returns:
             dict: of serializable items
         """
-
-        if 'replace_mobject_with_string' in dir(self):
+        if isinstance(self, zBuilder.nodes.dg_node.DGNode):
             self.replace_mobject_with_string()
 
         output = dict()
         for key in self.__dict__:
-
             if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
                 output[key] = self.__dict__[key].serialize()
             try:
@@ -142,7 +140,6 @@ class Base(object):
                 output[key] = self.__dict__[key]
             except TypeError:
                 pass
-
         return output
 
     def deserialize(self, dictionary):
