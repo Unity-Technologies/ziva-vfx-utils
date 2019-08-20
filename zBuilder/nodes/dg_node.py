@@ -92,7 +92,7 @@ class DGNode(Base):
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
         """
-        pass
+        raise NotImplementedError
 
     @property
     def association(self):
