@@ -120,26 +120,14 @@ class Base(object):
     def serialize(self):
         """  Makes node serializable.
 
-        This replaces an mObject with the name of the object in scene to make it
-        serializable for writing out to json.  Then it loops through keys in
-        dict and saves out a temp dict of items that can be serializable and
-        returns that temp dict for json writing purposes.
+        It loops through keys in __dict__ and saves out a temp dict of items
+        that can be serializable and returns that temp dict for json writing
+        purposes.
 
         Returns:
             dict: of serializable items
         """
-        if isinstance(self, zBuilder.nodes.dg_node.DGNode):
-            self.replace_mobject_with_string()
-
-        output = dict()
-        for key in self.__dict__:
-            if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
-                output[key] = self.__dict__[key].serialize()
-            try:
-                json.dumps(self.__dict__[key])
-                output[key] = self.__dict__[key]
-            except TypeError:
-                pass
+        output = serialize_object(self)
         return output
 
     def deserialize(self, dictionary):
@@ -216,3 +204,24 @@ class Base(object):
         if io.dump_json(file_path, json_data):
             self.find_mobject_from_string()
             logger.info('Wrote File: %s' % file_path)
+
+
+def serialize_object(obj):
+    """ Takes in a python obj and scrubs through the __dict__
+
+    Args:
+        obj ([object]): Python object to inspect.
+
+    Returns:
+        dict: Of serializable obj
+    """
+    output = dict()
+    for key in obj.__dict__:
+        if hasattr(obj.__dict__[key], '_class') and hasattr(obj.__dict__[key], 'serialize'):
+            output[key] = obj.__dict__[key].serialize()
+        try:
+            json.dumps(obj.__dict__[key])
+            output[key] = obj.__dict__[key]
+        except TypeError:
+            pass
+    return output

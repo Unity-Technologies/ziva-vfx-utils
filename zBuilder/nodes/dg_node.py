@@ -5,6 +5,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
+from zBuilder.nodes.base import serialize_object
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,21 @@ class DGNode(Base):
 
     def __repr__(self):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
+        return output
+
+    def serialize(self):
+        """  Makes node serializable.
+
+        This replaces an mObject with the name of the object in scene to make it
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
+
+        Returns:
+            dict: of serializable items
+        """
+        self.replace_mobject_with_string()
+        output = serialize_object(self)
         return output
 
     def populate(self, maya_node=None):
