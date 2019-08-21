@@ -18,6 +18,7 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
+import maya.utils as mutils
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -49,6 +50,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
+        self.waiting_nodes = []
 
         root_node = None
 
@@ -79,6 +81,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.callback_ids = {}
 
         self.reset_tree(root_node=root_node)
+
+        id_ = om.MDGMessage.addNodeAddedCallback(self.node_added)
+        self.callback_ids["NodeAdded"] = [id_]
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))
@@ -307,7 +312,6 @@ class MyDockingUI(QtWidgets.QWidget):
 
         if node.type == 'zAttachment':
             menu.addAction(self.actionSelectST)
-
             menu.addLabel('Maps')
             source_map_menu = menu.addMenu('source')
             source_map_menu.addAction(self.actionPaintSource)
@@ -324,6 +328,7 @@ class MyDockingUI(QtWidgets.QWidget):
             target_map_menu.addAction(self.actionInvertWeight)
             menu.addSection('')
             sub = menu.addMenu('Paint By Proximity')
+            sub.setTitle('Paint By Proximity')
             prox_widget = model.ProximityWidget()
             actionPaintByProx = QtWidgets.QWidgetAction(sub)
             actionPaintByProx.setDefaultWidget(prox_widget)
@@ -367,6 +372,44 @@ class MyDockingUI(QtWidgets.QWidget):
                 attr_dict = mz.build_attr_key_values(node_name, [attr_name])
                 if attr_name in attr_dict:
                     z_node.attrs[attr_name] = attr_dict[attr_name]
+        # elif msg & om.MNodeMessage.kConnectionMade:
+        #     name = other_plug.name()
+        #     node_name = name.split(".")[0]
+        #     if name.split(".")[-1] in ['oMuscle', 'oGeo', 'oAttachment', 'oLineOfActionData']:
+        #         # currently expanded items
+        #         if not self.builder.get_scene_items(name_filter=node_name):
+        #             expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+        #                                                model.SceneGraphModel.expandedRole, True, -1,
+        #                                                QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        #             names_to_expand = []
+        #             for index in expanded:
+        #                 node = index.data(model.SceneGraphModel.nodeRole)
+        #                 names_to_expand.append(node.long_name)
+        #             mc.select(node_name)
+        #             self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+        #             self.callback_ids["AttributeChanged"] = []
+        #             self.callback_ids["NameChanged"] = []
+        #             self.builder.retrieve_connections()
+        #             scene_items = self.builder.get_scene_items()
+        #             for item in scene_items:
+        #                 obj = item.mobject
+        #                 id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+        #                 self.callback_ids["AttributeChanged"].append(id_)
+        #                 id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+        #                 self.callback_ids["NameChanged"].append(id_)
+        #             for item in self.builder.bodies.values():
+        #                 obj = item.mobject
+        #                 id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+        #                 self.callback_ids["AttributeChanged"].append(id_)
+        #                 id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+        #                 self.callback_ids["NameChanged"].append(id_)
+        #             self.treeView.collapseAll()
+        #             for name in names_to_expand:
+        #                 indices = self._proxy_model.match(
+        #                     self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+        #                     -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        #                 for index in indices:
+        #                     self.treeView.expand(index)
 
         self.redraw_tree_view()
 
@@ -396,6 +439,60 @@ class MyDockingUI(QtWidgets.QWidget):
                 break
 
         self.redraw_tree_view()
+
+    def add_waiting_nodes(self):
+        for node_name in self.waiting_nodes:
+            print node_name
+            if not self.builder.get_scene_items(name_filter=node_name):
+                expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                   model.SceneGraphModel.expandedRole, True, -1,
+                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                names_to_expand = []
+                for index in expanded:
+                    node = index.data(model.SceneGraphModel.nodeRole)
+                    names_to_expand.append(node.long_name)
+
+                self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+                self.callback_ids["AttributeChanged"] = []
+                self.callback_ids["NameChanged"] = []
+
+                mc.select(node_name)
+                self.builder.retrieve_connections()
+                scene_items = self.builder.get_scene_items()
+                for item in scene_items:
+                    obj = item.mobject
+                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                    self.callback_ids["AttributeChanged"].append(id_)
+                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                    self.callback_ids["NameChanged"].append(id_)
+                for item in self.builder.bodies.values():
+                    obj = item.mobject
+                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                    self.callback_ids["AttributeChanged"].append(id_)
+                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                    self.callback_ids["NameChanged"].append(id_)
+
+                self.treeView.collapseAll()
+                for name in names_to_expand:
+                    indices = self._proxy_model.match(
+                        self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                        -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                    for index in indices:
+                        self.treeView.expand(index)
+
+        self.waiting_nodes = []
+
+    def node_added(self, node, *clientData):
+        if node.apiTypeStr() in ('kPluginDependNode', 'kPluginDeformerNode'):
+            dep_node = om.MFnDependencyNode(node)
+            node_type = dep_node.typeName()
+            ziva_nodes = ['zAttachment', 'zBone', 'zMaterial', 'zTissue', 'zRivetToBone', 'zLineOfAction', 'zFiber']
+            if node_type in ziva_nodes:
+                self.waiting_nodes.append(dep_node.name())
+                mutils.executeDeferred(self.add_waiting_nodes)
+
+        # kPluginDeformerNode
+        #print node.apiType()
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -442,6 +539,8 @@ class MyDockingUI(QtWidgets.QWidget):
         # connect callbacks for Maya meshes
         for item in self.builder.bodies.values():
             obj = item.mobject
+            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(id_)
             id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
             self.callback_ids["NameChanged"].append(id_)
 
