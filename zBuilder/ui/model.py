@@ -2,7 +2,21 @@ from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import maya.cmds as mc
 import maya.mel as mm
-from functools import partial
+
+
+class GroupedLineEdit(QtWidgets.QLineEdit):
+
+    def __init__(self, parent=None):
+        super(GroupedLineEdit, self).__init__(parent)
+        self.sibling = None
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
+            if self.sibling:
+                self.sibling.setFocus()
+                return True
+
+        return super(GroupedLineEdit, self).event(event)
 
 
 class CustomMenu(QtWidgets.QMenu):
@@ -14,17 +28,15 @@ class CustomMenu(QtWidgets.QMenu):
 
     def addMenu(self, *args, **kwargs):
         menu = super(CustomMenu, self).addMenu(*args, **kwargs)
-        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
-        menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        if isinstance(menu, QtWidgets.QMenu):
+            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         return menu
 
     def addLabel(self, text):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QHBoxLayout(widget)
         label_text = QtWidgets.QLabel(text)
-        # label_line = QtWidgets.QLabel()
-        # canvas = QtGui.QPixmap(self.width(), 15)
-        # label_line.setPixmap(canvas)
         line = QtWidgets.QFrame()
         line.setObjectName("line")
         line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -36,10 +48,6 @@ class CustomMenu(QtWidgets.QMenu):
         line.setSizePolicy(size_policy)
         layout.addWidget(label_text)
         layout.addWidget(line)
-        # painter = QtGui.QPainter(label_line.pixmap())
-        # painter.setBackground(QtGui.QBrush(QtGui.QColor(0, 0, 0, 255)))
-        # painter.setBrush(QtGui.QBrush(QtGui.QColor(200, 200, 200, 0)))
-        # painter.drawLine(0, 7, self.width(), 7)
         action = QtWidgets.QWidgetAction(self)
         action.setDefaultWidget(widget)
         self.addAction(action)
@@ -49,56 +57,35 @@ class ProximityWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
-        # self.v_layout = QtWidgets.QVBoxLayout(self)
         self.h_layout = QtWidgets.QHBoxLayout(self)
         self.h_layout.setContentsMargins(15, 15, 15, 15)
-        # self.label = QtWidgets.QLabel("Interactive 0.0 - 5.0 :")
-        # self.from_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        # self.from_slider.setFixedHeight(16)
-        # self.from_slider.setMinimum(0)
-        # self.from_slider.setMaximum(500)
-        # self.from_slider.setSingleStep(1)
-        # self.from_slider.setValue(5)
-        # self.to_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        # self.to_slider.setFixedHeight(16)
-        # self.to_slider.setMinimum(0)
-        # self.to_slider.setMaximum(500)
-        # self.to_slider.setSingleStep(1)
-        # self.to_slider.setValue(100)
-        self.from_edit = QtWidgets.QLineEdit()
+        self.from_edit = GroupedLineEdit()
         self.from_edit.setFixedHeight(24)
         self.from_edit.setPlaceholderText("From")
         self.from_edit.setText("0.1")
         self.from_edit.setFixedWidth(40)
-        self.to_edit = QtWidgets.QLineEdit()
+        self.to_edit = GroupedLineEdit()
         self.to_edit.setFixedHeight(24)
         self.to_edit.setPlaceholderText("To")
         self.to_edit.setText("0.2")
         self.to_edit.setFixedWidth(40)
+        self.from_edit.sibling = self.to_edit
+        self.to_edit.sibling = self.from_edit
         self.ok_button = QtWidgets.QPushButton()
         self.ok_button.setText("Ok")
-        # self.v_layout.addWidget(self.label)
-        # self.v_layout.addLayout(self.h_layout)
         self.h_layout.addWidget(self.from_edit)
         self.h_layout.addWidget(self.to_edit)
         self.h_layout.addWidget(self.ok_button)
-        self.ok_button.clicked.connect(self.paint_by_prox)
-        # self.from_slider.valueChanged.connect(self.paint_by_prox)
-        # self.to_slider.valueChanged.connect(self.paint_by_prox)
+        self.ok_button.clicked.connect(self.paintByProx)
 
-    def paint_by_prox(self):
+    def paintByProx(self):
         """Paints attachment map by proximity.
         """
 
-        # if self.from_slider.value() > self.to_slider.value():
-        #     self.to_slider.setValue(self.from_slider.value())
-
-        # mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_slider.value() / 100.0, self.to_slider.value() / 100.0))
         mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(), self.to_edit.text()))
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
-
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
