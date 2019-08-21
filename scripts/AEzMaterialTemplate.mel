@@ -1,0 +1,36 @@
+global proc AEzMaterialTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+  editorTemplate -addControl "youngsModulus";
+  editorTemplate -addControl "youngsModulusExp";
+  editorTemplate -addControl "poissonsRatio";
+  editorTemplate -addControl "volumeConservation";
+  editorTemplate -addControl "volumeConservationExp";
+  editorTemplate -addControl "massDensity";
+  editorTemplate -addControl "tensileStiffness";
+  editorTemplate -addControl "tensileStiffnessExp";
+  editorTemplate -addControl "shearStiffness";
+  editorTemplate -addControl "shearStiffnessExp";
+  editorTemplate -addControl "bendStiffness";
+  editorTemplate -addControl "bendStiffnessExp";
+  editorTemplate -addControl "clothMassDensity";
+  editorTemplate -addControl "restScale";
+  editorTemplate -addControl "pressure";
+  editorTemplate -addControl "surfaceTension";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "oGeo";
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "input";
+  editorTemplate -suppress "weightList";
+  editorTemplate -suppress "map64BitIndices";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

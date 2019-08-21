@@ -1,0 +1,32 @@
+global proc AEzBoneWarpTemplate(string $nodeName)
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+  editorTemplate -addControl "recompute";
+  editorTemplate -addControl "tetSize";
+  editorTemplate -addControl "maxResolution";
+  editorTemplate -addControl "surfacePenalty";
+  editorTemplate -addControl "showTetMesh";
+  editorTemplate -addControl "boneTetMeshResolution";
+  editorTemplate -addControl "maxIterations";
+  editorTemplate -addControl "showBoneTetMesh";
+  editorTemplate -addControl "showLandmarks";
+
+  // Suppress attributes
+  editorTemplate -suppress "sourceMesh";
+  editorTemplate -suppress "targetMesh";
+  editorTemplate -suppress "oDraw";
+  editorTemplate -suppress "inputTransforms";
+  editorTemplate -suppress "outputTransforms";
+  editorTemplate -suppress "tetMesh";
+  editorTemplate -suppress "cacheHash";
+  editorTemplate -suppress "landmarks";
+  editorTemplate -suppress "landmarkList";
+  editorTemplate -suppress "boneTetMeshes";
+  editorTemplate -suppress "boneCacheHashes";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

@@ -1,0 +1,21 @@
+global proc AEzEmbedderTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "iSolved";
+  editorTemplate -suppress "iSolverParams";
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "input";
+  editorTemplate -suppress "weightList";
+  editorTemplate -suppress "map64BitIndices";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

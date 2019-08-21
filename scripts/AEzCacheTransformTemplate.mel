@@ -1,0 +1,17 @@
+global proc AEzCacheTransformTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our cache attribute
+  editorTemplate -addControl "cache";
+
+  // suppress oCacheParams attribute
+  editorTemplate -suppress "oCacheParams";
+
+  // Add the template for a transform node
+  AEtransformMain $nodeName;
+  AEtransformNoScroll $nodeName;
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

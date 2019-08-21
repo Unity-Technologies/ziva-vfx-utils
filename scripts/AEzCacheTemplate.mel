@@ -1,0 +1,14 @@
+global proc AEzCacheTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "iCache";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "localPosition";
+  editorTemplate -suppress "localScale";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

@@ -1,0 +1,28 @@
+global proc AEzAttachmentTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+  editorTemplate -addControl "attachmentMode";
+  editorTemplate -addControl "stiffness";
+  editorTemplate -addControl "stiffnessExp";
+  editorTemplate -addControl "maintainOffset";
+  editorTemplate -addControl "correspondence";
+  editorTemplate -addControl "show";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "iGeo1";
+  editorTemplate -suppress "iGeo2";
+  editorTemplate -suppress "oAttachment";
+
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "input";
+  editorTemplate -suppress "weightList";
+  editorTemplate -suppress "map64BitIndices";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}
