@@ -1,0 +1,74 @@
+source "zivaMenuFunctions";
+
+global string $gMainWindow;
+setParent $gMainWindow;
+menu -label "Ziva" -tearOff true zivaMainMenu;
+setParent -menu zivaMainMenu;
+
+menuItem -label "Solver" -divider true;
+menuItem -label "Create" -ec true -ecr true -c "ziva -s" -ann "Creates an empty solver.";
+menuItem -label "Info" -ec true -ecr true -c "ziva -i" -ann "Outputs solver statistics.";
+menuItem -label "Select" -ec true -ecr true -c "ziva -sel" -ann "Selects (via Maya selection) the solver node that contains the selected Ziva object. If selection contains no Ziva objects, selects the solver (if there is exactly 1 solver in the scene), or the default solver (if 2 or more solvers in the scene).";
+menuItem -ob yes -ann "options" -c "ziva_selectSolver(0)";
+menuItem -label "Set Default" -ec true -ecr true -c "ziva -def" -ann "Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.";
+menuItem -ob yes -ann "options" -c "ziva_selectSolver(1)";
+menuItem -label "Launch Scene Panel" -ec true -ecr true -c "python(\"from zBuilder.ui import zUI;zUI.run()\")" -ann "Launches a Scene Panel for inspecting the solver components.";
+
+menuItem -label "Add Simulation Component" -divider true;
+menuItem -label "Tissue" -ec true -ecr true -c "ziva -t" -ann "Converts the selected Maya mesh(es) to tissue(s). Tissues are solid deformable objects (examples: muscles, fat, skin).";
+menuItem -label "Cloth (fascia/skin)" -ec true -ecr true -c "ziva -c" -ann "Converts the selected Maya mesh(es) to cloth. Cloth objects are thin deformable objects (examples: sheets, textile, skin, membranes).";
+menuItem -label "Bone" -ec true -ecr true -c "ziva -b" -ann "Converts the selected Maya mesh(es) to bone(s). Bones are externally animated Maya meshes of any geometry and purpose whatsoever. The bones may deform and/or be animated using any Maya technique. They are *not* simulated using the Ziva solver.";
+menuItem -label "Attachment" -ec true -ecr true -c "ziva -a" -ann "Creates an attachment (a constraint) between two selected Ziva objects and/or their selected vertices. Parts of the mesh where constraints apply may be painted (default: entire surface, or the selected vertices if they are provided). For a sliding attachment, vertices of the first object will slide on the second object.";
+menuItem -label "Goal Attachment" -ec true -ecr true -c "ziva -ga" -ann "Attracts (goals) the selected tissue to the selected bone, using an adjustable soft constraint. Bone may deform and/or be animated using any Maya technique.";
+
+menuItem -label "Add Tissue Property" -divider true;
+menuItem -label "Material Layer" -ec true -ecr true -c "ziva -m" -ann "Adds an additional material node to selected tissue(s) or cloth(es) and/or their selected vertices.";
+menuItem -label "Muscle Fiber" -ec true -ecr true -c "ziva -f" -ann "Adds a muscle fiber to selected tissue(s) or cloth(es) and/or their selected vertices.";
+menuItem -label "Muscle Line-of-Action" -ec true -ecr true -c "ziva -loa" -ann "Connects a NURBS curve(s) to a muscle fiber - firing the fiber when the curve compresses.";
+menuItem -label "Rivet to Bone" -ec true -ecr true -c "zRivetToBone" -ann "Rivets the selected curve CVs to the selected bone mesh.";
+menuItem -label "Collision Mesh" -ec true -ecr true -c "ziva -tcm" -ann "Sets the collision mesh of the selected tissue or cloth to be the selected mesh.";
+menuItem -label "Subtissue" -ec true -ecr true -c "ziva -ast" -ann "Sets the remaining selected tissues to be subtissues of the first.";
+menuItem -label "Rest Shape" -ec true -ecr true -c "zRestShape -a" -ann "Adds rest shape(s) to the a tissue.";
+menuItem -label "Embedded Mesh" -ec true -ecr true -c "ziva -e" -ann "Embeds an additional Maya mesh into the tet mesh of the selected tissue or cloth.";
+menuItem -label "User Tet Mesh" -ec true -ecr true -c "ziva -cut" -ann "Replaces the tet mesh of the selected tissue with the selected tet mesh.";
+menuItem -subMenu true -label "Field";
+  menuItem -label "Air" -ec true -ecr true -c "ziva_attachField(\"air\")" -ann "Attaches a Maya Air field to the selected Tissue/Cloth";
+  menuItem -label "Drag" -ec true -ecr true -c "ziva_attachField(\"drag\")" -ann "Attaches a Maya Drag field to the selected Tissue/Cloth";
+  menuItem -label "Gravity" -ec true -ecr true -c "ziva_attachField(\"gravity\")" -ann "Attaches a Maya Gravity field to the selected Tissue/Cloth";
+  menuItem -label "Newton" -ec true -ecr true -c "ziva_attachField(\"newton\")" -ann "Attaches a Maya Newton field to the selected Tissue/Cloth";
+  menuItem -label "Radial" -ec true -ecr true -c "ziva_attachField(\"radial\")" -ann "Attaches a Maya Radial field to the selected Tissue/Cloth";
+  menuItem -label "Turbulence" -ec true -ecr true -c "ziva_attachField(\"turbulence\")" -ann "Attaches a Maya Turbulence field to the selected Tissue/Cloth";
+  menuItem -label "Uniform" -ec true -ecr true -c "ziva_attachField(\"uniform\")" -ann "Attaches a Maya Uniform field to the selected Tissue/Cloth";
+  menuItem -label "Vortex" -ec true -ecr true -c "ziva_attachField(\"vortex\")" -ann "Attaches a Maya Vortex field to the selected Tissue/Cloth";
+setParent -menu ..;
+
+menuItem -label "Update Simulation Component" -divider true;
+menuItem -label "Tissue, Cloth or Bone" -ec true -ecr true -c "ziva -tm" -ann "Updates the geometry of a tissue, cloth or bone. Select the tissue, cloth or bone whose geometry is to be replaced, and the Maya mesh to replace it with.";
+menuItem -label "Swap Attachment Direction" -ec true -ecr true -c "ziva -sai" -ann "Swaps the source and target Ziva objects of the selected attachment.";
+
+menuItem -label "Remove" -divider true;
+menuItem -label "Tissue, Cloth or Bone" -ec true -ecr true -c "ziva -rm" -ann "Removes the selected tissue(s), cloth(es) or bone(s) from the solver.";
+menuItem -label "Rest Shape" -ec true -ecr true -c "zRestShape -r" -ann "Removes rest shape(s) from a tissue.";
+menuItem -label "Embedded Mesh" -ec true -ecr true -c "ziva -re" -ann "Un-embeds the selected mesh(es) from the Ziva object that currently embeds it.";
+menuItem -label "Collision Mesh" -ec true -ecr true -c "ziva -rcm" -ann "Removes the custom collision mesh from the selected tissue(s) or cloth(es).";
+menuItem -label "Subtissue" -ec true -ecr true -c "ziva -rst" -ann "Removes subtissue connections, making the selected tissues full tissues again.";
+menuItem -label "User Tet Mesh" -ec true -ecr true -c "ziva -dut" -ann "Detaches any user-provided tet mesh and uses an automatic tet mesh for the selected tissue(s).";
+menuItem -label "Selected Solver(s)" -ec true -ecr true -c "zRemoveSolver(askForConfirmation=True)" -sourceType "python" -ann "Removes the solver(s) inferred from selection, including their Ziva rigs.";
+menuItem -label "All Solvers" -ec true -ecr true -c "zRemoveAllSolvers(askForConfirmation=True)" -sourceType "python" -ann "Removes all Ziva solvers from the scene, including all Ziva rigs.";
+
+menuItem -label "Delete" -divider true;
+menuItem -label "Delete selection" -ec true -ecr true -c "ZivaDeleteSelection" -ann "Deletes the selected objects after first removing them from the solver.";
+
+menuItem -label "Cache" -divider true;
+menuItem -label "Add" -ec true -ecr true -c "ziva -acn" -ann "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.";
+menuItem -label "Clear" -ec true -ecr true -c "zCache -c" -ann "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached.";
+menuItem -label "Load..." -ec true -ecr true -c "ZivaLoadCache" -ann "Loads a simulation cache from a .zcache disk file and applies it to the current solver.";
+menuItem -label "Save..." -ec true -ecr true -c "ZivaSaveCache" -ann "Saves the solver's simulation cache to a .zcache file.";
+
+menuItem -label "Select" -ec true -ecr true -c "select -r `zQuery -t zCacheTransform`" -ann "Select the solver's simulation cache node.";
+
+menuItem -divider true;
+menuItem -label "About" -ec true -ecr true -c "ziva -z" -ann "About the Ziva Maya plug-in.";
+menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http://zivadynamics.com/resource-library\"";
+
+source "zivaToolMenu";

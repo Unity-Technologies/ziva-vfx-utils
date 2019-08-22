@@ -1,0 +1,69 @@
+global string $gMainWindow;
+setParent $gMainWindow;
+menu -label "Ziva Tools" -tearOff true zivaToolMenu;
+setParent -menu zivaToolMenu;
+
+menuItem -label "Interactive Playback" -ec true -ecr true -c "play -record" -ann "Starts interactive playback mode. In this mode, you can manipulate the bones using standard Maya tools (move, rotate, etc.), and see an interactive response.";
+menuItem -divider true;
+menuItem -label "Toggle Enabled Bodies" -ec true -ecr true -c "ZivaToggleEnabled" -ann "Toggles the active state of the selected Ziva objects.";
+
+menuItem -label "Help" -divider true;
+menuItem -label "Ziva Command Help" -ec true -ecr true -c "ziva -h" -ann "Print Ziva command help to the Maya script editor.";
+
+menuItem -label "Examples" -divider true;
+
+menuItem -subMenu true -label "Run Demo";
+  menuItem -label "Anatomical Arm" -ec true -ecr true -c "ziva_main_anatomicalArmDemo(1)" -ann "Demonstrates an anatomical human arm.";
+  menuItem -label "Goaling, Self-Collisions, Ziva Cache and Spatially Varying Materials" -ec true -ecr true -c "ziva_main_goalingDemo(1)" -ann "Demonstrates goaling, self-collisions, Ziva caching, and spatially varying materials, on a Maya-rigged fish example.";
+  menuItem -label "Self-Collisions, Ziva Cache and Delaunay Tet Mesher" -ec true -ecr true -c "ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(1)" -ann "Demonstrates self-collisions, Ziva cache and the Delaunay tet mesher.";
+  menuItem -label "Attachments" -ec true -ecr true -c "ziva_main_attachmentTest(1)" -ann "Demonstrates attachments.";
+  menuItem -label "Collisions" -ec true -ecr true -c "ziva_main_collisionTest(1)" -ann "Demonstrates collisions.";
+  menuItem -label "One Of Each Attachments" -ec true -ecr true -c "ziva_main_oneOfEachAttachments(1)" -ann "Demonstrates one of each of the four attachment types.";
+  menuItem -label "One Of Each Collision Types" -ec true -ecr true -c "ziva_main_oneOfEachCollisionTypes(1)" -ann "Demonstrates one of each of the four collision types.";
+  menuItem -label "Spatially Varying Materials" -ec true -ecr true -c "ziva_main_spatiallyVaryingMaterials(1)" -ann "Demonstrates spatially varying materials.";
+  menuItem -label "Cloth" -ec true -ecr true -c "ziva_main_clothDemo(1)" -ann "Demonstrates cloth and cloth-object collisions.";
+  menuItem -label "Cloth Rest Scale and Pressure" -ec true -ecr true -c "ziva_main_restScalePressureDemo(1)" -ann "Demonstrates cloth rest scale and pressure.";
+  menuItem -label "Isomesher" -ec true -ecr true -c "ziva_main_isoMesherDemo(1)" -ann "Demonstrates the Ziva isomesher.";
+setParent -menu ..;
+
+menuItem -subMenu true -label "See MEL Source of Demo";
+  menuItem -label "Anatomical Arm" -ec true -ecr true -c "zTextCmd -anatomicalArmDemoSource" -ann "Show the MEL source code of the anatomical human arm demo.";
+  menuItem -label "Goaling, Self-Collisions, Ziva Cache and Spatially Varying Materials" -ec true -ecr true -c "zTextCmd -goalingDemoSource" -ann "Show the MEL source code of the goaling, self-collisions, Ziva caching, and spatially varying materials demo.";
+  menuItem -label "Self-Collisions, Ziva Cache and Delaunay Tet Mesher" -ec true -ecr true -c "zTextCmd -delaunayTetMesherDemoSource" -ann "Show the MEL source code of the self-collisions, Ziva cache and Delaunay tet mesher demo.";
+  menuItem -label "Attachments" -ec true -ecr true -c "zTextCmd -attachmentTestSource" -ann "Show the MEL source code of the attachments demo.";
+  menuItem -label "Collisions" -ec true -ecr true -c "zTextCmd -collisionTestSource" -ann "Show the MEL source code of the collisions demo.";
+  menuItem -label "One Of Each Attachments" -ec true -ecr true -c "zTextCmd -oneOfEachAttachmentsSource" -ann "Show the MEL source code of the four attachment types demo.";
+  menuItem -label "One Of Each Collision Types" -ec true -ecr true -c "zTextCmd -oneOfEachCollisionTypesSource" -ann "Show the MEL source code of the four collision types demo.";
+  menuItem -label "Spatially Varying Materials" -ec true -ecr true -c "zTextCmd -spatiallyVaryingMaterialsSource" -ann "Show the MEL source code of the spatially varying materials demo.";
+  menuItem -label "Cloth" -ec true -ecr true -c "zTextCmd -clothDemoSource" -ann "Show the MEL source code of the cloth demo.";
+  menuItem -label "Cloth Rest Scale and Pressure" -ec true -ecr true -c "zTextCmd -restScalePressureDemoSource" -ann "Show the MEL source code of the cloth rest scale and pressure demo.";
+  menuItem -label "Isomesher" -ec true -ecr true -c "zTextCmd -isoMesherDemoSource" -ann "Show the MEL source code of the Ziva isomesher demo.";
+setParent -menu ..;
+
+menuItem -label "Meshing" -divider true;
+menuItem -label "Create Isosurface Triangle Mesh" -ec true -ecr true -c "zIsoMesh" -ann "Builds an isosurface triangle mesh of the selected triangle mesh(es) or tissue(s).";
+menuItem -label "Create Delaunay Tet Mesh" -ec true -ecr true -c "zDelaunayTetMesh" -ann "Builds a Delaunay tet mesh of the selected triangle mesh(es) or tissue(s).";
+menuItem -label "zPolyCombine" -ec true -ecr true -c "zPolyCombine" -ann "Will combine multiple polySets into a single polySet.";
+menuItem -label "Create Line-of-Action Curve" -ec true -ecr true -c "zLineOfActionUtil" -ann "Create simple curves from the selected tissues/fibers.";
+
+menuItem -label "Modeling" -divider true;
+menuItem -label "Run Mesh Analysis" -ec true -ecr true -c "zMeshCheck -select" -ann "Quality-check the selected mesh(es).";
+menuItem -label "Find Intersections" -ec true -ecr true -c "ZivaSelectIntersections" -ann "Find intersections between Maya meshes.";
+menuItem -label "Find Self Intersections" -ec true -ecr true -c "ZivaSelectSelfIntersections" -ann "Find self-intersections (self-collisions) on a Maya mesh.";
+menuItem -label "Select Connected" -divider true;
+menuItem -label "zTissues" -ec true -ecr true -c "select -r `zQuery -t zTissue`" -ann "Selects zTissue nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zCloth" -ec true -ecr true -c "select -r `zQuery -t zCloth`" -ann "Selects zCloth nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zBones" -ec true -ecr true -c "select -r `zQuery -t zBone`" -ann "Selects zBone nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zTet" -ec true -ecr true -c "select -r `zQuery -t zTet`" -ann "Selects zTet nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zAttachments" -ec true -ecr true -c "select -r `zQuery -t zAttachment`" -ann "Selects zAttachment nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zMaterials" -ec true -ecr true - c "select -r `zQuery -t zMaterial`" -ann "Selects zMaterial nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zFibers" -ec true -ecr true -c "select -r `zQuery -t zFiber`" -ann "Selects zFiber nodes that are connected to the currently selected mesh(es).";
+menuItem -label "Select in Hierarchy" -divider true;
+menuItem -label "Tissues" -ec true -ecr true -c "ZivaSelectInHierarchy zTissue" -ann "Selects tissue meshes in the currently selected hierarchy.";
+menuItem -label "Cloth" -ec true -ecr true -c "ZivaSelectInHierarchy zCloth" -ann "Selects cloth meshes in the currently selected hierarchy.";
+menuItem -label "Bones" -ec true -ecr true -c "ZivaSelectInHierarchy zBone" -ann "Selects bone meshes in the currently selected hierarchy.";
+menuItem -label "Proximity Tools" -divider true;
+menuItem -label "Select Vertices" -aob true -ec true -ecr true -c "zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat" -ann "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.";
+menuItem -ob true -ann "Proximity Selection Options" -c "ZivaSelectVerticesByProximityOptions";
+menuItem -label "Paint Attachments By Proximity" -aob true -ec true -ecr true -c "zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat" -ann "For a selected existing attachment, choose new source vertices (and repaint the source attachment map accordingly), by selecting the vertices that are within the specified distance threshold to the attachment target object.";
+menuItem -ob true -ann "Proximity Attachment Paint Options" -c "ZivaPaintAttachmentsByProximityOptions";
