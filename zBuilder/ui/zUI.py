@@ -150,21 +150,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        # self.actionPaintByProx = QtWidgets.QAction(self)
-        # self.actionPaintByProx.setText('Paint By Proximity UI')
-        # self.actionPaintByProx.setObjectName("actionPaint")
-        # self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
-
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox, .1, .2))
-
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox, .1, 10))
-
         self.actionPaintSource = QtWidgets.QAction(self)
         self.actionPaintSource.setText('Paint')
         self.actionPaintSource.setObjectName("paintSource")
