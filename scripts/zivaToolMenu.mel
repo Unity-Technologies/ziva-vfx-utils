@@ -1,3 +1,5 @@
+// ----------------------------------------------------------------------------
+// ziva tool menu definition
 global string $gMainWindow;
 setParent $gMainWindow;
 menu -label "Ziva Tools" -tearOff true zivaToolMenu;

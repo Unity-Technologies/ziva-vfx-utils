@@ -1,6 +1,10 @@
+// ----------------------------------------------------------------------------
+// Helper functions for ziva transfer menu
 source "zivaTransferMenuHelper";
 source "zivaTransferMenuLoadSave";
 
+// ----------------------------------------------------------------------------
+// ziva transfer menu definition
 global string $gMainWindow;
 setParent $gMainWindow;
 menu -label "Ziva Transfer" -tearOff true zivaTransferMenu;

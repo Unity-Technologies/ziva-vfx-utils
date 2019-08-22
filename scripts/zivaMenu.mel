@@ -1,5 +1,9 @@
+// ----------------------------------------------------------------------------
+// Helper functions for ziva menu
 source "zivaMenuFunctions";
 
+// ----------------------------------------------------------------------------
+// ziva menu definition
 global string $gMainWindow;
 setParent $gMainWindow;
 menu -label "Ziva" -tearOff true zivaMainMenu;
@@ -71,5 +75,7 @@ menuItem -divider true;
 menuItem -label "About" -ec true -ecr true -c "ziva -z" -ann "About the Ziva Maya plug-in.";
 menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http://zivadynamics.com/resource-library\"";
 
+// ----------------------------------------------------------------------------
+// source other menu files
 source "zivaToolMenu";
 source "zivaTransferMenu";
