@@ -72,3 +72,4 @@ menuItem -label "About" -ec true -ecr true -c "ziva -z" -ann "About the Ziva May
 menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http://zivadynamics.com/resource-library\"";
 
 source "zivaToolMenu";
+source "zivaTransferMenu";
