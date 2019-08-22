@@ -50,6 +50,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
+        self.weights = []
+        self.attrs = {}
 
         root_node = None
 
@@ -89,7 +91,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.top_layout = QtWidgets.QHBoxLayout()
         self.top_layout.addWidget(self.tool_bar)
-        self.top_layout.setContentsMargins(20, 0, 0, 0)
+        self.top_layout.setContentsMargins(15, 0, 0, 0)
         self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
@@ -175,6 +177,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionCopyWeight.setObjectName("actionCopyWeight")
         self.actionCopyWeight.triggered.connect(self.copy_weight)
 
+        self.actionCopyAttrs = QtWidgets.QAction(self)
+        self.actionCopyAttrs.setText('Copy')
+        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
+        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
+
         self.actionInvertWeight = QtWidgets.QAction(self)
         self.actionInvertWeight.setText('Invert')
         self.actionInvertWeight.setObjectName("actionCopyWeight")
@@ -184,6 +191,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteWeight.setText('Paste')
         self.actionPasteWeight.setObjectName("actionPasteWeight")
         self.actionPasteWeight.triggered.connect(self.paste_weight)
+
+        self.actionPasteAttrs = QtWidgets.QAction(self)
+        self.actionPasteAttrs.setText('Paste')
+        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
+        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
 
         self.actionToggleTetsVisibility = QtWidgets.QAction(self)
         self.actionToggleTetsVisibility.setText("Tets")
@@ -204,6 +216,28 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionToggleAxesVisibility.setText("Axes")
         self.actionToggleAxesVisibility.setObjectName("actionToggleAxes")
         self.actionToggleAxesVisibility.setCheckable(True)
+
+    def copy_attrs(self):
+        indexes = self.treeView.selectedIndexes()
+        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
+        self.attrs[node.type] = node.attrs.copy()
+        print self.attrs
+
+    def paste_attrs(self):
+        indexes = self.treeView.selectedIndexes()
+        objs = []
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            for key in self.attrs:
+                if node.type == key:
+                    for attr in self.attrs[key]:
+                        if mc.getAttr("%s.%s" % (node.name, attr), lock=True):
+                            mc.setAttr("%s.%s" % (node.name, attr), lock=False)
+                        mc.setAttr("%s.%s" % (node.name, attr), self.attrs[key][attr]['value'])
+                        mc.setAttr("%s.%s" % (node.name, attr), lock=self.attrs[key][attr]['locked'])
+                    objs.append(node.name)
+        if objs:
+            print 'Attributes pasted to:', ', '.join(objs)
 
     def set_node_attribute(self, attr, node, value=None):
         if not value:
@@ -328,8 +362,13 @@ class MyDockingUI(QtWidgets.QWidget):
             materials_menu.addAction(action_materials)
 
         if node.type == 'zTet':
+            menu.setFixedWidth(125)
+
+            attributes_menu = menu.addMenu('attributes')
+            attributes_menu.addAction(self.actionCopyAttrs)
+            attributes_menu.addAction(self.actionPasteAttrs)
+
             menu.addLabel('Maps')
-            menu.setFixedWidth(100)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -337,9 +376,21 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
 
+        if node.type == 'zTissue':
+            menu.setFixedWidth(125)
+
+            attributes_menu = menu.addMenu('attributes')
+            attributes_menu.addAction(self.actionCopyAttrs)
+            attributes_menu.addAction(self.actionPasteAttrs)
+
         if node.type == 'zFiber':
+            menu.setFixedWidth(125)
+
+            attributes_menu = menu.addMenu('attributes')
+            attributes_menu.addAction(self.actionCopyAttrs)
+            attributes_menu.addAction(self.actionPasteAttrs)
+
             menu.addLabel('Maps')
-            menu.setFixedWidth(120)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -355,8 +406,13 @@ class MyDockingUI(QtWidgets.QWidget):
             target_map_menu.addAction(self.actionInvertWeight)
 
         if node.type == 'zMaterial':
+            menu.setFixedWidth(125)
+
+            attributes_menu = menu.addMenu('attributes')
+            attributes_menu.addAction(self.actionCopyAttrs)
+            attributes_menu.addAction(self.actionPasteAttrs)
+
             menu.addLabel('Maps')
-            menu.setFixedWidth(100)
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
@@ -369,6 +425,10 @@ class MyDockingUI(QtWidgets.QWidget):
             menu.addSection('')
 
         if node.type == 'zAttachment':
+            attributes_menu = menu.addMenu('attributes')
+            attributes_menu.addAction(self.actionCopyAttrs)
+            attributes_menu.addAction(self.actionPasteAttrs)
+
             menu.addAction(self.actionSelectST)
 
             menu.addLabel('Maps')
@@ -421,7 +481,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.show()
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & om.MNodeMessage.kAttributeSet:
+        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked | om.MNodeMessage.kAttributeUnlocked):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
@@ -591,7 +651,6 @@ class MyDockingUI(QtWidgets.QWidget):
         return self
 
     def copy_weight(self):
-
         indexes = self.treeView.selectedIndexes()
         tmp = []
         for i in indexes:
