@@ -4,6 +4,26 @@ import maya.cmds as mc
 import maya.mel as mm
 
 
+class RadioButtonsWidget(QtWidgets.QWidget):
+
+    def __init__(self, buttons, checked_button=None, parent=None):
+        super(RadioButtonsWidget, self).__init__(parent)
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.v_layout = QtWidgets.QVBoxLayout()
+        self.group_box = QtWidgets.QGroupBox(self)
+        self.buttons = []
+        for i, button in enumerate(buttons):
+            radio_button = QtWidgets.QRadioButton(self)
+            radio_button.setText(button)
+            self.buttons.append(radio_button)
+            if i == checked_button:
+                radio_button.setChecked(True)
+            self.v_layout.addWidget(radio_button)
+        self.group_box.setLayout(self.v_layout)
+        self.layout.addWidget(self.group_box)
+
+
 class GroupedLineEdit(QtWidgets.QLineEdit):
 
     def __init__(self, parent=None):
@@ -51,6 +71,17 @@ class CustomMenu(QtWidgets.QMenu):
         action = QtWidgets.QWidgetAction(self)
         action.setDefaultWidget(widget)
         self.addAction(action)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.MouseButtonRelease:
+            if isinstance(obj, QtWidgets.QMenu):
+                if obj.activeAction():
+                    if not obj.activeAction().menu():
+                        if obj.activeAction().isCheckable():
+                            obj.activeAction().trigger()
+                            return True
+
+        return super(CustomMenu, self).eventFilter(obj, event)
 
 
 class ProximityWidget(QtWidgets.QWidget):

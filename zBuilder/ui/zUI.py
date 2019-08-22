@@ -4,6 +4,7 @@ from functools import partial
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
+
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -118,7 +119,6 @@ class MyDockingUI(QtWidgets.QWidget):
                     om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
-
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -200,6 +200,31 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteWeight.setObjectName("actionPasteWeight")
         self.actionPasteWeight.triggered.connect(self.paste_weight)
 
+        self.actionToggleTetsVisibility = QtWidgets.QAction(self)
+        self.actionToggleTetsVisibility.setText("Tets")
+        self.actionToggleTetsVisibility.setObjectName("actionToggleTets")
+        self.actionToggleTetsVisibility.setCheckable(True)
+
+        self.actionToggleFibersVisibility = QtWidgets.QAction(self)
+        self.actionToggleFibersVisibility.setText("Fibers")
+        self.actionToggleFibersVisibility.setObjectName("actionToggleFibers")
+        self.actionToggleFibersVisibility.setCheckable(True)
+
+        self.actionToggleBonesVisibility = QtWidgets.QAction(self)
+        self.actionToggleBonesVisibility.setText("Bones")
+        self.actionToggleBonesVisibility.setObjectName("actionToggleBones")
+        self.actionToggleBonesVisibility.setCheckable(True)
+
+        self.actionToggleAxesVisibility = QtWidgets.QAction(self)
+        self.actionToggleAxesVisibility.setText("Axes")
+        self.actionToggleAxesVisibility.setObjectName("actionToggleAxes")
+        self.actionToggleAxesVisibility.setCheckable(True)
+
+    def set_node_attribute(self, attr, node, value=None):
+        if not value:
+            value = not mc.getAttr('%s.%s' % (node.name, attr))
+        mc.setAttr('%s.%s' % (node.name, attr), value)
+
     def paint_by_prox_options(self):
         """Brings up UI for painting by proximity.
         """
@@ -261,8 +286,61 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
         menu = model.CustomMenu(self)
+        menu.installEventFilter(menu)
         menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
         menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        if node.type == 'zSolverTransform':
+            node = node.child(0)
+
+        if node.type == 'zSolver':
+            menu.addLabel('Visibility')
+            menu.setFixedWidth(135)
+
+            tets_value = node.attrs['showTetMeshes']['value']
+            fibers_value = node.attrs['showMuscleFibers']['value']
+            bones_value = node.attrs['showBones']['value']
+            axes_value = node.attrs['showAxes']['value']
+            attachments_value = node.attrs['showAttachments']['value']
+            collisions_value = node.attrs['showCollisions']['value']
+            materials_value = node.attrs['showMaterials']['value']
+
+            self.actionToggleTetsVisibility.setChecked(tets_value)
+            self.actionToggleTetsVisibility.triggered.connect(partial(self.set_node_attribute, 'showTetMeshes', node))
+            menu.addAction(self.actionToggleTetsVisibility)
+            self.actionToggleFibersVisibility.setChecked(fibers_value)
+            self.actionToggleFibersVisibility.triggered.connect(partial(self.set_node_attribute, 'showMuscleFibers', node))
+            menu.addAction(self.actionToggleFibersVisibility)
+            self.actionToggleBonesVisibility.setChecked(bones_value)
+            self.actionToggleBonesVisibility.triggered.connect(partial(self.set_node_attribute, 'showBones', node))
+            menu.addAction(self.actionToggleBonesVisibility)
+            self.actionToggleAxesVisibility.setChecked(axes_value)
+            self.actionToggleAxesVisibility.triggered.connect(partial(self.set_node_attribute, 'showAxes', node))
+            menu.addAction(self.actionToggleAxesVisibility)
+
+            attachments_menu = menu.addMenu("Attachments")
+            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'], attachments_value)
+            for i, button in enumerate(radio_widget.buttons):
+                button.clicked.connect(partial(self.set_node_attribute, 'showAttachments', node, i))
+            action_attachments = QtWidgets.QWidgetAction(attachments_menu)
+            action_attachments.setDefaultWidget(radio_widget)
+            attachments_menu.addAction(action_attachments)
+
+            collisions_menu = menu.addMenu("Collisions")
+            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'], collisions_value)
+            for i, button in enumerate(radio_widget.buttons):
+                button.clicked.connect(partial(self.set_node_attribute, 'showCollisions', node, i))
+            action_collisions = QtWidgets.QWidgetAction(collisions_menu)
+            action_collisions.setDefaultWidget(radio_widget)
+            collisions_menu.addAction(action_collisions)
+
+            materials_menu = menu.addMenu("Materials")
+            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Youngs Modulus', 'Strain', 'Volume Change'], materials_value)
+            for i, button in enumerate(radio_widget.buttons):
+                button.clicked.connect(partial(self.set_node_attribute, 'showMaterials', node, i))
+            action_materials = QtWidgets.QWidgetAction(materials_menu)
+            action_materials.setDefaultWidget(radio_widget)
+            materials_menu.addAction(action_materials)
 
         if node.type == 'zTet':
             menu.addLabel('Maps')
@@ -323,11 +401,11 @@ class MyDockingUI(QtWidgets.QWidget):
             target_map_menu.addAction(self.actionPasteWeight)
             target_map_menu.addAction(self.actionInvertWeight)
             menu.addSection('')
-            sub = menu.addMenu('Paint By Proximity')
+            proximity_menu = menu.addMenu('Paint By Proximity')
             prox_widget = model.ProximityWidget()
-            actionPaintByProx = QtWidgets.QWidgetAction(sub)
+            actionPaintByProx = QtWidgets.QWidgetAction(proximity_menu)
             actionPaintByProx.setDefaultWidget(prox_widget)
-            sub.addAction(actionPaintByProx)
+            proximity_menu.addAction(actionPaintByProx)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 

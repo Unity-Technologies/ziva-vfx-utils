@@ -45,6 +45,16 @@ QMenu::item
     font-size: 9pt;
 }
 
+QMenu::item:checked
+{
+    padding-left: 20px;
+}
+
+QMenu::item:unchecked
+{
+    padding-left: 20px;
+}
+
 QMenu::item:selected
 {
     color: rgb(88, 156, 224);
@@ -75,6 +85,12 @@ QLabel
     color: rgb(150, 150, 150);
     background: transparent;
     font-size: 8pt;
+}
+
+QGroupBox
+{
+    background-color: transparent;
+    border: 0;
 }
 
 QHeaderView
