@@ -8,3 +8,6 @@ global proc string zivaGetScriptPath()
 
 $anatomicalArmDemoScriptPath = zivaGetScriptPath() + "../demos/anatomicalArm.mel";
 eval("source \"" + $anatomicalArmDemoScriptPath + "\"");
+
+$goalingDemoScriptPath = zivaGetScriptPath() + "../demos/goaling.mel";
+eval("source \"" + $goalingDemoScriptPath + "\"");

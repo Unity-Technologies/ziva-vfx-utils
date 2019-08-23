@@ -1189,10 +1189,8 @@ global proc ziva_main_anatomicalArmDemo(int $newScene)
   }
 
   // load the geometry of the bones and muscles, setup the bone rig and animation of the bones
-  $anatomicalArmSceneFilePath = zivaGetScriptPath() + "/../demo/anatomicalArm.ma";
+  $anatomicalArmSceneFilePath = zivaGetScriptPath() + "/../demos/anatomicalArm.ma";
   file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $anatomicalArmSceneFilePath;
-  //print($anatomicalArmSceneFilePath)
-  //eval("file -import -type \"mayaAscii\" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options \"v=0;p=17;f=0\" -pr \"" + $anatomicalArmSceneFilePath "\"");
 
   // make a solver node
   ziva -s;
