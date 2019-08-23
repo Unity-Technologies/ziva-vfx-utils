@@ -1,0 +1,141 @@
+// =========================================================
+
+/*
+Self-collisions, Ziva Cache and Delaunay tet mesher demo
+========================================================
+
+Demonstrates how to use the Ziva Delaunay tet mesher
+to build a Delaunay tetrahedral mesh to a given input Maya geometry,
+and use it for simulations using the Ziva solver.
+Also demonstrates the Ziva cache, and self-collision detection handling.
+The demo first builds an isomesh to the given Maya input mesh, using "zIsoMesh".
+It then builds a Delaunay tet mesh (with refinement), using "zDelaunayTetMesh".
+Finally, the resulting Delaunay tet mesh replaces the default grid tet mesh, using ziva -cut.
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+// the main function
+global proc ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  // adjust the solver scale, to generate more interesting deformations
+  setAttr "zSolver1.scaleZ" 1;
+  setAttr "zSolver1.scaleX" 1;
+  setAttr "zSolver1.scaleY" 1;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+  setAttr "zSolver1.substeps" 4; // decrease the internal timestep 4x
+  setAttr "zSolver1.collisionDetection" 1; // enable collision detection
+
+  // make a helix
+  polyHelix -c 3 -h 2 -w 2 -r 0.4 -sa 8 -sco 50 -sc 0 -d 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1;
+  setAttr "polyHelix1.radius" 0.2;
+  setAttr "polyHelix1.coils" 10;
+  setAttr "polyHelix1.height" 10;
+
+  // convert the helix into a Ziva tissue, and adjust material parameters
+  select -r pHelix1;
+  ziva -t;
+  setAttr "zMaterial1.youngsModulusExp" 6;
+
+  // build an isomesh to the helix
+  // the result is a triangle mesh, meshing the distance level set 0.1 to the helix geometry
+  zIsoMesh;
+  select -r zIsoMesh1;
+  setAttr "zIsoMesh1.isosurfaceValue" 0.15;
+  setAttr "zIsoMesh1.triangleSize" 0.5;
+  setAttr "zIsoMesh1.inputGeometry" 1; // this sets the input geometry mode to "manifold and self-intersection free"
+  setAttr "zIsoMesh1.recompute" 1; // this launches the computation
+  setAttr "zIsoMesh1.recompute" 0; // this turns off future re-computation, in case the inputs change
+
+  // build a Delaunay tet mesh to the isomesh
+  select -r pHelix1_isoMesh;
+  zDelaunayTetMesh; // launch the Ziva Delaunay tet mesher with refinement
+
+  // replace the grid tet mesh with the computed Delaunay tet mesh
+  // note: this command will automatically duplicate pHelix1_isoMesh_tetMesh into pHelix1_isoMesh_tetMesh1,
+  //       and use pHelix1_isoMesh_tetMesh1 as the tissue's tet mesh, to avoid a Maya connection cycle
+  select -r pHelix1;
+  select -add pHelix1_isoMesh_tetMesh;
+  ziva -cut;
+
+  // enable self-collision detection on the helix
+  setAttr "zTissue1.selfCollisions" 1;
+  setAttr "zTissue1.contactStiffness" 50; // adjust contact stiffness
+  setAttr "zTissue1.contactStiffnessExp" 7; // adjust contact stiffness exponent
+
+  // make the ground plane
+  polyCube -w 3.75 -h 0.25 -d 3.75 -sx 1 -sy 1 -sz 1 -ax 0 1 0 -cuv 4 -ch 1;
+  move -r 0 -6 0; // move it down
+  ziva -b; // make it a bone
+  setAttr "zBone1.contactStiffnessExp" 8; // adjust contact stiffness exponent
+
+  // hide the isomesh and the tet meshes
+  select -r pHelix1_isoMesh pHelix1_isoMesh_tetMesh pHelix1_isoMesh_tetMesh1;
+  hide;
+
+  // adjust the camera
+  select -r pHelix1;
+  if (`about -batch` != 1)
+  {
+    FrameSelected;
+    fitPanel -selected;
+  }
+  select -cl;
+
+  // set the camera view
+  setAttr "persp.translateX" -24;
+  setAttr "persp.translateY" 1;
+  setAttr "persp.translateZ" 21;
+  setAttr "persp.rotateX" -12.0;
+  setAttr "persp.rotateY" -50.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+
+  // select the tissue (so that the Delaunay tet mesh is visible)
+  // (disabled)
+  // select -r pHelix1;
+
+  playbackOptions -e -maxTime 300; // adjust playback to give 300 frames
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  // add and enable the Ziva cache
+  // the simulation will be automatically cached
+  ziva -acn;
+
+  if (`about -batch` != 1)
+  {
+    // enable "Wireframe on Shaded" shading
+    displayStyle -wos;
+  }
+
+  print "Scene created. Demonstrates self-collisions, the Ziva cache and Delaunay tet mesher. Press \"Play\" to simulate.\n";
+}

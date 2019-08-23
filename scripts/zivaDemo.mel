@@ -14,3 +14,30 @@ eval("source \"" + $demoScriptPath + "\"");
 
 $demoScriptPath = zivaGetScriptPath() + "../demos/restScalePressure.mel";
 eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/attachmentTest.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/collisionTest.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/oneOfEachAttachments.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/oneOfEachCollisionTypes.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/spatiallyVaryingMaterials.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/cloth.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/isoMesher.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/selfCollisionsCacheAndDelaunayTetMesher.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/restScalePressure.mel";
+eval("source \"" + $demoScriptPath + "\"");

@@ -1,0 +1,132 @@
+// =========================================================
+
+/*
+Spatially varying materials
+===========================
+
+Makes a tissue sphere where the right part is 100x stiffer than the left part.
+Under gravity, the left part deforms visibly more than the right part.
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+// the main function
+global proc ziva_main_spatiallyVaryingMaterials(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+        if ($response == "Cancel")
+          return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  // make a cube bone; the tissue will be suspended from this bone
+  polyCube -w 1 -h 1 -d 1 -sx 1 -sy 1 -sz 1 -ax 0 1 0 -cuv 4 -ch 1;
+  setAttr "pCube1.scaleZ" 0.1;
+  setAttr "pCube1.scaleX" 0.1;
+  setAttr "pCube1.scaleY" 0.1;
+  setAttr "pCube1.translateY" 2;
+  ziva -b;
+
+  // make a deformable sphere (tissue)
+  polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+  ziva -t;
+
+  // set the tissue tet mesh resolution
+  setAttr "zTet1.tetSize" 0.2;
+
+  // set the stiffness for the original material to a 10x larger value than default, by setting the Young's modulus exponent value to 4 (default youngsModulusExp value is 3)
+  setAttr "zMaterial1.youngsModulusExp" 4;
+  // add another material to the tissue
+  ziva -m;
+  // set the stiffness for the newly created material to a 10x smaller value than default, by setting the Young's modulus exponent value to 2 (default youngsModulusExp value is 3)
+  // hence, the newly created material is 100x softer than the first material
+  setAttr "zMaterial2.youngsModulusExp" 2;
+  // set the material weights of the newly created material to zero in the right hemisphere; thus the first, stiffer, material (zMaterial1) is used for those vertices
+  // note: this would normally be generated interactively via the UI, by painting the zero weights for zMaterial2 on the vertices
+  int $rightHemisphereVertices[] = { 0, 1, 2, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+    53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82,
+    93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
+    133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162,
+    173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202,
+    213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242,
+    253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282,
+    293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322,
+    333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362,
+    374, 375, 376, 377, 378, 379 };
+
+  int $i;
+  for ($i = 0; $i < size($rightHemisphereVertices); $i++)
+  {
+    // note: here, we set the paint weight to 0.0
+    // one could set it to some other value, say 0.5; then, one would be blending the two materials for that vertex
+    setAttr zMaterial2.weightList[0].weights[$rightHemisphereVertices[$i]] 0.0;
+  }
+
+  // select the vertices to constrain on the tissue sphere
+  select -r pSphere1.vtx[360:379] pSphere1.vtx[381];
+  // select the bone (the cube)
+  select -add pCube1;
+  // make the attachment (attaching the sphere to the cube)
+  ziva -a;
+  // make the attachment 100x stiffer, by increasing its exponent from 5 (default) to 7
+  setAttr "zAttachment1.stiffnessExp" 7;
+
+  // set solver scale to 1.0 for more interesting deformations
+  setAttr "zSolver1.scaleX" 1.0;
+  setAttr "zSolver1.scaleY" 1.0;
+  setAttr "zSolver1.scaleZ" 1.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // select the solver node
+  select -r `zQuery -t zSolverTransform`;
+
+  // set the camera for a good view
+  setAttr "persp.translateX" -4.505;
+  setAttr "persp.translateY" 3.164;
+  setAttr "persp.translateZ" 9.607;
+  setAttr "persp.rotateX" -18.938;
+  setAttr "persp.rotateY" -25;
+  setAttr "persp.rotateZ" 0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  if (`about -batch` != 1)
+  {
+    viewFit -all;
+  }
+  setAttr "persp.translateX" -4.505;
+  setAttr "persp.translateY" 3.164;
+  setAttr "persp.translateZ" 9.607;
+
+  playbackOptions -e -maxTime 200; // adjust playback to give 200 frames
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  if (`about -batch` != 1)
+  {
+    // enable "Wireframe on Shaded" shading
+    displayStyle -wos;
+  }
+
+  print "Scene created. Demonstrates spatially-varying materials. The right side of the sphere is 100x stiffer than the left. Press \"Play\" to simulate.\n";
+}

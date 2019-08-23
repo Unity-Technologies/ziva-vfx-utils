@@ -1,0 +1,134 @@
+// =========================================================
+
+/*
+  Collision test
+  ==============
+
+  Drop two tissue spheres onto a bone box ramp.
+
+  Copyright (C) Ziva Dynamics 2017
+  Permission is hereby granted for anybody with a valid Ziva
+  license to use this script for any purpose.
+*/
+
+proc ziva_makeGeometry_collisionTest(string $meshes[])
+{
+  // make two spheres and a box
+  string $sphere1[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 0`;
+  string $sphere2[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 0`;
+  string $cube1[] = `polyCube -w 1 -h 1 -d 1 -sx 20 -sy 10 -sz 10 -ax 0 1 0 -cuv 4 -ch 0`;
+
+  $meshes[0] = $sphere1[0];
+  $meshes[1] = $sphere2[0];
+  $meshes[2] = $cube1[0];
+}
+
+proc ziva_moveGeometry_collisionTest(string $meshes[])
+{
+  xform -a -ws -t 0.0 7.0 2.25 $meshes[0];
+  xform -a -ws -t 0.0 7.0 -2.25 $meshes[1];
+  xform -a -ws -ro 0.0 0.0 -24.0 -s 20 1 10 $meshes[2];
+
+  dgdirty -a;
+  refresh;
+}
+
+proc ziva_addBodies_collisionTest(string $meshes[])
+{
+  // make the first tissue sphere
+  select -r $meshes[0];
+  string $tissueA[] = `ziva -t`;
+  select -r $tissueA;
+  string $zTissueA[] = `ls -sl -type "zTissue"`;
+  // adjust the contact stiffness
+  setAttr ($zTissueA[0] + ".contactStiffnessExp") 6;
+  // disable sliding contacts (i.e., infinite friction)
+  setAttr ($zTissueA[0] + ".contactSliding") 0;
+
+  // make the second tissue sphere
+  select -r $meshes[1];
+  string $tissueB[] = `ziva -t`; // uses sliding contacts by default
+  select -r $tissueB;
+  string $zTissueB[] = `ls -sl -type "zTissue"`;
+  // adjust the contact stiffness
+  setAttr ($zTissueB[0] + ".contactStiffnessExp") 6;
+
+  // make the box bone ramp
+  select -r $meshes[2];
+  string $bones[] = `ziva -b`;
+
+  // enable collision detection
+  string $solvers[] = `ls -type "zSolver"`;
+  setAttr ($solvers[0] + ".collisionDetection") 1;
+  // adjust gravity
+  setAttr ($solvers[0] + ".gravityY") -0.5;
+}
+
+// the main function
+global proc ziva_main_collisionTest(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  string $meshes[];
+  ziva_makeGeometry_collisionTest($meshes);
+  ziva_moveGeometry_collisionTest($meshes);
+  ziva_addBodies_collisionTest($meshes);
+
+  // set solver scale to 1.0 for more interesting deformations
+  setAttr "zSolver1.scaleX" 1.0;
+  setAttr "zSolver1.scaleY" 1.0;
+  setAttr "zSolver1.scaleZ" 1.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // select the solver node
+  select -r `zQuery -t zSolverTransform`;
+
+  // set the camera view
+  setAttr "persp.translateX" 21.0;
+  setAttr "persp.translateY" 6.0;
+  setAttr "persp.translateZ" 35.0;
+  setAttr "persp.rotateX" -8.0;
+  setAttr "persp.rotateY" 26.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  if (`about -batch` != 1)
+  {
+    viewFit -all;
+  }
+
+  playbackOptions -e -maxTime 500; // adjust playback to give 500 frames
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  if (`about -batch` != 1)
+  {
+    // enable "Wireframe on Shaded" shading
+    displayStyle -wos;
+  }
+
+  print "Scene created. One sphere uses contact sliding, the other does not. Press \"Play\" to simulate.\n";
+}
