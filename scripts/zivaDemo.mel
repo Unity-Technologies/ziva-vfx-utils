@@ -1,0 +1,10 @@
+global proc string zivaGetScriptPath()
+{ // Retrieve ziva script path by running whatIs command,
+  // It returns string like, "Mel procedure found in: <PATH TO THE ZIVA SCRIPT>"
+  $rawZivaCmdScriptPath = `whatIs ZivaToggleEnabled`;
+  $zivaCmdScriptPath = stringRemovePrefix($rawZivaCmdScriptPath, "Mel procedure found in: ");
+  return dirname($zivaCmdScriptPath) + "/";
+}
+
+$anatomicalArmDemoScriptPath = zivaGetScriptPath() + "../demos/anatomicalArm.mel";
+eval("source \"" + $anatomicalArmDemoScriptPath + "\"");
