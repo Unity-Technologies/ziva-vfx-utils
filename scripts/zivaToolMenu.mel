@@ -28,20 +28,6 @@ menuItem -subMenu true -label "Run Demo";
   menuItem -label "Isomesher" -ec true -ecr true -c "ziva_main_isoMesherDemo(1)" -ann "Demonstrates the Ziva isomesher.";
 setParent -menu ..;
 
-menuItem -subMenu true -label "See MEL Source of Demo";
-  menuItem -label "Anatomical Arm" -ec true -ecr true -c "zTextCmd -anatomicalArmDemoSource" -ann "Show the MEL source code of the anatomical human arm demo.";
-  menuItem -label "Goaling, Self-Collisions, Ziva Cache and Spatially Varying Materials" -ec true -ecr true -c "zTextCmd -goalingDemoSource" -ann "Show the MEL source code of the goaling, self-collisions, Ziva caching, and spatially varying materials demo.";
-  menuItem -label "Self-Collisions, Ziva Cache and Delaunay Tet Mesher" -ec true -ecr true -c "zTextCmd -delaunayTetMesherDemoSource" -ann "Show the MEL source code of the self-collisions, Ziva cache and Delaunay tet mesher demo.";
-  menuItem -label "Attachments" -ec true -ecr true -c "zTextCmd -attachmentTestSource" -ann "Show the MEL source code of the attachments demo.";
-  menuItem -label "Collisions" -ec true -ecr true -c "zTextCmd -collisionTestSource" -ann "Show the MEL source code of the collisions demo.";
-  menuItem -label "One Of Each Attachments" -ec true -ecr true -c "zTextCmd -oneOfEachAttachmentsSource" -ann "Show the MEL source code of the four attachment types demo.";
-  menuItem -label "One Of Each Collision Types" -ec true -ecr true -c "zTextCmd -oneOfEachCollisionTypesSource" -ann "Show the MEL source code of the four collision types demo.";
-  menuItem -label "Spatially Varying Materials" -ec true -ecr true -c "zTextCmd -spatiallyVaryingMaterialsSource" -ann "Show the MEL source code of the spatially varying materials demo.";
-  menuItem -label "Cloth" -ec true -ecr true -c "zTextCmd -clothDemoSource" -ann "Show the MEL source code of the cloth demo.";
-  menuItem -label "Cloth Rest Scale and Pressure" -ec true -ecr true -c "zTextCmd -restScalePressureDemoSource" -ann "Show the MEL source code of the cloth rest scale and pressure demo.";
-  menuItem -label "Isomesher" -ec true -ecr true -c "zTextCmd -isoMesherDemoSource" -ann "Show the MEL source code of the Ziva isomesher demo.";
-setParent -menu ..;
-
 menuItem -label "Meshing" -divider true;
 menuItem -label "Create Isosurface Triangle Mesh" -ec true -ecr true -c "zIsoMesh" -ann "Builds an isosurface triangle mesh of the selected triangle mesh(es) or tissue(s).";
 menuItem -label "Create Delaunay Tet Mesh" -ec true -ecr true -c "zDelaunayTetMesh" -ann "Builds a Delaunay tet mesh of the selected triangle mesh(es) or tissue(s).";
