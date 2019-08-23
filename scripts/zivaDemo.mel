@@ -6,8 +6,11 @@ global proc string zivaGetScriptPath()
   return dirname($zivaCmdScriptPath) + "/";
 }
 
-$anatomicalArmDemoScriptPath = zivaGetScriptPath() + "../demos/anatomicalArm.mel";
-eval("source \"" + $anatomicalArmDemoScriptPath + "\"");
+$demoScriptPath = zivaGetScriptPath() + "../demos/anatomicalArm.mel";
+eval("source \"" + $demoScriptPath + "\"");
 
-$goalingDemoScriptPath = zivaGetScriptPath() + "../demos/goaling.mel";
-eval("source \"" + $goalingDemoScriptPath + "\"");
+$demoScriptPath = zivaGetScriptPath() + "../demos/goaling.mel";
+eval("source \"" + $demoScriptPath + "\"");
+
+$demoScriptPath = zivaGetScriptPath() + "../demos/restScalePressure.mel";
+eval("source \"" + $demoScriptPath + "\"");

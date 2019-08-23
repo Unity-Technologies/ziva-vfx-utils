@@ -1,43 +1,41 @@
+// =========================================================
 
+/*
+Goaling, Self-Collisions, Ziva Cache and Spatially-Varying Materials demo
+=========================================================================
 
-  // =========================================================
+Demonstrates how to use Ziva goaling to automatically
+generate physically based secondary motion.
+There are two copies of the fish in the scene.
+In the neutral configuration, they are on top of each other.
+The first fish was animated in a traditional way,
+using a Maya skeleton and a skin cluster.
+It is made into a Ziva bone.
+The second fish is a Ziva tissue. It is simulated using
+the Ziva FEM simulator, by goaling it to the first fish.
+The goaling weights are painted 1 on the fish body, and 0
+on the fish fins. In this way, only the body is goaled,
+whereas the fins are free to evolve according to physics,
+producing physically based secondary motion.
+The simulated fish is simulated using self-collision detection,
+and therefore the fins don't penetrate into the body of the fish.
+The tail fin is made 2x stiffer, by generating a new material that
+is 2x stiffer than the body material, and painting its weights
+to 1.0 so that it applies to the tail fin region.
+Similarly, the dorsal fin is made 10x softer.
+This demo also demonstrates the Ziva cache. The simulation is
+cached and can be replayed quickly. You can also scrub the Maya
+timeline to see the cached simulation frames.
 
-  /*
-  Goaling, Self-Collisions, Ziva Cache and Spatially-Varying Materials demo
-  =========================================================================
+Credits for the fish model:
+Prof. Keenan Crane, "3D Model Repository", Carnegie Mellon University
+("Blub"; released by Prof. Crane into the public domain)
+https://www.cs.cmu.edu/~kmcrane/Projects/ModelRepository/
 
-  Demonstrates how to use Ziva goaling to automatically
-  generate physically based secondary motion.
-  There are two copies of the fish in the scene.
-  In the neutral configuration, they are on top of each other.
-  The first fish was animated in a traditional way,
-  using a Maya skeleton and a skin cluster.
-  It is made into a Ziva bone.
-  The second fish is a Ziva tissue. It is simulated using
-  the Ziva FEM simulator, by goaling it to the first fish.
-  The goaling weights are painted 1 on the fish body, and 0
-  on the fish fins. In this way, only the body is goaled,
-  whereas the fins are free to evolve according to physics,
-  producing physically based secondary motion.
-  The simulated fish is simulated using self-collision detection,
-  and therefore the fins don't penetrate into the body of the fish.
-  The tail fin is made 2x stiffer, by generating a new material that
-  is 2x stiffer than the body material, and painting its weights
-  to 1.0 so that it applies to the tail fin region.
-  Similarly, the dorsal fin is made 10x softer.
-  This demo also demonstrates the Ziva cache. The simulation is
-  cached and can be replayed quickly. You can also scrub the Maya
-  timeline to see the cached simulation frames.
-
-  Credits for the fish model:
-  Prof. Keenan Crane, "3D Model Repository", Carnegie Mellon University
-  ("Blub"; released by Prof. Crane into the public domain)
-  https://www.cs.cmu.edu/~kmcrane/Projects/ModelRepository/
-
-  Copyright (C) Ziva Dynamics 2017
-  Permission is hereby granted for anybody with a valid Ziva
-  license to use this script for any purpose.
-  */
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
 
 global proc ziva_generateGoalAttachment_goalingDemo()
 {
