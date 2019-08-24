@@ -1,43 +1,19 @@
-global proc string zivaGetScriptPath()
-{ // Retrieve ziva script path by running whatIs command,
-  // It returns string like, "Mel procedure found in: <PATH TO THE ZIVA SCRIPT>"
-  $rawZivaCmdScriptPath = `whatIs ZivaToggleEnabled`;
-  $zivaCmdScriptPath = stringRemovePrefix($rawZivaCmdScriptPath, "Mel procedure found in: ");
-  return dirname($zivaCmdScriptPath) + "/";
-}
+global proc zivaSourceDemo(string $melScriptName)
+{ // Retrieve ziva demo path by running `whatIs zivaDemo` command,
+  // It returns string like, "Script found in: <PATH TO THE ZIVA DEMO SCRIPT>"
+  $returnString = `whatIs zivaDemo`;
+  $zivaDemoScriptPath = stringRemovePrefix($returnString, "Script found in: ");  
+  $demoPath = dirname($zivaDemoScriptPath) + "/../demos/" + $melScriptName;
+  eval("source \"" + $demoPath + "\"");  
+};
 
-$demoScriptPath = zivaGetScriptPath() + "../demos/anatomicalArm.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/goaling.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/restScalePressure.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/attachmentTest.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/collisionTest.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/oneOfEachAttachments.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/oneOfEachCollisionTypes.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/spatiallyVaryingMaterials.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/cloth.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/isoMesher.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/selfCollisionsCacheAndDelaunayTetMesher.mel";
-eval("source \"" + $demoScriptPath + "\"");
-
-$demoScriptPath = zivaGetScriptPath() + "../demos/restScalePressure.mel";
-eval("source \"" + $demoScriptPath + "\"");
+zivaSourceDemo("anatomicalArm.mel");
+zivaSourceDemo("goaling.mel");
+zivaSourceDemo("restScalePressure.mel");
+zivaSourceDemo("collisionTest.mel");
+zivaSourceDemo("oneOfEachAttachments.mel");
+zivaSourceDemo("oneOfEachCollisionTypes.mel");
+zivaSourceDemo("spatiallyVaryingMaterials.mel");
+zivaSourceDemo("cloth.mel");
+zivaSourceDemo("isoMesher.mel");
+zivaSourceDemo("selfCollisionsCacheAndDelaunayTetMesher.mel");

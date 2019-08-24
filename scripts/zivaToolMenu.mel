@@ -18,7 +18,6 @@ menuItem -subMenu true -label "Run Demo";
   menuItem -label "Anatomical Arm" -ec true -ecr true -c "ziva_main_anatomicalArmDemo(1)" -ann "Demonstrates an anatomical human arm.";
   menuItem -label "Goaling, Self-Collisions, Ziva Cache and Spatially Varying Materials" -ec true -ecr true -c "ziva_main_goalingDemo(1)" -ann "Demonstrates goaling, self-collisions, Ziva caching, and spatially varying materials, on a Maya-rigged fish example.";
   menuItem -label "Self-Collisions, Ziva Cache and Delaunay Tet Mesher" -ec true -ecr true -c "ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(1)" -ann "Demonstrates self-collisions, Ziva cache and the Delaunay tet mesher.";
-  menuItem -label "Attachments" -ec true -ecr true -c "ziva_main_attachmentTest(1)" -ann "Demonstrates attachments.";
   menuItem -label "Collisions" -ec true -ecr true -c "ziva_main_collisionTest(1)" -ann "Demonstrates collisions.";
   menuItem -label "One Of Each Attachments" -ec true -ecr true -c "ziva_main_oneOfEachAttachments(1)" -ann "Demonstrates one of each of the four attachment types.";
   menuItem -label "One Of Each Collision Types" -ec true -ecr true -c "ziva_main_oneOfEachCollisionTypes(1)" -ann "Demonstrates one of each of the four collision types.";
