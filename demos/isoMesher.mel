@@ -36,7 +36,7 @@ global proc ziva_main_isoMesherDemo(int $newScene)
   }
 
   // load the geometry of the bones and muscles, setup the bone rig and animation of the bones
-  $anatomicalArmSceneFilePath = zivaGetScriptPath() + "/../demos/anatomicalArm.ma";
+  $anatomicalArmSceneFilePath = getDemoAssetPath("anatomicalArm.ma");
   file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $anatomicalArmSceneFilePath;
 
   // set the camera view

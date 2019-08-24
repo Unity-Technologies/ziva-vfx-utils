@@ -40,7 +40,7 @@ global proc ziva_main_restScalePressureDemo(int $newScene)
   }
 
   // load the geometry of the demo
-  $restScalePressureSceneFilePath = zivaGetScriptPath() + "/../demos/restScalePressureGeometry.ma";
+  $restScalePressureSceneFilePath = getDemoAssetPath("restScalePressureGeometry.ma");
   file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $restScalePressureSceneFilePath;
 
   // keyframe the rotator to rotate

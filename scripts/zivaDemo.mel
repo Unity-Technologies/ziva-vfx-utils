@@ -1,10 +1,16 @@
-global proc zivaSourceDemo(string $melScriptName)
+global proc string getDemoAssetPath(string $demoAssetName)
 { // Retrieve ziva demo path by running `whatIs zivaDemo` command,
   // It returns string like, "Script found in: <PATH TO THE ZIVA DEMO SCRIPT>"
   $returnString = `whatIs zivaDemo`;
-  $zivaDemoScriptPath = stringRemovePrefix($returnString, "Script found in: ");  
-  $demoPath = dirname($zivaDemoScriptPath) + "/../demos/" + $melScriptName;
-  eval("source \"" + $demoPath + "\"");  
+  $demoScriptPath = stringRemovePrefix($returnString, "Script found in: ");
+  $demoAssetPath = dirname($demoScriptPath) + "/../demos/" + $demoAssetName;
+  return $demoAssetPath;
+}
+
+global proc zivaSourceDemo(string $demoAssetName)
+{
+  $demoPath = getDemoAssetPath($demoAssetName);
+  eval("source \"" + $demoPath + "\"");
 };
 
 zivaSourceDemo("anatomicalArm.mel");

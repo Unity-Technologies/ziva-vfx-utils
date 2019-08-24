@@ -319,7 +319,7 @@ global proc ziva_main_goalingDemo(int $newScene)
   }
 
   // load the geometry of the fish (two identical copies), setup the skeleton rig and animation of the first fish
-  $goalingSceneFilePath = zivaGetScriptPath() + "/../demos/fishGeometry.ma";
+  $goalingSceneFilePath = getDemoAssetPath("fishGeometry.ma");
   file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $goalingSceneFilePath;
 
   // show the texture
