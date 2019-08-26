@@ -79,9 +79,26 @@ class DGNode(Base):
         Returns:
             dict: of serializable items
         """
-        self.replace_mobject_with_string()
+        # convert mObjectHandle to name of maya object (str)
+        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
         output = serialize_object(self)
+
+        # convert the string back to an mobject
+        self.mobject = self.__mobject_handle
+
         return output
+
+    def deserialize(self, json_data):
+        """ Deserializes a node with given dict.
+
+        Takes a dictionary and goes through keys and fills up __dict__.
+
+        Args (dict): The given dict.
+        """
+        self.__dict__ = json_data
+
+        # Finding the mObject in scene if it exists
+        self.mobject = self.__mobject_handle
 
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
@@ -227,10 +244,11 @@ class DGNode(Base):
             mObject
 
         """
-        if isinstance(self.__mobject_handle, unicode) or isinstance(self.__mobject_handle, str):
-            return str(self.__mobject_handle)
-        if self.__mobject_handle.isValid():
-            return self.__mobject_handle.object()
+        if not isinstance(self.__mobject_handle, str):
+            if self.__mobject_handle:
+                if self.__mobject_handle.isValid():
+                    return self.__mobject_handle.object()
+
         return None
 
     @mobject.setter
@@ -247,25 +265,9 @@ class DGNode(Base):
 
         """
         self.__mobject_handle = None
-        if maya_node:
-            if mc.objExists(maya_node):
-                selection_list = om.MSelectionList()
-                selection_list.add(maya_node)
-                mobject = om.MObject()
-                selection_list.getDependNode(0, mobject)
-                self.__mobject_handle = om.MObjectHandle(mobject)
-
-    def mobject_reset(self):
-        """Resets the mObject in object by setting it to None
-        """
-        self.__mobject_handle = None
-
-    def replace_mobject_with_string(self):
-        """This takes the mObject stored in zBuilder and converts it to a string
-        name.  This is useful if you need to serialize the object.
-        """
-        if not isinstance(self.__mobject_handle, str) and self.__mobject_handle:
-            self.__mobject_handle = str(mz.get_name_from_m_object(self.mobject))
-
-    def find_mobject_from_string(self):
-        self.mobject = self.mobject
+        if mc.objExists(maya_node):
+            selection_list = om.MSelectionList()
+            selection_list.add(maya_node)
+            mobject = om.MObject()
+            selection_list.getDependNode(0, mobject)
+            self.__mobject_handle = om.MObjectHandle(mobject)

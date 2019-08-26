@@ -206,11 +206,3 @@ class Bundle(object):
         """
         for item in self.scene_items:
             item.string_replace(search, replace)
-
-    def find_mobject_from_string(self):
-        """Runs 'find_mobject_from_string' on all objects in bundle.  First it checks
-        if it exists.
-        """
-        for item in self.scene_items:
-            if 'find_mobject_from_string' in dir(item):
-                item.find_mobject_from_string()

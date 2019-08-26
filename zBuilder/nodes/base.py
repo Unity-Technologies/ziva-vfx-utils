@@ -39,7 +39,6 @@ class Base(object):
         self.info['operating_system'] = mc.about(os=True)
 
         if self._parent is not None:
-            # print 'ASSING CHILD', self._parent
             self._parent.add_child(self)
 
         if deserialize:
@@ -137,9 +136,7 @@ class Base(object):
 
         Args (dict): The given dict.
         """
-        for key in dictionary:
-            if key not in ['_setup', '_class']:
-                self.__dict__[key] = dictionary[key]
+        self.__dict__ = dictionary
 
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.
@@ -202,7 +199,6 @@ class Base(object):
         json_data = [node_data, info]
 
         if io.dump_json(file_path, json_data):
-            self.find_mobject_from_string()
             logger.info('Wrote File: %s' % file_path)
 
 
@@ -215,6 +211,11 @@ def serialize_object(obj):
     Returns:
         dict: Of serializable obj
     """
+
+    obj._parent = None
+    obj._children = None
+
+    # tmp_tmp = []
     output = dict()
     for key in obj.__dict__:
         if hasattr(obj.__dict__[key], '_class') and hasattr(obj.__dict__[key], 'serialize'):
@@ -224,4 +225,5 @@ def serialize_object(obj):
             output[key] = obj.__dict__[key]
         except TypeError:
             pass
+
     return output

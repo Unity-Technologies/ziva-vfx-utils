@@ -159,7 +159,6 @@ class Builder(object):
                                               type_filter=type_filter,
                                               invert_match=invert_match)
         if io.dump_json(file_path, json_data):
-            self.bundle.find_mobject_from_string()
             self.bundle.stats()
             logger.info('Wrote File: %s' % file_path)
 
@@ -173,7 +172,6 @@ class Builder(object):
         before = datetime.datetime.now()
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
-        self.bundle.find_mobject_from_string()
         self.bundle.stats()
         after = datetime.datetime.now()
         logger.info('Read File: {} in {}'.format(file_path, after - before))

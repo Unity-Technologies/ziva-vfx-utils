@@ -68,10 +68,9 @@ class Ziva(Builder):
             grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = DGNode(deserialize=item.serialize())
-
-            # add mobject
+            grp.depends_on = item.mobject
             grp.mobject = item.long_association[0]
+
             self.bodies[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
