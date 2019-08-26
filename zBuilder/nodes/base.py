@@ -29,8 +29,8 @@ class Base(object):
         self.builder = kwargs.get('builder', None)
         deserialize = kwargs.get('deserialize', None)
 
-        self._children = []
-        self._parent = kwargs.get('parent', None)
+        self.children = []
+        self.parent = kwargs.get('parent', None)
 
         self.info = dict()
         self.info['version'] = zBuilder.__version__
@@ -38,8 +38,8 @@ class Base(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
-        if self._parent is not None:
-            self._parent.add_child(self)
+        if self.parent is not None:
+            self.parent.add_child(self)
 
         if deserialize:
             self.deserialize(deserialize)
@@ -56,20 +56,33 @@ class Base(object):
         return not self.__eq__(other)
 
     def add_child(self, child):
-        self._children.append(child)
+        self.children.append(child)
 
     def child(self, row):
         return self._children[row]
 
     def child_count(self):
-        return len(self._children)
+        return len(self.children)
 
+    @property
     def parent(self):
         return self._parent
 
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
+
+    @property
+    def children(self):
+        return self._children
+
+    @children.setter
+    def children(self, children):
+        self._children = children
+
     def row(self):
-        if self._parent is not None:
-            return self._parent._children.index(self)
+        if self.parent is not None:
+            return self.parent.children.index(self)
         else:
             return 0
 
@@ -81,9 +94,9 @@ class Base(object):
             output += "\t"
         output += "|-----" + self._name + "\n"
 
-        print self._children
-        print self._parent
-        for child in self._children:
+        print self.children
+        print self.parent
+        for child in self.children:
             output += child.log(tab_level)
 
         tab_level -= 1
@@ -212,8 +225,8 @@ def serialize_object(obj):
         dict: Of serializable obj
     """
 
-    obj._parent = None
-    obj._children = None
+    obj.parent = None
+    obj.children = None
 
     # tmp_tmp = []
     output = dict()
