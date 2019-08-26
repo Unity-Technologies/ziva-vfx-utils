@@ -17,19 +17,18 @@ class BaseNodeEncoder(json.JSONEncoder):
             return super(BaseNodeEncoder, self).default(obj)
 
 
-def pack_zbuilder_contents(json_data, type_filter=[], invert_match=False):
+def pack_zbuilder_contents(builder, type_filter=[], invert_match=False):
     """ Utility to package the data in a dictionary.
     """
     logger.info("packing zBuilder contents for json.")
 
     node_data = dict()
     node_data['d_type'] = 'node_data'
-    node_data['data'] = json_data.get_scene_items(type_filter=type_filter,
-                                                  invert_match=invert_match)
+    node_data['data'] = builder.get_scene_items(type_filter=type_filter, invert_match=invert_match)
 
     info = dict()
     info['d_type'] = 'info'
-    info['data'] = json_data.info
+    info['data'] = builder.info
 
     return [node_data, info]
 
