@@ -11,7 +11,10 @@ if "%~1"=="" (
     set mayaYear=%1
 )
 
-python %~dp0..\..\..\CMT\bin\runmayatests.py -m %mayaYear% --path %~dp0%tests
+python %~dp0..\..\..\CMT\bin\runmayatests.py ^
+    -m %mayaYear% ^
+    --path %~dp0%tests ^
+    --maya-script-path %~dp0..\..\..\scripts
 
 
 echo|set /p="deactivating virtual environment ..."
