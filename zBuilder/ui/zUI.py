@@ -200,6 +200,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.setObjectName("actionPasteAttrs")
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
 
+        self.actionDuplicateObject = QtWidgets.QAction(self)
+        self.actionDuplicateObject.setText("Duplicate")
+        self.actionDuplicateObject.setObjectName("actionDuplicateObject")
+        self.actionDuplicateObject.triggered.connect(self.duplicate_ziva_objects)
+
         self.actionToggleTetsVisibility = QtWidgets.QAction(self)
         self.actionToggleTetsVisibility.setText("Tets")
         self.actionToggleTetsVisibility.setObjectName("actionToggleTets")
@@ -220,18 +225,53 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionToggleAxesVisibility.setObjectName("actionToggleAxes")
         self.actionToggleAxesVisibility.setCheckable(True)
 
-    # def duplicate_ziva_objects(self):
-    #     indexes = self.treeView.selectedIndexes()
-    #
-    #     for index in indexes:
-    #         self.treeView.setSelection(index)
-    #         self.copy_attrs()
-    #         self.copy_weight()
-    #         node = index.data(model.SceneGraphModel.nodeRole)
-    #         if node.type == 'zMaterial':
-    #             name = mc.ziva(m=True)[0]
-    #         elif node.type == 'zFiber':
-    #             pass
+    def duplicate_ziva_objects(self):
+        indexes = self.treeView.selectedIndexes()
+        # currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole, True, -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        # remember names of items to expand
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+        for index in indexes:
+            self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+            self.copy_attrs()
+            self.copy_weight()
+            node = index.data(model.SceneGraphModel.nodeRole)
+            if node.type == 'zMaterial':
+                mc.select(node.association[0])
+                name = mc.ziva(m=True)[0]
+                mc.select(name)
+                self.builder.retrieve_connections()
+                scene_items = self.builder.get_scene_items()
+                self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+                self.callback_ids["AttributeChanged"] = []
+                self.callback_ids["NameChanged"] = []
+                for item in scene_items:
+                    obj = item.mobject
+                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                    self.callback_ids["AttributeChanged"].append(id_)
+                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                    self.callback_ids["NameChanged"].append(id_)
+                for item in self.builder.bodies.values():
+                    obj = item.mobject
+                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                    self.callback_ids["AttributeChanged"].append(id_)
+                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                    self.callback_ids["NameChanged"].append(id_)
+
+        self.treeView.collapseAll()
+        for name in names_to_expand:
+            indices = self._proxy_model.match(
+                self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indices:
+                self.treeView.expand(index)
+        self.paste_attrs()
+        self.paste_weight()
 
     def copy_attrs(self):
         indexes = self.treeView.selectedIndexes()
@@ -441,6 +481,7 @@ class MyDockingUI(QtWidgets.QWidget):
         if node.type == 'zMaterial':
             menu.setFixedWidth(125)
 
+            menu.addAction(self.actionDuplicateObject)
             attributes_menu = menu.addMenu('attributes')
             attributes_menu.addAction(self.actionCopyAttrs)
             attributes_menu.addAction(self.actionPasteAttrs)
@@ -755,7 +796,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def paste_weight(self, map_name=None, source=True):
         indexes = self.treeView.selectedIndexes()[-1]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        if map_name:
+        if not map_name:
             if source:
                 index = 0
             else:
