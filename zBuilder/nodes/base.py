@@ -215,10 +215,11 @@ class Base(object):
 
 
 def serialize_object(obj):
-    """ Takes in a python obj and scrubs through the __dict__
+    """ Takes in a python obj and scrubs through the __dict__ and returns a serializable
+    dictionary.
 
     Args:
-        obj ([object]): Python object to inspect.
+        obj (object): Python object to inspect.
 
     Returns:
         dict: Of serializable obj
