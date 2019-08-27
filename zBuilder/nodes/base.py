@@ -200,7 +200,6 @@ class Base(object):
         Args:
             file_path (str): The file path to write to disk.
         """
-        # json_data = io.pack_zbuilder_contents(self)
         node_data = dict()
         node_data['d_type'] = 'node_data'
         node_data['data'] = self
