@@ -76,6 +76,9 @@ class DGNode(Base):
         dict and saves out a temp dict of items that can be serializable and
         returns that temp dict for json writing purposes.
 
+        Replaces .mobject mobject with a string name before serilization.
+        Afterwords it converts it back to an mObject.
+
         Returns:
             dict: of serializable items
         """
@@ -91,9 +94,11 @@ class DGNode(Base):
     def deserialize(self, json_data):
         """ Deserializes a node with given dict.
 
-        Takes a dictionary and goes through keys and fills up __dict__.
+        Assigns a dictionary to __dict__.  Adds an mObject to the .mobject if 
+        applicable.
 
-        Args (dict): The given dict.
+        Args:
+            json_data(dict): The given dict.
         """
         self.__dict__ = json_data
 
