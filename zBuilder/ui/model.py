@@ -1,129 +1,11 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import maya.cmds as mc
-import maya.mel as mm
-
-
-class RadioButtonsWidget(QtWidgets.QWidget):
-
-    def __init__(self, buttons, checked_button=None, parent=None):
-        super(RadioButtonsWidget, self).__init__(parent)
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.v_layout = QtWidgets.QVBoxLayout()
-        self.group_box = QtWidgets.QGroupBox(self)
-        self.buttons = []
-        for i, button in enumerate(buttons):
-            radio_button = QtWidgets.QRadioButton(self)
-            radio_button.setText(button)
-            self.buttons.append(radio_button)
-            if i == checked_button:
-                radio_button.setChecked(True)
-            self.v_layout.addWidget(radio_button)
-        self.group_box.setLayout(self.v_layout)
-        self.layout.addWidget(self.group_box)
-
-
-class GroupedLineEdit(QtWidgets.QLineEdit):
-    acceptSignal = QtCore.Signal()
-
-    def __init__(self, parent=None):
-        super(GroupedLineEdit, self).__init__(parent)
-        self.sibling = None
-
-    def event(self, event):
-        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
-            if self.sibling:
-                self.sibling.setFocus()
-                return True
-
-        if event.type() == QtCore.QEvent.KeyPress and event.key() in [QtCore.Qt.Key_Enter,  QtCore.Qt.Key_Return]:
-            self.acceptSignal.emit()
-            return True
-
-        return super(GroupedLineEdit, self).event(event)
-
-
-class CustomMenu(QtWidgets.QMenu):
-
-    def __init__(self, parent=None):
-        super(CustomMenu, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-    def addMenu(self, *args, **kwargs):
-        menu = super(CustomMenu, self).addMenu(*args, **kwargs)
-        if isinstance(menu, QtWidgets.QMenu):
-            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
-            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        return menu
-
-    def addLabel(self, text):
-        widget = QtWidgets.QWidget()
-        layout = QtWidgets.QHBoxLayout(widget)
-        label_text = QtWidgets.QLabel(text)
-        line = QtWidgets.QFrame()
-        line.setObjectName("line")
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        line.setFixedHeight(1)
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        size_policy.setHorizontalStretch(0)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(line.sizePolicy().hasHeightForWidth())
-        line.setSizePolicy(size_policy)
-        layout.addWidget(label_text)
-        layout.addWidget(line)
-        action = QtWidgets.QWidgetAction(self)
-        action.setDefaultWidget(widget)
-        self.addAction(action)
-
-    def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.MouseButtonRelease:
-            if isinstance(obj, QtWidgets.QMenu):
-                if obj.activeAction():
-                    if not obj.activeAction().menu():
-                        if obj.activeAction().isCheckable():
-                            obj.activeAction().trigger()
-                            return True
-
-        return super(CustomMenu, self).eventFilter(obj, event)
-
-
-class ProximityWidget(QtWidgets.QWidget):
-
-    def __init__(self, parent=None):
-        super(ProximityWidget, self).__init__(parent)
-        self.h_layout = QtWidgets.QHBoxLayout(self)
-        self.h_layout.setContentsMargins(15, 15, 15, 15)
-        self.from_edit = GroupedLineEdit()
-        self.from_edit.setFixedHeight(24)
-        self.from_edit.setPlaceholderText("From")
-        self.from_edit.setText("0.1")
-        self.from_edit.setFixedWidth(40)
-        self.to_edit = GroupedLineEdit()
-        self.to_edit.setFixedHeight(24)
-        self.to_edit.setPlaceholderText("To")
-        self.to_edit.setText("0.2")
-        self.to_edit.setFixedWidth(40)
-        self.from_edit.sibling = self.to_edit
-        self.to_edit.sibling = self.from_edit
-        self.ok_button = QtWidgets.QPushButton()
-        self.ok_button.setText("Ok")
-        self.h_layout.addWidget(self.from_edit)
-        self.h_layout.addWidget(self.to_edit)
-        self.h_layout.addWidget(self.ok_button)
-        self.ok_button.clicked.connect(self.paintByProx)
-        self.from_edit.acceptSignal.connect(self.paintByProx)
-        self.to_edit.acceptSignal.connect(self.paintByProx)
-
-    def paintByProx(self):
-        """Paints attachment map by proximity.
-        """
-
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(), self.to_edit.text()))
+import zBuilder.zMaya as mz
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
+
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
@@ -200,7 +82,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if index.column() == 0:
                 node = index.internalPointer()
                 if hasattr(node, 'depends_on'):
-                    node = node.depends_on
+                    mobject = node.depends_on
+                    name = mz.get_name_from_m_object(mobject)
+                    # search through the children for the expected node.
+                    for x in node.children:
+                        if x.name == name:
+                            node = x
+                            break
+
                 if hasattr(node, 'attrs'):
                     attrs = node.attrs
                     if "envelope" in attrs:
@@ -235,7 +124,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def parent(self, index):
 
         node = self.getNode(index)
-        parentNode = node.parent()
+        parentNode = node.parent
 
         if parentNode in (self.root_node, None):
             return QtCore.QModelIndex()

@@ -1,0 +1,391 @@
+// Pre-amble global initializations.
+
+global string $zHarmonicWarpWindowName = "zHarmonicWarpOptions";
+global string $zBoneWarpWindowName = "zBoneWarpOptions";
+global string $zRBFWarpWindowName = "zRBFWarpOptions";
+global string $zRigTransferWindowName = "zRigTransferOptions";
+global string $zSkinClusterTransferWindowName = "zSkinClusterTransferOptions";
+global string $zRigCopyPasteWithNameSubstitutionWindowName = "zRigCopyPasteWithNameSubstitutionOptions";
+
+global string $zivaTransfer_tetSizeString_default = "default";
+global int $zivaTransfer_maxResolution_default = 150;
+global float $zivaTransfer_surfacePenalty_default = 2.0;
+global int $zivaTransfer_boneTetMeshResolution_default = 10;
+global int $zivaTransfer_maxIterations_default = 10;
+global int $zivaTransfer_maxKernelCenters_default = 50;
+global string $zivaTransfer_regularExpression_default = "(^|_)l($|_)";
+global string $zivaTransfer_substituteMatchesWith_default = "r";
+
+global string $zivaTransfer_tetSizeString;
+global int $zivaTransfer_maxResolution;
+global float $zivaTransfer_surfacePenalty;
+global int $zivaTransfer_boneTetMeshResolution;
+global int $zivaTransfer_maxIterations;
+global int $zivaTransfer_maxKernelCenters;
+global string $zivaTransfer_regularExpression;
+global string $zivaTransfer_substituteMatchesWith;
+
+// Closes the specified window.
+global proc zWindowClose(string $windowName)
+{
+  if (`window -exists $windowName` == 1)
+  {
+    deleteUI $windowName;
+  }
+}
+
+// Sets the internal warp parameters to their default values.
+global proc zSetInternalWarpDefaults()
+{
+  global string $zivaTransfer_tetSizeString_default;
+  global int $zivaTransfer_maxResolution_default;
+  global float $zivaTransfer_surfacePenalty_default;
+  global int $zivaTransfer_boneTetMeshResolution_default;
+  global int $zivaTransfer_maxIterations_default;
+  global string $zivaTransfer_tetSizeString;
+  global int $zivaTransfer_maxResolution;
+  global float $zivaTransfer_surfacePenalty;
+  global int $zivaTransfer_boneTetMeshResolution;
+  global int $zivaTransfer_maxIterations;
+
+  $zivaTransfer_tetSizeString = $zivaTransfer_tetSizeString_default;
+  $zivaTransfer_maxResolution = $zivaTransfer_maxResolution_default;
+  $zivaTransfer_surfacePenalty = $zivaTransfer_surfacePenalty_default;
+  $zivaTransfer_boneTetMeshResolution = $zivaTransfer_boneTetMeshResolution_default;
+  $zivaTransfer_maxIterations = $zivaTransfer_maxIterations_default;
+}
+zSetInternalWarpDefaults(); // Set the global variables to their default values (one-time call, during initialization).
+
+// Sets the RBF warp parameters to their default values.
+global proc zSetRBFWarpDefaults()
+{
+  global int $zivaTransfer_maxKernelCenters_default;
+  global int $zivaTransfer_maxKernelCenters;
+  $zivaTransfer_maxKernelCenters = $zivaTransfer_maxKernelCenters_default;
+}
+zSetRBFWarpDefaults(); // Set the global variables to their default values (one-time call, during initialization).
+
+// Sets the parameters for cloning a Ziva (using regular expressions) to their default values.
+global proc zSetCloneRigDefaults()
+{
+  global string $zivaTransfer_regularExpression_default;
+  global string $zivaTransfer_substituteMatchesWith_default;
+  global string $zivaTransfer_regularExpression;
+  global string $zivaTransfer_substituteMatchesWith;
+  $zivaTransfer_regularExpression = $zivaTransfer_regularExpression_default;
+  $zivaTransfer_substituteMatchesWith = $zivaTransfer_substituteMatchesWith_default;
+}
+zSetCloneRigDefaults(); // Set the global variables to their default values (one-time call, during initialization).
+
+// Runs the zInternalWarp, with the parameters stored in the zivaTransfer_* global variables.
+// warpType: 0=zHarmonicWarp, 1=zBoneWarp
+global proc zInternalWarpButtonExecute(int $warpType)
+{
+  global string $zivaTransfer_tetSizeString;
+  global int $zivaTransfer_maxResolution;
+  global float $zivaTransfer_surfacePenalty;
+  global int $zivaTransfer_boneTetMeshResolution;
+  global int $zivaTransfer_maxIterations;
+
+  global string $zHarmonicWarpWindowName;
+  global string $zBoneWarpWindowName;
+  string $zInternalWarpWindowName;
+  if ($warpType == 0)
+  {
+    $zInternalWarpWindowName = $zHarmonicWarpWindowName;
+  }
+  else
+  {
+    $zInternalWarpWindowName = $zBoneWarpWindowName;
+  }
+
+  if (`window -exists $zInternalWarpWindowName` == 1)
+  {
+    $zivaTransfer_tetSizeString = `textField -q -text zInternalWarpButton_tetSizeText`;
+    int $useDefaultTetSize = ($zivaTransfer_tetSizeString == "default");
+    float $zivaTransfer_tetSize;
+    if ($useDefaultTetSize == 0)
+    {
+      $zivaTransfer_tetSize = (float)$zivaTransfer_tetSizeString;
+    }
+    $zivaTransfer_maxResolution = `intField -q -value zInternalWarpButton_maxResolution`;
+    $zivaTransfer_surfacePenalty = `floatField -q -value zInternalWarpButton_surfacePenalty`;
+    if ($warpType == 1)
+    {
+      $zivaTransfer_boneTetMeshResolution = `intField -q -value zInternalWarpButton_boneTetMeshResolution`;
+      $zivaTransfer_maxIterations = `intField -q -value zInternalWarpButton_maxIterations`;
+    }
+    deleteUI $zInternalWarpWindowName;
+    if ($warpType == 0)
+    {
+      if ($useDefaultTetSize == 0)
+      {
+        zHarmonicWarp -tetSize $zivaTransfer_tetSize -maxResolution $zivaTransfer_maxResolution -surfacePenalty $zivaTransfer_surfacePenalty;
+      }
+      else
+      {
+        zHarmonicWarp -maxResolution $zivaTransfer_maxResolution -surfacePenalty $zivaTransfer_surfacePenalty;
+      }
+    }
+    else
+    {
+      if ($useDefaultTetSize == 0)
+      {
+        zBoneWarp -tetSize $zivaTransfer_tetSize -maxResolution $zivaTransfer_maxResolution -surfacePenalty $zivaTransfer_surfacePenalty -boneTetMeshResolution $zivaTransfer_boneTetMeshResolution -maxIterations $zivaTransfer_maxIterations;
+      }
+      else
+      {
+        zBoneWarp -maxResolution $zivaTransfer_maxResolution -surfacePenalty $zivaTransfer_surfacePenalty -boneTetMeshResolution $zivaTransfer_boneTetMeshResolution -maxIterations $zivaTransfer_maxIterations;
+      }
+    }
+  }
+}
+
+// Brings up the options dialog box for zInternalWarp settings (i.e., zHarmonicWarp and zBoneWarp).
+global proc zInternalWarpOptions(int $warpType)
+{
+  global string $zivaTransfer_tetSizeString;
+  global int $zivaTransfer_maxResolution;
+  global float $zivaTransfer_surfacePenalty;
+  global int $zivaTransfer_boneTetMeshResolution;
+  global int $zivaTransfer_maxIterations;
+
+  global string $zHarmonicWarpWindowName;
+  global string $zBoneWarpWindowName;
+  string $zInternalWarpWindowName;
+  string $titleString;
+  if ($warpType == 0)
+  {
+    $zInternalWarpWindowName = $zHarmonicWarpWindowName;
+    $titleString = "Warp internal anatomy: meshes/NURBS surfaces and curves/joints/locators";
+  }
+  else
+  {
+    $zInternalWarpWindowName = $zBoneWarpWindowName;
+    $titleString = "Warp bones";
+  }
+
+  // window name, and window size
+  int $windowSize[] = { 360, 80 };
+  if (`window -exists $zInternalWarpWindowName` == 1)
+  {
+    deleteUI $zInternalWarpWindowName;
+  }
+
+  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zInternalWarpWindowName;
+
+  columnLayout -adjustableColumn true;
+
+  gridLayout -numberOfRowsColumns 4 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Tet size [scene units]:" -align "left";
+  textField -text $zivaTransfer_tetSizeString zInternalWarpButton_tetSizeText;
+
+  text -label " Max resolution:" -align "left";
+  intField -minValue 1 -value $zivaTransfer_maxResolution zInternalWarpButton_maxResolution;
+
+  text -label " Surface penalty:" -align "left";
+  floatField -value $zivaTransfer_surfacePenalty -precision 1 zInternalWarpButton_surfacePenalty;
+
+  if ($warpType == 1)
+  {
+    text -label " Bone tet mesh resolution:" -align "left";
+    intField -minValue 1 -value $zivaTransfer_boneTetMeshResolution zInternalWarpButton_boneTetMeshResolution;
+
+    text -label " Max iterations:" -align "left";
+    intField -minValue 1 -value $zivaTransfer_maxIterations zInternalWarpButton_maxIterations;
+  }
+
+  setParent ..;
+  gridLayout -numberOfRowsColumns 1 3 -cellWidthHeight 120 20;
+
+  string $warpCommand = "zInternalWarpButtonExecute(" + $warpType + ")";
+  string $setDefaultCommand = "zWindowClose(\"" +
+                              $zInternalWarpWindowName +
+                              "\"); zSetInternalWarpDefaults(); zInternalWarpOptions(" +
+                              string($warpType) +
+                              ");";
+  string $closeCommand = "zWindowClose(\"" + $zInternalWarpWindowName + "\")";
+  button -label "Warp" -command $warpCommand;
+  button -label "Reset Settings" -command $setDefaultCommand;
+  button -label "Close" -command $closeCommand;
+
+  showWindow $zInternalWarpWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zInternalWarpWindowName;
+}
+
+// Runs the zRBFWarp, with the parameters stored in the zivaTransfer_* global variables.
+global proc zRBFWarpButtonExecute()
+{
+  global int $zivaTransfer_maxKernelCenters;
+
+  global string $zRBFWarpWindowName;
+  if (`window -exists $zRBFWarpWindowName` == 1)
+  {
+    $zivaTransfer_maxKernelCenters = `intField -q -value zRBFWarpButton_maxKernelCenters`;
+    deleteUI $zRBFWarpWindowName;
+    zRBFWarp -maxKernelCenters $zivaTransfer_maxKernelCenters;
+  }
+}
+
+// Brings up the options dialog box for zRBFWarp settings.
+global proc zRBFWarpOptions()
+{
+  global int $zivaTransfer_maxKernelCenters;
+
+  // window name, and window size
+  global string $zRBFWarpWindowName;
+  int $windowSize[] = { 360, 40 };
+  if (`window -exists $zRBFWarpWindowName` == 1)
+  {
+    deleteUI $zRBFWarpWindowName;
+  }
+
+  $titleString = "Warp external geometry";
+  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zRBFWarpWindowName;
+
+  columnLayout -adjustableColumn true;
+
+  $numRows = 2;
+  gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Max kernel centers:" -align "left";
+  intField -minValue 0 -value $zivaTransfer_maxKernelCenters zRBFWarpButton_maxKernelCenters;
+
+  setParent ..;
+  gridLayout -numberOfRowsColumns 1 3 -cellWidthHeight 120 20;
+
+  string $warpCommand = "zRBFWarpButtonExecute()";
+  string $setDefaultCommand = "zWindowClose(\"" +
+                              $zRBFWarpWindowName +
+                              "\"); zSetRBFWarpDefaults(); zRBFWarpOptions();";
+  string $closeCommand = "zWindowClose(\"" + $zRBFWarpWindowName + "\")";
+  button -label "Warp" -command $warpCommand;
+  button -label "Reset Settings" -command $setDefaultCommand;
+  button -label "Close" -command $closeCommand;
+
+  showWindow $zRBFWarpWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zRBFWarpWindowName;
+}
+
+// Runs the transfer of the Ziva rig, based on the parameter values in zRigTransfer_*.
+global proc zRigTransferButtonExecute()
+{
+  global string $zRigTransferWindowName;
+  if (`window -exists $zRigTransferWindowName` == 1)
+  {
+    string $sourceSolver = `optionMenu -q -value zRigTransfer_sourceSolver`;
+    string $outputPrefix = `textField -q -text zRigTransfer_outputPrefix`;
+    string $targetSolver = `optionMenu -q -value zRigTransfer_targetSolver`;
+    if ($targetSolver == "<Output prefix><Source solver>")
+      $targetSolver = $outputPrefix + $sourceSolver;
+    $pythonCommand = "zRigTransfer('" + $sourceSolver + "', '" + $outputPrefix + "', '" + $targetSolver + "')";
+    deleteUI $zRigTransferWindowName;
+    python ($pythonCommand);
+  }
+}
+
+// Brings up the options dialog box for the Ziva rig transfer.
+global proc zRigTransferOptions()
+{
+  string $solvers[] = `ls -type zSolverTransform`;
+  if (size($solvers) == 0)
+  {
+    error "No ziva solvers in the scene.";
+    return;
+  }
+
+  // window name and window size
+  global string $zRigTransferWindowName;
+  int $windowSize[] = { 360, 80 };
+  if (`window -exists $zRigTransferWindowName` == 1)
+  {
+    deleteUI $zRigTransferWindowName;
+  }
+
+  $titleString = "Transfer Ziva Rig";
+  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zRigTransferWindowName;
+
+  $numRows = 3;
+  gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Source solver:" -align "left";
+  optionMenu zRigTransfer_sourceSolver;
+    for($solverName in $solvers)
+    {
+      menuItem -label $solverName;
+    }
+  setParent layout;
+
+  text -label " Target solver:" -align "left";
+  optionMenu zRigTransfer_targetSolver;
+    menuItem -label "<Output prefix><Source solver>";
+    for($solverName in $solvers)
+    {
+      menuItem -label $solverName;
+    }
+  setParent layout;
+
+  text -label " Prefix of geometry in target solver:" -align "left";
+  textField -text "warped_" zRigTransfer_outputPrefix;
+  setParent layout;
+
+  button -label "Transfer" -command "zRigTransferButtonExecute";
+  button -label "Close" -command "zWindowClose($zRigTransferWindowName)";
+
+  showWindow $zRigTransferWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1]
+            -resizeToFitChildren true $zRigTransferWindowName;
+}
+
+// Runs the transfer of the Maya skin cluster, based on the parameter values in zSkinClusterTransfer_*.
+global proc zSkinClusterTransferButtonExecute()
+{
+  global string $zSkinClusterTransferWindowName;
+  if (`window -exists $zSkinClusterTransferWindowName` == 1)
+  {
+    string $prefix = `textField -q -text zSkinClusterTransfer_prefix`;
+    $pythonCommand = "zSkinClusterTransfer('" + $prefix + "')";
+    deleteUI $zSkinClusterTransferWindowName;
+    python ($pythonCommand);
+  }
+}
+
+// Brings up the options dialog box for the Ziva skin cluster transfer.
+global proc zSkinClusterTransferOptions()
+{
+  string $selection[] = `ls -sl`;
+  if (size($selection) == 0)
+  {
+    error "No meshes selected.";
+    return;
+  }
+
+  // window name, and window size
+  global string $zSkinClusterTransferWindowName;
+  int $windowSize[] = { 360, 40 };
+  if (`window -exists $zSkinClusterTransferWindowName` == 1)
+  {
+    deleteUI $zSkinClusterTransferWindowName;
+  }
+
+  $titleString = "Transfer Skin Cluster";
+  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zSkinClusterTransferWindowName;
+
+  $numRows = 1;
+  gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Prefix of target geometry:" -align "left";
+  textField -text "warped_" zSkinClusterTransfer_prefix;
+  setParent layout;
+
+  button -label "Transfer" -command "zSkinClusterTransferButtonExecute";
+  button -label "Close" -command "zWindowClose($zSkinClusterTransferWindowName)";
+
+  showWindow $zSkinClusterTransferWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zSkinClusterTransferWindowName;
+}
