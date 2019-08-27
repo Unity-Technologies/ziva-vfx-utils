@@ -25,6 +25,7 @@ class RadioButtonsWidget(QtWidgets.QWidget):
 
 
 class GroupedLineEdit(QtWidgets.QLineEdit):
+    acceptSignal = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(GroupedLineEdit, self).__init__(parent)
@@ -35,6 +36,10 @@ class GroupedLineEdit(QtWidgets.QLineEdit):
             if self.sibling:
                 self.sibling.setFocus()
                 return True
+
+        if event.type() == QtCore.QEvent.KeyPress and event.key() in [QtCore.Qt.Key_Enter,  QtCore.Qt.Key_Return]:
+            self.acceptSignal.emit()
+            return True
 
         return super(GroupedLineEdit, self).event(event)
 
@@ -108,6 +113,8 @@ class ProximityWidget(QtWidgets.QWidget):
         self.h_layout.addWidget(self.to_edit)
         self.h_layout.addWidget(self.ok_button)
         self.ok_button.clicked.connect(self.paintByProx)
+        self.from_edit.acceptSignal.connect(self.paintByProx)
+        self.to_edit.acceptSignal.connect(self.paintByProx)
 
     def paintByProx(self):
         """Paints attachment map by proximity.

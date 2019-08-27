@@ -19,6 +19,9 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
+import copy
+
+from zBuilder.parameters import maps
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -184,7 +187,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.actionInvertWeight = QtWidgets.QAction(self)
         self.actionInvertWeight.setText('Invert')
-        self.actionInvertWeight.setObjectName("actionCopyWeight")
+        self.actionInvertWeight.setObjectName("actionInvertWeight")
         self.actionInvertWeight.triggered.connect(self.invert_weight)
 
         self.actionPasteWeight = QtWidgets.QAction(self)
@@ -216,6 +219,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionToggleAxesVisibility.setText("Axes")
         self.actionToggleAxesVisibility.setObjectName("actionToggleAxes")
         self.actionToggleAxesVisibility.setCheckable(True)
+
+    # def duplicate_ziva_objects(self):
+    #     indexes = self.treeView.selectedIndexes()
+    #
+    #     for index in indexes:
+    #         self.treeView.setSelection(index)
+    #         self.copy_attrs()
+    #         self.copy_weight()
+    #         node = index.data(model.SceneGraphModel.nodeRole)
+    #         if node.type == 'zMaterial':
+    #             name = mc.ziva(m=True)[0]
+    #         elif node.type == 'zFiber':
+    #             pass
 
     def copy_attrs(self):
         indexes = self.treeView.selectedIndexes()
@@ -372,7 +388,8 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
+            action_copy_weight = self.actionCopyWeight
+            source_map_menu.addAction(action_copy_weight)
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
 
@@ -394,16 +411,32 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
+            action_copy_weight = QtWidgets.QAction(self)
+            action_copy_weight.setText('Copy')
+            action_copy_weight.setObjectName("actionCopyWeight")
+            action_copy_weight.triggered.connect(self.copy_weight)
+            source_map_menu.addAction(action_copy_weight)
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
 
             target_map_menu = menu.addMenu('endPoints')
             target_map_menu.addAction(self.actionPaintEndPoints)
             target_map_menu.addSection('')
-            target_map_menu.addAction(self.actionCopyWeight)
-            target_map_menu.addAction(self.actionPasteWeight)
-            target_map_menu.addAction(self.actionInvertWeight)
+            action_copy_weight = QtWidgets.QAction(self)
+            action_copy_weight.setText('Copy')
+            action_copy_weight.setObjectName("actionCopyWeight")
+            action_copy_weight.triggered.connect(partial(self.copy_weight, 'endPoints'))
+            target_map_menu.addAction(action_copy_weight)
+            action_paste_weight = QtWidgets.QAction(self)
+            action_paste_weight.setText('Paste')
+            action_paste_weight.setObjectName("actionPasteWeight")
+            action_paste_weight.triggered.connect(partial(self.paste_weight, 'endPoints'))
+            target_map_menu.addAction(action_paste_weight)
+            action_invert_weight = QtWidgets.QAction(self)
+            action_invert_weight.setText('Invert')
+            action_invert_weight.setObjectName("actionInvertWeight")
+            action_invert_weight.triggered.connect(partial(self.invert_weight, 'endPoints'))
+            target_map_menu.addAction(action_invert_weight)
 
         if node.type == 'zMaterial':
             menu.setFixedWidth(125)
@@ -416,7 +449,8 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
             source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
+            action_copy_weight = self.actionCopyWeight
+            source_map_menu.addAction(action_copy_weight)
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
 
@@ -435,22 +469,40 @@ class MyDockingUI(QtWidgets.QWidget):
             source_map_menu = menu.addMenu('source')
             source_map_menu.addAction(self.actionPaintSource)
             source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
+            action_copy_weight = QtWidgets.QAction(self)
+            action_copy_weight.setText('Copy')
+            action_copy_weight.setObjectName("actionCopyWeight")
+            action_copy_weight.triggered.connect(self.copy_weight)
+            source_map_menu.addAction(action_copy_weight)
             source_map_menu.addAction(self.actionPasteWeight)
             source_map_menu.addAction(self.actionInvertWeight)
             source_map_menu.addSection('')
             target_map_menu = menu.addMenu('target')
             target_map_menu.addAction(self.actionPaintTarget)
             target_map_menu.addSection('')
-            target_map_menu.addAction(self.actionCopyWeight)
-            target_map_menu.addAction(self.actionPasteWeight)
-            target_map_menu.addAction(self.actionInvertWeight)
+            action_copy_weight = QtWidgets.QAction(self)
+            action_copy_weight.setText('Copy')
+            action_copy_weight.setObjectName("actionCopyWeight")
+            action_copy_weight.triggered.connect(partial(self.copy_weight, None, False))
+            target_map_menu.addAction(action_copy_weight)
+            action_paste_weight = QtWidgets.QAction(self)
+            action_paste_weight.setText('Paste')
+            action_paste_weight.setObjectName("actionPasteWeight")
+            action_paste_weight.triggered.connect(partial(self.paste_weight, None, False))
+            target_map_menu.addAction(action_paste_weight)
+            action_invert_weight = QtWidgets.QAction(self)
+            action_invert_weight.setText('Invert')
+            action_invert_weight.setObjectName("actionInvertWeight")
+            action_invert_weight.triggered.connect(partial(self.invert_weight, None, False))
+            target_map_menu.addAction(action_invert_weight)
             menu.addSection('')
             proximity_menu = menu.addMenu('Paint By Proximity')
+            proximity_menu.installEventFilter(menu)
             prox_widget = model.ProximityWidget()
             actionPaintByProx = QtWidgets.QWidgetAction(proximity_menu)
             actionPaintByProx.setDefaultWidget(prox_widget)
             proximity_menu.addAction(actionPaintByProx)
+            proximity_menu.setDefaultAction(actionPaintByProx)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
@@ -650,43 +702,71 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
-    def copy_weight(self):
+    def copy_weight(self, map_name=None, source=True):
         indexes = self.treeView.selectedIndexes()
         tmp = []
+        mesh = None
         for i in indexes:
             node = i.data(model.SceneGraphModel.nodeRole)
-            mesh = node.association[0]
-            vert_count = mc.polyEvaluate(mesh, v=True)
-            tmp.append(
-                mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1)))
+            if map_name:
+                weights = mc.getAttr("{}.{}".format(node.name, map_name))
+                mesh = node.association[0]
+            else:
+                if source:
+                    index = 0
+                else:
+                    index = 1
+                mesh = node.association[index]
+                vert_count = mc.polyEvaluate(mesh, v=True)
+                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(node.name, index, vert_count - 1))
+            tmp.append(weights)
 
         self.weights = [sum(i) for i in zip(*tmp)]
         self.weights = [max(min(x, 1.0), 0) for x in self.weights]
         print mesh, self.weights
 
-    def invert_weight(self):
+    def invert_weight(self, map_name=None, source=True):
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        mesh = node.association[0]
-        vert_count = mc.polyEvaluate(mesh, v=True)
-        weights = mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1))
-        weights = [1 - x for x in weights]
+        if map_name:
+            weights = mc.getAttr("{}.{}".format(node.name, map_name))
+            map_ = node.name + '.' + map_name
+            weights = [1.0 - x for x in weights]
+            mc.setAttr(map_, weights, type="doubleArray")
+        else:
+            if source:
+                index = 0
+            else:
+                index = 1
+            mesh = node.association[index]
+            vert_count = mc.polyEvaluate(mesh, v=True)
+            weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(node.name, index, vert_count - 1))
+            map_ = node.name + '.weightList[%d].weights' % index
 
-        map_ = node.name + '.weightList[0].weights'
-        tmp = []
-        for w in weights:
-            tmp.append(str(w))
-        val = ' '.join(tmp)
-        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
-        mm.eval(cmd)
+            weights = [1.0 - x for x in weights]
 
-    def paste_weight(self):
-        indexes = self.treeView.selectedIndexes()[0]
+            tmp = []
+            for w in weights:
+                tmp.append(str(w))
+            val = ' '.join(tmp)
+            cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
+            mm.eval(cmd)
+
+    def paste_weight(self, map_name=None, source=True):
+        indexes = self.treeView.selectedIndexes()[-1]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        map_ = node.name + '.weightList[0].weights'
-        tmp = []
-        for w in self.weights:
-            tmp.append(str(w))
-        val = ' '.join(tmp)
-        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
-        mm.eval(cmd)
+        if map_name:
+            if source:
+                index = 0
+            else:
+                index = 1
+            map_ = node.name + '.weightList[%d].weights' % index
+            tmp = []
+            for w in self.weights:
+                tmp.append(str(w))
+            val = ' '.join(tmp)
+            cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
+            mm.eval(cmd)
+        else:
+            map_ = node.name + '.' + map_name
+            mc.setAttr(map_, self.weights, type="doubleArray")
