@@ -225,14 +225,13 @@ def serialize_object(obj):
         dict: Of serializable obj
     """
 
-    # clearing these attributes for now as they are causing issues with serilization as they are 
+    # clearing these attributes for now as they are causing issues with serilization as they are
     # python objects and they are not needed in this context.  These attributes are used
-    # for the QTreeView to define the tree layout.  If we want to seralize this we will 
-    # need to treat these similiar to .mobject.  
+    # for the QTreeView to define the tree layout.  If we want to seralize this we will
+    # need to treat these similiar to .mobject.
     obj.parent = None
     obj.children = None
 
-    # tmp_tmp = []
     output = dict()
     for key in obj.__dict__:
         if hasattr(obj.__dict__[key], '_class') and hasattr(obj.__dict__[key], 'serialize'):
