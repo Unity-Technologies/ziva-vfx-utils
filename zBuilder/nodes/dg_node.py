@@ -5,6 +5,7 @@ import maya.cmds as mc
 import maya.mel as mm
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
+from zBuilder.nodes.base import serialize_object
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +68,43 @@ class DGNode(Base):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
+    def serialize(self):
+        """  Makes node serializable.
+
+        This replaces an mObject with the name of the object in scene to make it
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
+
+        Replaces .mobject mobject with a string name before serilization.
+        Afterwords it converts it back to an mObject.
+
+        Returns:
+            dict: of serializable items
+        """
+        # convert mObjectHandle to name of maya object (str)
+        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+        output = serialize_object(self)
+
+        # convert the string back to an mobject
+        self.mobject = self.__mobject_handle
+
+        return output
+
+    def deserialize(self, json_data):
+        """ Deserializes a node with given dict.
+
+        Assigns a dictionary to __dict__.  Adds an mObject to the .mobject if 
+        applicable.
+
+        Args:
+            json_data(dict): The given dict.
+        """
+        self.__dict__ = json_data
+
+        # Finding the mObject in scene if it exists
+        self.mobject = self.__mobject_handle
+
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
@@ -92,8 +130,7 @@ class DGNode(Base):
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
         """
-        pass
-        # raise NotImplementedError
+        raise NotImplementedError
 
     @property
     def association(self):
@@ -107,10 +144,6 @@ class DGNode(Base):
     @association.setter
     def association(self, association):
         self._association = mc.ls(association, long=True)
-        # if isinstance(association, str):
-        #     self._association = [association]
-        # else:
-        #     self._association = association
 
     @property
     def long_association(self):
@@ -152,7 +185,7 @@ class DGNode(Base):
 
         if not long_name:
             name = name.split('|')[-1]
-            
+
         return name
 
     def set_maya_attrs(self, attr_filter=None):
@@ -216,8 +249,11 @@ class DGNode(Base):
             mObject
 
         """
-        if self.__mobject_handle.isValid():
-            return self.__mobject_handle.object()
+        if not isinstance(self.__mobject_handle, str):
+            if self.__mobject_handle:
+                if self.__mobject_handle.isValid():
+                    return self.__mobject_handle.object()
+
         return None
 
     @mobject.setter
@@ -234,13 +270,9 @@ class DGNode(Base):
 
         """
         self.__mobject_handle = None
-        if maya_node:
-            if mc.objExists(maya_node):
-                selection_list = om.MSelectionList()
-                selection_list.add(maya_node)
-                mobject = om.MObject()
-                selection_list.getDependNode(0, mobject)
-                self.__mobject_handle = om.MObjectHandle(mobject)
-
-    def mobject_reset(self):
-        self.__mobject_handle = None
+        if mc.objExists(maya_node):
+            selection_list = om.MSelectionList()
+            selection_list.add(maya_node)
+            mobject = om.MObject()
+            selection_list.getDependNode(0, mobject)
+            self.__mobject_handle = om.MObjectHandle(mobject)
