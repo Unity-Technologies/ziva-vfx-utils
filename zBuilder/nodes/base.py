@@ -234,7 +234,7 @@ def serialize_object(obj):
 
     output = dict()
     for key in obj.__dict__:
-        if hasattr(obj.__dict__[key], '_class') and hasattr(obj.__dict__[key], 'serialize'):
+        if hasattr(obj, '_class') and (hasattr(obj, 'serialize') and callable(obj.serialize)):
             output[key] = obj.__dict__[key].serialize()
         try:
             json.dumps(obj.__dict__[key])
