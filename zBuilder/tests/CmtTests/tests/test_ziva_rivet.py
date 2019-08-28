@@ -13,7 +13,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaRivetTestCase(VfxTestCase):
-
     @classmethod
     def setUpClass(cls):
         pass
@@ -27,10 +26,10 @@ class ZivaRivetTestCase(VfxTestCase):
         # create l
         mc.select('r_tricepsLong_muscle')
         crv = mm.eval('zLineOfActionUtil')[0]
-        mc.select(crv+'.cv[0]', 'r_humerus_bone')
-        riv1 = mm.eval('zRivetToBone')
-        mc.select(crv+'.cv[1]', 'r_scapula_bone')
-        riv2 = mm.eval('zRivetToBone')
+        mc.select(crv + '.cv[0]', 'r_humerus_bone')
+        self.riv1 = mm.eval('zRivetToBone')
+        mc.select(crv + '.cv[1]', 'r_scapula_bone')
+        self.riv2 = mm.eval('zRivetToBone')
         mc.select('r_tricepsLong_muscle', crv)
         mm.eval('ziva -loa;')
 
@@ -56,7 +55,7 @@ class ZivaRivetTestCase(VfxTestCase):
         # check that 2 rivets are in zBuilder
         rivets = z.get_scene_items(type_filter='zRivetToBone')
         self.assertTrue(len(rivets) == 2)
-        
+
     def test_retrieve_rivet_selection_none(self):
         # use builder to retrieve from scene-----------------------------------
         mc.select('r_bicep_muscle')
@@ -66,7 +65,7 @@ class ZivaRivetTestCase(VfxTestCase):
         # check that there are 0 rivets in scene (based on selection)
         rivets = z.get_scene_items(type_filter='zRivetToBone')
         self.assertTrue(len(rivets) == 0)
-        
+
     def test_build_rivet(self):
         # use builder to retrieve from scene-----------------------------------
         mc.select('r_tricepsLong_muscle')
@@ -84,7 +83,7 @@ class ZivaRivetTestCase(VfxTestCase):
         # create a rivetToBone driving 2 cv's
         mc.select('r_bicep_muscle')
         crv = mm.eval('zLineOfActionUtil')[0]
-        mc.select(crv+'.cv[0]', crv+'.cv[1]', 'r_humerus_bone')
+        mc.select(crv + '.cv[0]', crv + '.cv[1]', 'r_humerus_bone')
         riv2 = mm.eval('zRivetToBone')
         mc.select('r_bicep_muscle', crv)
         mm.eval('ziva -loa;')
@@ -101,7 +100,7 @@ class ZivaRivetTestCase(VfxTestCase):
         # create a rivetToBone driving 2 cv's
         mc.select('r_bicep_muscle')
         crv = mm.eval('zLineOfActionUtil')[0]
-        mc.select(crv+'.cv[0]', crv+'.cv[1]', 'r_humerus_bone')
+        mc.select(crv + '.cv[0]', crv + '.cv[1]', 'r_humerus_bone')
         riv2 = mm.eval('zRivetToBone')
         mc.select('r_bicep_muscle', crv)
         mm.eval('ziva -loa;')
@@ -117,3 +116,12 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # should be 2 in scene
         self.assertTrue(len(mc.ls(type='zRivetToBone')) == 3)
+
+    def test_retrieve_connections_rivet(self):
+        # this tests if retrieve_connections works if a rivet is selected
+        mc.select(self.riv1)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # should not be empty
+        self.assertTrue(len(builder.get_scene_items()) > 0)

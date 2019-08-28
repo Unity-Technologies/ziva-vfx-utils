@@ -71,3 +71,15 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         # after it is built there should be 2 curves hooked up to loa
         curves = mc.listConnections('zLineOfAction1.curves')
         self.assertTrue(len(curves) == 2)
+
+    def test_retrieve_connections_loa_selected(self):
+
+        loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
+
+        # now retrieve
+        mc.select(loa.name)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # should not be empty
+        self.assertTrue(len(builder.get_scene_items()) > 0)
