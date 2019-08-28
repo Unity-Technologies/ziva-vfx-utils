@@ -5,7 +5,7 @@ global proc string getDemoAssetPath(string $demoAssetName)
   $demoScriptPath = stringRemovePrefix($returnString, "Script found in: ");
   $demoAssetPath = dirname($demoScriptPath) + "/../demos/" + $demoAssetName;
   return $demoAssetPath;
-}
+};
 
 global proc zivaSourceDemo(string $demoAssetName)
 {
@@ -16,6 +16,7 @@ global proc zivaSourceDemo(string $demoAssetName)
 zivaSourceDemo("anatomicalArm.mel");
 zivaSourceDemo("goaling.mel");
 zivaSourceDemo("restScalePressure.mel");
+zivaSourceDemo("attachmentTest.mel");
 zivaSourceDemo("collisionTest.mel");
 zivaSourceDemo("oneOfEachAttachments.mel");
 zivaSourceDemo("oneOfEachCollisionTypes.mel");
