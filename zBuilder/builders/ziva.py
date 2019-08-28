@@ -607,7 +607,6 @@ def zQuery(types, solver):
 
     solver_history = mc.listHistory(solver)
     types_not_in_znodes = list(set(types) - set(ZNODES))
-    print 'NOT: ', types_not_in_znodes
     nodes = [x for x in solver_history if mc.objectType(x) in types_not_in_znodes]
 
     types_in_znodes = list(set(ZNODES) & set(types))
