@@ -50,8 +50,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
-        self.weights = []
-        self.attrs = {}
 
         root_node = None
 
@@ -73,7 +71,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
-        # self.treeView.setHeaderHidden(True)
+
+        # changing header size
+        # by stylesheet header is transparent so this works like an offset
         header = self.treeView.header()
         header.setOffset(-20)
         header.setOffsetToSectionPosition(20)
@@ -222,52 +222,53 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-        node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if len(indexes) == 1:
+            node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-        menu = model.CustomMenu(self)
-        menu.installEventFilter(menu)
-        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
-                            | QtCore.Qt.NoDropShadowWindowHint)
-        menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            menu = model.CustomMenu(self)
+            menu.installEventFilter(menu)
+            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
+                                | QtCore.Qt.NoDropShadowWindowHint)
+            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        if node.type == 'zTet':
-            menu.setFixedWidth(110)
-            menu.addLabel('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
+            if node.type == 'zTet':
+                menu.setFixedWidth(110)
+                menu.addLabel('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
 
-        if node.type == 'zFiber':
-            menu.setFixedWidth(125)
-            menu.addLabel('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
+            if node.type == 'zFiber':
+                menu.setFixedWidth(125)
+                menu.addLabel('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
 
-            target_map_menu = menu.addMenu('endPoints')
-            target_map_menu.addAction(self.actionPaintEndPoints)
+                target_map_menu = menu.addMenu('endPoints')
+                target_map_menu.addAction(self.actionPaintEndPoints)
 
-        if node.type == 'zMaterial':
-            menu.setFixedWidth(110)
-            menu.addLabel('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
+            if node.type == 'zMaterial':
+                menu.setFixedWidth(110)
+                menu.addLabel('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
 
-        if node.type == 'zAttachment':
-            menu.addAction(self.actionSelectST)
+            if node.type == 'zAttachment':
+                menu.addAction(self.actionSelectST)
 
-            menu.addLabel('Maps')
-            source_map_menu = menu.addMenu('source')
-            source_map_menu.addAction(self.actionPaintSource)
-            target_map_menu = menu.addMenu('target')
-            target_map_menu.addAction(self.actionPaintTarget)
-            menu.addSection('')
-            proximity_menu = menu.addMenu('Paint By Proximity')
-            prox_widget = model.ProximityWidget()
-            action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
-            action_paint_by_prox.setDefaultWidget(prox_widget)
-            proximity_menu.addAction(action_paint_by_prox)
-            proximity_menu.setDefaultAction(action_paint_by_prox)
+                menu.addLabel('Maps')
+                source_map_menu = menu.addMenu('source')
+                source_map_menu.addAction(self.actionPaintSource)
+                target_map_menu = menu.addMenu('target')
+                target_map_menu.addAction(self.actionPaintTarget)
+                menu.addSection('')
+                proximity_menu = menu.addMenu('Paint By Proximity')
+                prox_widget = model.ProximityWidget()
+                action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+                action_paint_by_prox.setDefaultWidget(prox_widget)
+                proximity_menu.addAction(action_paint_by_prox)
+                proximity_menu.setDefaultAction(action_paint_by_prox)
 
-        menu.exec_(self.treeView.viewport().mapToGlobal(position))
+            menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
@@ -296,8 +297,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.show()
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked
-                  | om.MNodeMessage.kAttributeUnlocked):
+        if msg & om.MNodeMessage.kAttributeSet:
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]

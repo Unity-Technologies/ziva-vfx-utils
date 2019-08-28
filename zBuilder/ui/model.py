@@ -6,6 +6,10 @@ import zBuilder.zMaya as mz
 
 
 class GroupedLineEdit(QtWidgets.QLineEdit):
+    """
+    Groups LineEdits together so after you press Tab it switch focus to sibling
+    Sends acceptSignal when Enter or Return buttons pressed
+    """
     acceptSignal = QtCore.Signal()
 
     def __init__(self, parent=None):
@@ -37,11 +41,13 @@ class CustomMenu(QtWidgets.QMenu):
     def addMenu(self, *args, **kwargs):
         menu = super(CustomMenu, self).addMenu(*args, **kwargs)
         if isinstance(menu, QtWidgets.QMenu):
+            # making widget accepting transparency parementer from stylesheet
             menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
                                 | QtCore.Qt.NoDropShadowWindowHint)
             menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         return menu
 
+    # Separator with text, looks like: Text---------
     def addLabel(self, text):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QHBoxLayout(widget)
