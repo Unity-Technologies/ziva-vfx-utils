@@ -274,11 +274,9 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         solver = None
         if args:
-            history = mc.listHistory(args[0], ac=True)
-            solver = mc.ls(history, type='zSolver')
+            solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))
         else:
-            history = mc.listHistory(ac=True, )
-            solver = mc.ls(history, type='zSolver')
+            solver = mm.eval('zQuery -t "zSolver"')
 
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
