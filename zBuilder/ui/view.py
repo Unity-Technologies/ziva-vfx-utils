@@ -20,11 +20,13 @@ class SceneTreeView(QtWidgets.QTreeView):
         row_count = self.model().rowCount(index.parent())
 
         for column in xrange(column_count):
-            x_1 = column * self.indentation()
-            x_2 = self.indentation()
-
-            rect = QtCore.QRect(x_1 + 20, rect.top(), x_2,
-                                rect.height())
+            # padding from the left side of widget
+            offset = 20
+            pos_x = column * self.indentation()
+            pos_y = rect.top()
+            width = self.indentation()
+            height = rect.height()
+            rect = QtCore.QRect(pos_x + offset, pos_y, width, height)
             if column == column_count - 1:
                 if node.child_count():
                     if self.isExpanded(index):

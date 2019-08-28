@@ -73,11 +73,17 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setIndentation(15)
 
         # changing header size
-        # by stylesheet header is transparent so this works like an offset
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle duzzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        height = 10
+        offset = -20
         header = self.treeView.header()
-        header.setOffset(-20)
+        header.setOffset(offset)
         header.setOffsetToSectionPosition(20)
-        header.setFixedHeight(10)
+        header.setFixedHeight(height)
 
         self.callback_ids = {}
 
