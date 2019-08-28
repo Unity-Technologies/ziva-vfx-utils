@@ -172,140 +172,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
-        self.actionCopyWeight = QtWidgets.QAction(self)
-        self.actionCopyWeight.setText('Copy')
-        self.actionCopyWeight.setObjectName("actionCopyWeight")
-        self.actionCopyWeight.triggered.connect(self.copy_weight)
-
-        self.actionCopyAttrs = QtWidgets.QAction(self)
-        self.actionCopyAttrs.setText('Copy')
-        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
-        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
-
-        self.actionInvertWeight = QtWidgets.QAction(self)
-        self.actionInvertWeight.setText('Invert')
-        self.actionInvertWeight.setObjectName("actionInvertWeight")
-        self.actionInvertWeight.triggered.connect(self.invert_weight)
-
-        self.actionPasteWeight = QtWidgets.QAction(self)
-        self.actionPasteWeight.setText('Paste')
-        self.actionPasteWeight.setObjectName("actionPasteWeight")
-        self.actionPasteWeight.triggered.connect(self.paste_weight)
-
-        self.actionPasteAttrs = QtWidgets.QAction(self)
-        self.actionPasteAttrs.setText('Paste')
-        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
-        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
-
-        self.actionDuplicateObject = QtWidgets.QAction(self)
-        self.actionDuplicateObject.setText("Duplicate")
-        self.actionDuplicateObject.setObjectName("actionDuplicateObject")
-        self.actionDuplicateObject.triggered.connect(self.duplicate_ziva_objects)
-
-        self.actionToggleTetsVisibility = QtWidgets.QAction(self)
-        self.actionToggleTetsVisibility.setText("Tets")
-        self.actionToggleTetsVisibility.setObjectName("actionToggleTets")
-        self.actionToggleTetsVisibility.setCheckable(True)
-
-        self.actionToggleFibersVisibility = QtWidgets.QAction(self)
-        self.actionToggleFibersVisibility.setText("Fibers")
-        self.actionToggleFibersVisibility.setObjectName("actionToggleFibers")
-        self.actionToggleFibersVisibility.setCheckable(True)
-
-        self.actionToggleBonesVisibility = QtWidgets.QAction(self)
-        self.actionToggleBonesVisibility.setText("Bones")
-        self.actionToggleBonesVisibility.setObjectName("actionToggleBones")
-        self.actionToggleBonesVisibility.setCheckable(True)
-
-        self.actionToggleAxesVisibility = QtWidgets.QAction(self)
-        self.actionToggleAxesVisibility.setText("Axes")
-        self.actionToggleAxesVisibility.setObjectName("actionToggleAxes")
-        self.actionToggleAxesVisibility.setCheckable(True)
-
-    def duplicate_ziva_objects(self):
-        indexes = self.treeView.selectedIndexes()
-        # currently expanded items
-        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                           model.SceneGraphModel.expandedRole, True, -1,
-                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-        # remember names of items to expand
-        names_to_expand = []
-        for index in expanded:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            names_to_expand.append(node.long_name)
-        for index in indexes:
-            self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
-            self.copy_attrs()
-            self.copy_weight()
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zMaterial':
-                mc.select(node.association[0])
-                name = mc.ziva(m=True)[0]
-                mc.select(name)
-                self.builder.retrieve_connections()
-                scene_items = self.builder.get_scene_items()
-                self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-                self.callback_ids["AttributeChanged"] = []
-                self.callback_ids["NameChanged"] = []
-                for item in scene_items:
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
-                for item in self.builder.bodies.values():
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
-
-        self.treeView.collapseAll()
-        for name in names_to_expand:
-            indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.fullNameRole, name, -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in indices:
-                self.treeView.expand(index)
-        self.paste_attrs()
-        self.paste_weight()
-
-    def copy_attrs(self):
-        indexes = self.treeView.selectedIndexes()
-        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
-        self.attrs[node.type] = node.attrs.copy()
-        print self.attrs
-
-    def paste_attrs(self):
-        indexes = self.treeView.selectedIndexes()
-        objs = []
-        for index in indexes:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            for key in self.attrs:
-                if node.type == key:
-                    for attr in self.attrs[key]:
-                        if mc.getAttr("%s.%s" % (node.name, attr), lock=True):
-                            mc.setAttr("%s.%s" % (node.name, attr), lock=False)
-                        mc.setAttr("%s.%s" % (node.name, attr), self.attrs[key][attr]['value'])
-                        mc.setAttr("%s.%s" % (node.name, attr),
-                                   lock=self.attrs[key][attr]['locked'])
-                    objs.append(node.name)
-        if objs:
-            print 'Attributes pasted to:', ', '.join(objs)
-
-    def set_node_attribute(self, attr, node, value=None):
-        if not value:
-            value = not mc.getAttr('%s.%s' % (node.name, attr))
-        mc.setAttr('%s.%s' % (node.name, attr), value)
-
-    def paint_by_prox_options(self):
-        """Brings up UI for painting by proximity.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
         
@@ -364,198 +230,48 @@ class MyDockingUI(QtWidgets.QWidget):
                             | QtCore.Qt.NoDropShadowWindowHint)
         menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        if node.type == 'zSolverTransform':
-            node = node.child(0)
-
-        if node.type == 'zSolver':
-            menu.addLabel('Visibility')
-            menu.setFixedWidth(135)
-
-            tets_value = node.attrs['showTetMeshes']['value']
-            fibers_value = node.attrs['showMuscleFibers']['value']
-            bones_value = node.attrs['showBones']['value']
-            axes_value = node.attrs['showAxes']['value']
-            attachments_value = node.attrs['showAttachments']['value']
-            collisions_value = node.attrs['showCollisions']['value']
-            materials_value = node.attrs['showMaterials']['value']
-
-            self.actionToggleTetsVisibility.setChecked(tets_value)
-            self.actionToggleTetsVisibility.triggered.connect(
-                partial(self.set_node_attribute, 'showTetMeshes', node))
-            menu.addAction(self.actionToggleTetsVisibility)
-            self.actionToggleFibersVisibility.setChecked(fibers_value)
-            self.actionToggleFibersVisibility.triggered.connect(
-                partial(self.set_node_attribute, 'showMuscleFibers', node))
-            menu.addAction(self.actionToggleFibersVisibility)
-            self.actionToggleBonesVisibility.setChecked(bones_value)
-            self.actionToggleBonesVisibility.triggered.connect(
-                partial(self.set_node_attribute, 'showBones', node))
-            menu.addAction(self.actionToggleBonesVisibility)
-            self.actionToggleAxesVisibility.setChecked(axes_value)
-            self.actionToggleAxesVisibility.triggered.connect(
-                partial(self.set_node_attribute, 'showAxes', node))
-            menu.addAction(self.actionToggleAxesVisibility)
-
-            attachments_menu = menu.addMenu("Attachments")
-            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'],
-                                                    attachments_value)
-            for i, button in enumerate(radio_widget.buttons):
-                button.clicked.connect(partial(self.set_node_attribute, 'showAttachments', node, i))
-            action_attachments = QtWidgets.QWidgetAction(attachments_menu)
-            action_attachments.setDefaultWidget(radio_widget)
-            attachments_menu.addAction(action_attachments)
-
-            collisions_menu = menu.addMenu("Collisions")
-            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'],
-                                                    collisions_value)
-            for i, button in enumerate(radio_widget.buttons):
-                button.clicked.connect(partial(self.set_node_attribute, 'showCollisions', node, i))
-            action_collisions = QtWidgets.QWidgetAction(collisions_menu)
-            action_collisions.setDefaultWidget(radio_widget)
-            collisions_menu.addAction(action_collisions)
-
-            materials_menu = menu.addMenu("Materials")
-            radio_widget = model.RadioButtonsWidget(
-                ['None', 'Type', 'Youngs Modulus', 'Strain', 'Volume Change'], materials_value)
-            for i, button in enumerate(radio_widget.buttons):
-                button.clicked.connect(partial(self.set_node_attribute, 'showMaterials', node, i))
-            action_materials = QtWidgets.QWidgetAction(materials_menu)
-            action_materials.setDefaultWidget(radio_widget)
-            materials_menu.addAction(action_materials)
-
         if node.type == 'zTet':
-            menu.setFixedWidth(125)
-
-            attributes_menu = menu.addMenu('attributes')
-            attributes_menu.addAction(self.actionCopyAttrs)
-            attributes_menu.addAction(self.actionPasteAttrs)
-
+            menu.setFixedWidth(110)
             menu.addLabel('Maps')
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            action_copy_weight = self.actionCopyWeight
-            source_map_menu.addAction(action_copy_weight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-
-        if node.type == 'zTissue':
-            menu.setFixedWidth(125)
-
-            attributes_menu = menu.addMenu('attributes')
-            attributes_menu.addAction(self.actionCopyAttrs)
-            attributes_menu.addAction(self.actionPasteAttrs)
 
         if node.type == 'zFiber':
             menu.setFixedWidth(125)
-
-            attributes_menu = menu.addMenu('attributes')
-            attributes_menu.addAction(self.actionCopyAttrs)
-            attributes_menu.addAction(self.actionPasteAttrs)
-
             menu.addLabel('Maps')
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(self.copy_weight)
-            source_map_menu.addAction(action_copy_weight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
 
             target_map_menu = menu.addMenu('endPoints')
             target_map_menu.addAction(self.actionPaintEndPoints)
-            target_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(partial(self.copy_weight, 'endPoints'))
-            target_map_menu.addAction(action_copy_weight)
-            action_paste_weight = QtWidgets.QAction(self)
-            action_paste_weight.setText('Paste')
-            action_paste_weight.setObjectName("actionPasteWeight")
-            action_paste_weight.triggered.connect(partial(self.paste_weight, 'endPoints'))
-            target_map_menu.addAction(action_paste_weight)
-            action_invert_weight = QtWidgets.QAction(self)
-            action_invert_weight.setText('Invert')
-            action_invert_weight.setObjectName("actionInvertWeight")
-            action_invert_weight.triggered.connect(partial(self.invert_weight, 'endPoints'))
-            target_map_menu.addAction(action_invert_weight)
 
         if node.type == 'zMaterial':
-            menu.setFixedWidth(125)
-
-            menu.addAction(self.actionDuplicateObject)
-            attributes_menu = menu.addMenu('attributes')
-            attributes_menu.addAction(self.actionCopyAttrs)
-            attributes_menu.addAction(self.actionPasteAttrs)
-
+            menu.setFixedWidth(110)
             menu.addLabel('Maps')
             source_map_menu = menu.addMenu('weight')
             source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            action_copy_weight = self.actionCopyWeight
-            source_map_menu.addAction(action_copy_weight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-
-        if node.type == 'zEmbedder':
-            menu.addAction(self.actionPaintWeight)
-            menu.addSection('')
 
         if node.type == 'zAttachment':
-            attributes_menu = menu.addMenu('attributes')
-            attributes_menu.addAction(self.actionCopyAttrs)
-            attributes_menu.addAction(self.actionPasteAttrs)
-
             menu.addAction(self.actionSelectST)
 
             menu.addLabel('Maps')
             source_map_menu = menu.addMenu('source')
             source_map_menu.addAction(self.actionPaintSource)
-            source_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(self.copy_weight)
-            source_map_menu.addAction(action_copy_weight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-            source_map_menu.addSection('')
             target_map_menu = menu.addMenu('target')
             target_map_menu.addAction(self.actionPaintTarget)
-            target_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(partial(self.copy_weight, None, False))
-            target_map_menu.addAction(action_copy_weight)
-            action_paste_weight = QtWidgets.QAction(self)
-            action_paste_weight.setText('Paste')
-            action_paste_weight.setObjectName("actionPasteWeight")
-            action_paste_weight.triggered.connect(partial(self.paste_weight, None, False))
-            target_map_menu.addAction(action_paste_weight)
-            action_invert_weight = QtWidgets.QAction(self)
-            action_invert_weight.setText('Invert')
-            action_invert_weight.setObjectName("actionInvertWeight")
-            action_invert_weight.triggered.connect(partial(self.invert_weight, None, False))
-            target_map_menu.addAction(action_invert_weight)
             menu.addSection('')
             proximity_menu = menu.addMenu('Paint By Proximity')
-            proximity_menu.installEventFilter(menu)
             prox_widget = model.ProximityWidget()
-            actionPaintByProx = QtWidgets.QWidgetAction(proximity_menu)
-            actionPaintByProx.setDefaultWidget(prox_widget)
-            proximity_menu.addAction(actionPaintByProx)
-            proximity_menu.setDefaultAction(actionPaintByProx)
+            action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+            action_paint_by_prox.setDefaultWidget(prox_widget)
+            proximity_menu.addAction(action_paint_by_prox)
+            proximity_menu.setDefaultAction(action_paint_by_prox)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
-        corrisponding item in Maya scene.
+        corresponding item in Maya scene.
         """
         # To exclude cycle caused by selection we need to break the loop before manually making selection
         self.is_selection_callback_active = False
@@ -749,74 +465,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-
-    def copy_weight(self, map_name=None, source=True):
-        indexes = self.treeView.selectedIndexes()
-        tmp = []
-        mesh = None
-        for i in indexes:
-            node = i.data(model.SceneGraphModel.nodeRole)
-            if map_name:
-                weights = mc.getAttr("{}.{}".format(node.name, map_name))
-                mesh = node.association[0]
-            else:
-                if source:
-                    index = 0
-                else:
-                    index = 1
-                mesh = node.association[index]
-                vert_count = mc.polyEvaluate(mesh, v=True)
-                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
-                    node.name, index, vert_count - 1))
-            tmp.append(weights)
-
-        self.weights = [sum(i) for i in zip(*tmp)]
-        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
-        print mesh, self.weights
-
-    def invert_weight(self, map_name=None, source=True):
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        if map_name:
-            weights = mc.getAttr("{}.{}".format(node.name, map_name))
-            map_ = node.name + '.' + map_name
-            weights = [1.0 - x for x in weights]
-            mc.setAttr(map_, weights, type="doubleArray")
-        else:
-            if source:
-                index = 0
-            else:
-                index = 1
-            mesh = node.association[index]
-            vert_count = mc.polyEvaluate(mesh, v=True)
-            weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
-                node.name, index, vert_count - 1))
-            map_ = node.name + '.weightList[%d].weights' % index
-
-            weights = [1.0 - x for x in weights]
-
-            tmp = []
-            for w in weights:
-                tmp.append(str(w))
-            val = ' '.join(tmp)
-            cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
-            mm.eval(cmd)
-
-    def paste_weight(self, map_name=None, source=True):
-        indexes = self.treeView.selectedIndexes()[-1]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        if not map_name:
-            if source:
-                index = 0
-            else:
-                index = 1
-            map_ = node.name + '.weightList[%d].weights' % index
-            tmp = []
-            for w in self.weights:
-                tmp.append(str(w))
-            val = ' '.join(tmp)
-            cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
-            mm.eval(cmd)
-        else:
-            map_ = node.name + '.' + map_name
-            mc.setAttr(map_, self.weights, type="doubleArray")

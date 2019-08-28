@@ -33,7 +33,6 @@ QMenu
 {
     background: rgba(31, 31, 31, 75%);
     color: rgb(255, 255, 255);
-    /*border-radius: 10px;*/
     border-top-left-radius: 0;
     border: 1px solid rgb(88, 156, 224);
 }
@@ -97,47 +96,4 @@ QHeaderView
 {
     background: #313131;
     color: transparent;
-}
-
-QSlider::groove:horizontal {
-    background: transparent;
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::sub-page:horizontal {
-    background: rgb(200, 200, 200);
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: rgb(200, 200, 200);
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: rgb(100, 100, 100);
-    width: 8px;
-    margin-top: -4px;
-    margin-bottom: -4px;
-    border-radius: 3px;
-}
-
-QSlider::handle:horizontal:hover {
-    background: rgb(120, 120, 120);
-    border-radius: 3px;
-}
-
-QSlider::sub-page:horizontal:disabled {
-    background: rgb(100, 100, 100);
-}
-
-QSlider::add-page:horizontal:disabled {
-    background: rgb(100, 100, 100);
-}
-
-QSlider::handle:horizontal:disabled {
-    background: rgb(68, 68, 68);
 }
