@@ -10,7 +10,7 @@ QTreeView
     font-size: 12px;
     icon-size: 18px;
     font-family: "Verdana";
-    background: #313131;
+    background: rgb(49, 49, 49);
 }
 
 QTreeView::item
@@ -94,6 +94,6 @@ QGroupBox
 
 QHeaderView
 {
-    background: #313131;
+    background: rgb(49, 49, 49);
     color: transparent;
 }

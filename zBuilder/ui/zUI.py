@@ -231,7 +231,7 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = model.CustomMenu(self)
+            menu = view.MenuWithLabelSeparator(self)
             menu.installEventFilter(menu)
             menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
                                 | QtCore.Qt.NoDropShadowWindowHint)
@@ -268,7 +268,7 @@ class MyDockingUI(QtWidgets.QWidget):
                 target_map_menu.addAction(self.actionPaintTarget)
                 menu.addSection('')
                 proximity_menu = menu.addMenu('Paint By Proximity')
-                prox_widget = model.ProximityWidget()
+                prox_widget = view.ProximityWidget()
                 action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
                 action_paint_by_prox.setDefaultWidget(prox_widget)
                 proximity_menu.addAction(action_paint_by_prox)
