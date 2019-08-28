@@ -19,9 +19,6 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
-import copy
-
-from zBuilder.parameters import maps
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -265,9 +262,9 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.treeView.collapseAll()
         for name in names_to_expand:
-            indices = self._proxy_model.match(
-                self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indices:
                 self.treeView.expand(index)
         self.paste_attrs()
@@ -290,7 +287,8 @@ class MyDockingUI(QtWidgets.QWidget):
                         if mc.getAttr("%s.%s" % (node.name, attr), lock=True):
                             mc.setAttr("%s.%s" % (node.name, attr), lock=False)
                         mc.setAttr("%s.%s" % (node.name, attr), self.attrs[key][attr]['value'])
-                        mc.setAttr("%s.%s" % (node.name, attr), lock=self.attrs[key][attr]['locked'])
+                        mc.setAttr("%s.%s" % (node.name, attr),
+                                   lock=self.attrs[key][attr]['locked'])
                     objs.append(node.name)
         if objs:
             print 'Attributes pasted to:', ', '.join(objs)
@@ -362,7 +360,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         menu = model.CustomMenu(self)
         menu.installEventFilter(menu)
-        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+        menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
+                            | QtCore.Qt.NoDropShadowWindowHint)
         menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         if node.type == 'zSolverTransform':
@@ -381,20 +380,25 @@ class MyDockingUI(QtWidgets.QWidget):
             materials_value = node.attrs['showMaterials']['value']
 
             self.actionToggleTetsVisibility.setChecked(tets_value)
-            self.actionToggleTetsVisibility.triggered.connect(partial(self.set_node_attribute, 'showTetMeshes', node))
+            self.actionToggleTetsVisibility.triggered.connect(
+                partial(self.set_node_attribute, 'showTetMeshes', node))
             menu.addAction(self.actionToggleTetsVisibility)
             self.actionToggleFibersVisibility.setChecked(fibers_value)
-            self.actionToggleFibersVisibility.triggered.connect(partial(self.set_node_attribute, 'showMuscleFibers', node))
+            self.actionToggleFibersVisibility.triggered.connect(
+                partial(self.set_node_attribute, 'showMuscleFibers', node))
             menu.addAction(self.actionToggleFibersVisibility)
             self.actionToggleBonesVisibility.setChecked(bones_value)
-            self.actionToggleBonesVisibility.triggered.connect(partial(self.set_node_attribute, 'showBones', node))
+            self.actionToggleBonesVisibility.triggered.connect(
+                partial(self.set_node_attribute, 'showBones', node))
             menu.addAction(self.actionToggleBonesVisibility)
             self.actionToggleAxesVisibility.setChecked(axes_value)
-            self.actionToggleAxesVisibility.triggered.connect(partial(self.set_node_attribute, 'showAxes', node))
+            self.actionToggleAxesVisibility.triggered.connect(
+                partial(self.set_node_attribute, 'showAxes', node))
             menu.addAction(self.actionToggleAxesVisibility)
 
             attachments_menu = menu.addMenu("Attachments")
-            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'], attachments_value)
+            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'],
+                                                    attachments_value)
             for i, button in enumerate(radio_widget.buttons):
                 button.clicked.connect(partial(self.set_node_attribute, 'showAttachments', node, i))
             action_attachments = QtWidgets.QWidgetAction(attachments_menu)
@@ -402,7 +406,8 @@ class MyDockingUI(QtWidgets.QWidget):
             attachments_menu.addAction(action_attachments)
 
             collisions_menu = menu.addMenu("Collisions")
-            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'], collisions_value)
+            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Stiffness', 'Strain'],
+                                                    collisions_value)
             for i, button in enumerate(radio_widget.buttons):
                 button.clicked.connect(partial(self.set_node_attribute, 'showCollisions', node, i))
             action_collisions = QtWidgets.QWidgetAction(collisions_menu)
@@ -410,7 +415,8 @@ class MyDockingUI(QtWidgets.QWidget):
             collisions_menu.addAction(action_collisions)
 
             materials_menu = menu.addMenu("Materials")
-            radio_widget = model.RadioButtonsWidget(['None', 'Type', 'Youngs Modulus', 'Strain', 'Volume Change'], materials_value)
+            radio_widget = model.RadioButtonsWidget(
+                ['None', 'Type', 'Youngs Modulus', 'Strain', 'Volume Change'], materials_value)
             for i, button in enumerate(radio_widget.buttons):
                 button.clicked.connect(partial(self.set_node_attribute, 'showMaterials', node, i))
             action_materials = QtWidgets.QWidgetAction(materials_menu)
@@ -574,7 +580,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.show()
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked | om.MNodeMessage.kAttributeUnlocked):
+        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked
+                  | om.MNodeMessage.kAttributeUnlocked):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
@@ -670,9 +677,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # expand item in view.
         if expanded:
             for name in names_to_expand:
-                indices = self._proxy_model.match(
-                    self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                    -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                  model.SceneGraphModel.fullNameRole, name, -1,
+                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
                 for index in indices:
                     self.treeView.expand(index)
         if sel:
@@ -759,7 +766,8 @@ class MyDockingUI(QtWidgets.QWidget):
                     index = 1
                 mesh = node.association[index]
                 vert_count = mc.polyEvaluate(mesh, v=True)
-                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(node.name, index, vert_count - 1))
+                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
+                    node.name, index, vert_count - 1))
             tmp.append(weights)
 
         self.weights = [sum(i) for i in zip(*tmp)]
@@ -781,7 +789,8 @@ class MyDockingUI(QtWidgets.QWidget):
                 index = 1
             mesh = node.association[index]
             vert_count = mc.polyEvaluate(mesh, v=True)
-            weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(node.name, index, vert_count - 1))
+            weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
+                node.name, index, vert_count - 1))
             map_ = node.name + '.weightList[%d].weights' % index
 
             weights = [1.0 - x for x in weights]
