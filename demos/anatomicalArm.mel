@@ -10,6 +10,12 @@
   license to use this script for any purpose.
 */
 
+global proc ziva_loadArmGeometry_anatomicalArmDemo()
+{
+  $anatomicalArmSceneFilePath = getDemoAssetPath("anatomicalArm.ma");
+  file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $anatomicalArmSceneFilePath;
+}
+
 global proc ziva_makeBone_anatomicalArmDemo(string $src, int $contactStiffnessExp)
 {
   // Make a single bone, based on geometry $src.
@@ -1189,8 +1195,7 @@ global proc ziva_main_anatomicalArmDemo(int $newScene)
   }
 
   // load the geometry of the bones and muscles, setup the bone rig and animation of the bones
-  $anatomicalArmSceneFilePath = getDemoAssetPath("anatomicalArm.ma");
-  file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $anatomicalArmSceneFilePath;
+  ziva_loadArmGeometry_anatomicalArmDemo();
 
   // make a solver node
   ziva -s;
