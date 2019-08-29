@@ -58,7 +58,6 @@ class MenuWithLabelSeparator(QtWidgets.QMenu):
                                             QtWidgets.QSizePolicy.Fixed)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(line.sizePolicy().hasHeightForWidth())
         line.setSizePolicy(size_policy)
         layout.addWidget(label_text)
         layout.addWidget(line)
