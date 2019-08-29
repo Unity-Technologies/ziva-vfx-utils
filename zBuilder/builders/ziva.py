@@ -112,6 +112,13 @@ class Ziva(Builder):
                 rivets[x.long_curve_name] = []
             rivets[x.long_curve_name].append(x)
 
+        # zRestShape ------
+        rest_shapes = {}
+        for x in self.get_scene_items(type_filter='zRestShape'):
+            if x.long_curve_name not in rivets:
+                rivets[x.long_curve_name] = []
+            rivets[x.long_curve_name].append(x)
+
         # line of actions
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
@@ -300,6 +307,7 @@ class Ziva(Builder):
             'zLineOfAction',
             'zFieldAdaptor',
             'zRivetToBone',
+            'zRestShape',
         ]
 
         node_types.extend(Field.TYPES)

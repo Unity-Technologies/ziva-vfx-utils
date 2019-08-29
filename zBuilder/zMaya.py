@@ -372,6 +372,9 @@ def get_association(zNode):
 
         return tmp
 
+    elif _type == 'zRestShape':
+        return []
+
     elif _type == 'zFieldAdaptor':
         return []
 
