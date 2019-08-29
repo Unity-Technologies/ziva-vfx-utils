@@ -596,8 +596,8 @@ def get_meshes_from_selection(selection):
             history = mc.listHistory(item, f=True)
             fiber = mc.ls(history, type='zFiber')
             mc.select(fiber)
-            meshss = mm.eval('zQuery -t zTissue -m')
-            output.append(meshss[0])
+            meshes = mm.eval('zQuery -t zTissue -m')
+            output.append(meshes[0])
         else:
             output.append(item)
     return output
