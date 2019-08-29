@@ -585,7 +585,7 @@ def get_meshes_from_selection(selection):
 
     Returns:
         list(): Selection list with item types in 'type_' replaced with 
-        corrisponding tissued mesh.
+        corresponding tissued mesh.
     """
     # these are the types we need to find the tissued mesh for.
     type_ = ['zLineOfAction', 'zRivetToBone']
