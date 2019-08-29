@@ -128,5 +128,6 @@ global proc ziva_main_spatiallyVaryingMaterials(int $newScene)
     displayStyle -wos;
   }
 
+  printDemoScriptPath("ziva_main_spatiallyVaryingMaterials");
   print "Scene created. Demonstrates spatially-varying materials. The right side of the sphere is 100x stiffer than the left. Press \"Play\" to simulate.\n";
 }

@@ -266,5 +266,6 @@ The second dimension corresponds to:\n\
   5. tissue self-colliding with itself\n\n\
 ";
 
+  printDemoScriptPath("ziva_main_oneOfEachCollisionTypes");
   print "Scene created. Demonstrates each of the collision types. Press \"Play\" to simulate.\n";
 }

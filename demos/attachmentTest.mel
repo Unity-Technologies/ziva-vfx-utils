@@ -183,5 +183,6 @@ global proc ziva_main_attachmentTest(int $newScene)
   playbackOptions -e -maxTime 200; // adjust playback to give 200 frames
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 
+  printDemoScriptPath("ziva_main_attachmentTest");
   print "Scene created. Demonstrates the various attachments. Press \"Play\" to simulate.\n";
 }

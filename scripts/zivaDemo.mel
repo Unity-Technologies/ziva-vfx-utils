@@ -7,6 +7,13 @@ global proc string getDemoAssetPath(string $demoAssetName)
   return $demoAssetPath;
 };
 
+global proc printDemoScriptPath(string $demoEntryFunctionName)
+{
+  $returnString = eval("whatIs \"" + $demoEntryFunctionName + "\"");
+  $demoScriptPath = stringRemovePrefix($returnString, "Mel procedure found in: ");
+  print ("Demo script file path: \"" + $demoScriptPath + "\"\n");
+};
+
 global proc zivaSourceDemo(string $demoAssetName)
 {
   $demoPath = getDemoAssetPath($demoAssetName);
