@@ -125,3 +125,15 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # should not be empty
         self.assertTrue(len(builder.get_scene_items()) > 0)
+
+    def test_retrieve_connections_rivet_check(self):
+        # this tests if retrieve_connections works if a rivet is selected
+        mc.select(self.riv1)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # this should have grabbed the specific loa
+        result = builder.get_scene_items(name_filter=self.riv1)
+
+        # result will have named loa
+        self.assertTrue(len(result) == 1)
