@@ -301,7 +301,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
         if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked
-                  | om.MNodeMessage.kAttributeUnlocked):
+                  | om.MNodeMessage.kAttributeUnlocked | om.MNodeMessage.kConnectionMade):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
