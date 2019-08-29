@@ -193,7 +193,7 @@ class Ziva(Builder):
         else:
             selection = mc.ls(sl=True)
 
-        selection = get_meshes_from_selection(selection)
+        selection = transform_rivet_and_LoA_into_tissue_meshes(selection)
 
         nodes = []
         nodes.extend(self.__add_bodies(selection))
@@ -573,7 +573,7 @@ class Ziva(Builder):
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
 
 
-def get_meshes_from_selection(selection):
+def transform_rivet_and_LoA_into_tissue_meshes(selection):
     """ This takes a list of items from a maya scene and if it finds any 
     zLineOfAction or zRivetToBone it replaces that item with the corresponding
     tissued mesh.
