@@ -74,7 +74,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
-        # "razzle duzzle" but the only way I could handle that
+        # "razzle dazzle" but the only way I could handle that
         # height - defines padding from top
         # offset - defines padding from left
         # opposite value of offset should be applied in view.py in drawBranches method
