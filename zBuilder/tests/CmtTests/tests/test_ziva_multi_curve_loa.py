@@ -80,6 +80,22 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         mc.select(loa.name)
         builder = zva.Ziva()
         builder.retrieve_connections()
-
+        builder.stats()
+        print builder.get_scene_items()
         # should not be empty
         self.assertTrue(len(builder.get_scene_items()) > 0)
+
+    def test_retrieve_connections_loa_selected_check(self):
+
+        loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
+
+        # now retrieve
+        mc.select(loa.name)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # this should have grabbed the specific loa
+        result = builder.get_scene_items(name_filter=loa.name)
+
+        # result will have named loa
+        self.assertTrue(len(result) == 1)
