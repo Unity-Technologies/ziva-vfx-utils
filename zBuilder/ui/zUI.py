@@ -82,7 +82,6 @@ class MyDockingUI(QtWidgets.QWidget):
         offset = -20
         header = self.treeView.header()
         header.setOffset(offset)
-        header.setOffsetToSectionPosition(20)
         header.setFixedHeight(height)
 
         self.callback_ids = {}
