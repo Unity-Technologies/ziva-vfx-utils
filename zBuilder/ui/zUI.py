@@ -307,7 +307,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.show()
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & om.MNodeMessage.kAttributeSet:
+        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked
+                  | om.MNodeMessage.kAttributeUnlocked | om.MNodeMessage.kConnectionMade
+                  | om.MNodeMessage.kConnectionBroken):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
