@@ -14,7 +14,18 @@ class RestShapeNode(Ziva):
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
+        self.targets = None
         Ziva.__init__(self, *args, **kwargs)
+
+    def populate(self, maya_node=None):
+        """ This populates the node given a selection.
+
+        Args:
+            maya_node: Maya node to populate with.
+        """
+        super(RestShapeNode, self).populate(maya_node=maya_node)
+
+        self.targets = mc.listConnections(self.name + '.target')
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
