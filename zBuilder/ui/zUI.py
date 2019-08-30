@@ -84,6 +84,7 @@ class MyDockingUI(QtWidgets.QWidget):
         header.setOffset(offset)
         header.setFixedHeight(height)
 
+
         self.callback_ids = {}
 
         self.reset_tree(root_node=root_node)
@@ -218,6 +219,15 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
+    def add_placeholder_action(self, menu):
+        """Adds an empty action to the menu
+        To be able to add separator at the very top of menu
+        """
+        empty_widget = QtWidgets.QWidget()
+        empty_action = QtWidgets.QWidgetAction(menu)
+        empty_action.setDefaultWidget(empty_widget)
+        menu.addAction(empty_action)
+
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -230,21 +240,18 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = view.MenuWithLabelSeparator(self)
-            menu.installEventFilter(menu)
-            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
-                                | QtCore.Qt.NoDropShadowWindowHint)
-            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            menu = QtWidgets.QMenu(self)
 
             if node.type == 'zTet':
-                menu.setFixedWidth(110)
-                menu.addLabel('Maps')
+                # QMenu.addSection only works after action, creates an empty action before
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
                 source_map_menu = menu.addMenu('weight')
                 source_map_menu.addAction(self.actionPaintWeight)
 
             if node.type == 'zFiber':
-                menu.setFixedWidth(125)
-                menu.addLabel('Maps')
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
                 source_map_menu = menu.addMenu('weight')
                 source_map_menu.addAction(self.actionPaintWeight)
 
@@ -252,15 +259,15 @@ class MyDockingUI(QtWidgets.QWidget):
                 target_map_menu.addAction(self.actionPaintEndPoints)
 
             if node.type == 'zMaterial':
-                menu.setFixedWidth(110)
-                menu.addLabel('Maps')
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
                 source_map_menu = menu.addMenu('weight')
                 source_map_menu.addAction(self.actionPaintWeight)
 
             if node.type == 'zAttachment':
                 menu.addAction(self.actionSelectST)
 
-                menu.addLabel('Maps')
+                menu.addSection('Maps')
                 source_map_menu = menu.addMenu('source')
                 source_map_menu.addAction(self.actionPaintSource)
                 target_map_menu = menu.addMenu('target')
@@ -271,7 +278,6 @@ class MyDockingUI(QtWidgets.QWidget):
                 action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
                 action_paint_by_prox.setDefaultWidget(prox_widget)
                 proximity_menu.addAction(action_paint_by_prox)
-                proximity_menu.setDefaultAction(action_paint_by_prox)
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
