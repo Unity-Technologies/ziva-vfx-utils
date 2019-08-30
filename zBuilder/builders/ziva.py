@@ -201,6 +201,8 @@ class Ziva(Builder):
         else:
             selection = mc.ls(sl=True)
 
+        selection = transform_rivet_and_LoA_into_tissue_meshes(selection)
+
         nodes = []
         nodes.extend(self.__add_bodies(selection))
 
@@ -580,11 +582,43 @@ class Ziva(Builder):
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
 
 
+def transform_rivet_and_LoA_into_tissue_meshes(selection):
+    """ This takes a list of items from a maya scene and if it finds any 
+    zLineOfAction or zRivetToBone it replaces that item with the corresponding
+    tissued mesh.
+
+    This is until zQuery is re-implemented in python.
+    
+    Args:
+        selection ([str]): List of items in mayas scene
+
+    Returns:
+        list(): Selection list with item types in 'type_' replaced with 
+        corresponding tissued mesh.
+    """
+    # these are the types we need to find the tissued mesh for.
+    type_ = ['zLineOfAction', 'zRivetToBone']
+
+    output = []
+    for item in selection:
+        if mc.objectType(item) in type_:
+            history = mc.listHistory(item, future=True)
+            fiber = mc.ls(history, type='zFiber')
+            mc.select(fiber)
+            meshes = mm.eval('zQuery -t zTissue -m')
+            output.append(meshes[0])
+        else:
+            output.append(item)
+    return output
+
+
 def zQuery(types, solver):
-    types_not_in_znodes = list(set(types) - set(ZNODES))
+
+    solver_history = mc.listHistory(solver)
+    types_not_in_znodes = set(types) - set(ZNODES)
+    nodes = [x for x in solver_history if mc.objectType(x) in types_not_in_znodes]
+
     types_in_znodes = list(set(ZNODES) & set(types))
-    hist = mc.listHistory(solver)
-    nodes = [x for x in hist if mc.objectType(x) in types_not_in_znodes]
 
     for node_type in types_in_znodes:
         tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
