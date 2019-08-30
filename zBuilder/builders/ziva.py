@@ -593,7 +593,7 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
     output = []
     for item in selection:
         if mc.objectType(item) in type_:
-            history = mc.listHistory(item, f=True)
+            history = mc.listHistory(item, future=True)
             fiber = mc.ls(history, type='zFiber')
             mc.select(fiber)
             meshes = mm.eval('zQuery -t zTissue -m')
