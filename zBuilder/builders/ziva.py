@@ -94,8 +94,7 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item.parent = parent_node
 
-        for item in self.get_scene_items(
-                type_filter=['zMaterial', 'zFiber', 'zAttachment', 'zRestShape']):
+        for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
             parent_node = self.bodies.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
@@ -105,6 +104,23 @@ class Ziva(Builder):
                 parent_node = self.bodies.get(item.long_association[1], None)
                 if parent_node:
                     parent_node.add_child(item)
+
+        # rest shapes
+        for item in self.get_scene_items(type_filter=['zRestShape']):
+            parent_node = self.get_scene_items(name_filter=item.tissue_name)[0]
+            if parent_node:
+                parent_node.add_child(item)
+                item.parent = parent_node
+
+            # targets ----------------------
+            if item.targets:
+                for target in item.targets:
+                    grp = DGNode()
+                    grp.name = target
+                    grp.type = 'ui_zTissue_body'
+                    grp.mobject = target
+                    grp.parent = item
+                    item.add_child(grp)
 
         # rivets ------
         rivets = {}
