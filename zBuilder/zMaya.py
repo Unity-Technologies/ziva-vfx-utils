@@ -373,7 +373,9 @@ def get_association(zNode):
         return tmp
 
     elif _type == 'zRestShape':
-        return []
+        tet = mc.listConnections('{}.iGeo'.format(zNode))[0]
+        mesh = mm.eval('zQuery -type "zTissue" -m {}'.format(tet))
+        return mesh
 
     elif _type == 'zFieldAdaptor':
         return []
