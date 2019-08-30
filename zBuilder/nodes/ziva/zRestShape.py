@@ -15,3 +15,8 @@ class RestShapeNode(Ziva):
 
     def __init__(self, *args, **kwargs):
         Ziva.__init__(self, *args, **kwargs)
+
+    def build(self, *args, **kwargs):
+        """ Builds the node in maya.  mean to be overwritten.
+        """
+        pass
