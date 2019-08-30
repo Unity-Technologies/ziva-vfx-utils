@@ -11,7 +11,7 @@ QTreeView
     font-size: 12px;
     icon-size: 18px;
     font-family: "Verdana";
-    background: rgb(49, 49, 49);
+    background: rgb(54, 54, 54);
 }
 
 QTreeView::item
@@ -30,19 +30,8 @@ QTreeView QLineEdit
     font-family: "Verdana";
 }
 
-QFrame#line
-{
-    background: rgb(150, 150, 150);
-}
-
-QLabel
-{
-    color: rgb(150, 150, 150);
-    font-size: 8pt;
-}
-
 QHeaderView
 {
-    background: rgb(49, 49, 49);
+    background: rgb(54, 54, 54);
     color: transparent;
 }
