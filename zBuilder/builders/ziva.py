@@ -94,7 +94,8 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item.parent = parent_node
 
-        for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
+        for item in self.get_scene_items(
+                type_filter=['zMaterial', 'zFiber', 'zAttachment', 'zRestShape']):
             parent_node = self.bodies.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
@@ -108,13 +109,6 @@ class Ziva(Builder):
         # rivets ------
         rivets = {}
         for x in self.get_scene_items(type_filter='zRivetToBone'):
-            if x.long_curve_name not in rivets:
-                rivets[x.long_curve_name] = []
-            rivets[x.long_curve_name].append(x)
-
-        # zRestShape ------
-        rest_shapes = {}
-        for x in self.get_scene_items(type_filter='zRestShape'):
             if x.long_curve_name not in rivets:
                 rivets[x.long_curve_name] = []
             rivets[x.long_curve_name].append(x)
