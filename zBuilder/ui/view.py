@@ -29,52 +29,15 @@ class GroupedLineEdit(QtWidgets.QLineEdit):
         return super(GroupedLineEdit, self).event(event)
 
 
-class MenuWithLabelSeparator(QtWidgets.QMenu):
-    def __init__(self, parent=None):
-        super(MenuWithLabelSeparator, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint
-                            | QtCore.Qt.NoDropShadowWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-    def addMenu(self, *args, **kwargs):
-        menu = super(MenuWithLabelSeparator, self).addMenu(*args, **kwargs)
-        if isinstance(menu, QtWidgets.QMenu):
-            # making widget accepting transparency parameter from stylesheet
-            menu.setWindowFlags(menu.windowFlags() | QtCore.Qt.FramelessWindowHint
-                                | QtCore.Qt.NoDropShadowWindowHint)
-            menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        return menu
-
-    # Separator with text, looks like: Text---------
-    def addLabel(self, text):
-        widget = QtWidgets.QWidget()
-        layout = QtWidgets.QHBoxLayout(widget)
-        label_text = QtWidgets.QLabel(text)
-        line = QtWidgets.QFrame()
-        line.setObjectName("line")
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        line.setFixedHeight(1)
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                            QtWidgets.QSizePolicy.Fixed)
-        size_policy.setHorizontalStretch(0)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(line.sizePolicy().hasHeightForWidth())
-        line.setSizePolicy(size_policy)
-        layout.addWidget(label_text)
-        layout.addWidget(line)
-        action = QtWidgets.QWidgetAction(self)
-        action.setDefaultWidget(widget)
-        self.addAction(action)
-
-
 class ProximityWidget(QtWidgets.QWidget):
     """
     Widget in right-click menu to change map weights for attachments
     """
+
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
-        self.h_layout = QtWidgets.QHBoxLayout(self)
-        self.h_layout.setContentsMargins(15, 15, 15, 15)
+        h_layout = QtWidgets.QHBoxLayout(self)
+        h_layout.setContentsMargins(15, 15, 15, 15)
         self.from_edit = GroupedLineEdit()
         self.from_edit.setFixedHeight(24)
         self.from_edit.setPlaceholderText("From")
@@ -87,12 +50,12 @@ class ProximityWidget(QtWidgets.QWidget):
         self.to_edit.setFixedWidth(40)
         self.from_edit.sibling = self.to_edit
         self.to_edit.sibling = self.from_edit
-        self.ok_button = QtWidgets.QPushButton()
-        self.ok_button.setText("Ok")
-        self.h_layout.addWidget(self.from_edit)
-        self.h_layout.addWidget(self.to_edit)
-        self.h_layout.addWidget(self.ok_button)
-        self.ok_button.clicked.connect(self.paintByProx)
+        ok_button = QtWidgets.QPushButton()
+        ok_button.setText("Ok")
+        h_layout.addWidget(self.from_edit)
+        h_layout.addWidget(self.to_edit)
+        h_layout.addWidget(ok_button)
+        ok_button.clicked.connect(self.paintByProx)
         self.from_edit.acceptSignal.connect(self.paintByProx)
         self.to_edit.acceptSignal.connect(self.paintByProx)
 
