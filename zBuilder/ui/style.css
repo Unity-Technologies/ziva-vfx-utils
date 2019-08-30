@@ -1,3 +1,8 @@
+QWidget
+{
+    font-family: "Verdana";
+}
+
 QTreeView
 {
     selection-color: rgb(68, 136, 204);
@@ -6,12 +11,13 @@ QTreeView
     font-size: 12px;
     icon-size: 18px;
     font-family: "Verdana";
+    background: rgb(54, 54, 54);
 }
 
 QTreeView::item
 {
     border: none;
-    height: 19px;
+    height: 21px;
 }
 
 QTreeView QLineEdit
@@ -22,4 +28,10 @@ QTreeView QLineEdit
     padding: 0 2px;
     selection-background-color: rgb(81, 81, 81);
     font-family: "Verdana";
+}
+
+QHeaderView
+{
+    background: rgb(54, 54, 54);
+    color: transparent;
 }

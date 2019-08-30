@@ -4,6 +4,7 @@ from functools import partial
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
+
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -71,15 +72,32 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
 
+        # changing header size
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle dazzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        height = 10
+        offset = -20
+        header = self.treeView.header()
+        header.setOffset(offset)
+        header.setFixedHeight(height)
+
         self.callback_ids = {}
 
         self.reset_tree(root_node=root_node)
 
         self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32))
+        self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
+        self.setFixedHeight(27)
+        self.setFixedWidth(27)
 
-        self.main_layout.addWidget(self.tool_bar)
+        self.top_layout = QtWidgets.QHBoxLayout()
+        self.top_layout.addWidget(self.tool_bar)
+        self.top_layout.setContentsMargins(15, 0, 0, 0)
+        self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
         # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
@@ -108,7 +126,6 @@ class MyDockingUI(QtWidgets.QWidget):
                     om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
-
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -140,47 +157,25 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
-
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox, .1, .2))
-
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox, .1, 10))
         self.actionPaintSource = QtWidgets.QAction(self)
-        self.actionPaintSource.setText('Paint - source weights')
+        self.actionPaintSource.setText('Paint')
         self.actionPaintSource.setObjectName("paintSource")
         self.actionPaintSource.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintTarget = QtWidgets.QAction(self)
-        self.actionPaintTarget.setText('Paint - target weights')
+        self.actionPaintTarget.setText('Paint')
         self.actionPaintTarget.setObjectName("paintTarget")
         self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
 
         self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint - weights')
+        self.actionPaintWeight.setText('Paint')
         self.actionPaintWeight.setObjectName("paintWeight")
         self.actionPaintWeight.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintEndPoints = QtWidgets.QAction(self)
-        self.actionPaintEndPoints.setText('Paint - endPoints')
+        self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
-
-    def paint_by_prox_options(self):
-        """Brings up UI for painting by proximity.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
 
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
@@ -223,13 +218,14 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu
-        command.
+    def add_placeholder_action(self, menu):
+        """Adds an empty action to the menu
+        To be able to add separator at the very top of menu
         """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.curve)
+        empty_widget = QtWidgets.QWidget()
+        empty_action = QtWidgets.QWidgetAction(menu)
+        empty_action.setDefaultWidget(empty_widget)
+        menu.addAction(empty_action)
 
     def open_menu(self, position):
         """Generates menu for tree items
@@ -243,39 +239,50 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+            menu = QtWidgets.QMenu(self)
 
             if node.type == 'zTet':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+                # QMenu.addSection only works after action, creates an empty action before
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
 
             if node.type == 'zFiber':
-                menu.addAction(self.actionPaintWeight)
-                menu.addAction(self.actionPaintEndPoints)
-                menu.addSection('')
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
+
+                target_map_menu = menu.addMenu('endPoints')
+                target_map_menu.addAction(self.actionPaintEndPoints)
 
             if node.type == 'zMaterial':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zEmbedder':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+                self.add_placeholder_action(menu)
+                menu.addSection('Maps')
+                source_map_menu = menu.addMenu('weight')
+                source_map_menu.addAction(self.actionPaintWeight)
 
             if node.type == 'zAttachment':
-                menu.addAction(self.actionPaintSource)
-                menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
                 menu.addAction(self.actionSelectST)
+
+                menu.addSection('Maps')
+                source_map_menu = menu.addMenu('source')
+                source_map_menu.addAction(self.actionPaintSource)
+                target_map_menu = menu.addMenu('target')
+                target_map_menu.addAction(self.actionPaintTarget)
+                menu.addSection('')
+                proximity_menu = menu.addMenu('Paint By Proximity')
+                prox_widget = view.ProximityWidget()
+                action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+                action_paint_by_prox.setDefaultWidget(prox_widget)
+                proximity_menu.addAction(action_paint_by_prox)
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
-        corrisponding item in Maya scene.
+        corresponding item in Maya scene.
         """
         # To exclude cycle caused by selection we need to break the loop before manually making selection
         self.is_selection_callback_active = False
@@ -393,17 +400,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        # Expand all zSolverTransform tree items-------------------------------
-        if not expanded:
-            for row in range(self._proxy_model.rowCount()):
-                index = self._proxy_model.index(row, 0)
-                node = index.data(model.SceneGraphModel.nodeRole)
-                if node.type == 'zSolverTransform':
-                    self.treeView.expand(index)
-
         sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
+        if expanded:
+            for name in names_to_expand:
+                indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                  model.SceneGraphModel.fullNameRole, name, -1,
+                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                for index in indices:
+                    self.treeView.expand(index)
         if sel:
             checked = self.find_and_select(sel)
 
@@ -413,18 +419,19 @@ class MyDockingUI(QtWidgets.QWidget):
             # UI
             if checked:
                 # keeps previous expansion if TreeView was updated
-                if expanded:
-                    for name in names_to_expand:
-                        indices = self._proxy_model.match(
-                            self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                            -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                        for index in indices:
-                            self.treeView.expand(index)
-
                 self.treeView.expand(checked[0])
                 parent = checked[0].parent()
                 if parent.isValid():
                     self.treeView.expand(parent)
+
+        # Expand all zSolverTransform tree items-------------------------------
+        if not expanded:
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
+                    break
 
     def find_and_select(self, sel=None):
         """
