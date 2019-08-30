@@ -117,7 +117,7 @@ class Ziva(Builder):
                 for target in item.targets:
                     grp = DGNode()
                     grp.name = target
-                    grp.type = 'ui_zTissue_body'
+                    grp.type = 'ui_target_body'
                     grp.mobject = target
                     grp.parent = item
                     item.add_child(grp)
