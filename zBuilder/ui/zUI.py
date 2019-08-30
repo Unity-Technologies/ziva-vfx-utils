@@ -84,7 +84,6 @@ class MyDockingUI(QtWidgets.QWidget):
         header.setOffset(offset)
         header.setFixedHeight(height)
 
-
         self.callback_ids = {}
 
         self.reset_tree(root_node=root_node)
