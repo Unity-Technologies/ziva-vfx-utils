@@ -259,95 +259,111 @@ class MyDockingUI(QtWidgets.QWidget):
 
         menu = QtWidgets.QMenu(self)
 
-        if node.type == 'zTet':
-            # QMenu.addSection only works after action, creates an empty action before
-            self.add_placeholder_action(menu)
-            menu.addSection('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
+        menu_dict = {
+            'zTet': [{
+                'placeholder': None
+            }, {
+                'section': 'Maps'
+            }, {
+                'menu': 'weight'
+            }],
+            'zFiber': [{
+                'placeholder': None
+            }, {
+                'section': 'Maps'
+            }, {
+                'menu': 'weight'
+            }, {
+                'menu': {
+                    'endPoints': ['endPoints', True]
+                }
+            }],
+            'zMaterial': [{
+                'placeholder': None
+            }, {
+                'section': 'Maps'
+            }, {
+                'menu': 'weight'
+            }],
+            'zAttachment': [{
+                'select_source_and_target': None
+            }, {
+                'section': 'Maps'
+            }, {
+                'menu': {
+                    'source': [None, False]
+                }
+            }, {
+                'menu': {
+                    'target': [None, False]
+                }
+            }, {
+                'paint_by_proximity': None
+            }]
+        }
 
-        elif node.type == 'zFiber':
-            self.add_placeholder_action(menu)
-            menu.addSection('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-
-            target_map_menu = menu.addMenu('endPoints')
-            target_map_menu.addAction(self.actionPaintEndPoints)
-            target_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(partial(self.copy_weight, 'endPoints'))
-            target_map_menu.addAction(action_copy_weight)
-            action_paste_weight = QtWidgets.QAction(self)
-            action_paste_weight.setText('Paste')
-            action_paste_weight.setObjectName("actionPasteWeight")
-            action_paste_weight.triggered.connect(partial(self.paste_weight, 'endPoints'))
-            target_map_menu.addAction(action_paste_weight)
-            action_invert_weight = QtWidgets.QAction(self)
-            action_invert_weight.setText('Invert')
-            action_invert_weight.setObjectName("actionInvertWeight")
-            action_invert_weight.triggered.connect(partial(self.invert_weight, 'endPoints'))
-            target_map_menu.addAction(action_invert_weight)
-
-        elif node.type == 'zMaterial':
-            self.add_placeholder_action(menu)
-            menu.addSection('Maps')
-            source_map_menu = menu.addMenu('weight')
-            source_map_menu.addAction(self.actionPaintWeight)
-            source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-
-        elif node.type == 'zAttachment':
-            source_mesh = node.association[0]
-            target_mesh = node.association[1]
-            menu.addAction(self.actionSelectST)
-
-            menu.addSection('Maps')
-            text = (source_mesh[:12] + '..') if len(source_mesh) > 14 else source_mesh
-            source_map_menu = menu.addMenu('source (%s)' % text)
-            source_map_menu.addAction(self.actionPaintSource)
-            source_map_menu.addSection('')
-            source_map_menu.addAction(self.actionCopyWeight)
-            source_map_menu.addAction(self.actionPasteWeight)
-            source_map_menu.addAction(self.actionInvertWeight)
-            source_map_menu.addSection('')
-            text = (target_mesh[:12] + '..') if len(target_mesh) > 14 else target_mesh
-            target_map_menu = menu.addMenu('target (%s)' % text)
-            target_map_menu.addAction(self.actionPaintTarget)
-            target_map_menu.addSection('')
-            action_copy_weight = QtWidgets.QAction(self)
-            action_copy_weight.setText('Copy')
-            action_copy_weight.setObjectName("actionCopyWeight")
-            action_copy_weight.triggered.connect(partial(self.copy_weight, None, False))
-            target_map_menu.addAction(action_copy_weight)
-            action_paste_weight = QtWidgets.QAction(self)
-            action_paste_weight.setText('Paste')
-            action_paste_weight.setObjectName("actionPasteWeight")
-            action_paste_weight.triggered.connect(partial(self.paste_weight, None, False))
-            target_map_menu.addAction(action_paste_weight)
-            action_invert_weight = QtWidgets.QAction(self)
-            action_invert_weight.setText('Invert')
-            action_invert_weight.setObjectName("actionInvertWeight")
-            action_invert_weight.triggered.connect(partial(self.invert_weight, None, False))
-            target_map_menu.addAction(action_invert_weight)
-            menu.addSection('')
-            proximity_menu = menu.addMenu('Paint By Proximity')
-            prox_widget = view.ProximityWidget()
-            action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
-            action_paint_by_prox.setDefaultWidget(prox_widget)
-            proximity_menu.addAction(action_paint_by_prox)
+        if node.type in menu_dict:
+            menu_list = menu_dict[node.type]
+            for item in menu_list:
+                name = item.keys()[0]
+                if name == 'placeholder':
+                    self.add_placeholder_action(menu)
+                elif name == 'section':
+                    menu.addSection(item[name])
+                elif name == 'menu':
+                    if item[name] == 'weight':
+                        map_menu = menu.addMenu('weight')
+                        map_menu.addAction(self.actionPaintWeight)
+                        map_menu.addSection('')
+                        map_menu.addAction(self.actionCopyWeight)
+                        map_menu.addAction(self.actionPasteWeight)
+                        map_menu.addAction(self.actionInvertWeight)
+                    else:
+                        map_dict = item[name]
+                        map_name = map_dict.keys()[0]
+                        map_values = map_dict[map_name]
+                        if map_name == 'source':
+                            source_mesh = node.association[0]
+                            text = (source_mesh[:12] +
+                                    '..') if len(source_mesh) > 14 else source_mesh
+                            text = 'source (%s)' % text
+                        elif map_name == 'target':
+                            target_mesh = node.association[1]
+                            text = (target_mesh[:12] +
+                                    '..') if len(target_mesh) > 14 else target_mesh
+                            text = 'source (%s)' % text
+                        else:
+                            text = map_name
+                        target_map_menu = menu.addMenu(text)
+                        target_map_menu.addAction(self.actionPaintEndPoints)
+                        target_map_menu.addSection('')
+                        action_copy_weight = QtWidgets.QAction(self)
+                        action_copy_weight.setText('Copy')
+                        action_copy_weight.setObjectName("actionCopyWeight")
+                        action_copy_weight.triggered.connect(
+                            partial(self.copy_weight, map_values[0], map_values[1]))
+                        target_map_menu.addAction(action_copy_weight)
+                        action_paste_weight = QtWidgets.QAction(self)
+                        action_paste_weight.setText('Paste')
+                        action_paste_weight.setObjectName("actionPasteWeight")
+                        action_paste_weight.triggered.connect(
+                            partial(self.paste_weight, map_values[0], map_values[1]))
+                        target_map_menu.addAction(action_paste_weight)
+                        action_invert_weight = QtWidgets.QAction(self)
+                        action_invert_weight.setText('Invert')
+                        action_invert_weight.setObjectName("actionInvertWeight")
+                        action_invert_weight.triggered.connect(
+                            partial(self.invert_weight, map_values[0], map_values[1]))
+                        target_map_menu.addAction(action_invert_weight)
+                elif name == 'paint_by_proximity':
+                    menu.addSection('')
+                    proximity_menu = menu.addMenu('Paint By Proximity')
+                    prox_widget = view.ProximityWidget()
+                    action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+                    action_paint_by_prox.setDefaultWidget(prox_widget)
+                    proximity_menu.addAction(action_paint_by_prox)
+                elif name == 'select_source_and_target':
+                    menu.addAction(self.actionSelectST)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
