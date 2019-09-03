@@ -493,6 +493,7 @@ class Ziva(Builder):
               fields=True,
               lineOfActions=True,
               rivetToBone=True,
+              restShape=True,
               mirror=False,
               permissive=True,
               check_meshes=False):
@@ -574,6 +575,8 @@ class Ziva(Builder):
             node_types_to_build.append('zLineOfAction')
         if rivetToBone:
             node_types_to_build.append('zRivetToBone')
+        if restShape:
+            node_types_to_build.append('zRestShape')
         if embedder:
             node_types_to_build.append('zEmbedder')
         if fields:

@@ -30,9 +30,25 @@ class RestShapeNode(Ziva):
         self.tissue_name = get_rest_shape_tissue(self.name)
 
     def build(self, *args, **kwargs):
-        """ Builds the node in maya.  mean to be overwritten.
+        """ Builds the node in maya.
         """
-        pass
+        attr_filter = kwargs.get('attr_filter', list())
+
+        mesh = self.association[0]
+
+        # for this we are using short name of targets
+        targets = [x.split('|')[-1] for x in self.targets]
+
+        if mc.objExists(mesh):
+            mc.select(mesh)
+            mc.select(targets, add=True)
+            results = mm.eval('zRestShape -a')[0]
+            self.mobject = results
+            mc.rename(results, self.name)
+        else:
+            logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')
+
+        self.set_maya_attrs(attr_filter=attr_filter)
 
 
 def get_rest_shape_tissue(rest_shape):
