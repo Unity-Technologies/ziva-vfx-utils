@@ -19,9 +19,6 @@ class RestShapeNode(Ziva):
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
-
-        Args:
-            maya_node: Maya node to populate with.
         """
         super(RestShapeNode, self).populate(maya_node=maya_node)
 
@@ -35,16 +32,16 @@ class RestShapeNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
 
         mesh = self.association[0]
-
         # for this we are using short name of targets
         targets = [x.split('|')[-1] for x in self.targets]
 
         if mc.objExists(mesh):
-            mc.select(mesh)
-            mc.select(targets, add=True)
-            results = mm.eval('zRestShape -a')[0]
-            self.mobject = results
-            mc.rename(results, self.name)
+            if not mc.objExists(self.name):
+                mc.select(mesh)
+                mc.select(targets, add=True)
+                results = mm.eval('zRestShape -a')[0]
+                self.mobject = results
+                mc.rename(results, self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')
 
