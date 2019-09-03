@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 ZNODES = [
     'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
     'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
-    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone'
+    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
 ]
 """ All available ziva nodes to be able to cleanup. """
 
