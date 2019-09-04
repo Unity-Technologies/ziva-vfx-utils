@@ -1,0 +1,163 @@
+global string $zSelectSolverWindowName = "selectSolverForLoadedRig";
+
+// Closes the window to load a Ziva rig.
+global proc zLoadRigClose()
+{
+  global string $zSelectSolverWindowName;
+  if (`window -exists $zSelectSolverWindowName` == 1)
+  {
+    deleteUI $zSelectSolverWindowName;
+  }
+}
+
+// Loads a Ziva rig into the specified solver.
+global proc zLoadRigExecute()
+{
+  global string $zSelectSolverWindowName;
+  if (`window -exists $zSelectSolverWindowName` == 1)
+  {
+    string $multipleFilters = "zBuilder (*.zBuilder);;All Files (*.*)";
+    string $result[] = `fileDialog2 -fileFilter $multipleFilters -selectFileFilter "zBuilder"
+                                    -dialogStyle 2 -cap "Load Ziva rig from a file into a Ziva solver" -fm 1`;
+    if (size($result) == 1)
+    {
+      string $solver = `optionMenu -q -value zSelectSolverForLoadedRig`;
+      deleteUI $zSelectSolverWindowName;
+
+      if ($solver == "<New solver>")
+      {
+        string $solverParts[] = `ziva -s`;
+        $solver = $solverParts[1];
+      }
+
+      ziva -def $solver;
+      string $pythonCommand = "zLoadRig('" + $result[0] + "', '" + $solver + "')";
+      python($pythonCommand);
+      select -cl;
+    }
+    else if (size($result) > 1)
+    {
+      error -n "Only one file can be selected to load the Ziva rig.";
+    }
+  }
+}
+
+// Brings up the options dialog box to load a Ziva rig.
+global proc zLoadRigOptions()
+{
+  string $solvers[] = `ls -type zSolverTransform`;
+
+  // Ask the user to either make a new solver, or select the solver to which to apply the loaded Ziva rig.
+
+  global string $zSelectSolverWindowName;
+  if (`window -exists $zSelectSolverWindowName` == 1)
+  {
+    deleteUI $zSelectSolverWindowName;
+  }
+
+  int $windowSize[] = { 360, 30 };
+  window -title "Select solver into which to load the Ziva rig"
+         -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zSelectSolverWindowName;
+
+  gridLayout -numberOfRowsColumns 1 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Solver:" -align "left";
+  optionMenu zSelectSolverForLoadedRig;
+  menuItem -label "<New solver>";
+  for($solverIndex = 0; $solverIndex < size($solvers); $solverIndex++)
+  {
+    string $solverName = $solvers[$solverIndex];
+    menuItem -label $solverName;
+  }
+  optionMenu -e -select 1 zSelectSolverForLoadedRig; // make first option default
+  setParent layout;
+
+  button -label "Apply" -command "zLoadRigExecute()";
+  button -label "Close" -command "zLoadRigClose()";
+
+  showWindow $zSelectSolverWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zSelectSolverWindowName;
+};
+
+// Brings up the options dialog box to save a Ziva rig.
+global proc zSaveRigOptions()
+{
+   string $multipleFilters = "zBuilder (*.zBuilder);;All Files (*.*)";
+   string $result[] = `fileDialog2 -fileFilter $multipleFilters -selectFileFilter "zBuilder" -dialogStyle 2 -cap "Save Ziva rig to a file" -fm 0`;
+   if (size($result) == 1)
+   {
+      python("zSaveRig('" + $result[0] + "')");
+   }
+   else if (size($result) > 1)
+   {
+      error -n "Only one file can be selected to save the Ziva rig.";
+   }
+};
+
+// Closes the window to clone a Ziva rig using regular expressions.
+global proc zRigCopyPasteWithNameSubstitutionClose()
+{
+  global string $zRigCopyPasteWithNameSubstitutionWindowName;
+  if (`window -exists $zRigCopyPasteWithNameSubstitutionWindowName` == 1)
+  {
+    deleteUI $zRigCopyPasteWithNameSubstitutionWindowName;
+  }
+}
+
+// Clones a Ziva rig using regular expressions, based on parameters in zClone{Source,Target}RegularExpression
+global proc zRigCopyPasteWithNameSubstitutionApply()
+{
+  global string $zRigCopyPasteWithNameSubstitutionWindowName;
+  global string $zivaTransfer_regularExpression;
+  global string $zivaTransfer_substituteMatchesWith;
+  if (`window -exists $zRigCopyPasteWithNameSubstitutionWindowName` == 1)
+  {
+    $zivaTransfer_regularExpression = `textField -q -text zRigCopyPasteWithNameSubstitutionRegularExpression`;
+    $zivaTransfer_substituteMatchesWith = `textField -q -text zRigCopyPasteWithNameSubstitutionSubstituteMatchesWith`;
+    deleteUI $zRigCopyPasteWithNameSubstitutionWindowName;
+    python("zRigCopyPasteWithNameSubstitution('" + $zivaTransfer_regularExpression + "', '" + $zivaTransfer_substituteMatchesWith + "')");
+  }
+}
+
+// Brings up the options dialog box to clone a Ziva rig using regular expressions.
+global proc zRigCopyPasteWithNameSubstitutionOptions()
+{
+  global string $zRigCopyPasteWithNameSubstitutionWindowName;
+  global string $zivaTransfer_regularExpression;
+  global string $zivaTransfer_substituteMatchesWith;
+
+  if (`window -exists $zRigCopyPasteWithNameSubstitutionWindowName` == 1)
+  {
+    deleteUI $zRigCopyPasteWithNameSubstitutionWindowName;
+  }
+
+  int $windowSize[] = { 300, 30 };
+  window -title "Copy/Paste Ziva Rig with Name Substitution"
+         -widthHeight $windowSize[0] $windowSize[1]
+         -resizeToFitChildren true $zRigCopyPasteWithNameSubstitutionWindowName;
+
+  columnLayout -adjustableColumn true;
+
+  gridLayout -numberOfRowsColumns 2 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Regular expression:" -align "left";
+  textField -text $zivaTransfer_regularExpression zRigCopyPasteWithNameSubstitutionRegularExpression;
+  text -label " Substitute Matches With:" -align "left";
+  textField -text $zivaTransfer_substituteMatchesWith zRigCopyPasteWithNameSubstitutionSubstituteMatchesWith;
+
+  setParent ..;
+  gridLayout -numberOfRowsColumns 1 3 -cellWidthHeight 120 20;
+
+  string $applyCommand = "zRigCopyPasteWithNameSubstitutionApply()";
+  string $setDefaultCommand = "zWindowClose(\"" +
+                              $zRigCopyPasteWithNameSubstitutionWindowName +
+                              "\"); zSetCloneRigDefaults(); zRigCopyPasteWithNameSubstitutionOptions();";
+  string $closeCommand = "zRigCopyPasteWithNameSubstitutionClose()";
+  button -label "Apply" -command $applyCommand;
+  button -label "Reset Settings" -command $setDefaultCommand;
+  button -label "Close" -command $closeCommand;
+
+  showWindow $zRigCopyPasteWithNameSubstitutionWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zRigCopyPasteWithNameSubstitutionWindowName;
+};

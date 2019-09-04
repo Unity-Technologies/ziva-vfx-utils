@@ -1,0 +1,28 @@
+global proc AEzTissueTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "enable";
+  editorTemplate -addControl "collisions";
+  editorTemplate -addControl "selfCollisions";
+  editorTemplate -addControl "collisionVolume";
+  editorTemplate -addControl "contactSliding";
+  editorTemplate -addControl "contactStiffness";
+  editorTemplate -addControl "contactStiffnessExp";
+  editorTemplate -addControl "material";
+  editorTemplate -addControl "compressionResistance";
+  editorTemplate -addControl "inertialDamping";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+
+  editorTemplate -suppress "collisionMesh";
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "oGeo";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

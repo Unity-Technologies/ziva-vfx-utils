@@ -1,0 +1,19 @@
+global proc AEzGeoTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+
+  // suppress attributes attribute
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+
+  editorTemplate -suppress "oGeo";
+  editorTemplate -suppress "iSolverParams";
+  editorTemplate -suppress "iNeutralMesh";
+  editorTemplate -suppress "iNeutralMatrix";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

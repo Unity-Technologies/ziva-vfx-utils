@@ -14,7 +14,6 @@ from vfx_test_case import VfxTestCase
 
 
 class IOTestCase(VfxTestCase):
-
     @classmethod
     def setUpClass(cls):
         pass
@@ -54,7 +53,7 @@ class IOTestCase(VfxTestCase):
         self.assertTrue(os.path.exists(temp.name))
 
     def test_scene_item_write(self):
-        # loop through each scene item and write individually to see if they 
+        # loop through each scene item and write individually to see if they
         # write
         bools = []  # to store if the files exist
         for item in self.z.get_scene_items():
@@ -67,3 +66,24 @@ class IOTestCase(VfxTestCase):
         # check to see if all files exist in one go
         self.assertTrue(all(bools))
 
+    def test_builder_write_build(self):
+        # tests a case where you write out a zBuilder file then immediatly build
+        # this could potentially screw up during the build.
+
+        # find a temp file location
+        temp = tempfile.TemporaryFile()
+
+        mc.file(new=True, f=True)
+        utl.build_arm()
+
+        mc.select('zSolver1')
+        z = zva.Ziva()
+        z.retrieve_from_scene()
+        # build it on live scene
+        z.write(temp.name)
+
+        mz.clean_scene()
+
+        z.build()
+
+        self.assertSceneHasNodes(['r_bicep_muscle_zTissue'])

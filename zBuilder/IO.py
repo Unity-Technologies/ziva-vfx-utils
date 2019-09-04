@@ -17,17 +17,42 @@ class BaseNodeEncoder(json.JSONEncoder):
             return super(BaseNodeEncoder, self).default(obj)
 
 
-def wrap_data(data, type_):
-    """ Utility wrapper to identify data.
+def pack_zbuilder_contents(builder, type_filter=[], invert_match=False):
+    """ Utility to package the data in a dictionary.
+    """
+    logger.info("packing zBuilder contents for json.")
+
+    node_data = dict()
+    node_data['d_type'] = 'node_data'
+    node_data['data'] = builder.get_scene_items(type_filter=type_filter, invert_match=invert_match)
+
+    info = dict()
+    info['d_type'] = 'info'
+    info['data'] = builder.info
+
+    return [node_data, info]
+
+
+def unpack_zbuilder_contents(builder, json_data):
+    """ Gets data out of json serialization and assigns it to node collection
+    object.
 
     Args:
-        data:
-        type_ (:obj:`str`): The type of data it is.
+        json_data: Data to assign to builder object.
     """
-    wrapped = dict()
-    wrapped['d_type'] = type_
-    wrapped['data'] = data
-    return wrapped
+    for d in json_data:
+        if d['d_type'] == 'node_data':
+            builder.bundle.extend_scene_items(d['data'])
+            logger.info("Reading scene items. {} nodes".format(len(d['data'])))
+
+        if d['d_type'] == 'info':
+            builder.info = d['data']
+            logger.info("Reading info.")
+
+    logger.info("Assigning builder.")
+    for item in builder.bundle:
+        if item:
+            item.builder = builder
 
 
 def dump_json(file_path, json_data):
@@ -89,22 +114,18 @@ def load_base_node(json_object):
     Returns:
         obj:  Result of operation
     """
-
-    update_json(json_object)
-
     if '_class' in json_object:
         module_ = json_object['_class'][0]
-        type_ = json_object['type']
+        type_ = json_object.get('type', 'Base')
 
         builder_type = json_object['_builder_type']
-
         obj = find_class(builder_type, type_)
 
         # this catches the scene items for ui that slip in.
         try:
-            parameter = obj(deserialize=json_object)
-            return parameter
-        except:
+            scene_item = obj(deserialize=json_object)
+            return scene_item
+        except TypeError:
             return json_object
 
     else:
@@ -129,68 +150,3 @@ def find_class(module_, type_):
                     return obj
             if type_ == obj.type:
                 return obj
-
-
-def update_json(json_object):
-    """
-    This takes the json_object and updates it to work with zBuilder 1.0.0
-
-    Returns:
-        modified json_object
-    """
-
-    # replacing key attribute names with value.  A simple swap.
-    replace_me = dict()
-    replace_me['_type'] = 'type'
-    replace_me['_attrs'] = 'attrs'
-    replace_me['_value'] = 'values'
-    replace_me['__collection'] = 'parameters'
-    replace_me['data'] = 'components'
-    replace_me['_zFiber'] = 'fiber'
-    replace_me['_SkinClusterNode__influneces'] = 'influences'
-
-    if '_class' in json_object:
-        for key, value in json_object.iteritems():
-            if key in replace_me:
-                json_object[replace_me[key]] = json_object[key]
-                json_object.pop(key, None)
-
-        if 'type' not in json_object:
-            json_object['type'] = json_object['_class'][1].lower()
-
-        if json_object['type'] == 'skinCluster':
-            if '_maps' in json_object:
-                json_object['weights'] = json_object['_maps']
-
-        if '_builder_type' not in json_object:
-            module_ = json_object['_class'][0]
-            if 'zBuilder.nodes' in module_:
-                json_object['_builder_type'] = 'zBuilder.nodes'
-            if 'zBuilder.data' in module_:
-                json_object['_builder_type'] = 'zBuilder.parameters'
-        if '_maps' in json_object:
-            json_object.pop('_maps', None)
-
-    return json_object
-
-
-def check_data(data):
-    """ Utility to check data format after loaded from josn.  Used to check if
-    data is wrapped in dictionary.  If it isn't it wraps it.  Used to deal with
-    older zBuilder files.
-
-    Args:
-        data: Data to check.
-
-    Returns:
-        Result of operation.
-    """
-    if 'd_type' in data[0]:
-        return data
-    else:
-        tmp = list()
-        tmp.append(wrap_data(data[0], 'node_data'))
-        tmp.append(wrap_data(data[1], 'component_data'))
-        if len(data) == 3:
-            tmp.append(wrap_data(data[2], 'info'))
-        return tmp

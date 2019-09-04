@@ -69,9 +69,9 @@ class Bundle(object):
             type_filter (:obj:`str`): filter by parameter type.
                 Defaults to :obj:`str`
         """
+
         tmp = {}
         for i, d in enumerate(self):
-
             t = d.type
             if type_filter:
                 if type_filter == t:
@@ -87,13 +87,6 @@ class Bundle(object):
 
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
-
-        # data_types = set([item.type for item in self.parameters])
-        # output = 'parameters: '
-        # for data_type in data_types:
-        #     amount = len([x for x in self.parameters if x.type == data_type])
-        #     output += '{} {}   '.format(data_type, amount)
-        # logger.info(output)
 
     def append_scene_item(self, scene_item):
         """

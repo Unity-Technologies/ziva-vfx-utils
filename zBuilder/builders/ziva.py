@@ -43,14 +43,14 @@ class Ziva(Builder):
 
         # reset stuff............
         for item in self.get_scene_items():
-            self.root_node._children = []
-            item._parent = None
-            item._children = []
+            self.root_node.children = []
+            item.parent = None
+            item.children = []
 
         # solver transforms
         for item in self.get_scene_items(type_filter='zSolverTransform'):
             self.root_node.add_child(item)
-            item._parent = self.root_node
+            item.parent = self.root_node
 
         # solvers
         solver = {}
@@ -61,17 +61,16 @@ class Ziva(Builder):
                     solver[item.name] = x
 
             parent_node.add_child(item)
-            item._parent = parent_node
+            item.parent = parent_node
 
         # get bodies-----------------------------------------------------------
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = DGNode(deserialize=item.serialize())
-
-            # add mobject
+            grp.depends_on = item.mobject
             grp.mobject = item.long_association[0]
+
             self.bodies[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
@@ -84,22 +83,22 @@ class Ziva(Builder):
             else:
                 parent_node = solver.get(item.solver, self.root_node)
 
-            self.bodies[item.long_association[0]]._parent = parent_node
+            self.bodies[item.long_association[0]].parent = parent_node
             parent_node.add_child(self.bodies[item.long_association[0]])
 
             self.bodies[item.long_association[0]].add_child(item)
-            item._parent = self.bodies[item.long_association[0]]
+            item.parent = self.bodies[item.long_association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
             parent_node = self.bodies.get(item.long_association[0], self.root_node)
             parent_node.add_child(item)
-            item._parent = parent_node
+            item.parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
             parent_node = self.bodies.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
-                item._parent = parent_node
+                item.parent = parent_node
 
             if item.type == 'zAttachment':
                 parent_node = self.bodies.get(item.long_association[1], None)
@@ -121,27 +120,27 @@ class Ziva(Builder):
                 grp = Base()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
-                grp.depends_on = item
+                grp.depends_on = item.mobject
                 parent_node.add_child(grp)
-                grp._parent = parent_node
+                grp.parent = parent_node
 
                 grp.add_child(item)
-                item._parent = parent_node
+                item.parent = parent_node
                 rivet_items = rivets.get(crv, None)
                 if rivet_items:
                     for rivet in rivet_items:
                         grp.add_child(rivet)
-                        rivet._parent = grp
+                        rivet.parent = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
-            item._parent = self.root_node
+            item.parent = self.root_node
 
         # assign zFieldAdapter to solver
         for item in self.get_scene_items(type_filter=['zFieldAdaptor']):
             parent_node = self.get_scene_items(name_filter=item.input_field)[0]
             parent_node.add_child(item)
-            item._parent = parent_node
+            item.parent = parent_node
 
     def __add_bodies(self, bodies):
         '''This is using zQuery -a under the hood.  It queries everything connected to bodies.
@@ -193,6 +192,8 @@ class Ziva(Builder):
             mc.select(selection)
         else:
             selection = mc.ls(sl=True)
+
+        selection = transform_rivet_and_LoA_into_tissue_meshes(selection)
 
         nodes = []
         nodes.extend(self.__add_bodies(selection))
@@ -572,11 +573,43 @@ class Ziva(Builder):
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
 
 
+def transform_rivet_and_LoA_into_tissue_meshes(selection):
+    """ This takes a list of items from a maya scene and if it finds any 
+    zLineOfAction or zRivetToBone it replaces that item with the corresponding
+    tissued mesh.
+
+    This is until zQuery is re-implemented in python.
+    
+    Args:
+        selection ([str]): List of items in mayas scene
+
+    Returns:
+        list(): Selection list with item types in 'type_' replaced with 
+        corresponding tissued mesh.
+    """
+    # these are the types we need to find the tissued mesh for.
+    type_ = ['zLineOfAction', 'zRivetToBone']
+
+    output = []
+    for item in selection:
+        if mc.objectType(item) in type_:
+            history = mc.listHistory(item, future=True)
+            fiber = mc.ls(history, type='zFiber')
+            mc.select(fiber)
+            meshes = mm.eval('zQuery -t zTissue -m')
+            output.append(meshes[0])
+        else:
+            output.append(item)
+    return output
+
+
 def zQuery(types, solver):
-    types_not_in_znodes = list(set(types) - set(ZNODES))
+
+    solver_history = mc.listHistory(solver)
+    types_not_in_znodes = set(types) - set(ZNODES)
+    nodes = [x for x in solver_history if mc.objectType(x) in types_not_in_znodes]
+
     types_in_znodes = list(set(ZNODES) & set(types))
-    hist = mc.listHistory(solver)
-    nodes = [x for x in hist if mc.objectType(x) in types_not_in_znodes]
 
     for node_type in types_in_znodes:
         tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))

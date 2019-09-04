@@ -1,0 +1,229 @@
+global float $ZivaSelectByProximityRadiusFloat = 0.25;
+global float $ZivaPaintByProximityMinFloat = 0.5;
+global float $ZivaPaintByProximityMaxFloat = 2.0;
+
+global proc ZivaSelectIntersections()
+{
+  select -r `zFindIntersections -excludeSelf`;
+}
+
+global proc ZivaSelectSelfIntersections()
+{
+  select -r `zFindIntersections -excludeOthers`;
+}
+
+global proc ZivaToggleEnabled()
+{
+  string $sels[] = `ls -sl`;
+  int $i=0;
+  string $bodies[];
+  string $tissue[] = `zQuery -t zTissue`;
+  string $bone[] = `zQuery -t zBone`;
+  string $cloth[] = `zQuery -t zCloth`;
+  appendStringArray($bodies, $tissue, `size($tissue)`);
+  appendStringArray($bodies, $bone, `size($bone)`);
+  appendStringArray($bodies, $cloth, `size($cloth)`);
+  for($b in $bodies)
+  {
+    int $val = `getAttr ($b + ".enable")`;
+    setAttr ($b + ".enable") ($val * -1 + 1);
+  }
+};
+
+global proc ZivaSelectInHierarchy(string $nodeType)
+{
+  select -hi;
+  string $sels[] = `ls -sl -type "mesh"`;
+  select -cl;
+  string $selection[];
+  int $i=0;
+  for($s in $sels)
+  {
+    string $trans[] = `listRelatives -p -f $s`;
+    select -r $trans[0];
+    string $tmp[] = `zQuery -t $nodeType`;
+    if(`size($tmp[0])` > 0)
+    {
+        $selection[$i++] = $trans[0];
+    }
+  }
+  select -r $selection;
+};
+
+// For backwards-compatibility with old versions of the plug-in.
+// As of v1.3, the zSelectVerticesByProximity command is officially deprecated.
+// Only supports the no-arguments version of the command.
+global proc zSelectVerticesByProximity()
+{
+  select -r `zFindVerticesByProximity`;
+};
+
+global proc zSelectVerticesByProximityRadius(float $radius)
+{
+  select -r `zFindVerticesByProximity -r $radius`;
+};
+
+global proc ZivaApplySelectVerticesByProximityRadius()
+{
+  global float $ZivaSelectByProximityRadiusFloat;
+  $ZivaSelectByProximityRadiusFloat = `floatField -q -v ZivaSelectVerticesByProximityRadiusFLT`;
+};
+
+global proc ZivaSelectSelectVerticesByProximityRadius()
+{
+  global float $ZivaSelectByProximityRadiusFloat;
+  $ZivaSelectByProximityRadiusFloat = `floatField -q -v ZivaSelectVerticesByProximityRadiusFLT`;
+  zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat;
+};
+
+global proc ZivaPaintByProximityApply()
+{
+  global float $ZivaPaintByProximityMinFloat;
+  global float $ZivaPaintByProximityMaxFloat;
+  $ZivaPaintByProximityMinFloat = `floatField -q -v ZivaPaintByProximityMinFLT`;
+  $ZivaPaintByProximityMaxFloat = `floatField -q -v ZivaPaintByProximityMaxFLT`;
+};
+
+global proc ZivaPaintByProximityCreate()
+{
+  global float $ZivaPaintByProximityMinFloat;
+  global float $ZivaPaintByProximityMaxFloat;
+  $ZivaPaintByProximityMinFloat = `floatField -q -v ZivaPaintByProximityMinFLT`;
+  $ZivaPaintByProximityMaxFloat = `floatField -q -v ZivaPaintByProximityMaxFLT`;
+  zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat;
+}
+
+global proc ZivaDeleteSelection()
+{
+  string $sels[] = `ls -sl`;
+  for($s in $sels)
+  {
+    if((nodeType($s) == "zTissue") || (nodeType($s) == "zTet") || (nodeType($s) == "zCloth") || (nodeType($s) == "zBone"))
+    {
+        warning("selected node: " + $s + " can not be deleted in isolation");
+        continue;
+    }
+    if((nodeType($s) == "transform") || (nodeType($s) == "mesh"))
+    {
+      string $body[] = `zQuery -m $s`;
+      if(`size($body[0])` > 0)
+      {
+        ziva -rm $body;
+        for($b in $body)
+        {
+          if(`objExists($b)`)
+          {
+            evalDeferred("delete " + $b);
+          }
+        }
+      }
+    }
+    if((nodeType($s) == "zAttachment") || (nodeType($s) == "zFiber") || (nodeType($s) == "zMaterial"))
+    {
+      if(`objExists($s)`)
+      {
+        evalDeferred("delete " + $s);
+      }
+    }
+  }
+};
+
+global proc ZivaJointCylindersCreate(float $radius)
+{
+  // generates a cylinder around every joint in the skeleton subdivisions
+  int $sx = 20;
+  int $sy = 10;
+  int $sz = 1;
+  //float $radius = 0.25;
+  select -hi;
+  string $sels[] = `ls -sl -l -type "joint"`;
+  string $cylinders[];
+  int $i=0;
+  for($s in $sels)
+  {
+    string $child[] = `listRelatives -c -f $s`;
+    if(`size($child)` >= 1)
+    {
+      for($c in $child)
+      {
+        string $cyl[] = `polyCylinder -r $radius -h 1 -sx $sx -sy $sy -sz $sz -ax 1 0 0 -rcp 0 -cuv 3 -ch 0`;
+        xform -piv 0.5 0 0 $cyl[0];
+        xform -t -0.5 0 0 $cyl[0];
+        makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 -pn 1 $cyl[0];
+        parent -r $cyl[0] $s;
+        select -r $c $cyl[0];
+        delete `aimConstraint -w 1`;
+        float $valA[] = `xform -q -a -ws -t $s`;
+        float $valB[] = `xform -q -a -ws -t $c`;
+        float $vec[];
+        $vec[0] = $valB[0] - $valA[0];
+        $vec[1] = $valB[1] - $valA[1];
+        $vec[2] = $valB[2] - $valA[2];
+        float $dist = $vec[0] * $vec[0] + $vec[1] * $vec[1] +$vec[2] * $vec[2];
+        $dist = sqrt($dist);
+        setAttr ($cyl[0] + ".sx") ($dist * -1.0);
+        $cylinders[$i++] = $cyl[0];
+      }
+    }
+  }
+  select -r $cylinders;
+}
+
+global proc ZivaSaveCache()
+{
+  string $cacheNodes[] = `zQuery -t zCacheTransform`;
+  if (size($cacheNodes) == 1)
+  {
+    string $multipleFilters = "zCache (*.zCache);;All Files (*.*)";
+    string $result[] = `fileDialog2 -fileFilter $multipleFilters -selectFileFilter "zCache" -dialogStyle 2 -cap "Save Cache" -fm 0`;
+    if (size($result) == 1)
+    {
+      zCache -s $result[0];
+    }
+    else if (size($result) > 1)
+    {
+      error -n "Only one file can be selected to save the cache.";
+    }
+  }
+  else if (size($cacheNodes) == 0)
+  {
+    error -n "No cache node found. Does one exist on the solver?";
+  }
+  else
+  {
+    error -n "Multiple cache nodes found. Please select the solver you want to save a cache for.";
+  }
+};
+
+global proc ZivaLoadCache()
+{
+  string $cacheNodes[] = `zQuery -t zCacheTransform`;
+  if (size($cacheNodes) == 0)
+  {
+    // Create the cache node.
+    ziva -acn;
+    print "Created a cache node to support loading the cache, as one did not exist in the scene.\n";
+    $cacheNodes = `zQuery -t zCacheTransform`;
+  }
+  if (size($cacheNodes) == 1)
+  {
+      string $multipleFilters = "zCache (*.zCache);;All Files (*.*)";
+      string $result[] = `fileDialog2 -fileFilter $multipleFilters -selectFileFilter "zCache" -dialogStyle 2 -cap "Load Cache" -fm 1`;
+      if (size($result) == 1)
+      {
+          zCache -l $result[0];
+      }
+      else if (size($result) > 1)
+      {
+          error -n "Only one file can be selected to load the cache.";
+      }
+  }
+  else if (size($cacheNodes) == 0)
+  {
+      error -n "No cache node found. Create a cache node first.";
+  }
+  else
+  {
+      error -n "Multiple cache nodes found. Please select the solver you want to load a cache for.";
+  }
+};

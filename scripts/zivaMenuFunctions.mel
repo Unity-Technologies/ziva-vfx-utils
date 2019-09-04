@@ -1,0 +1,198 @@
+global proc ZivaSelectVerticesByProximityOptions()
+{
+  if (`window -ex ZivaSelectVerticesByProximityUI`)
+  {
+    deleteUI ZivaSelectVerticesByProximityUI;
+  }
+
+  window -title "Select Vertices By Proximity Options" -mxb false ZivaSelectVerticesByProximityUI;
+  columnLayout;
+  frameLayout -l "Radius" -labelAlign "center" -cll 1 -cl 0;
+    columnLayout;
+      scrollLayout -hst 20 -vst 20 -h 180 -w 425 -cr 1;
+        columnLayout;
+          rowColumnLayout -nc 4
+            -cat 1 "right" 5
+            -cw 1 15
+            -cw 2 70
+            -cw 3 70
+            -cw 4 70;
+          text -l "";
+          floatField -value 0.25 ZivaSelectVerticesByProximityRadiusFLT;
+          button -w 70 -l "Apply" -ann "Apply Change" ZivaSelectVerticesByProximityApplyBTN;
+          button -w 70 -l "Select" -ann "Select with Change" ZivaSelectVerticesByProximitySelectBTN;
+        setParent ..;
+
+        rowColumnLayout -nc 2
+          -cat 1 "right" 5
+          -cat 2 "left" 5
+          -cw 1 50
+          -cw 2 100;
+
+        button -e -c ZivaApplySelectVerticesByProximityRadius ZivaSelectVerticesByProximityApplyBTN;
+        button -e -c ZivaSelectSelectVerticesByProximityRadius ZivaSelectVerticesByProximitySelectBTN;
+        setParent ..;
+
+      setParent ..;
+    setParent ..;
+  setParent ..;
+
+  showWindow ZivaSelectVerticesByProximityUI;
+};
+
+global proc ZivaPaintAttachmentsByProximityOptions()
+{
+  if (`window -ex ZivaPaintAttachmentsByProximityUI`)
+  {
+    deleteUI ZivaPaintAttachmentsByProximityUI;
+  }
+
+  window -title "Proximity Attachment Paint Options" -mxb false ZivaPaintAttachmentsByProximityUI;
+  columnLayout;
+  frameLayout -l "threshold" -labelAlign "center" -cll 1 -cl 0;
+    columnLayout;
+      scrollLayout -hst 20 -vst 20 -h 180 -w 425 -cr 1;
+        columnLayout;
+          rowColumnLayout -nc 5
+            -cat 1 "right" 5
+            -cw 1 15
+            -cw 2 70
+            -cw 3 70
+            -cw 4 70;
+          text -l "";
+          floatField -value 0.5 ZivaPaintByProximityMinFLT;
+          floatField -value 2.0 ZivaPaintByProximityMaxFLT;
+          button -w 70 -l "Apply" -ann "Apply Change" ZivaPaintByProximityApplyBTN;
+          button -w 70 -l "Paint" -ann "Paint Change" ZivaPaintByProximityCreateBTN;
+        setParent ..;
+
+        rowColumnLayout -nc 2
+          -cat 1 "right" 5
+          -cat 2 "left" 5
+          -cw 1 50
+          -cw 2 100;
+        button -e -c ZivaPaintByProximityApply ZivaPaintByProximityApplyBTN;
+        button -e -c ZivaPaintByProximityCreate ZivaPaintByProximityCreateBTN;
+        setParent ..;
+
+      setParent ..;
+    setParent ..;
+  setParent ..;
+
+  showWindow ZivaPaintAttachmentsByProximityUI;
+};
+
+global string $ziva_selectSolverWindowName = "selectDefaultSolver";
+
+global proc ziva_selectSolverClose()
+{
+  global string $ziva_selectSolverWindowName;
+  if (`window -exists $ziva_selectSolverWindowName` == 1)
+  {
+    deleteUI $ziva_selectSolverWindowName;
+  }
+}
+
+global proc ziva_selectSolverApply(int $method)
+{
+  global string $ziva_selectSolverWindowName;
+  if (`window -exists $ziva_selectSolverWindowName` == 1)
+  {
+    string $newDefaultSolver = `optionMenu -q -value ziva_selectSolver_solver`;
+    deleteUI $ziva_selectSolverWindowName;
+    if ($method == 0)
+    {
+      select $newDefaultSolver;
+    }
+    if ($method == 1)
+    {
+      string $melCommand = "ziva -def " + $newDefaultSolver;
+      eval($melCommand);
+    }
+  }
+}
+
+global proc ziva_selectSolver(int $method)
+{
+  string $solvers[] = `ls -type zSolverTransform`;
+  if (size($solvers) == 0)
+  {
+    error "No ziva solvers in the scene.";
+    return;
+  }
+
+  string $defaultSolvers[] = `zQuery -def`;
+  string $defaultSolver = "";
+  if (size($defaultSolvers) > 0)
+  {
+    $defaultSolver = $defaultSolvers[0];
+  }
+
+  global string $ziva_selectSolverWindowName;
+  if (`window -exists $ziva_selectSolverWindowName` == 1)
+  {
+    deleteUI $ziva_selectSolverWindowName;
+  }
+
+  string $titleString;
+  if ($method == 0)
+    $titleString = "Select solver";
+  if ($method == 1)
+    $titleString = "Set default solver";
+  int $windowSize[] = { 360, 30 };
+  window -title $titleString -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $ziva_selectSolverWindowName;
+
+  $numRows = 1;
+  gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
+
+  text -label " Solver:" -align "left";
+  optionMenu ziva_selectSolver_solver;
+  for($solverIndex = 0; $solverIndex < size($solvers); $solverIndex++)
+  {
+    string $solverName = $solvers[$solverIndex];
+    menuItem -label $solverName;
+    if($solverName == $defaultSolver)
+    {
+      int $defaultSolverIndex = $solverIndex+1; // optionMenu is 1-indexed!
+      optionMenu -e -select $defaultSolverIndex ziva_selectSolver_solver;
+    }
+  }
+  setParent layout;
+
+  string $applyCommand = "ziva_selectSolverApply(" + $method + ")";
+  button -label "Apply" -command $applyCommand;
+  button -label "Close" -command "ziva_selectSolverClose()";
+
+  showWindow $ziva_selectSolverWindowName;
+  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $ziva_selectSolverWindowName;
+}
+
+global proc ziva_attachField(string $fieldType)
+{
+  // save current selection
+  string $allSelected[] = `ls -sl`;
+
+  // filter selection for Ziva bodies
+  string $zivaMeshes[] = `zQuery -m -t zTissue $allSelected`;
+  string $cloths[] = `zQuery -m -t zCloth $allSelected`;
+  appendStringArray($zivaMeshes, $cloths, size($cloths));
+
+  // if user has no Ziva bodies selected, don't proceed
+  if (`size($zivaMeshes)` == 0)
+  {
+    error -n "No Ziva Tissue or Cloth objects selected\n";
+    return;
+  }
+
+  // de-select all so we can add the field
+  select -cl;
+
+  // add the field, shouldn't be connected to anything
+  eval($fieldType);
+
+  // reselect the saved selection above
+  select -add  $zivaMeshes;
+
+  // run the connect command which will connect all selected Ziva bodies to the new field
+  ziva -cf;
+}

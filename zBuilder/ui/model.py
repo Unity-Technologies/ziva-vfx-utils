@@ -1,6 +1,7 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import maya.cmds as mc
+<<<<<<< HEAD
 import maya.mel as mm
 
 
@@ -83,6 +84,9 @@ class ProximityWidget(QtWidgets.QWidget):
         """
 
         mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(), self.to_edit.text()))
+=======
+import zBuilder.zMaya as mz
+>>>>>>> release/version1.7
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -163,7 +167,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if index.column() == 0:
                 node = index.internalPointer()
                 if hasattr(node, 'depends_on'):
-                    node = node.depends_on
+                    mobject = node.depends_on
+                    name = mz.get_name_from_m_object(mobject)
+                    # search through the children for the expected node.
+                    for x in node.children:
+                        if x.name == name:
+                            node = x
+                            break
+
                 if hasattr(node, 'attrs'):
                     attrs = node.attrs
                     if "envelope" in attrs:
@@ -198,7 +209,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def parent(self, index):
 
         node = self.getNode(index)
-        parentNode = node.parent()
+        parentNode = node.parent
 
         if parentNode in (self.root_node, None):
             return QtCore.QModelIndex()

@@ -1,0 +1,165 @@
+// =========================================================
+
+/*
+Cloth rest scale and pressure demo
+===================================
+
+Demonstrates how to use the Ziva rest scale and pressure cloth features.
+These features are useful to simulate fascia wrapping around muscles
+and bones. In this scene, the largest cylinder is the "fascia", and the
+three smaller cylinders inside it are "muscles". The fascia's rest scale
+and pressure attributes are ramped from 0 (inactive) to 1 (fully active)
+over a few frames, by keyframing their envelope primitives. Note how
+the fascia "shrink-wraps" around the "muscles".
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+// the main function
+global proc ziva_main_restScalePressureDemo(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // load the geometry of the demo
+  $restScalePressureSceneFilePath = getDemoAssetPath("restScalePressureGeometry.ma");
+  file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $restScalePressureSceneFilePath;
+
+  // keyframe the rotator to rotate
+  setKeyframe -attribute "rz" -time 1.0 -value 0.0 rotator;
+  setKeyframe -attribute "rz" -time 4.0 -value 0.0 rotator;
+  setKeyframe -attribute "rz" -time 24.0 -value -90.0 rotator;
+
+  // make a solver node
+  ziva -s;
+
+  // disable gravity
+  setAttr "zSolver1.gravityY" 0.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // decrease internal timestep
+  setAttr "zSolver1.substeps" 1;
+
+  // increase FPS; this effectively decreases simulation timestep and improves stability
+  setAttr "zSolver1.framesPerSecond" 240;
+
+  // set damping
+  setAttr "zSolver1.stiffnessDamping" 0.01;
+
+  // enable collision detection
+  setAttr "zSolver1.collisionDetection" 1;
+
+  // make a cloth for the fascia
+  select -r fascia;
+  ziva -c;
+  setAttr "zCloth1.contactStiffnessExp" 8; // set contact stiffness
+
+  // make a tissue for each muscle
+  select -r muscle1 muscle2 muscle3;
+  ziva -t;
+  // refine tet meshes
+  setAttr "zTet1.tetSize" 1.0;
+  setAttr "zTet2.tetSize" 1.0;
+  setAttr "zTet3.tetSize" 1.0;
+
+  // make the boxes into bones
+  select -r fixed rotator;
+  ziva -b;
+
+  // setup attachments between the muscles and the boxes
+  select -r muscle1.vtx[55:62] muscle1.vtx[171:172] muscle1.vtx[227:235] rotator;
+  ziva -a;
+  select -r muscle2.vtx[55:62] muscle2.vtx[171:172] muscle2.vtx[227:235] rotator;
+  ziva -a;
+  select -r muscle3.vtx[55:62] muscle3.vtx[171:172] muscle3.vtx[227:235] rotator;
+  ziva -a;
+  select -r muscle1.vtx[54] muscle1.vtx[162:170] muscle1.vtx[218:226] fixed;
+  ziva -a;
+  select -r muscle2.vtx[54] muscle2.vtx[162:170] muscle2.vtx[218:226] fixed;
+  ziva -a;
+  select -r muscle3.vtx[54] muscle3.vtx[162:170] muscle3.vtx[218:226] fixed;
+  ziva -a;
+
+  // set attachment stiffness
+  setAttr "zAttachment1.stiffness" 5.0;
+  setAttr "zAttachment1.stiffnessExp" 7;
+  setAttr "zAttachment2.stiffness" 5.0;
+  setAttr "zAttachment2.stiffnessExp" 7;
+  setAttr "zAttachment3.stiffness" 5.0;
+  setAttr "zAttachment3.stiffnessExp" 7;
+  setAttr "zAttachment4.stiffness" 5.0;
+  setAttr "zAttachment4.stiffnessExp" 7;
+  setAttr "zAttachment5.stiffness" 5.0;
+  setAttr "zAttachment5.stiffnessExp" 7;
+  setAttr "zAttachment6.stiffness" 5.0;
+  setAttr "zAttachment6.stiffnessExp" 7;
+
+  // set the fascia's rest scale and pressure
+  setAttr "zMaterial1.restScale" 0.8; // default is 1.0 (=no scale)
+  setAttr "zMaterial1.pressure" 500.0; // default is 0.0 (=off)
+
+  // keyframe envelopes for rest scale and pressure to rise from 0.0 to 1.0 over a few frames
+  // (so that rest scale and pressure smoothly blend in)
+  setKeyframe -attribute "restScaleEnvelope" -time 1.0 -value 0.0 zCloth1;
+  setKeyframe -attribute "pressureEnvelope" -time 1.0 -value 0.0 zCloth1;
+  setKeyframe -attribute "restScaleEnvelope" -time 5.0 -value 1.0 zCloth1;
+  setKeyframe -attribute "pressureEnvelope" -time 5.0 -value 1.0 zCloth1;
+
+  // set the camera view
+  setAttr "persp.translateX" 35.9;
+  setAttr "persp.translateY" 27.5;
+  setAttr "persp.translateZ" 8.8;
+  setAttr "persp.rotateX" -33.3;
+  setAttr "persp.rotateY" 74.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  select -r fascia;
+  if (`about -batch` != 1)
+  {
+    viewFit -f 1.0; // center the camera on the fascia, which gives a good view
+  }
+  setAttr "persp.translateX" 35.9;
+  setAttr "persp.translateY" 27.5;
+  setAttr "persp.translateZ" 8.8;
+
+  // select the fascia
+  select -r fascia ;
+
+  if (`about -batch` != 1)
+  {
+    // enable "Wireframe on Shaded" shading
+    displayStyle -wos;
+  }
+
+  playbackOptions -e -maxTime 30; // adjust playback range
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  // add and enable the Ziva cache
+  // the simulation will be automatically cached
+  ziva -acn;
+
+  print "Scene created. Demonstrates cloth rest scale and pressure. The fascia cloth wraps around the three cylinder tissues. Rotation starts at frame 6. Press \"Play\" to simulate.\n";
+}

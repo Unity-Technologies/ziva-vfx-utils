@@ -27,8 +27,8 @@ class ZivaBuildTestCase(VfxTestCase):
         mc.select(cl=True)
 
         # use builder to retrieve from scene-----------------------------------
-        self.z = zva.Ziva()
-        self.z.retrieve_from_scene()
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
 
     def tearDown(self):
         super(ZivaBuildTestCase, self).tearDown()
@@ -58,7 +58,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mz.clean_scene()
 
         # build
-        self.z.build()
+        self.builder.build()
         self.assertTrue(len(zAttachments) == len(mc.ls(type='zAttachment')))
 
     def test_string_replace(self):
@@ -66,10 +66,10 @@ class ZivaBuildTestCase(VfxTestCase):
         mz.clean_scene()
 
         mc.rename('r_bicep_muscle', 'r_biceps_muscle')
-        self.z.string_replace('r_bicep_muscle', 'r_biceps_muscle')
+        self.builder.string_replace('r_bicep_muscle', 'r_biceps_muscle')
 
         # build
-        self.z.build()
+        self.builder.build()
 
         # after its build check scene for the proper named zTissue
         self.assertSceneHasNodes(['r_biceps_muscle_zTissue'])
@@ -82,7 +82,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mc.delete('r_bicep_muscle')
 
         with self.assertRaises(StandardError):
-            self.z.build(permissive=False)
+            self.builder.build(permissive=False)
 
     def test_bad_mesh_error(self):
         # make sure we get an error if mesh fails a check
@@ -96,7 +96,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
         # now build should raise a standard error
         with self.assertRaises(StandardError):
-            self.z.build()
+            self.builder.build()
 
     def test_tissue_attrs_not_updating(self):
         # this tests an issue of zTissues not updating attributes if the
@@ -107,7 +107,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mc.setAttr("r_bicep_muscle_zTissue.inertialDamping", .5)
 
         # now build from the zBuilder
-        self.z.build()
+        self.builder.build()
 
         # if the attribute is 0 we know it worked
         self.assertTrue(mc.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
@@ -162,8 +162,34 @@ class ZivaBuildTestCase(VfxTestCase):
         mobjects = []
         # return mobjects from items, lets do all zAttachments
         # since the scene has been cleaned this should return no mobjects
-        for item in self.z.get_scene_items(type_filter='zAttachment'):
+        for item in self.builder.get_scene_items(type_filter='zAttachment'):
             mobjects.append(item.mobject)
 
         # this list should all be None
         self.assertTrue(all(x is None for x in mobjects))
+
+    def test_retrieving_serialize_mobject(self):
+        # testing retrieving, serializing then checking mobjects
+
+        type_filter = ['zAttachment', 'zTissue', 'zBone', 'zSolverTransform', 'zSolver', 'zFiber']
+
+        mobjects = []
+        # loop through and serialize
+        for item in self.builder.get_scene_items(type_filter=type_filter):
+            item.serialize()
+            mobjects.append(item)
+
+        # this list should all be None
+        self.assertTrue(all(x is not None for x in mobjects))
+
+    def test_retrieving_writing_mobject_string(self):
+        # testing retrieving, building then checking mobjects
+
+        type_filter = ['zAttachment', 'zTissue', 'zBone', 'zSolverTransform', 'zSolver', 'zFiber']
+
+        mobjects = []
+        for item in self.builder.get_scene_items(type_filter=type_filter):
+            mobjects.append(type(item.mobject))
+
+        # this list should all be None
+        self.assertTrue(all(x is not 'str' for x in mobjects))
