@@ -72,7 +72,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
-        # self.treeView.setHeaderHidden(True)
         header = self.treeView.header()
         header.setOffset(-20)
         header.setOffsetToSectionPosition(20)
