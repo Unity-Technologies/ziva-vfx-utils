@@ -19,6 +19,7 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
+import zBuilder.parameters.maps as mp
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -50,7 +51,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
-        self.weights = []
+        # clipboard for copied weightmaps
+        self.weights_clipboard = []
 
         root_node = None
 
@@ -136,23 +138,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setObjectName("actionUndo")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
-
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
         self.actionSelectST.setObjectName("actionSelectST")
@@ -168,30 +153,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintTarget.setObjectName("paintTarget")
         self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
 
-        self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint')
-        self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights, 0, 'weights'))
-
         self.actionPaintEndPoints = QtWidgets.QAction(self)
         self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
-
-        self.actionCopyWeight = QtWidgets.QAction(self)
-        self.actionCopyWeight.setText('Copy')
-        self.actionCopyWeight.setObjectName("actionCopyWeight")
-        self.actionCopyWeight.triggered.connect(self.copy_weight)
-
-        self.actionInvertWeight = QtWidgets.QAction(self)
-        self.actionInvertWeight.setText('Invert')
-        self.actionInvertWeight.setObjectName("actionInvertWeight")
-        self.actionInvertWeight.triggered.connect(self.invert_weight)
-
-        self.actionPasteWeight = QtWidgets.QAction(self)
-        self.actionPasteWeight.setText('Paste')
-        self.actionPasteWeight.setObjectName("actionPasteWeight")
-        self.actionPasteWeight.triggered.connect(self.paste_weight)
 
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
@@ -259,113 +224,94 @@ class MyDockingUI(QtWidgets.QWidget):
 
         menu = QtWidgets.QMenu(self)
 
-        menu_dict = {
-            'zTet': [{
-                'placeholder': None
-            }, {
-                'section': 'Maps'
-            }, {
-                'menu': 'weight'
-            }],
-            'zFiber': [{
-                'placeholder': None
-            }, {
-                'section': 'Maps'
-            }, {
-                'menu': 'weight'
-            }, {
-                'menu': {
-                    'endPoints': ['endPoints', True]
-                }
-            }],
-            'zMaterial': [{
-                'placeholder': None
-            }, {
-                'section': 'Maps'
-            }, {
-                'menu': 'weight'
-            }],
-            'zAttachment': [{
-                'select_source_and_target': None
-            }, {
-                'section': 'Maps'
-            }, {
-                'menu': {
-                    'source': [None, False]
-                }
-            }, {
-                'menu': {
-                    'target': [None, False]
-                }
-            }, {
-                'paint_by_proximity': None
-            }]
-        }
+        source_mesh_name = node.association[0]
+        if len(node.association) > 1:
+            target_mesh_name = node.association[1]
+        else:
+            target_mesh_name = None
+        menu_dict = {'zTet': [self.open_tet_menu,
+                              menu,
+                              source_mesh_name],
+                     'zFiber': [self.open_fiber_menu,
+                                menu,
+                                source_mesh_name],
+                     'zMaterial': [self.open_tet_menu, menu, source_mesh_name],
+                     'zAttachment': [self.open_attachment_menu,
+                                     menu,
+                                     source_mesh_name,
+                                     target_mesh_name]}
 
         if node.type in menu_dict:
-            menu_list = menu_dict[node.type]
-            for item in menu_list:
-                name = item.keys()[0]
-                if name == 'placeholder':
-                    self.add_placeholder_action(menu)
-                elif name == 'section':
-                    menu.addSection(item[name])
-                elif name == 'menu':
-                    if item[name] == 'weight':
-                        map_menu = menu.addMenu('weight')
-                        map_menu.addAction(self.actionPaintWeight)
-                        map_menu.addSection('')
-                        map_menu.addAction(self.actionCopyWeight)
-                        map_menu.addAction(self.actionPasteWeight)
-                        map_menu.addAction(self.actionInvertWeight)
-                    else:
-                        map_dict = item[name]
-                        map_name = map_dict.keys()[0]
-                        map_values = map_dict[map_name]
-                        if map_name == 'source':
-                            source_mesh = node.association[0]
-                            text = (source_mesh[:12] +
-                                    '..') if len(source_mesh) > 14 else source_mesh
-                            text = 'source (%s)' % text
-                        elif map_name == 'target':
-                            target_mesh = node.association[1]
-                            text = (target_mesh[:12] +
-                                    '..') if len(target_mesh) > 14 else target_mesh
-                            text = 'source (%s)' % text
-                        else:
-                            text = map_name
-                        target_map_menu = menu.addMenu(text)
-                        target_map_menu.addAction(self.actionPaintEndPoints)
-                        target_map_menu.addSection('')
-                        action_copy_weight = QtWidgets.QAction(self)
-                        action_copy_weight.setText('Copy')
-                        action_copy_weight.setObjectName("actionCopyWeight")
-                        action_copy_weight.triggered.connect(
-                            partial(self.copy_weight, map_values[0], map_values[1]))
-                        target_map_menu.addAction(action_copy_weight)
-                        action_paste_weight = QtWidgets.QAction(self)
-                        action_paste_weight.setText('Paste')
-                        action_paste_weight.setObjectName("actionPasteWeight")
-                        action_paste_weight.triggered.connect(
-                            partial(self.paste_weight, map_values[0], map_values[1]))
-                        target_map_menu.addAction(action_paste_weight)
-                        action_invert_weight = QtWidgets.QAction(self)
-                        action_invert_weight.setText('Invert')
-                        action_invert_weight.setObjectName("actionInvertWeight")
-                        action_invert_weight.triggered.connect(
-                            partial(self.invert_weight, map_values[0], map_values[1]))
-                        target_map_menu.addAction(action_invert_weight)
-                elif name == 'paint_by_proximity':
-                    menu.addSection('')
-                    proximity_menu = menu.addMenu('Paint By Proximity')
-                    prox_widget = view.ProximityWidget()
-                    action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
-                    action_paint_by_prox.setDefaultWidget(prox_widget)
-                    proximity_menu.addAction(action_paint_by_prox)
-                elif name == 'select_source_and_target':
-                    menu.addAction(self.actionSelectST)
+            method = menu_dict[node.type][0]
+            args = []
+            for arg in menu_dict[node.type]:
+                if arg != method:
+                    args.append(arg)
+            method(*args)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
+
+    def add_copy_paste_invert_to_menu(self, menu, map_name_format_string, mesh_name):
+        menu.addSection('')
+        action_copy_weight = QtWidgets.QAction(self)
+        action_copy_weight.setText('Copy')
+        action_copy_weight.setObjectName("actionCopyWeight")
+        action_copy_weight.triggered.connect(partial(self.copy_weight, map_name_format_string, mesh_name))
+        menu.addAction(action_copy_weight)
+        action_paste_weight = QtWidgets.QAction(self)
+        action_paste_weight.setText('Paste')
+        action_paste_weight.setObjectName("actionPasteWeight")
+        action_paste_weight.triggered.connect(partial(self.paste_weight, map_name_format_string))
+        menu.addAction(action_paste_weight)
+        action_invert_weight = QtWidgets.QAction(self)
+        action_invert_weight.setText('Invert')
+        action_invert_weight.setObjectName("actionInvertWeight")
+        action_invert_weight.triggered.connect(partial(self.invert_weight, map_name_format_string, mesh_name))
+        menu.addAction(action_invert_weight)
+
+    def open_tet_menu(self, menu, mesh_name):
+        self.add_placeholder_action(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
+
+    def open_fiber_menu(self, menu, mesh_name):
+        self.add_placeholder_action(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
+        end_points_map_menu = menu.addMenu('endPoints')
+        end_points_map_menu.addAction(self.actionPaintEndPoints)
+        self.add_copy_paste_invert_to_menu(end_points_map_menu, '{}.endPoints', mesh_name)
+
+    def open_material_menu(self, menu, mesh_name):
+        self.add_placeholder_action(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
+        
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        source_menu_text = (source_mesh_name[:12] + '..') if len(source_mesh_name) > 14 else source_mesh_name
+        source_menu_text = 'source (%s)' % source_menu_text
+        source_map_menu = menu.addMenu(source_menu_text)
+        source_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]', source_mesh_name)
+        target_menu_text = (target_mesh_name[:12] + '..') if len(target_mesh_name) > 14 else target_mesh_name
+        target_menu_text = 'target (%s)' % target_menu_text
+        target_map_menu = menu.addMenu(target_menu_text)
+        target_map_menu.addAction(self.actionPaintTarget)
+        self.add_copy_paste_invert_to_menu(target_map_menu, '{}.weightList[1].weights[0:{}]', target_mesh_name)
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = view.ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
@@ -565,87 +511,74 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
-    def copy_weight(self, map_name=None, source=True):
+    def copy_weight(self, map_name_format_string, mesh_name):
         """
-        :param map_name: str, if name of the map is different from default maya
-        :param source: bool, defines object to copy weights from ( source or target )
-        :return: prints mesh name weights copied from and weight values
+        :param map_name_format_string: A format string to produce the map name.
+               Format argument will be (node_name)
+        :param mesh_name: name of the mesh
+        :return: None
         """
         indexes = self.treeView.selectedIndexes()
         tmp = []
+
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            if map_name:
-                weights = mc.getAttr("{}.{}".format(node.name, map_name))
-            else:
-                if source:
-                    num = 0
-                else:
-                    num = 1
-                mesh = node.association[num]
-                vert_count = mc.polyEvaluate(mesh, v=True)
-                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
-                    node.name, num, vert_count - 1))
+            map_node = mp.Map()
+            # remove vertex array if exists, requirement for populate method
+            map_name_format_string = map_name_format_string.split('[0:')[0]
+            map_node.populate(map_name_format_string.format(node.name), mesh_name)
+            weights = map_node.values
             tmp.append(weights)
 
-        self.weights = [sum(i) for i in zip(*tmp)]
-        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
+        self.weights_clipboard = [sum(i) for i in zip(*tmp)]
+        self.weights_clipboard = [max(min(x, 1.0), 0) for x in self.weights_clipboard]
 
-    def invert_weight(self, map_name=None, source=True):
+    def invert_weight(self, map_name_format_string, mesh_name):
         """
-        :param map_name: str, if name of the map is different from default maya
-        :param source: bool, defines object to invert weights ( source or target )
+        :param map_name_format_string: A format string to produce the map name.
+               Format arguments will be (node_name, number_of_vertices_in_mesh)
+        :param mesh_name: name of the mesh
         :return: None
         """
         indexes = self.treeView.selectedIndexes()
+
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            if map_name:
-                weights = mc.getAttr("{}.{}".format(node.name, map_name))
-                map_ = node.name + '.' + map_name
-                weights = [1.0 - x for x in weights]
-                mc.setAttr(map_, weights, type="doubleArray")
-            else:
-                if source:
-                    num = 0
-                else:
-                    num = 1
-                mesh = node.association[num]
-                vert_count = mc.polyEvaluate(mesh, v=True)
-                weights = mc.getAttr('{}.weightList[{}].weights[0:{}]'.format(
-                    node.name, num, vert_count - 1))
-                map_ = node.name + '.weightList[%d].weights' % num
+            map_node = mp.Map()
+            # remove vertex array if exists, requirement for populate method
+            map_name_format_string_part = map_name_format_string.split('[0:')[0]
+            map_node.populate(map_name_format_string_part.format(node.name), mesh_name)
+            weights = map_node.values
+            number_of_vertices_in_mesh = len(weights) - 1
 
-                weights = [1.0 - x for x in weights]
+            weights = [1.0 - x for x in weights]
 
-                tmp = []
-                for w in weights:
-                    tmp.append(str(w))
-                val = ' '.join(tmp)
-                cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
-                mm.eval(cmd)
+            map_attribute = map_name_format_string.format(node.name, number_of_vertices_in_mesh)
+            self.set_weights(map_attribute, weights)
 
-    def paste_weight(self, map_name=None, source=True):
+    def paste_weight(self, map_name_format_string):
         """
-        :param map_name: str, if name of the map is different from default maya
-        :param source: bool, defines object to paste weights to ( source or target )
+        :param map_name_format_string: A format string to produce the map name.
+               Format arguments will be (node_name, number_of_vertices_in_mesh)
         :return: None
         """
         indexes = self.treeView.selectedIndexes()
+        number_of_vertices_in_mesh = len(self.weights_clipboard) - 1
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            if not map_name:
-                if source:
-                    num = 0
-                else:
-                    num = 1
-                map_ = node.name + '.weightList[%d].weights' % num
-                tmp = []
-                for w in self.weights:
-                    tmp.append(str(w))
-                val = ' '.join(tmp)
-                cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
-                mm.eval(cmd)
-            else:
-                map_ = node.name + '.' + map_name
-                mc.setAttr(map_, self.weights, type="doubleArray")
+
+            map_attribute = map_name_format_string.format(node.name, number_of_vertices_in_mesh)
+            self.set_weights(map_attribute, self.weights_clipboard)
+
+    def set_weights(self, map_attribute, weights):
+        # Maya's weightList.weights is not doubleArray and should be set as mel command
+        # Could not set doubleArray easily other then using maya.cmds ( Maya issue )
+        if mc.getAttr(map_attribute, type=True) == 'doubleArray':
+            mc.setAttr(map_attribute, weights, type='doubleArray')
+        else:
+            tmp = []
+            for w in weights:
+                tmp.append(str(w))
+            val = ' '.join(tmp)
+            cmd = "setAttr " + map_attribute + " " + val
+            mm.eval(cmd)
