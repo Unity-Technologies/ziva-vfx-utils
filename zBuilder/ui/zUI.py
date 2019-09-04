@@ -229,17 +229,12 @@ class MyDockingUI(QtWidgets.QWidget):
             target_mesh_name = node.association[1]
         else:
             target_mesh_name = None
-        menu_dict = {'zTet': [self.open_tet_menu,
-                              menu,
-                              source_mesh_name],
-                     'zFiber': [self.open_fiber_menu,
-                                menu,
-                                source_mesh_name],
-                     'zMaterial': [self.open_tet_menu, menu, source_mesh_name],
-                     'zAttachment': [self.open_attachment_menu,
-                                     menu,
-                                     source_mesh_name,
-                                     target_mesh_name]}
+        menu_dict = {
+            'zTet': [self.open_tet_menu, menu, source_mesh_name],
+            'zFiber': [self.open_fiber_menu, menu, source_mesh_name],
+            'zMaterial': [self.open_tet_menu, menu, source_mesh_name],
+            'zAttachment': [self.open_attachment_menu, menu, source_mesh_name, target_mesh_name]
+        }
 
         if node.type in menu_dict:
             method = menu_dict[node.type][0]
@@ -256,7 +251,8 @@ class MyDockingUI(QtWidgets.QWidget):
         action_copy_weight = QtWidgets.QAction(self)
         action_copy_weight.setText('Copy')
         action_copy_weight.setObjectName("actionCopyWeight")
-        action_copy_weight.triggered.connect(partial(self.copy_weight, map_name_format_string, mesh_name))
+        action_copy_weight.triggered.connect(
+            partial(self.copy_weight, map_name_format_string, mesh_name))
         menu.addAction(action_copy_weight)
         action_paste_weight = QtWidgets.QAction(self)
         action_paste_weight.setText('Paste')
@@ -266,7 +262,8 @@ class MyDockingUI(QtWidgets.QWidget):
         action_invert_weight = QtWidgets.QAction(self)
         action_invert_weight.setText('Invert')
         action_invert_weight.setObjectName("actionInvertWeight")
-        action_invert_weight.triggered.connect(partial(self.invert_weight, map_name_format_string, mesh_name))
+        action_invert_weight.triggered.connect(
+            partial(self.invert_weight, map_name_format_string, mesh_name))
         menu.addAction(action_invert_weight)
 
     def open_tet_menu(self, menu, mesh_name):
@@ -274,14 +271,16 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
-        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
 
     def open_fiber_menu(self, menu, mesh_name):
         self.add_placeholder_action(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
-        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
         end_points_map_menu = menu.addMenu('endPoints')
         end_points_map_menu.addAction(self.actionPaintEndPoints)
         self.add_copy_paste_invert_to_menu(end_points_map_menu, '{}.endPoints', mesh_name)
@@ -291,21 +290,26 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
-        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]', mesh_name)
-        
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
+
     def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
-        source_menu_text = (source_mesh_name[:12] + '..') if len(source_mesh_name) > 14 else source_mesh_name
+        source_menu_text = (source_mesh_name[:12] +
+                            '..') if len(source_mesh_name) > 14 else source_mesh_name
         source_menu_text = 'source (%s)' % source_menu_text
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
-        self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]', source_mesh_name)
-        target_menu_text = (target_mesh_name[:12] + '..') if len(target_mesh_name) > 14 else target_mesh_name
+        self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           source_mesh_name)
+        target_menu_text = (target_mesh_name[:12] +
+                            '..') if len(target_mesh_name) > 14 else target_mesh_name
         target_menu_text = 'target (%s)' % target_menu_text
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
-        self.add_copy_paste_invert_to_menu(target_map_menu, '{}.weightList[1].weights[0:{}]', target_mesh_name)
+        self.add_copy_paste_invert_to_menu(target_map_menu, '{}.weightList[1].weights[0:{}]',
+                                           target_mesh_name)
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
         prox_widget = view.ProximityWidget()
