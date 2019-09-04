@@ -184,12 +184,11 @@ class Ziva(Builder):
                 nodes.extend(line_of_actions)
 
             tet_names = [x for x in nodes if mc.objectType(x) == 'zTet']
-            if tet_names:
-                for tet_name in tet_names:
-                    # find the rest shape--------------------------------------
-                    rest_shape = mc.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
-                    if rest_shape:
-                        nodes.extend(rest_shape)
+            for tet_name in tet_names:
+                # find the rest shape--------------------------------------
+                rest_shape = mc.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
+                if rest_shape:
+                    nodes.extend(rest_shape)
 
             return nodes
         else:
