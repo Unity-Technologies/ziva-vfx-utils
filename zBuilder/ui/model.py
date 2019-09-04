@@ -1,8 +1,8 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import maya.cmds as mc
-<<<<<<< HEAD
 import maya.mel as mm
+import zBuilder.zMaya as mz
 
 
 class GroupedLineEdit(QtWidgets.QLineEdit):
@@ -84,10 +84,6 @@ class ProximityWidget(QtWidgets.QWidget):
         """
 
         mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(), self.to_edit.text()))
-=======
-import zBuilder.zMaya as mz
->>>>>>> release/version1.7
-
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
 

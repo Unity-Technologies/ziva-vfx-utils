@@ -4,7 +4,6 @@ from functools import partial
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
-
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -73,18 +72,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.delegate = model.TreeItemDelegate()
         self.treeView.setItemDelegate(self.delegate)
         self.treeView.setIndentation(15)
-
-        # changing header size
-        # this used to create some space between left/top side of the tree view and it items
-        # "razzle dazzle" but the only way I could handle that
-        # height - defines padding from top
-        # offset - defines padding from left
-        # opposite value of offset should be applied in view.py in drawBranches method
-        height = 10
-        offset = -20
+        # self.treeView.setHeaderHidden(True)
         header = self.treeView.header()
-        header.setOffset(offset)
-        header.setFixedHeight(height)
+        header.setOffset(-20)
+        header.setOffsetToSectionPosition(20)
+        header.setFixedHeight(10)
 
         self.callback_ids = {}
 
@@ -101,7 +93,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.top_layout = QtWidgets.QHBoxLayout()
         self.top_layout.addWidget(self.tool_bar)
-        self.top_layout.setContentsMargins(15, 0, 0, 0)
+        self.top_layout.setContentsMargins(20, 0, 0, 0)
         self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
@@ -131,6 +123,7 @@ class MyDockingUI(QtWidgets.QWidget):
                     om.MMessage.removeCallback(id_)
 
     def _setup_actions(self):
+
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -162,6 +155,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
+        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
+        self.actionPaintByProx_1_2.setText('By Proximity .1 - .2')
+        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
+        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox, .1, .2))
+
+        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
+        self.actionPaintByProx_1_10.setText('By Proximity .1 - 1.0')
+        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
+        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox, .1, 10))
+
         self.actionPaintSource = QtWidgets.QAction(self)
         self.actionPaintSource.setText('Paint')
         self.actionPaintSource.setObjectName("paintSource")
@@ -181,6 +184,29 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
+
+        self.actionCopyWeight = QtWidgets.QAction(self)
+        self.actionCopyWeight.setText('Copy')
+        self.actionCopyWeight.setObjectName("actionCopyWeight")
+        self.actionCopyWeight.triggered.connect(self.copy_weight)
+
+        self.actionInvertWeight = QtWidgets.QAction(self)
+        self.actionInvertWeight.setText('Invert')
+        self.actionInvertWeight.setObjectName("actionCopyWeight")
+        self.actionInvertWeight.triggered.connect(self.invert_weight)
+
+        self.actionPasteWeight = QtWidgets.QAction(self)
+        self.actionPasteWeight.setText('Paste')
+        self.actionPasteWeight.setObjectName("actionPasteWeight")
+        self.actionPasteWeight.triggered.connect(self.paste_weight)
+
+    def paint_by_prox_options(self):
+        """Brings up UI for painting by proximity.
+        """
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mc.select(node.name, r=True)
+        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
 
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
@@ -223,15 +249,6 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def add_placeholder_action(self, menu):
-        """Adds an empty action to the menu
-        To be able to add separator at the very top of menu
-        """
-        empty_widget = QtWidgets.QWidget()
-        empty_action = QtWidgets.QWidgetAction(menu)
-        empty_action.setDefaultWidget(empty_widget)
-        menu.addAction(empty_action)
-
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -241,7 +258,6 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-<<<<<<< HEAD
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
         menu = model.CustomMenu(self)
@@ -314,55 +330,10 @@ class MyDockingUI(QtWidgets.QWidget):
             sub.addAction(actionPaintByProx)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
-=======
-        if len(indexes) == 1:
-            node = indexes[0].data(model.SceneGraphModel.nodeRole)
-
-            menu = QtWidgets.QMenu(self)
-
-            if node.type == 'zTet':
-                # QMenu.addSection only works after action, creates an empty action before
-                self.add_placeholder_action(menu)
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
-
-            if node.type == 'zFiber':
-                self.add_placeholder_action(menu)
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
-
-                target_map_menu = menu.addMenu('endPoints')
-                target_map_menu.addAction(self.actionPaintEndPoints)
-
-            if node.type == 'zMaterial':
-                self.add_placeholder_action(menu)
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
-
-            if node.type == 'zAttachment':
-                menu.addAction(self.actionSelectST)
-
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('source')
-                source_map_menu.addAction(self.actionPaintSource)
-                target_map_menu = menu.addMenu('target')
-                target_map_menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                proximity_menu = menu.addMenu('Paint By Proximity')
-                prox_widget = view.ProximityWidget()
-                action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
-                action_paint_by_prox.setDefaultWidget(prox_widget)
-                proximity_menu.addAction(action_paint_by_prox)
-
-            menu.exec_(self.treeView.viewport().mapToGlobal(position))
->>>>>>> release/version1.7
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
-        corresponding item in Maya scene.
+        corrisponding item in Maya scene.
         """
         # To exclude cycle caused by selection we need to break the loop before manually making selection
         self.is_selection_callback_active = False
@@ -387,9 +358,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.show()
 
     def attribute_changed(self, msg, plug, other_plug, *clientData):
-        if msg & (om.MNodeMessage.kAttributeSet | om.MNodeMessage.kAttributeLocked
-                  | om.MNodeMessage.kAttributeUnlocked | om.MNodeMessage.kConnectionMade
-                  | om.MNodeMessage.kConnectionBroken):
+        if msg & om.MNodeMessage.kAttributeSet:
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
@@ -579,9 +548,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # expand item in view.
         if expanded:
             for name in names_to_expand:
-                indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                  model.SceneGraphModel.fullNameRole, name, -1,
-                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                indices = self._proxy_model.match(
+                    self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                    -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
                 for index in indices:
                     self.treeView.expand(index)
         if sel:
@@ -651,3 +620,45 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
+
+    def copy_weight(self):
+
+        indexes = self.treeView.selectedIndexes()
+        tmp = []
+        for i in indexes:
+            node = i.data(model.SceneGraphModel.nodeRole)
+            mesh = node.association[0]
+            vert_count = mc.polyEvaluate(mesh, v=True)
+            tmp.append(
+                mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1)))
+
+        self.weights = [sum(i) for i in zip(*tmp)]
+        self.weights = [max(min(x, 1.0), 0) for x in self.weights]
+        print mesh, self.weights
+
+    def invert_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        mesh = node.association[0]
+        vert_count = mc.polyEvaluate(mesh, v=True)
+        weights = mc.getAttr('{}.weightList[0].weights[0:{}]'.format(node.name, vert_count - 1))
+        weights = [1 - x for x in weights]
+
+        map_ = node.name + '.weightList[0].weights'
+        tmp = []
+        for w in weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(weights) - 1) + val
+        mm.eval(cmd)
+
+    def paste_weight(self):
+        indexes = self.treeView.selectedIndexes()[0]
+        node = indexes.data(model.SceneGraphModel.nodeRole)
+        map_ = node.name + '.weightList[0].weights'
+        tmp = []
+        for w in self.weights:
+            tmp.append(str(w))
+        val = ' '.join(tmp)
+        cmd = "setAttr " + '%s[0:%d] ' % (map_, len(self.weights) - 1) + val
+        mm.eval(cmd)
