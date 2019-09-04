@@ -2,6 +2,7 @@ QWidget
 {
     font-family: "Verdana";
 }
+
 QTreeView
 {
     selection-color: rgb(68, 136, 204);
@@ -10,7 +11,7 @@ QTreeView
     font-size: 12px;
     icon-size: 18px;
     font-family: "Verdana";
-    background: #313131;
+    background: rgb(54, 54, 54);
 }
 
 QTreeView::item
@@ -29,115 +30,8 @@ QTreeView QLineEdit
     font-family: "Verdana";
 }
 
-QMenu
-{
-    background: rgba(31, 31, 31, 75%);
-    color: rgb(255, 255, 255);
-    /*border-radius: 10px;*/
-    border-top-left-radius: 0;
-    border: 1px solid rgb(88, 156, 224);
-}
-
-QMenu::item
-{
-    height: 25px;
-    margin: 0px 24px 2px 10px;
-    font-size: 9pt;
-}
-
-QMenu::item:checked
-{
-    padding-left: 20px;
-}
-
-QMenu::item:unchecked
-{
-    padding-left: 20px;
-}
-
-QMenu::item:selected
-{
-    color: rgb(88, 156, 224);
-}
-
-QMenu::separator
-{
-    background: rgb(77, 117, 144);
-    height: 1px;
-    font-size:10pt;
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-QFrame#line
-{
-    background: rgb(150, 150, 150);
-}
-
-QMenu::section
-{
-    font-size:10px;
-    height: 10px;
-}
-
-QLabel
-{
-    color: rgb(150, 150, 150);
-    background: transparent;
-    font-size: 8pt;
-}
-
-QGroupBox
-{
-    background-color: transparent;
-    border: 0;
-}
-
 QHeaderView
 {
-    background: #313131;
+    background: rgb(54, 54, 54);
     color: transparent;
-}
-
-QSlider::groove:horizontal {
-    background: transparent;
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::sub-page:horizontal {
-    background: rgb(200, 200, 200);
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::add-page:horizontal {
-    background: rgb(200, 200, 200);
-    height: 8px;
-    border-radius: 4px;
-}
-
-QSlider::handle:horizontal {
-    background: rgb(100, 100, 100);
-    width: 8px;
-    margin-top: -4px;
-    margin-bottom: -4px;
-    border-radius: 3px;
-}
-
-QSlider::handle:horizontal:hover {
-    background: rgb(120, 120, 120);
-    border-radius: 3px;
-}
-
-QSlider::sub-page:horizontal:disabled {
-    background: rgb(100, 100, 100);
-}
-
-QSlider::add-page:horizontal:disabled {
-    background: rgb(100, 100, 100);
-}
-
-QSlider::handle:horizontal:disabled {
-    background: rgb(68, 68, 68);
 }
