@@ -51,8 +51,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
-        # list of nodes that are waiting for Maya's idle state to be added to Scene Panel
-        self.waiting_nodes = []
 
         root_node = None
 
@@ -91,8 +89,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.reset_tree(root_node=root_node)
 
-        id_ = om.MDGMessage.addNodeAddedCallback(self.node_added)
-        self.callback_ids["NodeAdded"] = [id_]
+        id_ = om.MDGMessage.addNodeRemovedCallback(self.node_removed)
+        self.callback_ids["NodeRemoved"] = [id_]
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))
@@ -354,61 +352,16 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.redraw_tree_view()
 
-    def add_waiting_nodes(self):
-        for node_name in self.waiting_nodes:
-            print node_name
-            if not self.builder.get_scene_items(name_filter=node_name):
-                # store currently expanded items
-                expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   model.SceneGraphModel.expandedRole, True, -1,
-                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                names_to_expand = []
-                for index in expanded:
-                    node = index.data(model.SceneGraphModel.nodeRole)
-                    names_to_expand.append(node.long_name)
+    def node_removed(self, node, *clientData):
+        dep_node = om.MFnDependencyNode(node)
+        node_name = dep_node.name()
 
-                self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-                self.callback_ids["AttributeChanged"] = []
-                self.callback_ids["NameChanged"] = []
-
-                # rebuild treeView objects
-                mc.select(node_name)
-                self.builder.retrieve_connections()
-                scene_items = self.builder.get_scene_items()
-                for item in scene_items:
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
-                for item in self.builder.bodies.values():
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
-
-                # update the tree by collapsing and expanding items
-                # otherwise new item will not show up ( Qt bug )
-                self.treeView.collapseAll()
-                for name in names_to_expand:
-                    indices = self._proxy_model.match(
-                        self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                        -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                    for index in indices:
-                        self.treeView.expand(index)
-
-        self.waiting_nodes = []
-
-    def node_added(self, node, *clientData):
-        if node.apiTypeStr() in ('kPluginDependNode', 'kPluginDeformerNode'):
-            dep_node = om.MFnDependencyNode(node)
-            node_type = dep_node.typeName()
-            # list of node that should trigger an update
-            ziva_nodes = ['zAttachment', 'zBone', 'zMaterial', 'zTissue', 'zRivetToBone', 'zLineOfAction', 'zFiber']
-            if node_type in ziva_nodes:
-                self.waiting_nodes.append(dep_node.name())
-                mutils.executeDeferred(self.add_waiting_nodes)
+        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                          QtCore.Qt.DisplayRole, node_name, -1,
+                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        for index in indices:
+            model_index = self._proxy_model.mapToSource(index)
+            self._model.removeRow(model_index)
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -455,8 +408,6 @@ class MyDockingUI(QtWidgets.QWidget):
         # connect callbacks for Maya meshes
         for item in self.builder.bodies.values():
             obj = item.mobject
-            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(id_)
             id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
             self.callback_ids["NameChanged"].append(id_)
 
