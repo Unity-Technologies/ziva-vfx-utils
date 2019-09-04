@@ -51,6 +51,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
+        # list of nodes that are waiting for Maya's idle state to be added to Scene Panel
         self.waiting_nodes = []
 
         root_node = None
