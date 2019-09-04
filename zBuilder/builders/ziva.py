@@ -174,10 +174,11 @@ class Ziva(Builder):
         mc.select(bodies)
         nodes = mm.eval('zQuery -a')
 
-        # find line of actions-------------------------------------------------
         if nodes:
+            # find zFiber---------------------------------------------
             fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
             if fiber_names:
+                # find line of action----------------------------------------
                 line_of_actions = mc.listHistory(fiber_names)
                 line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
                 nodes.extend(line_of_actions)
@@ -185,6 +186,7 @@ class Ziva(Builder):
             tet_names = [x for x in nodes if mc.objectType(x) == 'zTet']
             if tet_names:
                 for tet_name in tet_names:
+                    # find the rest shape--------------------------------------
                     rest_shape = mc.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
                     if rest_shape:
                         nodes.extend(rest_shape)
