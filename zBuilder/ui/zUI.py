@@ -20,6 +20,7 @@ import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
 import maya.utils as mutils
+import re
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -319,11 +320,13 @@ class MyDockingUI(QtWidgets.QWidget):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
-            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
-            if attr_name in z_node.attrs:
-                attr_dict = mz.build_attr_key_values(node_name, [attr_name])
-                if attr_name in attr_dict:
-                    z_node.attrs[attr_name] = attr_dict[attr_name]
+            scene_items = self.builder.get_scene_items(name_filter=node_name)
+            if scene_items:
+                z_node = scene_items[-1]
+                if attr_name in z_node.attrs:
+                    attr_dict = mz.build_attr_key_values(node_name, [attr_name])
+                    if attr_name in attr_dict:
+                        z_node.attrs[attr_name] = attr_dict[attr_name]
 
         self.redraw_tree_view()
 
@@ -355,60 +358,80 @@ class MyDockingUI(QtWidgets.QWidget):
         self.redraw_tree_view()
 
     def add_waiting_nodes(self):
-        for node_name in self.waiting_nodes:
-            print node_name
-            if not self.builder.get_scene_items(name_filter=node_name):
-                # store currently expanded items
-                expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                   model.SceneGraphModel.expandedRole, True, -1,
-                                                   QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                names_to_expand = []
-                for index in expanded:
-                    node = index.data(model.SceneGraphModel.nodeRole)
-                    names_to_expand.append(node.long_name)
+        # This statement is useful if multiple nodes were added at the same time
+        # node_added will ask this method to be called as many times as amount of nodes created
+        # but waiting_nodes list contains all of them so it can be executed one time
+        if self.waiting_nodes:
+            # store currently expanded items
+            names_to_expand = self.get_expanded()
 
-                self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-                self.callback_ids["AttributeChanged"] = []
-                self.callback_ids["NameChanged"] = []
+            self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+            self.callback_ids["AttributeChanged"] = []
+            self.callback_ids["NameChanged"] = []
 
-                # rebuild treeView objects
-                mc.select(node_name)
-                self.builder.retrieve_connections()
-                scene_items = self.builder.get_scene_items()
-                for item in scene_items:
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
-                for item in self.builder.bodies.values():
-                    obj = item.mobject
-                    id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                    self.callback_ids["AttributeChanged"].append(id_)
-                    id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                    self.callback_ids["NameChanged"].append(id_)
+            mc.select(self.waiting_nodes)
+            self.builder.retrieve_connections()
 
-                # update the tree by collapsing and expanding items
-                # otherwise new item will not show up ( Qt bug )
-                self.treeView.collapseAll()
-                for name in names_to_expand:
-                    indices = self._proxy_model.match(
-                        self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                        -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                    for index in indices:
-                        self.treeView.expand(index)
+            # rebuild treeView objects
+            scene_items = self.builder.get_scene_items()
+            for item in scene_items:
+                obj = item.mobject
+                id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                self.callback_ids["AttributeChanged"].append(id_)
+                id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                self.callback_ids["NameChanged"].append(id_)
+            for item in self.builder.bodies.values():
+                obj = item.mobject
+                id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+                self.callback_ids["AttributeChanged"].append(id_)
+                id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+                self.callback_ids["NameChanged"].append(id_)
 
-        self.waiting_nodes = []
+            # restore previous expansion in treeView
+            if names_to_expand:
+                self.expand(names_to_expand)
+
+            self.waiting_nodes = []
 
     def node_added(self, node, *clientData):
         if node.apiTypeStr() in ('kPluginDependNode', 'kPluginDeformerNode'):
             dep_node = om.MFnDependencyNode(node)
             node_type = dep_node.typeName()
-            # list of node that should trigger an update
-            ziva_nodes = ['zAttachment', 'zBone', 'zMaterial', 'zTissue', 'zRivetToBone', 'zLineOfAction', 'zFiber']
-            if node_type in ziva_nodes:
+            # regex to filter Ziva nodes: starts with z and capital letter
+            ziva_nodes_pattern = re.compile('z[A-Z]*')
+            if ziva_nodes_pattern.match(node_type):
                 self.waiting_nodes.append(dep_node.name())
                 mutils.executeDeferred(self.add_waiting_nodes)
+
+    def get_expanded(self):
+        """
+        :return: array of item names that are currently expanded in treeView
+        """
+        # store currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole, True, -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+
+        return names_to_expand
+
+    def expand(self, names):
+        """
+        :param names: list of names to expand in treeView
+        :return: None
+        """
+        # collapseAll added in case refreshing of treeView needed
+        # otherwise new items might not be displayed ( Qt bug )
+        self.treeView.collapseAll()
+        for name in names:
+            indices = self._proxy_model.match(
+                self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
+                -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indices:
+                self.treeView.expand(index)
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -429,16 +452,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         scene_items = self.builder.get_scene_items()
 
-        # currently expanded items
-        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                           model.SceneGraphModel.expandedRole, True, -1,
-                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-
         # remember names of items to expand
-        names_to_expand = []
-        for index in expanded:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            names_to_expand.append(node.long_name)
+        names_to_expand = self.get_expanded()
 
         self.unregister_callbacks(["AttributeChanged", "NameChanged"])
         self.callback_ids["AttributeChanged"] = []
@@ -464,38 +479,32 @@ class MyDockingUI(QtWidgets.QWidget):
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        sel = mc.ls(sl=True, long=True)
+        # restore previous expansion in treeView
+        if names_to_expand:
+            self.expand(names_to_expand)
+
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
-        if expanded:
-            for name in names_to_expand:
-                indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                  model.SceneGraphModel.fullNameRole, name, -1,
-                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                for index in indices:
-                    self.treeView.expand(index)
+        sel = mc.ls(sl=True, long=True)
+
         if sel:
             checked = self.find_and_select(sel)
 
             # this works for a zBuilder view.  This is expanding the item
-            # selected and it's parent if any.  This makes it possible if you
-            # have a material or attachment selected, it will become visible in
-            # UI
+            # selected and it's parent if any.
             if checked:
-                # keeps previous expansion if TreeView was updated
                 self.treeView.expand(checked[0])
                 parent = checked[0].parent()
                 if parent.isValid():
                     self.treeView.expand(parent)
 
-        # Expand all zSolverTransform tree items-------------------------------
-        if not expanded:
+        # expand all zSolverTransform tree items
+        if not names_to_expand:
             for row in range(self._proxy_model.rowCount()):
                 index = self._proxy_model.index(row, 0)
                 node = index.data(model.SceneGraphModel.nodeRole)
                 if node.type == 'zSolverTransform':
                     self.treeView.expand(index)
-                    break
 
     def find_and_select(self, sel=None):
         """
