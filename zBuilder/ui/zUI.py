@@ -224,9 +224,9 @@ class MyDockingUI(QtWidgets.QWidget):
 
         menu = QtWidgets.QMenu(self)
 
-        source_mesh_name = node.association[0]
-        if len(node.association) > 1:
-            target_mesh_name = node.association[1]
+        source_mesh_name = node.long_association[0]
+        if len(node.long_association) > 1:
+            target_mesh_name = node.long_association[1]
         else:
             target_mesh_name = None
         menu_dict = {
@@ -238,10 +238,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         if node.type in menu_dict:
             method = menu_dict[node.type][0]
-            args = []
-            for arg in menu_dict[node.type]:
-                if arg != method:
-                    args.append(arg)
+            args = menu_dict[node.type][1:]
             method(*args)
 
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
@@ -296,15 +293,18 @@ class MyDockingUI(QtWidgets.QWidget):
     def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
-        source_menu_text = (source_mesh_name[:12] +
-                            '..') if len(source_mesh_name) > 14 else source_mesh_name
+        # create short name for labels
+        source_mesh_name_short = source_mesh_name.split('|')[-1]
+        target_mesh_name_short = target_mesh_name.split('|')[-1]
+        source_menu_text = (source_mesh_name_short[:12] +
+                            '..') if len(source_mesh_name_short) > 14 else source_mesh_name_short
         source_menu_text = 'source (%s)' % source_menu_text
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
         self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]',
                                            source_mesh_name)
-        target_menu_text = (target_mesh_name[:12] +
-                            '..') if len(target_mesh_name) > 14 else target_mesh_name
+        target_menu_text = (target_mesh_name_short[:12] +
+                            '..') if len(target_mesh_name_short) > 14 else target_mesh_name_short
         target_menu_text = 'target (%s)' % target_menu_text
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
@@ -515,6 +515,16 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
+    def get_weights(self, map_name, mesh_name):
+        """
+        :param map_name: name of the map
+        :param mesh_name: name of the mesh
+        :return: array of weight values
+        """
+        map_node = mp.Map()
+        map_node.populate(map_name, mesh_name)
+        return map_node.values
+
     def copy_weight(self, map_name_format_string, mesh_name):
         """
         :param map_name_format_string: A format string to produce the map name.
@@ -527,11 +537,10 @@ class MyDockingUI(QtWidgets.QWidget):
 
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            map_node = mp.Map()
-            # remove vertex array if exists, requirement for populate method
+            # remove vertex array if exists
             map_name_format_string = map_name_format_string.split('[0:')[0]
-            map_node.populate(map_name_format_string.format(node.name), mesh_name)
-            weights = map_node.values
+            map_name = map_name_format_string.format(node.name)
+            weights = self.get_weights(map_name, mesh_name)
             tmp.append(weights)
 
         self.weights_clipboard = [sum(i) for i in zip(*tmp)]
@@ -548,11 +557,10 @@ class MyDockingUI(QtWidgets.QWidget):
 
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            map_node = mp.Map()
-            # remove vertex array if exists, requirement for populate method
+            # remove vertex array if exists
             map_name_format_string_part = map_name_format_string.split('[0:')[0]
-            map_node.populate(map_name_format_string_part.format(node.name), mesh_name)
-            weights = map_node.values
+            map_name = map_name_format_string_part.format(node.name)
+            weights = self.get_weights(map_name, mesh_name)
             number_of_vertices_in_mesh = len(weights) - 1
 
             weights = [1.0 - x for x in weights]
@@ -580,9 +588,7 @@ class MyDockingUI(QtWidgets.QWidget):
         if mc.getAttr(map_attribute, type=True) == 'doubleArray':
             mc.setAttr(map_attribute, weights, type='doubleArray')
         else:
-            tmp = []
-            for w in weights:
-                tmp.append(str(w))
+            tmp = [str(w) for w in weights]
             val = ' '.join(tmp)
             cmd = "setAttr " + map_attribute + " " + val
             mm.eval(cmd)
