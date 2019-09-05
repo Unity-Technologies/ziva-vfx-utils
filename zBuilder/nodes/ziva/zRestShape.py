@@ -15,6 +15,7 @@ class RestShapeNode(Ziva):
 
     def __init__(self, *args, **kwargs):
         self.targets = None
+        self.tissue_name = None
         Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
