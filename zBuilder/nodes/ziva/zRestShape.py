@@ -50,6 +50,5 @@ class RestShapeNode(Ziva):
 
 
 def get_rest_shape_tissue(rest_shape):
-    tet = mc.listConnections('{}.iGeo'.format(rest_shape))[0]
-    tissue = mm.eval('zQuery -type "zTissue" {}'.format(tet))
+    tissue = mm.eval('zQuery -type "zTissue" {}'.format(rest_shape))
     return tissue[0]
