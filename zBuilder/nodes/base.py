@@ -129,7 +129,7 @@ class Base(object):
         else:
             self._name = name
 
-    def serialize(self):
+    def serialize(self, restore=True):
         """  Makes node serializable.
 
         It loops through keys in __dict__ and saves out a temp dict of items

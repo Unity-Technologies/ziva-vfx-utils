@@ -68,7 +68,7 @@ class DGNode(Base):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
-    def serialize(self):
+    def serialize(self, restore=True):
         """  Makes node serializable.
 
         This replaces an mObject with the name of the object in scene to make it
@@ -78,16 +78,24 @@ class DGNode(Base):
 
         Replaces .mobject mobject with a string name before serilization.
         Afterwords it converts it back to an mObject.
-
+        Args:
+            restore(bool): If restore is False it does not replace the mobject back
+            to an mobject.  Instead it fills it with None so that we can use the 
+            serializable builder outside of writing.
         Returns:
             dict: of serializable items
         """
         # convert mObjectHandle to name of maya object (str)
-        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+        if restore:
+            self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+
         output = serialize_object(self)
 
-        # convert the string back to an mobject
-        self.mobject = self.__mobject_handle
+        if restore:
+            # convert the string back to an mobject
+            self.mobject = self.__mobject_handle
+        else:
+            self.__mobject_handle = None
 
         return output
 
