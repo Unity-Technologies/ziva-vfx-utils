@@ -215,12 +215,12 @@ def rig_cut_copy(cut=False):
 
 
 def rig_cut():
-    # Cut Ziva rig. See zRigCutCopy for instructions.
+    # Cut Ziva rig. See rig_cut_copy for instructions.
     rig_cut_copy(cut=True)
 
 
 def rig_copy():
-    # Copy Ziva rig. See zRigCutCopy for instructions.
+    # Copy Ziva rig. See rig_cut_copy for instructions.
     rig_cut_copy(cut=False)
 
 
