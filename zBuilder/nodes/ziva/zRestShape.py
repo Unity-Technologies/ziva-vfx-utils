@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class RestShapeNode(Ziva):
-    """ This node for storing information related to zFibers.
+    """ This node for storing information related to zRestShape.
     """
     type = 'zRestShape'
     """ The type of node. """
