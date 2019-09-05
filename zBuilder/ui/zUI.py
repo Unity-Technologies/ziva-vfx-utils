@@ -505,9 +505,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # otherwise new items might not be displayed ( Qt bug )
         self.treeView.collapseAll()
         for name in names:
-            indices = self._proxy_model.match(
-                self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name,
-                -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indices:
                 self.treeView.expand(index)
 
