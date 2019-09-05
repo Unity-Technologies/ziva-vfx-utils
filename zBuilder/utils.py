@@ -27,11 +27,11 @@ def copy_paste(*args, **kwargs):
     else:
         selection = mc.ls(sl=True, l=True)
 
-    z = zva.Ziva()
-    z.retrieve_from_scene_selection(selection[0])
-    z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
-    z.stats()
-    z.build(**kwargs)
+    builder = zva.Ziva()
+    builder.retrieve_from_scene_selection(selection[0])
+    builder.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
+    builder.stats()
+    builder.build(**kwargs)
 
     mc.select(sel)
 
@@ -52,10 +52,10 @@ def check_map_validity():
     # we are going to check fibers and attachments
     mc.select(mc.ls(type=['zAttachment', 'zFiber']), r=True)
 
-    z = zva.Ziva()
-    z.retrieve_from_scene_selection(connections=False)
+    builder = zva.Ziva()
+    builder.retrieve_from_scene_selection(connections=False)
 
-    mz.check_map_validity(z.get_scene_items(type_filter='map'))
+    mz.check_map_validity(builder.get_scene_items(type_filter='map'))
 
     mc.select(sel, r=True)
 
@@ -250,7 +250,7 @@ def zRigPaste():
         if hasattr(item, 'mobject_reset'):
             item.mobject_reset()
     # Make the deepcopy.
-    z = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
+    builder = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
     target_selection = mc.ls(sl=True, l=True)
@@ -263,7 +263,8 @@ def zRigPaste():
     #     source selection 2 is pasted onto target selection 2; and so on.
     if not (target_selection == [] or ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE):
         for i in range(0, numObjectToPaste):
-            z.string_replace(source_selection[i].split('|')[-1], target_selection[i].split('|')[-1])
+            builder.string_replace(source_selection[i].split('|')[-1],
+                                   target_selection[i].split('|')[-1])
 
     # In case there are other solvers in the scene, we need to make sure that all the zBuilder commands
     # go to the solver stored in the clipboard. Otherwise, errors could occur due to solver ambiguity.
@@ -279,8 +280,8 @@ def zRigPaste():
             solverInClipboard)  # rename the solver (this also auto-renames the solver shape node)
     mm.eval('ziva -def ' + solverInClipboard + ';')  # make the clipboard solver default
 
-    z.reset_solvers()
-    z.build()
+    builder.reset_solvers()
+    builder.build()
 
 
 # Updates the Ziva rig in the solver(s).
@@ -298,8 +299,8 @@ def zRigUpdate(solvers=None):
         solverTransform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
         mc.select(solver)
-        z = zva.Ziva()
-        z.retrieve_from_scene()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
 
         # remove existing solver
         zRemoveSolver(solvers=[solver])
@@ -312,8 +313,8 @@ def zRigUpdate(solvers=None):
         mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
-        z.reset_solvers()
-        z.build()
+        builder.reset_solvers()
+        builder.build()
 
 
 # Transfers the Ziva rig from 'sourceSolver' to another solver (targetSolver).
@@ -338,18 +339,18 @@ def zRigTransfer(sourceSolver, prefix, targetSolver=""):
 
     # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
     mc.select(sourceSolver)
-    z = zva.Ziva()
-    z.retrieve_from_scene()
+    builder = zva.Ziva()
+    builder.retrieve_from_scene()
 
     # rename to prefix
-    z.string_replace('^', prefix)
-    z.string_replace('^' + prefix + sourceSolver,
-                     targetSolver)  # rename the solver stored in the zBuilder to targetSolver
+    builder.string_replace('^', prefix)
+    builder.string_replace('^' + prefix + sourceSolver,
+                           targetSolver)  # rename the solver stored in the zBuilder to targetSolver
 
     # build the transferred solver
     mm.eval('ziva -def ' + targetSolver + ';')  # make the target solver be default
-    z.reset_solvers()
-    z.build()
+    builder.reset_solvers()
+    builder.build()
 
 
 # Transfer the skin clusters for the selected mesh(es) onto their warped counterpart(s),
@@ -365,10 +366,10 @@ def zSkinClusterTransfer(prefix=""):
     if prefix == "":
         mc.error('Must specify a prefix.')
 
-    z = skn.SkinCluster()
-    z.retrieve_from_scene()
-    z.string_replace('^', prefix)
-    z.build()
+    builder = skn.SkinCluster()
+    builder.retrieve_from_scene()
+    builder.string_replace('^', prefix)
+    builder.build()
 
 
 # Load a Ziva rig from a file. Geometry must already be in the scene.
@@ -376,14 +377,14 @@ def zSkinClusterTransfer(prefix=""):
 # If solverName is provided, replace the name of the solver stored in the zBuilder file
 # with a given solverName, and apply the rig to that solver.
 def zLoadRig(zBuilderFilename, solverName=None):
-    z = zva.Ziva()
-    z.retrieve_from_file(zBuilderFilename)
+    builder = zva.Ziva()
+    builder.retrieve_from_file(zBuilderFilename)
     if solverName != None:
         # replace the solver name stored in the .zBuilder file with solverName
-        solverNameInFile = z.get_scene_items(
+        solverNameInFile = builder.get_scene_items(
             type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
-        z.string_replace(solverNameInFile, solverName)
-    z.build()
+        builder.string_replace(solverNameInFile, solverName)
+    builder.build()
 
 
 # Save a Ziva rig to a file.
@@ -391,9 +392,9 @@ def zLoadRig(zBuilderFilename, solverName=None):
 # If there is multiple solvers, save the first solver in the union
 # of selected solvers and the default solver.
 def zSaveRig(zBuilderFilename):
-    z = zva.Ziva()
-    z.retrieve_from_scene()
-    z.write(zBuilderFilename)
+    builder = zva.Ziva()
+    builder.retrieve_from_scene()
+    builder.write(zBuilderFilename)
 
 
 # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
@@ -410,10 +411,10 @@ def zSaveRig(zBuilderFilename):
 # Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
 # for better visual feedback to the user.
 def zRigCopyPasteWithNameSubstitution(regularExpression, stringToSubstituteMatchesWith):
-    z = zva.Ziva()
-    z.retrieve_from_scene_selection()
-    z.string_replace(regularExpression, stringToSubstituteMatchesWith)
-    z.build()
+    builder = zva.Ziva()
+    builder.retrieve_from_scene_selection()
+    builder.string_replace(regularExpression, stringToSubstituteMatchesWith)
+    builder.build()
 
     # Select the new items that have been pasted, for better visual feedback to the user.
     # Look into the zBuilder object and find the meshes associated with a few common Ziva node types:
@@ -421,6 +422,6 @@ def zRigCopyPasteWithNameSubstitution(regularExpression, stringToSubstituteMatch
     # clear selection
     mc.select(cl=True)
     for displayedNodeType in displayedNodeTypes:
-        for item in z.get_scene_items(type_filter=displayedNodeType):
+        for item in builder.get_scene_items(type_filter=displayedNodeType):
             # Add each mesh of this type to selection.
             mc.select(item.long_association, add=True)
