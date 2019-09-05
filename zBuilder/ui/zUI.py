@@ -4,6 +4,7 @@ from functools import partial
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
+import maya.utils as mutils
 
 try:
     from shiboken2 import wrapInstance
@@ -19,7 +20,6 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
-import maya.utils as mutils
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -51,6 +51,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
+        # list of object names that removed in Maya to delete them on idle state from Scene Panel
+        self.nodes_to_remove = []
 
         root_node = None
 
@@ -89,7 +91,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.reset_tree(root_node=root_node)
 
-        id_ = om.MDGMessage.addNodeRemovedCallback(self.node_removed)
+        id_ = om.MDGMessage.addNodeRemovedCallback(self.add_nodes_to_remove)
         self.callback_ids["NodeRemoved"] = [id_]
 
         self.tool_bar = QtWidgets.QToolBar(self)
@@ -352,16 +354,37 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.redraw_tree_view()
 
-    def node_removed(self, node, *clientData):
-        dep_node = om.MFnDependencyNode(node)
-        node_name = dep_node.name()
+    def add_nodes_to_remove(self, node, *clientData):
+        # filter some node types kDagNode used for meshes, transforms and curves
+        if node.hasFn(om.MFn.kDagNode) or node.apiTypeStr() in ('kPluginDependNode',
+                                                                'kPluginDeformerNode'):
+            dep_node = om.MFnDependencyNode(node)
+            node_name = dep_node.name()
+            self.nodes_to_remove.append(node_name)
+            mutils.executeDeferred(self.clean_removed_nodes)
 
-        indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                          QtCore.Qt.DisplayRole, node_name, -1,
-                                          QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-        for index in indices:
-            model_index = self._proxy_model.mapToSource(index)
-            self._model.removeRow(model_index)
+    def clean_removed_nodes(self):
+        for node_name in self.nodes_to_remove:
+            indices = self._proxy_model.match(self._proxy_model.index(0, 0), QtCore.Qt.DisplayRole,
+                                              node_name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+            # need to store parent since if you get parent from model_index it returns bad
+            # QModelIndex which refers to the wrong internal pointer
+            persistent_indices = []
+            persistent_indices_parent = []
+            for index in indices:
+                model_index = self._proxy_model.mapToSource(index)
+                parent_index = self._proxy_model.mapToSource(index.parent())
+                persistent_indices.append(QtCore.QPersistentModelIndex(model_index))
+                persistent_indices_parent.append(QtCore.QPersistentModelIndex(parent_index))
+
+            for i, index in enumerate(persistent_indices):
+                scene_panel_node = index.internalPointer()
+                if not mc.objExists(scene_panel_node.long_name):
+                    self._model.removeRow(index.row(), persistent_indices_parent[i])
+
+        self.nodes_to_remove = []
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
