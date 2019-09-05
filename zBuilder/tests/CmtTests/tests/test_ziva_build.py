@@ -240,15 +240,3 @@ class ZivaRestShapeTestCase(VfxTestCase):
         builder.build()
 
         self.assertTrue(mc.objExists('zRestShape1'))
-
-    def test_retrieve_build_update(self):
-
-        mc.select(cl=True)
-
-        # use builder to retrieve from scene-----------------------------------
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
-
-        builder.build()
-
-        self.assertTrue(mc.objExists('zRestShape1'))
