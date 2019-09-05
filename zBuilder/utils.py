@@ -1,15 +1,12 @@
+import logging
+import copy as copy
+
 import maya.cmds as mc
 import maya.mel as mm
+
 import zBuilder.zMaya as mz
-
-import logging
-
-import copy as zivaMayaCopy
-import maya.cmds as zivaMayaCmds
-import maya.mel as zivaMayaMel
-import zBuilder.builders.ziva as zBuilderBuildersZiva
-import zBuilder.builders.skinClusters as zBuilderBuildersSkinClusters
-import zBuilder.zMaya as zBuilderzMaya
+import zBuilder.builders.ziva as zva
+import zBuilder.builders.skinClusters as skn
 
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
@@ -30,7 +27,6 @@ def copy_paste(*args, **kwargs):
     else:
         selection = mc.ls(sl=True, l=True)
 
-    import zBuilder.builders.ziva as zva
     z = zva.Ziva()
     z.retrieve_from_scene_selection(selection[0])
     z.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
@@ -52,7 +48,6 @@ def check_map_validity():
         list of offending maps
     """
     sel = mc.ls(sl=True)
-    import zBuilder.builders.ziva as zva
 
     # we are going to check fibers and attachments
     mc.select(mc.ls(type=['zAttachment', 'zFiber']), r=True)
@@ -74,27 +69,27 @@ def zRemove(nodes):
 
     for node in nodes:
         # Check if node still exists.
-        if not zivaMayaCmds.objExists(node):
+        if not mc.objExists(node):
             continue
 
         # Check if node is a solver, and if so, remove it first.
-        if zBuilderzMaya.isSolver([node]):
+        if mz.isSolver([node]):
             zRemoveSolver(solvers=[node])
 
         # Check if node still exists.
-        if not zivaMayaCmds.objExists(node):
+        if not mc.objExists(node):
             continue
 
         # Check if node is a body, and if so, remove it.
         # We do this first as this will remove other items.
-        if zBuilderzMaya.check_body_type([node]):
+        if mz.check_body_type([node]):
             # If this is a zTissue of zTet, we need to select the mesh before we remove it:
-            zivaMayaCmds.select(zivaMayaMel.eval('zQuery -m'))
-            zivaMayaMel.eval('ziva -rm')
+            mc.select(mm.eval('zQuery -m'))
+            mm.eval('ziva -rm')
         # Check again if node exists after the body has been removed.
-        if zivaMayaCmds.objExists(node):
-            if zivaMayaCmds.objectType(node) in safe_to_delete:
-                zivaMayaCmds.delete(node)
+        if mc.objExists(node):
+            if mc.objectType(node) in safe_to_delete:
+                mc.delete(node)
 
 
 # Removes the entire Ziva rig from the solver(s).
@@ -107,50 +102,50 @@ def zRemoveSolver(solvers=None, askForConfirmation=False):
 
     if solvers == None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
-        numSelectedObjects = len(zivaMayaCmds.ls(selection=True))
+        numSelectedObjects = len(mc.ls(selection=True))
         if numSelectedObjects > 0:
-            solvers = zivaMayaMel.eval('zQuery -t "zSolver" -l')
+            solvers = mm.eval('zQuery -t "zSolver" -l')
         else:
-            zivaMayaMel.eval('error -n "Nothing is selected"')
+            mm.eval('error -n "Nothing is selected"')
             return
     if solvers == None:
-        zivaMayaMel.eval('error -n "No solver selected"')
+        mm.eval('error -n "No solver selected"')
         return
 
     # Convert any solver transform nodes to solver shape nodes.
-    solvers = zivaMayaMel.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
+    solvers = mm.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
     for solver in solvers:
-        shortSolverName = zivaMayaCmds.ls(solver)[0][:-5]  # remove 'Shape' at the end
+        shortSolverName = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
         message += shortSolverName + ', '
     message += 'including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
-        response = zivaMayaCmds.confirmDialog(title='Remove Ziva solver(s)',
-                                              message=message,
-                                              button=['Yes', 'Cancel'],
-                                              defaultButton='Yes',
-                                              cancelButton='Cancel')
+        response = mc.confirmDialog(title='Remove Ziva solver(s)',
+                                    message=message,
+                                    button=['Yes', 'Cancel'],
+                                    defaultButton='Yes',
+                                    cancelButton='Cancel')
         if response != 'Yes':
             return
 
     to_erase = []
-    for node in zBuilderzMaya.ZNODES:
-        nodes_in_scene = zivaMayaCmds.ls(type=node)
+    for node in mz.ZNODES:
+        nodes_in_scene = mc.ls(type=node)
         for item in nodes_in_scene:
-            solverOfThisItem = zBuilderzMaya.get_zSolver(item)[0]
+            solverOfThisItem = mz.get_zSolver(item)[0]
             if solverOfThisItem in solvers:
                 to_erase.append(item)
             # unlock the transform attributes
             if (node == 'zTissue') or (node == 'zCloth'):
-                mayaMesh = zivaMayaMel.eval('zQuery -m ' + item)[0]
+                mayaMesh = mm.eval('zQuery -m ' + item)[0]
                 attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
                 for attr in attrs:
-                    zivaMayaMel.eval('setAttr -lock 0 ' + mayaMesh + '.' + attr)
+                    mm.eval('setAttr -lock 0 ' + mayaMesh + '.' + attr)
 
-    zivaMayaMel.eval('select -cl;')  # needed to avoid Maya error messages
+    mm.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
-        zivaMayaCmds.delete(to_erase)
+        mc.delete(to_erase)
 
 
 # Removes all Ziva solvers from the scene, including all Ziva rigs.
@@ -159,7 +154,7 @@ def zRemoveSolver(solvers=None, askForConfirmation=False):
 def zRemoveAllSolvers(askForConfirmation=False):
 
     if askForConfirmation:
-        response = zivaMayaCmds.confirmDialog(
+        response = mc.confirmDialog(
             title='Remove all Ziva solvers',
             message=
             'This command will erase all Ziva nodes from the Maya scene. All Ziva nodes, including all solvers, will be erased. Proceed?',
@@ -169,7 +164,7 @@ def zRemoveAllSolvers(askForConfirmation=False):
         if response != 'Yes':
             return
 
-    zBuilderzMaya.clean_scene()
+    mz.clean_scene()
 
 
 # Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
@@ -182,18 +177,18 @@ def zRigCutCopy(cut=False):
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
-    selection = zivaMayaCmds.ls(sl=True)
+    selection = mc.ls(sl=True)
     if len(selection) == 0:
-        zivaMayaMel.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
+        mm.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
         return
 
     # Enforce that the selected objects come from exactly one solver.
-    selectedSolvers = zivaMayaMel.eval('zQuery -t "zSolver" -l')
+    selectedSolvers = mm.eval('zQuery -t "zSolver" -l')
     if selectedSolvers == None:
-        zivaMayaMel.eval('error -n "Selected objects are not connected to a solver."')
+        mm.eval('error -n "Selected objects are not connected to a solver."')
         return
     if len(selectedSolvers) >= 2:
-        zivaMayaMel.eval(
+        mm.eval(
             'error -n "Selected objects come from two or more solvers. Inputs to cut/copy must come from only one solver."'
         )
         return
@@ -203,17 +198,17 @@ def zRigCutCopy(cut=False):
     # Also check if selection contains two or more solver nodes. This is an error.
     numSolverNodes = 0
     for item in selection:
-        if zBuilderzMaya.isSolver([item]):
+        if mz.isSolver([item]):
             numSolverNodes = numSolverNodes + 1
     if numSolverNodes == 0:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
     elif numSolverNodes == 1:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
-        zivaMayaMel.eval('error -n "Selection contains more than one solver node. "')
+        mm.eval('error -n "Selection contains more than one solver node. "')
         return
 
-    ZIVA_CLIPBOARD_ZBUILDER = zBuilderBuildersZiva.Ziva()
+    ZIVA_CLIPBOARD_ZBUILDER = zva.Ziva()
     ZIVA_CLIPBOARD_ZBUILDER.retrieve_from_scene_selection()
     ZIVA_CLIPBOARD_SELECTION = selection
 
@@ -244,7 +239,7 @@ def zRigPaste():
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     if ZIVA_CLIPBOARD_ZBUILDER == None:
-        zivaMayaMel.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
+        mm.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
         return
 
     # We need to do a deepcopy of ziva_clipboard_zbuilder because we want to manipulate
@@ -255,10 +250,10 @@ def zRigPaste():
         if hasattr(item, 'mobject_reset'):
             item.mobject_reset()
     # Make the deepcopy.
-    z = zivaMayaCopy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
+    z = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
-    target_selection = zivaMayaCmds.ls(sl=True, l=True)
+    target_selection = mc.ls(sl=True, l=True)
     numObjectToPaste = min([len(source_selection), len(target_selection)])
 
     # If nothing is selected when we paste, or the clipboard contains a solver node,
@@ -277,12 +272,12 @@ def zRigPaste():
     # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
     solverInClipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
         type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
-    if not zivaMayaCmds.objExists(solverInClipboard):
-        generatedSolver = zivaMayaMel.eval('ziva -s;')[1]  # make a new solver
-        zivaMayaCmds.rename(
+    if not mc.objExists(solverInClipboard):
+        generatedSolver = mm.eval('ziva -s;')[1]  # make a new solver
+        mc.rename(
             generatedSolver,
             solverInClipboard)  # rename the solver (this also auto-renames the solver shape node)
-    zivaMayaMel.eval('ziva -def ' + solverInClipboard + ';')  # make the clipboard solver default
+    mm.eval('ziva -def ' + solverInClipboard + ';')  # make the clipboard solver default
 
     z.reset_solvers()
     z.build()
@@ -294,27 +289,27 @@ def zRigPaste():
 # If no "solvers" are provided, they are inferred from selection.
 def zRigUpdate(solvers=None):
     if solvers == None:
-        solvers = zivaMayaMel.eval('zQuery -t "zSolver" -l')
+        solvers = mm.eval('zQuery -t "zSolver" -l')
     if solvers == None:
-        zivaMayaMel.eval('error -n "No solver selected"')
+        mm.eval('error -n "No solver selected"')
         return
 
     for solver in solvers:
-        solverTransform = zivaMayaCmds.listRelatives(solver, p=True, f=True)[0][1:]
+        solverTransform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
-        zivaMayaCmds.select(solver)
-        z = zBuilderBuildersZiva.Ziva()
+        mc.select(solver)
+        z = zva.Ziva()
         z.retrieve_from_scene()
 
         # remove existing solver
         zRemoveSolver(solvers=[solver])
 
         # create an empty solver
-        generatedSolver = zivaMayaMel.eval('ziva -s;')[1]  # make the output solver
-        zivaMayaCmds.rename(
+        generatedSolver = mm.eval('ziva -s;')[1]  # make the output solver
+        mc.rename(
             generatedSolver,
             solverTransform)  # rename the solver (this also auto-renames the solver shape node)
-        zivaMayaMel.eval('ziva -def ' + solver + ';')  # make this solver be default
+        mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
         z.reset_solvers()
@@ -336,15 +331,14 @@ def zRigTransfer(sourceSolver, prefix, targetSolver=""):
     if (targetSolver == ""):
         targetSolver = prefix + sourceSolver  # default target solver
 
-    if (not zivaMayaCmds.objExists(targetSolver)):
-        generatedSolver = zivaMayaMel.eval('ziva -s;')[1]  # make the output solver
-        zivaMayaCmds.rename(
-            generatedSolver,
-            targetSolver)  # rename the solver (this also auto-renames the transform node)
+    if (not mc.objExists(targetSolver)):
+        generatedSolver = mm.eval('ziva -s;')[1]  # make the output solver
+        mc.rename(generatedSolver,
+                  targetSolver)  # rename the solver (this also auto-renames the transform node)
 
     # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
-    zivaMayaCmds.select(sourceSolver)
-    z = zBuilderBuildersZiva.Ziva()
+    mc.select(sourceSolver)
+    z = zva.Ziva()
     z.retrieve_from_scene()
 
     # rename to prefix
@@ -353,7 +347,7 @@ def zRigTransfer(sourceSolver, prefix, targetSolver=""):
                      targetSolver)  # rename the solver stored in the zBuilder to targetSolver
 
     # build the transferred solver
-    zivaMayaMel.eval('ziva -def ' + targetSolver + ';')  # make the target solver be default
+    mm.eval('ziva -def ' + targetSolver + ';')  # make the target solver be default
     z.reset_solvers()
     z.build()
 
@@ -364,14 +358,14 @@ def zRigTransfer(sourceSolver, prefix, targetSolver=""):
 # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
 # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the quotes).
 def zSkinClusterTransfer(prefix=""):
-    selectedNodes = zivaMayaCmds.ls(sl=True)
+    selectedNodes = mc.ls(sl=True)
     if len(selectedNodes) == 0:
-        zivaMayaCmds.error("Must select at least one mesh.\n")
+        mc.error("Must select at least one mesh.\n")
 
     if prefix == "":
-        zivaMayaCmds.error('Must specify a prefix.')
+        mc.error('Must specify a prefix.')
 
-    z = zBuilderBuildersSkinClusters.SkinCluster()
+    z = skn.SkinCluster()
     z.retrieve_from_scene()
     z.string_replace('^', prefix)
     z.build()
@@ -382,7 +376,7 @@ def zSkinClusterTransfer(prefix=""):
 # If solverName is provided, replace the name of the solver stored in the zBuilder file
 # with a given solverName, and apply the rig to that solver.
 def zLoadRig(zBuilderFilename, solverName=None):
-    z = zBuilderBuildersZiva.Ziva()
+    z = zva.Ziva()
     z.retrieve_from_file(zBuilderFilename)
     if solverName != None:
         # replace the solver name stored in the .zBuilder file with solverName
@@ -397,7 +391,7 @@ def zLoadRig(zBuilderFilename, solverName=None):
 # If there is multiple solvers, save the first solver in the union
 # of selected solvers and the default solver.
 def zSaveRig(zBuilderFilename):
-    z = zBuilderBuildersZiva.Ziva()
+    z = zva.Ziva()
     z.retrieve_from_scene()
     z.write(zBuilderFilename)
 
@@ -416,7 +410,7 @@ def zSaveRig(zBuilderFilename):
 # Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
 # for better visual feedback to the user.
 def zRigCopyPasteWithNameSubstitution(regularExpression, stringToSubstituteMatchesWith):
-    z = zBuilderBuildersZiva.Ziva()
+    z = zva.Ziva()
     z.retrieve_from_scene_selection()
     z.string_replace(regularExpression, stringToSubstituteMatchesWith)
     z.build()
@@ -425,8 +419,8 @@ def zRigCopyPasteWithNameSubstitution(regularExpression, stringToSubstituteMatch
     # Look into the zBuilder object and find the meshes associated with a few common Ziva node types:
     displayedNodeTypes = ['zTissue', 'zBone', 'zCloth']
     # clear selection
-    zivaMayaCmds.select(cl=True)
+    mc.select(cl=True)
     for displayedNodeType in displayedNodeTypes:
         for item in z.get_scene_items(type_filter=displayedNodeType):
             # Add each mesh of this type to selection.
-            zivaMayaCmds.select(item.long_association, add=True)
+            mc.select(item.long_association, add=True)
