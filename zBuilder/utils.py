@@ -398,7 +398,7 @@ def save_rig(file_name):
     builder.write(file_name)
 
 
-def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitute_matches_with):
+def copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with):
     # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
     # whose names are defined using regular expressions.
     # This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,
