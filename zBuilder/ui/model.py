@@ -159,7 +159,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             parent_node.children.pop(row)
             node.parent = None
             self.endRemoveRows()
-            if not parent_node.children:
+            if not parent_node.children and parent_node.type.startswith('ui_'):
                 self.removeRow(parent.row(), parent.parent())
 
 
