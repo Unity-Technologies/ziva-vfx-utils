@@ -74,7 +74,7 @@ class IOTestCase(VfxTestCase):
         temp = tempfile.TemporaryFile()
 
         mc.file(new=True, f=True)
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         mc.select('zSolver1')
         z = zva.Ziva()

@@ -142,15 +142,13 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         types = ['zAttachment', 'zFiber']
         result = []
-        # testing removing a single attachment
 
-        for type_ in types:
-            all_items = mc.ls(type=type_)
+        all_items = mc.ls(type=types)
+        utility.remove(all_items)
 
-            # delete first one
-            utility.remove(all_items[0])
-            result.append(mc.objExists(all_items[0]))
-        self.assertTrue(all(x is False for x in result))
+        result.extend(mc.ls(type=types))
+
+        self.assertTrue(result == [])
 
     def test_remove_all_of_type(self):
         types = ['zAttachment', 'zFiber']
