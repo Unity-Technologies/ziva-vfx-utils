@@ -63,7 +63,7 @@ def check_map_validity():
 # Safely remove the given Ziva nodes without worrying about breaking the scene.
 # A solver node can be specified either by its transform node or shape node (or both);
 # in any case, both are removed.
-def zRemove(nodes):
+def remove(nodes):
     # The following node types are safe to remove directly.
     safe_to_delete = ['zFiber', 'zAttachment']
 
@@ -74,7 +74,7 @@ def zRemove(nodes):
 
         # Check if node is a solver, and if so, remove it first.
         if mz.isSolver([node]):
-            zRemoveSolver(solvers=[node])
+            remove_solver(solvers=[node])
 
         # Check if node still exists.
         if not mc.objExists(node):
@@ -98,12 +98,12 @@ def zRemove(nodes):
 # Otherwise, the provided solvers are removed. Solvers can be provided either
 # as a solver transform node, or solver shape node.
 # The command also deletes the solver nodes themselves.
-def zRemoveSolver(solvers=None, askForConfirmation=False):
+def remove_solver(solvers=None, askForConfirmation=False):
 
     if solvers == None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
-        numSelectedObjects = len(mc.ls(selection=True))
-        if numSelectedObjects > 0:
+        num_selected_objects = len(mc.ls(selection=True))
+        if num_selected_objects > 0:
             solvers = mm.eval('zQuery -t "zSolver" -l')
         else:
             mm.eval('error -n "Nothing is selected"')
@@ -117,8 +117,8 @@ def zRemoveSolver(solvers=None, askForConfirmation=False):
 
     message = 'This command will remove the solver(s): '
     for solver in solvers:
-        shortSolverName = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
-        message += shortSolverName + ', '
+        short_solver_name = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
+        message += short_solver_name + ', '
     message += 'including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
         response = mc.confirmDialog(title='Remove Ziva solver(s)',
@@ -133,15 +133,15 @@ def zRemoveSolver(solvers=None, askForConfirmation=False):
     for node in mz.ZNODES:
         nodes_in_scene = mc.ls(type=node)
         for item in nodes_in_scene:
-            solverOfThisItem = mz.get_zSolver(item)[0]
-            if solverOfThisItem in solvers:
+            solver_of_this_item = mz.get_zSolver(item)[0]
+            if solver_of_this_item in solvers:
                 to_erase.append(item)
             # unlock the transform attributes
             if (node == 'zTissue') or (node == 'zCloth'):
-                mayaMesh = mm.eval('zQuery -m ' + item)[0]
+                maya_mesh = mm.eval('zQuery -m ' + item)[0]
                 attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
                 for attr in attrs:
-                    mm.eval('setAttr -lock 0 ' + mayaMesh + '.' + attr)
+                    mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
 
     mm.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
@@ -151,7 +151,7 @@ def zRemoveSolver(solvers=None, askForConfirmation=False):
 # Removes all Ziva solvers from the scene, including all Ziva rigs.
 # All Ziva nodes are removed from the Maya scene.
 # The command also deletes the solvers themselves.
-def zRemoveAllSolvers(askForConfirmation=False):
+def remove_all_solvers(askForConfirmation=False):
 
     if askForConfirmation:
         response = mc.confirmDialog(
@@ -173,7 +173,7 @@ def zRemoveAllSolvers(askForConfirmation=False):
 # (it does not matter if the solver node is a solver transform node, or solver shape node).
 # The selected objects must all come from exactly one solver; otherwise an error is reported.
 # If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
-def zRigCutCopy(cut=False):
+def rig_cut_copy(cut=False):
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
@@ -183,11 +183,11 @@ def zRigCutCopy(cut=False):
         return
 
     # Enforce that the selected objects come from exactly one solver.
-    selectedSolvers = mm.eval('zQuery -t "zSolver" -l')
-    if selectedSolvers == None:
+    selected_solvers = mm.eval('zQuery -t "zSolver" -l')
+    if selected_solvers == None:
         mm.eval('error -n "Selected objects are not connected to a solver."')
         return
-    if len(selectedSolvers) >= 2:
+    if len(selected_solvers) >= 2:
         mm.eval(
             'error -n "Selected objects come from two or more solvers. Inputs to cut/copy must come from only one solver."'
         )
@@ -196,13 +196,13 @@ def zRigCutCopy(cut=False):
     # Record if selection contains a solver node.
     # We'll need this information when pasting.
     # Also check if selection contains two or more solver nodes. This is an error.
-    numSolverNodes = 0
+    num_solver_nodes = 0
     for item in selection:
         if mz.isSolver([item]):
-            numSolverNodes = numSolverNodes + 1
-    if numSolverNodes == 0:
+            num_solver_nodes = num_solver_nodes + 1
+    if num_solver_nodes == 0:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
-    elif numSolverNodes == 1:
+    elif num_solver_nodes == 1:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
         mm.eval('error -n "Selection contains more than one solver node. "')
@@ -213,17 +213,17 @@ def zRigCutCopy(cut=False):
     ZIVA_CLIPBOARD_SELECTION = selection
 
     if cut:
-        zRemove(selection)
+        remove(selection)
 
 
 # Cut Ziva rig. See zRigCutCopy for instructions.
-def zRigCut():
-    zRigCutCopy(cut=True)
+def rig_cut():
+    rig_cut_copy(cut=True)
 
 
 # Copy Ziva rig. See zRigCutCopy for instructions.
-def zRigCopy():
-    zRigCutCopy(cut=False)
+def rig_copy():
+    rig_cut_copy(cut=False)
 
 
 # Paste the Ziva rig from the Ziva clipboard onto scene geometry.
@@ -235,7 +235,7 @@ def zRigCopy():
 # The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
 # If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
 # it is created.
-def zRigPaste():
+def rig_paste():
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     if ZIVA_CLIPBOARD_ZBUILDER == None:
@@ -254,7 +254,7 @@ def zRigPaste():
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
     target_selection = mc.ls(sl=True, l=True)
-    numObjectToPaste = min([len(source_selection), len(target_selection)])
+    num_object_to_paste = min([len(source_selection), len(target_selection)])
 
     # If nothing is selected when we paste, or the clipboard contains a solver node,
     # we paste without any name substitution.
@@ -262,7 +262,7 @@ def zRigPaste():
     #     source selection 1 is pasted onto target selection 1;
     #     source selection 2 is pasted onto target selection 2; and so on.
     if not (target_selection == [] or ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE):
-        for i in range(0, numObjectToPaste):
+        for i in range(0, num_object_to_paste):
             builder.string_replace(source_selection[i].split('|')[-1],
                                    target_selection[i].split('|')[-1])
 
@@ -271,14 +271,14 @@ def zRigPaste():
     # We resolve this as follows: If such a solver does not exist in the scene (because, say,
     # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
     # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
-    solverInClipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
+    solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
         type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
-    if not mc.objExists(solverInClipboard):
-        generatedSolver = mm.eval('ziva -s;')[1]  # make a new solver
+    if not mc.objExists(solver_in_clipboard):
+        generated_solver = mm.eval('ziva -s;')[1]  # make a new solver
         mc.rename(
-            generatedSolver,
-            solverInClipboard)  # rename the solver (this also auto-renames the solver shape node)
-    mm.eval('ziva -def ' + solverInClipboard + ';')  # make the clipboard solver default
+            generated_solver,
+            solver_in_clipboard)  # rename the solver (this also auto-renames the solver shape node)
+    mm.eval('ziva -def ' + solver_in_clipboard + ';')  # make the clipboard solver default
 
     builder.reset_solvers()
     builder.build()
@@ -288,7 +288,7 @@ def zRigPaste():
 # This command can be used if you made geometry modifications and you'd like to re-use a previously
 # built Ziva rig on the modified geometry.
 # If no "solvers" are provided, they are inferred from selection.
-def zRigUpdate(solvers=None):
+def rig_update(solvers=None):
     if solvers == None:
         solvers = mm.eval('zQuery -t "zSolver" -l')
     if solvers == None:
@@ -296,20 +296,20 @@ def zRigUpdate(solvers=None):
         return
 
     for solver in solvers:
-        solverTransform = mc.listRelatives(solver, p=True, f=True)[0][1:]
+        solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
         mc.select(solver)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
         # remove existing solver
-        zRemoveSolver(solvers=[solver])
+        remove_solver(solvers=[solver])
 
         # create an empty solver
-        generatedSolver = mm.eval('ziva -s;')[1]  # make the output solver
+        generated_solver = mm.eval('ziva -s;')[1]  # make the output solver
         mc.rename(
-            generatedSolver,
-            solverTransform)  # rename the solver (this also auto-renames the solver shape node)
+            generated_solver,
+            solver_transform)  # rename the solver (this also auto-renames the solver shape node)
         mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
@@ -328,27 +328,28 @@ def zRigUpdate(solvers=None):
 # If targetSolver does not exist yet, the command generates it.
 # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
 # on the 'warped_*' geometry is added into the sourceSolver.
-def zRigTransfer(sourceSolver, prefix, targetSolver=""):
-    if (targetSolver == ""):
-        targetSolver = prefix + sourceSolver  # default target solver
+def rig_transfer(source_solver, prefix, target_solver=""):
+    if (target_solver == ""):
+        target_solver = prefix + source_solver  # default target solver
 
-    if (not mc.objExists(targetSolver)):
-        generatedSolver = mm.eval('ziva -s;')[1]  # make the output solver
-        mc.rename(generatedSolver,
-                  targetSolver)  # rename the solver (this also auto-renames the transform node)
+    if (not mc.objExists(target_solver)):
+        generated_solver = mm.eval('ziva -s;')[1]  # make the output solver
+        mc.rename(generated_solver,
+                  target_solver)  # rename the solver (this also auto-renames the transform node)
 
     # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
-    mc.select(sourceSolver)
+    mc.select(source_solver)
     builder = zva.Ziva()
     builder.retrieve_from_scene()
 
     # rename to prefix
     builder.string_replace('^', prefix)
-    builder.string_replace('^' + prefix + sourceSolver,
-                           targetSolver)  # rename the solver stored in the zBuilder to targetSolver
+    builder.string_replace(
+        '^' + prefix + source_solver,
+        target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
     # build the transferred solver
-    mm.eval('ziva -def ' + targetSolver + ';')  # make the target solver be default
+    mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
     builder.reset_solvers()
     builder.build()
 
@@ -358,9 +359,9 @@ def zRigTransfer(sourceSolver, prefix, targetSolver=""):
 # Both geometries must have the same topology. The names of the warped meshes must be prefixed with prefix.
 # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
 # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the quotes).
-def zSkinClusterTransfer(prefix=""):
-    selectedNodes = mc.ls(sl=True)
-    if len(selectedNodes) == 0:
+def skincluster_transfer(prefix=""):
+    selected_nodes = mc.ls(sl=True)
+    if len(selected_nodes) == 0:
         mc.error("Must select at least one mesh.\n")
 
     if prefix == "":
@@ -376,14 +377,14 @@ def zSkinClusterTransfer(prefix=""):
 # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
 # If solverName is provided, replace the name of the solver stored in the zBuilder file
 # with a given solverName, and apply the rig to that solver.
-def zLoadRig(zBuilderFilename, solverName=None):
+def load_rig(file_name, solver_name=None):
     builder = zva.Ziva()
-    builder.retrieve_from_file(zBuilderFilename)
-    if solverName != None:
+    builder.retrieve_from_file(file_name)
+    if solver_name != None:
         # replace the solver name stored in the .zBuilder file with solverName
-        solverNameInFile = builder.get_scene_items(
+        solver_name_in_file = builder.get_scene_items(
             type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
-        builder.string_replace(solverNameInFile, solverName)
+        builder.string_replace(solver_name_in_file, solver_name)
     builder.build()
 
 
@@ -391,10 +392,10 @@ def zLoadRig(zBuilderFilename, solverName=None):
 # If there is only one solver in the scene, it is saved.
 # If there is multiple solvers, save the first solver in the union
 # of selected solvers and the default solver.
-def zSaveRig(zBuilderFilename):
+def save_rig(file_name):
     builder = zva.Ziva()
     builder.retrieve_from_scene()
-    builder.write(zBuilderFilename)
+    builder.write(file_name)
 
 
 # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
@@ -410,18 +411,18 @@ def zSaveRig(zBuilderFilename):
 # The selected objects should come from exactly one solver.
 # Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
 # for better visual feedback to the user.
-def zRigCopyPasteWithNameSubstitution(regularExpression, stringToSubstituteMatchesWith):
+def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitute_matches_with):
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection()
-    builder.string_replace(regularExpression, stringToSubstituteMatchesWith)
+    builder.string_replace(regular_expression, string_to_substitute_matches_with)
     builder.build()
 
     # Select the new items that have been pasted, for better visual feedback to the user.
     # Look into the zBuilder object and find the meshes associated with a few common Ziva node types:
-    displayedNodeTypes = ['zTissue', 'zBone', 'zCloth']
+    displayed_node_types = ['zTissue', 'zBone', 'zCloth']
     # clear selection
     mc.select(cl=True)
-    for displayedNodeType in displayedNodeTypes:
-        for item in builder.get_scene_items(type_filter=displayedNodeType):
+    for displayed_node_type in displayed_node_types:
+        for item in builder.get_scene_items(type_filter=displayed_node_type):
             # Add each mesh of this type to selection.
             mc.select(item.long_association, add=True)
