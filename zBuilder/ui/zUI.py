@@ -357,6 +357,26 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.redraw_tree_view()
 
+    def build_scene_items_callbacks(self):
+        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+        self.callback_ids["AttributeChanged"] = []
+        self.callback_ids["NameChanged"] = []
+
+        scene_items = self.builder.get_scene_items()
+        # connect callbacks from Ziva objects
+        for item in scene_items:
+            obj = item.mobject
+            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(id_)
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
+        # connect callbacks for Maya meshes
+        for item in self.builder.bodies.values():
+            obj = item.mobject
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
     def add_waiting_nodes(self):
         # This statement is useful if multiple nodes were added at the same time
         # node_added will ask this method to be called as many times as amount of nodes created
@@ -365,27 +385,10 @@ class MyDockingUI(QtWidgets.QWidget):
             # store currently expanded items
             names_to_expand = self.get_expanded()
 
-            self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-            self.callback_ids["AttributeChanged"] = []
-            self.callback_ids["NameChanged"] = []
-
             mc.select(self.waiting_nodes)
             self.builder.retrieve_connections()
 
-            # rebuild treeView objects
-            scene_items = self.builder.get_scene_items()
-            for item in scene_items:
-                obj = item.mobject
-                id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                self.callback_ids["AttributeChanged"].append(id_)
-                id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                self.callback_ids["NameChanged"].append(id_)
-            for item in self.builder.bodies.values():
-                obj = item.mobject
-                id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-                self.callback_ids["AttributeChanged"].append(id_)
-                id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-                self.callback_ids["NameChanged"].append(id_)
+            self.build_scene_items_callbacks()
 
             # restore previous expansion in treeView
             if names_to_expand:
@@ -450,30 +453,10 @@ class MyDockingUI(QtWidgets.QWidget):
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
-        scene_items = self.builder.get_scene_items()
-
         # remember names of items to expand
         names_to_expand = self.get_expanded()
 
-        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-        self.callback_ids["AttributeChanged"] = []
-        self.callback_ids["NameChanged"] = []
-
-        # connect callbacks from Ziva objects
-        for item in scene_items:
-            obj = item.mobject
-            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(id_)
-            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-            self.callback_ids["NameChanged"].append(id_)
-
-        # connect callbacks for Maya meshes
-        for item in self.builder.bodies.values():
-            obj = item.mobject
-            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(id_)
-            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-            self.callback_ids["NameChanged"].append(id_)
+        self.build_scene_items_callbacks()
 
         self._model.beginResetModel()
         self._model.root_node = root_node
