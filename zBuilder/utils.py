@@ -99,7 +99,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
     # Otherwise, the provided solvers are removed. Solvers can be provided either
     # as a solver transform node, or solver shape node.
     # The command also deletes the solver nodes themselves.
-    if solvers == None:
+    if solvers is None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
         num_selected_objects = len(mc.ls(selection=True))
         if num_selected_objects > 0:
@@ -107,7 +107,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
         else:
             mm.eval('error -n "Nothing is selected"')
             return
-    if solvers == None:
+    if solvers is None:
         mm.eval('error -n "No solver selected"')
         return
 
@@ -147,11 +147,11 @@ def remove_solver(solvers=None, askForConfirmation=False):
         mc.delete(to_erase)
 
 
-def remove_all_solvers(askForConfirmation=False):
+def remove_all_solvers(confirmation=False):
     # Removes all Ziva solvers from the scene, including all Ziva rigs.
     # All Ziva nodes are removed from the Maya scene.
     # The command also deletes the solvers themselves.
-    if askForConfirmation:
+    if confirmation:
         response = mc.confirmDialog(
             title='Remove all Ziva solvers',
             message=
@@ -182,7 +182,7 @@ def rig_cut_copy(cut=False):
 
     # Enforce that the selected objects come from exactly one solver.
     selected_solvers = mm.eval('zQuery -t "zSolver" -l')
-    if selected_solvers == None:
+    if selected_solvers is None:
         mm.eval('error -n "Selected objects are not connected to a solver."')
         return
     if len(selected_solvers) >= 2:
@@ -236,7 +236,7 @@ def rig_paste():
     # it is created.
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
-    if ZIVA_CLIPBOARD_ZBUILDER == None:
+    if ZIVA_CLIPBOARD_ZBUILDER is None:
         mm.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
         return
 
@@ -327,10 +327,10 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # If targetSolver does not exist yet, the command generates it.
     # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
     # on the 'warped_*' geometry is added into the sourceSolver.
-    if (target_solver == ""):
+    if target_solver == "":
         target_solver = prefix + source_solver  # default target solver
 
-    if (not mc.objExists(target_solver)):
+    if not mc.objExists(target_solver):
         generated_solver = mm.eval('ziva -s;')[1]  # make the output solver
         mc.rename(generated_solver,
                   target_solver)  # rename the solver (this also auto-renames the transform node)
@@ -355,9 +355,11 @@ def rig_transfer(source_solver, prefix, target_solver=""):
 def skincluster_transfer(prefix=""):
     # Transfer the skin clusters for the selected mesh(es) onto their warped counterpart(s),
     # and connect the warped mesh(es) to the warped joint hierarchy.
-    # Both geometries must have the same topology. The names of the warped meshes must be prefixed with prefix.
+    # Both geometries must have the same topology. The names of the warped meshes must be prefixed
+    # with prefix.
     # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
-    # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the quotes).
+    # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the
+    # quotes).
     selected_nodes = mc.ls(sl=True)
     if len(selected_nodes) == 0:
         mc.error("Must select at least one mesh.\n")
@@ -401,9 +403,11 @@ def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitu
     # whose names are defined using regular expressions.
     # This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,
     # then use this command to automatically "copy" the rig to the other side.
-    # Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or similar.
+    # Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or
+    # similar.
     # The specific naming convention is defined via a regular expression (regularExpression),
-    # and a string with which to replace any regular expression matches (stringToSubstituteMatchesWith).
+    # and a string with which to replace any regular expression matches
+    # (stringToSubstituteMatchesWith).
     # For example, if regularExpression is "^l_" and stringToSubstituteMatchesWith is "r_", then all
     # instances of geometry that begin with "r_" will be rigged in the same way as the corresponding
     # geometry that begins with "l_".
@@ -416,7 +420,8 @@ def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitu
     builder.build()
 
     # Select the new items that have been pasted, for better visual feedback to the user.
-    # Look into the zBuilder object and find the meshes associated with a few common Ziva node types:
+    # Look into the zBuilder object and find the meshes associated with a few common Ziva node
+    # types:
     displayed_node_types = ['zTissue', 'zBone', 'zCloth']
     # clear selection
     mc.select(cl=True)
