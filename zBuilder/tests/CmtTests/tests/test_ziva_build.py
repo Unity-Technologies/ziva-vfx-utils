@@ -218,9 +218,6 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         mc.select(cl=True)
 
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
-
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -233,9 +230,6 @@ class ZivaRestShapeTestCase(VfxTestCase):
     def test_retrieve_build_clean(self):
 
         mc.select(cl=True)
-
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
 
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
@@ -250,9 +244,6 @@ class ZivaRestShapeTestCase(VfxTestCase):
     def test_retrieve_build_update(self):
 
         mc.select(cl=True)
-
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
 
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
