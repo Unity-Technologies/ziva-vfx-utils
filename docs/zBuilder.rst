@@ -37,10 +37,10 @@ zBuilder.bundle module
     :undoc-members:
     :show-inheritance:
 
-zBuilder.util module
+zBuilder.utils module
 --------------------
 
-.. automodule:: zBuilder.util
+.. automodule:: zBuilder.utils
     :members:
     :undoc-members:
     :show-inheritance:
