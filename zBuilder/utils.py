@@ -11,9 +11,9 @@ import zBuilder.builders.ziva as zBuilderBuildersZiva
 import zBuilder.builders.skinClusters as zBuilderBuildersSkinClusters
 import zBuilder.zMaya as zBuilderzMaya
 
-ziva_clipboard_zbuilder = None
-ziva_clipboard_selection = None
-ziva_clipboard_contains_solver_node = False
+ZIVA_CLIPBOARD_ZBUILDER = None
+ZIVA_CLIPBOARD_SELECTION = None
+ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
 
 logger = logging.getLogger(__name__)
 
@@ -179,9 +179,9 @@ def zRemoveAllSolvers(askForConfirmation=False):
 # The selected objects must all come from exactly one solver; otherwise an error is reported.
 # If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
 def zRigCutCopy(cut=False):
-    global ziva_clipboard_zbuilder
-    global ziva_clipboard_selection
-    global ziva_clipboard_contains_solver_node
+    global ZIVA_CLIPBOARD_ZBUILDER
+    global ZIVA_CLIPBOARD_SELECTION
+    global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
     selection = zivaMayaCmds.ls(sl=True)
     if len(selection) == 0:
         zivaMayaMel.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
@@ -206,16 +206,16 @@ def zRigCutCopy(cut=False):
         if zBuilderzMaya.isSolver([item]):
             numSolverNodes = numSolverNodes + 1
     if numSolverNodes == 0:
-        ziva_clipboard_contains_solver_node = False
+        ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
     elif numSolverNodes == 1:
-        ziva_clipboard_contains_solver_node = True
+        ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
         zivaMayaMel.eval('error -n "Selection contains more than one solver node. "')
         return
 
-    ziva_clipboard_zbuilder = zBuilderBuildersZiva.Ziva()
-    ziva_clipboard_zbuilder.retrieve_from_scene_selection()
-    ziva_clipboard_selection = selection
+    ZIVA_CLIPBOARD_ZBUILDER = zBuilderBuildersZiva.Ziva()
+    ZIVA_CLIPBOARD_ZBUILDER.retrieve_from_scene_selection()
+    ZIVA_CLIPBOARD_SELECTION = selection
 
     if cut:
         zRemove(selection)
@@ -241,9 +241,9 @@ def zRigCopy():
 # If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
 # it is created.
 def zRigPaste():
-    global ziva_clipboard_zbuilder
-    global ziva_clipboard_selection
-    if ziva_clipboard_zbuilder == None:
+    global ZIVA_CLIPBOARD_ZBUILDER
+    global ZIVA_CLIPBOARD_SELECTION
+    if ZIVA_CLIPBOARD_ZBUILDER == None:
         zivaMayaMel.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
         return
 
@@ -251,13 +251,13 @@ def zRigPaste():
     # it (using string_replace), and not change the original ziva_clipboard_zbuilder object.
     # In this way, we can paste the same clipboard multiple times.
     # In order to deepcopy, we need to first remove all mobject references, using mobject_reset.
-    for item in ziva_clipboard_zbuilder.get_scene_items():
+    for item in ZIVA_CLIPBOARD_ZBUILDER.get_scene_items():
         if hasattr(item, 'mobject_reset'):
             item.mobject_reset()
     # Make the deepcopy.
-    z = zivaMayaCopy.deepcopy(ziva_clipboard_zbuilder)
+    z = zivaMayaCopy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
-    source_selection = ziva_clipboard_selection
+    source_selection = ZIVA_CLIPBOARD_SELECTION
     target_selection = zivaMayaCmds.ls(sl=True, l=True)
     numObjectToPaste = min([len(source_selection), len(target_selection)])
 
@@ -266,7 +266,7 @@ def zRigPaste():
     # Otherwise, perform name substitution:
     #     source selection 1 is pasted onto target selection 1;
     #     source selection 2 is pasted onto target selection 2; and so on.
-    if not (target_selection == [] or ziva_clipboard_contains_solver_node):
+    if not (target_selection == [] or ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE):
         for i in range(0, numObjectToPaste):
             z.string_replace(source_selection[i].split('|')[-1], target_selection[i].split('|')[-1])
 
@@ -275,7 +275,7 @@ def zRigPaste():
     # We resolve this as follows: If such a solver does not exist in the scene (because, say,
     # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
     # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
-    solverInClipboard = ziva_clipboard_zbuilder.get_scene_items(
+    solverInClipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
         type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
     if not zivaMayaCmds.objExists(solverInClipboard):
         generatedSolver = zivaMayaMel.eval('ziva -s;')[1]  # make a new solver
