@@ -398,7 +398,7 @@ class MyDockingUI(QtWidgets.QWidget):
             dep_node = om.MFnDependencyNode(node)
             node_type = dep_node.typeName()
             # regex to filter Ziva nodes: starts with z and capital letter
-            ziva_nodes_pattern = re.compile('z[A-Z]*')
+            ziva_nodes_pattern = re.compile('z[A-Z]')
             if ziva_nodes_pattern.match(node_type):
                 self.waiting_nodes.append(dep_node.name())
                 mutils.executeDeferred(self.add_waiting_nodes)
