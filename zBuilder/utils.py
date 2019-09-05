@@ -60,10 +60,10 @@ def check_map_validity():
     mc.select(sel, r=True)
 
 
-# Safely remove the given Ziva nodes without worrying about breaking the scene.
-# A solver node can be specified either by its transform node or shape node (or both);
-# in any case, both are removed.
 def remove(nodes):
+    # Safely remove the given Ziva nodes without worrying about breaking the scene.
+    # A solver node can be specified either by its transform node or shape node (or both);
+    # in any case, both are removed.
     # The following node types are safe to remove directly.
     safe_to_delete = ['zFiber', 'zAttachment']
 
@@ -92,14 +92,13 @@ def remove(nodes):
                 mc.delete(node)
 
 
-# Removes the entire Ziva rig from the solver(s).
-# If no solver is provided, it infers them from selection.
-# If no solver is provided, and nothing is selected, it returns an error.
-# Otherwise, the provided solvers are removed. Solvers can be provided either
-# as a solver transform node, or solver shape node.
-# The command also deletes the solver nodes themselves.
 def remove_solver(solvers=None, askForConfirmation=False):
-
+    # Removes the entire Ziva rig from the solver(s).
+    # If no solver is provided, it infers them from selection.
+    # If no solver is provided, and nothing is selected, it returns an error.
+    # Otherwise, the provided solvers are removed. Solvers can be provided either
+    # as a solver transform node, or solver shape node.
+    # The command also deletes the solver nodes themselves.
     if solvers == None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
         num_selected_objects = len(mc.ls(selection=True))
@@ -148,11 +147,10 @@ def remove_solver(solvers=None, askForConfirmation=False):
         mc.delete(to_erase)
 
 
-# Removes all Ziva solvers from the scene, including all Ziva rigs.
-# All Ziva nodes are removed from the Maya scene.
-# The command also deletes the solvers themselves.
 def remove_all_solvers(askForConfirmation=False):
-
+    # Removes all Ziva solvers from the scene, including all Ziva rigs.
+    # All Ziva nodes are removed from the Maya scene.
+    # The command also deletes the solvers themselves.
     if askForConfirmation:
         response = mc.confirmDialog(
             title='Remove all Ziva solvers',
@@ -167,13 +165,13 @@ def remove_all_solvers(askForConfirmation=False):
     mz.clean_scene()
 
 
-# Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
-# Selection cannot be empty; otherwise an error is reported.
-# Selection can contain zero or one solver node; otherwise an error is reported
-# (it does not matter if the solver node is a solver transform node, or solver shape node).
-# The selected objects must all come from exactly one solver; otherwise an error is reported.
-# If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
 def rig_cut_copy(cut=False):
+    # Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
+    # Selection cannot be empty; otherwise an error is reported.
+    # Selection can contain zero or one solver node; otherwise an error is reported
+    # (it does not matter if the solver node is a solver transform node, or solver shape node).
+    # The selected objects must all come from exactly one solver; otherwise an error is reported.
+    # If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
@@ -216,26 +214,26 @@ def rig_cut_copy(cut=False):
         remove(selection)
 
 
-# Cut Ziva rig. See zRigCutCopy for instructions.
 def rig_cut():
+    # Cut Ziva rig. See zRigCutCopy for instructions.
     rig_cut_copy(cut=True)
 
 
-# Copy Ziva rig. See zRigCutCopy for instructions.
 def rig_copy():
+    # Copy Ziva rig. See zRigCutCopy for instructions.
     rig_cut_copy(cut=False)
 
 
-# Paste the Ziva rig from the Ziva clipboard onto scene geometry.
-# If nothing is selected, or the Ziva clipboard contains an explicit solver node,
-# the Ziva rig is applied to scene geometry that is named inside the Ziva clipboard.
-# If something is selected, then:
-#   source selection 1 is pasted onto target selection 1;
-#   source selection 2 is pasted onto target selection 2; and so on.
-# The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
-# If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
-# it is created.
 def rig_paste():
+    # Paste the Ziva rig from the Ziva clipboard onto scene geometry.
+    # If nothing is selected, or the Ziva clipboard contains an explicit solver node,
+    # the Ziva rig is applied to scene geometry that is named inside the Ziva clipboard.
+    # If something is selected, then:
+    #   source selection 1 is pasted onto target selection 1;
+    #   source selection 2 is pasted onto target selection 2; and so on.
+    # The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
+    # If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
+    # it is created.
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     if ZIVA_CLIPBOARD_ZBUILDER == None:
@@ -284,11 +282,11 @@ def rig_paste():
     builder.build()
 
 
-# Updates the Ziva rig in the solver(s).
-# This command can be used if you made geometry modifications and you'd like to re-use a previously
-# built Ziva rig on the modified geometry.
-# If no "solvers" are provided, they are inferred from selection.
 def rig_update(solvers=None):
+    # Updates the Ziva rig in the solver(s).
+    # This command can be used if you made geometry modifications and you'd like to re-use a previously
+    # built Ziva rig on the modified geometry.
+    # If no "solvers" are provided, they are inferred from selection.
     if solvers == None:
         solvers = mm.eval('zQuery -t "zSolver" -l')
     if solvers == None:
@@ -317,18 +315,18 @@ def rig_update(solvers=None):
         builder.build()
 
 
-# Transfers the Ziva rig from 'sourceSolver' to another solver (targetSolver).
-# This command does not transfer the geometry. It assumes that a copy of the geometry from
-# sourceSolver is already available in the scene, prefixed by "prefix" (without the quotes).
-# For example, if sourceSolver is 'zSolver1', and prefix is 'warped_', and 'zSolver1' has a
-# tissue geometry (a mesh) called "tissue1", then this command assumes that there is a mesh
-# called "warped_tissue1" in the scene.
-# The command generates a Ziva rig on the 'warped_*' geometry, in the targetSolver.
-# If targetSolver is "", the command sets the targetSolver to sourceSolver + prefix.
-# If targetSolver does not exist yet, the command generates it.
-# Note that the targetSolver may be the same as the sourceSolver, in which case the rig
-# on the 'warped_*' geometry is added into the sourceSolver.
 def rig_transfer(source_solver, prefix, target_solver=""):
+    # Transfers the Ziva rig from 'sourceSolver' to another solver (targetSolver).
+    # This command does not transfer the geometry. It assumes that a copy of the geometry from
+    # sourceSolver is already available in the scene, prefixed by "prefix" (without the quotes).
+    # For example, if sourceSolver is 'zSolver1', and prefix is 'warped_', and 'zSolver1' has a
+    # tissue geometry (a mesh) called "tissue1", then this command assumes that there is a mesh
+    # called "warped_tissue1" in the scene.
+    # The command generates a Ziva rig on the 'warped_*' geometry, in the targetSolver.
+    # If targetSolver is "", the command sets the targetSolver to sourceSolver + prefix.
+    # If targetSolver does not exist yet, the command generates it.
+    # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
+    # on the 'warped_*' geometry is added into the sourceSolver.
     if (target_solver == ""):
         target_solver = prefix + source_solver  # default target solver
 
@@ -354,12 +352,12 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     builder.build()
 
 
-# Transfer the skin clusters for the selected mesh(es) onto their warped counterpart(s),
-# and connect the warped mesh(es) to the warped joint hierarchy.
-# Both geometries must have the same topology. The names of the warped meshes must be prefixed with prefix.
-# This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
-# skin cluster(s), have already been warped, and are prefixed with "prefix" (without the quotes).
 def skincluster_transfer(prefix=""):
+    # Transfer the skin clusters for the selected mesh(es) onto their warped counterpart(s),
+    # and connect the warped mesh(es) to the warped joint hierarchy.
+    # Both geometries must have the same topology. The names of the warped meshes must be prefixed with prefix.
+    # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
+    # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the quotes).
     selected_nodes = mc.ls(sl=True)
     if len(selected_nodes) == 0:
         mc.error("Must select at least one mesh.\n")
@@ -373,11 +371,11 @@ def skincluster_transfer(prefix=""):
     builder.build()
 
 
-# Load a Ziva rig from a file. Geometry must already be in the scene.
-# If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
-# If solverName is provided, replace the name of the solver stored in the zBuilder file
-# with a given solverName, and apply the rig to that solver.
 def load_rig(file_name, solver_name=None):
+    # Load a Ziva rig from a file. Geometry must already be in the scene.
+    # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
+    # If solverName is provided, replace the name of the solver stored in the zBuilder file
+    # with a given solverName, and apply the rig to that solver.
     builder = zva.Ziva()
     builder.retrieve_from_file(file_name)
     if solver_name != None:
@@ -388,30 +386,30 @@ def load_rig(file_name, solver_name=None):
     builder.build()
 
 
-# Save a Ziva rig to a file.
-# If there is only one solver in the scene, it is saved.
-# If there is multiple solvers, save the first solver in the union
-# of selected solvers and the default solver.
 def save_rig(file_name):
+    # Save a Ziva rig to a file.
+    # If there is only one solver in the scene, it is saved.
+    # If there is multiple solvers, save the first solver in the union
+    # of selected solvers and the default solver.
     builder = zva.Ziva()
     builder.retrieve_from_scene()
     builder.write(file_name)
 
 
-# Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
-# whose names are defined using regular expressions.
-# This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,
-# then use this command to automatically "copy" the rig to the other side.
-# Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or similar.
-# The specific naming convention is defined via a regular expression (regularExpression),
-# and a string with which to replace any regular expression matches (stringToSubstituteMatchesWith).
-# For example, if regularExpression is "^l_" and stringToSubstituteMatchesWith is "r_", then all
-# instances of geometry that begin with "r_" will be rigged in the same way as the corresponding
-# geometry that begins with "l_".
-# The selected objects should come from exactly one solver.
-# Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
-# for better visual feedback to the user.
 def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitute_matches_with):
+    # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
+    # whose names are defined using regular expressions.
+    # This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,
+    # then use this command to automatically "copy" the rig to the other side.
+    # Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or similar.
+    # The specific naming convention is defined via a regular expression (regularExpression),
+    # and a string with which to replace any regular expression matches (stringToSubstituteMatchesWith).
+    # For example, if regularExpression is "^l_" and stringToSubstituteMatchesWith is "r_", then all
+    # instances of geometry that begin with "r_" will be rigged in the same way as the corresponding
+    # geometry that begins with "l_".
+    # The selected objects should come from exactly one solver.
+    # Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
+    # for better visual feedback to the user.
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection()
     builder.string_replace(regular_expression, string_to_substitute_matches_with)
