@@ -32,11 +32,13 @@ menuItem -label "Create Isosurface Triangle Mesh" -ec true -ecr true -c "zIsoMes
 menuItem -label "Create Delaunay Tet Mesh" -ec true -ecr true -c "zDelaunayTetMesh" -ann "Builds a Delaunay tet mesh of the selected triangle mesh(es) or tissue(s).";
 menuItem -label "zPolyCombine" -ec true -ecr true -c "zPolyCombine" -ann "Will combine multiple polySets into a single polySet.";
 menuItem -label "Create Line-of-Action Curve" -ec true -ecr true -c "zLineOfActionUtil" -ann "Create simple curves from the selected tissues/fibers.";
+menuItem -label "Extract Rest Shape" -ec true -ecr true -c "zRestShape -pg" -ann "Extracts a new shape from a simulated mesh + sculpted mesh that can be used as a Rest Shape target";
 
-menuItem -label "Modeling" -divider true;
+menuItem -label "Mesh Inspection" -divider true;
 menuItem -label "Run Mesh Analysis" -ec true -ecr true -c "zMeshCheck -select" -ann "Quality-check the selected mesh(es).";
 menuItem -label "Find Intersections" -ec true -ecr true -c "ZivaSelectIntersections" -ann "Find intersections between Maya meshes.";
 menuItem -label "Find Self Intersections" -ec true -ecr true -c "ZivaSelectSelfIntersections" -ann "Find self-intersections (self-collisions) on a Maya mesh.";
+
 menuItem -label "Select Connected" -divider true;
 menuItem -label "zTissues" -ec true -ecr true -c "select -r `zQuery -t zTissue`" -ann "Selects zTissue nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zCloth" -ec true -ecr true -c "select -r `zQuery -t zCloth`" -ann "Selects zCloth nodes that are connected to the currently selected mesh(es).";
@@ -45,10 +47,12 @@ menuItem -label "zTet" -ec true -ecr true -c "select -r `zQuery -t zTet`" -ann "
 menuItem -label "zAttachments" -ec true -ecr true -c "select -r `zQuery -t zAttachment`" -ann "Selects zAttachment nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zMaterials" -ec true -ecr true - c "select -r `zQuery -t zMaterial`" -ann "Selects zMaterial nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zFibers" -ec true -ecr true -c "select -r `zQuery -t zFiber`" -ann "Selects zFiber nodes that are connected to the currently selected mesh(es).";
+
 menuItem -label "Select in Hierarchy" -divider true;
 menuItem -label "Tissues" -ec true -ecr true -c "ZivaSelectInHierarchy zTissue" -ann "Selects tissue meshes in the currently selected hierarchy.";
 menuItem -label "Cloth" -ec true -ecr true -c "ZivaSelectInHierarchy zCloth" -ann "Selects cloth meshes in the currently selected hierarchy.";
 menuItem -label "Bones" -ec true -ecr true -c "ZivaSelectInHierarchy zBone" -ann "Selects bone meshes in the currently selected hierarchy.";
+
 menuItem -label "Proximity Tools" -divider true;
 menuItem -label "Select Vertices" -aob true -ec true -ecr true -c "zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat" -ann "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.";
 menuItem -ob true -ann "Proximity Selection Options" -c "ZivaSelectVerticesByProximityOptions";

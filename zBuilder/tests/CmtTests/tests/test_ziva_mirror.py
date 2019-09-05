@@ -7,13 +7,12 @@ import sys
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 import zBuilder.tests.utils as utl
-import zBuilder.util as utility
+import zBuilder.utils as utility
 
 from vfx_test_case import VfxTestCase
 
 
 class ZivaMirrorTestCase(VfxTestCase):
-
     @classmethod
     def setUpClass(cls):
         pass
@@ -42,4 +41,3 @@ class ZivaMirrorTestCase(VfxTestCase):
 
         # check if left muscle is connected to zGeo
         self.assertTrue(len(mc.listConnections('l_muscle', type='zGeo')))
-
