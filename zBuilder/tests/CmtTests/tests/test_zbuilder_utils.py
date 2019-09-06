@@ -100,15 +100,9 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         super(BuilderUtilsTestCaseArm, self).setUp()
 
         utl.build_anatomical_arm_with_no_popup()
-        self.temp_files = []
 
     def tearDown(self):
         super(BuilderUtilsTestCaseArm, self).tearDown()
-
-        # delete temp files
-        for temp_file in self.temp_files:
-            if os.path.exists(temp_file):
-                os.remove(temp_file)
 
     def test_copy_paste(self):
         mc.select(cl=True)
@@ -190,34 +184,34 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
     def test_save_rig(self):
         # find a temp file location
-        temp = tempfile.TemporaryFile()
-        file_name = temp.name + '.zBuilder'
+        fd, file_name = tempfile.mkstemp(suffix='.zBuilder')
 
         mc.select('zSolver1')
 
         utility.save_rig(file_name)
-
-        self.temp_files.append(file_name)
 
         # simply check if file exists, if it does it passes
         self.assertTrue(os.path.exists(file_name))
 
+        os.close(fd)
+        os.remove(file_name)
+
     def test_load_rig(self):
         # find a temp file location
-        temp = tempfile.TemporaryFile()
-        # temp = 'c:\\Temp\\testing.zBuilder'
+        fd, file_name = tempfile.mkstemp(suffix='.zBuilder')
+
         mc.select('zSolver1')
 
-        file_name = temp.name + '.zBuilder'
         utility.save_rig(file_name)
-
-        self.temp_files.append(file_name)
 
         # clean scene so we just have geo
         mz.clean_scene()
 
         utility.load_rig(file_name)
         self.assertSceneHasNodes(['zSolver1'])
+
+        os.close(fd)
+        os.remove(file_name)
 
 
 class BuilderUtilsTestCase(VfxTestCase):
