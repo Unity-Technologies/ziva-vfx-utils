@@ -4,7 +4,6 @@ from functools import partial
 import maya.cmds as mc
 import maya.mel as mm
 import maya.OpenMaya as om
-import maya.utils as mutils
 
 try:
     from shiboken2 import wrapInstance
@@ -94,7 +93,7 @@ class MyDockingUI(QtWidgets.QWidget):
         header.setOffset(offset)
         header.setFixedHeight(height)
 
-        self.callback_ids = {}
+        self.callback_ids = {"AttributeChanged": [], "NameChanged": []}
 
         self.reset_tree(root_node=root_node)
 
@@ -107,8 +106,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
-        self.setFixedHeight(27)
-        self.setFixedWidth(27)
 
         self.top_layout = QtWidgets.QHBoxLayout()
         self.top_layout.addWidget(self.tool_bar)
@@ -121,7 +118,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # self.is_selection_callback_active = False
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
         self.callback_ids["SelectionCallback"] = [event_id]
+
         self.destroyed.connect(lambda: self.unregister_callbacks())
+
         self.is_selection_callback_active = True
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
@@ -131,15 +130,13 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def unregister_callbacks(self, callback_names=None):
-        if callback_names:
-            for callback in callback_names:
-                if callback in self.callback_ids:
-                    for id_ in self.callback_ids[callback]:
-                        om.MMessage.removeCallback(id_)
-        else:
-            for ids in self.callback_ids.values():
-                for id_ in ids:
+        callback_names = callback_names or self.callback_ids.keys()
+
+        for callback in callback_names:
+            if callback in self.callback_ids:
+                for id_ in self.callback_ids[callback]:
                     om.MMessage.removeCallback(id_)
+                self.callback_ids[callback] = []
 
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
@@ -407,35 +404,73 @@ class MyDockingUI(QtWidgets.QWidget):
             dep_node = om.MFnDependencyNode(node)
             node_name = dep_node.name()
             self.nodes_to_remove.append(node_name)
-            mutils.executeDeferred(self.clean_removed_nodes)
+            # to call scriptJob once per cycle
+            if len(self.nodes_to_remove) == 1:
+                # maya.utils.executeDeferred causing Maya to crash after closing Scene Panel window
+                # Maya 2018 bug, works fine in Maya 2019
+                # ie - idleEvent, ro - runOnce
+                mc.scriptJob(ie=self.clean_removed_nodes, ro=True)
+
+    def wrap_model_indexes_to_persistent(self, indexes):
+        # need to store parent since if you get parent from model_index it returns bad
+        # QModelIndex which refers to the wrong internal pointer
+        persistent_indexes = []
+        persistent_indexes_parent = []
+        for index in indexes:
+            model_index = self._proxy_model.mapToSource(index)
+            parent_index = self._proxy_model.mapToSource(index.parent())
+            persistent_indexes.append(QtCore.QPersistentModelIndex(model_index))
+            persistent_indexes_parent.append(QtCore.QPersistentModelIndex(parent_index))
+
+        return persistent_indexes, persistent_indexes_parent
 
     def clean_removed_nodes(self):
+        if not self.nodes_to_remove:
+            return
+
         for node_name in self.nodes_to_remove:
-            indices = self._proxy_model.match(self._proxy_model.index(0, 0), QtCore.Qt.DisplayRole,
-                                              node_name, -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            nodes = self.builder.get_scene_items(name_filter=[node_name])
+            if nodes:
+                node = nodes[0]
+                name = node.long_name
+                if not mc.objExists(name):
+                    indexes = self._proxy_model.match(
+                        self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name, -1,
+                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
 
-            # need to store parent since if you get parent from model_index it returns bad
-            # QModelIndex which refers to the wrong internal pointer
-            persistent_indices = []
-            persistent_indices_parent = []
-            for index in indices:
-                model_index = self._proxy_model.mapToSource(index)
-                parent_index = self._proxy_model.mapToSource(index.parent())
-                persistent_indices.append(QtCore.QPersistentModelIndex(model_index))
-                persistent_indices_parent.append(QtCore.QPersistentModelIndex(parent_index))
+                    p_indexes, p_indexes_parent = self.wrap_model_indexes_to_persistent(indexes)
 
-            for i, index in enumerate(persistent_indices):
-                scene_panel_node = index.internalPointer()
-                if not mc.objExists(scene_panel_node.long_name):
-                    self._model.removeRow(index.row(), persistent_indices_parent[i])
+                    for i, index in enumerate(p_indexes):
+                        self._model.removeRow(index.row(), p_indexes_parent[i])
+                    scene_items = self.builder.get_scene_items()
+                    scene_items.remove(node)
+
+        self.build_scene_items_callbacks()
 
         self.nodes_to_remove = []
+        self.clean_empty_nodes()
+
+    # removes geometry nodes from Scene Panel that don't have children
+    def clean_empty_nodes(self):
+        bodies = self.builder.bodies
+        to_remove = []
+        for name in bodies:
+            node = bodies[name]
+            if not node.children:
+                indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                  model.SceneGraphModel.fullNameRole, name, -1,
+                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+                p_indexes, p_indexes_parent = self.wrap_model_indexes_to_persistent(indexes)
+                for i, index in enumerate(p_indexes):
+                    self._model.removeRow(index.row(), p_indexes_parent[i])
+                    to_remove.append(name)
+
+        for name in to_remove:
+            bodies.pop(name)
 
     def build_scene_items_callbacks(self):
         self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-        self.callback_ids["AttributeChanged"] = []
-        self.callback_ids["NameChanged"] = []
 
         scene_items = self.builder.get_scene_items()
         # connect callbacks from Ziva objects
@@ -479,7 +514,9 @@ class MyDockingUI(QtWidgets.QWidget):
             ziva_nodes_pattern = re.compile('z[A-Z]')
             if ziva_nodes_pattern.match(node_type):
                 self.waiting_nodes.append(dep_node.name())
-                mutils.executeDeferred(self.add_waiting_nodes)
+                # to call executeDeferred once per cycle
+                if len(self.waiting_nodes) == 1:
+                    mutils.executeDeferred(self.add_waiting_nodes)
 
     def get_expanded(self):
         """
@@ -505,10 +542,10 @@ class MyDockingUI(QtWidgets.QWidget):
         # otherwise new items might not be displayed ( Qt bug )
         self.treeView.collapseAll()
         for name in names:
-            indices = self._proxy_model.match(self._proxy_model.index(0, 0),
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
                                               model.SceneGraphModel.fullNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-            for index in indices:
+            for index in indexes:
                 self.treeView.expand(index)
 
     def reset_tree(self, root_node=None):
@@ -569,7 +606,7 @@ class MyDockingUI(QtWidgets.QWidget):
         find and select items in the Tree View based on maya selection
         :param sel: maya selection
         :return:
-        checked - indices that match selection ( QModelIndex )
+        checked - indexes that match selection ( QModelIndex )
         """
         if not sel:
             sel = mc.ls(sl=True, long=True)
