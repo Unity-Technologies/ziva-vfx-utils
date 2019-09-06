@@ -190,15 +190,9 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
-            for key in self.attrs_clipboard:
-                if node.type == key:
-                    for attr in self.attrs_clipboard[key]:
-                        if mc.getAttr("%s.%s" % (node.name, attr), lock=True):
-                            mc.setAttr("%s.%s" % (node.name, attr), lock=False)
-                        mc.setAttr("%s.%s" % (node.name, attr),
-                                   self.attrs_clipboard[key][attr]['value'])
-                        mc.setAttr("%s.%s" % (node.name, attr),
-                                   lock=self.attrs_clipboard[key][attr]['locked'])
+            for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
+                mc.setAttr("{}.{}".format(node.name, attr), lock=False)
+                mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
 
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
@@ -240,15 +234,6 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
-
-    def add_placeholder_action(self, menu):
-        """Adds an empty action to the menu
-        To be able to add separator at the very top of menu
-        """
-        empty_widget = QtWidgets.QWidget()
-        empty_action = QtWidgets.QWidgetAction(menu)
-        empty_action.setDefaultWidget(empty_widget)
-        menu.addAction(empty_action)
 
     def open_menu(self, position):
         """Generates menu for tree items
