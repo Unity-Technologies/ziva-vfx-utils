@@ -21,7 +21,7 @@ class ZivaBuildTestCase(VfxTestCase):
         super(ZivaBuildTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         # clear selection.  It should retrieve whole scene
         mc.select(cl=True)
@@ -35,7 +35,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
     def test_retrieve_selected(self):
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         # select a muscle geo
         mc.select('r_bicep_muscle')
@@ -117,7 +117,7 @@ class ZivaBuildTestCase(VfxTestCase):
         # of deformed shape
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         # capture point position of first vert at rest
         rest_point_position = mc.pointPosition('r_bicep_muscle.vtx[0]')

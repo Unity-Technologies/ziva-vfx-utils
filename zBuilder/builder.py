@@ -4,6 +4,7 @@ import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
 
+import copy
 from functools import wraps
 import datetime
 import sys

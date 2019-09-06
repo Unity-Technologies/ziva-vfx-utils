@@ -26,7 +26,7 @@ class UtilTestCase(VfxTestCase):
     def test_copy_paste(self):
         # This builds the Zivas anatomical arm demo with no pop up dialog.
         # mc.loadPlugin('ziva.mll')
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         mc.select(cl=True)
 
