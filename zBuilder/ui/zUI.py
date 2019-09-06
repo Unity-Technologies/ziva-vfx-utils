@@ -93,16 +93,6 @@ class MyDockingUI(QtWidgets.QWidget):
         header.setOffset(offset)
         header.setFixedHeight(height)
 
-        self.callback_ids = {"AttributeChanged": [], "NameChanged": []}
-
-        self.reset_tree(root_node=root_node)
-
-        id_ = om.MDGMessage.addNodeAddedCallback(self.node_added)
-        self.callback_ids["NodeAdded"] = [id_]
-
-        id_ = om.MDGMessage.addNodeRemovedCallback(self.add_nodes_to_remove)
-        self.callback_ids["NodeRemoved"] = [id_]
-
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
@@ -113,23 +103,61 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
-        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
-        # you making selection by code, to prevent that make sure to break the loop by using variable
-        # self.is_selection_callback_active = False
-        event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
-        self.callback_ids["SelectionCallback"] = [event_id]
+        self.callback_ids = {"AttributeChanged": [], "NameChanged": []}
+
+        self.reset_tree(root_node=root_node)
 
         self.destroyed.connect(lambda: self.unregister_callbacks())
 
-        self.is_selection_callback_active = True
-
+        self.is_selection_callback_active = False
+        self._setup_node_callbacks()
+        self._setup_scene_callbacks()
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
 
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
 
-    def unregister_callbacks(self, callback_names=None):
+    def _setup_node_callbacks(self):
+        node_callbacks = ["NodeAdded", "NodeRemoved", "SelectionCallback"]
+        self.unregister_callbacks(node_callbacks)
+        id_ = om.MDGMessage.addNodeAddedCallback(self.node_added)
+        self.callback_ids["NodeAdded"] = [id_]
+
+        id_ = om.MDGMessage.addNodeRemovedCallback(self.add_nodes_to_remove)
+        self.callback_ids["NodeRemoved"] = [id_]
+
+        # The next two selection signals ( eventCallback and selectionModel ) will cause a loop if
+        # you making selection by code, to prevent that make sure to break the loop by using variable
+        # self.is_selection_callback_active = False
+        id_ = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
+        self.callback_ids["SelectionCallback"] = [id_]
+
+        self.is_selection_callback_active = True
+
+    def _setup_scene_callbacks(self):
+        non_scene_callbacks = [
+            "AttributeChanged", "NameChanged", "NodeAdded", "NodeRemoved", "SelectionCallback"
+        ]
+
+        id_ = om.MSceneMessage.addCallback(om.MSceneMessage.kBeforeOpen,
+                                           partial(self.unregister_callbacks, non_scene_callbacks))
+        self.callback_ids["BeforeOpen"] = [id_]
+        id_ = om.MSceneMessage.addCallback(om.MSceneMessage.kBeforeNew,
+                                           partial(self.unregister_callbacks, non_scene_callbacks))
+        self.callback_ids["BeforeNew"] = [id_]
+
+        id_ = om.MSceneMessage.addCallback(om.MSceneMessage.kAfterOpen, self.update_tree)
+        self.callback_ids["AfterOpen"] = [id_]
+        id_ = om.MSceneMessage.addCallback(om.MSceneMessage.kAfterNew, self.update_tree)
+        self.callback_ids["AfterNew"] = [id_]
+
+    def update_tree(self, *args):
+        mc.select(cl=True)
+        self.reset_tree()
+        self._setup_node_callbacks()
+
+    def unregister_callbacks(self, callback_names=None, *args):
         callback_names = callback_names or self.callback_ids.keys()
 
         for callback in callback_names:
@@ -137,6 +165,8 @@ class MyDockingUI(QtWidgets.QWidget):
                 for id_ in self.callback_ids[callback]:
                     om.MMessage.removeCallback(id_)
                 self.callback_ids[callback] = []
+                if callback == "SelectionCallback":
+                    self.is_selection_callback_active = False
 
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
