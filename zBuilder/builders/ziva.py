@@ -185,13 +185,12 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------
         # ---------------------------------------------------------------------
-        scene_selection = mc.ls(sl=True)
-        selection = []
+        scene_selection = mc.ls(sl=True, l=True)
         if args:
             selection = args[0]
             mc.select(selection)
         else:
-            selection = mc.ls(sl=True)
+            selection = scene_selection
 
         selection = transform_rivet_and_LoA_into_tissue_meshes(selection)
 
@@ -596,7 +595,7 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
             history = mc.listHistory(item, future=True)
             fiber = mc.ls(history, type='zFiber')
             mc.select(fiber)
-            meshes = mm.eval('zQuery -t zTissue -m')
+            meshes = mm.eval('zQuery -t zTissue -m -l')
             output.append(meshes[0])
         else:
             output.append(item)

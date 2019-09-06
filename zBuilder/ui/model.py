@@ -150,6 +150,16 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         return self.root_node
 
+    def removeRow(self, row, parent):
+        if parent.isValid():
+            self.beginRemoveRows(parent, row, row)
+            index = parent.child(row, parent.column())
+            node = index.internalPointer()
+            parent_node = parent.internalPointer()
+            parent_node.children.pop(row)
+            node.parent = None
+            self.endRemoveRows()
+
 
 class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
