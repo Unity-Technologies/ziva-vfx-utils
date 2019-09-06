@@ -153,7 +153,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
     def test_remove_all_of_type(self):
         types = ['zAttachment', 'zFiber']
         result = []
-        # testing removing a single attachment
+        # testing removing all attachments
 
         for type_ in types:
             all_items = mc.ls(type=type_)
@@ -166,7 +166,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
     def test_remove_all_of_bodies(self):
         types = ['zTissue', 'zBone', 'zCloth']
-        # testing removing a single attachment
+        # testing removing all bodies
 
         sph = mc.polySphere()
         mc.select(sph[0])
