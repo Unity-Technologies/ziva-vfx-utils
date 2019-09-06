@@ -55,6 +55,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.builder = builder
         # list of object names that removed in Maya to delete them on idle state from Scene Panel
         self.nodes_to_remove = []
+        # clipboard for copied attributes
+        self.attrs_clipboard = {}
         # clipboard for copied weightmaps
         self.weights_clipboard = []
         # list of nodes that are waiting for Maya's idle state to be added to Scene Panel
@@ -168,6 +170,30 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
+        self.actionCopyAttrs = QtWidgets.QAction(self)
+        self.actionCopyAttrs.setText('Copy')
+        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
+        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
+
+        self.actionPasteAttrs = QtWidgets.QAction(self)
+        self.actionPasteAttrs.setText('Paste')
+        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
+        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
+
+    def copy_attrs(self):
+        self.attrs_clipboard = {}
+        indexes = self.treeView.selectedIndexes()
+        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
+        self.attrs_clipboard[node.type] = node.attrs.copy()
+
+    def paste_attrs(self):
+        indexes = self.treeView.selectedIndexes()
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
+                mc.setAttr("{}.{}".format(node.name, attr), lock=False)
+                mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
         
@@ -209,15 +235,6 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def add_placeholder_action(self, menu):
-        """Adds an empty action to the menu
-        To be able to add separator at the very top of menu
-        """
-        empty_widget = QtWidgets.QWidget()
-        empty_action = QtWidgets.QWidgetAction(menu)
-        empty_action.setDefaultWidget(empty_widget)
-        menu.addAction(empty_action)
-
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -232,6 +249,9 @@ class MyDockingUI(QtWidgets.QWidget):
 
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
+        if not node.long_association:
+            return
+
         menu = QtWidgets.QMenu(self)
 
         source_mesh_name = node.long_association[0]
@@ -243,7 +263,11 @@ class MyDockingUI(QtWidgets.QWidget):
             'zTet': [self.open_tet_menu, menu, source_mesh_name],
             'zFiber': [self.open_fiber_menu, menu, source_mesh_name],
             'zMaterial': [self.open_tet_menu, menu, source_mesh_name],
-            'zAttachment': [self.open_attachment_menu, menu, source_mesh_name, target_mesh_name]
+            'zAttachment': [self.open_attachment_menu, menu, source_mesh_name, target_mesh_name],
+            'zTissue': [self.open_tissue_menu, menu],
+            'zBone': [self.open_bone_menu, menu],
+            'zLineOfAction': [self.open_line_of_action_menu, menu],
+            'zRestShapeNode': [self.open_rest_shape_menu, menu]
         }
 
         if node.type in menu_dict:
@@ -273,8 +297,13 @@ class MyDockingUI(QtWidgets.QWidget):
             partial(self.invert_weight, map_name_format_string, mesh_name))
         menu.addAction(action_invert_weight)
 
+    def add_attributes_menu(self, menu):
+        attrs_menu = menu.addMenu('attributes')
+        attrs_menu.addAction(self.actionCopyAttrs)
+        attrs_menu.addAction(self.actionPasteAttrs)
+
     def open_tet_menu(self, menu, mesh_name):
-        self.add_placeholder_action(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
@@ -282,7 +311,7 @@ class MyDockingUI(QtWidgets.QWidget):
                                            mesh_name)
 
     def open_fiber_menu(self, menu, mesh_name):
-        self.add_placeholder_action(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
@@ -293,7 +322,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_copy_paste_invert_to_menu(end_points_map_menu, '{}.endPoints', mesh_name)
 
     def open_material_menu(self, menu, mesh_name):
-        self.add_placeholder_action(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('weight')
         weight_map_menu.addAction(self.actionPaintSource)
@@ -301,6 +330,8 @@ class MyDockingUI(QtWidgets.QWidget):
                                            mesh_name)
 
     def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        self.add_attributes_menu(menu)
+        menu.addSection('')
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
         # create short name for labels
@@ -326,6 +357,18 @@ class MyDockingUI(QtWidgets.QWidget):
         action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
         action_paint_by_prox.setDefaultWidget(prox_widget)
         proximity_menu.addAction(action_paint_by_prox)
+
+    def open_tissue_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_bone_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_line_of_action_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_rest_shape_menu(self, menu):
+        self.add_attributes_menu(menu)
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
