@@ -245,7 +245,6 @@ def rig_paste():
     # We need to do a deepcopy of ziva_clipboard_zbuilder because we want to manipulate
     # it (using string_replace), and not change the original ziva_clipboard_zbuilder object.
     # In this way, we can paste the same clipboard multiple times.
-    # In order to deepcopy, we need to first remove all mobject references, using mobject_reset.
 
     # Make the deepcopy
     builder = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
