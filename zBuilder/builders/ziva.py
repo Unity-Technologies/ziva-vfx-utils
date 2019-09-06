@@ -105,6 +105,22 @@ class Ziva(Builder):
                 if parent_node:
                     parent_node.add_child(item)
 
+        # rest shapes
+        for item in self.get_scene_items(type_filter=['zRestShape']):
+            parent_node = self.get_scene_items(name_filter=item.tissue_name)[0]
+            if parent_node:
+                parent_node.add_child(item)
+                item.parent = parent_node
+
+            # targets ----------------------
+            for target in item.targets:
+                grp = DGNode()
+                grp.name = target
+                grp.type = 'ui_target_body'
+                grp.mobject = target
+                grp.parent = item
+                item.add_child(grp)
+
         # rivets ------
         rivets = {}
         for x in self.get_scene_items(type_filter='zRivetToBone'):
@@ -117,7 +133,7 @@ class Ziva(Builder):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
 
             for crv in item.long_association:
-                grp = Base()
+                grp = DGNode()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
                 grp.depends_on = item.mobject
@@ -157,13 +173,21 @@ class Ziva(Builder):
         mc.select(bodies)
         nodes = mm.eval('zQuery -a')
 
-        # find line of actions-------------------------------------------------
         if nodes:
+            # find zFiber---------------------------------------------
             fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
             if fiber_names:
+                # find line of action----------------------------------------
                 line_of_actions = mc.listHistory(fiber_names)
                 line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
                 nodes.extend(line_of_actions)
+
+            tet_names = [x for x in nodes if mc.objectType(x) == 'zTet']
+            for tet_name in tet_names:
+                # find the rest shape--------------------------------------
+                rest_shape = mc.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
+                if rest_shape:
+                    nodes.extend(rest_shape)
 
             return nodes
         else:
@@ -301,6 +325,7 @@ class Ziva(Builder):
             'zLineOfAction',
             'zFieldAdaptor',
             'zRivetToBone',
+            'zRestShape',
         ]
 
         node_types.extend(Field.TYPES)
@@ -467,6 +492,7 @@ class Ziva(Builder):
               fields=True,
               lineOfActions=True,
               rivetToBone=True,
+              restShape=True,
               mirror=False,
               permissive=True,
               check_meshes=False):
@@ -548,6 +574,8 @@ class Ziva(Builder):
             node_types_to_build.append('zLineOfAction')
         if rivetToBone:
             node_types_to_build.append('zRivetToBone')
+        if restShape:
+            node_types_to_build.append('zRestShape')
         if embedder:
             node_types_to_build.append('zEmbedder')
         if fields:

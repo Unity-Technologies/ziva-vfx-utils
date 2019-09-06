@@ -193,3 +193,50 @@ class ZivaBuildTestCase(VfxTestCase):
 
         # this list should all be None
         self.assertTrue(all(x is not 'str' for x in mobjects))
+
+
+class ZivaRestShapeTestCase(VfxTestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+
+    def setUp(self):
+        super(ZivaRestShapeTestCase, self).setUp()
+
+        # setup simple scene
+        # build simple zRestShape scene
+        tissue_mesh = mc.polySphere(name='tissue_mesh')[0]
+        target_a = mc.polySphere(name='a')[0]
+        target_b = mc.polySphere(name='b')[0]
+
+        mc.select(tissue_mesh)
+        mm.eval('ziva -t')
+        mc.select(tissue_mesh, target_a, target_b)
+        mm.eval('zRestShape -a')
+
+    def test_retrieve(self):
+
+        mc.select(cl=True)
+
+        # use builder to retrieve from scene-----------------------------------
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # check amount of zTissue and zTet.  Should be 1 of each
+        items = builder.get_scene_items(type_filter=['zRestShape'])
+
+        self.assertTrue(len(items) == 1)
+
+    def test_retrieve_build_clean(self):
+
+        mc.select(cl=True)
+
+        # use builder to retrieve from scene-----------------------------------
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        mz.clean_scene()
+
+        builder.build()
+
+        self.assertTrue(mc.objExists('zRestShape1'))

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 ZNODES = [
     'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
     'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
-    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone'
+    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
 ]
 """ All available ziva nodes to be able to cleanup. """
 
@@ -371,6 +371,11 @@ def get_association(zNode):
         # mc.select(sel,r=True)
 
         return tmp
+
+    elif _type == 'zRestShape':
+        tet = mc.listConnections('{}.iGeo'.format(zNode))[0]
+        mesh = mm.eval('zQuery -type "zTissue" -m {}'.format(tet))
+        return mesh
 
     elif _type == 'zFieldAdaptor':
         return []
