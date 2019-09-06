@@ -249,19 +249,6 @@ class Builder(object):
                                            association_regex=association_regex,
                                            invert_match=invert_match)
 
-    def deepcopy(self):
-        """Returns a deepcopy of the builder object after it makes it serializable
-        
-        Returns:
-            obj: Copy of builder opbject
-        """
-        for item in self.get_scene_items():
-            item.serialize(restore=False)
-        self.bodies = None
-        dup = copy.deepcopy(self)
-
-        return dup
-
 
 def builder_factory(class_name):
     """A factory node to return the correct Builder given class name.

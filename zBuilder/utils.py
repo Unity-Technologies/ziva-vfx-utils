@@ -248,7 +248,7 @@ def rig_paste():
     # In order to deepcopy, we need to first remove all mobject references, using mobject_reset.
 
     # Make the deepcopy
-    builder = ZIVA_CLIPBOARD_ZBUILDER.deepcopy()
+    builder = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
     target_selection = mc.ls(sl=True, l=True)

@@ -1,8 +1,11 @@
 import logging
 import inspect
+import copy
+
 import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
+
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
 from zBuilder.nodes.base import serialize_object
@@ -68,7 +71,27 @@ class DGNode(Base):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
-    def serialize(self, restore=True):
+    def __deepcopy__(self, memo):
+        # Some attributes cannot be deepcopied so define a listy of attributes
+        # to ignore.
+        non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
+
+        cls = self.__class__
+        result = cls.__new__(cls)
+
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+
+            # skip over attributes defined as non-copyable in non_copyable_attrs
+            if k not in non_copyable_attrs:
+                setattr(result, k, copy.deepcopy(v, memo))
+            else:
+                print k
+                setattr(result, k, None)
+
+        return result
+
+    def serialize(self):
         """  Makes node serializable.
 
         This replaces an mObject with the name of the object in scene to make it
@@ -78,24 +101,16 @@ class DGNode(Base):
 
         Replaces .mobject mobject with a string name before serilization.
         Afterwords it converts it back to an mObject.
-        Args:
-            restore(bool): If restore is False it does not replace the mobject back
-            to an mobject.  Instead it fills it with None so that we can use the 
-            serializable builder outside of writing.
+
         Returns:
             dict: of serializable items
         """
         # convert mObjectHandle to name of maya object (str)
-        if restore:
-            self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
 
         output = serialize_object(self)
 
-        if restore:
-            # convert the string back to an mobject
-            self.mobject = self.__mobject_handle
-        else:
-            self.__mobject_handle = None
+        self.mobject = self.__mobject_handle
 
         return output
 
