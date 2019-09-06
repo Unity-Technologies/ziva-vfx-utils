@@ -20,6 +20,5 @@ global proc AEzRestShapeTemplate( string $nodeName )
   editorTemplate -suppress "oGeo";
   editorTemplate -suppress "target";
   
-  editorTemplate -addExtraControls;
   editorTemplate -endScrollLayout;
 }
