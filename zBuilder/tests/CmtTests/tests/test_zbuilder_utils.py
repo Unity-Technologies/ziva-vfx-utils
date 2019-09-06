@@ -181,7 +181,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             # delete all
             utility.remove(mc.ls(sl=True))
         mc.select(cl=True)
-        self.assertEqual(mm.eval('zQuery -bt'), None)
+        self.assertIsNone(mm.eval('zQuery -bt'))
 
     def test_utils_copy_no_selection(self):
         # Without a selection should raise an error
@@ -232,14 +232,14 @@ class BuilderUtilsTestCase(VfxTestCase):
 
         utility.remove_all_solvers()
 
-        self.assertEqual(len(mc.ls(type='zSolver')), 0)
+        self.assertEqual(mc.ls(type='zSolver'), [])
 
     def test_remove_solver(self):
         mm.eval('ziva -s')
         mm.eval('ziva -s')
 
         utility.remove_solver(solvers=['zSolver1'])
-        self.assertEqual(len(mc.ls(type='zSolver')), 1)
+        self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2'])
 
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
