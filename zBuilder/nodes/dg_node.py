@@ -85,9 +85,6 @@ class DGNode(Base):
             # skip over attributes defined as non-copyable in non_copyable_attrs
             if k not in non_copyable_attrs:
                 setattr(result, k, copy.deepcopy(v, memo))
-            else:
-                print k
-                setattr(result, k, None)
 
         return result
 
