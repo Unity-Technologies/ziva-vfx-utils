@@ -79,7 +79,6 @@ class DGNode(Base):
         cls = self.__class__
         result = cls.__new__(cls)
 
-        memo[id(self)] = result
         for k, v in self.__dict__.items():
 
             # skip over attributes defined as non-copyable in non_copyable_attrs
