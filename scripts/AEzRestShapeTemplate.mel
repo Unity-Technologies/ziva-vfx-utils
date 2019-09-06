@@ -1,0 +1,24 @@
+global proc AEzRestShapeTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+  editorTemplate -addControl "surfacePenalty";
+  editorTemplate -addControl "surfacePenaltyExp";
+  editorTemplate -addControl "targetWeight";
+
+  // suppress attributes attribute  
+  editorTemplate -suppress "input";
+  editorTemplate -suppress "weightList";
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "map64BitIndices";
+
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "oGeo";
+  editorTemplate -suppress "target";
+  
+  editorTemplate -endScrollLayout;
+}

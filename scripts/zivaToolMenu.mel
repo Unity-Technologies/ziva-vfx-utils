@@ -43,6 +43,7 @@ menuItem -label "Select Connected" -divider true;
 menuItem -label "zTissues" -ec true -ecr true -c "select -r `zQuery -t zTissue`" -ann "Selects zTissue nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zCloth" -ec true -ecr true -c "select -r `zQuery -t zCloth`" -ann "Selects zCloth nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zBones" -ec true -ecr true -c "select -r `zQuery -t zBone`" -ann "Selects zBone nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zRestShape" -ec true -ecr true -c "select -r `zQuery -t zRestShape`" -ann "Selects zRestShape nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zTet" -ec true -ecr true -c "select -r `zQuery -t zTet`" -ann "Selects zTet nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zAttachments" -ec true -ecr true -c "select -r `zQuery -t zAttachment`" -ann "Selects zAttachment nodes that are connected to the currently selected mesh(es).";
 menuItem -label "zMaterials" -ec true -ecr true - c "select -r `zQuery -t zMaterial`" -ann "Selects zMaterial nodes that are connected to the currently selected mesh(es).";
