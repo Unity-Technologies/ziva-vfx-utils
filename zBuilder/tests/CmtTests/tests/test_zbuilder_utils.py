@@ -192,6 +192,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         # simply check if file exists, if it does it passes
         self.assertTrue(os.path.exists(file_name))
+        self.assertGreater(os.path.getsize(file_name), 1000)
 
         os.close(fd)
         os.remove(file_name)
