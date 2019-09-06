@@ -183,8 +183,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         mc.select(cl=True)
         self.assertIsNone(mm.eval('zQuery -bt'))
 
-    def test_utils_copy_no_selection(self):
-        # Without a selection should raise an error
+    def test_rig_copy_without_selection_should_raise(self):
         mc.select(cl=True)
         with self.assertRaises(StandardError):
             utility.rig_copy()
@@ -234,7 +233,7 @@ class BuilderUtilsTestCase(VfxTestCase):
 
         self.assertEqual(mc.ls(type='zSolver'), [])
 
-    def test_remove_solver(self):
+    def test_remove_single_solver(self):
         mm.eval('ziva -s')
         mm.eval('ziva -s')
 
