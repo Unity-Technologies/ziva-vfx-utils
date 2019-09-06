@@ -7,7 +7,7 @@ import sys
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 import zBuilder.tests.utils as utl
-import zBuilder.util as utility
+import zBuilder.utils as utility
 
 from vfx_test_case import VfxTestCase
 
@@ -71,3 +71,31 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         # after it is built there should be 2 curves hooked up to loa
         curves = mc.listConnections('zLineOfAction1.curves')
         self.assertTrue(len(curves) == 2)
+
+    def test_retrieve_connections_loa_selected(self):
+
+        loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
+
+        # now retrieve
+        mc.select(loa.name)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        builder.stats()
+        print builder.get_scene_items()
+        # should not be empty
+        self.assertTrue(len(builder.get_scene_items()) > 0)
+
+    def test_retrieve_connections_loa_selected_check(self):
+
+        loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
+
+        # now retrieve
+        mc.select(loa.name)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # this should have grabbed the specific loa
+        result = builder.get_scene_items(name_filter=loa.name)
+
+        # result will have named loa
+        self.assertTrue(len(result) == 1)

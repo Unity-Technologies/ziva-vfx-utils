@@ -19,6 +19,9 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
+import zBuilder.parameters.maps as mp
+import maya.utils as mutils
+import re
 
 dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 os.chdir(dir_path)
@@ -50,7 +53,14 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder
+        # list of object names that removed in Maya to delete them on idle state from Scene Panel
+        self.nodes_to_remove = []
+        # clipboard for copied attributes
         self.attrs_clipboard = {}
+        # clipboard for copied weightmaps
+        self.weights_clipboard = []
+        # list of nodes that are waiting for Maya's idle state to be added to Scene Panel
+        self.waiting_nodes = []
 
         root_node = None
 
@@ -85,15 +95,19 @@ class MyDockingUI(QtWidgets.QWidget):
         header.setOffset(offset)
         header.setFixedHeight(height)
 
-        self.callback_ids = {}
+        self.callback_ids = {"AttributeChanged": [], "NameChanged": []}
 
         self.reset_tree(root_node=root_node)
+
+        id_ = om.MDGMessage.addNodeAddedCallback(self.node_added)
+        self.callback_ids["NodeAdded"] = [id_]
+
+        id_ = om.MDGMessage.addNodeRemovedCallback(self.add_nodes_to_remove)
+        self.callback_ids["NodeRemoved"] = [id_]
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
-        self.setFixedHeight(27)
-        self.setFixedWidth(27)
 
         self.top_layout = QtWidgets.QHBoxLayout()
         self.top_layout.addWidget(self.tool_bar)
@@ -106,7 +120,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # self.is_selection_callback_active = False
         event_id = om.MEventMessage.addEventCallback("SelectionChanged", self.selection_callback)
         self.callback_ids["SelectionCallback"] = [event_id]
+
         self.destroyed.connect(lambda: self.unregister_callbacks())
+
         self.is_selection_callback_active = True
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
@@ -116,15 +132,13 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def unregister_callbacks(self, callback_names=None):
-        if callback_names:
-            for callback in callback_names:
-                if callback in self.callback_ids:
-                    for id_ in self.callback_ids[callback]:
-                        om.MMessage.removeCallback(id_)
-        else:
-            for ids in self.callback_ids.values():
-                for id_ in ids:
+        callback_names = callback_names or self.callback_ids.keys()
+
+        for callback in callback_names:
+            if callback in self.callback_ids:
+                for id_ in self.callback_ids[callback]:
                     om.MMessage.removeCallback(id_)
+                self.callback_ids[callback] = []
 
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
@@ -135,23 +149,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionUndo")
         self.actionRefresh.triggered.connect(self.reset_tree)
-
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
@@ -167,11 +164,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintTarget.setText('Paint')
         self.actionPaintTarget.setObjectName("paintTarget")
         self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
-
-        self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint')
-        self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintEndPoints = QtWidgets.QAction(self)
         self.actionPaintEndPoints.setText('Paint')
@@ -189,13 +181,13 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
 
     def copy_attrs(self):
+        self.attrs_clipboard = {}
         indexes = self.treeView.selectedIndexes()
         node = indexes[-1].data(model.SceneGraphModel.nodeRole)
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
-        objs = []
         for index in indexes:
             node = index.data(model.SceneGraphModel.nodeRole)
             for key in self.attrs_clipboard:
@@ -203,12 +195,10 @@ class MyDockingUI(QtWidgets.QWidget):
                     for attr in self.attrs_clipboard[key]:
                         if mc.getAttr("%s.%s" % (node.name, attr), lock=True):
                             mc.setAttr("%s.%s" % (node.name, attr), lock=False)
-                        mc.setAttr("%s.%s" % (node.name, attr), self.attrs_clipboard[key][attr]['value'])
+                        mc.setAttr("%s.%s" % (node.name, attr),
+                                   self.attrs_clipboard[key][attr]['value'])
                         mc.setAttr("%s.%s" % (node.name, attr),
                                    lock=self.attrs_clipboard[key][attr]['locked'])
-                    objs.append(node.name)
-        if objs:
-            print 'Attributes pasted to:', ', '.join(objs)
 
     def paint_by_prox(self, minimum, maximum):
         """Paints attachment map by proximity.
@@ -251,6 +241,15 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
+    def add_placeholder_action(self, menu):
+        """Adds an empty action to the menu
+        To be able to add separator at the very top of menu
+        """
+        empty_widget = QtWidgets.QWidget()
+        empty_action = QtWidgets.QWidgetAction(menu)
+        empty_action.setDefaultWidget(empty_widget)
+        menu.addAction(empty_action)
+
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -260,66 +259,131 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-        if len(indexes) == 1:
-            node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if not indexes:
+            return
 
-            menu = QtWidgets.QMenu(self)
+        node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            if node.type == 'zTet':
-                attributes_menu = menu.addMenu('attributes')
-                attributes_menu.addAction(self.actionCopyAttrs)
-                attributes_menu.addAction(self.actionPasteAttrs)
+        if not node.long_association:
+            return
 
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
+        menu = QtWidgets.QMenu(self)
 
-            if node.type == 'zTissue':
-                attributes_menu = menu.addMenu('attributes')
-                attributes_menu.addAction(self.actionCopyAttrs)
-                attributes_menu.addAction(self.actionPasteAttrs)
+        source_mesh_name = node.long_association[0]
+        if len(node.long_association) > 1:
+            target_mesh_name = node.long_association[1]
+        else:
+            target_mesh_name = None
+        menu_dict = {
+            'zTet': [self.open_tet_menu, menu, source_mesh_name],
+            'zFiber': [self.open_fiber_menu, menu, source_mesh_name],
+            'zMaterial': [self.open_tet_menu, menu, source_mesh_name],
+            'zAttachment': [self.open_attachment_menu, menu, source_mesh_name, target_mesh_name],
+            'zTissue': [self.open_tissue_menu, menu],
+            'zBone': [self.open_bone_menu, menu],
+            'zLineOfAction': [self.open_line_of_action_menu, menu],
+            'zRestShapeNode': [self.open_rest_shape_menu, menu]
+        }
 
-            if node.type == 'zFiber':
-                attributes_menu = menu.addMenu('attributes')
-                attributes_menu.addAction(self.actionCopyAttrs)
-                attributes_menu.addAction(self.actionPasteAttrs)
+        if node.type in menu_dict:
+            method = menu_dict[node.type][0]
+            args = menu_dict[node.type][1:]
+            method(*args)
 
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
+        menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-                target_map_menu = menu.addMenu('endPoints')
-                target_map_menu.addAction(self.actionPaintEndPoints)
+    def add_copy_paste_invert_to_menu(self, menu, map_name_format_string, mesh_name):
+        menu.addSection('')
+        action_copy_weight = QtWidgets.QAction(self)
+        action_copy_weight.setText('Copy')
+        action_copy_weight.setObjectName("actionCopyWeight")
+        action_copy_weight.triggered.connect(
+            partial(self.copy_weight, map_name_format_string, mesh_name))
+        menu.addAction(action_copy_weight)
+        action_paste_weight = QtWidgets.QAction(self)
+        action_paste_weight.setText('Paste')
+        action_paste_weight.setObjectName("actionPasteWeight")
+        action_paste_weight.triggered.connect(partial(self.paste_weight, map_name_format_string))
+        menu.addAction(action_paste_weight)
+        action_invert_weight = QtWidgets.QAction(self)
+        action_invert_weight.setText('Invert')
+        action_invert_weight.setObjectName("actionInvertWeight")
+        action_invert_weight.triggered.connect(
+            partial(self.invert_weight, map_name_format_string, mesh_name))
+        menu.addAction(action_invert_weight)
 
-            if node.type == 'zMaterial':
-                attributes_menu = menu.addMenu('attributes')
-                attributes_menu.addAction(self.actionCopyAttrs)
-                attributes_menu.addAction(self.actionPasteAttrs)
+    def add_attributes_menu(self, menu):
+        attrs_menu = menu.addMenu('attributes')
+        attrs_menu.addAction(self.actionCopyAttrs)
+        attrs_menu.addAction(self.actionPasteAttrs)
 
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('weight')
-                source_map_menu.addAction(self.actionPaintWeight)
+    def open_tet_menu(self, menu, mesh_name):
+        self.add_attributes_menu(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
 
-            if node.type == 'zAttachment':
-                attributes_menu = menu.addMenu('attributes')
-                attributes_menu.addAction(self.actionCopyAttrs)
-                attributes_menu.addAction(self.actionPasteAttrs)
+    def open_fiber_menu(self, menu, mesh_name):
+        self.add_attributes_menu(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
+        end_points_map_menu = menu.addMenu('endPoints')
+        end_points_map_menu.addAction(self.actionPaintEndPoints)
+        self.add_copy_paste_invert_to_menu(end_points_map_menu, '{}.endPoints', mesh_name)
 
-                menu.addAction(self.actionSelectST)
+    def open_material_menu(self, menu, mesh_name):
+        self.add_attributes_menu(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           mesh_name)
 
-                menu.addSection('Maps')
-                source_map_menu = menu.addMenu('source')
-                source_map_menu.addAction(self.actionPaintSource)
-                target_map_menu = menu.addMenu('target')
-                target_map_menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                proximity_menu = menu.addMenu('Paint By Proximity')
-                prox_widget = view.ProximityWidget()
-                action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
-                action_paint_by_prox.setDefaultWidget(prox_widget)
-                proximity_menu.addAction(action_paint_by_prox)
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        self.add_attributes_menu(menu)
+        menu.addSection('')
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        # create short name for labels
+        source_mesh_name_short = source_mesh_name.split('|')[-1]
+        target_mesh_name_short = target_mesh_name.split('|')[-1]
+        source_menu_text = (source_mesh_name_short[:12] +
+                            '..') if len(source_mesh_name_short) > 14 else source_mesh_name_short
+        source_menu_text = 'source (%s)' % source_menu_text
+        source_map_menu = menu.addMenu(source_menu_text)
+        source_map_menu.addAction(self.actionPaintSource)
+        self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]',
+                                           source_mesh_name)
+        target_menu_text = (target_mesh_name_short[:12] +
+                            '..') if len(target_mesh_name_short) > 14 else target_mesh_name_short
+        target_menu_text = 'target (%s)' % target_menu_text
+        target_map_menu = menu.addMenu(target_menu_text)
+        target_map_menu.addAction(self.actionPaintTarget)
+        self.add_copy_paste_invert_to_menu(target_map_menu, '{}.weightList[1].weights[0:{}]',
+                                           target_mesh_name)
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = view.ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
 
-            menu.exec_(self.treeView.viewport().mapToGlobal(position))
+    def open_tissue_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_bone_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_line_of_action_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_rest_shape_menu(self, menu):
+        self.add_attributes_menu(menu)
 
     def tree_changed(self, *args):
         """When the tree selection changes this gets executed to select
@@ -354,11 +418,13 @@ class MyDockingUI(QtWidgets.QWidget):
             name = plug.name()
             attr_name = name.split(".")[-1]
             node_name = name.split(".")[0]
-            z_node = self.builder.get_scene_items(name_filter=node_name)[-1]
-            if attr_name in z_node.attrs:
-                attr_dict = mz.build_attr_key_values(node_name, [attr_name])
-                if attr_name in attr_dict:
-                    z_node.attrs[attr_name] = attr_dict[attr_name]
+            scene_items = self.builder.get_scene_items(name_filter=node_name)
+            if scene_items:
+                z_node = scene_items[-1]
+                if attr_name in z_node.attrs:
+                    attr_dict = mz.build_attr_key_values(node_name, [attr_name])
+                    if attr_name in attr_dict:
+                        z_node.attrs[attr_name] = attr_dict[attr_name]
 
         self.redraw_tree_view()
 
@@ -389,6 +455,157 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.redraw_tree_view()
 
+    def add_nodes_to_remove(self, node, *clientData):
+        # filter some node types kDagNode used for meshes, transforms and curves
+        if node.hasFn(om.MFn.kDagNode) or node.apiTypeStr() in ('kPluginDependNode',
+                                                                'kPluginDeformerNode'):
+            dep_node = om.MFnDependencyNode(node)
+            node_name = dep_node.name()
+            self.nodes_to_remove.append(node_name)
+            # to call scriptJob once per cycle
+            if len(self.nodes_to_remove) == 1:
+                # maya.utils.executeDeferred causing Maya to crash after closing Scene Panel window
+                # Maya 2018 bug, works fine in Maya 2019
+                # ie - idleEvent, ro - runOnce
+                mc.scriptJob(ie=self.clean_removed_nodes, ro=True)
+
+    def wrap_model_indexes_to_persistent(self, indexes):
+        # need to store parent since if you get parent from model_index it returns bad
+        # QModelIndex which refers to the wrong internal pointer
+        persistent_indexes = []
+        persistent_indexes_parent = []
+        for index in indexes:
+            model_index = self._proxy_model.mapToSource(index)
+            parent_index = self._proxy_model.mapToSource(index.parent())
+            persistent_indexes.append(QtCore.QPersistentModelIndex(model_index))
+            persistent_indexes_parent.append(QtCore.QPersistentModelIndex(parent_index))
+
+        return persistent_indexes, persistent_indexes_parent
+
+    def clean_removed_nodes(self):
+        if not self.nodes_to_remove:
+            return
+
+        for node_name in self.nodes_to_remove:
+            nodes = self.builder.get_scene_items(name_filter=[node_name])
+            if nodes:
+                node = nodes[0]
+                name = node.long_name
+                if not mc.objExists(name):
+                    indexes = self._proxy_model.match(
+                        self._proxy_model.index(0, 0), model.SceneGraphModel.fullNameRole, name, -1,
+                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+                    p_indexes, p_indexes_parent = self.wrap_model_indexes_to_persistent(indexes)
+
+                    for i, index in enumerate(p_indexes):
+                        self._model.removeRow(index.row(), p_indexes_parent[i])
+                    scene_items = self.builder.get_scene_items()
+                    scene_items.remove(node)
+
+        self.build_scene_items_callbacks()
+
+        self.nodes_to_remove = []
+        self.clean_empty_nodes()
+
+    # removes geometry nodes from Scene Panel that don't have children
+    def clean_empty_nodes(self):
+        bodies = self.builder.bodies
+        to_remove = []
+        for name in bodies:
+            node = bodies[name]
+            if not node.children:
+                indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                                  model.SceneGraphModel.fullNameRole, name, -1,
+                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+
+                p_indexes, p_indexes_parent = self.wrap_model_indexes_to_persistent(indexes)
+                for i, index in enumerate(p_indexes):
+                    self._model.removeRow(index.row(), p_indexes_parent[i])
+                    to_remove.append(name)
+
+        for name in to_remove:
+            bodies.pop(name)
+
+    def build_scene_items_callbacks(self):
+        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
+
+        scene_items = self.builder.get_scene_items()
+        # connect callbacks from Ziva objects
+        for item in scene_items:
+            obj = item.mobject
+            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
+            self.callback_ids["AttributeChanged"].append(id_)
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
+        # connect callbacks for Maya meshes
+        for item in self.builder.bodies.values():
+            obj = item.mobject
+            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
+            self.callback_ids["NameChanged"].append(id_)
+
+    def add_waiting_nodes(self):
+        # This statement is useful if multiple nodes were added at the same time
+        # node_added will ask this method to be called as many times as amount of nodes created
+        # but waiting_nodes list contains all of them so it can be executed one time
+        if self.waiting_nodes:
+            # store currently expanded items
+            names_to_expand = self.get_expanded()
+
+            mc.select(self.waiting_nodes)
+            self.builder.retrieve_connections()
+
+            self.build_scene_items_callbacks()
+
+            # restore previous expansion in treeView
+            if names_to_expand:
+                self.expand(names_to_expand)
+
+            self.waiting_nodes = []
+
+    def node_added(self, node, *clientData):
+        if node.apiTypeStr() in ('kPluginDependNode', 'kPluginDeformerNode'):
+            dep_node = om.MFnDependencyNode(node)
+            node_type = dep_node.typeName()
+            # regex to filter Ziva nodes: starts with z and capital letter
+            ziva_nodes_pattern = re.compile('z[A-Z]')
+            if ziva_nodes_pattern.match(node_type):
+                self.waiting_nodes.append(dep_node.name())
+                # to call executeDeferred once per cycle
+                if len(self.waiting_nodes) == 1:
+                    mutils.executeDeferred(self.add_waiting_nodes)
+
+    def get_expanded(self):
+        """
+        :return: array of item names that are currently expanded in treeView
+        """
+        # store currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole, True, -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+
+        return names_to_expand
+
+    def expand(self, names):
+        """
+        :param names: list of names to expand in treeView
+        :return: None
+        """
+        # collapseAll added in case refreshing of treeView needed
+        # otherwise new items might not be displayed ( Qt bug )
+        self.treeView.collapseAll()
+        for name in names:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
+                self.treeView.expand(index)
+
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
@@ -406,80 +623,48 @@ class MyDockingUI(QtWidgets.QWidget):
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
-        scene_items = self.builder.get_scene_items()
-
-        # currently expanded items
-        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                           model.SceneGraphModel.expandedRole, True, -1,
-                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-
         # remember names of items to expand
-        names_to_expand = []
-        for index in expanded:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            names_to_expand.append(node.long_name)
+        names_to_expand = self.get_expanded()
 
-        self.unregister_callbacks(["AttributeChanged", "NameChanged"])
-        self.callback_ids["AttributeChanged"] = []
-        self.callback_ids["NameChanged"] = []
-
-        # connect callbacks from Ziva objects
-        for item in scene_items:
-            obj = item.mobject
-            id_ = om.MNodeMessage.addAttributeChangedCallback(obj, self.attribute_changed)
-            self.callback_ids["AttributeChanged"].append(id_)
-            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-            self.callback_ids["NameChanged"].append(id_)
-
-        # connect callbacks for Maya meshes
-        for item in self.builder.bodies.values():
-            obj = item.mobject
-            id_ = om.MNodeMessage.addNameChangedCallback(obj, self.node_renamed)
-            self.callback_ids["NameChanged"].append(id_)
+        self.build_scene_items_callbacks()
 
         self._model.beginResetModel()
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        sel = mc.ls(sl=True, long=True)
+        # restore previous expansion in treeView
+        if names_to_expand:
+            self.expand(names_to_expand)
+
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
-        if expanded:
-            for name in names_to_expand:
-                indices = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                                  model.SceneGraphModel.fullNameRole, name, -1,
-                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                for index in indices:
-                    self.treeView.expand(index)
+        sel = mc.ls(sl=True, long=True)
+
         if sel:
             checked = self.find_and_select(sel)
 
             # this works for a zBuilder view.  This is expanding the item
-            # selected and it's parent if any.  This makes it possible if you
-            # have a material or attachment selected, it will become visible in
-            # UI
+            # selected and it's parent if any.
             if checked:
-                # keeps previous expansion if TreeView was updated
                 self.treeView.expand(checked[0])
                 parent = checked[0].parent()
                 if parent.isValid():
                     self.treeView.expand(parent)
 
-        # Expand all zSolverTransform tree items-------------------------------
-        if not expanded:
+        # expand all zSolverTransform tree items
+        if not names_to_expand:
             for row in range(self._proxy_model.rowCount()):
                 index = self._proxy_model.index(row, 0)
                 node = index.data(model.SceneGraphModel.nodeRole)
                 if node.type == 'zSolverTransform':
                     self.treeView.expand(index)
-                    break
 
     def find_and_select(self, sel=None):
         """
         find and select items in the Tree View based on maya selection
         :param sel: maya selection
         :return:
-        checked - indices that match selection ( QModelIndex )
+        checked - indexes that match selection ( QModelIndex )
         """
         if not sel:
             sel = mc.ls(sl=True, long=True)
@@ -518,3 +703,81 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
+
+    def get_weights(self, map_name, mesh_name):
+        """
+        :param map_name: name of the map
+        :param mesh_name: name of the mesh
+        :return: array of weight values
+        """
+        map_node = mp.Map()
+        map_node.populate(map_name, mesh_name)
+        return map_node.values
+
+    def copy_weight(self, map_name_format_string, mesh_name):
+        """
+        :param map_name_format_string: A format string to produce the map name.
+               Format argument will be (node_name)
+        :param mesh_name: name of the mesh
+        :return: None
+        """
+        indexes = self.treeView.selectedIndexes()
+        tmp = []
+
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            # remove vertex array if exists
+            map_name_format_string = map_name_format_string.split('[0:')[0]
+            map_name = map_name_format_string.format(node.name)
+            weights = self.get_weights(map_name, mesh_name)
+            tmp.append(weights)
+
+        self.weights_clipboard = [sum(i) for i in zip(*tmp)]
+        self.weights_clipboard = [max(min(x, 1.0), 0) for x in self.weights_clipboard]
+
+    def invert_weight(self, map_name_format_string, mesh_name):
+        """
+        :param map_name_format_string: A format string to produce the map name.
+               Format arguments will be (node_name, number_of_vertices_in_mesh)
+        :param mesh_name: name of the mesh
+        :return: None
+        """
+        indexes = self.treeView.selectedIndexes()
+
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            # remove vertex array if exists
+            map_name_format_string_part = map_name_format_string.split('[0:')[0]
+            map_name = map_name_format_string_part.format(node.name)
+            weights = self.get_weights(map_name, mesh_name)
+            number_of_vertices_in_mesh = len(weights) - 1
+
+            weights = [1.0 - x for x in weights]
+
+            map_attribute = map_name_format_string.format(node.name, number_of_vertices_in_mesh)
+            self.set_weights(map_attribute, weights)
+
+    def paste_weight(self, map_name_format_string):
+        """
+        :param map_name_format_string: A format string to produce the map name.
+               Format arguments will be (node_name, number_of_vertices_in_mesh)
+        :return: None
+        """
+        indexes = self.treeView.selectedIndexes()
+        number_of_vertices_in_mesh = len(self.weights_clipboard) - 1
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+
+            map_attribute = map_name_format_string.format(node.name, number_of_vertices_in_mesh)
+            self.set_weights(map_attribute, self.weights_clipboard)
+
+    def set_weights(self, map_attribute, weights):
+        # Maya's weightList.weights is not doubleArray and should be set as mel command
+        # Could not set doubleArray easily other then using maya.cmds ( Maya issue )
+        if mc.getAttr(map_attribute, type=True) == 'doubleArray':
+            mc.setAttr(map_attribute, weights, type='doubleArray')
+        else:
+            tmp = [str(w) for w in weights]
+            val = ' '.join(tmp)
+            cmd = "setAttr " + map_attribute + " " + val
+            mm.eval(cmd)
