@@ -1,8 +1,11 @@
 import logging
 import inspect
+import copy
+
 import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
+
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
 from zBuilder.nodes.base import serialize_object
@@ -68,6 +71,22 @@ class DGNode(Base):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
+    def __deepcopy__(self, memo):
+        # Some attributes cannot be deepcopied so define a listy of attributes
+        # to ignore.
+        non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
+
+        cls = self.__class__
+        result = cls.__new__(cls)
+
+        for k, v in self.__dict__.items():
+
+            # skip over attributes defined as non-copyable in non_copyable_attrs
+            if k not in non_copyable_attrs:
+                setattr(result, k, copy.deepcopy(v, memo))
+
+        return result
+
     def serialize(self):
         """  Makes node serializable.
 
@@ -84,9 +103,9 @@ class DGNode(Base):
         """
         # convert mObjectHandle to name of maya object (str)
         self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+
         output = serialize_object(self)
 
-        # convert the string back to an mobject
         self.mobject = self.__mobject_handle
 
         return output

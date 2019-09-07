@@ -20,6 +20,7 @@ from .ziva.zLineOfAction import LineOfActionNode
 from .ziva.zFieldAdaptor import FieldAdaptorNode
 from .ziva.zRelaxer import ZRelaxerNode
 from .ziva.zRivetToBone import RivetToBoneNode
+from .ziva.zRestShape import RestShapeNode
 
 # deformer----------------------------------------------------------------------
 from .deformers.deltaMush import DeltaMush
@@ -30,4 +31,3 @@ from .deformers.wrap import Wrap
 from .utils.constraint import Constraint
 from .utils.fields import Field
 from .deformers.skinCluster import SkinCluster
-

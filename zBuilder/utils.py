@@ -175,8 +175,9 @@ def rig_cut_copy(cut=False):
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
+
     selection = mc.ls(sl=True)
-    if len(selection) == 0:
+    if not selection:
         mm.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
         return
 
@@ -208,6 +209,7 @@ def rig_cut_copy(cut=False):
 
     ZIVA_CLIPBOARD_ZBUILDER = zva.Ziva()
     ZIVA_CLIPBOARD_ZBUILDER.retrieve_from_scene_selection()
+
     ZIVA_CLIPBOARD_SELECTION = selection
 
     if cut:
@@ -243,11 +245,8 @@ def rig_paste():
     # We need to do a deepcopy of ziva_clipboard_zbuilder because we want to manipulate
     # it (using string_replace), and not change the original ziva_clipboard_zbuilder object.
     # In this way, we can paste the same clipboard multiple times.
-    # In order to deepcopy, we need to first remove all mobject references, using mobject_reset.
-    for item in ZIVA_CLIPBOARD_ZBUILDER.get_scene_items():
-        if hasattr(item, 'mobject_reset'):
-            item.mobject_reset()
-    # Make the deepcopy.
+
+    # Make the deepcopy
     builder = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
@@ -278,7 +277,6 @@ def rig_paste():
             solver_in_clipboard)  # rename the solver (this also auto-renames the solver shape node)
     mm.eval('ziva -def ' + solver_in_clipboard + ';')  # make the clipboard solver default
 
-    builder.reset_solvers()
     builder.build()
 
 
@@ -398,7 +396,7 @@ def save_rig(file_name):
     builder.write(file_name)
 
 
-def rig_copy_paste_with_name_substitution(regular_expression, string_to_substitute_matches_with):
+def copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with):
     # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
     # whose names are defined using regular expressions.
     # This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,

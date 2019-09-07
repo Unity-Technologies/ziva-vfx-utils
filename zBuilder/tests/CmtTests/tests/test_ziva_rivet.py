@@ -21,7 +21,7 @@ class ZivaRivetTestCase(VfxTestCase):
         super(ZivaRivetTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_arm()
+        utl.build_anatomical_arm_with_no_popup()
 
         # create l
         mc.select('r_tricepsLong_muscle')
