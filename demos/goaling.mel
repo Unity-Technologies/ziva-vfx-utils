@@ -453,5 +453,6 @@ global proc ziva_main_goalingDemo(int $newScene)
   playbackOptions -e -maxTime 160; // adjust playback to give 160 frames
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 
+  printDemoScriptPath("ziva_main_goalingDemo");
   print "Scene created. The textured fish is simulated. Its body tracks the Maya-keyframed gray fish. This produces secondary motion in the fins. Press \"Play\" to simulate.\n";
 }

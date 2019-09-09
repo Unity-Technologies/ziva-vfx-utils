@@ -86,5 +86,6 @@ global proc ziva_main_isoMesherDemo(int $newScene)
   //setAttr "zIsoMesh1.triangleSize" 0.5'
   //setAttr "zIsoMesh1.recompute" 1; // launch the recomputation
 
+  printDemoScriptPath("ziva_main_isoMesherDemo");
   print "Demonstrates the isomesher. It will run for a few seconds, generating an isosurface mesh of the human arm geometry. Once done, you can tweak the mesher parameters in the zIsoMesh1 node.\n";
 }

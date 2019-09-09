@@ -92,5 +92,6 @@ global proc ziva_main_clothDemo(int $newScene)
     displayStyle -wos;
   }
 
+  printDemoScriptPath("ziva_main_clothDemo");
   print "Scene created. Demonstrates cloth and cloth-object collisions. Press \"Play\" to simulate.\n";
 }

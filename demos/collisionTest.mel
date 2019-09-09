@@ -130,5 +130,6 @@ global proc ziva_main_collisionTest(int $newScene)
     displayStyle -wos;
   }
 
+  printDemoScriptPath("ziva_main_collisionTest");
   print "Scene created. One sphere uses contact sliding, the other does not. Press \"Play\" to simulate.\n";
 }
