@@ -158,5 +158,6 @@ global proc ziva_main_oneOfEachAttachments(int $newScene)
 
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 
+  printDemoScriptPath("ziva_main_oneOfEachAttachments");
   print "Scene created. Demonstrates the four attachment types. Press \"Play\" to simulate.\n";
 }

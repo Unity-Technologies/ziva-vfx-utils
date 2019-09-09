@@ -1,0 +1,188 @@
+// =========================================================
+
+/*
+  Attachment test
+  ===============
+
+  Makes several Maya polygonal objects,
+  converts them to tissues and bones,
+  and connects them with various attachments.
+
+  Copyright (C) Ziva Dynamics 2017
+  Permission is hereby granted for anybody with a valid Ziva
+  license to use this script for any purpose.
+*/
+
+proc ziva_makeGeometry_attachmentTest(string $meshes[])
+{
+  string $sphere1[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 0`; // will be a tissue
+  string $sphere2[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 0`; // will be a tissue
+  string $cube1[] = `polyCube -w 1 -h 1 -d 1 -sx 10 -sy 10 -sz 10 -ax 0 1 0 -cuv 4 -ch 0`; // will be a bone
+  string $cube2[] = `polyCube -w 1 -h 1 -d 1 -sx 10 -sy 10 -sz 10 -ax 0 1 0 -cuv 4 -ch 0`; // will be a tissue
+  string $torus1[] = `polyTorus -r 1 -sr 0.5 -tw 0 -sx 20 -sy 20 -ax 0 1 0 -cuv 1 -ch 0`; // will be a tissue
+  string $torus2[] = `polyTorus -r 1 -sr 0.5 -tw 0 -sx 20 -sy 20 -ax 0 1 0 -cuv 1 -ch 0`; // will be a tissue
+  string $cylinder1[] = `polyCylinder -r 1 -h 2 -sx 20 -sy 4 -sz 4 -ax 0 1 0 -rcp 0 -cuv 3 -ch 0`; // will be a bone
+  string $cylinder2[] = `polyCylinder -r 1 -h 2 -sx 20 -sy 20 -sz 4 -ax 0 1 0 -rcp 0 -cuv 3 -ch 0`; // will be a tissue
+
+  $meshes[0] = $sphere1[0];
+  $meshes[1] = $sphere2[0];
+  $meshes[2] = $cube1[0];
+  $meshes[3] = $cube2[0];
+  $meshes[4] = $torus1[0];
+  $meshes[5] = $torus2[0];
+  $meshes[6] = $cylinder1[0];
+  $meshes[7] = $cylinder2[0];
+}
+
+proc ziva_moveGeometry_attachmentTest(string $meshes[])
+{
+  xform -a -ws -t -5 5 5 $meshes[0];
+  xform -a -ws -t 2.5 5 5 $meshes[1];
+  xform -a -ws -t -1 7 5 -s 10 1 10 $meshes[2];
+  xform -a -ws -t -5 2.5 5 $meshes[3];
+  xform -a -ws -t 0 5 5 $meshes[4];
+  xform -a -ws -t 2.5 0 5 $meshes[5];
+  xform -a -ws -t -2.5 10 -4 $meshes[6];
+  xform -a -ws -t 2.5 13 -4 -ro 0 0 90 -s 1 20 1 $meshes[7];
+
+  dgdirty -a;
+  refresh;
+}
+
+proc ziva_addBodies_attachmentTest(string $meshes[])
+{
+  select -r $meshes;
+  select -tgl $meshes[2] $meshes[6] $meshes[7]; // de-select these meshes
+  ziva -t; // make the tissues
+
+  select -r $meshes[7];
+  string $tissueNodes[] = `ziva -t`; // make the tissue
+  setAttr ($tissueNodes[2] + ".tetSize") 2.0; // adjust the size of the tets in the mesh
+
+  select -r $meshes[2] $meshes[6];
+  ziva -b; // make the bones
+}
+
+proc ziva_addAttachments_attachmentTest(string $meshes[])
+{
+  // generate the various attachments, and set whether they are fixed/sliding, and whether they are hard/soft
+  // attachmentMode: fixed=1, sliding=2
+
+  select -r ($meshes[0] + ".vtx[320:379]") $meshes[2];
+  ziva -a;
+
+  select -r ($meshes[3] + ".vtx[110:228]") $meshes[0];
+  string $attach[] = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 1;
+  setAttr ($attach[0] + ".isHard") 0;
+
+  select -r ($meshes[4] + ".vtx[120:139]") $meshes[2];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 2;
+  setAttr ($attach[0] + ".isHard") 1;
+
+  select -r ($meshes[1] + ".vtx[320:379]") $meshes[4];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 2;
+  setAttr ($attach[0] + ".isHard") 0;
+
+  select -r ($meshes[5] + ".vtx[120:139]") $meshes[0];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 2;
+  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".stiffnessExp") 6;
+
+  select -r ($meshes[5] + ".vtx[179:180]") ($meshes[5] + ".vtx[198:200]") ($meshes[5] + ".vtx[218:220]") $meshes[1];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 2;
+  setAttr ($attach[0] + ".isHard") 1;
+
+  select -r ($meshes[1] + ".vtx[0:39]") $meshes[3];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 1;
+  setAttr ($attach[0] + ".isHard") 0;
+
+  select -r ($meshes[6] + ".vtx[140:219]") $meshes[7];
+  $attach = `ziva -a`;
+  setAttr ($attach[0] + ".attachmentMode") 1;
+  setAttr ($attach[0] + ".isHard") 0;
+
+  // adjust Young's modulus (stiffness)
+  select -r $meshes[3];
+  string $mat[] = `zQuery -t zMaterial`;
+  setAttr ($mat[0] + ".youngsModulus") 120000;
+
+  select -r $meshes[4];
+  $mat = `zQuery -t zMaterial`;
+  setAttr ($mat[0] + ".youngsModulus") 120000;
+
+  select -r $meshes[7];
+  $mat = `zQuery -t zMaterial`;
+
+  setAttr ($mat[0] + ".youngsModulus") 120000;
+}
+
+// the main function
+global proc ziva_main_attachmentTest(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  string $meshes[];
+  ziva_makeGeometry_attachmentTest($meshes);
+  ziva_moveGeometry_attachmentTest($meshes);
+  ziva_addBodies_attachmentTest($meshes);
+  ziva_addAttachments_attachmentTest($meshes);
+
+  // set solver scale to 1.0 for more interesting deformations
+  setAttr "zSolver1.scaleX" 1.0;
+  setAttr "zSolver1.scaleY" 1.0;
+  setAttr "zSolver1.scaleZ" 1.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // select the solver node
+  select -r `zQuery -t zSolverTransform`;
+
+  // set the camera view
+  setAttr "persp.translateX" 29.0;
+  setAttr "persp.translateY" 13.0;
+  setAttr "persp.translateZ" 50.0;
+  setAttr "persp.rotateX" -8.0;
+  setAttr "persp.rotateY" 26.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  if (`about -batch` != 1)
+  {
+    viewFit -all;
+  }
+
+  playbackOptions -e -maxTime 200; // adjust playback to give 200 frames
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  printDemoScriptPath("ziva_main_attachmentTest");
+  print "Scene created. Demonstrates the various attachments. Press \"Play\" to simulate.\n";
+}

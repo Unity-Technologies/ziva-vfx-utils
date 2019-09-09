@@ -77,5 +77,5 @@ menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http
 
 // ----------------------------------------------------------------------------
 // source other menu files
-source "zivaToolMenu";
+source "zivaToolsMenu";
 source "zivaTransferMenu";

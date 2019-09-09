@@ -137,5 +137,6 @@ global proc ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(int $newScene)
     displayStyle -wos;
   }
 
+  printDemoScriptPath("ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo");
   print "Scene created. Demonstrates self-collisions, the Ziva cache and Delaunay tet mesher. Press \"Play\" to simulate.\n";
 }

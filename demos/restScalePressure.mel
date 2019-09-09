@@ -161,5 +161,6 @@ global proc ziva_main_restScalePressureDemo(int $newScene)
   // the simulation will be automatically cached
   ziva -acn;
 
+  printDemoScriptPath("ziva_main_restScalePressureDemo");
   print "Scene created. Demonstrates cloth rest scale and pressure. The fascia cloth wraps around the three cylinder tissues. Rotation starts at frame 6. Press \"Play\" to simulate.\n";
 }
