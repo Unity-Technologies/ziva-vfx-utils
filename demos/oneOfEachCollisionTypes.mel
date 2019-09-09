@@ -249,22 +249,18 @@ global proc ziva_main_oneOfEachCollisionTypes(int $newScene)
   playbackOptions -e -maxTime 200; // adjust playback to give 200 frames
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 
-  print "\n\
-Makes a 4 x 5 array of collision tests.\n\
-\n\
-The first dimension corresponds to the different collision types:\n\
-  1. fixed soft\n\
-  2. fixed hard\n\
-  3. sliding soft\n\
-  4. sliding hard\n\
-\n\
-The second dimension corresponds to:\n\
-  1. tissue colliding with a bone; enable tissue collisions only\n\
-  2. tissue colliding with a bone; enable bone collisions only\n\
-  3. tissue colliding with a bone; enable tissue and bone collisions\n\
-  4. tissue colliding with a tissue; enable collisions, disable self-collisions\n\
-  5. tissue self-colliding with itself\n\n\
-";
+  print ("\nMakes a 4 x 5 array of collision tests.\n\n" +
+"The first dimension corresponds to the different collision types:\n" +
+"  1. fixed soft\n" +
+"  2. fixed hard\n" +
+"  3. sliding soft\n" +
+"  4. sliding hard\n" +
+"\nThe second dimension corresponds to:\n" +
+"  1. tissue colliding with a bone; enable tissue collisions only\n" +
+"  2. tissue colliding with a bone; enable bone collisions only\n" +
+"  3. tissue colliding with a bone; enable tissue and bone collisions\n" +
+"  4. tissue colliding with a tissue; enable collisions, disable self-collisions\n" +
+"  5. tissue self-colliding with itself\n\n");
 
   printDemoScriptPath("ziva_main_oneOfEachCollisionTypes");
   print "Scene created. Demonstrates each of the collision types. Press \"Play\" to simulate.\n";
