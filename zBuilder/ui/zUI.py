@@ -141,6 +141,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def _setup_scene_callbacks(self):
         scene_callbacks = ["BeforeOpen", "BeforeNew", "AfterOpen", "AfterNew"]
         non_scene_callbacks = list(set(self.callback_ids) - set(scene_callbacks))
+        self.unregister_callbacks(scene_callbacks)
 
         id_ = om.MSceneMessage.addCallback(om.MSceneMessage.kBeforeOpen,
                                            partial(self.unregister_callbacks, non_scene_callbacks))
