@@ -78,9 +78,9 @@ class DGNode(Base):
 
         cls = self.__class__
         result = cls.__new__(cls)
+        result.__init__()
 
         for k, v in self.__dict__.items():
-
             # skip over attributes defined as non-copyable in non_copyable_attrs
             if k not in non_copyable_attrs:
                 setattr(result, k, copy.deepcopy(v, memo))
