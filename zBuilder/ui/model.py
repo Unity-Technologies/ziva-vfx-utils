@@ -110,8 +110,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if isinstance(self.parent_, QtWidgets.QTreeView):
                 tree = self.parent_
             elif self.parent_:
-                if isinstance(self.parent_.parent(), QtWidgets.QTreeView):
-                    tree = self.parent_.parent()
+                if isinstance(self.parent_.parent_, QtWidgets.QTreeView):
+                    tree = self.parent_.parent_
 
             if tree:
                 index = self.parent_.mapFromSource(index)
@@ -164,6 +164,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
         super(SceneSortFilterProxyModel, self).__init__(parent)
+        self.parent_ = parent
 
 
 class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
