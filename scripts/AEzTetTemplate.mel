@@ -1,0 +1,28 @@
+global proc AEzTetTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "tetSize";
+  editorTemplate -addControl "surfaceRefinement";
+  editorTemplate -addControl "refinementPropagation";
+
+  editorTemplate -addControl "fillInterior";
+  editorTemplate -addControl "tetsUpperBound";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "envelope";
+  editorTemplate -suppress "iTet";
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "oMesh";
+  editorTemplate -suppress "oGeo";
+  editorTemplate -suppress "input";
+  editorTemplate -suppress "weightList";
+  editorTemplate -suppress "map64BitIndices";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

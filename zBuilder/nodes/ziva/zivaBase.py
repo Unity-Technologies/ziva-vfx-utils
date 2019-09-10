@@ -20,9 +20,10 @@ class Ziva(Deformer):
     except RuntimeError:
         pass
 
-    def __init__(self,  parent=None, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
         self.solver = None
-        Deformer.__init__(self, maya_node=maya_node,
+        Deformer.__init__(self,
+                          maya_node=maya_node,
                           builder=builder,
                           deserialize=deserialize,
                           parent=parent)
@@ -47,7 +48,6 @@ class Ziva(Deformer):
 
         mesh = mz.get_association(maya_node)
         self.association = mesh
-        
 
         solver = mm.eval('zQuery -t zSolver {}'.format(self.name))
         if solver:
@@ -69,9 +69,9 @@ class Ziva(Deformer):
         '''
         mc.select(meshes, r=True)
 
-        # this is all the required checks for a body.  If any of these fail the 
+        # this is all the required checks for a body.  If any of these fail the
         # check it will not create body.
-        mc.select(meshes,r=True)
+        mc.select(meshes, r=True)
         bad_meshes = mm.eval('zMeshCheck -iso -vb -me -mv -st -la -oe')
         if bad_meshes:
             bad_meshes = [x.split('.')[0] for x in bad_meshes]
@@ -88,6 +88,3 @@ class Ziva(Deformer):
                 raise StandardError(error_message)
         else:
             return None
-
-
-

@@ -1,0 +1,24 @@
+global proc AEzBoneTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "enable";
+  editorTemplate -addControl "collisions";
+  editorTemplate -addControl "collisionVolume";
+  editorTemplate -addControl "contactSliding";
+  editorTemplate -addControl "contactStiffness";
+  editorTemplate -addControl "contactStiffnessExp";
+
+  // suppress attributes attribute
+  editorTemplate -suppress "caching";
+  editorTemplate -suppress "nodeState";
+  editorTemplate -suppress "frozen";
+  editorTemplate -suppress "animatedMesh";
+  editorTemplate -suppress "collisionMesh";
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "oGeo";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class SolverNode(Ziva):
     """ This node is for storing information related to zSolver.
     """
@@ -14,7 +15,7 @@ class SolverNode(Ziva):
 
     def __init__(self, *args, **kwargs):
         Ziva.__init__(self, *args, **kwargs)
-        
+
     def build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 

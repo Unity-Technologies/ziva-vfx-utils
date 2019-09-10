@@ -6,8 +6,10 @@ class Field(DGNode):
     """ The base node for the node functionality of all nodes
     """
     type = None
-    TYPES = ['airField','dragField','gravityField','newtonField',
-        'radialField','turbulenceField','uniformField','vortexField']
+    TYPES = [
+        'airField', 'dragField', 'gravityField', 'newtonField', 'radialField', 'turbulenceField',
+        'uniformField', 'vortexField'
+    ]
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
@@ -29,21 +31,22 @@ class Field(DGNode):
 
         name = self.get_scene_name()
         if not mc.objExists(name):
-            # clearing the selection before we create anything as the 
+            # clearing the selection before we create anything as the
             # selection is used to assign it to something.
             mc.select(cl=True)
             factory = {
-                'airField' : mc.air,
+                'airField': mc.air,
                 'dragField': mc.drag,
                 'gravityField': mc.gravity,
                 'newtonField': mc.newton,
                 'radialField': mc.radial,
                 'turbulenceField': mc.turbulence,
                 'uniformField': mc.uniform,
-                'vortexField': mc.vortex}
-            results = factory[self.type](n=name);
+                'vortexField': mc.vortex
+            }
+            results = factory[self.type](n=name)
             self.mobject = name
-            
+
         else:
             new_name = mc.rename(name, self.name)
             self.mobject = new_name
@@ -52,6 +55,3 @@ class Field(DGNode):
 
     def populate(self, maya_node=None):
         super(Field, self).populate(maya_node=maya_node)
-
-
-

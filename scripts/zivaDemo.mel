@@ -1,0 +1,33 @@
+global proc string getDemoAssetPath(string $demoAssetName)
+{ // Retrieve ziva demo path by running `whatIs zivaDemo` command,
+  // It returns string like, "Script found in: <PATH TO THE ZIVA DEMO SCRIPT>"
+  $returnString = `whatIs zivaDemo`;
+  $demoScriptPath = stringRemovePrefix($returnString, "Script found in: ");
+  $demoAssetPath = dirname(dirname($demoScriptPath)) + "/demos/" + $demoAssetName;
+  return $demoAssetPath;
+};
+
+global proc printDemoScriptPath(string $demoEntryFunctionName)
+{
+  $returnString = eval("whatIs \"" + $demoEntryFunctionName + "\"");
+  $demoScriptPath = stringRemovePrefix($returnString, "Mel procedure found in: ");
+  print ("Demo script file path: \"" + $demoScriptPath + "\"\n");
+};
+
+global proc zivaSourceDemo(string $demoAssetName)
+{
+  $demoPath = getDemoAssetPath($demoAssetName);
+  eval("source \"" + $demoPath + "\"");
+};
+
+zivaSourceDemo("anatomicalArm.mel");
+zivaSourceDemo("goaling.mel");
+zivaSourceDemo("restScalePressure.mel");
+zivaSourceDemo("attachmentTest.mel");
+zivaSourceDemo("collisionTest.mel");
+zivaSourceDemo("oneOfEachAttachments.mel");
+zivaSourceDemo("oneOfEachCollisionTypes.mel");
+zivaSourceDemo("spatiallyVaryingMaterials.mel");
+zivaSourceDemo("cloth.mel");
+zivaSourceDemo("isoMesher.mel");
+zivaSourceDemo("selfCollisionsCacheAndDelaunayTetMesher.mel");

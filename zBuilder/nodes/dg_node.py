@@ -1,10 +1,14 @@
 import logging
 import inspect
+import copy
+
 import maya.OpenMaya as om
 import maya.cmds as mc
 import maya.mel as mm
+
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
+from zBuilder.nodes.base import serialize_object
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +45,7 @@ class DGNode(Base):
     def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
         self.attrs = {}
         self._association = []
-        self.__mobject = None
+        self.__mobject_handle = None
 
         Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
 
@@ -52,7 +56,8 @@ class DGNode(Base):
         if self.name:
             name = self.name
             output = ''
-            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
+            output += '= {} <{} {}> ==================================\n'.format(
+                name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 try:
                     output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
@@ -65,6 +70,59 @@ class DGNode(Base):
     def __repr__(self):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
+
+    def __deepcopy__(self, memo):
+        # Some attributes cannot be deepcopied so define a listy of attributes
+        # to ignore.
+        non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
+
+        cls = self.__class__
+        result = cls.__new__(cls)
+
+        for k, v in self.__dict__.items():
+
+            # skip over attributes defined as non-copyable in non_copyable_attrs
+            if k not in non_copyable_attrs:
+                setattr(result, k, copy.deepcopy(v, memo))
+
+        return result
+
+    def serialize(self):
+        """  Makes node serializable.
+
+        This replaces an mObject with the name of the object in scene to make it
+        serializable for writing out to json.  Then it loops through keys in
+        dict and saves out a temp dict of items that can be serializable and
+        returns that temp dict for json writing purposes.
+
+        Replaces .mobject mobject with a string name before serilization.
+        Afterwords it converts it back to an mObject.
+
+        Returns:
+            dict: of serializable items
+        """
+        # convert mObjectHandle to name of maya object (str)
+        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+
+        output = serialize_object(self)
+
+        self.mobject = self.__mobject_handle
+
+        return output
+
+    def deserialize(self, json_data):
+        """ Deserializes a node with given dict.
+
+        Assigns a dictionary to __dict__.  Adds an mObject to the .mobject if 
+        applicable.
+
+        Args:
+            json_data(dict): The given dict.
+        """
+        self.__dict__ = json_data
+
+        # Finding the mObject in scene if it exists
+        self.mobject = self.__mobject_handle
 
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
@@ -91,8 +149,7 @@ class DGNode(Base):
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
         """
-        pass
-        # raise NotImplementedError
+        raise NotImplementedError
 
     @property
     def association(self):
@@ -106,10 +163,6 @@ class DGNode(Base):
     @association.setter
     def association(self, association):
         self._association = mc.ls(association, long=True)
-        # if isinstance(association, str):
-        #     self._association = [association]
-        # else:
-        #     self._association = association
 
     @property
     def long_association(self):
@@ -144,33 +197,15 @@ class DGNode(Base):
         Returns:
             (str) Name of maya object.
         """
-        name = None
-        if self.is_m_object_valid():
-            name = mz.get_name_from_m_object(self.mobject)
-            if not mc.objExists(name):
-                name = self.name
+        name = self.long_name
 
-        if not name:
-            name = self.long_name
+        if self.mobject:
+            name = mz.get_name_from_m_object(self.mobject, long_name=True)
 
         if not long_name:
             name = name.split('|')[-1]
+
         return name
-
-    def is_m_object_valid(self):
-        """This checks if stored MObject is valid.  Querying an invalid one
-        (if node has been deleted from scene for example) will cause maya to
-        crash.
-
-        Returns:
-            [bool]: True if MObject still valid
-        """
-
-        if self.mobject:
-            handle = om.MObjectHandle(self.mobject)
-            if handle.isValid():
-                return True
-        return False
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
@@ -193,8 +228,7 @@ class DGNode(Base):
         node_attrs = self.attrs.keys()
         if attr_filter:
             if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
+                node_attrs = list(set(node_attrs).intersection(attr_filter[type_]))
 
         for attr in node_attrs:
             if self.attrs[attr]['type'] == 'doubleArray':
@@ -210,8 +244,7 @@ class DGNode(Base):
                 if mc.objExists('{}.{}'.format(scene_name, attr)):
                     if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
                         try:
-                            mc.setAttr('{}.{}'.format(scene_name, attr),
-                                       self.attrs[attr]['value'])
+                            mc.setAttr('{}.{}'.format(scene_name, attr), self.attrs[attr]['value'])
                         except:
                             pass
                 else:
@@ -223,19 +256,24 @@ class DGNode(Base):
                 alias = self.attrs[attr].get('alias', None)
                 if alias:
                     try:
-                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr) )
+                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
                     except RuntimeError:
                         pass
 
     @property
     def mobject(self):
         """
-        Gets mObject stored with parameter.
+        Gets mObject out of mObjectHandle.  Checks if it is valid before releasing it.
         Returns:
             mObject
 
         """
-        return self.__mobject
+        if not isinstance(self.__mobject_handle, str):
+            if self.__mobject_handle:
+                if self.__mobject_handle.isValid():
+                    return self.__mobject_handle.object()
+
+        return None
 
     @mobject.setter
     def mobject(self, maya_node):
@@ -250,15 +288,10 @@ class DGNode(Base):
             Nothing
 
         """
-        self.__mobject = None
-        if maya_node:
-            if mc.objExists(maya_node):
-                selection_list = om.MSelectionList()
-                selection_list.add(maya_node)
-                mobject = om.MObject()
-                selection_list.getDependNode(0, mobject)
-                self.__mobject = mobject
- 
-    def mobject_reset(self):
-        self.__mobject = None
-        
+        self.__mobject_handle = None
+        if mc.objExists(maya_node):
+            selection_list = om.MSelectionList()
+            selection_list.add(maya_node)
+            mobject = om.MObject()
+            selection_list.getDependNode(0, mobject)
+            self.__mobject_handle = om.MObjectHandle(mobject)

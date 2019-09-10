@@ -1,0 +1,42 @@
+global proc AEzSolverTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "collisionDetection";
+  editorTemplate -addControl "collisionPointSpacing";
+  editorTemplate -addControl "maxNewtonIterations";
+  editorTemplate -addControl "substeps";
+  editorTemplate -addControl "framesPerSecond";
+  editorTemplate -addControl "stiffnessDamping";
+  editorTemplate -addControl "massDamping";
+  editorTemplate -addControl "gravity";
+
+  editorTemplate -addSeparator;
+
+  editorTemplate -addControl "showBones";
+  editorTemplate -addControl "showTetMeshes";
+  editorTemplate -addControl "showMuscleFibers";
+  editorTemplate -addControl "showAxes";
+  editorTemplate -addControl "showAttachments";
+  editorTemplate -addControl "showCollisions";
+  editorTemplate -addControl "showMaterials";
+  editorTemplate -addControl "oCache";
+
+  AEaddRampControl( $nodeName + ".attachmentColorRamp" );
+  AEaddRampControl( $nodeName + ".collisionColorRamp" );
+  AEaddRampControl( $nodeName + ".materialColorRamp" );
+
+  // suppress attributes attribute
+  editorTemplate -suppress "localPosition";
+  editorTemplate -suppress "localScale";
+  editorTemplate -suppress "iGeo";
+  editorTemplate -suppress "iAttachment";
+  editorTemplate -suppress "iMuscle";
+  editorTemplate -suppress "iSolverParams";
+  editorTemplate -suppress "iCacheParams";
+  editorTemplate -suppress "oSolved";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

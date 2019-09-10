@@ -93,6 +93,10 @@ def main():
                         help='Just create a clean MAYA_APP_DIR and exit')
     parser.add_argument('-p', '--path',
                         help='Path to a folder with tests')
+    parser.add_argument('-msp', '--maya-script-path',
+                        help='Path append to MAYA_SCRIPT_PATH environment variable')
+    parser.add_argument('-mmp', '--maya-module-path',
+                        help='Path append to MAYA_MODULE_PATH environment variable')
     pargs = parser.parse_args()
     mayaunittest = os.path.join(CMT_ROOT_DIR, 'scripts', 'cmt', 'test', 'mayaunittest.py')
     cmd = []
@@ -125,10 +129,19 @@ def main():
 
     # Create clean prefs
     os.environ['MAYA_APP_DIR'] = maya_app_dir
-    # Clear out any MAYA_SCRIPT_PATH value so we know we're in a clean env.
+    
+    # Clear out any MAYA_SCRIPT_PATH value except explicit specified
     os.environ['MAYA_SCRIPT_PATH'] = ''
-    # Run the tests in this module.
+    mayaScriptPath = pargs.maya_script_path
+    if mayaScriptPath:
+        os.environ['MAYA_SCRIPT_PATH'] = mayaScriptPath
+
+    # Run the tests in this module, and other explicit specified ones
     os.environ['MAYA_MODULE_PATH'] = CMT_ROOT_DIR
+    mayaModulePath = pargs.maya_module_path
+    if mayaModulePath:
+        os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaScriptPath)
+
     # Make sure that we're not picking up things accidentally from MAYA_PLUG_IN_PATH on local dev machine
     os.environ['MAYA_PLUG_IN_PATH'] = ''
     

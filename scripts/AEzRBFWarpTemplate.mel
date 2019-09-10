@@ -1,0 +1,18 @@
+global proc AEzRBFWarpTemplate(string $nodeName)
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "envelope";
+  editorTemplate -addControl "recompute";
+  editorTemplate -addControl "maxKernelCenters";
+  editorTemplate -addControl "showKernels";
+
+  // Suppress attributes
+  editorTemplate -suppress "sourceMesh";
+  editorTemplate -suppress "targetMesh";
+  editorTemplate -suppress "oDraw";
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

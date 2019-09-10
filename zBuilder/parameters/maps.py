@@ -32,7 +32,8 @@ class Map(Base):
         if self.name:
             name = self.name
             output = ''
-            output += '= {} <{} {}> ==================================\n'.format(name,self.__class__.__module__, self.__class__.__name__)
+            output += '= {} <{} {}> ==================================\n'.format(
+                name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 if key == 'values':
                     output += '\t{} - [{},....]\n'.format(key, self.__dict__[key][0])
@@ -76,7 +77,7 @@ class Map(Base):
         Args:
             mesh: The mesh name to store.
         """
-        self._mesh = mesh   
+        self._mesh = mesh
 
     def get_mesh(self, long_name=False):
         """ Gets the stores name of the mesh associated with map.
@@ -103,8 +104,7 @@ class Map(Base):
             zBuilder data object of mesh.
         """
         mesh_name = self.get_mesh(long_name=False)
-        mesh_data = self.builder.get_scene_items(type_filter='mesh',
-                                                 name_filter=mesh_name)[0]
+        mesh_data = self.builder.get_scene_items(type_filter='mesh', name_filter=mesh_name)[0]
         return mesh_data
 
     def is_topologically_corresponding(self):
@@ -119,13 +119,11 @@ class Map(Base):
     def interpolate(self):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
-        
+
         if mc.objExists(mesh_data.name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
-            weight_list = interpolate_values(created_mesh,
-                                             mesh_data.name,
-                                             self.values)
+            weight_list = interpolate_values(created_mesh, mesh_data.name, self.values)
             self.values = weight_list
 
             mc.delete(created_mesh)
@@ -171,8 +169,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     source_mesh_m_mesh_intersector = om.MMeshIntersector()
     source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node())
 
-    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(
-        destination_mesh_m_dag_path)
+    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
     source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
 
     u_util = om.MScriptUtil()
@@ -188,28 +185,18 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
         closest_m_point_on_mesh = om.MPointOnMesh()
         source_mesh_m_mesh_intersector.getClosestPoint(
-            destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld),
-            closest_m_point_on_mesh
-        )
+            destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld), closest_m_point_on_mesh)
 
-        source_mesh_m_it_mesh_polygon.setIndex(
-            closest_m_point_on_mesh.faceIndex(),
-            int_util.asIntPtr()
-        )
+        source_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
+                                               int_util.asIntPtr())
         triangle_m_point_array = om.MPointArray()
         triangle_m_int_array = om.MIntArray()
 
-        source_mesh_m_it_mesh_polygon.getTriangle(
-            closest_m_point_on_mesh.triangleIndex(),
-            triangle_m_point_array,
-            triangle_m_int_array,
-            om.MSpace.kWorld
-        )
+        source_mesh_m_it_mesh_polygon.getTriangle(closest_m_point_on_mesh.triangleIndex(),
+                                                  triangle_m_point_array, triangle_m_int_array,
+                                                  om.MSpace.kWorld)
 
-        closest_m_point_on_mesh.getBarycentricCoords(
-            u_util_ptr,
-            v_util_ptr
-        )
+        closest_m_point_on_mesh.getBarycentricCoords(u_util_ptr, v_util_ptr)
 
         weights = list()
         for i in xrange(3):

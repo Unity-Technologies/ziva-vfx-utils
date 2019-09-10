@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 class BlendShape(Deformer):
     type = 'blendShape'
-    MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights',
-                'inputTarget[*].baseWeights']
+    MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights', 'inputTarget[*].baseWeights']
     EXTEND_ATTR_LIST = ['origin']
 
     def __init__(self, *args, **kwargs):
@@ -58,7 +57,7 @@ class BlendShape(Deformer):
         name = self.get_scene_name()
 
         num_weights = mc.blendShape(name, q=True, wc=True)
-        attr_list = ['weight['+str(i)+']' for i in range(0, num_weights)]
+        attr_list = ['weight[' + str(i) + ']' for i in range(0, num_weights)]
         attrs = mz.build_attr_key_values(name, attr_list)
         self.attrs.update(attrs)
 
@@ -78,4 +77,3 @@ class BlendShape(Deformer):
 def get_target(blend_shape):
     target = mc.blendShape(blend_shape, q=True, t=True)
     return target
-

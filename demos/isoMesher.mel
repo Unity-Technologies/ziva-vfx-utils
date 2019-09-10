@@ -1,0 +1,91 @@
+// =========================================================
+
+/*
+Isomesher demo
+==============
+
+Demonstrates the Ziva isomesher, on the human arm anatomical geometry.
+The isomesher calculates a triangle mesh that meshes a chosen isosurface
+to the given Maya geometry.
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+// the main function
+global proc ziva_main_isoMesherDemo(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // load the geometry of the bones and muscles, setup the bone rig and animation of the bones
+  $anatomicalArmSceneFilePath = getDemoAssetPath("anatomicalArm.ma");
+  file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $anatomicalArmSceneFilePath;
+
+  // set the camera view
+  setAttr "persp.translateX" -19;
+  setAttr "persp.translateY" 230;
+  setAttr "persp.translateZ" 143;
+  setAttr "persp.rotateX" -32.0;
+  setAttr "persp.rotateY" 8.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  select -r r_bicep_muscle r_radius_bone r_scapula_bone;
+  if (`about -batch` != 1)
+  {
+    viewFit -f 0.7;
+  }
+  select -cl;
+
+  // combine all the muscles and bones into one mesh, called "r_all"
+  polyUnite -ch 1 -mergeUVSets 1 -name r_all
+      r_tricepsLateral_muscle r_tricepsTendon_muscle r_tricepsMedial_muscle r_brachialis_muscle
+      r_tricepsLong_muscle r_bicep_muscle r_coracobrachialis_muscle r_ulna_bone
+      r_radius_bone r_humerus_bone r_scapula_bone;
+  refresh; // refresh the Maya screen
+
+  // generate the isosurface of "r_all"
+  // isosurface value is 0.5
+  // triangle size is 0.25
+  // resolution is 256 x 256 x 256
+  // max meshing time is 120.0 seconds (routine will timeout if this time is exceeded, to avoid hanging the machine)
+  select -r r_all; // select the Maya mesh to be iso-meshed
+  zIsoMesh -isoMeshIsosurfaceValue 0.5 -isoMeshTriangleSize 0.25 -isoMeshResolution 256 -isoMeshMaxTime 120.0;
+
+  if (`about -batch` != 1)
+  {
+    // select the input mesh, and the resulting mesh
+    select -r r_all r_all_isoMeshShape;
+    // enable x-ray viewing, so that the isomesh can be compared to the input mesh
+    modelEditor -edit -xray on `getPanel -withFocus`;
+  }
+
+  // you can further tweak the isosurface like this:
+  //setAttr "zIsoMesh1.recompute" 0; // disable recompute while adjusting the parameters
+  // make the isovalue and triangle size 2x bigger; this will generate a coarser mesh
+  //setAttr "zIsoMesh1.isosurfaceValue" 1.0;
+  //setAttr "zIsoMesh1.triangleSize" 0.5'
+  //setAttr "zIsoMesh1.recompute" 1; // launch the recomputation
+
+  printDemoScriptPath("ziva_main_isoMesherDemo");
+  print "Demonstrates the isomesher. It will run for a few seconds, generating an isosurface mesh of the human arm geometry. Once done, you can tweak the mesher parameters in the zIsoMesh1 node.\n";
+}

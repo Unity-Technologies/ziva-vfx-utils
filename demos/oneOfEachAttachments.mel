@@ -1,0 +1,163 @@
+// =========================================================
+
+/*
+One of each attachments
+=======================
+
+Makes four sphere columns of three spheres each.
+The top sphere is a bone, and the other two are tissues.
+The spheres are attached to each other.
+Each column uses a different attachment type:
+  fixed soft
+  fixed hard
+  sliding soft
+  sliding hard
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+proc ziva_makeGeometry_oneOfEachAttachments(string $meshes[], float $dx)
+{
+  // make three spheres, positioned along the y-axis
+  string $sphere0[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1`;
+  string $sphere1[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1`;
+  string $sphere2[] = `polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1`;
+  $meshes[0] = $sphere0[0];
+  $meshes[1] = $sphere1[0];
+  $meshes[2] = $sphere2[0];
+  xform -a -ws -t $dx 5.0 0 $meshes[0];
+  xform -a -ws -t $dx 2.5 0 $meshes[1];
+  xform -a -ws -t $dx 0.0 0 $meshes[2];
+
+  // keyframe the top sphere motion
+  setAttr "zSolver1.enable" 0; // disable the solving while setting up the keyframes (to avoid solver warnings)
+  currentTime 1;
+  setKeyframe ($meshes[0] + ".tz");
+  currentTime 25;
+  xform -a -ws -t $dx 5.0 3.0 $meshes[0];
+  setKeyframe ($meshes[0] + ".tz");
+  currentTime 49;
+  xform -a -ws -t $dx 5.0 0.0 $meshes[0];
+  setKeyframe ($meshes[0] + ".tz");
+  currentTime 73;
+  xform -a -ws -t $dx 5.0 -3.0 $meshes[0];
+  setKeyframe ($meshes[0] + ".tz");
+  currentTime 97;
+  xform -a -ws -t $dx 5.0 0.0 $meshes[0];
+  setKeyframe ($meshes[0] + ".tz");
+  currentTime 1;
+  setAttr "zSolver1.enable" 1; // re-enable the solving
+}
+
+proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachmentMode, int $isHard)
+{
+  // select the first sphere
+  select -r $meshes[0];
+  ziva -b; // make it into a bone (fixed non-simulated object)
+
+  // select the second sphere
+  select -r $meshes[1];
+  ziva -t; // make it into a tissue (soft object, simulated using our solver)
+
+  // select the third sphere
+  select -r $meshes[2];
+  ziva -t; // make it into a tissue (soft object, simulated using our solver)
+
+  // select some vertices on the tissue sphere 1, and select the bone sphere
+  select -r ($meshes[1] + ".vtx[320:379]") $meshes[0];
+  // make an attachment constraining the selected vertices of tissue sphere 1 to the bone sphere
+  string $attachment1[] = `ziva -a`;
+
+  // select some vertices on the tissue sphere 2, and select tissue sphere 1
+  select -r ($meshes[2] + ".vtx[320:379]") $meshes[1];
+  // make an attachment constraining the selected vertices of tissue sphere 2 to the tissue sphere 1
+  string $attachment2[] = `ziva -a`;
+
+  // set attachment mode and hardness for the first attachment
+  setAttr ($attachment1[0] + ".attachmentMode") $attachmentMode;
+  setAttr ($attachment1[0] + ".isHard") $isHard;
+
+  // set attachment mode and hardness for the second attachment
+  setAttr ($attachment2[0] + ".attachmentMode") $attachmentMode;
+  setAttr ($attachment2[0] + ".isHard") $isHard;
+}
+
+proc ziva_makeColumn_oneOfEachAttachments(float $dx, int $attachmentMode, int $isHard)
+{
+  string $meshes[];
+  ziva_makeGeometry_oneOfEachAttachments($meshes, $dx);
+  ziva_makeAttachments_oneOfEachAttachments($meshes, $attachmentMode, $isHard);
+}
+
+// the main function
+global proc ziva_main_oneOfEachAttachments(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ( $response == "Cancel" )
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  // generate four columns of spheres, one for each attachment type
+  float $dx = 0.0;
+  for ($attachmentMode = 1; $attachmentMode <= 2; $attachmentMode++)
+  {
+    // attachmentMode: 1=fixed, 2=sliding
+    for ($isHard = 0; $isHard <= 1; $isHard++)
+    {
+      ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $isHard);
+      $dx = $dx + 3.0; // position the next column three units to the right in x
+    }
+  }
+
+  // set solver scale to 1.0 for more interesting deformations
+  setAttr "zSolver1.scaleX" 1.0;
+  setAttr "zSolver1.scaleY" 1.0;
+  setAttr "zSolver1.scaleZ" 1.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // select the solver node
+  select -r `zQuery -t zSolverTransform`;
+
+  // set the camera view
+  setAttr "persp.translateX" 20.0;
+  setAttr "persp.translateY" 7.0;
+  setAttr "persp.translateZ" 16.0;
+  setAttr "persp.rotateX" -17.0;
+  setAttr "persp.rotateY" 44.0;
+  setAttr "persp.rotateZ" 0.0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  if (`about -batch` != 1)
+  {
+    viewFit -all;
+  }
+  setAttr "persp.translateY" 8.0;
+
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  printDemoScriptPath("ziva_main_oneOfEachAttachments");
+  print "Scene created. Demonstrates the four attachment types. Press \"Play\" to simulate.\n";
+}

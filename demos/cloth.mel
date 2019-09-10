@@ -1,0 +1,97 @@
+// =========================================================
+
+/*
+Cloth demo
+==========
+
+A piece of cloth falling under gravity on a fixed bone sphere.
+
+Copyright (C) Ziva Dynamics 2017
+Permission is hereby granted for anybody with a valid Ziva
+license to use this script for any purpose.
+*/
+
+// the main function
+global proc ziva_main_clothDemo(int $newScene)
+{
+  if (($newScene == 1) && (`about -batch` != 1))
+  {
+    if (`file -q -anyModified`)
+    {
+      $response = `confirmDialog -title "Changes not saved"
+        -message "This example will create a new scene. There are unsaved changes in the current scene that will be lost. Proceed?"
+        -button "Yes"
+        -button "Cancel"
+        -defaultButton "Yes"
+        -cancelButton "Cancel"
+        -dismissString "Cancel"`;
+
+      if ($response == "Cancel")
+        return;
+    }
+
+    file -f -new;
+  }
+
+  // make a solver node
+  ziva -s;
+
+  // make the cloth geometry (a plane)
+  polyPlane -w 5 -h 5 -sx 30 -sy 30 -ax 0 1 0 -cuv 2 -ch 1;
+  move -r 0 2 0; // displace it up
+  ziva -c; // convert it into a cloth
+
+  // make a fixed obstacle (a sphere bone)
+  polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+  setAttr "pSphere1.translateX" -0.5; // displace it slightly
+  setAttr "pSphere1.translateZ" 0.3;
+  ziva -b;
+
+  // change the solver scale for more interesting deformations
+  setAttr "zSolver1.scaleX" 1.0;
+  setAttr "zSolver1.scaleY" 1.0;
+  setAttr "zSolver1.scaleZ" 1.0;
+
+  // decrease the number of solver Newton iterations to 1
+  // this increases simulation speed; the sim is still stable
+  setAttr "zSolver1.maxNewtonIterations" 1;
+
+  // enable collision detection in the solver
+  setAttr "zSolver1Shape.collisionDetection" 1;
+
+  // decrease the solver timestep, by taking 10 steps per Maya frame
+  setAttr "zSolver1Shape.substeps" 10;
+
+  // select the solver node
+  select -r `zQuery -t zSolverTransform`;
+
+  // set the camera for a good view
+  setAttr "persp.translateX" 12;
+  setAttr "persp.translateY" 9;
+  setAttr "persp.translateZ" 12;
+  setAttr "persp.rotateX" -30;
+  setAttr "persp.rotateY" 45;
+  setAttr "persp.rotateZ" 0;
+  setAttr "persp.scaleX" 1.0;
+  setAttr "persp.scaleY" 1.0;
+  setAttr "persp.scaleZ" 1.0;
+  if (`about -batch` != 1)
+  {
+    viewFit -all;
+  }
+  setAttr "persp.translateX" 12;
+  setAttr "persp.translateY" 9;
+  setAttr "persp.translateZ" 12;
+
+  playbackOptions -e -maxTime 60; // adjust playback to give 60 frames
+  playbackOptions -e -playbackSpeed 0; // set the playback to every frame
+
+  if (`about -batch` != 1)
+  {
+    // enable "Wireframe on Shaded" shading
+    displayStyle -wos;
+  }
+
+  printDemoScriptPath("ziva_main_clothDemo");
+  print "Scene created. Demonstrates cloth and cloth-object collisions. Press \"Play\" to simulate.\n";
+}

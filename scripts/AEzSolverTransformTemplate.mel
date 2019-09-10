@@ -1,0 +1,18 @@
+global proc AEzSolverTransformTemplate( string $nodeName )
+{
+  editorTemplate -beginScrollLayout;
+
+  // Add our controls
+  editorTemplate -addControl "enable";
+  editorTemplate -addControl "startFrame";
+
+  // suppress oSolverParams attribute
+  editorTemplate -suppress "oSolverParams";
+
+  // Add the template for a transform node
+  AEtransformMain $nodeName;
+  AEtransformNoScroll $nodeName;
+
+  editorTemplate -addExtraControls;
+  editorTemplate -endScrollLayout;
+}

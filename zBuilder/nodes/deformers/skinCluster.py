@@ -11,7 +11,7 @@ class SkinCluster(DGNode):
     TYPES = []
     """ The type of node. """
 
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'weights']
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""

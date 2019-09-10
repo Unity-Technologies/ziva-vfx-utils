@@ -44,31 +44,22 @@ class LineOfActionNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
-        name = self.name
-        association = self.association
-        fiber = self.fiber
-
-        if mc.objExists(association[0]) and mc.objExists(fiber):
+        if mc.objExists(self.association[0]) and mc.objExists(self.fiber):
             # check if the zFiber has a lineOf Action on it, if it does that is
             # what we want to use.  If not lets create a new one
-            existing = mc.listConnections(fiber, type='zLineOfAction')
+            existing = mc.listConnections(self.fiber, type='zLineOfAction')
             if not existing:
-                mc.select(fiber, association[0])
+                mc.select(self.fiber, self.association)
                 results_ = mm.eval('ziva -lineOfAction')
                 clt = mc.ls(results_, type='zLineOfAction')[0]
                 self.mobject = clt
-                mc.rename(clt, name)
-
+                mc.rename(clt, self.name)
             else:
                 self.mobject = existing[0]
-                mc.rename(name, self.name)
-
         else:
-            mc.warning(association[
-                           0] + ' mesh does not exists in scene, skippings line of action')
+            mc.warning(self.association[0] +
+                       ' mesh does not exists in scene, skippings line of action')
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-

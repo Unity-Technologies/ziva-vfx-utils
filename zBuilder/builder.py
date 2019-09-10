@@ -4,15 +4,13 @@ import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
 
+import copy
 from functools import wraps
 import datetime
 import sys
 import inspect
 import logging
 import time
-
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +19,7 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
+
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -40,8 +39,12 @@ class Builder(object):
         self.root_node.log()
 
     def view(self):
-        import zBuilder.ui.tree as tree
-        tree.go(root_node=self.root_node)
+        try:
+            import zBuilder.ui.reader as reader
+        except ImportError:
+            raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+
+        reader.view(root_node=self.root_node)
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
@@ -62,7 +65,7 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(parent=parent,maya_node=node, builder=self))
+                        item_list.append(obj(parent=parent, maya_node=node, builder=self))
                 if type_ == obj.type:
 
                     objct = obj(parent=parent, maya_node=node, builder=self)
@@ -82,23 +85,40 @@ class Builder(object):
 
         return item_list
 
-    def parameter_factory(self, type_, stuff):
+    def parameter_factory(self, parameter_type, parameter_names):
+        ''' This looks for zBuilder objects in sys.modules and instantiates
+        desired one based on arguments.
+        
+        Args:
+            type_ (str): The type of parameter to instentiate (map or mesh)
+            names (str or list): The name of parameter to instentiate.  This should be 
+                a node in the maya scene.  Either a mesh or a map name.
+
+                Currently sometimes parameter_names could be a list.  It is a list
+                when dealing with a map.  The second element is the payload 
+                whereas the first is the name.
+        
+        Returns:
+            object: zBuilder parameter object
+        '''
         # put association filter in a list if it isn't
-        if not isinstance(stuff, list):
-            stuff = [stuff]
+        if not isinstance(parameter_names, list):
+            parameter_names = [parameter_names]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
-                if type_ == obj.type:
-                    if not self.bundle.get_scene_items(type_filter=type_,
-                                                       name_filter=stuff):
-                        return obj(*stuff, builder=self)
+                if parameter_type == obj.type:
+                    scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
+                    scene_items = [x.long_name for x in scene_items]
+                    if any(x not in scene_items for x in parameter_names):
+                        return obj(*parameter_names, builder=self)
 
     @staticmethod
     def time_this(original_function):
         """
         A decorator to time functions.
         """
+
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -116,7 +136,6 @@ class Builder(object):
         for parameter in parameters:
             parameter.build(*args, **kwargs)
 
-    # @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class
@@ -128,7 +147,7 @@ class Builder(object):
 
         self.bundle.stats()
 
-    def write(self, file_path, type_filter=list(), invert_match=False):
+    def write(self, file_path, type_filter=[], invert_match=False):
         """ Writes out the scene items to a json file given a file path.
 
         Args:
@@ -137,16 +156,12 @@ class Builder(object):
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
         """
-
-        json_data = self.__get_json_data(type_filter=type_filter,
-                                         invert_match=invert_match)
-
+        json_data = io.pack_zbuilder_contents(self,
+                                              type_filter=type_filter,
+                                              invert_match=invert_match)
         if io.dump_json(file_path, json_data):
-            for parameter in self.bundle.scene_items:
-                if hasattr(parameter, 'mobject'):
-                    parameter.mobject = parameter.mobject
             self.bundle.stats()
-            logger.info('Wrote File: {}'.format(file_path))
+            logger.info('Wrote File: %s' % file_path)
 
     def retrieve_from_file(self, file_path):
         """ Reads scene items from a given file.  The items get placed in the bundle.
@@ -155,75 +170,12 @@ class Builder(object):
             file_path (:obj:`str`): The file path to read from disk.
 
         """
-
         before = datetime.datetime.now()
-
         json_data = io.load_json(file_path)
-        self.__assign_json_data(json_data)
-        self.__assign_setup()
+        io.unpack_zbuilder_contents(self, json_data)
         self.bundle.stats()
-        for parameter in self.bundle.scene_items:
-            if hasattr(parameter, 'mobject'):
-                parameter.mobject = parameter.mobject
         after = datetime.datetime.now()
-
         logger.info('Read File: {} in {}'.format(file_path, after - before))
-
-    def __assign_json_data(self, json_data):
-        """ Gets data out of json serialization and assigns it to node collection
-        object.
-
-        Args:
-            json_data: Data to assign to builder object.
-        """
-        data = io.check_data(json_data)
-        for d in data:
-
-            if d['d_type'] == 'node_data':
-                self.bundle.extend_scene_items(d['data'])
-                logger.info("reading parameters. {} nodes".format(len(d['data'])))
-            if d['d_type'] == 'component_data':
-                # if d['data' is a dictionary it is saved as pre 1.0.0 so lets
-                if not isinstance(d['data'], list):
-                    for k, v in d['data'].iteritems():
-                        for k2 in d['data'][k]:
-                            self.bundle.scene_items.append(d['data'][k][k2])
-                else:
-                    # saved as 1.0.0
-                    self.components = d['data']
-
-                # logger.info("reading component_data. ")
-            if d['d_type'] == 'info':
-                logger.info("reading info")
-                self.info = d['data']
-
-    def __get_json_data(self, type_filter=[], invert_match=False):
-        """ Utility function to define data stored in json
-        Args:
-            type_filter (list, optional): Types of scene items to write.
-            invert_match (bool): Invert the sense of matching, to select non-matching items.
-                Defaults to ``False``
-        Returns:
-            list: List of items to save out.
-        """
-
-        tmp = []
-
-        logger.info("writing Scene Items")
-        tmp.append(io.wrap_data(self.bundle.get_scene_items(type_filter=type_filter, invert_match=invert_match), 'node_data'))
-        logger.info("writing info")
-        tmp.append(io.wrap_data(self.info, 'info'))
-
-        return tmp
-
-    def __assign_setup(self):
-        """
-
-        Returns:
-
-        """
-        for x in self.bundle:
-            x.builder = self
 
     def stats(self):
         """
@@ -263,7 +215,8 @@ class Builder(object):
         """
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
 
-    def get_scene_items(self, type_filter=list(),
+    def get_scene_items(self,
+                        type_filter=list(),
                         name_filter=list(),
                         name_regex=None,
                         association_filter=list(),
@@ -288,7 +241,6 @@ class Builder(object):
         Returns:
             list: List of scene items.
         """
-        # self.get_scene_items.__doc__ = self.bundle.get_scene_items.__doc__
 
         return self.bundle.get_scene_items(type_filter=type_filter,
                                            name_filter=name_filter,

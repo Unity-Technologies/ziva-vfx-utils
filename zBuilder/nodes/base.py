@@ -9,7 +9,6 @@ import maya.cmds as mc
 import time
 import json
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,14 +24,13 @@ class Base(object):
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._builder_type = self.__class__.__module__.split('.')
-        self._builder_type = '{}.{}'.format(self._builder_type[0],
-                                            self._builder_type[1])
+        self._builder_type = '{}.{}'.format(self._builder_type[0], self._builder_type[1])
 
         self.builder = kwargs.get('builder', None)
         deserialize = kwargs.get('deserialize', None)
 
-        self._children = []
-        self._parent = kwargs.get('parent', None)
+        self.children = []
+        self.parent = kwargs.get('parent', None)
 
         self.info = dict()
         self.info['version'] = zBuilder.__version__
@@ -40,9 +38,8 @@ class Base(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
-        if self._parent is not None:
-            # print 'ASSING CHILD', self._parent
-            self._parent.add_child(self)
+        if self.parent is not None:
+            self.parent.add_child(self)
 
         if deserialize:
             self.deserialize(deserialize)
@@ -59,20 +56,35 @@ class Base(object):
         return not self.__eq__(other)
 
     def add_child(self, child):
-        self._children.append(child)
+        self.children.append(child)
 
     def child(self, row):
         return self._children[row]
 
     def child_count(self):
-        return len(self._children)
+        return len(self.children)
 
+    @property
     def parent(self):
         return self._parent
 
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
+
+    @property
+    def children(self):
+        return self._children
+
+    @children.setter
+    def children(self, children):
+        self._children = children
+
     def row(self):
-        if self._parent is not None:
-            return self._parent._children.index(self)
+        if self.parent is not None:
+            return self.parent.children.index(self)
+        else:
+            return 0
 
     def log(self, tab_level=-1):
         output = ""
@@ -82,9 +94,9 @@ class Base(object):
             output += "\t"
         output += "|-----" + self._name + "\n"
 
-        print self._children
-        print self._parent
-        for child in self._children:
+        print self.children
+        print self.parent
+        for child in self.children:
             output += child.log(tab_level)
 
         tab_level -= 1
@@ -120,29 +132,14 @@ class Base(object):
     def serialize(self):
         """  Makes node serializable.
 
-        This replaces an mObject with the name of the object in scene to make it
-        serializable for writing out to json.  Then it loops through keys in
-        dict and saves out a temp dict of items that can be serializable and
-        returns that temp dict for json writing purposes.
+        It loops through keys in __dict__ and saves out a temp dict of items
+        that can be serializable and returns that temp dict for json writing
+        purposes.
 
         Returns:
             dict: of serializable items
         """
-        # removing and storing mobject as a string (object name)
-        if hasattr(self, '__mobject'):
-            if self.__mobject:
-                self.__mobject = mz.get_name_from_m_object(self.__mobject)
-
-        # culling __dict__ of any non-serializable items so we can save as json
-        output = dict()
-        for key in self.__dict__:
-            if hasattr(self.__dict__[key], '_class') and hasattr(self.__dict__[key], 'serialize'):
-                output[key] = self.__dict__[key].serialize()
-            try:
-                json.dumps(self.__dict__[key])
-                output[key] = self.__dict__[key]
-            except TypeError:
-                pass
+        output = serialize_object(self)
         return output
 
     def deserialize(self, dictionary):
@@ -152,9 +149,7 @@ class Base(object):
 
         Args (dict): The given dict.
         """
-        for key in dictionary:
-            if key not in ['_setup', '_class']:
-                self.__dict__[key] = dictionary[key]
+        self.__dict__ = dictionary
 
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.
@@ -181,9 +176,7 @@ class Base(object):
                         new_names.append(new_name)
                         self.__dict__[item] = new_names
             elif isinstance(self.__dict__[item], basestring):
-                self.__dict__[item] = mz.replace_long_name(search,
-                                                           replace,
-                                                           self.__dict__[item])
+                self.__dict__[item] = mz.replace_long_name(search, replace, self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
                 new_names = []
                 self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
@@ -202,17 +195,52 @@ class Base(object):
                                 self.__dict__[item][key] = new_names
 
     def write(self, file_path):
-        """ Writes out individual item to a json file given a file path.
+        """ Writes out the scene item to a json file given a file path.
 
         Args:
             file_path (str): The file path to write to disk.
         """
-        json_data = []
-        json_data.append(io.wrap_data([self], 'node_data'))
-        json_data.append(io.wrap_data(self.info, 'info'))
+        node_data = dict()
+        node_data['d_type'] = 'node_data'
+        node_data['data'] = self
 
-        io.dump_json(file_path, json_data)
-        if hasattr(self, 'mobject'):
-            self.mobject = self.mobject
+        info = dict()
+        info['d_type'] = 'info'
+        info['data'] = self.builder.info
 
-        logger.info('Wrote File: {}'.format(file_path))
+        json_data = [node_data, info]
+
+        if io.dump_json(file_path, json_data):
+            logger.info('Wrote File: %s' % file_path)
+
+
+def serialize_object(obj):
+    """ Takes in a python obj and scrubs through the __dict__ and returns a serializable
+    dictionary.
+
+    Args:
+        obj (object): Python object to inspect.
+
+    Returns:
+        dict: Of serializable obj
+    """
+
+    # clearing these attributes for now as they are causing issues with serilization as they are
+    # python objects and they are not needed in this context.  These attributes are used
+    # for the QTreeView to define the tree layout.  If we want to seralize this we will
+    # need to treat these similiar to .mobject.
+    obj.parent = None
+    obj.children = None
+
+    output = dict()
+    for key in obj.__dict__:
+        if hasattr(obj.__dict__[key], '_class') and (hasattr(obj.__dict__[key], 'serialize')
+                                                     and callable(obj.serialize)):
+            output[key] = obj.__dict__[key].serialize()
+        try:
+            json.dumps(obj.__dict__[key])
+            output[key] = obj.__dict__[key]
+        except TypeError:
+            pass
+
+    return output

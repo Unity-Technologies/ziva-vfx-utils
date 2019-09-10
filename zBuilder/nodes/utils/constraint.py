@@ -94,23 +94,27 @@ class Constraint(DGNode):
 def get_targets(constraint_name):
     i = 0
     targets = list()
-    while not mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)) == None:
-        targets.extend(mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)))
+    while not mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name,
+                                                                           i)) == None:
+        targets.extend(
+            mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)))
         i += 1
     return targets
 
 
 def get_constrained(constraint_name):
-    con = ['constraintTranslateX',
-           'constraintTranslateY',
-           'constraintTranslateZ',
-           'constraintRotateX',
-           'constraintRotateY',
-           'constraintRotateZ']
+    con = [
+        'constraintTranslateX', 'constraintTranslateY', 'constraintTranslateZ', 'constraintRotateX',
+        'constraintRotateY', 'constraintRotateZ'
+    ]
 
-    constrained = [mc.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con if mc.objExists('{}.{}'.format(constraint_name, c))]
+    constrained = [
+        mc.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con
+        if mc.objExists('{}.{}'.format(constraint_name, c))
+    ]
     constrained = list(set(constrained))
     return constrained
+
 
 #
 # def get_constraint_data(constraintName):

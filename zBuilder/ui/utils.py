@@ -2,9 +2,12 @@ import maya.cmds as mc
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def dock_window(dialog_class, root_node=None):
+def dock_window(dialog_class, *args, **kwargs):
     try:
         mc.deleteUI(dialog_class.CONTROL_NAME)
         logger.info('removed workspace {}'.format(dialog_class.CONTROL_NAME))
@@ -12,8 +15,12 @@ def dock_window(dialog_class, root_node=None):
         pass
 
     # building the workspace control with maya.cmds
-    main_control = mc.workspaceControl(dialog_class.CONTROL_NAME, ttc=["AttributeEditor", -1], iw=300, mw=100,
-                                       wp='preferred', label=dialog_class.DOCK_LABEL_NAME)
+    main_control = mc.workspaceControl(dialog_class.CONTROL_NAME,
+                                       ttc=["AttributeEditor", -1],
+                                       iw=300,
+                                       mw=100,
+                                       wp='preferred',
+                                       label=dialog_class.DOCK_LABEL_NAME)
 
     # now lets get a C++ pointer to it using OpenMaya
     control_widget = omui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
@@ -23,10 +30,8 @@ def dock_window(dialog_class, root_node=None):
     # control_wrap is the widget of the docking window and now we can start working with it:
     control_wrap.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-    win = dialog_class(control_wrap, root_node=root_node)
+    win = dialog_class(control_wrap, *args, **kwargs)
     # after maya is ready we should restore the window since it may not be visible
     mc.evalDeferred(lambda *args: mc.workspaceControl(main_control, e=True, rs=True))
 
     win.run()
-
-
