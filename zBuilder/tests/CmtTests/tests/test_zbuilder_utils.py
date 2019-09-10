@@ -233,7 +233,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         mm.eval('ziva -s')
 
         utility.remove_solver(solvers=['zSolver1'])
-        self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2'])
+        self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2Shape'])
 
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
