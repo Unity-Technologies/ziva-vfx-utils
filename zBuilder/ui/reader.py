@@ -9,6 +9,7 @@ import model
 import icons
 from zBuilder.ui.utils import dock_window
 
+
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
     CONTROL_NAME = 'zBuilderView'
@@ -34,7 +35,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.reset_tree(root_node=self.root_node)
 
         self.main_layout.addWidget(self.treeView)
-        
 
     def reset_tree(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -100,5 +100,6 @@ class MyDockingUI(QtWidgets.QWidget):
     def run(self):
         return self
 
-def go(root_node=None):
+
+def view(root_node=None):
     dock_window(MyDockingUI, root_node=root_node)
