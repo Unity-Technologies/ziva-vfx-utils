@@ -310,7 +310,7 @@ class MyDockingUI(QtWidgets.QWidget):
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent)
+                self.treeView.expand(checked[-1].parent())
 
 
     @staticmethod
