@@ -329,14 +329,14 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addAction(action_invert_weight)
 
     def add_attributes_menu(self, menu):
-        attrs_menu = menu.addMenu('attributes')
+        attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
         attrs_menu.addAction(self.actionPasteAttrs)
 
     def open_tet_menu(self, menu, mesh_name):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
-        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
         self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
                                            mesh_name)
@@ -344,18 +344,18 @@ class MyDockingUI(QtWidgets.QWidget):
     def open_fiber_menu(self, menu, mesh_name):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
-        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
         self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
                                            mesh_name)
-        end_points_map_menu = menu.addMenu('endPoints')
+        end_points_map_menu = menu.addMenu('EndPoints')
         end_points_map_menu.addAction(self.actionPaintEndPoints)
         self.add_copy_paste_invert_to_menu(end_points_map_menu, '{}.endPoints', mesh_name)
 
     def open_material_menu(self, menu, mesh_name):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
-        weight_map_menu = menu.addMenu('weight')
+        weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
         self.add_copy_paste_invert_to_menu(weight_map_menu, '{}.weightList[0].weights[0:{}]',
                                            mesh_name)
@@ -370,14 +370,14 @@ class MyDockingUI(QtWidgets.QWidget):
         target_mesh_name_short = target_mesh_name.split('|')[-1]
         source_menu_text = (source_mesh_name_short[:12] +
                             '..') if len(source_mesh_name_short) > 14 else source_mesh_name_short
-        source_menu_text = 'source (%s)' % source_menu_text
+        source_menu_text = 'Source (%s)' % source_menu_text
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
         self.add_copy_paste_invert_to_menu(source_map_menu, '{}.weightList[0].weights[0:{}]',
                                            source_mesh_name)
         target_menu_text = (target_mesh_name_short[:12] +
                             '..') if len(target_mesh_name_short) > 14 else target_mesh_name_short
-        target_menu_text = 'target (%s)' % target_menu_text
+        target_menu_text = 'Target (%s)' % target_menu_text
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
         self.add_copy_paste_invert_to_menu(target_map_menu, '{}.weightList[1].weights[0:{}]',
