@@ -31,7 +31,7 @@ global proc zLoadRigExecute()
       }
 
       ziva -def $solver;
-      string $pythonCommand = "zLoadRig('" + $result[0] + "', '" + $solver + "')";
+      string $pythonCommand = "import zBuilder.utils as utility; utility.load_rig('" + $result[0] + "', '" + $solver + "')";
       python($pythonCommand);
       select -cl;
     }
@@ -87,7 +87,7 @@ global proc zSaveRigOptions()
    string $result[] = `fileDialog2 -fileFilter $multipleFilters -selectFileFilter "zBuilder" -dialogStyle 2 -cap "Save Ziva rig to a file" -fm 0`;
    if (size($result) == 1)
    {
-      python("zSaveRig('" + $result[0] + "')");
+      python("import zBuilder.utils as utility; utility.save_rig('" + $result[0] + "')");
    }
    else if (size($result) > 1)
    {
@@ -116,7 +116,7 @@ global proc zRigCopyPasteWithNameSubstitutionApply()
     $zivaTransfer_regularExpression = `textField -q -text zRigCopyPasteWithNameSubstitutionRegularExpression`;
     $zivaTransfer_substituteMatchesWith = `textField -q -text zRigCopyPasteWithNameSubstitutionSubstituteMatchesWith`;
     deleteUI $zRigCopyPasteWithNameSubstitutionWindowName;
-    python("zRigCopyPasteWithNameSubstitution('" + $zivaTransfer_regularExpression + "', '" + $zivaTransfer_substituteMatchesWith + "')");
+    python("import zBuilder.utils as utility; utility.copy_paste_with_substitution('" + $zivaTransfer_regularExpression + "', '" + $zivaTransfer_substituteMatchesWith + "')");
   }
 }
 

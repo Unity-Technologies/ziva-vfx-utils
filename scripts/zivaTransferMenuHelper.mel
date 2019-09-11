@@ -281,7 +281,7 @@ global proc zRigTransferButtonExecute()
     string $targetSolver = `optionMenu -q -value zRigTransfer_targetSolver`;
     if ($targetSolver == "<Output prefix><Source solver>")
       $targetSolver = $outputPrefix + $sourceSolver;
-    $pythonCommand = "zRigTransfer('" + $sourceSolver + "', '" + $outputPrefix + "', '" + $targetSolver + "')";
+    $pythonCommand = "import zBuilder.utils as utility; utility.rig_transfer('" + $sourceSolver + "', '" + $outputPrefix + "', '" + $targetSolver + "')";
     deleteUI $zRigTransferWindowName;
     python ($pythonCommand);
   }
@@ -348,7 +348,7 @@ global proc zSkinClusterTransferButtonExecute()
   if (`window -exists $zSkinClusterTransferWindowName` == 1)
   {
     string $prefix = `textField -q -text zSkinClusterTransfer_prefix`;
-    $pythonCommand = "zSkinClusterTransfer('" + $prefix + "')";
+    $pythonCommand = "import zBuilder.utils as utility; utility.skincluster_transfer('" + $prefix + "')";
     deleteUI $zSkinClusterTransferWindowName;
     python ($pythonCommand);
   }
