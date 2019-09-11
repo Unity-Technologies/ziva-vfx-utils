@@ -19,9 +19,7 @@ class DGNode(Base):
     Args:
         maya_node (str, optional): maya node to populate parameter with.
         builder (object, optional): The builder object for reference.
-        deserialize (dict, optional): if given a dictionary to deserialize it
-            fills hte parameter with contents of dictionary using the deserialize
-            method.
+
 
     Attributes:
         
@@ -42,8 +40,8 @@ class DGNode(Base):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, parent=None, builder=None, deserialize=None):
-        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
+    def __init__(self, parent=None, builder=None):
+        Base.__init__(self, parent=parent, builder=builder)
 
         self.attrs = {}
         self._association = []
@@ -118,9 +116,6 @@ class DGNode(Base):
         """
         self.__dict__ = json_data
 
-        if self.type == 'zSolver':
-            print 'DICT', self.__dict__.keys()
-            print 'HHHHH', json_data
         # Finding the mObject in scene if it exists
         self.mobject = self.__mobject_handle
 
