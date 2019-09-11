@@ -76,7 +76,7 @@ class DGNode(Base):
         # to ignore.
         non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
 
-        result = self.__class__()
+        result = type(self)()
 
         for k, v in self.__dict__.items():
             # skip over attributes defined as non-copyable in non_copyable_attrs
