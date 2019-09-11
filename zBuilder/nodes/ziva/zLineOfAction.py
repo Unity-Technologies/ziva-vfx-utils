@@ -15,9 +15,8 @@ class LineOfActionNode(Ziva):
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        self.fiber = None
-
         Ziva.__init__(self, *args, **kwargs)
+        self.fiber = None
 
     def spawn_parameters(self):
         return {}

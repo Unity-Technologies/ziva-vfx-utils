@@ -14,10 +14,9 @@ class EmbedderNode(Ziva):
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
+        Ziva.__init__(self, *args, **kwargs)
         self.__embedded_meshes = None
         self.__collision_meshes = None
-
-        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

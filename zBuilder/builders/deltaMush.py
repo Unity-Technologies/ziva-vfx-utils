@@ -12,9 +12,6 @@ class DeltaMush(Builder):
     """To capture a deltaMush
     """
 
-    def __init__(self):
-        Builder.__init__(self)
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------

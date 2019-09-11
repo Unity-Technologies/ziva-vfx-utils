@@ -13,9 +13,8 @@ class BlendShape(Deformer):
     EXTEND_ATTR_LIST = ['origin']
 
     def __init__(self, *args, **kwargs):
-        self._target = None
-
         Deformer.__init__(self, *args, **kwargs)
+        self._target = None
 
     def get_map_meshes(self):
         """

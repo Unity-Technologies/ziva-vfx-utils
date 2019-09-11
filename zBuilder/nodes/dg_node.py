@@ -42,15 +42,12 @@ class DGNode(Base):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, builder=None, deserialize=None):
+        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
+
         self.attrs = {}
         self._association = []
         self.__mobject_handle = None
-
-        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
-
-        if maya_node:
-            self.populate(maya_node=maya_node)
 
     def __str__(self):
         if self.name:
@@ -76,11 +73,11 @@ class DGNode(Base):
         # to ignore.
         non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
 
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__init__()
+        result = self.__class__()
+        # result = cls.__new__(cls)
 
         for k, v in self.__dict__.items():
+
             # skip over attributes defined as non-copyable in non_copyable_attrs
             if k not in non_copyable_attrs:
                 setattr(result, k, copy.deepcopy(v, memo))
@@ -121,6 +118,9 @@ class DGNode(Base):
         """
         self.__dict__ = json_data
 
+        if self.type == 'zSolver':
+            print 'DICT', self.__dict__.keys()
+            print 'HHHHH', json_data
         # Finding the mObject in scene if it exists
         self.mobject = self.__mobject_handle
 
@@ -268,6 +268,8 @@ class DGNode(Base):
             mObject
 
         """
+        if self.type == 'zSolver':
+            print self
         if not isinstance(self.__mobject_handle, str):
             if self.__mobject_handle:
                 if self.__mobject_handle.isValid():

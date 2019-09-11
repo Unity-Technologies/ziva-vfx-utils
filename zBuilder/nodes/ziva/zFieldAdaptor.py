@@ -15,8 +15,8 @@ class FieldAdaptorNode(Ziva):
     """ The type of node. """
 
     def __init__(self, *args, **kwargs):
-        self.output_bodies = []
         Ziva.__init__(self, *args, **kwargs)
+        self.output_bodies = []
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

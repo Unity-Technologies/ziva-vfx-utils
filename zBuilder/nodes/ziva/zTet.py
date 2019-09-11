@@ -17,9 +17,8 @@ class TetNode(Ziva):
     """ List of maps to store. """
 
     def __init__(self, *args, **kwargs):
-        self._user_tet_mesh = None
-
         Ziva.__init__(self, *args, **kwargs)
+        self._user_tet_mesh = None
 
     def set_user_tet_mesh(self, mesh):
         """ Setting of the user tet mesh.

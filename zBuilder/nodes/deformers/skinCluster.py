@@ -17,10 +17,9 @@ class SkinCluster(DGNode):
     """ List of maya attributes to add to attribute list when capturing."""
 
     def __init__(self, *args, **kwargs):
+        DGNode.__init__(self, *args, **kwargs)
         self.influences = list()
         self.weights = dict()
-
-        DGNode.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This extends ZivaBase.populate()
