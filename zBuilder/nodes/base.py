@@ -237,6 +237,6 @@ def serialize_object(obj):
             json.dumps(obj.__dict__[key])
             output[key] = obj.__dict__[key]
         except TypeError:
-            print 'dumping ', key
+            pass
 
     return output
