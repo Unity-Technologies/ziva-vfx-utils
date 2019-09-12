@@ -1,5 +1,20 @@
 Release Notes
 =============
+1.0.9
+-----
+* Fix for Copy/Paste transfer menu items.
+* Now able to deepcopy a builder object
+* Rename util.py to utils.py
+* Adding support for zRestShape (retrieving, building, serialize, deserialize, Scene Panel)
+* Improvements to serialization and deserialization
+* Support for multiple curves for zLineOfAction
+* Storing mObjectHandle instead of mObject for robustness
+* Adding zRivet and repective curves to Scene Panel
+* Fix for zCloth objects not mirroring
+* Storing intermediate shape of mesh
+* Fix for zTissue attributes not updating in some edge cases
+* Genreal bug fixes and cleanup
+
 1.0.8
 -----
 * clamping values when interpolating maps
