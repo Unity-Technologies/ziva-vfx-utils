@@ -75,9 +75,9 @@ class Builder(object):
 
                     item_list.append(objct)
         if not item_list:
-            obb = zBuilder.nodes.DGNode(parent=parent, builder=self)
-            obb.populate(maya_node=node)
-            item_list.append(obb)
+            objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
+            objct.populate(maya_node=node)
+            item_list.append(objct)
 
         if get_parameters:
             for obj__ in item_list:
