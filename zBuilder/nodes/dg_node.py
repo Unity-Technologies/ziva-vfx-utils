@@ -17,12 +17,9 @@ class DGNode(Base):
     """ The base node for the node functionality of all nodes
 
     Args:
-        maya_node (str, optional): maya node to populate parameter with.
         builder (object, optional): The builder object for reference.
 
-
     Attributes:
-        
         :rtype: :func:`type` (str): type of parameter.  Tied with maya node type.
         attrs (dict): A place for the maya attributes dictionary.
 
