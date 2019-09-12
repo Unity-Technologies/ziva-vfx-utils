@@ -20,14 +20,14 @@ class SkinCluster(Builder):
         # parse args------------------------------------------------------------
         selection = mz.parse_maya_node_for_selection(args)
 
-        hist = mc.listHistory(selection)
-        skinClusters = mc.ls(hist, type='skinCluster')[::-1]
+        history = mc.listHistory(selection)
+        skin_clusters = mc.ls(history, type='skinCluster')[::-1]
 
-        if not skinClusters:
+        if not skin_clusters:
             raise StandardError('No skinClusters found, aborting!')
 
-        for skinCluster in skinClusters:
-            scene_item = self.node_factory(skinCluster)
+        for skin_cluster in skin_clusters:
+            scene_item = self.node_factory(skin_cluster)
             self.bundle.extend_scene_items(scene_item)
         self.stats()
 
@@ -38,7 +38,6 @@ class SkinCluster(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        parameters = self.get_scene_items(name_filter=name_filter, type_filter='skinCluster')
-        for parameter in parameters:
-            parameter.mobject = None
-            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
+        scene_items = self.get_scene_items(name_filter=name_filter, type_filter='skinCluster')
+        for scene_item in scene_items:
+            scene_item.build(attr_filter=attr_filter, interp_maps=interp_maps)
