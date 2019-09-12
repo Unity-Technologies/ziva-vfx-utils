@@ -52,7 +52,8 @@ menuItem -label "Swap Attachment Direction" -ec true -ecr true -c "ziva -sai" -a
 
 menuItem -label "Remove" -divider true;
 menuItem -label "Tissue, Cloth or Bone" -ec true -ecr true -c "ziva -rm" -ann "Removes the selected tissue(s), cloth(es) or bone(s) from the solver.";
-menuItem -label "Rest Shape" -ec true -ecr true -c "zRestShape -r" -ann "Removes rest shape(s) from a tissue.";
+menuItem -label "Rest Shape" -ec true -ecr true -c "ZivaDeleteSelectedRestShape();" -ann "Removes rest shape(s) from a tissue.";
+menuItem -label "Rest Shape Target Mesh" -ec true -ecr true -c "zRestShape -r" -ann "Removes rest shape target mesh from a tissue.";
 menuItem -label "Embedded Mesh" -ec true -ecr true -c "ziva -re" -ann "Un-embeds the selected mesh(es) from the Ziva object that currently embeds it.";
 menuItem -label "Collision Mesh" -ec true -ecr true -c "ziva -rcm" -ann "Removes the custom collision mesh from the selected tissue(s) or cloth(es).";
 menuItem -label "Subtissue" -ec true -ecr true -c "ziva -rst" -ann "Removes subtissue connections, making the selected tissues full tissues again.";
