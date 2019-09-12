@@ -258,8 +258,6 @@ class DGNode(Base):
             mObject
 
         """
-        if self.type == 'zSolver':
-            print self
         if not isinstance(self.__mobject_handle, str):
             if self.__mobject_handle:
                 if self.__mobject_handle.isValid():
