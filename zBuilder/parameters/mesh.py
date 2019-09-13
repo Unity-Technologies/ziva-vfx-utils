@@ -12,8 +12,8 @@ class Mesh(Base):
     type = 'mesh'
     """ Type of node. """
 
-    def __init__(self, *args):
-        super(Mesh, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(Mesh, self).__init__(*args, **kwargs)
 
         self._pCountList = []
         self._pConnectList = []
