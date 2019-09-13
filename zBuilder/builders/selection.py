@@ -6,9 +6,6 @@ class Selection(Builder):
     """Storing maya selection.
     """
 
-    def __init__(self):
-        Builder.__init__(self)
-
     @Builder.time_this
     def retrieve_from_scene(self):
         selection = mc.ls(sl=True, l=True)

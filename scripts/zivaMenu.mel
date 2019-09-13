@@ -52,13 +52,14 @@ menuItem -label "Swap Attachment Direction" -ec true -ecr true -c "ziva -sai" -a
 
 menuItem -label "Remove" -divider true;
 menuItem -label "Tissue, Cloth or Bone" -ec true -ecr true -c "ziva -rm" -ann "Removes the selected tissue(s), cloth(es) or bone(s) from the solver.";
-menuItem -label "Rest Shape" -ec true -ecr true -c "zRestShape -r" -ann "Removes rest shape(s) from a tissue.";
+menuItem -label "Rest Shape" -ec true -ecr true -c "ZivaDeleteSelectedRestShape();" -ann "Removes rest shape(s) from a tissue.";
+menuItem -label "Rest Shape Target Mesh" -ec true -ecr true -c "zRestShape -r" -ann "Removes rest shape target mesh from a tissue.";
 menuItem -label "Embedded Mesh" -ec true -ecr true -c "ziva -re" -ann "Un-embeds the selected mesh(es) from the Ziva object that currently embeds it.";
 menuItem -label "Collision Mesh" -ec true -ecr true -c "ziva -rcm" -ann "Removes the custom collision mesh from the selected tissue(s) or cloth(es).";
 menuItem -label "Subtissue" -ec true -ecr true -c "ziva -rst" -ann "Removes subtissue connections, making the selected tissues full tissues again.";
 menuItem -label "User Tet Mesh" -ec true -ecr true -c "ziva -dut" -ann "Detaches any user-provided tet mesh and uses an automatic tet mesh for the selected tissue(s).";
-menuItem -label "Selected Solver(s)" -ec true -ecr true -c "zRemoveSolver(askForConfirmation=True)" -sourceType "python" -ann "Removes the solver(s) inferred from selection, including their Ziva rigs.";
-menuItem -label "All Solvers" -ec true -ecr true -c "zRemoveAllSolvers(askForConfirmation=True)" -sourceType "python" -ann "Removes all Ziva solvers from the scene, including all Ziva rigs.";
+menuItem -label "Selected Solver(s)" -ec true -ecr true -c "import zBuilder.utils as utility; utility.remove_solver(askForConfirmation=False)" -sourceType "python" -ann "Removes the solver(s) inferred from selection, including their Ziva rigs.";
+menuItem -label "All Solvers" -ec true -ecr true -c "import zBuilder.utils as utility; utility.remove_all_solvers(confirmation=False)" -sourceType "python" -ann "Removes all Ziva solvers from the scene, including all Ziva rigs.";
 
 menuItem -label "Delete" -divider true;
 menuItem -label "Delete selection" -ec true -ecr true -c "ZivaDeleteSelection" -ann "Deletes the selected objects after first removing them from the solver.";

@@ -15,9 +15,6 @@ class FiberNode(Ziva):
     MAP_LIST = ['weightList[0].weights', 'endPoints']
     """ List of maps to store. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
-
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically

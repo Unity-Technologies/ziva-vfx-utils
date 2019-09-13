@@ -13,9 +13,9 @@ class RivetToBoneNode(Ziva):
     type = 'zRivetToBone'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
+        super(RivetToBoneNode, self).__init__(parent=parent, builder=builder)
         self.cv_indices = []
-        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

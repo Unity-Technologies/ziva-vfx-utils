@@ -14,9 +14,6 @@ class Constraint(DGNode):
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
 
-    def __init__(self, *args, **kwargs):
-        DGNode.__init__(self, *args, **kwargs)
-
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 

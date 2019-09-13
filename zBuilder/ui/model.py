@@ -1,25 +1,15 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
-import maya.cmds as mc
-import zBuilder.zMaya as mz
-
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
 
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
-    envRole = QtCore.Qt.UserRole + 3
-    fullNameRole = QtCore.Qt.UserRole + 4
-    expandedRole = QtCore.Qt.UserRole + 5
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
-        '''
-        expandedRole is not supported if parent == None
-        '''
         self.root_node = root
-        self.parent_ = parent
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -33,20 +23,25 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             return "Scene Items"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if role == QtCore.Qt.EditRole:
-            node = index.internalPointer()
-            long_name = node.long_name
-            if value and value != long_name.split('|')[-1]:
-                name = mc.rename(long_name, value)
-                node.name = name
-        return super(SceneGraphModel, self).setData(index, value, role)
+
+        if index.isValid():
+
+            if role == QtCore.Qt.EditRole:
+
+                node = index.internalPointer()
+                node.name = value
+
+                return True
+
+        return False
+
 
     def data(self, index, role):
 
@@ -77,56 +72,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 if hasattr(node, 'type'):
                     return node
 
-        if role == SceneGraphModel.envRole:
-            env = True
-            if index.column() == 0:
-                node = index.internalPointer()
-                if hasattr(node, 'depends_on'):
-                    mobject = node.depends_on
-                    name = mz.get_name_from_m_object(mobject)
-                    # search through the children for the expected node.
-                    for x in node.children:
-                        if x.name == name:
-                            node = x
-                            break
-
-                if hasattr(node, 'attrs'):
-                    attrs = node.attrs
-                    if "envelope" in attrs:
-                        if not attrs["envelope"]["value"]:
-                            env = False
-                    elif "enable" in attrs:
-                        if not attrs["enable"]["value"]:
-                            env = False
-            return env
-
-        if role == SceneGraphModel.fullNameRole:
-            return node.long_name
-
-        if role == SceneGraphModel.expandedRole:
-            # return if index is expanded if possible
-            # otherwise return None instead of False to simplify debugging
-            tree = None
-            if isinstance(self.parent_, QtWidgets.QTreeView):
-                tree = self.parent_
-            elif self.parent_:
-                if isinstance(self.parent_.parent_, QtWidgets.QTreeView):
-                    tree = self.parent_.parent_
-
-            if tree:
-                index = self.parent_.mapFromSource(index)
-                if index.isValid():
-                    return tree.isExpanded(index)
-            else:
-                raise Exception(
-                    "Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
-
     def parent(self, index):
 
         node = self.getNode(index)
         parentNode = node.parent
 
-        if parentNode in (self.root_node, None):
+        if parentNode == self.root_node or parentNode == None:
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
@@ -149,39 +100,3 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return node
 
         return self.root_node
-
-    def removeRow(self, row, parent):
-        if parent.isValid():
-            self.beginRemoveRows(parent, row, row)
-            index = parent.child(row, parent.column())
-            node = index.internalPointer()
-            parent_node = parent.internalPointer()
-            parent_node.children.pop(row)
-            node.parent = None
-            self.endRemoveRows()
-
-
-class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
-    def __init__(self, parent=None):
-        super(SceneSortFilterProxyModel, self).__init__(parent)
-        self.parent_ = parent
-
-
-class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
-    def __init__(self, parent=None):
-        super(TreeItemDelegate, self).__init__(parent)
-
-    def paint(self, painter, option, index):
-        proxy_model = index.model()
-        index_model = proxy_model.mapToSource(index)
-
-        if index_model.isValid():
-            model = index_model.model()
-            env = model.data(index_model, model.envRole)
-            if not env:
-                if option.state & QtWidgets.QStyle.State_Selected:
-                    option.state &= ~QtWidgets.QStyle.State_Selected
-                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
-                else:
-                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
-        QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)
