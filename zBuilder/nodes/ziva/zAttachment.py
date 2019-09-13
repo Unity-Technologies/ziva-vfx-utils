@@ -16,9 +16,6 @@ class AttachmentNode(Ziva):
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
     """ List of maps to store. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
-
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 

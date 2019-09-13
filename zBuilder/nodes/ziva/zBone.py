@@ -14,9 +14,6 @@ class BoneNode(Ziva):
     type = 'zBone'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
-
     def build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 

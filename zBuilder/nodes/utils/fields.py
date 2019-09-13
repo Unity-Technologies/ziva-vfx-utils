@@ -12,9 +12,6 @@ class Field(DGNode):
     ]
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
-        DGNode.__init__(self, *args, **kwargs)
-
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 

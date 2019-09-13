@@ -65,13 +65,19 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(parent=parent, maya_node=node, builder=self))
+                        obb = obj(parent=parent, builder=self)
+                        obb.populate(maya_node=node)
+                        item_list.append(obb)
                 if type_ == obj.type:
 
-                    objct = obj(parent=parent, maya_node=node, builder=self)
+                    objct = obj(parent=parent, builder=self)
+                    objct.populate(maya_node=node)
+
                     item_list.append(objct)
         if not item_list:
-            item_list.append(zBuilder.nodes.DGNode(parent=parent, maya_node=node, builder=self))
+            objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
+            objct.populate(maya_node=node)
+            item_list.append(objct)
 
         if get_parameters:
             for obj__ in item_list:

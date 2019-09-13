@@ -13,11 +13,10 @@ class TissueNode(Ziva):
     type = 'zTissue'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
+        super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
         self.parent_tissue = None
-
-        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.

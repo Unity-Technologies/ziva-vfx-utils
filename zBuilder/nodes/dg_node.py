@@ -17,14 +17,9 @@ class DGNode(Base):
     """ The base node for the node functionality of all nodes
 
     Args:
-        maya_node (str, optional): maya node to populate parameter with.
         builder (object, optional): The builder object for reference.
-        deserialize (dict, optional): if given a dictionary to deserialize it
-            fills hte parameter with contents of dictionary using the deserialize
-            method.
 
     Attributes:
-        
         :rtype: :func:`type` (str): type of parameter.  Tied with maya node type.
         attrs (dict): A place for the maya attributes dictionary.
 
@@ -42,15 +37,12 @@ class DGNode(Base):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, builder=None):
+        super(DGNode, self).__init__(parent=parent, builder=builder)
+
         self.attrs = {}
         self._association = []
         self.__mobject_handle = None
-
-        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
-
-        if maya_node:
-            self.populate(maya_node=maya_node)
 
     def __str__(self):
         if self.name:

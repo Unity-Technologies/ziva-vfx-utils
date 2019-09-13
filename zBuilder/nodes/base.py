@@ -27,7 +27,6 @@ class Base(object):
         self._builder_type = '{}.{}'.format(self._builder_type[0], self._builder_type[1])
 
         self.builder = kwargs.get('builder', None)
-        deserialize = kwargs.get('deserialize', None)
 
         self.children = []
         self.parent = kwargs.get('parent', None)
@@ -40,9 +39,6 @@ class Base(object):
 
         if self.parent is not None:
             self.parent.add_child(self)
-
-        if deserialize:
-            self.deserialize(deserialize)
 
     def __eq__(self, other):
         """ Are names == in node objects?
