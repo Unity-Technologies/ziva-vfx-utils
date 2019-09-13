@@ -13,8 +13,8 @@ class RestShapeNode(Ziva):
     type = 'zRestShape'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
+    def __init__(self, parent=None, builder=None):
+        super(RestShapeNode, self).__init__(parent=parent, builder=builder)
         self.targets = []
         self.tissue_name = None
 

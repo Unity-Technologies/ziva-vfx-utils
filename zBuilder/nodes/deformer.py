@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Deformer(DGNode):
     def __init__(self, parent=None, builder=None):
-        DGNode.__init__(self, parent=parent, builder=builder)
+        super(Deformer, self).__init__(parent=parent, builder=builder)
 
     def spawn_parameters(self):
         """

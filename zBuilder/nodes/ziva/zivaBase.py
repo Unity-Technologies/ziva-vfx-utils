@@ -21,7 +21,7 @@ class Ziva(Deformer):
         pass
 
     def __init__(self, parent=None, builder=None):
-        Deformer.__init__(self, builder=builder, parent=parent)
+        super(Ziva, self).__init__(parent=parent, builder=builder)
         self.solver = None
 
     def populate(self, maya_node=None):

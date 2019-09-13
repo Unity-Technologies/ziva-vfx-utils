@@ -38,7 +38,7 @@ class DGNode(Base):
             to the auto generated attribute list to include."""
 
     def __init__(self, parent=None, builder=None):
-        Base.__init__(self, parent=parent, builder=builder)
+        super(DGNode, self).__init__(parent=parent, builder=builder)
 
         self.attrs = {}
         self._association = []

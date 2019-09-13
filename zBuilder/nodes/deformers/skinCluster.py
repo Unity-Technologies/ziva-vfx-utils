@@ -16,8 +16,8 @@ class SkinCluster(DGNode):
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
 
-    def __init__(self, *args, **kwargs):
-        DGNode.__init__(self, *args, **kwargs)
+    def __init__(self, parent=None, builder=None):
+        super(SkinCluster, self).__init__(parent=parent, builder=builder)
         self.influences = list()
         self.weights = dict()
 

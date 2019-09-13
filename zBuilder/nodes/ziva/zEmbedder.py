@@ -13,8 +13,8 @@ class EmbedderNode(Ziva):
     type = 'zEmbedder'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
+    def __init__(self, parent=None, builder=None):
+        super(EmbedderNode, self).__init__(parent=parent, builder=builder)
         self.__embedded_meshes = None
         self.__collision_meshes = None
 

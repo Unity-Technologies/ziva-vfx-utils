@@ -16,8 +16,8 @@ class TetNode(Ziva):
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
+    def __init__(self, parent=None, builder=None):
+        super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
 
     def set_user_tet_mesh(self, mesh):

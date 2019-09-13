@@ -19,17 +19,17 @@ class Base(object):
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
         self._name = None
         self._class = (self.__class__.__module__, self.__class__.__name__)
 
         self._builder_type = self.__class__.__module__.split('.')
         self._builder_type = '{}.{}'.format(self._builder_type[0], self._builder_type[1])
 
-        self.builder = kwargs.get('builder', None)
+        self.builder = builder
 
         self.children = []
-        self.parent = kwargs.get('parent', None)
+        self.parent = parent
 
         self.info = dict()
         self.info['version'] = zBuilder.__version__

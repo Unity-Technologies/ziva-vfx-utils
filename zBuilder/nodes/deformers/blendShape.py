@@ -12,8 +12,8 @@ class BlendShape(Deformer):
     MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights', 'inputTarget[*].baseWeights']
     EXTEND_ATTR_LIST = ['origin']
 
-    def __init__(self, *args, **kwargs):
-        Deformer.__init__(self, *args, **kwargs)
+    def __init__(self, parent=None, builder=None):
+        super(BlendShape, self).__init__(parent=parent, builder=builder)
         self._target = None
 
     def get_map_meshes(self):

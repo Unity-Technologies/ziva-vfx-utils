@@ -13,7 +13,7 @@ class Map(Base):
     type = 'map'
 
     def __init__(self, *args, **kwargs):
-        Base.__init__(self, *args, **kwargs)
+        super(Map, self).__init__(*args, **kwargs)
         self._mesh = None
         #: list of str: Doc comment *before* attribute, with type specified
         self.values = None
