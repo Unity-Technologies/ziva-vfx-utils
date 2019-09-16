@@ -132,7 +132,9 @@ def remove_solver(solvers=None, askForConfirmation=False):
     for node in mz.ZNODES:
         nodes_in_scene = mc.ls(type=node)
         for item in nodes_in_scene:
-            solver_of_this_item = mz.get_zSolver(item)[0]
+            solver_of_this_item = mz.get_zSolver(item)
+            if solver_of_this_item:
+                solver_of_this_item = solver_of_this_item[0]
             if solver_of_this_item in solvers:
                 to_erase.append(item)
             # unlock the transform attributes
@@ -142,6 +144,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
                 for attr in attrs:
                     mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
 
+    mz.delete_rivet_from_solver(solvers)
     mm.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
         mc.delete(to_erase)
