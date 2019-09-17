@@ -82,9 +82,8 @@ def delete_rivet_from_solver(solvers):
         locators = mc.ls(history, type='zRivetToBoneLocator')
         rivets = mc.ls(history, type='zRivetToBone')
         locator_parent = mc.listRelatives(locators, parent=True)
-        mc.select(locator_parent, rivets)
-        if mc.ls(sl=True):
-            mc.delete()
+        if rivets and locator_parent:
+            mc.delete(rivets + locator_parent)
 
 
 def get_zSolver(body):
