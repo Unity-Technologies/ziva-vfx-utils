@@ -100,22 +100,25 @@ global proc ZivaDeleteSelectedRestShape()
   {
     // Only node types in the node train that can determine the only restshape node is valid.
     // zSolver node, zAttachment node, which connects to two or all restshape node(s), are bad examples.
-    $isValidNode = (nodeType($s) == "zGeo") || (nodeType($s) == "zTissue") || (nodeType($s) == "zTet") || (nodeType($s) == "zMaterial") || (nodeType($s) == "zFiber") || (nodeType($s) == "zRestShape");
+    $isValidNode = ((nodeType($s) == "zGeo") || (nodeType($s) == "zTissue") ||
+      (nodeType($s) == "zTet") || (nodeType($s) == "zMaterial") ||
+      (nodeType($s) == "zFiber") || (nodeType($s) == "zRestShape") ||
+      (nodeType($s) == "transform") || (nodeType($s) == "mesh"));
     if ($isValidNode == true)
     {
-      string $restShape[] = `zQuery -t zRestShape`;
+      string $restShape[] = `zQuery -t zRestShape $s`;
       if ((`size($restShape)` > 0) && (`objExists($restShape[0])`))
       {
         evalDeferred("delete " + $restShape[0]);
       }
       else
       {
-        print("No RestShape found in current selection.\n");
+        warning("No RestShape found in current selection.\n");
       }
     }
     else
     {
-      print("Current selection connect to multiple or no RestShape node.\n");
+      warning("Current selection connect to multiple or no RestShape node.\n");
     }
   }
 }
