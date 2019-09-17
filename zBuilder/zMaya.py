@@ -60,10 +60,30 @@ def get_type(body):
 def clean_scene():
     """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
     """
+    solvers = mc.ls(type='zSolver')
+    delete_rivet_from_solver(solvers)
+
     for node in ZNODES:
         in_scene = mc.ls(type=node)
-        if len(in_scene) > 0:
+        if in_scene:
             mc.delete(in_scene)
+
+
+def delete_rivet_from_solver(solvers):
+    """This deletes all items related to zRivetToBone from a connected solver.  This includes
+    The locator, locator transform and the zRivetToBone node.  current implementation of
+    zQuery does not handle rivets so this is temporary until we get a python version going.
+
+    Args:
+        solver ([list]): The solver/s that have the rivets that are to be deleted.
+    """
+    history = mc.listHistory(solvers, allConnections=True, future=True)
+    if history:
+        locators = mc.ls(history, type='zRivetToBoneLocator')
+        rivets = mc.ls(history, type='zRivetToBone')
+        locator_parent = mc.listRelatives(locators, parent=True)
+        if rivets and locator_parent:
+            mc.delete(rivets + locator_parent)
 
 
 def get_zSolver(body):
