@@ -165,15 +165,13 @@ global proc zInternalWarpOptions(int $warpType)
     $titleString = "Warp bones";
   }
 
-  // window name, and window size
-  int $windowSize[] = { 360, 80 };
+  // window name
   if (`window -exists $zInternalWarpWindowName` == 1)
   {
     deleteUI $zInternalWarpWindowName;
   }
 
-  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
-         -resizeToFitChildren true $zInternalWarpWindowName;
+  window -title $titleString -resizeToFitChildren true $zInternalWarpWindowName;
 
   columnLayout -adjustableColumn true;
 
@@ -212,7 +210,7 @@ global proc zInternalWarpOptions(int $warpType)
   button -label "Close" -command $closeCommand;
 
   showWindow $zInternalWarpWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zInternalWarpWindowName;
+  window -e -resizeToFitChildren true $zInternalWarpWindowName;
 }
 
 // Runs the zRBFWarp, with the parameters stored in the zivaTransfer_* global variables.
@@ -234,17 +232,15 @@ global proc zRBFWarpOptions()
 {
   global int $zivaTransfer_maxKernelCenters;
 
-  // window name, and window size
+  // window name
   global string $zRBFWarpWindowName;
-  int $windowSize[] = { 360, 40 };
   if (`window -exists $zRBFWarpWindowName` == 1)
   {
     deleteUI $zRBFWarpWindowName;
   }
 
   $titleString = "Warp external geometry";
-  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
-         -resizeToFitChildren true $zRBFWarpWindowName;
+  window -title $titleString -resizeToFitChildren true $zRBFWarpWindowName;
 
   columnLayout -adjustableColumn true;
 
@@ -267,7 +263,7 @@ global proc zRBFWarpOptions()
   button -label "Close" -command $closeCommand;
 
   showWindow $zRBFWarpWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zRBFWarpWindowName;
+  window -e -resizeToFitChildren true $zRBFWarpWindowName;
 }
 
 // Runs the transfer of the Ziva rig, based on the parameter values in zRigTransfer_*.
@@ -297,17 +293,15 @@ global proc zRigTransferOptions()
     return;
   }
 
-  // window name and window size
+  // window name
   global string $zRigTransferWindowName;
-  int $windowSize[] = { 360, 80 };
   if (`window -exists $zRigTransferWindowName` == 1)
   {
     deleteUI $zRigTransferWindowName;
   }
 
   $titleString = "Transfer Ziva Rig";
-  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
-         -resizeToFitChildren true $zRigTransferWindowName;
+  window -title $titleString -resizeToFitChildren true $zRigTransferWindowName;
 
   $numRows = 3;
   gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
@@ -337,8 +331,7 @@ global proc zRigTransferOptions()
   button -label "Close" -command "zWindowClose($zRigTransferWindowName)";
 
   showWindow $zRigTransferWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1]
-            -resizeToFitChildren true $zRigTransferWindowName;
+  window -e -resizeToFitChildren true $zRigTransferWindowName;
 }
 
 // Runs the transfer of the Maya skin cluster, based on the parameter values in zSkinClusterTransfer_*.
@@ -364,17 +357,15 @@ global proc zSkinClusterTransferOptions()
     return;
   }
 
-  // window name, and window size
+  // window name
   global string $zSkinClusterTransferWindowName;
-  int $windowSize[] = { 360, 40 };
   if (`window -exists $zSkinClusterTransferWindowName` == 1)
   {
     deleteUI $zSkinClusterTransferWindowName;
   }
 
   $titleString = "Transfer Skin Cluster";
-  window -title $titleString -widthHeight $windowSize[0] $windowSize[1]
-         -resizeToFitChildren true $zSkinClusterTransferWindowName;
+  window -title $titleString -resizeToFitChildren true $zSkinClusterTransferWindowName;
 
   $numRows = 1;
   gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
@@ -387,5 +378,5 @@ global proc zSkinClusterTransferOptions()
   button -label "Close" -command "zWindowClose($zSkinClusterTransferWindowName)";
 
   showWindow $zSkinClusterTransferWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zSkinClusterTransferWindowName;
+  window -e -resizeToFitChildren true $zSkinClusterTransferWindowName;
 }

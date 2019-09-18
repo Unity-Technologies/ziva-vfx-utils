@@ -55,9 +55,7 @@ global proc zLoadRigOptions()
     deleteUI $zSelectSolverWindowName;
   }
 
-  int $windowSize[] = { 360, 30 };
   window -title "Select solver into which to load the Ziva rig"
-         -widthHeight $windowSize[0] $windowSize[1]
          -resizeToFitChildren true $zSelectSolverWindowName;
 
   gridLayout -numberOfRowsColumns 1 2 -cellWidthHeight 180 20 layout;
@@ -77,7 +75,7 @@ global proc zLoadRigOptions()
   button -label "Close" -command "zLoadRigClose()";
 
   showWindow $zSelectSolverWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zSelectSolverWindowName;
+  window -e -resizeToFitChildren true $zSelectSolverWindowName;
 };
 
 // Brings up the options dialog box to save a Ziva rig.
@@ -132,9 +130,7 @@ global proc zRigCopyPasteWithNameSubstitutionOptions()
     deleteUI $zRigCopyPasteWithNameSubstitutionWindowName;
   }
 
-  int $windowSize[] = { 300, 30 };
   window -title "Copy/Paste Ziva Rig with Name Substitution"
-         -widthHeight $windowSize[0] $windowSize[1]
          -resizeToFitChildren true $zRigCopyPasteWithNameSubstitutionWindowName;
 
   columnLayout -adjustableColumn true;
@@ -159,5 +155,5 @@ global proc zRigCopyPasteWithNameSubstitutionOptions()
   button -label "Close" -command $closeCommand;
 
   showWindow $zRigCopyPasteWithNameSubstitutionWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $zRigCopyPasteWithNameSubstitutionWindowName;
+  window -e -resizeToFitChildren true $zRigCopyPasteWithNameSubstitutionWindowName;
 };
