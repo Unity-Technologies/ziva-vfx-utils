@@ -292,7 +292,6 @@ def rig_update(solvers=None):
         solvers = mm.eval('zQuery -t "zSolver" -l')
 
     for solver in solvers:
-        print solver
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
         mc.select(solver)
