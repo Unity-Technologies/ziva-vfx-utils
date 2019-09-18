@@ -288,13 +288,11 @@ def rig_update(solvers=None):
     # This command can be used if you made geometry modifications and you'd like to re-use a previously
     # built Ziva rig on the modified geometry.
     # If no "solvers" are provided, they are inferred from selection.
-    if solvers == None:
+    if solvers is None:
         solvers = mm.eval('zQuery -t "zSolver" -l')
-    if solvers == None:
-        mm.eval('error -n "No solver selected"')
-        return
 
     for solver in solvers:
+        print solver
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
         mc.select(solver)
@@ -309,10 +307,10 @@ def rig_update(solvers=None):
         mc.rename(
             generated_solver,
             solver_transform)  # rename the solver (this also auto-renames the solver shape node)
+
         mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
-        builder.reset_solvers()
         builder.build()
 
 
@@ -349,7 +347,6 @@ def rig_transfer(source_solver, prefix, target_solver=""):
 
     # build the transferred solver
     mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
-    builder.reset_solvers()
     builder.build()
 
 
