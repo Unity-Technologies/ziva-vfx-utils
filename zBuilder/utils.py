@@ -349,6 +349,10 @@ def rig_transfer(source_solver, prefix, target_solver=""):
         '^' + prefix + source_solver,
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
+    # we need to clear the stored mobjects
+    for item in builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True):
+        item.reset_mobject()
+
     # build the transferred solver
     mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
     builder.build()
