@@ -214,6 +214,40 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         os.close(fd)
         os.remove(file_name)
 
+    def test_update_1_solver_nothing_selected(self):
+        # create a cluster on a vert on arm to move it on live ziva rig
+        vert = 'r_bicep_muscle.vtx[961]'
+        mc.select(vert)
+        mc.cluster()
+
+        mc.setAttr('cluster1Handle.translateZ', 5)
+        vert_position = mc.pointPosition(vert, world=True)
+
+        mc.select(cl=True)
+        utility.rig_update()
+
+        vert_position_new = mc.pointPosition(vert, world=True)
+
+        # after rig_update is run vert should be in same position
+        self.assertEqual(vert_position, vert_position_new)
+
+    def test_update_1_solver_solver_selected(self):
+        # create a cluster on a vert on arm to move it on live ziva rig
+        vert = 'r_bicep_muscle.vtx[961]'
+        mc.select(vert)
+        mc.cluster()
+
+        mc.setAttr('cluster1Handle.translateZ', 5)
+        vert_position = mc.pointPosition(vert, world=True)
+
+        mc.select('zSolver1')
+        utility.rig_update()
+
+        vert_position_new = mc.pointPosition(vert, world=True)
+
+        # after rig_update is run vert should be in same position
+        self.assertEqual(vert_position, vert_position_new)
+
 
 class BuilderUtilsTestCase(VfxTestCase):
     def test_builder_factory_throws_when_class_is_not_found(self):
@@ -234,6 +268,11 @@ class BuilderUtilsTestCase(VfxTestCase):
 
         utility.remove_solver(solvers=['zSolver1'])
         self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2Shape'])
+
+    def test_update_no_solvers(self):
+        # scene is empty with no solvers, this should raise an error with update
+        with self.assertRaises(StandardError):
+            utility.rig_update()
 
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
