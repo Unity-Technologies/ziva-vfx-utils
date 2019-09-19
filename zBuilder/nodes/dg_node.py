@@ -293,3 +293,9 @@ class DGNode(Base):
             mobject = om.MObject()
             selection_list.getDependNode(0, mobject)
             self.__mobject_handle = om.MObjectHandle(mobject)
+
+    def reset_mobject(self):
+        """Sets the mObject for the node to None.  This is useful if you want to break the 
+        connection between the node and what is in the scene.
+        """
+        self.__mobject_handle = None
