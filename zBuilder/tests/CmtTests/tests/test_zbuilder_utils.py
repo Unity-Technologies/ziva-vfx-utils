@@ -8,6 +8,7 @@ import zBuilder.zMaya as mz
 import zBuilder.tests.utils as utl
 import zBuilder.utils as utility
 import zBuilder.builder as bld
+from vfx_test_case import get_mesh_vertex_positions
 from vfx_test_case import VfxTestCase
 
 
@@ -215,38 +216,44 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         os.remove(file_name)
 
     def test_update_1_solver_nothing_selected(self):
+        ## SETUP
         # create a cluster on a vert on arm to move it on live ziva rig
         vert = 'r_bicep_muscle.vtx[961]'
         mc.select(vert)
         mc.cluster()
-
         mc.setAttr('cluster1Handle.translateZ', 5)
-        vert_position = mc.pointPosition(vert, world=True)
+        expected_pos = get_mesh_vertex_positions('r_bicep_muscle')
 
+        ## ACT
         mc.select(cl=True)
         utility.rig_update()
 
-        vert_position_new = mc.pointPosition(vert, world=True)
-
-        # after rig_update is run vert should be in same position
-        self.assertEqual(vert_position, vert_position_new)
+        ## VERIFY
+        geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        mc.polySphere(n='mesh')
+        mc.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
+        observed_pos = get_mesh_vertex_positions('mesh')
+        self.assertAllApproxEqual(expected_pos, observed_pos, 1e-3)
 
     def test_update_1_solver_solver_selected(self):
+        ## SETUP
         # create a cluster on a vert on arm to move it on live ziva rig
         vert = 'r_bicep_muscle.vtx[961]'
         mc.select(vert)
         mc.cluster()
-
         mc.setAttr('cluster1Handle.translateZ', 5)
-        vert_position = mc.pointPosition(vert, world=True)
+        expected_pos = get_mesh_vertex_positions('r_bicep_muscle')
 
+        ## ACT
         mc.select('zSolver1')
         utility.rig_update()
 
-        vert_position_new = mc.pointPosition(vert, world=True)
-
-        # after rig_update is run vert should be in same position
-        self.assertEqual(vert_position, vert_position_new)
+        ## VERIFY
+        geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        mc.polySphere(n='mesh')
+        mc.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
+        observed_pos = get_mesh_vertex_positions('mesh')
+        self.assertAllApproxEqual(expected_pos, observed_pos, 1e-3)
 
 
 class BuilderUtilsTestCase(VfxTestCase):
