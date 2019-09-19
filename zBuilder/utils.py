@@ -291,6 +291,12 @@ def rig_update(solvers=None):
     if solvers is None:
         solvers = mm.eval('zQuery -t "zSolver" -l')
 
+    # zQuery gives an error if no solvers though it does not stop script
+    # this is to stop script
+    if solvers is None:
+        mm.eval('error -n "No solver in scene"')
+        return
+
     for solver in solvers:
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
