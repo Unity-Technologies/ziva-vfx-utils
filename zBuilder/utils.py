@@ -288,11 +288,13 @@ def rig_update(solvers=None):
     # This command can be used if you made geometry modifications and you'd like to re-use a previously
     # built Ziva rig on the modified geometry.
     # If no "solvers" are provided, they are inferred from selection.
-    if solvers == None:
+    if solvers is None:
         solvers = mm.eval('zQuery -t "zSolver" -l')
-    if solvers == None:
-        mm.eval('error -n "No solver selected"')
-        return
+
+    # zQuery gives an error if no solvers though it does not stop script
+    # this is to stop script
+    if solvers is None:
+        raise StandardError("No solver in scene.")
 
     for solver in solvers:
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
@@ -309,10 +311,10 @@ def rig_update(solvers=None):
         mc.rename(
             generated_solver,
             solver_transform)  # rename the solver (this also auto-renames the solver shape node)
+
         mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
-        builder.reset_solvers()
         builder.build()
 
 
@@ -347,9 +349,12 @@ def rig_transfer(source_solver, prefix, target_solver=""):
         '^' + prefix + source_solver,
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
+    # we need to clear the stored mobjects.  Without doing this it keeps a pointer to original object
+    # and uses that instead of creating a new object.  This makes sure it is a new setup with new nodes.
+    builder.break_connection_to_scene()
+
     # build the transferred solver
     mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
-    builder.reset_solvers()
     builder.build()
 
 
