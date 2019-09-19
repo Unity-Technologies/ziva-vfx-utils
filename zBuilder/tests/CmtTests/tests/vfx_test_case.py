@@ -11,7 +11,7 @@ class VfxTestCase(TestCase):
         if not cmds.pluginInfo('ziva', query=True, loaded=True):
             print('loading plugin ...')
             self.pluginPath = get_plugin_path()
-            cmds.loadPlugin(self.pluginPath)        
+            cmds.loadPlugin(self.pluginPath)
             print('plugin loaded: '+self.pluginPath)
 
     def tearDown(self):
