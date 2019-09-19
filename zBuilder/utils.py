@@ -349,7 +349,8 @@ def rig_transfer(source_solver, prefix, target_solver=""):
         '^' + prefix + source_solver,
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
-    # we need to clear the stored mobjects
+    # we need to clear the stored mobjects.  Without doing this it keeps a pointer to original object
+    # and uses that instead of creating a new object.  This makes sure it is a new setup with new nodes.
     for item in builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True):
         item.reset_mobject()
 
