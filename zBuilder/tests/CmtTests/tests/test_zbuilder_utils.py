@@ -274,6 +274,33 @@ class BuilderUtilsTestCase(VfxTestCase):
         with self.assertRaises(StandardError):
             utility.rig_update()
 
+    def test_rig_transfer_warped_prefix(self):
+        # get demo arm geo to add prefix
+        utl.build_anatomical_arm_with_no_popup(ziva_setup=False)
+
+        # prefix all geometry transforms with warped_
+        to_change = ['muscle_grp', 'bone_grp', 'rig_grp']
+        transforms = mc.listRelatives(to_change,
+                                      children=True,
+                                      allDescendents=True,
+                                      type='transform')
+
+        for item in transforms + to_change:
+            mc.rename(item, 'warped_{}'.format(item))
+
+        # get full setup demo arm
+        utl.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
+
+        # now do the trasnfer
+        utility.rig_transfer('zSolver1', 'warped_', '')
+
+        # when done we should have some ziva nodes with a 'warped_' prefix
+        nodes_in_scene = [
+            'warped_zSolver1', 'warped_r_bicep_muscle_zTissue', 'warped_r_bicep_muscle_zFiber',
+            'warped_r_tricepsTendon_muscle_zTet'
+        ]
+        self.assertSceneHasNodes(nodes_in_scene)
+
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
     def test_copy_paste_with_substitution(self):
