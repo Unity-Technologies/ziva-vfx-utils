@@ -549,7 +549,7 @@ def check_mesh_quality(meshes):
 
     if tmp:
         mc.select(tmp)
-        raise StandardError, 'check meshes!'
+        raise StandardError('check meshes!')
     else:
         mc.select(meshes)
 
@@ -597,7 +597,7 @@ def parse_maya_node_for_selection(args):
             if mc.objExists(sel):
                 tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError, '{} does not exist in scene, stopping!'.format(sel)
+                raise StandardError('{} does not exist in scene, stopping!'.format(sel))
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -606,7 +606,7 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise StandardError, 'Nothing selected or passed, please select something and try again.'
+            raise StandardError('Nothing selected or passed, please select something and try again.')
     return selection
 
 
