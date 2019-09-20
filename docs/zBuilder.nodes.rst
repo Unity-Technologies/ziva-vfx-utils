@@ -37,14 +37,6 @@ zBuilder.nodes.dg_node module
     :undoc-members:
     :show-inheritance:
 
-zBuilder.nodes.transform module
--------------------------------
-
-.. automodule:: zBuilder.nodes.transform
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
