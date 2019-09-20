@@ -135,7 +135,7 @@ class ZivaBuildTestCase(VfxTestCase):
         # now check value of vert position.  Should be saem as rest
         mesh = z.get_scene_items(type_filter='mesh', name_filter='r_bicep_muscle')[0]
 
-        print mesh.get_point_list()[0], rest_point_position
+        print(mesh.get_point_list()[0], rest_point_position)
 
         self.assertTrue(mesh.get_point_list()[0] == rest_point_position)
 

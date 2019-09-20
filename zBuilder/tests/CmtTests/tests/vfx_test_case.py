@@ -62,7 +62,7 @@ def get_plugin_path():
         try:
             data = yaml.load(stream)
         except yaml.YAMLError as exc:
-            print exc
+            print(exc)
             raise StandardError('Error reading yaml file.')
 
     return data['settings']['plugin_path']

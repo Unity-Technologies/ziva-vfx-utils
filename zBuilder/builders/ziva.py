@@ -386,7 +386,7 @@ class Ziva(Builder):
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
-        print '\ngetting ziva......'
+        print('\ngetting ziva......')
 
         if not attr_filter:
             attr_filter = {}

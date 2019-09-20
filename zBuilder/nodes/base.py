@@ -94,8 +94,8 @@ class Base(object):
             output += "\t"
         output += "|-----" + self._name + "\n"
 
-        print self.children
-        print self.parent
+        print(self.children)
+        print(self.parent)
         for child in self.children:
             output += child.log(tab_level)
 

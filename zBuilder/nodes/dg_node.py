@@ -183,7 +183,7 @@ class DGNode(Base):
                     scene_val = mc.getAttr(name + '.' + attr)
                     obj_val = self.attrs[attr]['value']
                     if scene_val != obj_val:
-                        print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
+                        print('DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val)
 
     def get_scene_name(self, long_name=False):
         """This checks stored mObject and gets name of maya object in scene.  If no

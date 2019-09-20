@@ -459,7 +459,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     mesh = mesh.replace(r, '')
                 if item != '{}_{}'.format(mesh, zNode):
                     mc.rename(item, '{}_{}'.format(mesh, zNode))
-                    print 'rename: ', item, '{}_{}'.format(mesh, zNode)
+                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
 
     # for now doing an ls type for lineOfActions until with have zQuery support
     loas = mc.ls(type='zLineOfAction')
@@ -480,7 +480,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 t = t.replace(r, '')
             if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
                 mc.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print 'rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment')
+                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
 
     logger.info('finished renaming.... ')
 

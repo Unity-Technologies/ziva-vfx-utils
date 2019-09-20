@@ -81,7 +81,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         builder = zva.Ziva()
         builder.retrieve_connections()
         builder.stats()
-        print builder.get_scene_items()
+        print(builder.get_scene_items())
         # should not be empty
         self.assertTrue(len(builder.get_scene_items()) > 0)
 
