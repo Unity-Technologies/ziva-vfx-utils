@@ -175,7 +175,7 @@ class DGNode(Base):
                     scene_val = mc.getAttr(name + '.' + attr)
                     obj_val = self.attrs[attr]['value']
                     if scene_val != obj_val:
-                        print 'DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val
+                        print('DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val)
 
     def get_scene_name(self, long_name=False):
         """This checks stored mObject and gets name of maya object in scene.  If no
@@ -285,3 +285,9 @@ class DGNode(Base):
             mobject = om.MObject()
             selection_list.getDependNode(0, mobject)
             self.__mobject_handle = om.MObjectHandle(mobject)
+
+    def break_connection_to_scene(self):
+        """Sets the mObject for the node to None.  This is useful if you want to break the 
+        connection between the node and what is in the scene.
+        """
+        self.__mobject_handle = None

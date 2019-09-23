@@ -8,6 +8,7 @@ import zBuilder.zMaya as mz
 import zBuilder.tests.utils as utl
 import zBuilder.utils as utility
 import zBuilder.builder as bld
+from vfx_test_case import get_mesh_vertex_positions
 from vfx_test_case import VfxTestCase
 
 
@@ -214,6 +215,46 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         os.close(fd)
         os.remove(file_name)
 
+    def test_update_1_solver_nothing_selected(self):
+        ## SETUP
+        # create a cluster on a vert on arm to move it on live ziva rig
+        vert = 'r_bicep_muscle.vtx[961]'
+        mc.select(vert)
+        mc.cluster()
+        mc.setAttr('cluster1Handle.translateZ', 5)
+        expected_pos = get_mesh_vertex_positions('r_bicep_muscle')
+
+        ## ACT
+        mc.select(cl=True)
+        utility.rig_update()
+
+        ## VERIFY
+        geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        mc.polySphere(n='mesh')
+        mc.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
+        observed_pos = get_mesh_vertex_positions('mesh')
+        self.assertAllApproxEqual(expected_pos, observed_pos, 1e-3)
+
+    def test_update_1_solver_solver_selected(self):
+        ## SETUP
+        # create a cluster on a vert on arm to move it on live ziva rig
+        vert = 'r_bicep_muscle.vtx[961]'
+        mc.select(vert)
+        mc.cluster()
+        mc.setAttr('cluster1Handle.translateZ', 5)
+        expected_pos = get_mesh_vertex_positions('r_bicep_muscle')
+
+        ## ACT
+        mc.select('zSolver1')
+        utility.rig_update()
+
+        ## VERIFY
+        geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        mc.polySphere(n='mesh')
+        mc.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
+        observed_pos = get_mesh_vertex_positions('mesh')
+        self.assertAllApproxEqual(expected_pos, observed_pos, 1e-3)
+
 
 class BuilderUtilsTestCase(VfxTestCase):
     def test_builder_factory_throws_when_class_is_not_found(self):
@@ -234,6 +275,38 @@ class BuilderUtilsTestCase(VfxTestCase):
 
         utility.remove_solver(solvers=['zSolver1'])
         self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2Shape'])
+
+    def test_update_no_solvers(self):
+        # scene is empty with no solvers, this should raise an error with update
+        with self.assertRaises(StandardError):
+            utility.rig_update()
+
+    def test_rig_transfer_warped_prefix(self):
+        # get demo arm geo to add prefix
+        utl.build_anatomical_arm_with_no_popup(ziva_setup=False)
+
+        # prefix all geometry transforms with warped_
+        to_change = ['muscle_grp', 'bone_grp', 'rig_grp']
+        transforms = mc.listRelatives(to_change,
+                                      children=True,
+                                      allDescendents=True,
+                                      type='transform')
+
+        for item in transforms + to_change:
+            mc.rename(item, 'warped_{}'.format(item))
+
+        # get full setup demo arm
+        utl.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
+
+        # now do the trasnfer
+        utility.rig_transfer('zSolver1', 'warped_', '')
+
+        # when done we should have some ziva nodes with a 'warped_' prefix
+        nodes_in_scene = [
+            'warped_zSolver1', 'warped_r_bicep_muscle_zTissue', 'warped_r_bicep_muscle_zFiber',
+            'warped_r_tricepsTendon_muscle_zTet'
+        ]
+        self.assertSceneHasNodes(nodes_in_scene)
 
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):

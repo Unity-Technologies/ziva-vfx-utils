@@ -255,6 +255,13 @@ class Builder(object):
                                            association_regex=association_regex,
                                            invert_match=invert_match)
 
+    def break_connection_to_scene(self):
+        """Sets the mObject for all scene items to None.  This is useful if you want to break the 
+        connection between the node and what is in the scene.
+        """
+        for item in self.get_scene_items(type_filter=['map', 'mesh'], invert_match=True):
+            item.break_connection_to_scene()
+
 
 def builder_factory(class_name):
     """A factory node to return the correct Builder given class name.

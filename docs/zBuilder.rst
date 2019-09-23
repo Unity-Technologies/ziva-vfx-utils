@@ -38,7 +38,7 @@ zBuilder.bundle module
     :show-inheritance:
 
 zBuilder.utils module
---------------------
+---------------------
 
 .. automodule:: zBuilder.utils
     :members:

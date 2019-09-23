@@ -60,10 +60,30 @@ def get_type(body):
 def clean_scene():
     """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
     """
+    solvers = mc.ls(type='zSolver')
+    delete_rivet_from_solver(solvers)
+
     for node in ZNODES:
         in_scene = mc.ls(type=node)
-        if len(in_scene) > 0:
+        if in_scene:
             mc.delete(in_scene)
+
+
+def delete_rivet_from_solver(solvers):
+    """This deletes all items related to zRivetToBone from a connected solver.  This includes
+    The locator, locator transform and the zRivetToBone node.  current implementation of
+    zQuery does not handle rivets so this is temporary until we get a python version going.
+
+    Args:
+        solver ([list]): The solver/s that have the rivets that are to be deleted.
+    """
+    history = mc.listHistory(solvers, allConnections=True, future=True)
+    if history:
+        locators = mc.ls(history, type='zRivetToBoneLocator')
+        rivets = mc.ls(history, type='zRivetToBone')
+        locator_parent = mc.listRelatives(locators, parent=True)
+        if rivets and locator_parent:
+            mc.delete(rivets + locator_parent)
 
 
 def get_zSolver(body):
@@ -439,7 +459,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     mesh = mesh.replace(r, '')
                 if item != '{}_{}'.format(mesh, zNode):
                     mc.rename(item, '{}_{}'.format(mesh, zNode))
-                    print 'rename: ', item, '{}_{}'.format(mesh, zNode)
+                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
 
     # for now doing an ls type for lineOfActions until with have zQuery support
     loas = mc.ls(type='zLineOfAction')
@@ -460,7 +480,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 t = t.replace(r, '')
             if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
                 mc.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print 'rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment')
+                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
 
     logger.info('finished renaming.... ')
 
@@ -529,7 +549,7 @@ def check_mesh_quality(meshes):
 
     if tmp:
         mc.select(tmp)
-        raise StandardError, 'check meshes!'
+        raise StandardError('check meshes!')
     else:
         mc.select(meshes)
 
@@ -577,7 +597,7 @@ def parse_maya_node_for_selection(args):
             if mc.objExists(sel):
                 tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError, '{} does not exist in scene, stopping!'.format(sel)
+                raise StandardError('{} does not exist in scene, stopping!'.format(sel))
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -586,7 +606,7 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise StandardError, 'Nothing selected or passed, please select something and try again.'
+            raise StandardError('Nothing selected or passed, please select something and try again.')
     return selection
 
 

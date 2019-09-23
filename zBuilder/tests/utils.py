@@ -38,22 +38,30 @@ def ziva_mirror_sample_geo():
     mm.eval('ziva -a')
 
 
-def build_anatomical_arm_with_no_popup():
+def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
     """This simply builds Ziva's anatomical arm demo for testing purposes.
 
+    Args:
+        ziva_setup (bool): If True this will do the Ziva setup on arm.  Else it 
+        just brings in geometry.
+        new_scene (bool): If true it forces a new scene.
     Returns:
         nothing
     """
-    mc.file(new=True, f=True)
+    if new_scene:
+        mc.file(new=True, force=True)
+
     mm.eval('ziva_loadArmGeometry_anatomicalArmDemo();')
-    mm.eval('ziva -s;')
 
-    mm.eval('ziva_makeBones_anatomicalArmDemo();')
-    mm.eval('ziva_makeTissues_anatomicalArmDemo(1);')
-    mm.eval('ziva_makeAttachments_anatomicalArmDemo();')
-    mm.eval('ziva_makeMuscleFibers_anatomicalArmDemo();')
-    mm.eval('ziva_setupMuscleFibersActivation();')
+    if ziva_setup:
+        mm.eval('ziva -s;')
 
-    mc.setAttr('zSolver1.collisionDetection', 1)
-    mc.setAttr('zSolver1.substeps', 1)
-    mc.setAttr('zSolver1.maxNewtonIterations', 2)
+        mm.eval('ziva_makeBones_anatomicalArmDemo();')
+        mm.eval('ziva_makeTissues_anatomicalArmDemo(1);')
+        mm.eval('ziva_makeAttachments_anatomicalArmDemo();')
+        mm.eval('ziva_makeMuscleFibers_anatomicalArmDemo();')
+        mm.eval('ziva_setupMuscleFibersActivation();')
+
+        mc.setAttr('zSolver1.collisionDetection', 1)
+        mc.setAttr('zSolver1.substeps', 1)
+        mc.setAttr('zSolver1.maxNewtonIterations', 2)

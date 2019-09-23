@@ -60,5 +60,5 @@ class Wrap(Deformer):
         out = list()
         out.extend(output_geometry)
         out.extend(driver_points)
-        print 'FYUFSF', node, out
+        print('FYUFSF', node, out)
         return out

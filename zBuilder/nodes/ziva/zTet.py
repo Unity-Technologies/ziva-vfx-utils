@@ -54,7 +54,7 @@ class TetNode(Ziva):
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
-                print 'could not connect {}.worldMesh to {}.iTet'.format(user_mesh, name)
+                print('could not connect {}.worldMesh to {}.iTet'.format(user_mesh, name))
 
     def build(self, *args, **kwargs):
         """ Builds the zTets in maya scene.

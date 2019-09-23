@@ -139,8 +139,7 @@ global proc ziva_selectSolver(int $method)
     $titleString = "Select solver";
   if ($method == 1)
     $titleString = "Set default solver";
-  int $windowSize[] = { 360, 30 };
-  window -title $titleString -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $ziva_selectSolverWindowName;
+  window -title $titleString -resizeToFitChildren true $ziva_selectSolverWindowName;
 
   $numRows = 1;
   gridLayout -numberOfRowsColumns $numRows 2 -cellWidthHeight 180 20 layout;
@@ -164,7 +163,7 @@ global proc ziva_selectSolver(int $method)
   button -label "Close" -command "ziva_selectSolverClose()";
 
   showWindow $ziva_selectSolverWindowName;
-  window -e -widthHeight $windowSize[0] $windowSize[1] -resizeToFitChildren true $ziva_selectSolverWindowName;
+  window -e -resizeToFitChildren true $ziva_selectSolverWindowName;
 }
 
 global proc ziva_attachField(string $fieldType)

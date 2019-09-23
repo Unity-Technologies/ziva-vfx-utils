@@ -137,3 +137,9 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # result will have named loa
         self.assertTrue(len(result) == 1)
+
+    def test_delete_solver_with_rivet(self):
+        mc.select('zSolver1')
+        utility.remove_solver()
+
+        self.assertEquals(mc.ls(type=['zSolver', 'zRivetToBone', 'zRivetToBoneLocator']), [])
