@@ -252,4 +252,4 @@ class ZivaRestShapeTestCase(VfxTestCase):
         # check amount of zTissue and zTet.  Should be 1 of each
         items = builder.get_scene_items(type_filter=['zRestShape'])
 
-        self.assertTrue(len(items) == 1)
+        self.assertEqual(len(items), 1)
