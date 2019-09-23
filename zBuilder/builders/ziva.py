@@ -432,8 +432,7 @@ class Ziva(Builder):
                     if loas:
                         nodes.append(loas)
             if restShape:
-                solver_history = mc.listHistory(sol)
-                nodes.extend(mc.ls(solver_history, type='zRestShape'))
+                nodes.extend(mm.eval('zQuery -t zRestShape {}'.format(sol[0])))
             if embedder:
                 mc.select(selection)
                 embedder = mm.eval('zQuery -t "zEmbedder"')
