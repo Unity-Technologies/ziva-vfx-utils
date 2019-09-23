@@ -383,6 +383,7 @@ class Ziva(Builder):
         fields = kwargs.get('fields', True)
         lineOfAction = kwargs.get('lineOfAction', True)
         rivetToBone = kwargs.get('rivetToBone', True)
+        restShape = kwargs.get('restShape', True)
         embedder = kwargs.get('embedder', True)
         get_parameters = kwargs.get('get_parameters', True)
 
@@ -430,6 +431,9 @@ class Ziva(Builder):
                     loas = mz.get_fiber_lineofaction(fiber)
                     if loas:
                         nodes.append(loas)
+            if restShape:
+                solver_history = mc.listHistory(sol)
+                nodes.extend(mc.ls(solver_history, type='zRestShape'))
             if embedder:
                 mc.select(selection)
                 embedder = mm.eval('zQuery -t "zEmbedder"')
