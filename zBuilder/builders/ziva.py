@@ -432,7 +432,9 @@ class Ziva(Builder):
                     if loas:
                         nodes.append(loas)
             if restShape:
-                nodes.extend(mm.eval('zQuery -t zRestShape {}'.format(sol[0])))
+                rest_shapes = mm.eval('zQuery -t zRestShape {}'.format(sol[0]))
+                if rest_shapes:
+                    nodes.extend(rest_shapes)
             if embedder:
                 mc.select(selection)
                 embedder = mm.eval('zQuery -t "zEmbedder"')
