@@ -6,7 +6,7 @@ echo done
 @echo off
 : default maya version is 2018 unless overriden by a parameter
 if "%~1"=="" (
-    set mayaYear=2018
+    set mayaYear=2019
 ) else (
     set mayaYear=%1
 )
