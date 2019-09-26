@@ -6,7 +6,7 @@ import sys
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
-import zBuilder.tests.utils as utl
+import tests.utils as utl
 import zBuilder.utils as utility
 import zBuilder.builder as bld
 from vfx_test_case import VfxTestCase

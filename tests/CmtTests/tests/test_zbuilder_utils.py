@@ -5,7 +5,7 @@ import maya.cmds as mc
 import maya.mel as mm
 
 import zBuilder.zMaya as mz
-import zBuilder.tests.utils as utl
+import tests.utils as utl
 import zBuilder.utils as utility
 import zBuilder.builder as bld
 from vfx_test_case import get_mesh_vertex_positions

@@ -62,7 +62,8 @@ def create_clean_maya_app_dir(directory=None):
     temp_dir = tempfile.gettempdir()
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(str(uuid.uuid4())))
+    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(
+        str(uuid.uuid4())))
     if os.path.exists(dst):
         shutil.rmtree(dst, ignore_errors=False, onerror=remove_read_only)
     shutil.copytree(app_dir, dst)
@@ -78,7 +79,7 @@ def remove_read_only(func, path, exc):
     """
     excvalue = exc[1]
     if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
-        os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
+        os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
         func(path)
     else:
         raise RuntimeError('Could not remove {0}'.format(path))
@@ -86,16 +87,14 @@ def remove_read_only(func, path, exc):
 
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('-m', '--maya',
-                        help='Maya version',
-                        default='2018')
-    parser.add_argument('-mad', '--maya-app-dir',
-                        help='Just create a clean MAYA_APP_DIR and exit')
-    parser.add_argument('-p', '--path',
-                        help='Path to a folder with tests')
-    parser.add_argument('-msp', '--maya-script-path',
+    parser.add_argument('-m', '--maya', help='Maya version', default='2018')
+    parser.add_argument('-mad', '--maya-app-dir', help='Just create a clean MAYA_APP_DIR and exit')
+    parser.add_argument('-p', '--path', help='Path to a folder with tests')
+    parser.add_argument('-msp',
+                        '--maya-script-path',
                         help='Path append to MAYA_SCRIPT_PATH environment variable')
-    parser.add_argument('-mmp', '--maya-module-path',
+    parser.add_argument('-mmp',
+                        '--maya-module-path',
                         help='Path append to MAYA_MODULE_PATH environment variable')
     pargs = parser.parse_args()
     mayaunittest = os.path.join(CMT_ROOT_DIR, 'scripts', 'cmt', 'test', 'mayaunittest.py')
@@ -109,12 +108,13 @@ def main():
         cmd.append(pargs.path)
 
     if not os.path.exists(cmd[0]):
-        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
+        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(
+            pargs.maya, cmd[0]))
 
     # adding python path
-    module_dir = os.path.dirname(os.path.abspath(__file__)) 
+    module_dir = os.path.dirname(os.path.abspath(__file__))
     python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
-    virtualenv_path = os.path.join(python_path, 'zBuilder', 'tests', 'CmtTests', 'env2', 'Lib', 'site-packages')
+    virtualenv_path = os.path.join(python_path, 'tests', 'CmtTests', 'env2', 'Lib', 'site-packages')
 
     if "PYTHONPATH" not in os.environ:
         os.environ["PYTHONPATH"] = python_path + os.pathsep + virtualenv_path
@@ -129,7 +129,7 @@ def main():
 
     # Create clean prefs
     os.environ['MAYA_APP_DIR'] = maya_app_dir
-    
+
     # Clear out any MAYA_SCRIPT_PATH value except explicit specified
     os.environ['MAYA_SCRIPT_PATH'] = ''
     mayaScriptPath = pargs.maya_script_path
@@ -144,7 +144,7 @@ def main():
 
     # Make sure that we're not picking up things accidentally from MAYA_PLUG_IN_PATH on local dev machine
     os.environ['MAYA_PLUG_IN_PATH'] = ''
-    
+
     exitCode = 0
     try:
         subprocess.check_call(cmd)
@@ -152,8 +152,9 @@ def main():
         exitCode = error.returncode
     finally:
         shutil.rmtree(maya_app_dir)
-    
+
     sys.exit(exitCode)
+
 
 if __name__ == '__main__':
     main()

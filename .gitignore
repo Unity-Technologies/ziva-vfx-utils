@@ -5,4 +5,4 @@ _build
 docs/_build/
 .idea
 .vscode/
-zBuilder/tests/CmtTests/env2/
+tests/CmtTests/env2/
