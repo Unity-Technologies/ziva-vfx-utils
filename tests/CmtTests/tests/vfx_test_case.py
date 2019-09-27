@@ -70,7 +70,7 @@ def get_plugin_path():
     os_name = sys.platform
     if os_name in ("linux", "linux2"):
         path_name = 'plugin_path_linux'
-    elif os == "win32":
+    elif os_name == "win32":
         path_name = 'plugin_path_win'
     else:
         raise StandardError('OS {} is not supported.'.format(os_name))
