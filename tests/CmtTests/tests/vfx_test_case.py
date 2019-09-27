@@ -2,7 +2,6 @@ import os
 import sys
 import maya.cmds as cmds
 from cmt.test import TestCase
-import yaml
 
 def isApprox(a, b, eps=1e-6):
     if hasattr(type(a), '__iter__'):
@@ -59,6 +58,8 @@ class VfxTestCase(TestCase):
 
 
 def get_plugin_path():
+    import yaml
+
     with open(os.path.dirname(__file__) + '/../settings.yaml', 'r') as stream:
         try:
             data = yaml.load(stream)
@@ -72,6 +73,6 @@ def get_plugin_path():
     elif os == "win32":
         path_name = 'plugin_path_win'
     else:
-        raise StandardError('OS %s is not supported.' % os_name)
+        raise StandardError('OS {} is not supported.'.format(os_name))
 
     return data['settings'][path_name]

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Install virtualenv
+# Creates new environmet env2 in the current folder
+# Install required libraries from requirements2.txt
+# Has to be executed before run_zbuilder_smoke_tests
+
 rm -R ./env2
 
 echo 'Configuring env2 virtualenv ...'

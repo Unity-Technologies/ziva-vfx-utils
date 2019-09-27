@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Execute to run zBuilder tests
+# Has to be run after intall_python unless it was executed on current machine
+# and after configute scripts from the current folder
+# Optional input parameter: takes first argument as maya version number, default agrument is 2019
+
 echo "activating virtual environment ..."
 
 source ./env2/bin/activate

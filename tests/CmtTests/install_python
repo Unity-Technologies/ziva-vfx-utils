@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Run this script to install python 2.7.11
+# Has to be executed ones per machine before running configure and run_zbuilder_smoke_tests
+# Makes a new instance of python that matches Maya's python version to make installed libraries compatible
+# configure and run_zbuilder_smoke_tests scripts will not work before this script executed
+
 yum install -y zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel expat-devel
 
 yum install -y wget
