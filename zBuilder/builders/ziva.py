@@ -107,8 +107,9 @@ class Ziva(Builder):
 
         # rest shapes
         for item in self.get_scene_items(type_filter=['zRestShape']):
-            parent_node = self.get_scene_items(name_filter=item.tissue_name)[0]
+            parent_node = self.get_scene_items(name_filter=item.tissue_name)
             if parent_node:
+                parent_node = parent_node[0]
                 parent_node.add_child(item)
                 item.parent = parent_node
 
