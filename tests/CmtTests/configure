@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# To run use sudo ./configure
 # Install virtualenv
 # Creates new environmet env2 in the current folder
 # Install required libraries from requirements2.txt

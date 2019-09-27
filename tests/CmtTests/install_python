@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Run this script to install python 2.7.11
+# To run use sudo ./install_python
 # Has to be executed ones per machine before running configure and run_zbuilder_smoke_tests
 # Makes a new instance of python that matches Maya's python version to make installed libraries compatible
 # configure and run_zbuilder_smoke_tests scripts will not work before this script executed
@@ -12,7 +13,7 @@ yum install -y wget
 wget http://python.org/ftp/python/2.7.11/Python-2.7.11.tar.xz
 tar xf Python-2.7.11.tar.xz
 cd Python-2.7.11 || { echo "Could not find python installation folder: Python-2.7.11"; exit 1; }
-./configure --prefix=/usr/local --enable-unicode=ucs4 --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
+./configure --prefix=/usr --enable-unicode=ucs4 --enable-shared LDFLAGS="-Wl,-rpath /usr/lib"
 make && make altinstall
 
 strip /usr/local/lib/libpython2.7.so.1.0
