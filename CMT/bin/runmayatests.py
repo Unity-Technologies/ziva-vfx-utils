@@ -17,6 +17,7 @@ import subprocess
 import tempfile
 import uuid
 import sys
+import site
 
 CMT_ROOT_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
@@ -87,7 +88,7 @@ def remove_read_only(func, path, exc):
 
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('-m', '--maya', help='Maya version', default='2018')
+    parser.add_argument('-m', '--maya', help='Maya version', default='2019')
     parser.add_argument('-mad', '--maya-app-dir', help='Just create a clean MAYA_APP_DIR and exit')
     parser.add_argument('-p', '--path', help='Path to a folder with tests')
     parser.add_argument('-msp',
@@ -114,13 +115,17 @@ def main():
     # adding python path
     module_dir = os.path.dirname(os.path.abspath(__file__))
     python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
-    virtualenv_path = os.path.join(python_path, 'tests', 'CmtTests', 'env2', 'Lib', 'site-packages')
+
+    virtualenv_path = [p for p in site.sys.path if 'site-packages' in p]
+
+    all_paths = list(virtualenv_path)
+    all_paths.append(python_path)
+
 
     if "PYTHONPATH" not in os.environ:
-        os.environ["PYTHONPATH"] = python_path + os.pathsep + virtualenv_path
+        os.environ["PYTHONPATH"] = os.pathsep.join(all_paths)
     else:
-        os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
-        os.environ["PYTHONPATH"] = virtualenv_path + os.pathsep + os.environ["PYTHONPATH"]
+        os.environ["PYTHONPATH"] = os.pathsep.join(all_paths) + os.pathsep + os.environ["PYTHONPATH"]
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)

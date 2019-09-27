@@ -1,0 +1,13 @@
+#!/bin/bash
+
+rm -R ./env2
+
+echo 'Configuring env2 virtualenv ...'
+
+pip2.7 install virtualenv
+python2.7 -m virtualenv env2
+source ./env2/bin/activate
+pip install -r ./requirements2.txt --ignore-installed
+deactivate
+
+echo 'Done: configuring env2 virtualenv'

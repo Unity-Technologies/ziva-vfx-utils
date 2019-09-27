@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "activating virtual environment ..."
+
+source ./env2/bin/activate
+
+echo "done"
+
+echo "adding home folder to zivadyn_LICENSE ..."
+
+export zivadyn_LICENSE=$zivadyn_LICENSE:~
+
+echo "done"
+
+mayaYear=${1:-2019}
+
+python ../../CMT/bin/runmayatests.py -m "$mayaYear" --path ./tests --maya-script-path ../../scripts
+
+echo "deactivating virtual environment ..."
+
+deactivate
+
+echo "done"
