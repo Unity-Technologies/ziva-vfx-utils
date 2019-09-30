@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# To run use sudo ./configure
+# To run use ./configure
 # Install virtualenv
 # Creates new environmet env2 in the current folder
 # Install required libraries from requirements2.txt
@@ -10,7 +10,7 @@ rm -R ./env2
 
 echo 'Configuring env2 virtualenv ...'
 
-pip2.7 install virtualenv
+pip2.7 install --user virtualenv
 python2.7 -m virtualenv env2
 source ./env2/bin/activate
 pip install -r ./requirements2.txt --ignore-installed
