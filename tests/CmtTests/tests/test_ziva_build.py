@@ -253,3 +253,23 @@ class ZivaRestShapeTestCase(VfxTestCase):
         items = builder.get_scene_items(type_filter=['zRestShape'])
 
         self.assertEqual(len(items), 1)
+
+    def test_copy_non_restshape_selected(self):
+        # make sure VFXACT-347 stays functional
+        # create a tissue with no restShapes then select that and copy
+        non_rest_tissue = mc.polySphere(name='c')[0]
+        mc.select(non_rest_tissue)
+        mm.eval('ziva -t')
+
+        mc.select(non_rest_tissue)
+
+        utility.rig_copy()
+
+        # use builder to retrieve from scene-----------------------------------
+        builder = zva.Ziva()
+        builder.retrieve_from_scene_selection()
+
+        # check for a tissue, if it gets to this point regardless of what it finds
+        # the test passed
+        items = builder.get_scene_items(type_filter=['zTissue'])
+        self.assertEqual(len(items), 1)
