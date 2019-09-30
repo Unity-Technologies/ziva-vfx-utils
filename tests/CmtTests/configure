@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# To run use ./configure
-# Install virtualenv
-# Creates new environmet env2 in the current folder
-# Install required libraries from requirements2.txt
-# Has to be executed before run_zbuilder_smoke_tests
+# This script sets up a python virtualenv with everything
+# required to run the zBuilder automated tests.
+# The virtualenv will be created in ./env2 and any existing
+# contents of that directory will be deleted.
+# The intention is that this should be run after requrements2.txt changed
+# DO NOT run with sudo
 
 rm -R ./env2
 

@@ -5,6 +5,7 @@
 # Has to be executed ones per machine before running configure and run_zbuilder_smoke_tests
 # Makes a new instance of python that matches Maya's python version to make installed libraries compatible
 # configure and run_zbuilder_smoke_tests scripts will not work before this script executed
+# Reference: https://danieleriksson.net/2017/02/08/how-to-install-latest-python-on-centos/
 
 if test -f /usr/local/bin/python2.7; then
   if /usr/local/bin/python2.7 -V == "Python 2.7.11"; then
@@ -23,7 +24,6 @@ cd Python-2.7.11 || { echo "Could not find python installation folder: Python-2.
 ./configure --prefix=/usr/local/ --enable-unicode=ucs4 --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib/"
 make && make altinstall
 
-strip /usr/local/lib/libpython2.7.so.1.0
 wget https://bootstrap.pypa.io/get-pip.py
 /usr/local/bin/python2.7 get-pip.py
 

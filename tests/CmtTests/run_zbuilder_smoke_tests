@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Execute to run zBuilder tests
+# Read ./install_python and ./configure description before running
 # To run use ./run_zbuilder_smoke_tests
-# Has to be run after intall_python unless it was executed on current machine
-# and after configute scripts from the current folder
+# DO NOT run with sudo
 # Optional input parameter: takes first argument as maya version number, default agrument is 2019
 
 echo "activating virtual environment ..."
