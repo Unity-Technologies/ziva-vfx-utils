@@ -263,13 +263,4 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         mc.select(non_rest_tissue)
 
-        utility.rig_copy()
-
-        # use builder to retrieve from scene-----------------------------------
-        builder = zva.Ziva()
-        builder.retrieve_from_scene_selection()
-
-        # check for a tissue, if it gets to this point regardless of what it finds
-        # the test passed
-        items = builder.get_scene_items(type_filter=['zTissue'])
-        self.assertEqual(len(items), 1)
+        self.assertTrue(utility.rig_copy())
