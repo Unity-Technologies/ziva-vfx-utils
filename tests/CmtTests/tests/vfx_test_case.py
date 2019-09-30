@@ -2,6 +2,7 @@ import os
 import sys
 import maya.cmds as cmds
 from cmt.test import TestCase
+import logging
 
 def isApprox(a, b, eps=1e-6):
     if hasattr(type(a), '__iter__'):
@@ -23,10 +24,7 @@ class VfxTestCase(TestCase):
 
     def setUp(self):
         if not cmds.pluginInfo('ziva', query=True, loaded=True):
-            print('loading plugin ...')
-            self.pluginPath = get_plugin_path()
-            cmds.loadPlugin(self.pluginPath)
-            print('plugin loaded: '+self.pluginPath)
+            cmds.loadPlugin("ziva")
 
     def tearDown(self):
         # We do not unload the plugin here on purpose.
@@ -55,24 +53,3 @@ class VfxTestCase(TestCase):
                 a, b, eps))
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
-
-
-def get_plugin_path():
-    import yaml
-
-    with open(os.path.dirname(__file__) + '/../settings.yaml', 'r') as stream:
-        try:
-            data = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
-            raise StandardError('Error reading yaml file.')
-
-    os_name = sys.platform
-    if os_name in ("linux", "linux2"):
-        path_name = 'plugin_path_linux'
-    elif os_name == "win32":
-        path_name = 'plugin_path_win'
-    else:
-        raise StandardError('OS {} is not supported.'.format(os_name))
-
-    return data['settings'][path_name]

@@ -86,6 +86,27 @@ def remove_read_only(func, path, exc):
         raise RuntimeError('Could not remove {0}'.format(path))
 
 
+def get_plugin_path(maya_vesion):
+    import yaml
+
+    with open(os.path.dirname(__file__) + '/../../tests/CmtTests/settings.yaml', 'r') as stream:
+        try:
+            data = yaml.load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+            raise StandardError('Error reading yaml file.')
+
+    os_name = sys.platform
+    if sys.platform.startswith('linux'):
+        path_name = 'plugin_path_lin_' + str(maya_vesion)
+    elif sys.platform.startswith('win32'):
+        path_name = 'plugin_path_win_' + str(maya_vesion)
+    else:
+        raise StandardError('OS {} is not supported.'.format(os_name))
+
+    return data['settings'][path_name]
+
+
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
     parser.add_argument('-m', '--maya', help='Maya version', default='2019')
@@ -147,8 +168,10 @@ def main():
     if mayaModulePath:
         os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaScriptPath)
 
-    # Make sure that we're not picking up things accidentally from MAYA_PLUG_IN_PATH on local dev machine
-    os.environ['MAYA_PLUG_IN_PATH'] = ''
+    maya_path = get_plugin_path(pargs.maya)
+
+    # Set MAYA_PLUG_IN_PATH to the chosen Maya version
+    os.environ['MAYA_PLUG_IN_PATH'] = maya_path
 
     exitCode = 0
     try:
