@@ -169,12 +169,21 @@ def remove_all_solvers(confirmation=False):
 
 
 def rig_cut_copy(cut=False):
-    # Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
-    # Selection cannot be empty; otherwise an error is reported.
-    # Selection can contain zero or one solver node; otherwise an error is reported
-    # (it does not matter if the solver node is a solver transform node, or solver shape node).
-    # The selected objects must all come from exactly one solver; otherwise an error is reported.
-    # If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
+    """    Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
+    Selection cannot be empty; otherwise an error is reported.
+    Selection can contain zero or one solver node; otherwise an error is reported
+    (it does not matter if the solver node is a solver transform node, or solver shape node).
+    The selected objects must all come from exactly one solver; otherwise an error is reported.
+
+
+    Args:
+        cut (bool, optional): If cut is True, the Ziva rig is removed from the selection after being
+                              copied (i.e., perform a cut). Defaults to False.
+
+    Returns:
+        bool: True if successful
+    """
+
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
@@ -182,18 +191,18 @@ def rig_cut_copy(cut=False):
     selection = mc.ls(sl=True)
     if not selection:
         mm.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
-        return
+        return False
 
     # Enforce that the selected objects come from exactly one solver.
     selected_solvers = mm.eval('zQuery -t "zSolver" -l')
     if selected_solvers is None:
         mm.eval('error -n "Selected objects are not connected to a solver."')
-        return
+        return False
     if len(selected_solvers) >= 2:
         mm.eval(
             'error -n "Selected objects come from two or more solvers. Inputs to cut/copy must come from only one solver."'
         )
-        return
+        return False
 
     # Record if selection contains a solver node.
     # We'll need this information when pasting.
@@ -208,7 +217,7 @@ def rig_cut_copy(cut=False):
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
         mm.eval('error -n "Selection contains more than one solver node. "')
-        return
+        return False
 
     ZIVA_CLIPBOARD_ZBUILDER = zva.Ziva()
     ZIVA_CLIPBOARD_ZBUILDER.retrieve_from_scene_selection()
@@ -218,15 +227,29 @@ def rig_cut_copy(cut=False):
     if cut:
         remove(selection)
 
+    return True
+
 
 def rig_cut():
+    """ Cut selected.
+    
+    Returns:
+        bool: True if successful
+    """
     # Cut Ziva rig. See rig_cut_copy for instructions.
-    rig_cut_copy(cut=True)
+    result = rig_cut_copy(cut=True)
+    return result
 
 
 def rig_copy():
+    """Copy selected.
+    
+    Returns:
+        bool: True if successful
+    """
     # Copy Ziva rig. See rig_cut_copy for instructions.
-    rig_cut_copy(cut=False)
+    result = rig_cut_copy(cut=False)
+    return result
 
 
 def rig_paste():
