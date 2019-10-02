@@ -84,34 +84,6 @@ def remove_read_only(func, path, exc):
         raise RuntimeError('Could not remove {0}'.format(path))
 
 
-def test_output_looks_okay(output):
-    """
-    Pass this the output (stderr) from runing the CMT tests.
-    If the output looks okay, this returns true, else false.
-    The definition of "looks okay" is some string processing
-    based on matching what a successful test run looks like.
-
-    This is to help us ignore random Maya crashes when exiting.
-    """
-
-    # After the tests are run, this big bar is printed.
-    # Search for it so we can look at the summary that comes after.
-    sep = "----------------------------------------------------------------------"
-    parts = output.split(sep)
-    if len(parts) != 2:
-        return False  # output doesn't match <tests><sep><summary>
-    summary = parts[1]
-
-    # A successful run puts "OK" on a line by itself.
-    # In a truly successful run, it's at the end,
-    # but sometimes maya prints some irrelevant error messages after it.
-    # Another successful run pattern is, "OK (skipped=XXX)".
-    # That's also fine as certain test cases may be skipped.
-    import re
-    okay_pattern = "^OK"
-    return re.search(okay_pattern, summary, flags=re.MULTILINE)
-
-
 def main():
     print sys.argv
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
