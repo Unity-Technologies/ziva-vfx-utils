@@ -1,14 +1,14 @@
 {
     "plugin_path": {
-        "win_2019": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2019",
-        "win_2018": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2018",
-        "win_2017": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2017",
-        "win_2016.5": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016.5",
-        "win_2016": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016",
-        "lin_2019": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2019",
-        "lin_2018": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2018",
-        "lin_2017": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2017",
-        "lin_2016.5": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016.5",
-        "lin_2016": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016"
+        "win_2019": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2019/ziva.mll",
+        "win_2018": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2018/ziva.mll",
+        "win_2017": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2017/ziva.mll",
+        "win_2016.5": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016.5/ziva.mll",
+        "win_2016": "Z:/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016/ziva.mll",
+        "lin_2019": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2019/ziva.so",
+        "lin_2018": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2018/ziva.so",
+        "lin_2017": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2017/ziva.so",
+        "lin_2016.5": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016.5/ziva.so",
+        "lin_2016": "/mnt/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016/ziva.so"
     }
 }

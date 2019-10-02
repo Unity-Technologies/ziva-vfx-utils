@@ -33,7 +33,7 @@ else:
 with open('settings.json') as json_file:
     data = json.load(json_file)
     if maya_plugin_version in data['plugin_path']:
-        cmd.extend(["--plugin", '{}/ziva'.format(data['plugin_path'][maya_plugin_version])])
+        cmd.extend(["--plugin", '{}'.format(data['plugin_path'][maya_plugin_version])])
     else:
         raise StandardError('Plugin {} is not listed. Please change settings.json.'.format(maya_plugin_version))
 

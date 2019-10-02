@@ -22,8 +22,7 @@ class VfxTestCase(TestCase):
     pluginPath = None
 
     def setUp(self):
-        if not cmds.pluginInfo('ziva', query=True, loaded=True):
-            cmds.loadPlugin("ziva")
+        pass
 
     def tearDown(self):
         # We do not unload the plugin here on purpose.
