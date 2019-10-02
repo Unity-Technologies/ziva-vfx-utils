@@ -113,6 +113,7 @@ def test_output_looks_okay(output):
 
 
 def main():
+    print sys.argv
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
     parser.add_argument('-m', '--maya',
                         help='Maya version',
@@ -165,6 +166,13 @@ def main():
     if mayaModulePath:
         os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaScriptPath)
 
+    module_dir = os.path.dirname(os.path.abspath(__file__))
+    python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
+
+    if "PYTHONPATH" not in os.environ:
+        os.environ["PYTHONPATH"] = python_path
+    else:
+        os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
 
     exitCode = 0
     output = ''
@@ -173,28 +181,10 @@ def main():
         # This code is lifted from the cpython implementaion of check_output
         # https://github.com/python/cpython/blob/2.7/Lib/subprocess.py#L194
 
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-        stdout, stderr = process.communicate()
-        exitCode = process.poll()
-
-        # mayapy is a monster. As hard as we try, we cannot stop it from exiting
-        # with errors or segfaults or other silly things, even when all of the tests pass.
-        # So, we do not depend on the error code. Instead, we look for the final "OK"
-        # from python's unit tests runner. If that OK was printed, then the tests are good.
-        if (exitCode != 0) and test_output_looks_okay(stderr):
-            print("WARNING mayapy exited with {0}, but the tests look okay\n".format(exitCode))
-            sys.exit(0)
-
-        # This rarely happens. If it does, test_output_looks_okay() needs overhaul
-        if (exitCode == 0) and not test_output_looks_okay(stderr):
-            print("WARNING mayapy runs well but stderr does not look okay.\n Error message: {0}\n\n".format(stderr))
-            sys.exit(1)
-
-        # print stderr to output if the test output doesn't look okay
-        print(stderr)
+        exitCode = subprocess.check_call(cmd)
 
     except subprocess.CalledProcessError as error:
-        pass
+        print error.output
         # TODO: use this when we switch to subprocess.check_output
         # output = error.output
         # exitCode = error.returncode
