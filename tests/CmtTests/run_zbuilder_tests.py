@@ -1,6 +1,6 @@
 # Runs zBuilder tests
 # with specified maya version as a first argument ( default is 2018 )
-# Usage: python run_zbuilder_test.py -m 2018
+# Usage: python run_zbuilder_test.py --maya 2018
 
 import os
 import sys
@@ -13,7 +13,7 @@ MAYA_SCRIPT_PATH = os.path.normpath(os.path.join(os.path.dirname(os.path.realpat
 cmd = ["python", "{}/CMT/bin/runmayatests.py".format(MAYA_SCRIPT_PATH)]
 
 parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-parser.add_argument('-m', '--maya',
+parser.add_argument('--maya',
                     help='Maya version',
                     default='2018')
 
