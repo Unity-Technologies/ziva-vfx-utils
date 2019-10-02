@@ -2,7 +2,6 @@ import os
 import sys
 import maya.cmds as cmds
 from cmt.test import TestCase
-import logging
 
 def isApprox(a, b, eps=1e-6):
     if hasattr(type(a), '__iter__'):
