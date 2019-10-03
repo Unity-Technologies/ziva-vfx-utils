@@ -138,9 +138,8 @@ class Builder(object):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        parameters = self.bundle.get_scene_items()
-        for parameter in parameters:
-            parameter.build(*args, **kwargs)
+        for scene_item in self.bundle.get_scene_items():
+            scene_item.build(*args, **kwargs)
 
     def retrieve_from_scene(self, *args, **kwargs):
         """

@@ -28,6 +28,5 @@ class Fields(Builder):
 
     @Builder.time_this
     def build(self):
-        parameters = self.get_scene_items()
-        for parameter in parameters:
-            parameter.build()
+        for scene_item in self.get_scene_items():
+            scene_item.build()
