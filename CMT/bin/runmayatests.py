@@ -62,8 +62,7 @@ def create_clean_maya_app_dir(directory=None):
     temp_dir = tempfile.gettempdir()
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(
-        str(uuid.uuid4())))
+    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(str(uuid.uuid4())))
     if os.path.exists(dst):
         shutil.rmtree(dst, ignore_errors=False, onerror=remove_read_only)
     shutil.copytree(app_dir, dst)
@@ -85,21 +84,54 @@ def remove_read_only(func, path, exc):
         raise RuntimeError('Could not remove {0}'.format(path))
 
 
+def test_output_looks_okay(output):
+    """
+    Pass this the output (stderr) from runing the CMT tests.
+    If the output looks okay, this returns true, else false.
+    The definition of "looks okay" is some string processing
+    based on matching what a successful test run looks like.
+
+    This is to help us ignore random Maya crashes when exiting.
+    """
+
+    # After the tests are run, this big bar is printed.
+    # Search for it so we can look at the summary that comes after.
+    sep = "----------------------------------------------------------------------"
+    parts = output.split(sep)
+    if len(parts) != 2:
+        return False  # output doesn't match <tests><sep><summary>
+    summary = parts[1]
+
+    # A successful run puts "OK" on a line by itself.
+    # In a truly successful run, it's at the end,
+    # but sometimes maya prints some irrelevant error messages after it.
+    # Another successful run pattern is, "OK (skipped=XXX)".
+    # That's also fine as certain test cases may be skipped.
+    import re
+    okay_pattern = "^OK"
+    return re.search(okay_pattern, summary, flags=re.MULTILINE)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('-m', '--maya', help='Maya version', default='2018')
-    parser.add_argument('-mad', '--maya-app-dir', help='Just create a clean MAYA_APP_DIR and exit')
-    parser.add_argument('-p', '--path', help='Path to a folder with tests')
-    parser.add_argument('-msp',
-                        '--maya-script-path',
+    parser.add_argument('-m', '--maya',
+                        help='Maya version',
+                        default='2018')
+    parser.add_argument('-mad', '--maya-app-dir',
+                        help='Just create a clean MAYA_APP_DIR and exit')
+    parser.add_argument('-p', '--path',
+                        help='Path to a folder with tests')
+    parser.add_argument('-msp', '--maya-script-path',
                         help='Path append to MAYA_SCRIPT_PATH environment variable')
-    parser.add_argument('-mmp',
-                        '--maya-module-path',
+    parser.add_argument('-mmp', '--maya-module-path',
                         help='Path append to MAYA_MODULE_PATH environment variable')
+    parser.add_argument('--plugin',
+                        help='Path to a maya plugin')
     pargs = parser.parse_args()
     mayaunittest = os.path.join(CMT_ROOT_DIR, 'scripts', 'cmt', 'test', 'mayaunittest.py')
     cmd = []
     cmd.append(mayapy(pargs.maya))
+    # cmd.extend(['-m','pdb']) # Add '-m pdb' to start mayapy in the Python debugger
     cmd.append(mayaunittest)
 
     # passing through "--path" argument so that it can be used in mayaunittest.py module
@@ -107,26 +139,17 @@ def main():
         cmd.append('--path')
         cmd.append(pargs.path)
 
+    if pargs.plugin:
+        cmd.append('--plugin')
+        cmd.append(pargs.plugin)
+
     if not os.path.exists(cmd[0]):
-        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(
-            pargs.maya, cmd[0]))
-
-    # adding python path
-    module_dir = os.path.dirname(os.path.abspath(__file__))
-    python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
-    virtualenv_path = os.path.join(python_path, 'tests', 'CmtTests', 'env2', 'Lib', 'site-packages')
-
-    if "PYTHONPATH" not in os.environ:
-        os.environ["PYTHONPATH"] = python_path + os.pathsep + virtualenv_path
-    else:
-        os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
-        os.environ["PYTHONPATH"] = virtualenv_path + os.pathsep + os.environ["PYTHONPATH"]
+        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)
     if app_directory:
         return
-
     # Create clean prefs
     os.environ['MAYA_APP_DIR'] = maya_app_dir
 
@@ -142,16 +165,48 @@ def main():
     if mayaModulePath:
         os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaScriptPath)
 
-    # Make sure that we're not picking up things accidentally from MAYA_PLUG_IN_PATH on local dev machine
-    os.environ['MAYA_PLUG_IN_PATH'] = ''
+    module_dir = os.path.dirname(os.path.abspath(__file__))
+    python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
+
+    if "PYTHONPATH" not in os.environ:
+        os.environ["PYTHONPATH"] = python_path
+    else:
+        os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
 
     exitCode = 0
+    output = ''
     try:
-        subprocess.check_call(cmd)
+        # TODO: use subprocess.check_output(cmd) when we have Python 2.7 available.
+        # This code is lifted from the cpython implementaion of check_output
+        # https://github.com/python/cpython/blob/2.7/Lib/subprocess.py#L194
+
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        stdout, stderr = process.communicate()
+        exitCode = process.poll()
+
+        # mayapy is a monster. As hard as we try, we cannot stop it from exiting
+        # with errors or segfaults or other silly things, even when all of the tests pass.
+        # So, we do not depend on the error code. Instead, we look for the final "OK"
+        # from python's unit tests runner. If that OK was printed, then the tests are good.
+        if (exitCode != 0) and test_output_looks_okay(stderr):
+            print("WARNING mayapy exited with {0}, but the tests look okay\n".format(exitCode))
+            sys.exit(0)
+
+        # This rarely happens. If it does, test_output_looks_okay() needs overhaul
+        if (exitCode == 0) and not test_output_looks_okay(stderr):
+            print("WARNING mayapy runs well but stderr does not look okay.\n Error message: {0}\n\n".format(stderr))
+            sys.exit(1)
+
+        # print stderr to output if the test output doesn't look okay
+        print(stderr)
+
     except subprocess.CalledProcessError as error:
-        exitCode = error.returncode
+        pass
+        # TODO: use this when we switch to subprocess.check_output
+        # output = error.output
+        # exitCode = error.returncode
     finally:
-        shutil.rmtree(maya_app_dir)
+        shutil.rmtree(maya_app_dir, ignore_errors=True)
 
     sys.exit(exitCode)
 

@@ -1,4 +1,5 @@
 import os
+import sys
 import maya.cmds as cmds
 from cmt.test import TestCase
 
@@ -21,11 +22,7 @@ class VfxTestCase(TestCase):
     pluginPath = None
 
     def setUp(self):
-        if not cmds.pluginInfo('ziva', query=True, loaded=True):
-            print('loading plugin ...')
-            self.pluginPath = get_plugin_path()
-            cmds.loadPlugin(self.pluginPath)
-            print('plugin loaded: '+self.pluginPath)
+        pass
 
     def tearDown(self):
         # We do not unload the plugin here on purpose.
@@ -54,16 +51,3 @@ class VfxTestCase(TestCase):
                 a, b, eps))
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
-
-
-def get_plugin_path():
-    import yaml
-    with open(os.path.dirname(__file__) + '/../settings.yaml', 'r') as stream:
-        try:
-            data = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
-            raise StandardError('Error reading yaml file.')
-
-    return data['settings']['plugin_path']
-

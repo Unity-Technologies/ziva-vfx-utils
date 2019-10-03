@@ -39,6 +39,7 @@ import uuid
 import logging
 import maya.cmds as cmds
 import argparse
+import maya.standalone
 
 # The environment variable that signifies tests are being run with the custom TestResult class.
 CMT_TESTING_VAR = 'CMT_UNITTEST'
@@ -107,25 +108,7 @@ def maya_module_tests():
         if os.path.exists(p):
             yield p
 
-
-def run_tests_from_commandline():
-    """Runs the tests in Maya standalone mode.
-
-    This is called when running cmt/bin/runmayatests.py from the commandline.
-    """
-
-    parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('--path',
-                        help='Path to a folder with tests')
-    pargs = parser.parse_args()
-    
-    custom_dirs = None 
-    if pargs.path is not None:
-        custom_dirs = [pargs.path]
-
-    import maya.standalone
-    maya.standalone.initialize()
-
+def copy_pythonpath_to_sys_path():
     # Make sure all paths in PYTHONPATH are also in sys.path
     # When a maya module is loaded, the scripts folder is added to PYTHONPATH, but it doesn't seem
     # to be added to sys.path. So we are unable to import any of the python files that are in the
@@ -137,22 +120,132 @@ def run_tests_from_commandline():
         if p not in realsyspath:
             sys.path.insert(0, p)
 
+def maya_numeric_version():
+    """Maya version as a float, e.g. 2015, 2016.5, 2019"""
+
+    ver = cmds.about(v=True)
+    try:
+        return float(ver);
+    except ValueError as ex:
+        if (str(ver).startswith("2014")): # 2014 x64
+            return 2014
+        if (str(ver).startswith("2016")): # 2016 Extension 2
+            return 2016.5
+        else:
+            raise ex
+
+def load_plugin(plugin_path):
+    if not plugin_path:
+        return
+    print('loading plugin: ' + plugin_path)
+    cmds.loadPlugin(plugin_path)
+    print('plugin loaded: ' + plugin_path)
+
+def unload_plugin(plugin_path):
+    if not plugin_path:
+        return
+    print('unloading plugin: ' + plugin_path)
+    cmds.file(f=True, new=True) # this trick releases a plugin so that it could be safely unloaded
+    cmds.unloadPlugin(os.path.basename(plugin_path))   # plugin gets unloaded by file name only
+    print('plugin unloaded: ' + plugin_path)
+
+def unintialize_maya_and_exit(exit_code):
+    """
+        Do whatever needs to be done to get the process to exit with the supplied exit code.
+        This isn't bulletproof, but it does its best.
+        Pre: maya.standalone.initialize() has been called, but maya.standalone.uninitialize() has not.
+    """
+
+    # Wow, this is really complicated.
+    # In Maya 2016 or later, we need to call maya.standalone.unintialize() before exiting.
+    # If we don't, then Maya crashes when the process exits and the return code ends up
+    # being SIGSEV (-11) or heap-corruption (3221226356 = 0xC0000374) or something.
+    # So, we need to call maya.standalone.unintialize().
+    #
+    # But, on Linux with Maya 2016 this also crashes with (SIGSEV -11).
+    # We can work around that by using os._exit() to bypass any normal process shutdown
+    # stuff and directly return the error code we want. We can't do this on Windows,
+    # though. On Windows, using os._exit() doens't seem to bypass the problems in Maya,
+    # and we get an exit code of 3221226356 anyway.
+    # The os._exit() trick comes from PyMel, where they do it from Maya 2011 and later,
+    # but we only seem to need it for 2016
+    # https://github.com/LumaPictures/pymel/blob/master/pymel/internal/startup.py
+    #
+    # All of this still isn't enough to avoid 3221226356 on Windows when we repeatedly
+    # load and unload a plugin that registers MPxCommands. ZivaVFX can only be loaded
+    # about 28 times before calling unintialize() will crash. So, outside of this
+    # function, we still need to take care not to load the plugin multiple times.
+
+
+    maya_ver = maya_numeric_version()
+    print("maya_numeric_version() = {0}".format(maya_ver))
+
+    # Maya 2016 and later require calling standalone.uninitialize.
+    # Without that, Maya will crash and mess up the return code.
+    if maya_ver >= 2016.0:
+
+        import platform
+        if platform.system() == 'Linux':
+            print("Hard exiting without uninitialize(), to avoid Maya {0} crash.".format(maya_ver))
+            os._exit(exit_code)
+
+        print("Calling: maya.standalone.uninitialize")
+        maya.standalone.uninitialize()
+        print("Done: maya.standalone.uninitialize")
+
+    sys.exit(exit_code)
+
+
+def run_tests_from_commandline():
+    """Runs the tests in Maya standalone mode.
+
+    This is called when running cmt/bin/runmayatests.py from the commandline.
+    """
+
+    parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
+    parser.add_argument('--path',
+                        help='Path to a folder with tests')
+    parser.add_argument('--plugin',
+                        help='Path to a maya plugin')
+    pargs = parser.parse_args()
+
+    custom_dirs = None
+    if pargs.path:
+        custom_dirs = [pargs.path]
+
+    maya.standalone.initialize()
+
+    # By default, Maya uses all the cores. When running tests on machines with LOTS of
+    # cores, this is silly. Neither Maya or any of Ziva's code actually parallelizes that well.
+    # So, to be friendly to other users/jobs/processes on the machine, let's just cap the
+    # thread count for tests at ~16. If we ever improve our scalability, we can change this.
+    thread_count = cmds.threadCount(q=True, n=True)
+    max_thread_count = 16
+    if thread_count > max_thread_count:
+        cmds.threadCount(n=max_thread_count)
+
+    # Once upon a time, we loaded and unloaded the plugin before and after each test.
+    # As it turns out, mayapy can't handle this. If too many commands (MPxCommand) are
+    # loaded and unloaded repeatedly, eventually it will cause a heap corruption crash
+    # during maya.standalone.uninitialize(). The more commands a plugin has, the fewer
+    # times it can be loaded and unloaded. The mayaHIK.mll plugin has many commands and
+    # can only be loaded/unloaded a few times, for example. To work around this, we
+    # only load/unload the plugin once outside of the test cycle. A consequence of this
+    # is that the tests aren't all well isolated, so we need to take some care about
+    # making changing global plugin settings in a test.
+    load_plugin(pargs.plugin)
+
+    copy_pythonpath_to_sys_path()
+
     result = run_tests(directories=custom_dirs)
 
-    # Starting Maya 2016, we have to call uninitialize
-    ver = cmds.about(v=True)
-    if is_float(ver) and float(ver) >= 2016.0:
-        maya.standalone.uninitialize()
+    unload_plugin(pargs.plugin)
 
-    sys.exit(not result.wasSuccessful())
+    # Starting Maya 2016, we have to call uninitialize.
 
-def is_float(ver):
-    try:
-        float(ver)
-        return True
-    except ValueError:
-        return False
-    
+    exit_code = 0 if result.wasSuccessful() else 255
+    unintialize_maya_and_exit(exit_code)
+
 class Settings(object):
     """Contains options for running tests."""
     # Specifies where files generated during tests should be stored
