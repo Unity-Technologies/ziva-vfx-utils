@@ -30,7 +30,7 @@ elif sys.platform.startswith('win32'):
 else:
     raise StandardError('OS {} is not supported.'.format(sys.platform))
 
-with open('settings.json') as json_file:
+with open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json') as json_file:
     data = json.load(json_file)
     if maya_plugin_version in data['plugin_path']:
         cmd.extend(["--plugin", '{}'.format(data['plugin_path'][maya_plugin_version])])
