@@ -606,7 +606,8 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise StandardError('Nothing selected or passed, please select something and try again.')
+            raise StandardError(
+                'Nothing selected or passed, please select something and try again.')
     return selection
 
 
@@ -723,7 +724,7 @@ def replace_dict_keys(search, replace, dictionary):
     return tmp
 
 
-def cull_creation_nodes(parameters, permissive=True):
+def cull_creation_nodes(scene_items, permissive=True):
     """ To help speed up the build of a Ziva setup we are creating the bones and
     the tissues with one command.  Given a list of zBuilder nodes this checks
     if a given node needs to be created in scene.  Checks to see if it
@@ -732,7 +733,7 @@ def cull_creation_nodes(parameters, permissive=True):
 
     Args:
         permissive (bool):
-        parameters (object): the zBuilder nodes to check.
+        scene_items (object): the zBuilder nodes to check.
     Returns:
         dict: Dictionary of non culled
     """
@@ -740,24 +741,24 @@ def cull_creation_nodes(parameters, permissive=True):
     results = dict()
     results['meshes'] = []
     results['names'] = []
-    results['parameters'] = []
+    results['scene_items'] = []
 
     # -----------------------------------------------------------------------
     # check meshes for existing zBones or zTissue
-    for i, parameter in enumerate(parameters):
-        type_ = parameter.type
-        mesh = parameter.association[0]
-        name = parameter.name
+    for i, scene_item in enumerate(scene_items):
+        type_ = scene_item.type
+        mesh = scene_item.association[0]
+        name = scene_item.name
 
         if mc.objExists(mesh):
             existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
                 out = mc.rename(existing, name)
-                parameter.mobject = out
+                scene_item.mobject = out
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
-                results['parameters'].append(parameter)
+                results['scene_items'].append(scene_item)
         else:
             if not permissive:
                 raise StandardError(

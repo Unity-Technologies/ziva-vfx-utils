@@ -37,6 +37,5 @@ class Constraints(Builder):
         attr_filter = kwargs.get('attr_filter', None)
         name_filter = kwargs.get('name_filter', list())
 
-        parameters = self.get_scene_items(name_filter=name_filter, type_filter=self.acquire)
-        for parameter in parameters:
-            parameter.build(attr_filter=attr_filter)
+        for scene_item in self.get_scene_items(name_filter=name_filter, type_filter=self.acquire):
+            scene_item.build(attr_filter=attr_filter)
