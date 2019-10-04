@@ -264,3 +264,25 @@ class ZivaRestShapeTestCase(VfxTestCase):
         mc.select(non_rest_tissue)
 
         self.assertTrue(utility.rig_copy())
+
+    def test_restshape_selected_with_unwanted_restshapes(self):
+        # make sure VFXACT-356 stays functional
+        tis2 = mc.polySphere(name='tissue_mesh2')[0]
+        target_c = mc.polySphere(name='c')[0]
+
+        mc.select(tis2)
+        mm.eval('ziva -t')
+        mc.select(tis2, target_c)
+        mm.eval('zRestShape -a')
+
+        # now we have 2 tissue and 2 restShapes.
+        # select one and check contents of zBuilder.
+        mc.select(tis2)
+
+        builder = zva.Ziva()
+        builder.retrieve_from_scene_selection()
+
+        # there are 2 restShape nodes in scene, we should have captured 1
+        items = builder.get_scene_items(type_filter=['zRestShape'])
+
+        self.assertEqual(len(items), 1)
