@@ -213,9 +213,9 @@ class Builder(object):
         information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
+            type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
+            name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
                 Defaults to :obj:`list`
         """
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
@@ -231,15 +231,15 @@ class Builder(object):
         Gets the scene items from builder for further inspection or modification.
 
         Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``type``.
                 Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``name``.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``name``.
                 Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by parameter name by regular expression.
+            name_regex (:obj:`str`): filter by scene_item name by regular expression.
                 Defaults to ``None``.
-            association_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``association``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``association``.
                 Defaults to :obj:`list`.
-            association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
+            association_regex (:obj:`str`): filter by scene_item ``association`` by regular expression.
                 Defaults to ``None``.
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
