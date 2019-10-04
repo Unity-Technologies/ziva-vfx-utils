@@ -110,11 +110,11 @@ def build_multiple(tissue_items,
 
         # rename zTissues and zTets-----------------------------------------
         for new, name, node in zip(outs[1::4], tissue_results['names'],
-                                   tissue_results['parameters']):
+                                   tissue_results['scene_items']):
             node.mobject = new
             mc.rename(new, name)
 
-        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['parameters']):
+        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['scene_items']):
             node.mobject = new
             mc.rename(new, name)
 
