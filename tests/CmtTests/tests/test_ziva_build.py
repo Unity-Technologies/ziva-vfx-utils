@@ -266,7 +266,7 @@ class ZivaRestShapeTestCase(VfxTestCase):
         self.assertTrue(utility.rig_copy())
 
     def test_restshape_selected_with_unwanted_restshapes(self):
-        # make sure VFXACT-356 stays functional
+        # make sure VFXACT-358 stays functional
         tis2 = mc.polySphere(name='tissue_mesh2')[0]
         target_c = mc.polySphere(name='c')[0]
 
