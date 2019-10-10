@@ -18,7 +18,7 @@ pipeline {
                 }
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
             }
-            post { cleanup { cleanWs() } }
+            // post { cleanup { cleanWs() } }
         }
         stage('run tests for ziva-vfx-utils') {
             when {
@@ -39,7 +39,7 @@ pipeline {
                         unstash 'main'
                         runWindowsTestStage()
                     }
-                    post { cleanup { cleanWs() } }
+                    //post { cleanup { cleanWs() } }
                 }
 
                 stage('centos7') {
