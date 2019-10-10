@@ -22,21 +22,21 @@ parser.add_argument('--maya',
 pargs = parser.parse_args()
 
 cmd.extend(["--maya", pargs.maya])
-cmd.extend(["--path", "{}/tests".format(current_directory_path)])
-cmd.extend(["--maya-script-path", "{}/scripts".format(MAYA_SCRIPT_PATH)])
+cmd.extend(["--path", "{0}/tests".format(current_directory_path)])
+cmd.extend(["--maya-script-path", "{0}/scripts".format(MAYA_SCRIPT_PATH)])
 
 if sys.platform.startswith('linux'):
     maya_plugin_version = 'lin_' + pargs.maya
 elif sys.platform.startswith('win32'):
     maya_plugin_version = 'win_' + pargs.maya
 else:
-    raise StandardError('OS {} is not supported.'.format(sys.platform))
+    raise StandardError('OS {0} is not supported.'.format(sys.platform))
 
-with open('{}/settings.json'.format(current_directory_path)) as json_file:
+with open('{0}/settings.json'.format(current_directory_path)) as json_file:
     data = json.load(json_file)
     if maya_plugin_version in data['plugin_path']:
-        cmd.extend(["--plugin", '{}'.format(data['plugin_path'][maya_plugin_version])])
+        cmd.extend(["--plugin", '{0}'.format(data['plugin_path'][maya_plugin_version])])
     else:
-        raise StandardError('Plugin {} is not listed. Please change settings.json.'.format(maya_plugin_version))
+        raise StandardError('Plugin {0} is not listed. Please change settings.json.'.format(maya_plugin_version))
 
 subprocess.call(cmd)
