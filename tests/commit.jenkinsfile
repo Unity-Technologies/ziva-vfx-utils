@@ -90,24 +90,6 @@ def previousBuildSuccessful() {
     return false
 }
 
-// Return true iff the previous build has completed with a result indicating SUCCESS.
-// NOTE: This mean that this function returns false when the previous build hasn't finished yet,
-//       in addition to when it failed, or was aborted. If it hasn't finished yet, we can't know for
-//       sure that it will succeed, so the safest thing to do is to assume the worst, and behave as
-//       though it failed.
-def previousBuildSuccessful() {
-    def previousBuild = currentBuild.previousBuild
-    if (previousBuild) {
-        def success = previousBuild.result == "SUCCESS"
-        if (!success) {
-            echo "Previous build not successful."
-        }
-        return success
-    }
-    echo "No previous build found."
-    return false
-}
-
 def runWindowsTestStage() {
     echo "running windows test stage"
 
