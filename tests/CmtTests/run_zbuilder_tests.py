@@ -12,7 +12,7 @@ MAYA_SCRIPT_PATH = os.path.normpath(os.path.join(os.path.dirname(os.path.realpat
 
 current_directory_path = os.path.dirname(os.path.realpath(__file__))
 
-cmd = ["python", "{}/CMT/bin/runmayatests.py".format(MAYA_SCRIPT_PATH)]
+cmd = ["python", "{0}/CMT/bin/runmayatests.py".format(MAYA_SCRIPT_PATH)]
 
 parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
 parser.add_argument('--maya',
