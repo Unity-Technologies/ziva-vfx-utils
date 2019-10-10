@@ -18,7 +18,7 @@ pipeline {
                 }
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
             }
-            // post { cleanup { cleanWs() } }
+            post { cleanup { cleanWs() } }
         }
         stage('run tests for ziva-vfx-utils') {
             when {
@@ -39,7 +39,7 @@ pipeline {
                         unstash 'main'
                         runWindowsTestStage()
                     }
-                    //post { cleanup { cleanWs() } }
+                    post { cleanup { cleanWs() } }
                 }
 
                 stage('centos7') {
@@ -98,7 +98,7 @@ def runWindowsTestStage() {
     }
 
     dir('ziva-vfx-utils') {
-        bat 'python test/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
+        bat 'python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
     }
 }
 
@@ -109,7 +109,7 @@ def runLinuxTestStage() {
         withEnv([
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
-            sh 'python test/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
+            sh 'python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
         }
     }
 }
