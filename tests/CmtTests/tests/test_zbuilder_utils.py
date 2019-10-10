@@ -265,7 +265,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         mm.eval('ziva -s')
         mm.eval('ziva -s')
 
-        utils.move_all_solvers()
+        utils.remove_all_solvers()
 
         self.assertEqual(mc.ls(type='zSolver'), [])
 
@@ -279,7 +279,7 @@ class BuilderUtilsTestCase(VfxTestCase):
     def test_update_no_solvers(self):
         # scene is empty with no solvers, this should raise an error with update
         with self.assertRaises(StandardError):
-            utils.g_update()
+            utils.rig_update()
 
     def test_rig_transfer_warped_prefix(self):
         # get demo arm geo to add prefix
