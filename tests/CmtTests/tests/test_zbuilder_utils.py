@@ -5,8 +5,8 @@ import maya.cmds as mc
 import maya.mel as mm
 
 import zBuilder.zMaya as mz
-import tests.utils as utl
-import zBuilder.utils as utility
+import tests.utils as test_utils
+import zBuilder.utils as utils
 import zBuilder.builder as bld
 from vfx_test_case import get_mesh_vertex_positions
 from vfx_test_case import VfxTestCase
@@ -70,7 +70,7 @@ class BuilderMayaTestCase(VfxTestCase):
         self.assertEqual(results, outputs)
 
     def test_get_zbones_case1(self):
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # For this test lets add a bone without an attachment.  Previously
         # it was not able to pick this case up.
@@ -85,7 +85,7 @@ class BuilderMayaTestCase(VfxTestCase):
         self.assertEqual(len(bones), 5)
 
     def test_get_zbones_case2(self):
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # testing command
         mc.select('r_humerus_bone', 'r_radius_bone', 'hand_bone')
@@ -100,7 +100,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
     def setUp(self):
         super(BuilderUtilsTestCaseArm, self).setUp()
 
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
     def tearDown(self):
         super(BuilderUtilsTestCaseArm, self).tearDown()
@@ -112,23 +112,23 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         mc.polySmooth('dupe')
         mc.select('r_bicep_muscle', 'dupe')
 
-        utility.copy_paste()
+        utils.copy_paste()
         self.assertSceneHasNodes(['dupe_r_radius_bone'])
 
     def test_utils_rig_copy_paste_clean(self):
         # testing menu command to copy and paste on ziva that has been cleaned
         mc.select('zSolver1')
-        utility.rig_copy()
+        utils.rig_copy()
 
         mz.clean_scene()
 
-        utility.rig_paste()
+        utils.rig_paste()
         self.assertSceneHasNodes(['zSolver1'])
 
     def test_utils_rig_cut(self):
         # testing the cut feature, removing ziva setup after copy
         mc.select('zSolver1')
-        utility.rig_cut()
+        utils.rig_cut()
 
         # there should be no attachments in scene
         self.assertTrue(len(mc.ls(type='zAttachment')) is 0)
@@ -139,7 +139,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         result = []
 
         all_items = mc.ls(type=types)
-        utility.remove(all_items)
+        utils.remove(all_items)
 
         result.extend(mc.ls(type=types))
 
@@ -154,7 +154,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             all_items = mc.ls(type=type_)
 
             # delete all attachments
-            utility.remove(all_items)
+            utils.remove(all_items)
             result.append(mc.ls(type=type_))
 
         self.assertTrue(all(x == [] for x in result))
@@ -174,14 +174,14 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             mc.select(mm.eval('zQuery -m'))
 
             # delete all
-            utility.remove(mc.ls(sl=True))
+            utils.remove(mc.ls(sl=True))
         mc.select(cl=True)
         self.assertIsNone(mm.eval('zQuery -bt'))
 
     def test_rig_copy_without_selection_should_raise(self):
         mc.select(cl=True)
         with self.assertRaises(StandardError):
-            utility.rig_copy()
+            utils.rig_copy()
 
     def test_save_rig(self):
         # find a temp file location
@@ -189,7 +189,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         mc.select('zSolver1')
 
-        utility.save_rig(file_name)
+        utils.save_rig(file_name)
 
         # simply check if file exists, if it does it passes
         self.assertTrue(os.path.exists(file_name))
@@ -204,12 +204,12 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         mc.select('zSolver1')
 
-        utility.save_rig(file_name)
+        utils.save_rig(file_name)
 
         # clean scene so we just have geo
         mz.clean_scene()
 
-        utility.load_rig(file_name)
+        utils.load_rig(file_name)
         self.assertSceneHasNodes(['zSolver1'])
 
         os.close(fd)
@@ -226,7 +226,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         ## ACT
         mc.select(cl=True)
-        utility.rig_update()
+        utils.rig_update()
 
         ## VERIFY
         geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
@@ -246,7 +246,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         ## ACT
         mc.select('zSolver1')
-        utility.rig_update()
+        utils.rig_update()
 
         ## VERIFY
         geoNode = mm.eval('zQuery -t zGeo r_bicep_muscle')[0]
@@ -265,7 +265,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         mm.eval('ziva -s')
         mm.eval('ziva -s')
 
-        utility.remove_all_solvers()
+        utils.remove_all_solvers()
 
         self.assertEqual(mc.ls(type='zSolver'), [])
 
@@ -273,17 +273,17 @@ class BuilderUtilsTestCase(VfxTestCase):
         mm.eval('ziva -s')
         mm.eval('ziva -s')
 
-        utility.remove_solver(solvers=['zSolver1'])
+        utils.remove_solver(solvers=['zSolver1'])
         self.assertListEqual(mc.ls(type='zSolver'), ['zSolver2Shape'])
 
     def test_update_no_solvers(self):
         # scene is empty with no solvers, this should raise an error with update
         with self.assertRaises(StandardError):
-            utility.rig_update()
+            utils.rig_update()
 
     def test_rig_transfer_warped_prefix(self):
         # get demo arm geo to add prefix
-        utl.build_anatomical_arm_with_no_popup(ziva_setup=False)
+        test_utils.build_anatomical_arm_with_no_popup(ziva_setup=False)
 
         # prefix all geometry transforms with warped_
         to_change = ['muscle_grp', 'bone_grp', 'rig_grp']
@@ -296,10 +296,10 @@ class BuilderUtilsTestCase(VfxTestCase):
             mc.rename(item, 'warped_{}'.format(item))
 
         # get full setup demo arm
-        utl.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
+        test_utils.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
 
         # now do the trasnfer
-        utility.rig_transfer('zSolver1', 'warped_', '')
+        utils.rig_transfer('zSolver1', 'warped_', '')
 
         # when done we should have some ziva nodes with a 'warped_' prefix
         nodes_in_scene = [
@@ -311,11 +311,11 @@ class BuilderUtilsTestCase(VfxTestCase):
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
     def test_copy_paste_with_substitution(self):
-        utl.build_mirror_sample_geo()
-        utl.ziva_mirror_sample_geo()
+        test_utils.build_mirror_sample_geo()
+        test_utils.ziva_mirror_sample_geo()
         mz.rename_ziva_nodes()
 
         mc.select('r_muscle')
-        utility.copy_paste_with_substitution('^r', 'l')
+        utils.copy_paste_with_substitution('^r', 'l')
 
         self.assertSceneHasNodes(['l_zMaterial', 'l_zTissue'])

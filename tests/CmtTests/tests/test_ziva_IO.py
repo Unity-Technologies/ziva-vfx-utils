@@ -7,8 +7,7 @@ import tempfile
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
-import tests.utils as utl
-import zBuilder.utils as utility
+import tests.utils as test_utils
 
 from vfx_test_case import VfxTestCase
 
@@ -21,8 +20,8 @@ class IOTestCase(VfxTestCase):
     def setUp(self):
         super(IOTestCase, self).setUp()
         # Build a basic setup
-        utl.build_mirror_sample_geo()
-        utl.ziva_mirror_sample_geo()
+        test_utils.build_mirror_sample_geo()
+        test_utils.ziva_mirror_sample_geo()
 
         mc.select(cl=True)
 
@@ -74,7 +73,7 @@ class IOTestCase(VfxTestCase):
         temp = tempfile.TemporaryFile()
 
         mc.file(new=True, f=True)
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         mc.select('zSolver1')
         z = zva.Ziva()

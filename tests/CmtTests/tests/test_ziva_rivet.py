@@ -6,8 +6,8 @@ import sys
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
-import tests.utils as utl
-import zBuilder.utils as utility
+import tests.utils as test_utils
+import zBuilder.utils as utils
 
 from vfx_test_case import VfxTestCase
 
@@ -21,7 +21,7 @@ class ZivaRivetTestCase(VfxTestCase):
         super(ZivaRivetTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # create l
         mc.select('r_tricepsLong_muscle')
@@ -140,6 +140,6 @@ class ZivaRivetTestCase(VfxTestCase):
 
     def test_delete_solver_with_rivet(self):
         mc.select('zSolver1')
-        utility.remove_solver()
+        utils.remove_solver()
 
         self.assertEquals(mc.ls(type=['zSolver', 'zRivetToBone', 'zRivetToBoneLocator']), [])

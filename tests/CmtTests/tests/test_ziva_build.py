@@ -6,8 +6,8 @@ import sys
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
-import tests.utils as utl
-import zBuilder.utils as utility
+import tests.utils as test_utils
+import zBuilder.utils as utils
 
 from vfx_test_case import VfxTestCase
 
@@ -21,7 +21,7 @@ class ZivaBuildTestCase(VfxTestCase):
         super(ZivaBuildTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # clear selection.  It should retrieve whole scene
         mc.select(cl=True)
@@ -35,7 +35,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
     def test_retrieve_selected(self):
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # select a muscle geo
         mc.select('r_bicep_muscle')
@@ -117,7 +117,7 @@ class ZivaBuildTestCase(VfxTestCase):
         # of deformed shape
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        utl.build_anatomical_arm_with_no_popup()
+        test_utils.build_anatomical_arm_with_no_popup()
 
         # capture point position of first vert at rest
         rest_point_position = mc.pointPosition('r_bicep_muscle.vtx[0]')
@@ -263,7 +263,7 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         mc.select(non_rest_tissue)
 
-        self.assertTrue(utility.rig_copy())
+        self.assertTrue(utils.rig_copy())
 
     def test_restshape_selected_with_unwanted_restshapes(self):
         # make sure VFXACT-358 stays functional
