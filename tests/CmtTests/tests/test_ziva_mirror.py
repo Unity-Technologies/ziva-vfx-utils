@@ -11,32 +11,3 @@ import tests.utils as test_utils
 from vfx_test_case import VfxTestCase
 
 
-class ZivaMirrorTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
-    def setUp(self):
-        super(ZivaMirrorTestCase, self).setUp()
-        # Build a basic setup
-        test_utils.build_mirror_sample_geo()
-        test_utils.ziva_mirror_sample_geo()
-
-        mc.select(cl=True)
-
-        # use builder to retrieve from scene
-        self.z = zva.Ziva()
-        self.z.retrieve_from_scene()
-
-        # string replace
-        self.z.string_replace('^r_', 'l_')
-
-    def tearDown(self):
-        super(ZivaMirrorTestCase, self).tearDown()
-
-    def test_mirror_existing_scene(self):
-        # # build it on live scene
-        self.z.build()
-
-        # check if left muscle is connected to zGeo
-        self.assertTrue(len(mc.listConnections('l_muscle', type='zGeo')))
