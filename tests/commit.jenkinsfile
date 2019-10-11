@@ -94,7 +94,6 @@ def runWindowsTestStage() {
     echo "running windows test stage"
 
     environment {
-        PATH="C:\\Python27;${env.PATH}"
         zivadyn_LICENSE="${env.zivadyn_LICENSE};C:\\ziva"
     }
 
