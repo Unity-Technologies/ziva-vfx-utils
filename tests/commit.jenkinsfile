@@ -21,12 +21,6 @@ pipeline {
             post { cleanup { cleanWs() } }
         }
         stage('run tests for ziva-vfx-utils') {
-            when {
-                expression {
-                    return !previousBuildSuccessful()
-                }
-            }
-
             failFast true
             parallel {
                 stage('windows') {
