@@ -39,4 +39,6 @@ with open('{0}/settings.json'.format(current_directory_path)) as json_file:
     else:
         raise Exception('Plugin {0} is not listed. Please change settings.json.'.format(maya_plugin_version))
 
-subprocess.call(cmd)
+exit_code = subprocess.check_call(cmd)
+
+sys.exit(exit_code)
