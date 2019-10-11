@@ -98,7 +98,7 @@ def runWindowsTestStage() {
     }
 
     dir('ziva-vfx-utils') {
-        bat 'python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
+        bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
     }
 }
 
@@ -109,7 +109,7 @@ def runLinuxTestStage() {
         withEnv([
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
-            sh 'python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}'
+            sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
         }
     }
 }
