@@ -1,11 +1,12 @@
 import maya.cmds as mc
 import maya.mel as mm
-import sys
+import os
 '''
 These are small utilities to help with testing zBuilder.  Probably no real value
 outside of testing. 
 '''
 
+current_directory_path = os.path.dirname(os.path.realpath(__file__))
 
 def build_mirror_sample_geo():
     """ Builds 2 sphere and a cube to test some basic mirroring stuff.
@@ -36,6 +37,11 @@ def ziva_mirror_sample_geo():
     )
     mc.select('bone', add=True)
     mm.eval('ziva -a')
+
+
+def build_generic_scene():
+    path = current_directory_path + "/assets/generic.ma"
+    mc.file(path, open=True, force=True)
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
