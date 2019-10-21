@@ -9,24 +9,26 @@ import maya.OpenMaya as om
 
 from vfx_test_case import VfxTestCase
 
-current_directory_path = os.path.dirname(os.path.realpath(__file__))
 
-
-class ZivaSolverNoChangesTestCase(VfxTestCase):
-    """
-    This class requires to have test that are not modify scene and zBuilder data
-    """
+class ZivaSolverGenericTestCase(VfxTestCase):
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
+        pass
+
+    def setUp(self):
+        super(ZivaSolverGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-
-    def setUp(self):
-        super(ZivaSolverNoChangesTestCase, self).setUp()
+        if 'MAYA_APP_DIR' in os.environ:
+            self.temp_file_path = os.environ['MAYA_APP_DIR'].split(';')[0] + "/tmp.zBuilder"
+        else:
+            self.temp_file_path = os.path.expanduser("~").replace("\\", "/") + "/tmp.zBuilder"
 
     def tearDown(self):
-        super(ZivaSolverNoChangesTestCase, self).tearDown()
+        super(ZivaSolverGenericTestCase, self).tearDown()
+        if os.path.exists(self.temp_file_path):
+            os.remove(self.temp_file_path)
 
     def test_retrieve(self):
         # get solver from zBuilder
@@ -52,34 +54,33 @@ class ZivaSolverNoChangesTestCase(VfxTestCase):
                                               'bone_2',
                                               'cloth_1']
 
-        self.assertTrue(solver.name == "zSolver1Shape")
-        self.assertTrue(solver.type == "zSolver")
-        self.assertTrue(isinstance(solver.mobject, om.MObject))
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
+        self.assertIsInstance(solver.mobject, om.MObject)
 
         for attr in solver_attrs:
             value = mc.getAttr("{}.{}".format(solver.name, attr))
             self.assertTrue(value == solver.attrs[attr]['value'])
 
-        self.assertTrue(solver_transform.name == "zSolver1")
-        self.assertTrue(solver_transform.type == "zSolverTransform")
-        self.assertTrue(isinstance(solver_transform.mobject, om.MObject))
+        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.type, "zSolverTransform")
+        self.assertIsInstance(solver_transform.mobject, om.MObject)
 
         for attr in solver_transform_attrs:
             value = mc.getAttr("{}.{}".format(solver_transform.name, attr))
-            self.assertTrue(value == solver_transform.attrs[attr]['value'])
+            self.assertEqual(value, solver_transform.attrs[attr]['value'])
 
         solver_transform_children = [obj.name for obj in solver_transform.children]
-        for child in solver_transform_children_expected:
-            self.assertTrue(child in solver_transform_children)
+        self.assertGreaterEqual(set(solver_transform_children),
+                                set(solver_transform_children_expected))
 
-    def test_write_read(self):
-        temp_file_path = current_directory_path + "/tmp.zBuilder"
-        self.builder.write(temp_file_path)
+    def test_builder_has_same_solver_node_after_roundtrip_to_disk(self):
+        self.builder.write(self.temp_file_path)
 
-        self.assertTrue(os.path.exists(temp_file_path))
+        self.assertTrue(os.path.exists(self.temp_file_path))
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(temp_file_path)
+        builder.retrieve_from_file(self.temp_file_path)
 
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
 
@@ -90,13 +91,11 @@ class ZivaSolverNoChangesTestCase(VfxTestCase):
 
         solver_transform = solver_transform_nodes[0]
 
-        self.assertTrue(solver.name == "zSolver1Shape")
-        self.assertTrue(solver.type == "zSolver")
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
 
-        self.assertTrue(solver_transform.name == "zSolver1")
-        self.assertTrue(solver_transform.type == "zSolverTransform")
-
-        os.remove(temp_file_path)
+        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.type, "zSolverTransform")
 
 
 class ZivaSolverTestCase(VfxTestCase):
