@@ -4,6 +4,7 @@ import maya.mel as mm
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
+import zBuilder.zMaya as mz
 
 import maya.OpenMaya as om
 
@@ -30,7 +31,12 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
 
-    def check_retrieve_zsolver_looks_good(self, builder):
+    def check_retrieve_zsolver_looks_good(self, builder, attrs=None):
+        '''
+        :param builder: type builders.ziva.Ziva()
+        :param attrs: type list, compares to stored zBuilder values for zSolver
+                      if not defined - getting values from the scene
+        '''
         # get solver from zBuilder
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
 
@@ -46,11 +52,19 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertEqual(solver.type, "zSolver")
         self.assertIsInstance(solver.mobject, om.MObject)
 
-        for attr in solver_attrs:
-            value = mc.getAttr("{}.{}".format(solver.name, attr))
+        for i, attr in enumerate(solver_attrs):
+            if attrs:
+                value = attrs[i]
+            else:
+                value = mc.getAttr("{}.{}".format(solver.name, attr))
             self.assertTrue(value == solver.attrs[attr]['value'])
 
-    def check_retrieve_zsolver_transform_looks_good(self, builder):
+    def check_retrieve_zsolver_transform_looks_good(self, builder, attrs=None):
+        '''
+        :param builder: type builders.ziva.Ziva()
+        :param attrs: type list, compares to stored zBuilder values for zSolverTransform
+                      if not defined - getting values from the scene
+        '''
         # get solver transform from zBuilder
         solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
 
@@ -73,8 +87,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertEqual(solver_transform.type, "zSolverTransform")
         self.assertIsInstance(solver_transform.mobject, om.MObject)
 
-        for attr in solver_transform_attrs:
-            value = mc.getAttr("{}.{}".format(solver_transform.name, attr))
+        for i, attr in enumerate(solver_transform_attrs):
+            if attrs:
+                value = attrs[i]
+            else:
+                value = mc.getAttr("{}.{}".format(solver_transform.name, attr))
             self.assertEqual(value, solver_transform.attrs[attr]['value'])
 
         solver_transform_children = {obj.name for obj in solver_transform.children}
@@ -95,7 +112,55 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
 
-        self.assertTrue(len(solver_nodes) == 1)
+        self.assertEqual(len(solver_nodes), 1)
+
+        solver = solver_nodes[0]
+        solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
+
+        solver_transform = solver_transform_nodes[0]
+
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
+
+        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.type, "zSolverTransform")
+
+    def test_build_with_one_solver(self):
+        solver_attrs = ['substeps',
+                        'gravityY',
+                        'framesPerSecond']
+
+        solver_transform_attrs = ['enable',
+                                  'startFrame']
+
+        solver_values = []
+        for attr in solver_attrs:
+            value = mc.getAttr("{}.{}".format("zSolver1Shape", attr))
+            solver_values.append(value)
+
+        solver_transform_values = []
+        for attr in solver_transform_attrs:
+            value = mc.getAttr("{}.{}".format("zSolver1", attr))
+            solver_transform_values.append(value)
+
+        # remove all Ziva nodes from the scene and build them
+        mz.clean_scene()
+        self.builder.build()
+
+        self.check_retrieve_zsolver_looks_good(self.builder, solver_values)
+        self.check_retrieve_zsolver_transform_looks_good(self.builder, solver_transform_values)
+
+    def test_build_with_one_solver_from_file(self):
+        self.builder.write(self.temp_file_path)
+
+        builder = zva.Ziva()
+        builder.retrieve_from_file(self.temp_file_path)
+        mz.clean_scene()
+        builder.build()
+
+        solver_nodes = builder.get_scene_items(type_filter='zSolver')
+
+        self.assertEqual(len(solver_nodes), 1)
 
         solver = solver_nodes[0]
         solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
