@@ -30,18 +30,33 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
 
-    def test_retrieve(self):
+    def check_retrieve_zsolver_looks_good(self, builder):
         # get solver from zBuilder
-        solver_nodes = self.builder.get_scene_items(type_filter='zSolver')
+        solver_nodes = builder.get_scene_items(type_filter='zSolver')
 
-        self.assertTrue(len(solver_nodes) == 1)
+        self.assertEqual(len(solver_nodes), 1)
 
         solver = solver_nodes[0]
-        solver_transform = solver.parent
 
         solver_attrs = ['substeps',
                         'gravityY',
                         'framesPerSecond']
+
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
+        self.assertIsInstance(solver.mobject, om.MObject)
+
+        for attr in solver_attrs:
+            value = mc.getAttr("{}.{}".format(solver.name, attr))
+            self.assertTrue(value == solver.attrs[attr]['value'])
+
+    def check_retrieve_zsolver_transform_looks_good(self, builder):
+        # get solver transform from zBuilder
+        solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
+
+        self.assertEqual(len(solver_transform_nodes), 1)
+
+        solver_transform = solver_transform_nodes[0]
 
         solver_transform_attrs = ['enable',
                                   'startFrame']
@@ -54,14 +69,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                                               'bone_2',
                                               'cloth_1']
 
-        self.assertEqual(solver.name, "zSolver1Shape")
-        self.assertEqual(solver.type, "zSolver")
-        self.assertIsInstance(solver.mobject, om.MObject)
-
-        for attr in solver_attrs:
-            value = mc.getAttr("{}.{}".format(solver.name, attr))
-            self.assertTrue(value == solver.attrs[attr]['value'])
-
         self.assertEqual(solver_transform.name, "zSolver1")
         self.assertEqual(solver_transform.type, "zSolverTransform")
         self.assertIsInstance(solver_transform.mobject, om.MObject)
@@ -73,6 +80,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_transform_children = [obj.name for obj in solver_transform.children]
         self.assertGreaterEqual(set(solver_transform_children),
                                 set(solver_transform_children_expected))
+
+    def test_retrieve(self):
+        self.check_retrieve_zsolver_looks_good(self.builder)
+        self.check_retrieve_zsolver_transform_looks_good(self.builder)
 
     def test_builder_has_same_solver_node_after_roundtrip_to_disk(self):
         self.builder.write(self.temp_file_path)
