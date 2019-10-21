@@ -61,13 +61,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_transform_attrs = ['enable',
                                   'startFrame']
 
-        solver_transform_children_expected = ['zSolver1Shape',
+        solver_transform_children_expected = {'zSolver1Shape',
                                               'r_tissue_2',
                                               'c_tissue_3',
                                               'l_tissue_1',
                                               'bone_1',
                                               'bone_2',
-                                              'cloth_1']
+                                              'cloth_1'}
 
         self.assertEqual(solver_transform.name, "zSolver1")
         self.assertEqual(solver_transform.type, "zSolverTransform")
@@ -77,9 +77,9 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             value = mc.getAttr("{}.{}".format(solver_transform.name, attr))
             self.assertEqual(value, solver_transform.attrs[attr]['value'])
 
-        solver_transform_children = [obj.name for obj in solver_transform.children]
-        self.assertGreaterEqual(set(solver_transform_children),
-                                set(solver_transform_children_expected))
+        solver_transform_children = {obj.name for obj in solver_transform.children}
+        self.assertGreaterEqual(solver_transform_children,
+                                solver_transform_children_expected)
 
     def test_retrieve(self):
         self.check_retrieve_zsolver_looks_good(self.builder)
