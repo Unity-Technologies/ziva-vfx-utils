@@ -31,9 +31,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
 
-    def check_retrieve_zsolver_looks_good(self, builder, attrs=None):
+    def check_retrieve_zsolver_looks_good(self, builder, name, attrs=None):
         '''
         :param builder: type builders.ziva.Ziva()
+        :param name: type string, name of the solver to check
         :param attrs: type list, compares to stored zBuilder values for zSolver
                       if not defined - getting values from the scene
         '''
@@ -48,7 +49,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                         'gravityY',
                         'framesPerSecond']
 
-        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.name, name)
         self.assertEqual(solver.type, "zSolver")
         self.assertIsInstance(solver.mobject, om.MObject)
 
@@ -59,9 +60,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                 value = mc.getAttr("{}.{}".format(solver.name, attr))
             self.assertTrue(value == solver.attrs[attr]['value'])
 
-    def check_retrieve_zsolver_transform_looks_good(self, builder, attrs=None):
+    def check_retrieve_zsolver_transform_looks_good(self, builder, name, attrs=None):
         '''
         :param builder: type builders.ziva.Ziva()
+        :param name: type string, name of the solver transform to check
         :param attrs: type list, compares to stored zBuilder values for zSolverTransform
                       if not defined - getting values from the scene
         '''
@@ -83,7 +85,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                                               'bone_2',
                                               'cloth_1'}
 
-        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.name, name)
         self.assertEqual(solver_transform.type, "zSolverTransform")
         self.assertIsInstance(solver_transform.mobject, om.MObject)
 
@@ -99,8 +101,8 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                                 solver_transform_children_expected)
 
     def test_retrieve(self):
-        self.check_retrieve_zsolver_looks_good(self.builder)
-        self.check_retrieve_zsolver_transform_looks_good(self.builder)
+        self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape")
+        self.check_retrieve_zsolver_transform_looks_good(self.builder, "zSolver1")
 
     def test_builder_has_same_solver_node_after_roundtrip_to_disk(self):
         self.builder.write(self.temp_file_path)
@@ -147,8 +149,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         mz.clean_scene()
         self.builder.build()
 
-        self.check_retrieve_zsolver_looks_good(self.builder, solver_values)
-        self.check_retrieve_zsolver_transform_looks_good(self.builder, solver_transform_values)
+        self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
+        self.check_retrieve_zsolver_transform_looks_good(self.builder,
+                                                         "zSolver1",
+                                                         solver_transform_values)
 
     def test_build_with_one_solver_from_file(self):
         self.builder.write(self.temp_file_path)
