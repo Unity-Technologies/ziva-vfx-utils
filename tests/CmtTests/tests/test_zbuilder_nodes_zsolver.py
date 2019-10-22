@@ -18,7 +18,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         pass
 
     def setUp(self):
-        super(ZivaSolverGenericTestCase, self).setUp()111
+        super(ZivaSolverGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
