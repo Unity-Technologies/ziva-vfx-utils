@@ -127,7 +127,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertEqual(solver_transform.name, "zSolver1")
         self.assertEqual(solver_transform.type, "zSolverTransform")
 
-    def test_build_with_one_solver(self):
+    def test_build(self):
         solver_attrs = ['substeps',
                         'gravityY',
                         'framesPerSecond']
@@ -154,7 +154,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                                                          "zSolver1",
                                                          solver_transform_values)
 
-    def test_build_with_one_solver_from_file(self):
+    def test_build_from_file(self):
         self.builder.write(self.temp_file_path)
 
         builder = zva.Ziva()
