@@ -29,6 +29,26 @@ class Bundle(object):
         """
         return len(self.scene_items)
 
+    def __eq__(self, other):
+        """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
+        is equal.
+        """
+
+        if len(self.scene_items) == len(other.scene_items):
+
+            for a, b in zip(self.scene_items, other.scene_items):
+                if not a == b:
+                    return False
+
+            return True
+
+        return False
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self.__eq__(other)
+
     def print_(self, type_filter=list(), name_filter=list()):
         """
         Prints out basic information for each scene item in the Builder.  Information is all
@@ -97,12 +117,14 @@ class Bundle(object):
             scene_item (:obj:`obj`): the scene_item to append to collection list.
         """
 
-        if scene_item in self.scene_items:
-            self.scene_items = [
-                scene_item if item == scene_item else item for item in self.scene_items
-            ]
-        else:
-            self.scene_items.append(scene_item)
+        # if scene_item in self.scene_items:
+        #     self.scene_items = [
+        #         scene_item if item == scene_item else item for item in self.scene_items
+        #     ]
+        # else:
+        #     self.scene_items.append(scene_item)
+        #if not scene_item in self.scene_items:
+        self.scene_items.append(scene_item)
 
     def extend_scene_items(self, scene_items):
         """
@@ -113,8 +135,9 @@ class Bundle(object):
         Returns:
 
         """
-        for scene_item in scene_items:
-            self.append_scene_item(scene_item)
+        # for scene_item in scene_items:
+        #     self.append_scene_item(scene_item)
+        self.scene_items.extend(scene_items)
 
     def remove_scene_item(self, scene_item):
         """
