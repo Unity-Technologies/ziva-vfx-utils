@@ -33,12 +33,12 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             os.remove(self.temp_file_path)
 
     def check_retrieve_zsolver_looks_good(self, builder, name, attrs=None):
-        '''
+        """Args:
             builder (builders.ziva.Ziva()): builder object
             name (string): name of the solver transform to check
             attrs (list): compares to stored zBuilder values for zSolver
                           if not defined - getting values from the scene
-        '''
+        """
         # get solver from zBuilder
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
 
@@ -62,13 +62,12 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             self.assertTrue(value == solver.attrs[attr]['value'])
 
     def check_retrieve_zsolver_transform_looks_good(self, builder, name, attrs=None):
-        '''
-        Args:
+        """Args:
             builder (builders.ziva.Ziva()): builder object
             name (string): name of the solver transform to check
             attrs (list): compares to stored zBuilder values for zSolverTransform
                           if not defined - getting values from the scene
-        '''
+        """
         # get solver transform from zBuilder
         solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
 
