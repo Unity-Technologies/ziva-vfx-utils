@@ -4,6 +4,7 @@ import maya.mel as mm
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
+import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 
 import maya.OpenMaya as om
@@ -33,10 +34,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def check_retrieve_zsolver_looks_good(self, builder, name, attrs=None):
         '''
-        :param builder: type builders.ziva.Ziva()
-        :param name: type string, name of the solver to check
-        :param attrs: type list, compares to stored zBuilder values for zSolver
-                      if not defined - getting values from the scene
+            builder (builders.ziva.Ziva()): builder object
+            name (string): name of the solver transform to check
+            attrs (list): compares to stored zBuilder values for zSolver
+                          if not defined - getting values from the scene
         '''
         # get solver from zBuilder
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
@@ -62,10 +63,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def check_retrieve_zsolver_transform_looks_good(self, builder, name, attrs=None):
         '''
-        :param builder: type builders.ziva.Ziva()
-        :param name: type string, name of the solver transform to check
-        :param attrs: type list, compares to stored zBuilder values for zSolverTransform
-                      if not defined - getting values from the scene
+        Args:
+            builder (builders.ziva.Ziva()): builder object
+            name (string): name of the solver transform to check
+            attrs (list): compares to stored zBuilder values for zSolverTransform
+                          if not defined - getting values from the scene
         '''
         # get solver transform from zBuilder
         solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
