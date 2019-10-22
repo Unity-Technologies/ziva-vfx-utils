@@ -117,14 +117,12 @@ class Bundle(object):
             scene_item (:obj:`obj`): the scene_item to append to collection list.
         """
 
-        # if scene_item in self.scene_items:
-        #     self.scene_items = [
-        #         scene_item if item == scene_item else item for item in self.scene_items
-        #     ]
-        # else:
-        #     self.scene_items.append(scene_item)
-        #if not scene_item in self.scene_items:
-        self.scene_items.append(scene_item)
+        if scene_item in self.scene_items:
+            self.scene_items = [
+                scene_item if item == scene_item else item for item in self.scene_items
+            ]
+        else:
+            self.scene_items.append(scene_item)
 
     def extend_scene_items(self, scene_items):
         """
@@ -135,9 +133,8 @@ class Bundle(object):
         Returns:
 
         """
-        # for scene_item in scene_items:
-        #     self.append_scene_item(scene_item)
-        self.scene_items.extend(scene_items)
+        for scene_item in scene_items:
+            self.append_scene_item(scene_item)
 
     def remove_scene_item(self, scene_item):
         """
