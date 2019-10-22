@@ -98,17 +98,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertGreaterEqual(solver_transform_children,
                                 solver_transform_children_expected)
 
-    def check_solver_name_and_type(self, builder, solver):
-        solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
-
-        solver_transform = solver_transform_nodes[0]
-
-        self.assertEqual(solver.name, "zSolver1Shape")
-        self.assertEqual(solver.type, "zSolver")
-
-        self.assertEqual(solver_transform.name, "zSolver1")
-        self.assertEqual(solver_transform.type, "zSolverTransform")
-
     def test_retrieve(self):
         self.check_retrieve_zsolver_looks_good(self.builder)
         self.check_retrieve_zsolver_transform_looks_good(self.builder)
@@ -125,7 +114,16 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         self.assertEqual(len(solver_nodes), 1)
 
-        self.check_solver_name_and_type(builder, solver_nodes[0])
+        solver = solver_nodes[0]
+        solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
+
+        solver_transform = solver_transform_nodes[0]
+
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
+
+        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.type, "zSolverTransform")
 
     def test_build_with_one_solver(self):
         solver_attrs = ['substeps',
@@ -164,7 +162,16 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         self.assertEqual(len(solver_nodes), 1)
 
-        self.check_solver_name_and_type(builder, solver_nodes[0])
+        solver = solver_nodes[0]
+        solver_transform_nodes = builder.get_scene_items(type_filter='zSolverTransform')
+
+        solver_transform = solver_transform_nodes[0]
+
+        self.assertEqual(solver.name, "zSolver1Shape")
+        self.assertEqual(solver.type, "zSolver")
+
+        self.assertEqual(solver_transform.name, "zSolver1")
+        self.assertEqual(solver_transform.type, "zSolverTransform")
 
 
 class ZivaSolverTestCase(VfxTestCase):
