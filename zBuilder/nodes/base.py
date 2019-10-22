@@ -41,10 +41,14 @@ class Base(object):
             self.parent.add_child(self)
 
     def __eq__(self, other):
-        """ Are names == in node objects?
+        """ Comparing the dicts of two objects if they derived from same class.  We need
+        to exclude a few keys as they may or may not be equal and that doesn't matter.  For example .info
+        has a timestamp, username, maya version, os.  None of those are relevant in this case.
         """
-        if isinstance(other, Base):
-            return self.name == other.name
+        if type(other) == type(self):
+            exclude_keys = ['info', '_parent', '_children', '_class', 'builder']
+
+            return equal_dicts(self.__dict__, other.__dict__, exclude_keys)
 
     def __ne__(self, other):
         """ Define a non-equality test
