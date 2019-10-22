@@ -240,3 +240,25 @@ def serialize_object(obj):
             pass
 
     return output
+
+
+def equal_dicts(dict_1, dict_2, ignore_keys):
+    """Compares 2 dictionaries and returns True or False depending.
+    Args:
+        dict_1 (dict()): First dictionary to compare against
+        dict_2 (dict()): Second dictionary
+        ignore_keys (list()): List of strings that are key names to ignore in dictionary
+        when comparing.
+    Returns:
+        bool: True or False deopending.
+    """
+
+    ignored = set(ignore_keys)
+    for key_1, val_1 in dict_1.iteritems():
+        if key_1 not in ignored and (key_1 not in dict_2 or dict_2[key_1] != val_1):
+            return False
+    for key_2, val_2 in dict_2.iteritems():
+        if key_2 not in ignored and key_2 not in dict_1:
+            return False
+
+    return True
