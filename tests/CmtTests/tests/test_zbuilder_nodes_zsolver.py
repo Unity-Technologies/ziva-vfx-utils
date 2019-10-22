@@ -128,8 +128,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-
-        self.check_solver_and_transform_looks_good(builder, "zSolver1", "zSolver1Transform")
+        self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_build(self):
         solver_attrs = ['substeps',
@@ -165,8 +164,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         builder.retrieve_from_file(self.temp_file_path)
         mz.clean_scene()
         builder.build()
-
-        self.check_solver_and_transform_looks_good(builder, "zSolver1", "zSolver1Transform")
+        self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
 
 class ZivaSolverTestCase(VfxTestCase):
