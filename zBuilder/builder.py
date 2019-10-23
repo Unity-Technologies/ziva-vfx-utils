@@ -38,8 +38,7 @@ class Builder(object):
     def __eq__(self, other):
         """ Compares the builders.
         """
-        if type(other) == type(self):
-            return self.bundle == other.bundle
+        return type(other) == type(self) and self.bundle == other.bundle
 
     def __ne__(self, other):
         """ Define a non-equality test
