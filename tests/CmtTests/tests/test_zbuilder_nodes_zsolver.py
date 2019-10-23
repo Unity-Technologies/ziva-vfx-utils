@@ -204,6 +204,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
     def test_copy_paste(self):
         mc.select('zSolver1')
         utils.rig_copy()
+        self.assertSceneHasNodes(["zSolver1"])
         mz.clean_scene()
         utils.rig_paste()
         builder = zva.Ziva()
