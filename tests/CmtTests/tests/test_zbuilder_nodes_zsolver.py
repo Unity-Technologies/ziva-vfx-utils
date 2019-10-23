@@ -194,6 +194,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
     def test_cut_paste(self):
         mc.select('zSolver1')
         utils.rig_cut()
+        self.assertEqual(mc.ls("zSolver1"), [])
         utils.rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
