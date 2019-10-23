@@ -18,6 +18,9 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
+    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder']
+    """ A list of attribute names in __dict__ to exclude from
+            any comparisons.  Anything using __eq__. """
 
     def __init__(self, *args, **kwargs):
         self._name = None
@@ -46,9 +49,7 @@ class Base(object):
         has a timestamp, username, maya version, os.  None of those are relevant in this case.
         """
         if type(other) == type(self):
-            exclude_keys = ['info', '_parent', '_children', '_class', 'builder']
-
-            return equal_dicts(self.__dict__, other.__dict__, exclude_keys)
+            return equal_dicts(self.__dict__, other.__dict__, self.COMPARE_EXCLUDE)
 
     def __ne__(self, other):
         """ Define a non-equality test
