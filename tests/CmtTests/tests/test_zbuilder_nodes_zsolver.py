@@ -166,21 +166,14 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
-    def get_ziva_node_names_from_builder(self, builder):
-        # get items that has z + Capital case letter and don't have dots
-        # this will list all Ziva nodes
-        node_names = [obj.name for obj in builder.get_scene_items(name_regex="z[A-Z]([^\.]*)$")]
-        return node_names
-
     def test_remove_solver(self):
-        node_names = self.get_ziva_node_names_from_builder(self.builder)
+        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
         mc.select("zSolver1")
         utils.remove_solver(askForConfirmation=False)
         self.assertEqual(mc.ls(node_names), [])
 
     def test_remove_all_solvers(self):
-        node_names = self.get_ziva_node_names_from_builder(self.builder)
-        mc.select("zSolver1")
+        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
         utils.remove_all_solvers(confirmation=False)
         self.assertEqual(mc.ls(node_names), [])
 
@@ -194,6 +187,9 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.builder.retrieve_from_scene()
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
         self.assertEqual(len(solver_nodes), 1)
+
+        solver_nodes = self.builder.get_scene_items(name_filter=["zSolver1"])
+        self.assertEqual(len(solver_nodes), 0)
 
 
 class ZivaSolverTestCase(VfxTestCase):
