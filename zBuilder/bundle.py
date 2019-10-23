@@ -33,16 +33,7 @@ class Bundle(object):
         """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
         is equal.
         """
-
-        if len(self.scene_items) == len(other.scene_items):
-
-            for a, b in zip(self.scene_items, other.scene_items):
-                if not a == b:
-                    return False
-
-            return True
-
-        return False
+        return self.scene_items == other.scene_items
 
     def __ne__(self, other):
         """ Define a non-equality test
