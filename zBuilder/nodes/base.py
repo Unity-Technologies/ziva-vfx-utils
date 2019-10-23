@@ -254,15 +254,8 @@ def equal_dicts(dict_1, dict_2, ignore_keys):
         ignore_keys (list()): List of strings that are key names to ignore in dictionary
         when comparing.
     Returns:
-        bool: True or False deopending.
+        bool: True or False depending.
     """
-
-    ignored = set(ignore_keys)
-    for key_1, val_1 in dict_1.iteritems():
-        if key_1 not in ignored and (key_1 not in dict_2 or dict_2[key_1] != val_1):
-            return False
-    for key_2, val_2 in dict_2.iteritems():
-        if key_2 not in ignored and key_2 not in dict_1:
-            return False
-
-    return True
+    keys_1 = set(dict_1).difference(ignore_keys)
+    keys_2 = set(dict_2).difference(ignore_keys)
+    return keys_1 == keys_2 and all(dict_1[k] == dict_2[k] for k in keys_1)
