@@ -38,7 +38,7 @@ class Bundle(object):
     def __ne__(self, other):
         """ Define a non-equality test
         """
-        return not self.__eq__(other)
+        return not self == other
 
     def print_(self, type_filter=list(), name_filter=list()):
         """

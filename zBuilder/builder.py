@@ -43,7 +43,7 @@ class Builder(object):
     def __ne__(self, other):
         """ Define a non-equality test
         """
-        return not self.__eq__(other)
+        return not self == other
 
     def log(self):
         self.root_node.log()

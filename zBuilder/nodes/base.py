@@ -54,7 +54,7 @@ class Base(object):
     def __ne__(self, other):
         """ Define a non-equality test
         """
-        return not self.__eq__(other)
+        return not self == other
 
     def add_child(self, child):
         self.children.append(child)
