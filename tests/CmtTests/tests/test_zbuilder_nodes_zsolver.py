@@ -166,6 +166,31 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
+    def test_remove_solver(self):
+        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
+        mc.select("zSolver1")
+        utils.remove_solver(askForConfirmation=False)
+        self.assertEqual(mc.ls(node_names), [])
+
+    def test_remove_all_solvers(self):
+        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
+        utils.remove_all_solvers(confirmation=False)
+        self.assertEqual(mc.ls(node_names), [])
+
+    def test_string_replace(self):
+        self.builder.string_replace("zSolver1", "zSolver2")
+        solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
+        self.assertEqual(len(solver_nodes), 1)
+
+        mz.clean_scene()
+        self.builder.build()
+        self.builder.retrieve_from_scene()
+        solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
+        self.assertEqual(len(solver_nodes), 1)
+
+        solver_nodes = self.builder.get_scene_items(name_filter=["zSolver1"])
+        self.assertEqual(len(solver_nodes), 0)
+
 
 class ZivaSolverTestCase(VfxTestCase):
     @classmethod

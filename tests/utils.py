@@ -39,6 +39,13 @@ def ziva_mirror_sample_geo():
     mm.eval('ziva -a')
 
 
+def get_ziva_node_names_from_builder(builder):
+    # get items that has z + Capital case letter and don't have dots ( to exclude maps )
+    # this will list all Ziva nodes excluding meshes and maps
+    node_names = [obj.name for obj in builder.get_scene_items(name_regex="z[A-Z][^\.]*$")]
+    return node_names
+
+
 def build_generic_scene():
     path = current_directory_path + "/assets/generic.ma"
     mc.file(path, open=True, force=True)
