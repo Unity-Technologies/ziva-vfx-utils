@@ -46,9 +46,12 @@ def get_ziva_node_names_from_builder(builder):
     return node_names
 
 
-def build_generic_scene():
+def build_generic_scene(new_scene=True):
     path = current_directory_path + "/assets/generic.ma"
-    mc.file(path, open=True, force=True)
+    if new_scene:
+        mc.file(new=True, force=True)
+    # import with no namespace
+    mc.file(path, i=True, ns=":")
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):

@@ -191,6 +191,46 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver1"])
         self.assertEqual(len(solver_nodes), 0)
 
+    def test_cut_paste(self):
+        mc.select('zSolver1')
+        utils.rig_cut()
+        utils.rig_paste()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_zsolver_looks_good(builder, "zSolver1Shape", [])
+        self.check_retrieve_zsolver_transform_looks_good(builder, "zSolver1", [])
+
+    def test_copy_paste(self):
+        mc.select('zSolver1')
+        utils.rig_copy()
+        mz.clean_scene()
+        utils.rig_paste()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_zsolver_looks_good(builder, "zSolver1Shape", [])
+        self.check_retrieve_zsolver_transform_looks_good(builder, "zSolver1", [])
+
+    def test_transfer(self):
+        meshes = mc.ls(type="mesh")
+        meshes_transforms = mc.listRelatives(meshes, p=True)
+        # exclude duplicates
+        meshes_transforms = list(set(meshes_transforms))
+
+        for item in meshes_transforms:
+            mc.rename(item, 'warped_{}'.format(item))
+
+        mz.clean_scene()
+
+        test_utils.build_generic_scene(new_scene=False)
+
+        # now do the trasnfer
+        utils.rig_transfer('zSolver1', 'warped_', '')
+
+        # when done we should have some ziva nodes with a 'warped_' prefix
+        nodes_in_scene = ['warped_zSolver1',
+                          'warped_zSolver1Shape']
+        self.assertSceneHasNodes(nodes_in_scene)
+
 
 class ZivaSolverTestCase(VfxTestCase):
     @classmethod
