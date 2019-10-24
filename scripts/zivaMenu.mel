@@ -64,7 +64,7 @@ menuItem -label "All Solvers" -ec true -ecr true -c "import zBuilder.utils as ut
 menuItem -label "Delete" -divider true;
 menuItem -label "Delete selection" -ec true -ecr true -c "ZivaDeleteSelection" -ann "Deletes the selected objects after first removing them from the solver.";
 
-menuItem -label "Cache" -divider true;
+menuItem -label "Simulation RAM Cache" -divider true;
 menuItem -label "Add" -ec true -ecr true -c "ziva -acn" -ann "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.";
 menuItem -label "Clear" -ec true -ecr true -c "zCache -c" -ann "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached.";
 menuItem -label "Load..." -ec true -ecr true -c "ZivaLoadCache" -ann "Loads a simulation cache from a .zcache disk file and applies it to the current solver.";
