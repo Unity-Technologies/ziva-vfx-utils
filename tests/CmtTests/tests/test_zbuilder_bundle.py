@@ -43,3 +43,4 @@ class ZivaBundleTestCase(VfxTestCase):
         builder_from_file.bundle.scene_items.insert(10, builder_from_file.bundle.scene_items.pop(5))
 
         self.assertFalse(builder_orig.bundle == builder_from_file.bundle)
+        os.remove(file_name)

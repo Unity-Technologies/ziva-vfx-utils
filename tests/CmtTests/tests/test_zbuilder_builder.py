@@ -44,3 +44,4 @@ class ZivaBuilderTestCase(VfxTestCase):
             name_filter='c_tissue_3_zMaterial')[0].attrs['massDensity']['value'] = 1070.0
 
         self.assertFalse(builder_orig == builder_from_file)
+        os.remove(file_name)
