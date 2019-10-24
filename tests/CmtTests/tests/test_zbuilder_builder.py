@@ -24,8 +24,7 @@ class ZivaBuilderTestCase(VfxTestCase):
         the file.
         """
         test_utils.build_generic_scene()
-        fd, file_name = tempfile.mkstemp(suffix='.zBuilder')
-        os.close(fd)
+        file_name = test_utils.get_tmp_file_location()
 
         mc.select('zSolver1')
         builder_orig = zva.Ziva()
