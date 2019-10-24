@@ -37,7 +37,7 @@ class ZivaBaseTestCase(VfxTestCase):
         item2 = builder_from_file.get_scene_items(type_filter='zMaterial')[0]
 
         # should be same
-        self.assertTrue(item1 == item2)
+        self.assertEqual(item1, item2)
 
         # change a value in one and compare
         item1.attrs['massDensity']['value'] = 70.0

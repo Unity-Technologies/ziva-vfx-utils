@@ -32,7 +32,7 @@ class ZivaBuilderTestCase(VfxTestCase):
         builder_from_file = zva.Ziva()
         builder_from_file.retrieve_from_file(file_name)
         # The bundles should be same
-        self.assertTrue(builder_orig == builder_from_file)
+        self.assertEqual(builder_orig, builder_from_file)
 
         # change an item in the builder, lets compare.  should be not equal
         # in this case changing an attribute value.

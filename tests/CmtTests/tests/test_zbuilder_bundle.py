@@ -33,7 +33,7 @@ class ZivaBundleTestCase(VfxTestCase):
         builder_from_file.retrieve_from_file(file_name)
 
         # The bundles should be same
-        self.assertTrue(builder_orig.bundle == builder_from_file.bundle)
+        self.assertEqual(builder_orig.bundle, builder_from_file.bundle)
 
         # remove an element from one of them and should not be equal
         builder_from_file.bundle.scene_items.insert(10, builder_from_file.bundle.scene_items.pop(5))
