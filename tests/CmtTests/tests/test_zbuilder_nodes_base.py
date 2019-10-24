@@ -1,5 +1,3 @@
-import os
-
 import maya.cmds as mc
 
 import zBuilder.builders.ziva as zva
@@ -44,4 +42,3 @@ class ZivaBaseTestCase(VfxTestCase):
         # change a value in one and compare
         item1.attrs['massDensity']['value'] = 70.0
         self.assertFalse(item1 == item2)
-        os.remove(file_name)
