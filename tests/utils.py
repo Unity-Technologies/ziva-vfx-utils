@@ -6,7 +6,7 @@ These are small utilities to help with testing zBuilder.  Probably no real value
 outside of testing. 
 '''
 
-current_directory_path = os.path.dirname(os.path.realpath(__file__))
+CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def build_mirror_sample_geo():
     """ Builds 2 sphere and a cube to test some basic mirroring stuff.
@@ -47,7 +47,7 @@ def get_ziva_node_names_from_builder(builder):
 
 
 def build_generic_scene(new_scene=True):
-    path = current_directory_path + "/assets/generic.ma"
+    path = CURRENT_DIRECTORY_PATH + "/assets/generic.ma"
     if new_scene:
         mc.file(new=True, force=True)
     # import with no namespace
