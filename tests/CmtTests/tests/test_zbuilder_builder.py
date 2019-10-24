@@ -2,7 +2,6 @@ import os
 import tempfile
 
 import maya.cmds as mc
-import maya.mel as mm
 
 import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase
