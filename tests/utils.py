@@ -8,7 +8,7 @@ These are small utilities to help with testing zBuilder.  Probably no real value
 outside of testing. 
 '''
 
-current_directory_path = os.path.dirname(os.path.realpath(__file__))
+CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def get_tmp_file_location():
@@ -64,9 +64,12 @@ def get_ziva_node_names_from_builder(builder):
     return node_names
 
 
-def build_generic_scene():
-    path = current_directory_path + "/assets/generic.ma"
-    mc.file(path, open=True, force=True)
+def build_generic_scene(new_scene=True):
+    path = CURRENT_DIRECTORY_PATH + "/assets/generic.ma"
+    if new_scene:
+        mc.file(new=True, force=True)
+    # import with no namespace
+    mc.file(path, i=True, ns=":")
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):

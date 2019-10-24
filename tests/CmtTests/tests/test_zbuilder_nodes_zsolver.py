@@ -15,17 +15,13 @@ from vfx_test_case import VfxTestCase
 class ZivaSolverGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.temp_file_path = test_utils.get_tmp_file_location()
 
     def setUp(self):
         super(ZivaSolverGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-        if 'MAYA_APP_DIR' in os.environ:
-            self.temp_file_path = os.environ['MAYA_APP_DIR'].split(';')[0] + "/tmp.zBuilder"
-        else:
-            self.temp_file_path = os.path.expanduser("~").replace("\\", "/") + "/tmp.zBuilder"
 
     def tearDown(self):
         super(ZivaSolverGenericTestCase, self).tearDown()
@@ -190,6 +186,65 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver1"])
         self.assertEqual(len(solver_nodes), 0)
+
+    def test_cut_paste(self):
+        # Act
+        mc.select('zSolver1')
+        utils.rig_cut()
+
+        # Verify
+        self.assertEqual(mc.ls("zSolver1"), [])
+
+        # Act
+        utils.rig_paste()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # Verify
+        self.check_retrieve_zsolver_looks_good(builder, "zSolver1Shape", [])
+        self.check_retrieve_zsolver_transform_looks_good(builder, "zSolver1", [])
+
+    def test_copy_paste(self):
+        # Act
+        mc.select('zSolver1')
+        utils.rig_copy()
+
+        # Verify
+        self.assertSceneHasNodes(["zSolver1"])
+
+        # Act
+        mz.clean_scene()
+        utils.rig_paste()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # Verify
+        self.check_retrieve_zsolver_looks_good(builder, "zSolver1Shape", [])
+        self.check_retrieve_zsolver_transform_looks_good(builder, "zSolver1", [])
+
+    def test_transfer(self):
+        # Setup
+        meshes = mc.ls(type="mesh")
+        meshes_transforms = mc.listRelatives(meshes, p=True)
+        # exclude duplicates
+        meshes_transforms = list(set(meshes_transforms))
+
+        for item in meshes_transforms:
+            mc.rename(item, 'warped_{}'.format(item))
+
+        mz.clean_scene()
+
+        test_utils.build_generic_scene(new_scene=False)
+
+        # Act
+        # now do the trasnfer
+        utils.rig_transfer('zSolver1', 'warped_', '')
+
+        # Verify
+        # when done we should have some ziva nodes with a 'warped_' prefix
+        nodes_in_scene = ['warped_zSolver1',
+                          'warped_zSolver1Shape']
+        self.assertSceneHasNodes(nodes_in_scene)
 
 
 class ZivaSolverTestCase(VfxTestCase):
