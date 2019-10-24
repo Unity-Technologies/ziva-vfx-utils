@@ -66,11 +66,13 @@ class TissueNode(Ziva):
                            solver=solver,
                            interp_maps=interp_maps)
 
-        # set the attributes in maya
-        for ztet, ztissue in zip(tet_items, tissue_items):
-            ztet.set_maya_attrs(attr_filter=attr_filter)
-            ztissue.set_maya_attrs(attr_filter=attr_filter)
-            ztet.set_maya_weights(interp_maps=interp_maps)
+        # we only want to execute this if tissue_items is empty or self is the first tissue.
+        if not tissue_items or self == tissue_items[0]:
+            # set the attributes in maya
+            for ztet, ztissue in zip(tet_items, tissue_items):
+                ztet.set_maya_attrs(attr_filter=attr_filter)
+                ztissue.set_maya_attrs(attr_filter=attr_filter)
+                ztet.set_maya_weights(interp_maps=interp_maps)
 
 
 def build_multiple(tissue_items,
