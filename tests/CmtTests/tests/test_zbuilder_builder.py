@@ -15,7 +15,7 @@ class ZivaBuilderTestCase(VfxTestCase):
 
     def test_builder_compare(self):
         """ Getting the generic scene and writing out a zBuilder file.  This will
-        allow us to retrieve file and copmpare it against scene.
+        allow us to retrieve file and compare it against scene.
 
         We are going to compare builder from this setUp and a builder retrieved from 
         the file.
