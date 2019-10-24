@@ -15,17 +15,13 @@ from vfx_test_case import VfxTestCase
 class ZivaSolverGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.temp_file_path = test_utils.get_tmp_file_location()
 
     def setUp(self):
         super(ZivaSolverGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-        if 'MAYA_APP_DIR' in os.environ:
-            self.temp_file_path = os.environ['MAYA_APP_DIR'].split(';')[0] + "/tmp.zBuilder"
-        else:
-            self.temp_file_path = os.path.expanduser("~").replace("\\", "/") + "/tmp.zBuilder"
 
     def tearDown(self):
         super(ZivaSolverGenericTestCase, self).tearDown()
