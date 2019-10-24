@@ -1,3 +1,5 @@
+import tempfile
+
 import maya.cmds as mc
 import maya.mel as mm
 import os
@@ -7,6 +9,22 @@ outside of testing.
 '''
 
 current_directory_path = os.path.dirname(os.path.realpath(__file__))
+
+
+def get_tmp_file_location():
+    """Using the tempfile module this creates a tempfile and deletes it (os.close) and 
+    returns the name/location which is all we need to deal with files.
+    
+    Returns:
+        string: file path 
+    """
+    temp = tempfile.TemporaryFile()
+
+    # this closes the file and deletes it.  We just need to name of it.
+    temp.close()
+
+    return temp.name
+
 
 def build_mirror_sample_geo():
     """ Builds 2 sphere and a cube to test some basic mirroring stuff.
