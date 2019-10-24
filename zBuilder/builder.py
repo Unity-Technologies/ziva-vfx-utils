@@ -35,6 +35,16 @@ class Builder(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
+    def __eq__(self, other):
+        """ Compares the builders.
+        """
+        return type(other) == type(self) and self.bundle == other.bundle
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self == other
+
     def log(self):
         self.root_node.log()
 

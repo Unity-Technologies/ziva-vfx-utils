@@ -29,6 +29,17 @@ class Bundle(object):
         """
         return len(self.scene_items)
 
+    def __eq__(self, other):
+        """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
+        is equal.
+        """
+        return self.scene_items == other.scene_items
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self == other
+
     def print_(self, type_filter=list(), name_filter=list()):
         """
         Prints out basic information for each scene item in the Builder.  Information is all

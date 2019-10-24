@@ -18,6 +18,9 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
+    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder']
+    """ A list of attribute names in __dict__ to exclude from
+            any comparisons.  Anything using __eq__. """
 
     def __init__(self, *args, **kwargs):
         self._name = None
@@ -41,15 +44,17 @@ class Base(object):
             self.parent.add_child(self)
 
     def __eq__(self, other):
-        """ Are names == in node objects?
+        """ Comparing the dicts of two objects if they derived from same class.  We need
+        to exclude a few keys as they may or may not be equal and that doesn't matter.  For example .info
+        has a timestamp, username, maya version, os.  None of those are relevant in this case.
         """
-        if isinstance(other, Base):
-            return self.name == other.name
+        return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__,
+                                                         self.COMPARE_EXCLUDE)
 
     def __ne__(self, other):
         """ Define a non-equality test
         """
-        return not self.__eq__(other)
+        return not self == other
 
     def add_child(self, child):
         self.children.append(child)
@@ -240,3 +245,18 @@ def serialize_object(obj):
             pass
 
     return output
+
+
+def equal_dicts(dict_1, dict_2, ignore_keys):
+    """Compares 2 dictionaries and returns True or False depending.
+    Args:
+        dict_1 (dict()): First dictionary to compare against
+        dict_2 (dict()): Second dictionary
+        ignore_keys (list()): List of strings that are key names to ignore in dictionary
+        when comparing.
+    Returns:
+        bool: True or False depending.
+    """
+    keys_1 = set(dict_1).difference(ignore_keys)
+    keys_2 = set(dict_2).difference(ignore_keys)
+    return keys_1 == keys_2 and all(dict_1[k] == dict_2[k] for k in keys_1)
