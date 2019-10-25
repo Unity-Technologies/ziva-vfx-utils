@@ -19,6 +19,8 @@ class ZivaMapTestCase(VfxTestCase):
 
     def test_invert_map_through_zBuilder(self):
         # this tests the zBuilder interface for inverting maps
+        # This is grabbing a zTet map to test against.
+
         sphere = mc.polySphere()
 
         mm.eval('ziva -t {}'.format(sphere[0]))
@@ -29,8 +31,9 @@ class ZivaMapTestCase(VfxTestCase):
 
         mp = builder.get_scene_items(type_filter='map')[0]
 
-        current = mp.values
+        expected_values = maps.invert_weights(mp.values)
+
         mp.invert()
 
-        # this should be 1.0
-        self.assertEqual(current[0], 1.0)
+        # compare the result to expected
+        self.assertEqual(mp.values, expected_values)
