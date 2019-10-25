@@ -70,30 +70,40 @@ class BuilderMayaTestCase(VfxTestCase):
         self.assertEqual(results, outputs)
 
     def test_replace_long_name_prefix(self):
-        # testing prefix on short and long names
-        strings = ['r_bicep', 'r_bicep__r_tricep', '|r_bicep']
+        # yapf: disable
+        expected = {
 
-        outputs = ['prefix_r_bicep', 'prefix_r_bicep__r_tricep', '|prefix_r_bicep']
+            'r_bicep'           : 'prefix_r_bicep',
+            'r_bicep__r_tricep' : 'prefix_r_bicep__r_tricep',
+            '|r_bicep'          : '|prefix_r_bicep',
+            '|foo|r_bicep'      : '|prefix_foo|prefix_r_bicep',
+            '|foo|bar|r_bicep'  : '|prefix_foo|prefix_bar|prefix_r_bicep',
+            None                :  None,
+            ''                  : '',
+            ' '                 : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('^', 'prefix_', k) for k in expected.keys()}
 
-        results = list()
-
-        for case in strings:
-            results.append(mz.replace_long_name('^', 'prefix_', case))
-
-        self.assertEqual(results, outputs)
+        self.assertDictEqual(expected, observed)
 
     def test_replace_long_name_postfix(self):
-        # testing prefix on short and long names
-        strings = ['r_bicep', 'r_bicep__r_tricep', '|r_bicep']
+        # yapf: disable
+        expected = {
 
-        outputs = ['r_bicep_postfix', 'r_bicep__r_tricep_postfix', '|r_bicep_postfix']
+            'r_bicep'           : 'r_bicep_postfix',
+            'r_bicep__r_tricep' : 'r_bicep__r_tricep_postfix',
+            '|r_bicep'          : '|r_bicep_postfix',
+            '|foo|r_bicep'      : '|foo_postfix|r_bicep_postfix',
+            '|foo|bar|r_bicep'  : '|foo_postfix|bar_postfix|r_bicep_postfix',
+            None                :  None,
+            ''                  : '',
+            ' '                 : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('$', '_postfix', k) for k in expected.keys()}
 
-        results = list()
-
-        for case in strings:
-            results.append(mz.replace_long_name('$', '_postfix', case))
-
-        self.assertEqual(results, outputs)
+        self.assertDictEqual(expected, observed)
 
     def test_get_zbones_case1(self):
         test_utils.build_anatomical_arm_with_no_popup()
