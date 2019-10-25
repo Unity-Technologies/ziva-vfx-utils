@@ -128,6 +128,24 @@ class Map(Base):
 
             mc.delete(created_mesh)
 
+    def invert(self):
+        """Invert the map.
+        """
+        self.values = invert_weights(self.values)
+
+
+def invert_weights(weights):
+    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
+    
+    Args:
+        weights (list): Weight list, a list of floats or ints.
+    
+    Returns:
+        list: list of floats
+    """
+    weights = [1.0 - x for x in weights]
+    return weights
+
 
 def get_weights(map_name, mesh_name):
     """ Gets the weights for the map.
