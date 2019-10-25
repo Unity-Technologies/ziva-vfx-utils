@@ -683,23 +683,38 @@ def replace_long_name(search, replace, long_name):
     returns:
         str: result of search and replace
     """
-    items = long_name.split('|')
     new_name = ''
-    for item in items:
-        matches = re.finditer(search, item)
-        for match_num, match in enumerate(matches):
-            if match.groups():
-                with_this = item[match.span(1)[0]:match.
-                                 span(1)[1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
-                item = item[:match.start()] + with_this + item[match.end():]
-            else:
-                item = re.sub(search, replace, item)
+    # check if long_name is valid.  If it is not, return itself
+    if long_name and long_name != ' ':
+        items = long_name.split('|')
+        for item in items:
+            # This checks if the item is an empty string.  If this check is not made
+            # it will, under certain circumstances, add a prefex to an empty string
+            # and make the long name invalid.
+            if item:
+                matches = re.finditer(search, item)
+                for match in matches:
+                    if match.groups():
+                        # if there are groups in the regular expression, (), this splits them up and
+                        # creates a new replace string based on the groups and what is between them.
+                        # on this string: '|l_loa_curve'
+                        # This expression: "(^|_)l($|_)"
+                        # yeilds this replace string: "l_"
+                        # as it found an "_" at end of string.
+                        # then it performs a match replace on original string
+                        with_this = item[match.span(1)[0]:match.span(1)
+                                         [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                        item = item[:match.start()] + with_this + item[match.end():]
+                    else:
+                        item = re.sub(search, replace, item)
 
-        # reconstruct long name if applicable
-        if '|' in long_name and item != '':
-            new_name += '|' + item
-        else:
-            new_name += item
+                # reconstruct long name if applicable
+                if '|' in long_name and item != '':
+                    new_name += '|' + item
+                else:
+                    new_name += item
+    else:
+        return long_name
 
     return new_name
 

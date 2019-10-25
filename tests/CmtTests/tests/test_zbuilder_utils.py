@@ -51,23 +51,60 @@ class BuilderMayaTestCase(VfxTestCase):
 
         self.assertEqual(results, outputs)
 
-    def test_replace_long_name_usecase3(self):
-        strings = [
-            'r_bicep', 'r_bicep__r_tricep', '|muscle_geo|r_bicep', 'rr_bicep', '|r_bicep',
-            'r_bicep_r', '|muscles_geo|bicep_r|muscle_r'
-        ]
+    def test_replace_long_name_prefix(self):
+        # yapf: disable
+        expected = {
 
-        outputs = [
-            'l_bicep', 'l_bicep__l_tricep', '|muscle_geo|l_bicep', 'rr_bicep', '|l_bicep',
-            'l_bicep_l', '|muscles_geo|bicep_l|muscle_l'
-        ]
+            'r_bicep'           : 'prefix_r_bicep',
+            'r_bicep__r_tricep' : 'prefix_r_bicep__r_tricep',
+            '|r_bicep'          : '|prefix_r_bicep',
+            '|foo|r_bicep'      : '|prefix_foo|prefix_r_bicep',
+            '|foo|bar|r_bicep'  : '|prefix_foo|prefix_bar|prefix_r_bicep',
+            None                :  None,
+            ''                  : '',
+            ' '                 : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('^', 'prefix_', k) for k in expected.keys()}
 
-        results = list()
+        self.assertDictEqual(expected, observed)
 
-        for case in strings:
-            results.append(mz.replace_long_name('(^|_)r($|_)', 'l', case))
+    def test_replace_long_name_postfix(self):
+        # yapf: disable
+        expected = {
 
-        self.assertEqual(results, outputs)
+            'r_bicep'           : 'r_bicep_postfix',
+            'r_bicep__r_tricep' : 'r_bicep__r_tricep_postfix',
+            '|r_bicep'          : '|r_bicep_postfix',
+            '|foo|r_bicep'      : '|foo_postfix|r_bicep_postfix',
+            '|foo|bar|r_bicep'  : '|foo_postfix|bar_postfix|r_bicep_postfix',
+            None                :  None,
+            ''                  : '',
+            ' '                 : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('$', '_postfix', k) for k in expected.keys()}
+
+        self.assertDictEqual(expected, observed)
+
+    def test_replace_long_name_groups(self):
+        # yapf: disable
+        expected = {
+            '|muscles_geo|bicep_r|muscle_r' : '|muscles_geo|bicep_l|muscle_l',
+            'rr_bicep'                      : 'rr_bicep',
+            'r_bicep'                       : 'l_bicep',
+            'r_bicep__r_tricep'             : 'l_bicep__l_tricep',
+            '|r_bicep'                      : '|l_bicep',
+            '|foo|r_bicep'                  : '|foo|l_bicep',
+            '|foo|bar|r_bicep'              : '|foo|bar|l_bicep',
+            None                            :  None,
+            ''                              : '',
+            ' '                             : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('(^|_)r($|_)', 'l', k) for k in expected.keys()}
+
+        self.assertDictEqual(expected, observed)
 
     def test_get_zbones_case1(self):
         test_utils.build_anatomical_arm_with_no_popup()
