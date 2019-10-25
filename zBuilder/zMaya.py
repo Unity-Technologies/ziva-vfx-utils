@@ -686,20 +686,24 @@ def replace_long_name(search, replace, long_name):
     items = long_name.split('|')
     new_name = ''
     for item in items:
-        matches = re.finditer(search, item)
-        for match_num, match in enumerate(matches):
-            if match.groups():
-                with_this = item[match.span(1)[0]:match.
-                                 span(1)[1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
-                item = item[:match.start()] + with_this + item[match.end():]
-            else:
-                item = re.sub(search, replace, item)
+        # This checks if the item is an empty string.  If this check is not made
+        # it will, under certain circumstances, add a prefex to an empty string
+        # and make the long name invalid.
+        if item:
+            matches = re.finditer(search, item)
+            for match_num, match in enumerate(matches):
+                if match.groups():
+                    with_this = item[match.span(1)[0]:match.
+                                     span(1)[1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                    item = item[:match.start()] + with_this + item[match.end():]
+                else:
+                    item = re.sub(search, replace, item)
 
-        # reconstruct long name if applicable
-        if '|' in long_name and item != '':
-            new_name += '|' + item
-        else:
-            new_name += item
+            # reconstruct long name if applicable
+            if '|' in long_name and item != '':
+                new_name += '|' + item
+            else:
+                new_name += item
 
     return new_name
 
