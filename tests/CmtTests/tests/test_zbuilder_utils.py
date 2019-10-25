@@ -69,6 +69,32 @@ class BuilderMayaTestCase(VfxTestCase):
 
         self.assertEqual(results, outputs)
 
+    def test_replace_long_name_prefix(self):
+        # testing prefix on short and long names
+        strings = ['r_bicep', 'r_bicep__r_tricep', '|r_bicep']
+
+        outputs = ['prefix_r_bicep', 'prefix_r_bicep__r_tricep', '|prefix_r_bicep']
+
+        results = list()
+
+        for case in strings:
+            results.append(mz.replace_long_name('^', 'prefix_', case))
+
+        self.assertEqual(results, outputs)
+
+    def test_replace_long_name_postfix(self):
+        # testing prefix on short and long names
+        strings = ['r_bicep', 'r_bicep__r_tricep', '|r_bicep']
+
+        outputs = ['r_bicep_postfix', 'r_bicep__r_tricep_postfix', '|r_bicep_postfix']
+
+        results = list()
+
+        for case in strings:
+            results.append(mz.replace_long_name('$', '_postfix', case))
+
+        self.assertEqual(results, outputs)
+
     def test_get_zbones_case1(self):
         test_utils.build_anatomical_arm_with_no_popup()
 
