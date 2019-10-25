@@ -693,8 +693,15 @@ def replace_long_name(search, replace, long_name):
             # and make the long name invalid.
             if item:
                 matches = re.finditer(search, item)
-                for match_num, match in enumerate(matches):
+                for match in matches:
                     if match.groups():
+                        # if there are groups in the regular expression, (), this splits them up and
+                        # creates a new replace string based on the groups and what is between them.
+                        # on this string: '|l_loa_curve'
+                        # This expression: "(^|_)l($|_)"
+                        # yeilds this replace string: "l_"
+                        # as it found an "_" at end of string.
+                        # then it performs a match replace on original string
                         with_this = item[match.span(1)[0]:match.span(1)
                                          [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
                         item = item[:match.start()] + with_this + item[match.end():]
