@@ -7,7 +7,7 @@ import zBuilder.parameters.maps as maps
 import zBuilder.builders.ziva as zva
 
 
-class ZivaMapcTestCase(VfxTestCase):
+class ZivaMapTestCase(VfxTestCase):
     def test_invert_map_command(self):
         # this tests command for inverting maps
         weight_list = [0, .4, .6, .5, 1]
