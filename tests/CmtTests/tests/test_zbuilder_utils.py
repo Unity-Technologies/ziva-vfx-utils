@@ -51,24 +51,6 @@ class BuilderMayaTestCase(VfxTestCase):
 
         self.assertEqual(results, outputs)
 
-    def test_replace_long_name_usecase3(self):
-        strings = [
-            'r_bicep', 'r_bicep__r_tricep', '|muscle_geo|r_bicep', 'rr_bicep', '|r_bicep',
-            'r_bicep_r', '|muscles_geo|bicep_r|muscle_r'
-        ]
-
-        outputs = [
-            'l_bicep', 'l_bicep__l_tricep', '|muscle_geo|l_bicep', 'rr_bicep', '|l_bicep',
-            'l_bicep_l', '|muscles_geo|bicep_l|muscle_l'
-        ]
-
-        results = list()
-
-        for case in strings:
-            results.append(mz.replace_long_name('(^|_)r($|_)', 'l', case))
-
-        self.assertEqual(results, outputs)
-
     def test_replace_long_name_prefix(self):
         # yapf: disable
         expected = {
@@ -102,6 +84,25 @@ class BuilderMayaTestCase(VfxTestCase):
         }
         # yapf: enable
         observed = {k: mz.replace_long_name('$', '_postfix', k) for k in expected.keys()}
+
+        self.assertDictEqual(expected, observed)
+
+    def test_replace_long_name_groups(self):
+        # yapf: disable
+        expected = {
+            '|muscles_geo|bicep_r|muscle_r' : '|muscles_geo|bicep_l|muscle_l',
+            'rr_bicep'                      : 'rr_bicep',
+            'r_bicep'                       : 'l_bicep',
+            'r_bicep__r_tricep'             : 'l_bicep__l_tricep',
+            '|r_bicep'                      : '|l_bicep',
+            '|foo|r_bicep'                  : '|foo|l_bicep',
+            '|foo|bar|r_bicep'              : '|foo|bar|l_bicep',
+            None                            :  None,
+            ''                              : '',
+            ' '                             : ' ',
+        }
+        # yapf: enable
+        observed = {k: mz.replace_long_name('(^|_)r($|_)', 'l', k) for k in expected.keys()}
 
         self.assertDictEqual(expected, observed)
 
