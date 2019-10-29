@@ -45,13 +45,14 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(len(tissue_nodes), 4)
 
         for node in tissue_nodes:
-            self.assertTrue(node.name in self.tissue_geo_names)
+            geo_name = node.name.replace("_zTissue", "")
+            self.assertTrue(geo_name in self.tissue_geo_names)
             self.assertEqual(node.type, "zTissue")
             self.assertIsInstance(node.mobject, om.MObject)
 
             for i, attr in enumerate(self.tissue_attrs):
                 if attrs:
-                    value = attrs[node][i]
+                    value = attrs[geo_name][i]
                 else:
                     value = mc.getAttr("{}.{}".format(node.name, attr))
                 self.assertTrue(value == node.attrs[attr]['value'])
@@ -59,12 +60,13 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
-    def check_ztissue_looks_good(self, builder, names):
+    def check_ztissue_looks_good(self, builder):
         tissue_nodes = builder.get_scene_items(type_filter='zTissue')
         self.assertEqual(len(tissue_nodes), 4)
 
         for node in tissue_nodes:
-            self.assertTrue(node.name in names)
+            geo_name = node.name.replace("_zTissue", "")
+            self.assertTrue(geo_name in self.tissue_geo_names)
             self.assertEqual(node.type, "zTissue")
 
     def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
@@ -73,16 +75,16 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        self.check_ztissue_looks_good(builder, self.tissue_geo_names)
+        self.check_ztissue_looks_good(builder)
 
     def test_build(self):
         tissue_attrs_dict = {}
-        for tissue in self.tissue_geo_names:
+        for name in self.tissue_geo_names:
             tissue_values = []
             for attr in self.tissue_attrs:
-                value = mc.getAttr("{}.{}".format(tissue, attr))
+                value = mc.getAttr("{}.{}".format(name + "_zTissue", attr))
                 tissue_values.append(value)
-            tissue_attrs_dict[tissue] = tissue_values
+            tissue_attrs_dict[name] = tissue_values
 
         # remove all Ziva nodes from the scene and build them
         mz.clean_scene()
