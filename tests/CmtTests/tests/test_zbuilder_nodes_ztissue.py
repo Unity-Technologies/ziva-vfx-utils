@@ -67,7 +67,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         for node in tissue_nodes:
             geo_name = node.name.replace("_zTissue", "")
-            self.assertTrue(geo_name in self.tissue_geo_names)
+            self.assertIn(geo_name, self.tissue_geo_names)
             self.assertEqual(node.type, "zTissue")
 
     def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
