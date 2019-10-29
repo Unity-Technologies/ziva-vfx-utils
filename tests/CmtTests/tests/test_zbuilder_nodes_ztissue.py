@@ -18,9 +18,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
                                 "r_tissue_2",
                                 "c_tissue_3",
                                 "r_subtissue_1"]
-        cls.tissue_attrs = ['inertialDamping',
-                            'pressureEnvelope',
-                            'collisions']
+        cls.tissue_attrs = ["inertialDamping",
+                            "pressureEnvelope",
+                            "collisions"]
 
     def setUp(self):
         super(ZivaTissueGenericTestCase, self).setUp()
@@ -41,7 +41,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
                           {tissue_geo_name:[values for self.tissue_attrs]}
         """
         # get tissue from zBuilder
-        tissue_nodes = builder.get_scene_items(type_filter='zTissue')
+        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
 
         self.assertEqual(len(tissue_nodes), 4)
 
@@ -56,13 +56,13 @@ class ZivaTissueGenericTestCase(VfxTestCase):
                     value = attrs[geo_name][i]
                 else:
                     value = mc.getAttr("{}.{}".format(node.name, attr))
-                self.assertTrue(value == node.attrs[attr]['value'])
+                self.assertTrue(value == node.attrs[attr]["value"])
 
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
     def check_ztissue_looks_good(self, builder):
-        tissue_nodes = builder.get_scene_items(type_filter='zTissue')
+        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
         self.assertEqual(len(tissue_nodes), 4)
 
         for node in tissue_nodes:
