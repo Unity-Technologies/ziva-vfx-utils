@@ -101,5 +101,6 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         mz.clean_scene()
         retrieved_builder.build()
         # update zBuilder values from the scene
+        retrieved_builder = zva.Ziva()
         retrieved_builder.retrieve_from_scene()
         self.check_retrieve_ztissue_looks_good(retrieved_builder, {})
