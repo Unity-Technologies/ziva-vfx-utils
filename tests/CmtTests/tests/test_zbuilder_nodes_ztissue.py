@@ -38,6 +38,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
             builder (builders.ziva.Ziva()): builder object
             attrs (dict): compares to stored zBuilder values for zTissue
                           if empty - getting values from the scene
+                          {tissue_geo_name:[values for self.tissue_attrs]}
         """
         # get tissue from zBuilder
         tissue_nodes = builder.get_scene_items(type_filter='zTissue')
@@ -73,9 +74,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
-        builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
-        self.check_ztissue_looks_good(builder)
+        retrieved_builder = zva.Ziva()
+        retrieved_builder.retrieve_from_file(self.temp_file_path)
+        self.check_ztissue_looks_good(retrieved_builder)
 
     def test_build(self):
         tissue_attrs_dict = {}
@@ -95,10 +96,10 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def test_build_from_file(self):
         self.builder.write(self.temp_file_path)
 
-        builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        retrieved_builder = zva.Ziva()
+        retrieved_builder.retrieve_from_file(self.temp_file_path)
         mz.clean_scene()
-        builder.build()
+        retrieved_builder.build()
         # update zBuilder values from the scene
-        builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        retrieved_builder.retrieve_from_scene()
+        self.check_retrieve_ztissue_looks_good(retrieved_builder, {})
