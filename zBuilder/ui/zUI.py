@@ -11,10 +11,13 @@ except ImportError:
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
-import zBuilder.ui.model as model
-import zBuilder.ui.icons as icons
+import model
+import view
+import icons
+import os
 import zBuilder.builders.ziva as zva
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 # Show window with docking ability
 def run():
@@ -39,23 +42,45 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
+        self.ui.setStyleSheet(open(os.path.join(DIR_PATH, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.treeView = QtWidgets.QTreeView()
+        self._proxy_model = QtCore.QSortFilterProxyModel()
+        self.root_node = root_node
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.treeView.setModel(self._proxy_model)
+        self.treeView.setIndentation(15)
 
-        self._proxy_model = QtCore.QSortFilterProxyModel()
-        self.root_node = root_node
+        # must be after .setModel because assigning model resets item expansion
         self.reset_tree(root_node=self.root_node)
 
+        # changing header size
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle dazzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        header = self.treeView.header()
+        header.setOffset(-self.treeView.offset)
+        header.setFixedHeight(10)
+
         self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32))
+        self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
 
-        self.main_layout.addWidget(self.tool_bar)
+        self.top_layout = QtWidgets.QHBoxLayout()
+        self.top_layout.addWidget(self.tool_bar)
+        self.top_layout.setContentsMargins(15, 0, 0, 0)
+        self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
@@ -277,17 +302,12 @@ class MyDockingUI(QtWidgets.QWidget):
             z.retrieve_connections()
             root_node = z.root_node
 
-        self._model = model.SceneGraphModel(root_node)
+        self._model.beginResetModel()
+        self._model.root_node = root_node
+        self._model.endResetModel()
 
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self.treeView.setModel(self._proxy_model)
-
-        # Expand all zSolverTransform tree items-------------------------------
-        proxy_model = self.treeView.model()
-        for row in range(proxy_model.rowCount()):
-            index = proxy_model.index(row, 0)
+        for row in range(self._proxy_model.rowCount()):
+            index = self._proxy_model.index(row, 0)
             node = index.data(model.SceneGraphModel.nodeRole)
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
@@ -296,11 +316,11 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
-            checked = proxy_model.match(proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              QtCore.Qt.DisplayRole,
+                                              sel[0].split('|')[-1],
+                                              -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
 
@@ -329,4 +349,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-
