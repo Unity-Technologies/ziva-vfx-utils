@@ -302,17 +302,12 @@ class MyDockingUI(QtWidgets.QWidget):
             z.retrieve_connections()
             root_node = z.root_node
 
-        self._model = model.SceneGraphModel(root_node)
+        self._model.beginResetModel()
+        self._model.root_node = root_node
+        self._model.endResetModel()
 
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self.treeView.setModel(self._proxy_model)
-
-        # Expand all zSolverTransform tree items-------------------------------
-        proxy_model = self.treeView.model()
-        for row in range(proxy_model.rowCount()):
-            index = proxy_model.index(row, 0)
+        for row in range(self._proxy_model.rowCount()):
+            index = self._proxy_model.index(row, 0)
             node = index.data(model.SceneGraphModel.nodeRole)
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
@@ -321,11 +316,11 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
-            checked = proxy_model.match(proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              QtCore.Qt.DisplayRole,
+                                              sel[0].split('|')[-1],
+                                              -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
 
