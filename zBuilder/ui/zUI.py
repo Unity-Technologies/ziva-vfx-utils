@@ -73,7 +73,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
-        self.actionRefresh.setObjectName("actionUndo")
+        self.actionRefresh.setObjectName("actionRefresh")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
         self.actionCopy = QtWidgets.QAction(self)
