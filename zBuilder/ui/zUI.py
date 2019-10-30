@@ -159,7 +159,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
-        self.actionRefresh.setObjectName("actionUndo")
+        self.actionRefresh.setObjectName("actionRefresh")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
         self.actionSelectST = QtWidgets.QAction(self)
@@ -198,7 +198,9 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mesh = node.long_association[association_idx]
         mc.select(mesh, r=True)
-        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type, node.long_name, attribute)
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type,
+                                                                            node.long_name,
+                                                                            attribute)
         mm.eval(cmd)
 
     def select_source_and_target(self):
@@ -209,14 +211,6 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
-
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu
-        command.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.curve)
 
     def open_menu(self, position):
         """Generates menu for tree items
@@ -299,7 +293,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
-        corrisponding item in Maya scene.
+        corresponding item in Maya scene.
         """
         indexes = self.treeView.selectedIndexes()
         if indexes:
@@ -319,7 +313,6 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            import zBuilder.builders.ziva as zva
             z = zva.Ziva()
             z.retrieve_connections()
             root_node = z.root_node
@@ -348,12 +341,11 @@ class MyDockingUI(QtWidgets.QWidget):
 
             # this works for a zBuilder view.  This is expanding the item 
             # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visable in 
+            # have a material or attachment selected, it will become visible in
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
-
 
     @staticmethod
     def delete_instances():
@@ -362,7 +354,7 @@ class MyDockingUI(QtWidgets.QWidget):
                 ins.setParent(None)
                 ins.deleteLater()
             except:
-                # ignore the fact that the actual parent has already been 
+                # ignore the fact that the actual parent has already been
                 # deleted by Maya...
                 pass
 
