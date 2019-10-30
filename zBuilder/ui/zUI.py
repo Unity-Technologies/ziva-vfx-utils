@@ -27,6 +27,69 @@ def run():
     dock_window(MyDockingUI, root_node=z.root_node)
 
 
+class GroupedLineEdit(QtWidgets.QLineEdit):
+    """
+    Groups LineEdits together so after you press Tab it switch focus to sibling
+    Sends acceptSignal when Enter or Return buttons pressed
+    """
+    acceptSignal = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(GroupedLineEdit, self).__init__(parent)
+        self.sibling = None
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
+            if self.sibling:
+                self.sibling.setFocus()
+                return True
+
+        if event.type() == QtCore.QEvent.KeyPress and event.key() in [
+                QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
+        ]:
+            self.acceptSignal.emit()
+            return True
+
+        return super(GroupedLineEdit, self).event(event)
+
+
+class ProximityWidget(QtWidgets.QWidget):
+    """
+    Widget in right-click menu to change map weights for attachments
+    """
+
+    def __init__(self, parent=None):
+        super(ProximityWidget, self).__init__(parent)
+        h_layout = QtWidgets.QHBoxLayout(self)
+        h_layout.setContentsMargins(15, 15, 15, 15)
+        self.from_edit = GroupedLineEdit()
+        self.from_edit.setFixedHeight(24)
+        self.from_edit.setPlaceholderText("From")
+        self.from_edit.setText("0.1")
+        self.from_edit.setFixedWidth(40)
+        self.to_edit = GroupedLineEdit()
+        self.to_edit.setFixedHeight(24)
+        self.to_edit.setPlaceholderText("To")
+        self.to_edit.setText("0.2")
+        self.to_edit.setFixedWidth(40)
+        self.from_edit.sibling = self.to_edit
+        self.to_edit.sibling = self.from_edit
+        ok_button = QtWidgets.QPushButton()
+        ok_button.setText("Ok")
+        h_layout.addWidget(self.from_edit)
+        h_layout.addWidget(self.to_edit)
+        h_layout.addWidget(ok_button)
+        ok_button.clicked.connect(self.paint_by_prox)
+        self.from_edit.acceptSignal.connect(self.paint_by_prox)
+        self.to_edit.acceptSignal.connect(self.paint_by_prox)
+
+    def paint_by_prox(self):
+        """Paints attachment map by proximity.
+        """
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
+                                                                      self.to_edit.text()))
+
+
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
     CONTROL_NAME = 'zivaScenePanel'
@@ -90,109 +153,34 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def _setup_actions(self):
-
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
-                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionUndo")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
-
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionSelectFiberCurve = QtWidgets.QAction(self)
-        self.actionSelectFiberCurve.setText('Select Curve')
-        self.actionSelectFiberCurve.setObjectName("selectCurve")
-        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
-
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
-
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
-                                                             .1,
-                                                             .2))
-
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
-                                                              .1,
-                                                              10))
         self.actionPaintSource = QtWidgets.QAction(self)
-        self.actionPaintSource.setText('Paint - source weights')
+        self.actionPaintSource.setText('Paint')
         self.actionPaintSource.setObjectName("paintSource")
-        self.actionPaintSource.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintSource.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintTarget = QtWidgets.QAction(self)
-        self.actionPaintTarget.setText('Paint - target weights')
+        self.actionPaintTarget.setText('Paint')
         self.actionPaintTarget.setObjectName("paintTarget")
-        self.actionPaintTarget.triggered.connect(partial(self.paint_weights,
-                                                         1,
-                                                         'weights'))
-
-        self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint - weights')
-        self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
 
         self.actionPaintEndPoints = QtWidgets.QAction(self)
-        self.actionPaintEndPoints.setText('Paint - endPoints')
+        self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
-        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
-                                                            0,
-                                                            'endPoints'))
-
-    def paint_by_prox_options(self):
-        """Brings up UI for painting by proximity.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-
-    def paint_by_prox(self, minimum, maximum):
-        """Paints attachment map by proximity.
-        
-        Args:
-            minimum ([float]): minimum
-            maximum ([float]): maximum
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum), str(maximum)))
+        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -242,38 +230,72 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+            menu = QtWidgets.QMenu(self)
 
-            if node.type == 'zTet':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+            source_mesh_name = node.long_association[0]
+            if len(node.long_association) > 1:
+                target_mesh_name = node.long_association[1]
+            else:
+                target_mesh_name = None
+            menu_dict = {
+                'zTet': [self.open_tet_menu, menu],
+                'zFiber': [self.open_fiber_menu, menu],
+                'zMaterial': [self.open_material_menu, menu],
+                'zAttachment': [self.open_attachment_menu, menu, source_mesh_name,
+                                target_mesh_name]
+            }
 
-            if node.type == 'zFiber':
-                menu.addAction(self.actionPaintWeight)
-                menu.addAction(self.actionPaintEndPoints)
-                menu.addSection('')
-
-            if node.type == 'zMaterial':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zEmbedder':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zAttachment':
-                menu.addAction(self.actionPaintSource)
-                menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
-                menu.addAction(self.actionSelectST)
-
-            if node.type == 'zLineOfAction':
-                menu.addAction(self.actionSelectFiberCurve)
+            if node.type in menu_dict:
+                method = menu_dict[node.type][0]
+                args = menu_dict[node.type][1:]
+                method(*args)
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
+
+    def open_tet_menu(self, menu):
+        menu.addSection('')
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+
+    def open_fiber_menu(self, menu):
+        menu.addSection('')
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        end_points_map_menu = menu.addMenu('EndPoints')
+        end_points_map_menu.addAction(self.actionPaintEndPoints)
+
+    def open_material_menu(self, menu):
+        menu.addSection('')
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        # create short name for labels
+        source_mesh_name_short = source_mesh_name.split('|')[-1]
+        target_mesh_name_short = target_mesh_name.split('|')[-1]
+        source_menu_text = (source_mesh_name_short[:12] +
+                            '..') if len(
+            source_mesh_name_short) > 14 else source_mesh_name_short
+        source_menu_text = 'Source (%s)' % source_menu_text
+        source_map_menu = menu.addMenu(source_menu_text)
+        source_map_menu.addAction(self.actionPaintSource)
+        target_menu_text = (target_mesh_name_short[:12] +
+                            '..') if len(
+            target_mesh_name_short) > 14 else target_mesh_name_short
+        target_menu_text = 'Target (%s)' % target_menu_text
+        target_map_menu = menu.addMenu(target_menu_text)
+        target_map_menu.addAction(self.actionPaintTarget)
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
