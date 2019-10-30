@@ -1,6 +1,5 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 import icons
-import maya.mel as mm
 
 
 class SceneTreeView(QtWidgets.QTreeView):
