@@ -1,8 +1,8 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 
-class SceneGraphModel(QtCore.QAbstractItemModel):
 
+class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
@@ -42,35 +42,26 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         return False
 
-
     def data(self, index, role):
-
         if not index.isValid():
             return None
 
         node = index.internalPointer()
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            if index.column() == 0:
-                return node.name
-
-            if index.column() == 1:
-                if hasattr(node, 'type'):
-                    return node.type
+            return node.name
 
         if role == QtCore.Qt.DecorationRole:
-            if index.column() == 0:
-                if hasattr(node, 'type'):
-                    return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
+            if hasattr(node, 'type'):
+                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
 
         if role == SceneGraphModel.sortRole:
             if hasattr(node, 'type'):
                 return node.type
 
         if role == SceneGraphModel.nodeRole:
-            if index.column() == 0:
-                if hasattr(node, 'type'):
-                    return node
+            if hasattr(node, 'type'):
+                return node
 
     def parent(self, index):
 
