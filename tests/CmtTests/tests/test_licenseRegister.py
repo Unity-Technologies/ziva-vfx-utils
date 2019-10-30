@@ -1,5 +1,5 @@
 import unittest
-from os import path, mkdir
+from os import path, makedirs
 import tempfile
 from vfx_test_case import VfxTestCase
 from utils.licenseRegister.licenseRegister import LICENSE_FILE_NAME
@@ -15,7 +15,7 @@ class TestLicenseRegister(VfxTestCase):
         self.temp_dir = tempfile.gettempdir()
         self.module_path = path.join(self.temp_dir, 'Ziva/VFX/Ziva-VFX-Maya-Module')
         try:
-            mkdir(self.module_path)
+            makedirs(self.module_path)
         except OSError:
             pass  # path exists, proceed
         
