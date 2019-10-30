@@ -1,4 +1,4 @@
-from PySide2 import QtGui, QtWidgets, QtCore
+from PySide2 import QtGui, QtCore
 from icons import get_icon_path_from_node
 
 
