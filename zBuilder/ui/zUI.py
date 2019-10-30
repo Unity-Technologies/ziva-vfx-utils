@@ -11,10 +11,13 @@ except ImportError:
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
-import zBuilder.ui.model as model
-import zBuilder.ui.icons as icons
+import model
+import view
+import icons
+import os
 import zBuilder.builders.ziva as zva
 
+dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 # Show window with docking ability
 def run():
@@ -39,24 +42,47 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
+        self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.treeView = QtWidgets.QTreeView()
+        self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self.root_node = root_node
-        self.reset_tree(root_node=self.root_node)
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self.treeView.setModel(self._proxy_model)
+        self.treeView.setIndentation(15)
+
+        # changing header size
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle dazzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        height = 10
+        offset = -20
+        header = self.treeView.header()
+        header.setOffset(offset)
+        header.setFixedHeight(height)
 
         self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32))
+        self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
 
-        self.main_layout.addWidget(self.tool_bar)
+        self.top_layout = QtWidgets.QHBoxLayout()
+        self.top_layout.addWidget(self.tool_bar)
+        self.top_layout.setContentsMargins(15, 0, 0, 0)
+        self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
+
+        self.reset_tree(root_node=root_node)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
         
@@ -329,4 +355,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-
