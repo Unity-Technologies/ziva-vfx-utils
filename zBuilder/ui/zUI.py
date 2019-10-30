@@ -100,23 +100,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setObjectName("actionRefresh")
         self.actionRefresh.triggered.connect(self.reset_tree)
 
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
-
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
         self.actionSelectST.setObjectName("actionSelectST")
