@@ -330,7 +330,7 @@ class MyDockingUI(QtWidgets.QWidget):
             try:
                 ins.setParent(None)
                 ins.deleteLater()
-            finally:
+            except:
                 # ignore the fact that the actual parent has already been
                 # deleted by Maya...
                 pass
