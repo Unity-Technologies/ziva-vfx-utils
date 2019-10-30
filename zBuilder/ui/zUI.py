@@ -52,6 +52,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
+        self.root_node = root_node
+        self.reset_tree(root_node=self.root_node)
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
@@ -81,8 +83,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.top_layout.setContentsMargins(15, 0, 0, 0)
         self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
-
-        self.reset_tree(root_node=root_node)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
         
