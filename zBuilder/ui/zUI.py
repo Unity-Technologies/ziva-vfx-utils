@@ -197,14 +197,6 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu
-        command.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.curve)
-
     def open_menu(self, position):
         """Generates menu for tree items
 
