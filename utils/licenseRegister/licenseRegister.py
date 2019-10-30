@@ -25,6 +25,6 @@ def _read_license_content(license_path):
 
 
 def _write_license_content(module_path, content):
-    output_path = '{}/{}'.format(module_path, LICENSE_FILE_NAME)
+    output_path = path.join(module_path, LICENSE_FILE_NAME)
     with open(output_path, 'w') as lic_file:
         lic_file.write(content)
