@@ -53,7 +53,6 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self.root_node = root_node
-        self.reset_tree(root_node=self.root_node)
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
@@ -61,6 +60,9 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.treeView.setModel(self._proxy_model)
         self.treeView.setIndentation(15)
+
+        # must be after .setModel because assigning model resets item expansion
+        self.reset_tree(root_node=self.root_node)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
