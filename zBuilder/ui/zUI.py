@@ -46,11 +46,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.treeView = view.SceneTreeView(self)
-        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeView.customContextMenuRequested.connect(self.open_menu)
-        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self.root_node = root_node
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
@@ -58,6 +53,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
+        self.treeView = view.SceneTreeView(self)
+        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.open_menu)
+        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
         self.treeView.setIndentation(15)
 
