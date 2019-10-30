@@ -17,7 +17,7 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 
-dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
+DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 # Show window with docking ability
 def run():
@@ -42,7 +42,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
-        self.ui.setStyleSheet(open(os.path.join(dir_path, "style.css"), "r").read())
+        self.ui.setStyleSheet(open(os.path.join(DIR_PATH, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
 
@@ -69,11 +69,9 @@ class MyDockingUI(QtWidgets.QWidget):
         # height - defines padding from top
         # offset - defines padding from left
         # opposite value of offset should be applied in view.py in drawBranches method
-        height = 10
-        offset = -20
         header = self.treeView.header()
-        header.setOffset(offset)
-        header.setFixedHeight(height)
+        header.setOffset(-self.treeView.offset)
+        header.setFixedHeight(10)
 
         self.tool_bar = QtWidgets.QToolBar(self)
         self.tool_bar.setIconSize(QtCore.QSize(27, 27))

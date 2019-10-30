@@ -4,6 +4,9 @@ import maya.mel as mm
 
 
 class SceneTreeView(QtWidgets.QTreeView):
+    # pixel offset from the left horizontally
+    offset = 20
+
     def __init__(self, parent=None):
         super(SceneTreeView, self).__init__(parent)
 
@@ -22,12 +25,11 @@ class SceneTreeView(QtWidgets.QTreeView):
 
         for column in xrange(column_count):
             # padding from the left side of widget
-            offset = 20
             pos_x = column * self.indentation()
             pos_y = rect.top()
             width = self.indentation()
             height = rect.height()
-            rect = QtCore.QRect(pos_x + offset, pos_y, width, height)
+            rect = QtCore.QRect(pos_x + self.offset, pos_y, width, height)
             if column == column_count - 1:
                 if node.child_count():
                     if self.isExpanded(index):
