@@ -47,7 +47,7 @@ class MenuLineEdit(QtWidgets.QLineEdit):
                 self.sibling_right.setFocus()
                 return True
         if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
-            # PySide bug, have to use this number instead of Ket_Tab with modifiers
+            # PySide bug, have to use this number instead of Key_Tab with modifiers
             if event.key() == 16777218:
                 if self.sibling_left:
                     self.sibling_left.setFocus()
