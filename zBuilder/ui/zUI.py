@@ -292,19 +292,12 @@ class MyDockingUI(QtWidgets.QWidget):
     def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
-        # create short name for labels
-        source_mesh_name_short = source_mesh_name.split('|')[-1]
-        target_mesh_name_short = target_mesh_name.split('|')[-1]
-        source_menu_text = (source_mesh_name_short[:12] +
-                            '..') if len(
-            source_mesh_name_short) > 14 else source_mesh_name_short
-        source_menu_text = 'Source (%s)' % source_menu_text
+        truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
+        display_name = lambda x: truncate(x.split('|')[-1])
+        source_menu_text = 'Source ({})'.format(display_name(source_mesh_name))
+        target_menu_text = 'Target ({})'.format(display_name(target_mesh_name))
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
-        target_menu_text = (target_mesh_name_short[:12] +
-                            '..') if len(
-            target_mesh_name_short) > 14 else target_mesh_name_short
-        target_menu_text = 'Target (%s)' % target_menu_text
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
         menu.addSection('')
