@@ -246,17 +246,11 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu = QtWidgets.QMenu(self)
 
-            source_mesh_name = node.long_association[0]
-            if len(node.long_association) > 1:
-                target_mesh_name = node.long_association[1]
-            else:
-                target_mesh_name = None
             menu_dict = {
                 'zTet': [self.open_tet_menu, menu],
                 'zFiber': [self.open_fiber_menu, menu],
                 'zMaterial': [self.open_material_menu, menu],
-                'zAttachment': [self.open_attachment_menu, menu, source_mesh_name,
-                                target_mesh_name]
+                'zAttachment': [self.open_attachment_menu, menu] + node.long_association
             }
 
             if node.type in menu_dict:
