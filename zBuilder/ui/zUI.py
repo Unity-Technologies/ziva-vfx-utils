@@ -30,9 +30,11 @@ def run():
 
 class MenuLineEdit(QtWidgets.QLineEdit):
     """
-    Groups LineEdits together so after you press Tab it switch focus to sibling_right
-    If Shift+Tab pressed it uses sibling_left
-    Sends acceptSignal when Enter or Return button is pressed
+    Groups LineEdits together so after you press Tab it switch focus to sibling_right.
+    If Shift+Tab pressed it uses sibling_left.
+    Sends acceptSignal when Enter or Return button is pressed.
+    This is for use in Menus, where tab navigation is broken out of the box,
+    and the 'entered pressed' action undesirably causes the menu to close sometimes.
     """
     acceptSignal = QtCore.Signal()
 
