@@ -46,11 +46,9 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(DIR_PATH, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
-        self.builder = builder
+        self.builder = builder or zva.Ziva()
 
-        root_node = None
-        if builder:
-            root_node = builder.root_node
+        root_node = builder.root_node
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
@@ -297,10 +295,7 @@ class MyDockingUI(QtWidgets.QWidget):
         if not root_node:
             # clean builder
             # TODO: this line should be changed after VFXACT-388 to make it more clear to read
-            if not self.builder:
-                self.builder = zva.Ziva()
-            else:
-                self.builder.bundle.scene_items = []
+            self.builder.bundle.scene_items = []
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
