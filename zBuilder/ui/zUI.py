@@ -294,8 +294,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         if not root_node:
             # clean builder
-            # TODO: this line should be changed after VFXACT-388 to make it more clear to read
-            self.builder.bundle.scene_items = []
+            # TODO: this line should be changed after VFXACT-388 to make more efficient
+            self.builder = zva.Ziva()
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
