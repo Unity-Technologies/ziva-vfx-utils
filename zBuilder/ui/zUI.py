@@ -40,20 +40,16 @@ class MenuLineEdit(QtWidgets.QLineEdit):
 
     def __init__(self, parent=None):
         super(MenuLineEdit, self).__init__(parent)
-        self.sibling_right = None
-        self.sibling_left = None
 
     def event(self, event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
-            if self.sibling_right:
-                self.sibling_right.setFocus()
-                return True
+            self.nextInFocusChain().setFocus()
+            return True
         if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
             # PySide bug, have to use this number instead of Key_Tab with modifiers
             if event.key() == 16777218:
-                if self.sibling_left:
-                    self.sibling_left.setFocus()
-                    return True
+                self.previousInFocusChain().setFocus()
+                return True
 
         if event.type() == QtCore.QEvent.KeyPress and event.key() in [
                 QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
@@ -84,16 +80,16 @@ class ProximityWidget(QtWidgets.QWidget):
         self.to_edit.setPlaceholderText("To")
         self.to_edit.setText("0.2")
         self.to_edit.setFixedWidth(40)
-        self.from_edit.sibling_right = self.to_edit
-        self.to_edit.sibling_right = self.from_edit
-        self.from_edit.sibling_left = self.to_edit
-        self.to_edit.sibling_left = self.from_edit
         ok_button = QtWidgets.QPushButton()
         ok_button.setText("Ok")
         h_layout.addWidget(self.from_edit)
         h_layout.addWidget(self.to_edit)
         h_layout.addWidget(ok_button)
         ok_button.clicked.connect(self.paint_by_prox)
+        # setTabOrder doesn't work when used for menu
+        # need to use next 2 lines as a workaround
+        self.setFocusProxy(self.to_edit)
+        ok_button.setFocusProxy(self.from_edit)
         self.from_edit.acceptSignal.connect(self.paint_by_prox)
         self.to_edit.acceptSignal.connect(self.paint_by_prox)
 
