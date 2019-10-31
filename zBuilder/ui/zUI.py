@@ -86,6 +86,11 @@ class ProximityWidget(QtWidgets.QWidget):
     def paint_by_prox(self):
         """Paints attachment map by proximity.
         """
+        # to_edit can't have smaller value then from_edit
+        from_value = float(self.from_edit.text())
+        to_value = float(self.to_edit.text())
+        if to_value < from_value:
+            self.to_edit.setText(str(from_value))
         mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
                                                                       self.to_edit.text()))
 
@@ -155,7 +160,8 @@ class MyDockingUI(QtWidgets.QWidget):
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
+                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
