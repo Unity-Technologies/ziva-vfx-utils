@@ -245,10 +245,6 @@ class MyDockingUI(QtWidgets.QWidget):
                 menu.addAction(self.actionPaintWeight)
                 menu.addSection('')
 
-            if node.type == 'zEmbedder':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
             if node.type == 'zAttachment':
                 menu.addAction(self.actionPaintSource)
                 menu.addAction(self.actionPaintTarget)
