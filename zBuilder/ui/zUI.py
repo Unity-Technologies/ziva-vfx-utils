@@ -19,12 +19,13 @@ import zBuilder.builders.ziva as zva
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
+
 # Show window with docking ability
 def run():
-    z = zva.Ziva()
-    z.retrieve_connections()
+    builder = zva.Ziva()
+    builder.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, builder=builder)
 
 
 class MenuLineEdit(QtWidgets.QLineEdit):
@@ -111,7 +112,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None):
+    def __init__(self, parent=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -124,9 +125,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.ui.setStyleSheet(open(os.path.join(DIR_PATH, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        self.builder = builder or zva.Ziva()
+
+        root_node = builder.root_node
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self.root_node = root_node
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
@@ -140,7 +143,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
-        self.reset_tree(root_node=self.root_node)
+        self.reset_tree(root_node=root_node)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -329,9 +332,11 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            z = zva.Ziva()
-            z.retrieve_connections()
-            root_node = z.root_node
+            # clean builder
+            # TODO: this line should be changed after VFXACT-388 to make more efficient
+            self.builder = zva.Ziva()
+            self.builder.retrieve_connections()
+            root_node = self.builder.root_node
 
         self._model.beginResetModel()
         self._model.root_node = root_node
