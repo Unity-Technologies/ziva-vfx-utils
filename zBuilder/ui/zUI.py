@@ -28,6 +28,83 @@ def run():
     dock_window(MyDockingUI, builder=builder)
 
 
+class MenuLineEdit(QtWidgets.QLineEdit):
+    """
+    Groups LineEdits together so after you press Tab it switch focus to sibling_right.
+    If Shift+Tab pressed it uses sibling_left.
+    Sends acceptSignal when Enter or Return button is pressed.
+    This is for use in Menus, where tab navigation is broken out of the box,
+    and the 'entered pressed' action undesirably causes the menu to close sometimes.
+    """
+    acceptSignal = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(MenuLineEdit, self).__init__(parent)
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
+            self.nextInFocusChain().setFocus()
+            return True
+        if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
+            # PySide bug, have to use this number instead of Key_Tab with modifiers
+            if event.key() == 16777218:
+                self.previousInFocusChain().setFocus()
+                return True
+
+        if event.type() == QtCore.QEvent.KeyPress and event.key() in [
+                QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
+        ]:
+            self.acceptSignal.emit()
+            # This will prevent menu to close after Enter/Return is pressed
+            return True
+
+        return super(MenuLineEdit, self).event(event)
+
+
+class ProximityWidget(QtWidgets.QWidget):
+    """
+    Widget in right-click menu to change map weights for attachments
+    """
+
+    def __init__(self, parent=None):
+        super(ProximityWidget, self).__init__(parent)
+        h_layout = QtWidgets.QHBoxLayout(self)
+        h_layout.setContentsMargins(15, 15, 15, 15)
+        self.from_edit = MenuLineEdit()
+        self.from_edit.setFixedHeight(24)
+        self.from_edit.setPlaceholderText("From")
+        self.from_edit.setText("0.1")
+        self.from_edit.setFixedWidth(40)
+        self.to_edit = MenuLineEdit()
+        self.to_edit.setFixedHeight(24)
+        self.to_edit.setPlaceholderText("To")
+        self.to_edit.setText("0.2")
+        self.to_edit.setFixedWidth(40)
+        ok_button = QtWidgets.QPushButton()
+        ok_button.setText("Ok")
+        h_layout.addWidget(self.from_edit)
+        h_layout.addWidget(self.to_edit)
+        h_layout.addWidget(ok_button)
+        ok_button.clicked.connect(self.paint_by_prox)
+        # setTabOrder doesn't work when used for menu
+        # need to use next 2 lines as a workaround
+        self.setFocusProxy(self.to_edit)
+        ok_button.setFocusProxy(self.from_edit)
+        self.from_edit.acceptSignal.connect(self.paint_by_prox)
+        self.to_edit.acceptSignal.connect(self.paint_by_prox)
+
+    def paint_by_prox(self):
+        """Paints attachment map by proximity.
+        """
+        # to_edit can't have smaller value then from_edit
+        from_value = float(self.from_edit.text())
+        to_value = float(self.to_edit.text())
+        if to_value < from_value:
+            self.to_edit.setText(str(from_value))
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
+                                                                      self.to_edit.text()))
+
+
 class MyDockingUI(QtWidgets.QWidget):
     instances = list()
     CONTROL_NAME = 'zivaScenePanel'
@@ -108,71 +185,20 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
-
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
-                                                             .1,
-                                                             .2))
-
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
-                                                              .1,
-                                                              10))
         self.actionPaintSource = QtWidgets.QAction(self)
-        self.actionPaintSource.setText('Paint - source weights')
+        self.actionPaintSource.setText('Paint')
         self.actionPaintSource.setObjectName("paintSource")
-        self.actionPaintSource.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintSource.triggered.connect(partial(self.paint_weights, 0, 'weights'))
 
         self.actionPaintTarget = QtWidgets.QAction(self)
-        self.actionPaintTarget.setText('Paint - target weights')
+        self.actionPaintTarget.setText('Paint')
         self.actionPaintTarget.setObjectName("paintTarget")
-        self.actionPaintTarget.triggered.connect(partial(self.paint_weights,
-                                                         1,
-                                                         'weights'))
-
-        self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint - weights')
-        self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
+        self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
 
         self.actionPaintEndPoints = QtWidgets.QAction(self)
-        self.actionPaintEndPoints.setText('Paint - endPoints')
+        self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
-        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
-                                                            0,
-                                                            'endPoints'))
-
-    def paint_by_prox_options(self):
-        """Brings up UI for painting by proximity.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
-
-    def paint_by_prox(self, minimum, maximum):
-        """Paints attachment map by proximity.
-        
-        Args:
-            minimum ([float]): minimum
-            maximum ([float]): maximum
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum), str(maximum)))
+        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -216,31 +242,65 @@ class MyDockingUI(QtWidgets.QWidget):
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+            menu = QtWidgets.QMenu(self)
 
-            if node.type == 'zTet':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+            menu_dict = {
+                'zTet': [self.open_tet_menu, menu],
+                'zFiber': [self.open_fiber_menu, menu],
+                'zMaterial': [self.open_material_menu, menu],
+                'zAttachment': [self.open_attachment_menu, menu] + node.long_association
+            }
 
-            if node.type == 'zFiber':
-                menu.addAction(self.actionPaintWeight)
-                menu.addAction(self.actionPaintEndPoints)
-                menu.addSection('')
-
-            if node.type == 'zMaterial':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zAttachment':
-                menu.addAction(self.actionPaintSource)
-                menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
-                menu.addAction(self.actionSelectST)
+            if node.type in menu_dict:
+                method = menu_dict[node.type][0]
+                args = menu_dict[node.type][1:]
+                method(*args)
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
+
+    def add_placeholder_menu_item(self, menu):
+        placeholder_widget = QtWidgets.QWidget()
+        placeholder_action = QtWidgets.QWidgetAction(menu)
+        placeholder_action.setDefaultWidget(placeholder_widget)
+        menu.addAction(placeholder_action)
+
+    def open_tet_menu(self, menu):
+        self.add_placeholder_menu_item(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+
+    def open_fiber_menu(self, menu):
+        self.add_placeholder_menu_item(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+        end_points_map_menu = menu.addMenu('EndPoints')
+        end_points_map_menu.addAction(self.actionPaintEndPoints)
+
+    def open_material_menu(self, menu):
+        self.add_placeholder_menu_item(menu)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu.addAction(self.actionPaintSource)
+
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
+        display_name = lambda x: truncate(x.split('|')[-1])
+        source_menu_text = 'Source ({})'.format(display_name(source_mesh_name))
+        target_menu_text = 'Target ({})'.format(display_name(target_mesh_name))
+        source_map_menu = menu.addMenu(source_menu_text)
+        source_map_menu.addAction(self.actionPaintSource)
+        target_map_menu = menu.addMenu(target_menu_text)
+        target_map_menu.addAction(self.actionPaintTarget)
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
