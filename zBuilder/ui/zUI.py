@@ -27,30 +27,39 @@ def run():
     dock_window(MyDockingUI, root_node=z.root_node)
 
 
-class GroupedLineEdit(QtWidgets.QLineEdit):
+class MenuLineEdit(QtWidgets.QLineEdit):
     """
-    Groups LineEdits together so after you press Tab it switch focus to sibling
-    Sends acceptSignal when Enter or Return buttons pressed
+    Groups LineEdits together so after you press Tab it switch focus to sibling_right
+    If Shift+Tab pressed it uses sibling_left
+    Sends acceptSignal when Enter or Return button is pressed
     """
     acceptSignal = QtCore.Signal()
 
     def __init__(self, parent=None):
-        super(GroupedLineEdit, self).__init__(parent)
-        self.sibling = None
+        super(MenuLineEdit, self).__init__(parent)
+        self.sibling_right = None
+        self.sibling_left = None
 
     def event(self, event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
-            if self.sibling:
-                self.sibling.setFocus()
+            if self.sibling_right:
+                self.sibling_right.setFocus()
                 return True
+        if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
+            # PySide bug, have to use this number instead of Ket_Tab with modifiers
+            if event.key() == 16777218:
+                if self.sibling_left:
+                    self.sibling_left.setFocus()
+                    return True
 
         if event.type() == QtCore.QEvent.KeyPress and event.key() in [
                 QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
         ]:
             self.acceptSignal.emit()
+            # This will prevent menu to close after Enter/Return is pressed
             return True
 
-        return super(GroupedLineEdit, self).event(event)
+        return super(MenuLineEdit, self).event(event)
 
 
 class ProximityWidget(QtWidgets.QWidget):
@@ -62,18 +71,20 @@ class ProximityWidget(QtWidgets.QWidget):
         super(ProximityWidget, self).__init__(parent)
         h_layout = QtWidgets.QHBoxLayout(self)
         h_layout.setContentsMargins(15, 15, 15, 15)
-        self.from_edit = GroupedLineEdit()
+        self.from_edit = MenuLineEdit()
         self.from_edit.setFixedHeight(24)
         self.from_edit.setPlaceholderText("From")
         self.from_edit.setText("0.1")
         self.from_edit.setFixedWidth(40)
-        self.to_edit = GroupedLineEdit()
+        self.to_edit = MenuLineEdit()
         self.to_edit.setFixedHeight(24)
         self.to_edit.setPlaceholderText("To")
         self.to_edit.setText("0.2")
         self.to_edit.setFixedWidth(40)
-        self.from_edit.sibling = self.to_edit
-        self.to_edit.sibling = self.from_edit
+        self.from_edit.sibling_right = self.to_edit
+        self.to_edit.sibling_right = self.from_edit
+        self.from_edit.sibling_left = self.to_edit
+        self.to_edit.sibling_left = self.from_edit
         ok_button = QtWidgets.QPushButton()
         ok_button.setText("Ok")
         h_layout.addWidget(self.from_edit)
