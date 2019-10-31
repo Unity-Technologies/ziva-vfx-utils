@@ -16,24 +16,24 @@ def register_node_based_license(module_path, new_license_path):
         raise RuntimeError("Fail to read input license file: {}".format(new_license_path))
 
     merged_content = _merge_new_content_with_existing_license(module_path, content, NODE_BASED_LICENSE)
-    _write_license_content(module_path, merged_content if merged_content else content)
+    _write_license_content(module_path, merged_content)
 
 
 def register_floating_license(module_path, server, host_id, host_port):
     content = 'HOST {} {} {}'.format(server, host_id, host_port)
     merged_content = _merge_new_content_with_existing_license(module_path, content, FLOATING_LICENSE)
-    _write_license_content(module_path, merged_content if merged_content else content)
+    _write_license_content(module_path, merged_content)
 
 
 def _merge_new_content_with_existing_license(module_path, new_content, license_type):
     '''
-    If MODULE_PATH/zivavfx.lic exists, return merged content, return None otherwise.
+    If MODULE_PATH/zivavfx.lic exists, return merged content, return input content otherwise.
 
     The license file format is:
     HOST XXXXXXXXX  - floating license, can be multiple HOST lines
     LICENSE XXXXXX  - node-based license, can be multiple LICENSE lines
 
-    A valid license file can mix both license type. 
+    A valid license file can mix both license type.
     RLM server will try all of them till find proper one.
     However, it requires HOST line appears before LICENSE line, or the HOST line is not considered.
     
@@ -53,7 +53,7 @@ def _merge_new_content_with_existing_license(module_path, new_content, license_t
             else:
                 raise RuntimeError("Unknow license type: {}".format(license_type))
             return merged_content
-    return None
+    return new_content
 
 
 def _read_license_content(license_path):
