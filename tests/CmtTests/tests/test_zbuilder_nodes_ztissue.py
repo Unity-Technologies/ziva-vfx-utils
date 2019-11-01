@@ -41,10 +41,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         """        
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
             
-        self.assertEqual(len(tissue_nodes), len(self.tissue_names))
+        self.assertItemsEqual(self.tissue_names, [x.name for x in tissue_nodes])
 
         for node in tissue_nodes:
-            self.assertIn(node.name, self.tissue_names)
             self.assertEqual(node.type, "zTissue")
             self.assertIsInstance(node.mobject, om.MObject)
 
@@ -57,10 +56,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def check_ztissue_looks_good(self, builder):
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
-        self.assertEqual(len(tissue_nodes), len(self.tissue_names))
+        self.assertItemsEqual(self.tissue_names, [x.name for x in tissue_nodes])
 
         for node in tissue_nodes:
-            self.assertIn(node.name, self.tissue_names)
             self.assertEqual(node.type, "zTissue")
 
     def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
