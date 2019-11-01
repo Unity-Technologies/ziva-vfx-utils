@@ -288,26 +288,18 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def add_placeholder_menu_item(self, menu):
-        placeholder_widget = QtWidgets.QWidget()
-        placeholder_action = QtWidgets.QWidgetAction(menu)
-        placeholder_action.setDefaultWidget(placeholder_widget)
-        menu.addAction(placeholder_action)
-
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
         attrs_menu.addAction(self.actionPasteAttrs)
 
     def open_tet_menu(self, menu):
-        self.add_placeholder_menu_item(menu)
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
 
     def open_fiber_menu(self, menu):
-        self.add_placeholder_menu_item(menu)
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
@@ -316,7 +308,6 @@ class MyDockingUI(QtWidgets.QWidget):
         end_points_map_menu.addAction(self.actionPaintEndPoints)
 
     def open_material_menu(self, menu):
-        self.add_placeholder_menu_item(menu)
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
