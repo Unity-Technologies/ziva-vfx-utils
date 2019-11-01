@@ -413,15 +413,12 @@ class MyDockingUI(QtWidgets.QWidget):
         Returns: array of item names that are currently expanded in treeView
         """
         # store currently expanded items
-        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                           model.SceneGraphModel.expandedRole, True, -1,
-                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-        names_to_expand = []
-        for index in expanded:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            names_to_expand.append(node.long_name)
+        expanded = []
+        for index in self._proxy_model.persistentIndexList():
+            if self.treeView.isExpanded(index):
+                expanded.append(index.data(model.SceneGraphModel.fullNameRole))
 
-        return names_to_expand
+        return expanded
 
     def expand(self, names):
         """

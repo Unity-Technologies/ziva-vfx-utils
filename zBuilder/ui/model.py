@@ -9,17 +9,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     nodeRole = QtCore.Qt.UserRole + 1
     # full name of scene_item object in the scene
     fullNameRole = QtCore.Qt.UserRole + 2
-    # if scene_item object expanded or not
-    expandedRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
-        """expandedRole is not supported if parent == None
-        """
-        # .parent() method didn't work in Linux
-        # created .parent_ instead
         self.root_node = root
-        self.parent_ = parent
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -76,24 +69,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.fullNameRole:
             return node.long_name
 
-        if role == SceneGraphModel.expandedRole:
-            # return if index is expanded if possible
-            # otherwise return None instead of False to simplify debugging
-            tree = None
-            if isinstance(self.parent_, QtWidgets.QTreeView):
-                tree = self.parent_
-            elif self.parent_:
-                if isinstance(self.parent_.parent_, QtWidgets.QTreeView):
-                    tree = self.parent_.parent_
-
-            if tree:
-                index = self.parent_.mapFromSource(index)
-                if index.isValid():
-                    return tree.isExpanded(index)
-            else:
-                raise Exception(
-                    "Could not query expandedRole. QTreeView parent of SceneGraphModel not found.")
-
     def parent(self, index):
 
         node = self.getNode(index)
@@ -122,11 +97,3 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return node
 
         return self.root_node
-
-
-class SceneSortFilterProxyModel(QtCore.QSortFilterProxyModel):
-    # .parent() method didn't work in Linux
-    # created .parent_ instead
-    def __init__(self, parent=None):
-        super(SceneSortFilterProxyModel, self).__init__(parent)
-        self.parent_ = parent
