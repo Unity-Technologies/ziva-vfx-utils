@@ -41,7 +41,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         """        
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
             
-        self.assertEqual(len(tissue_nodes), 4)
+        self.assertEqual(len(tissue_nodes), len(self.tissue_geo_names))
 
         for node in tissue_nodes:
             geo_name = node.name.replace("_zTissue", "")
