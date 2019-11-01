@@ -37,3 +37,26 @@ class ZivaMapTestCase(VfxTestCase):
 
         # compare the result to expected
         self.assertEqual(mp.values, expected_values)
+
+    def test_apply_map(self):
+        # this tests the zBuilder interface for applying a map to maya scene
+        # This is grabbing a zTet map to test against.
+        sphere = mc.polySphere()
+
+        mm.eval('ziva -t {}'.format(sphere[0]))
+
+        mc.select(sphere[0])
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        tet_map = builder.get_scene_items(type_filter='map')[1]
+
+        expected_values = [.2 for x in tet_map.values]
+
+        # update node with expected
+        tet_map.values = expected_values
+        tet_map.apply_weights()
+
+        # get from scene and compare
+        scene_weights = mc.getAttr('{}[0:{}]'.format(tet_map.name, len(tet_map.values) - 1))
+        self.assertAllApproxEqual(scene_weights, expected_values)
