@@ -6,6 +6,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
+    # full name of zBuilder object in the scene
+    fullNameRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -62,6 +64,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.nodeRole:
             if hasattr(node, 'type'):
                 return node
+
+        if role == SceneGraphModel.fullNameRole:
+            return node.long_name
 
     def parent(self, index):
 

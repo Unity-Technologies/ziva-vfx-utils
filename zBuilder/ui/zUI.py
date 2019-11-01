@@ -340,13 +340,13 @@ class MyDockingUI(QtWidgets.QWidget):
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
+        sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
             checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              QtCore.Qt.DisplayRole,
-                                              sel[0].split('|')[-1],
+                                              model.SceneGraphModel.fullNameRole,
+                                              sel[0],
                                               -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
