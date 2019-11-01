@@ -138,10 +138,7 @@ class Map(Base):
         """
         if mc.objExists('%s[0]' % self.name):
             if not mc.getAttr('%s[0]' % self.name, l=True):
-                tmp = []
-                for w in self.values:
-                    tmp.append(str(w))
-                val = ' '.join(tmp)
+                val = ' '.join([str(w) for w in self.values])
                 cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
                 mm.eval(cmd)
         else:
