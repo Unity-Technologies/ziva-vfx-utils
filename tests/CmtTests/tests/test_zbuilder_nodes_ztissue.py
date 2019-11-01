@@ -57,7 +57,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def check_ztissue_looks_good(self, builder):
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
-        self.assertEqual(len(tissue_nodes), 4)
+        self.assertEqual(len(tissue_nodes), len(self.tissue_names))
 
         for node in tissue_nodes:
             self.assertIn(node.name, self.tissue_names)
