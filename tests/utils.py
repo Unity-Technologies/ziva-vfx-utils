@@ -69,7 +69,7 @@ def build_generic_scene(new_scene=True):
     if new_scene:
         mc.file(new=True, force=True)
     # import with no namespace
-    mc.file(path, i=True, ns=":")
+    mc.file(path, i=True, ns=":", ignoreVersion=True)
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
