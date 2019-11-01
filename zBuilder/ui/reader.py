@@ -32,11 +32,11 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self.root_node = root_node
-        self.reset_tree(root_node=self.root_node)
+        self.set_root_node(root_node=self.root_node)
 
         self.main_layout.addWidget(self.treeView)
 
-    def reset_tree(self, root_node=None):
+    def set_root_node(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed 
         it uses the scene selection to build a new root_node.

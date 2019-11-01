@@ -143,7 +143,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
-        self.reset_tree(root_node=root_node)
+        self.set_root_node(root_node=root_node)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -180,7 +180,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self.reset_tree)
+        self.actionRefresh.triggered.connect(self.set_root_node)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
@@ -350,7 +350,7 @@ class MyDockingUI(QtWidgets.QWidget):
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
 
-    def reset_tree(self, root_node=None):
+    def set_root_node(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
         it uses the scene selection to build a new root_node.
