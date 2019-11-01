@@ -133,6 +133,19 @@ class Map(Base):
         """
         self.values = invert_weights(self.values)
 
+    def apply_weights(self):
+        """This applies the weight from this node to the maya scene.
+        """
+        if mc.objExists('%s[0]' % self.name):
+            if not mc.getAttr('%s[0]' % self.name, l=True):
+                val = ' '.join([str(w) for w in self.values])
+                cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
+                mm.eval(cmd)
+        else:
+            # applying doubleArray maps
+            if mc.objExists(self.name):
+                mc.setAttr(self.name, self.values, type='doubleArray')
+
 
 def invert_weights(weights):
     """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
