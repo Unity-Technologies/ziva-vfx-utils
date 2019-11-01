@@ -139,8 +139,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.treeView.setIndentation(15)
         self.treeView.setModel(self._proxy_model)
+        self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
         self.set_root_node(root_node=root_node)
