@@ -127,18 +127,19 @@ class MyDockingUI(QtWidgets.QWidget):
 
         root_node = builder.root_node
 
-        self._proxy_model = QtCore.QSortFilterProxyModel()
+        self.treeView = view.SceneTreeView(self)
+        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.open_menu)
+        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.treeView.setIndentation(15)
+
+        self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
-        self.treeView = view.SceneTreeView(self)
-        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeView.customContextMenuRequested.connect(self.open_menu)
-        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
-        self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
         self.reset_tree(root_node=root_node)
@@ -330,15 +331,16 @@ class MyDockingUI(QtWidgets.QWidget):
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
+        # remember names of items to expand
+        names_to_expand = self.get_expanded()
+
         self._model.beginResetModel()
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        for row in range(self._proxy_model.rowCount()):
-            index = self._proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
-                self.treeView.expand(index)
+        # restore previous expansion in treeView
+        if names_to_expand:
+            self.expand(names_to_expand)
 
         sel = mc.ls(sl=True)
         # select item in treeview that is selected in maya to begin with and 
@@ -352,13 +354,43 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visible in
-            # UI
-            if checked:
-                self.treeView.expand(checked[-1])
-                self.treeView.expand(checked[-1].parent())
+        # expand all zSolverTransform tree items
+        if not names_to_expand:
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
+
+    def get_expanded(self):
+        """
+        Returns: array of item names that are currently expanded in treeView
+        """
+        # store currently expanded items
+        expanded = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                           model.SceneGraphModel.expandedRole, True, -1,
+                                           QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+        names_to_expand = []
+        for index in expanded:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            names_to_expand.append(node.long_name)
+
+        return names_to_expand
+
+    def expand(self, names):
+        """
+        Args:
+            names (list): names to expand in treeView
+        """
+        # collapseAll added in case refreshing of treeView needed
+        # otherwise new items might not be displayed ( Qt bug )
+        self.treeView.collapseAll()
+        for name in names:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
+                self.treeView.expand(index)
 
     @staticmethod
     def delete_instances():
