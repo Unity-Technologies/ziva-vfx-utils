@@ -4,7 +4,6 @@ from icons import get_icon_path_from_node
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
-    filterRole = QtCore.Qt.UserRole + 1
     nodeRole = QtCore.Qt.UserRole + 2
     # full name of zBuilder object in the scene
     fullNameRole = QtCore.Qt.UserRole + 3
