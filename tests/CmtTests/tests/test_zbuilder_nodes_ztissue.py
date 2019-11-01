@@ -10,10 +10,10 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.temp_file_path = test_utils.get_tmp_file_location()
-        cls.tissue_geo_names = ["l_tissue_1",
-                                "r_tissue_2",
-                                "c_tissue_3",
-                                "r_subtissue_1"]
+        cls.tissue_names = ["l_tissue_1_zTissue",
+                            "r_tissue_2_zTissue",
+                            "c_tissue_3_zTissue",
+                            "r_subtissue_1_zTissue"]
         cls.tissue_attrs = ["inertialDamping",
                             "pressureEnvelope",
                             "collisions"]
@@ -41,11 +41,10 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         """        
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
             
-        self.assertEqual(len(tissue_nodes), len(self.tissue_geo_names))
+        self.assertEqual(len(tissue_nodes), len(self.tissue_names))
 
         for node in tissue_nodes:
-            geo_name = node.name.replace("_zTissue", "")
-            self.assertIn(geo_name, self.tissue_geo_names)
+            self.assertIn(node.name, self.tissue_names)
             self.assertEqual(node.type, "zTissue")
             self.assertIsInstance(node.mobject, om.MObject)
 
@@ -61,8 +60,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(len(tissue_nodes), 4)
 
         for node in tissue_nodes:
-            geo_name = node.name.replace("_zTissue", "")
-            self.assertIn(geo_name, self.tissue_geo_names)
+            self.assertIn(node.name, self.tissue_names)
             self.assertEqual(node.type, "zTissue")
 
     def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
@@ -74,8 +72,8 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.check_ztissue_looks_good(retrieved_builder)
 
     def test_build(self):
-        plug_names = {'{}_zTissue.{}'.format(geo, attr) for geo in self.tissue_geo_names 
-                                                        for attr in self.tissue_attrs}
+        plug_names = {'{}.{}'.format(geo, attr) for geo in self.tissue_names 
+                                                for attr in self.tissue_attrs}
         tissue_attrs_dict = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
