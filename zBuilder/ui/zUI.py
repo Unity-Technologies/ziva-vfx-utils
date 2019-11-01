@@ -376,16 +376,17 @@ class MyDockingUI(QtWidgets.QWidget):
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        # restore previous expansion in treeView
+        # restore previous expansion in treeView or expand all zSolverTransform items
         if names_to_expand:
             self.expand(names_to_expand)
         else:
-            # expand all zSolverTransform tree items
-            for row in range(self._proxy_model.rowCount()):
-                index = self._proxy_model.index(row, 0)
-                node = index.data(model.SceneGraphModel.nodeRole)
-                if node.type == 'zSolverTransform':
-                    self.treeView.expand(index)
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.sortRole,
+                                              "zSolverTransform",
+                                              -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
+                self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
         # select item in treeview that is selected in maya to begin with and 
