@@ -350,7 +350,7 @@ class MyDockingUI(QtWidgets.QWidget):
                                               -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
             # this works for a zBuilder view.  This is expanding the item 
             # selected and it's parent if any.  This makes it possible if you 
