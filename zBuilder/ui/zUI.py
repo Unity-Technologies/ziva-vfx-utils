@@ -16,6 +16,7 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
+import zBuilder.parameters.maps as mp
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
@@ -212,6 +213,10 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.setObjectName("actionPasteAttrs")
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
 
+    def invert_weights(self, weight_map):
+        weight_map.invert()
+        weight_map.apply_weights()
+
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
         for index in indexes:
@@ -270,11 +275,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu = QtWidgets.QMenu(self)
 
+            maps = self.get_maps_from_node(node)
+
             menu_dict = {
-                'zTet': [self.open_tet_menu, menu],
-                'zFiber': [self.open_fiber_menu, menu],
-                'zMaterial': [self.open_material_menu, menu],
-                'zAttachment': [self.open_attachment_menu, menu] + node.long_association,
+                'zTet': [self.open_tet_menu, menu, maps[0]],
+                'zFiber': [self.open_fiber_menu, menu] + maps,
+                'zMaterial': [self.open_material_menu, menu, maps[0]],
+                'zAttachment': [self.open_attachment_menu, menu] + node.long_association + maps,
                 'zTissue': [self.open_tissue_menu, menu],
                 'zBone': [self.open_bone_menu, menu],
                 'zLineOfAction': [self.open_line_of_action_menu, menu],
@@ -288,32 +295,55 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
+    def get_maps_from_node(self, node):
+        maps = []
+        # get node parameters
+        param_dict = node.spawn_parameters()
+        param_dict.pop('mesh', None)
+        for key, values in param_dict.iteritems():
+            for value in values:
+                obj = self.builder.parameter_factory(key, value)
+                maps.append(obj)
+        return maps
+
+    def add_invert_action_to_menu(self, menu, weight_map):
+        action_invert_weight_map = QtWidgets.QAction(self)
+        action_invert_weight_map.setText('Invert')
+        action_invert_weight_map.setObjectName("actionInvertWeights")
+        action_invert_weight_map.triggered.connect(partial(self.invert_weights, weight_map))
+        menu.addAction(action_invert_weight_map)
+
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
         attrs_menu.addAction(self.actionPasteAttrs)
 
-    def open_tet_menu(self, menu):
+    def open_tet_menu(self, menu, weight_map):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+        self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-    def open_fiber_menu(self, menu):
+    def open_fiber_menu(self, menu, weight_map, end_points_map):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+        self.add_invert_action_to_menu(weight_map_menu, weight_map)
         end_points_map_menu = menu.addMenu('EndPoints')
         end_points_map_menu.addAction(self.actionPaintEndPoints)
+        self.add_invert_action_to_menu(end_points_map_menu, end_points_map)
 
-    def open_material_menu(self, menu):
+    def open_material_menu(self, menu, weight_map):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+        self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name,
+                             source_map, target_map):
         self.add_attributes_menu(menu)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
@@ -323,8 +353,10 @@ class MyDockingUI(QtWidgets.QWidget):
         target_menu_text = 'Target ({})'.format(display_name(target_mesh_name))
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
+        self.add_invert_action_to_menu(source_map_menu, source_map)
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
+        self.add_invert_action_to_menu(target_map_menu, target_map)
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
         prox_widget = ProximityWidget()
@@ -419,7 +451,7 @@ class MyDockingUI(QtWidgets.QWidget):
         expanded = []
         for index in self._proxy_model.persistentIndexList():
             if self.treeView.isExpanded(index):
-                expanded.append(index.data(model.SceneGraphModel.fullNameRole))
+                expanded.append(index.data(model.SceneGraphModel.longNameRole))
 
         return expanded
 
@@ -433,7 +465,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.collapseAll()
         for name in names:
             indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              model.SceneGraphModel.longNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)
