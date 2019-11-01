@@ -341,6 +341,13 @@ class MyDockingUI(QtWidgets.QWidget):
         # restore previous expansion in treeView
         if names_to_expand:
             self.expand(names_to_expand)
+        else:
+            # expand all zSolverTransform tree items
+            for row in range(self._proxy_model.rowCount()):
+                index = self._proxy_model.index(row, 0)
+                node = index.data(model.SceneGraphModel.nodeRole)
+                if node.type == 'zSolverTransform':
+                    self.treeView.expand(index)
 
         sel = mc.ls(sl=True)
         # select item in treeview that is selected in maya to begin with and 
@@ -354,13 +361,13 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
 
-        # expand all zSolverTransform tree items
-        if not names_to_expand:
-            for row in range(self._proxy_model.rowCount()):
-                index = self._proxy_model.index(row, 0)
-                node = index.data(model.SceneGraphModel.nodeRole)
-                if node.type == 'zSolverTransform':
-                    self.treeView.expand(index)
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
+            # have a material or attachment selected, it will become visible in
+            # UI
+            if checked:
+                self.treeView.expand(checked[-1])
+                self.treeView.expand(checked[-1].parent())
 
     def get_expanded(self):
         """
