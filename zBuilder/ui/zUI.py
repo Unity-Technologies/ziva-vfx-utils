@@ -207,6 +207,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionCopyAttrs.setObjectName("actionCopyAttrs")
         self.actionCopyAttrs.triggered.connect(self.copy_attrs)
 
+        self.actionPasteAttrs = QtWidgets.QAction(self)
+        self.actionPasteAttrs.setText('Paste')
+        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
+        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
+
+    def paste_attrs(self):
+        indexes = self.treeView.selectedIndexes()
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
+                mc.setAttr("{}.{}".format(node.name, attr), lock=False)
+                mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+
     def copy_attrs(self):
         self.attrs_clipboard = {}
         indexes = self.treeView.selectedIndexes()
@@ -284,6 +297,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
+        attrs_menu.addAction(self.actionPasteAttrs)
 
     def open_tet_menu(self, menu):
         self.add_placeholder_menu_item(menu)
