@@ -124,6 +124,8 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder or zva.Ziva()
+        # clipboard for copied attributes
+        self.attrs_clipboard = {}
 
         root_node = builder.root_node
 
@@ -142,7 +144,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setModel(self._proxy_model)
 
         # must be after .setModel because assigning model resets item expansion
-        self.reset_tree(root_node=root_node)
+        self.set_root_node(root_node=root_node)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -179,7 +181,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self.reset_tree)
+        self.actionRefresh.triggered.connect(self.set_root_node)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
@@ -200,6 +202,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setText('Paint')
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
+
+        self.actionPasteAttrs = QtWidgets.QAction(self)
+        self.actionPasteAttrs.setText('Paste')
+        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
+        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
+
+    def paste_attrs(self):
+        indexes = self.treeView.selectedIndexes()
+        for index in indexes:
+            node = index.data(model.SceneGraphModel.nodeRole)
+            for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
+                mc.setAttr("{}.{}".format(node.name, attr), lock=False)
+                mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -249,7 +264,11 @@ class MyDockingUI(QtWidgets.QWidget):
                 'zTet': [self.open_tet_menu, menu],
                 'zFiber': [self.open_fiber_menu, menu],
                 'zMaterial': [self.open_material_menu, menu],
-                'zAttachment': [self.open_attachment_menu, menu] + node.long_association
+                'zAttachment': [self.open_attachment_menu, menu] + node.long_association,
+                'zTissue': [self.open_tissue_menu, menu],
+                'zBone': [self.open_bone_menu, menu],
+                'zLineOfAction': [self.open_line_of_action_menu, menu],
+                'zRestShape': [self.open_rest_shape_menu, menu]
             }
 
             if node.type in menu_dict:
@@ -265,14 +284,20 @@ class MyDockingUI(QtWidgets.QWidget):
         placeholder_action.setDefaultWidget(placeholder_widget)
         menu.addAction(placeholder_action)
 
+    def add_attributes_menu(self, menu):
+        attrs_menu = menu.addMenu('Attributes')
+        attrs_menu.addAction(self.actionPasteAttrs)
+
     def open_tet_menu(self, menu):
         self.add_placeholder_menu_item(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
 
     def open_fiber_menu(self, menu):
         self.add_placeholder_menu_item(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
@@ -281,11 +306,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def open_material_menu(self, menu):
         self.add_placeholder_menu_item(menu)
+        self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
 
     def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name):
+        self.add_attributes_menu(menu)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
         truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
@@ -303,6 +330,18 @@ class MyDockingUI(QtWidgets.QWidget):
         action_paint_by_prox.setDefaultWidget(prox_widget)
         proximity_menu.addAction(action_paint_by_prox)
 
+    def open_tissue_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_bone_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_line_of_action_menu(self, menu):
+        self.add_attributes_menu(menu)
+
+    def open_rest_shape_menu(self, menu):
+        self.add_attributes_menu(menu)
+
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
@@ -312,7 +351,7 @@ class MyDockingUI(QtWidgets.QWidget):
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
 
-    def reset_tree(self, root_node=None):
+    def set_root_node(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
         it uses the scene selection to build a new root_node.
