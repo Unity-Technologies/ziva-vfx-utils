@@ -4,8 +4,7 @@ from icons import get_icon_path_from_node
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
-    filterRole = QtCore.Qt.UserRole + 1
-    nodeRole = QtCore.Qt.UserRole + 2
+    nodeRole = QtCore.Qt.UserRole + 1
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
