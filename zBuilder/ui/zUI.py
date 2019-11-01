@@ -129,18 +129,17 @@ class MyDockingUI(QtWidgets.QWidget):
 
         root_node = builder.root_node
 
-        self.treeView = view.SceneTreeView(self)
-        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeView.customContextMenuRequested.connect(self.open_menu)
-        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.treeView.setIndentation(15)
-
-        self._proxy_model = model.SceneSortFilterProxyModel(self.treeView)
+        self._proxy_model = QtCore.QSortFilterProxyModel()
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
+        self.treeView = view.SceneTreeView(self)
+        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.open_menu)
+        self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.treeView.setIndentation(15)
         self.treeView.setModel(self._proxy_model)
 
         # must be after .setModel because assigning model resets item expansion
