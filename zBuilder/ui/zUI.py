@@ -381,14 +381,23 @@ class MyDockingUI(QtWidgets.QWidget):
             self.builder.retrieve_connections()
             root_node = self.builder.root_node
 
+        # remember names of items to expand
+        names_to_expand = self.get_expanded()
+
         self._model.beginResetModel()
         self._model.root_node = root_node
         self._model.endResetModel()
 
-        for row in range(self._proxy_model.rowCount()):
-            index = self._proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
+        # restore previous expansion in treeView or expand all zSolverTransform items
+        if names_to_expand:
+            self.expand(names_to_expand)
+        else:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.sortRole,
+                                              "zSolverTransform",
+                                              -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
                 self.treeView.expand(index)
 
         sel = mc.ls(sl=True, long=True)
@@ -403,13 +412,40 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
             # have a material or attachment selected, it will become visible in
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
+
+    def get_expanded(self):
+        """
+        Returns: array of item names that are currently expanded in treeView
+        """
+        # store currently expanded items
+        expanded = []
+        for index in self._proxy_model.persistentIndexList():
+            if self.treeView.isExpanded(index):
+                expanded.append(index.data(model.SceneGraphModel.fullNameRole))
+
+        return expanded
+
+    def expand(self, names):
+        """
+        Args:
+            names (list): names to expand in treeView
+        """
+        # collapseAll added in case refreshing of treeView needed
+        # otherwise new items might not be displayed ( Qt bug )
+        self.treeView.collapseAll()
+        for name in names:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
+                self.treeView.expand(index)
 
     @staticmethod
     def delete_instances():

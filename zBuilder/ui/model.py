@@ -1,11 +1,13 @@
-from PySide2 import QtGui, QtCore
+from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
+    # scene_item.type ( zTissue, zBone, ... )
     sortRole = QtCore.Qt.UserRole
+    # scene_item object
     nodeRole = QtCore.Qt.UserRole + 1
-    # long name of zBuilder object in the scene
+    # long name of scene_item object in the scene
     longNameRole = QtCore.Qt.UserRole + 2
 
     def __init__(self, root, parent=None):
