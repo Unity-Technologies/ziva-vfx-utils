@@ -5,6 +5,8 @@ from icons import get_icon_path_from_node
 class SceneGraphModel(QtCore.QAbstractItemModel):
     sortRole = QtCore.Qt.UserRole
     nodeRole = QtCore.Qt.UserRole + 1
+    # long name of zBuilder object in the scene
+    longNameRole = QtCore.Qt.UserRole + 2
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -61,6 +63,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.nodeRole:
             if hasattr(node, 'type'):
                 return node
+
+        if role == SceneGraphModel.longNameRole:
+            return node.long_name
 
     def parent(self, index):
 
