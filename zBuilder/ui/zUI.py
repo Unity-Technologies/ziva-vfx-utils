@@ -345,7 +345,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # expand item in view.
         if sel:
             checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.fullNameRole,
+                                              model.SceneGraphModel.longNameRole,
                                               sel[0],
                                               -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
