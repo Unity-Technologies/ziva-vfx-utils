@@ -142,7 +142,7 @@ class Map(Base):
                 for w in self.values:
                     tmp.append(str(w))
                 val = ' '.join(tmp)
-                cmd = "setAttr " + '%s[0:%d] ' % (self.name, len(self.values) - 1) + val
+                cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
                 mm.eval(cmd)
         else:
             # applying doubleArray maps
