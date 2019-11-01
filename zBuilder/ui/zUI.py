@@ -202,6 +202,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
+        self.actionCopyAttrs = QtWidgets.QAction(self)
+        self.actionCopyAttrs.setText('Copy')
+        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
+        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
+
         self.actionPasteAttrs = QtWidgets.QAction(self)
         self.actionPasteAttrs.setText('Paste')
         self.actionPasteAttrs.setObjectName("actionPasteAttrs")
@@ -214,6 +219,12 @@ class MyDockingUI(QtWidgets.QWidget):
             for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
                 mc.setAttr("{}.{}".format(node.name, attr), lock=False)
                 mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+
+    def copy_attrs(self):
+        self.attrs_clipboard = {}
+        indexes = self.treeView.selectedIndexes()
+        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
+        self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -285,6 +296,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
+        attrs_menu.addAction(self.actionCopyAttrs)
         attrs_menu.addAction(self.actionPasteAttrs)
 
     def open_tet_menu(self, menu):
@@ -388,17 +400,17 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in indexes:
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
+        sel = mc.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and 
         # expand item in view.
         if sel:
             checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              QtCore.Qt.DisplayRole,
-                                              sel[0].split('|')[-1],
+                                              model.SceneGraphModel.longNameRole,
+                                              sel[0],
                                               -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
             # this works for a zBuilder view.  This is expanding the item
             # selected and it's parent if any.  This makes it possible if you
