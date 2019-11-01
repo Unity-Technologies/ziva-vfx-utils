@@ -3,15 +3,14 @@ from icons import get_icon_path_from_node
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
-    # type of zBuilder object
+    # scene_item.type ( zTissue, zBone, ... )
     sortRole = QtCore.Qt.UserRole
-    filterRole = QtCore.Qt.UserRole + 1
-    # zBuilder object
-    nodeRole = QtCore.Qt.UserRole + 2
-    # full name of zBuilder object in the scene
-    fullNameRole = QtCore.Qt.UserRole + 3
-    # if zBuilder object expanded or not
-    expandedRole = QtCore.Qt.UserRole + 4
+    # scene_item object
+    nodeRole = QtCore.Qt.UserRole + 1
+    # full name of scene_item object in the scene
+    fullNameRole = QtCore.Qt.UserRole + 2
+    # if scene_item object expanded or not
+    expandedRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
