@@ -295,6 +295,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
+    # TODO: Implement this functionality in zBuilder core
     def get_maps_from_node(self, node):
         maps = []
         # get node parameters
