@@ -419,7 +419,7 @@ class MyDockingUI(QtWidgets.QWidget):
         expanded = []
         for index in self._proxy_model.persistentIndexList():
             if self.treeView.isExpanded(index):
-                expanded.append(index.data(model.SceneGraphModel.fullNameRole))
+                expanded.append(index.data(model.SceneGraphModel.longNameRole))
 
         return expanded
 
@@ -433,7 +433,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.collapseAll()
         for name in names:
             indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.fullNameRole, name, -1,
+                                              model.SceneGraphModel.longNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)
