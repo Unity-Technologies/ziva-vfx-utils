@@ -1,3 +1,4 @@
+import copy
 import maya.cmds as mc
 
 import zBuilder.builders.ziva as zva
@@ -40,3 +41,25 @@ class ZivaBuilderTestCase(VfxTestCase):
             name_filter='c_tissue_3_zMaterial')[0].attrs['massDensity']['value'] = 1070.0
 
         self.assertFalse(builder_orig == builder_from_file)
+
+    def test_builder_deepcopy_compare(self):
+        """ Getting the generic scene and comparing 2 retrieves to retrieve.
+
+        We are going to compare the 2 builders
+        """
+        test_utils.build_generic_scene()
+
+        mc.select('zSolver1')
+        builder_orig = zva.Ziva()
+        builder_orig.retrieve_from_scene()
+        builder_from_deepcopy = copy.deepcopy(builder_orig)
+
+        # The bundles should be same
+        self.assertEqual(builder_orig, builder_from_deepcopy)
+
+        # change an item in the builder, lets compare.  should be not equal
+        # in this case changing an attribute value.
+        builder_from_deepcopy.get_scene_items(
+            name_filter='c_tissue_3_zMaterial')[0].attrs['massDensity']['value'] = 1070.0
+
+        self.assertFalse(builder_orig == builder_from_deepcopy)
