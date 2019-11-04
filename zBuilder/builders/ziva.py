@@ -37,8 +37,8 @@ class Ziva(Builder):
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
 
-    def setup_tree_hiearchy(self):
-        """Sets up hiearchy for a tree view.  This will look at items and assign the proper 
+    def setup_tree_hierarchy(self):
+        """Sets up hierarchy for a tree view.  This will look at items and assign the proper 
         children, parent for QT.
         """
         from zBuilder.nodes.base import Base
@@ -262,7 +262,7 @@ class Ziva(Builder):
 
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
-            self.setup_tree_hiearchy()
+            self.setup_tree_hierarchy()
 
         mc.select(scene_selection)
         self.stats()
@@ -336,7 +336,7 @@ class Ziva(Builder):
         nodes = zQuery(node_types, solver)
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
-            self.setup_tree_hiearchy()
+            self.setup_tree_hierarchy()
 
         self.stats()
 
@@ -452,7 +452,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
-        self.setup_tree_hiearchy()
+        self.setup_tree_hierarchy()
         self.stats()
 
     def _populate_nodes(self, nodes, get_parameters=True):
