@@ -38,6 +38,9 @@ class Ziva(Builder):
                 continue
 
     def setup_tree_hiearchy(self):
+        """Sets up hiearchy for a tree view.  This will look at items and assign the proper 
+        children, parent for QT.
+        """
         from zBuilder.nodes.base import Base
         from zBuilder.nodes.dg_node import DGNode
 
