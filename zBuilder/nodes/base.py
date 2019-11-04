@@ -18,7 +18,7 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
-    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder']
+    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', '_mobject_handle']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
