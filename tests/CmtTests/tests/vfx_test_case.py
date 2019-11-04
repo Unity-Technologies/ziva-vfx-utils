@@ -16,6 +16,29 @@ def get_mesh_vertex_positions(mesh):
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
     return cmds.xform(mesh+'.vtx[*]', q=True, ws=True, t=True)
 
+
+def attr_values_from_zbuilder_nodes(nodes):
+    """ From a list of zBuilder nodes get all of the attributes and their values as a dict.
+    e.g. Input: builder.get_scene_items(type_filter="zTissue")
+         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+    """
+    result = {}
+    for node in nodes:
+        for attr, attr_dict in node.attrs.items():
+            plug_name = "{}.{}".format(node.name, attr)
+            plug_value = attr_dict["value"]
+            result[plug_name] = plug_value
+    return result
+
+
+def attr_values_from_scene(plug_names):
+    """ From a collection of attribute names, get a dict of attr/value pairs.
+    e.g Input: ['zTissue1.collisions', 'my_zTetNode.tetSize', ...]
+        Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+    """
+    return {plug_name:cmds.getAttr(plug_name) for plug_name in plug_names}
+
+
 class VfxTestCase(TestCase):
     """Base class for unit test cases run for ZivaVFX plugin."""
 

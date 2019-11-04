@@ -1,14 +1,10 @@
-import maya.cmds as mc
-
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
-
 import maya.OpenMaya as om
 
-from vfx_test_case import VfxTestCase
-
+from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
 
 class ZivaTissueGenericTestCase(VfxTestCase):
     @classmethod
@@ -33,16 +29,18 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
 
-    def check_retrieve_ztissue_looks_good(self, builder, attrs):
+    def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
         """Args:
             builder (builders.ziva.Ziva()): builder object
-            attrs (dict): compares to stored zBuilder values for zTissue
-                          if empty - getting values from the scene
-                          {tissue_geo_name:[values for self.tissue_attrs]}
-        """
-        # get tissue from zBuilder
+            attrs (dict): A dict of expected attribute/value pairs.
+                          {'zTissue1.collisions':True, ...}.
+                          If None/empty/False, then attributes are taken from zBuilder
+                          and values are taken from the scene.
+                          Test fails if zBuilder is missing any of the keys
+                          or has any keys with different values.
+        """        
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
-
+            
         self.assertEqual(len(tissue_nodes), 4)
 
         for node in tissue_nodes:
@@ -51,12 +49,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
             self.assertEqual(node.type, "zTissue")
             self.assertIsInstance(node.mobject, om.MObject)
 
-            for i, attr in enumerate(self.tissue_attrs):
-                if attrs:
-                    value = attrs[geo_name][i]
-                else:
-                    value = mc.getAttr("{}.{}".format(node.name, attr))
-                self.assertTrue(value == node.attrs[attr]["value"])
+        zbuilder_plugs = attr_values_from_zbuilder_nodes(tissue_nodes)
+        expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
+        self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
 
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
@@ -79,13 +74,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.check_ztissue_looks_good(retrieved_builder)
 
     def test_build(self):
-        tissue_attrs_dict = {}
-        for name in self.tissue_geo_names:
-            tissue_values = []
-            for attr in self.tissue_attrs:
-                value = mc.getAttr("{}.{}".format(name + "_zTissue", attr))
-                tissue_values.append(value)
-            tissue_attrs_dict[name] = tissue_values
+        plug_names = {'{}_zTissue.{}'.format(geo, attr) for geo in self.tissue_geo_names 
+                                                        for attr in self.tissue_attrs}
+        tissue_attrs_dict = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
         mz.clean_scene()
