@@ -54,20 +54,13 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
-    def check_ztissue_looks_good(self, builder):
-        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
-        self.assertItemsEqual(self.tissue_names, [x.name for x in tissue_nodes])
-
-        for node in tissue_nodes:
-            self.assertEqual(node.type, "zTissue")
-
     def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
         self.builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         retrieved_builder = zva.Ziva()
         retrieved_builder.retrieve_from_file(self.temp_file_path)
-        self.check_ztissue_looks_good(retrieved_builder)
+        self.assertEqual(self.builder, retrieved_builder)
 
     def test_build(self):
         plug_names = {'{}.{}'.format(geo, attr) for geo in self.tissue_names 
