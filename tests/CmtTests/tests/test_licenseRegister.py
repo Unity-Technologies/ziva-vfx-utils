@@ -3,8 +3,8 @@ import os
 from os import path
 import tempfile
 from vfx_test_case import VfxTestCase
-from utils.licenseRegister.licenseRegister import LICENSE_FILE_NAME
-from utils.licenseRegister.licenseRegister import register_node_based_license, register_floating_license
+from utility.licenseRegister.licenseRegister import LICENSE_FILE_NAME
+from utility.licenseRegister.licenseRegister import register_node_based_license, register_floating_license
 
 
 def create_file(file_path, file_content):
