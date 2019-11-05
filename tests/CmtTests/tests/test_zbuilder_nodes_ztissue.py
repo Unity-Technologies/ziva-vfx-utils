@@ -1,4 +1,5 @@
 import os
+import copy
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
@@ -54,7 +55,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
-    def test_builder_has_same_tissue_node_after_roundtrip_to_disk(self):
+    def test_builder_is_unchanged_by_roundtrip_to_disk(self):
         self.builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
@@ -62,25 +63,14 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         retrieved_builder.retrieve_from_file(self.temp_file_path)
         self.assertEqual(self.builder, retrieved_builder)
 
-    def test_build(self):
+    def test_build_restores_attr_values(self):
         plug_names = {'{}.{}'.format(geo, attr) for geo in self.tissue_names 
                                                 for attr in self.tissue_attrs}
-        tissue_attrs_dict = attr_values_from_scene(plug_names)
+        attrs_before = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
         mz.clean_scene()
         self.builder.build()
 
-        self.check_retrieve_ztissue_looks_good(self.builder, tissue_attrs_dict)
-
-    def test_build_from_file(self):
-        self.builder.write(self.temp_file_path)
-
-        retrieved_builder = zva.Ziva()
-        retrieved_builder.retrieve_from_file(self.temp_file_path)
-        mz.clean_scene()
-        retrieved_builder.build()
-        # update zBuilder values from the scene
-        retrieved_builder = zva.Ziva()
-        retrieved_builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(retrieved_builder, {})
+        attrs_after = attr_values_from_scene(plug_names)
+        self.assertEqual(attrs_before, attrs_after)
