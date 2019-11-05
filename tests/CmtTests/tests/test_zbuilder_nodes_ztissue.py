@@ -74,11 +74,3 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         attrs_after = attr_values_from_scene(plug_names)
         self.assertEqual(attrs_before, attrs_after)
-
-    def test_build_does_not_change_builder(self):
-        pre_builder = copy.deepcopy(self.builder)
-
-        mz.clean_scene()
-        self.builder.build()
-        
-        self.assertEqual(self.builder, pre_builder)

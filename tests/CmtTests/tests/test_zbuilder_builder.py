@@ -2,6 +2,7 @@ import copy
 import maya.cmds as mc
 
 import zBuilder.builders.ziva as zva
+import zBuilder.zMaya
 from vfx_test_case import VfxTestCase
 import tests.utils as test_utils
 
@@ -63,3 +64,17 @@ class ZivaBuilderTestCase(VfxTestCase):
             name_filter='c_tissue_3_zMaterial')[0].attrs['massDensity']['value'] = 1070.0
 
         self.assertFalse(builder_orig == builder_from_deepcopy)
+
+    def test_build_does_not_change_builder(self):
+        # Setup
+        test_utils.build_generic_scene()
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        orig_builder = copy.deepcopy(builder)
+        zBuilder.zMaya.clean_scene()
+
+        # Act
+        builder.build()
+        
+        # Verify
+        self.assertEqual(builder, orig_builder)
