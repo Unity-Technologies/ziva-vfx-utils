@@ -849,3 +849,144 @@ def none_to_empty(x):
     # Note, this could be x or [], but that would return empty
     # list for anything that evaluates to false, not just None.
     return [] if x is None else x
+
+
+def next_free_plug_in_array(dst_plug):
+    """ Use this to work around the fact that zSolver.iGeo (and other attrs)
+    have indexMatters=True even though the index doesn't matter. As a result,
+    connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
+    find a specific array element to connect to instead.
+    
+    This function takes a plug name, and if it's an element of an array,
+    sets the index to a free index. Else, it's the identify function.
+    
+    next_free_dst('foo.bar[7]') --> 'foo.bar[42]'
+    next_free_dst('foo.bar') --> 'foo.bar'
+    """
+
+    array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
+    if array_match:
+        plug = array_match.group(1)
+        indices = mc.getAttr(plug, multiIndices=True)
+        new_index = indices[-1] + 1 if indices else 0  # [-1] assumes indices are sorted
+        new_dst = '{}[{}]'.format(plug, new_index)
+        return new_dst
+    return dst_plug
+
+
+def merge_solvers(solver_transform1, solver_transform2):
+    # type: (str, str) -> None
+    """ 
+    Given two solvers. 
+    Take everything from the second and put it into the first, then delete the second.
+    e.g. merge_solvers('zSolver1', 'zSolver2')
+    """
+    assert isinstance(solver_transform1, str), 'Arguments of wrong type!'
+    assert isinstance(solver_transform2, str), 'Arguments of wrong type!'
+    assert mc.nodeType(
+        solver_transform1) == 'zSolverTransform', 'Argument is not a zSolverTransform'
+    assert mc.nodeType(
+        solver_transform2) == 'zSolverTransform', 'Argument is not a zSolverTransform'
+
+    solver1 = mm.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
+    solver2 = mm.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
+    embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
+    embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
+
+    mc.setAttr('{}.enable'.format(solver_transform1), False)
+    mc.setAttr('{}.enable'.format(solver_transform2), False)
+
+    def pairwise(s):
+        "[s0,s1,s2,s3,...] -> (s0,s1), (s2,s3), (s4, s5), ..."
+        assert len(s) % 2 == 0, "List does not have an even number of elements " + str(s)
+        return zip(s[0::2], s[1::2])
+
+    # print('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
+    for src, dst in pairwise(
+            mc.listConnections(solver2,
+                               plugs=True,
+                               connections=True,
+                               source=False,
+                               destination=True)):
+        mc.disconnectAttr(src, dst)
+        new_src = src.replace(solver2, solver1, 1)
+        mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
+
+    # print('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
+    for dst, src in pairwise(
+            mc.listConnections(solver2,
+                               plugs=True,
+                               connections=True,
+                               source=True,
+                               destination=False)):
+        mc.disconnectAttr(src, dst)
+        new_dst = dst.replace(solver2, solver1, 1)
+        new_dst = next_free_plug_in_array(new_dst)
+        try:
+            # TODO: do not print errors for plugs we expect to fail (i.e. iSolverParams)
+            # TODO: Change zSolver arrays to allow use of nextAvailable?
+            mc.connectAttr(src, new_dst)
+        except:
+            print('Skipped new connection {} {}'.format(src, new_dst))
+
+    #print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+    for src, dst in pairwise(
+            mc.listConnections(solver_transform2,
+                               plugs=True,
+                               connections=True,
+                               source=False,
+                               destination=True)):
+        mc.disconnectAttr(src, dst)
+        new_src = src.replace(solver_transform2, solver_transform1, 1)
+        mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
+
+    print('Adding shapes from {} to {}'.format(embedder2, embedder1))
+
+    # TODO: Wow, this is WAY too complicated
+
+    # Find all of the embedded meshes and their tissues (cloths) from the solver we're deleting.
+    tissue_geo_plugs = mc.listConnections('zEmbedder2.iGeo',
+                                          plugs=True,
+                                          source=True,
+                                          destination=False)
+    tissues = [mm.eval('zQuery -m {}'.format(plug))[0] for plug in tissue_geo_plugs]
+    meshes = mc.deformer(embedder2, query=True, geometry=True)
+    mesh_to_geoplug = {m: t for m, t in zip(meshes, tissue_geo_plugs)}
+    mesh_to_tissue = {m: t for m, t in zip(meshes, tissues)}
+    existing_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+
+    print('tissues')
+    print(tissues)
+    print('meshes')
+    print(meshes)
+    # First add all of those embedded meshes to embedder1 while removing them from embedder2
+    for tissue, embedded in zip(tissues, meshes):
+        print('deform mesh {} according to tissue {}'.format(embedded, tissue))
+        mc.deformer(embedder2, edit=True, remove=True, geometry=embedded)
+        mc.deformer(embedder1, edit=True, geometry=embedded)
+
+    # Now, connect up the tissue iGeo connections, too.
+    # In principle, we could do this with 'ziva -embed', but that command won't let
+    # us embed something with a zGeoNode.
+    # We do this by looking at all of the meshes/indices and finding the ones that are missing.
+    # This would be 100% easier if `deformer` would say what index it used.
+    all_meshes = mc.deformer(embedder1, query=True, geometry=True)
+    all_indices = mc.deformer(embedder1, query=True, geometryIndices=True)
+
+    print('all_indices')
+    print(all_indices)
+    print('all_meshes')
+    print(all_meshes)
+    print('existing_indices', existing_indices)
+    for index, mesh in zip(all_indices, all_meshes):
+        print(index, mesh)
+        if index not in existing_indices:
+            geo_plug = mesh_to_geoplug[mesh]
+            mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, index))
+
+    # TODO: restore saved state, don't just set enable=True
+    mc.setAttr('{}.enable'.format(solver_transform1), True)
+
+    mc.delete(solver2)
+    mc.delete(solver_transform2)
+    mc.delete(embedder2)
