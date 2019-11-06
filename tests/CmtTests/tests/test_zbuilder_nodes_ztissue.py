@@ -55,14 +55,6 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
-    def test_builder_is_unchanged_by_roundtrip_to_disk(self):
-        self.builder.write(self.temp_file_path)
-        self.assertTrue(os.path.exists(self.temp_file_path))
-
-        retrieved_builder = zva.Ziva()
-        retrieved_builder.retrieve_from_file(self.temp_file_path)
-        self.assertEqual(self.builder, retrieved_builder)
-
     def test_build_restores_attr_values(self):
         plug_names = {'{}.{}'.format(geo, attr) for geo in self.tissue_names 
                                                 for attr in self.tissue_attrs}
