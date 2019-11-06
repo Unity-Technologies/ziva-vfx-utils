@@ -19,7 +19,6 @@ pipeline {
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
             }
             post {
-                always {  bitbucketStatusNotify(buildState: 'INPROGRESS') }
                 cleanup { cleanWs() } 
             }
         }
@@ -68,15 +67,6 @@ pipeline {
                     post { cleanup { cleanWs() } }
                 }
             }
-        }
-    }
-
-    post {
-        unsuccessful {
-            bitbucketStatusNotify(buildState: 'FAILED')
-        }
-        success {
-            bitbucketStatusNotify(buildState: 'SUCCESSFUL')
         }
     }
 }
