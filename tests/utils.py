@@ -1,8 +1,8 @@
 import tempfile
-
 import maya.cmds as mc
 import maya.mel as mm
 import os
+import zBuilder.builders.ziva as zva
 '''
 These are small utilities to help with testing zBuilder.  Probably no real value
 outside of testing. 
@@ -99,3 +99,20 @@ def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
         mc.setAttr('zSolver1.collisionDetection', 1)
         mc.setAttr('zSolver1.substeps', 1)
         mc.setAttr('zSolver1.maxNewtonIterations', 2)
+
+
+def retrieve_builder_from_scene():
+    """ Get a new zBuilder.builders.ziva.Ziva() with everything retrieved from scene."""
+    original_selection = mc.ls(selection=True)
+    mc.select(clear=True)
+    builder = zva.Ziva()
+    builder.retrieve_from_scene()
+    mc.select(original_selection, replace=True)
+    return builder
+
+
+def retrieve_builder_from_file(file_name):
+    """ Get a new zBuilder.builders.ziva.Ziva() retrieved from the given file. """
+    builder = zva.Ziva()
+    builder.retrieve_from_file(file_name)
+    return builder
