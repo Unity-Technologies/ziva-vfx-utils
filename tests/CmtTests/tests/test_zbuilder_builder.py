@@ -1,8 +1,5 @@
 import copy
 import os
-import maya.cmds as mc
-
-import zBuilder.builders.ziva as zva
 import zBuilder.zMaya
 from vfx_test_case import VfxTestCase
 import tests.utils as test_utils
