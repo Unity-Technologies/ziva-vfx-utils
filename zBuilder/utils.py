@@ -461,7 +461,6 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
             mc.select(item.long_association, add=True)
 
 
-
 def next_free_plug_in_array(dst_plug):
     """ Use this to work around the fact that zSolver.iGeo (and other attrs)
     have indexMatters=True even though the index doesn't matter. As a result,
@@ -492,12 +491,13 @@ def merge_solvers(solver_transform1, solver_transform2):
     Take everything from the second and put it into the first, then delete the second.
     e.g. merge_solvers('zSolver1', 'zSolver2')
     """
-    assert isinstance(solver_transform1, str), 'Arguments of wrong type!'
-    assert isinstance(solver_transform2, str), 'Arguments of wrong type!'
+    assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
+    assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
     assert mc.nodeType(
-        solver_transform1) == 'zSolverTransform', 'Argument is not a zSolverTransform'
+        solver_transform1) == 'zSolverTransform', 'Argument #1 is not a zSolverTransform'
     assert mc.nodeType(
-        solver_transform2) == 'zSolverTransform', 'Argument is not a zSolverTransform'
+        solver_transform2) == 'zSolverTransform', 'Argument #2 is not a zSolverTransform'
+    assert solver_transform1 != solver_transform2, 'The two solvers are not different'
 
     solver1 = mm.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
     solver2 = mm.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
@@ -508,7 +508,9 @@ def merge_solvers(solver_transform1, solver_transform2):
     mc.setAttr('{}.enable'.format(solver_transform2), False)
 
     def pairwise(s):
-        "[s0,s1,s2,s3,...] -> (s0,s1), (s2,s3), (s4, s5), ..."
+        """[s0,s1,s2,s3,...] -> [(s0,s1), (s2,s3), (s4, s5), ...], or  None -> []"""
+        if not s:  # Maya returns None instead of empty lists, so work around that.
+            return []
         assert len(s) % 2 == 0, "List does not have an even number of elements " + str(s)
         return zip(s[0::2], s[1::2])
 
@@ -556,12 +558,10 @@ def merge_solvers(solver_transform1, solver_transform2):
     # TODO: Wow, this is WAY too complicated
 
     # From solver2, find all of the embedded meshes and which zGeoNode they're deformed by.
-    tissue_geo_plugs = mc.listConnections('zEmbedder2.iGeo',
-                                          plugs=True,
-                                          source=True,
-                                          destination=False)
-    meshes = mc.deformer(embedder2, query=True, geometry=True)
-    indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+    tissue_geo_plugs = mz.none_to_empty(
+        mc.listConnections('zEmbedder2.iGeo', plugs=True, source=True, destination=False))
+    meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
+    indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
 
     # First add all of those embedded meshes to embedder1 while removing them from embedder2
     for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
