@@ -154,3 +154,19 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         new_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
         self.assertItemsEqual(old_meshes, new_meshes)
         # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
+
+    def test_merge_solvers_can_handle_connection_to_enabled(self):
+        # Setup
+        solver1, _ = make_a_simple_test_scene()
+        locator1 = mc.spaceLocator()[0]
+        mc.connectAttr(locator1 + '.visibility', solver1 + '.enable')
+        solver2, _ = make_a_simple_test_scene()
+        locator2 = mc.spaceLocator()[0]
+        mc.connectAttr(locator2 + '.visibility', solver2 + '.enable')
+
+        # Act
+        merge_solvers(solver1, solver2)
+
+        # Verify
+        input_to_enable = mc.listConnections(solver1 + '.enable', d=False, s=True, p=True)
+        self.assertEqual(input_to_enable, [locator1 + '.visibility'])

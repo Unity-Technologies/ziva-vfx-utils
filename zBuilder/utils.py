@@ -504,8 +504,12 @@ def merge_solvers(solver_transform1, solver_transform2):
     embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
     embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
 
-    mc.setAttr('{}.enable'.format(solver_transform1), False)
-    mc.setAttr('{}.enable'.format(solver_transform2), False)
+    # TODO: use SolverDisbler to do this 'right'
+    try:
+        mc.setAttr('{}.enable'.format(solver_transform1), False)
+        mc.setAttr('{}.enable'.format(solver_transform2), False)
+    except:
+        pass
 
     def pairwise(s):
         """[s0,s1,s2,s3,...] -> [(s0,s1), (s2,s3), (s4, s5), ...], or  None -> []"""
@@ -574,8 +578,11 @@ def merge_solvers(solver_transform1, solver_transform2):
         indices = new_indices
         mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
-    # TODO: restore saved state, don't just set enable=True
-    mc.setAttr('{}.enable'.format(solver_transform1), True)
+    # TODO: use SolverDisbler to do this 'right'
+    try:
+        mc.setAttr('{}.enable'.format(solver_transform1), True)
+    except:
+        pass
 
     for node in [solver2, solver_transform2, embedder2]:
         # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
