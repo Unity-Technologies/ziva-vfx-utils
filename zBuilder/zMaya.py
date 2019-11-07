@@ -944,45 +944,24 @@ def merge_solvers(solver_transform1, solver_transform2):
 
     # TODO: Wow, this is WAY too complicated
 
-    # Find all of the embedded meshes and their tissues (cloths) from the solver we're deleting.
+    # From solver2, find all of the embedded meshes and which zGeoNode they're deformed by.
     tissue_geo_plugs = mc.listConnections('zEmbedder2.iGeo',
                                           plugs=True,
                                           source=True,
                                           destination=False)
-    tissues = [mm.eval('zQuery -m {}'.format(plug))[0] for plug in tissue_geo_plugs]
     meshes = mc.deformer(embedder2, query=True, geometry=True)
-    mesh_to_geoplug = {m: t for m, t in zip(meshes, tissue_geo_plugs)}
-    mesh_to_tissue = {m: t for m, t in zip(meshes, tissues)}
-    existing_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+    indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
 
-    print('tissues')
-    print(tissues)
-    print('meshes')
-    print(meshes)
     # First add all of those embedded meshes to embedder1 while removing them from embedder2
-    for tissue, embedded in zip(tissues, meshes):
-        print('deform mesh {} according to tissue {}'.format(embedded, tissue))
-        mc.deformer(embedder2, edit=True, remove=True, geometry=embedded)
-        mc.deformer(embedder1, edit=True, geometry=embedded)
-
-    # Now, connect up the tissue iGeo connections, too.
-    # In principle, we could do this with 'ziva -embed', but that command won't let
-    # us embed something with a zGeoNode.
-    # We do this by looking at all of the meshes/indices and finding the ones that are missing.
-    # This would be 100% easier if `deformer` would say what index it used.
-    all_meshes = mc.deformer(embedder1, query=True, geometry=True)
-    all_indices = mc.deformer(embedder1, query=True, geometryIndices=True)
-
-    print('all_indices')
-    print(all_indices)
-    print('all_meshes')
-    print(all_meshes)
-    print('existing_indices', existing_indices)
-    for index, mesh in zip(all_indices, all_meshes):
-        print(index, mesh)
-        if index not in existing_indices:
-            geo_plug = mesh_to_geoplug[mesh]
-            mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, index))
+    for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
+        #print('deform mesh {} according to tissue {}'.format(mesh, geo_plug))
+        mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
+        mc.deformer(embedder1, edit=True, geometry=mesh)
+        # TODO: how do I get the index of a mesh without this mess?
+        new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+        new_index = list(new_indices - indices)[0]
+        indices = new_indices
+        mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
     # TODO: restore saved state, don't just set enable=True
     mc.setAttr('{}.enable'.format(solver_transform1), True)
