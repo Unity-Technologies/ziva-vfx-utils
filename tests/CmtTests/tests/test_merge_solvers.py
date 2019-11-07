@@ -1,6 +1,6 @@
 import maya.cmds as mc
 import maya.mel as mm
-from zBuilder.utils import merge_solvers
+from zBuilder.utils import merge_two_solvers
 import vfx_test_case
 
 
@@ -59,7 +59,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
     def test_merge_solvers_will_not_merge_gibberish_arguments(self):
         # Act & Verify
         with self.assertRaises(Exception):
-            merge_solvers([1, 2, 3], 7)
+            merge_two_solvers([1, 2, 3], 7)
 
     def test_merge_solvers_will_not_merge_solver_with_itself(self):
         # Setup
@@ -67,7 +67,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
         # Act & Verify
         with self.assertRaises(Exception):
-            merge_solvers('zSolver1', 'zSolver1')
+            merge_two_solvers('zSolver1', 'zSolver1')
 
     def test_merge_solvers_will_not_merge_solver_shapes(self):
         # Setup
@@ -76,7 +76,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
         # Act & Verify
         with self.assertRaises(Exception):
-            merge_solvers('zSolver1Shape', 'zSolver2Shape')
+            merge_two_solvers('zSolver1Shape', 'zSolver2Shape')
 
     def test_merge_solvers_can_merge_two_empty_solvers(self):
         # Setup
@@ -84,7 +84,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         solver2 = mc.rename(mm.eval('ziva -solver')[1], 'bar_solver')
 
         # Act
-        merge_solvers(solver1, solver2)
+        merge_two_solvers(solver1, solver2)
 
         # Verify
         nodes = set(mc.ls())
@@ -97,7 +97,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         solver2, _ = make_another_simple_test_scene()
 
         # Act
-        merge_solvers(solver1, solver2)
+        merge_two_solvers(solver1, solver2)
 
         # Verify
         nodes = set(mc.ls())
@@ -114,7 +114,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         attachments_orig = set(mc.ls(type='zAttachment'))
 
         # Act
-        merge_solvers(solver1, solver2)
+        merge_two_solvers(solver1, solver2)
         attachment_new = mm.eval('ziva -a {} {} {}'.format(solver1, tissue1, tissue2))[0]
 
         # Verify
@@ -129,7 +129,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         old_positions = get_simulated_positions()
 
         # Act
-        merge_solvers(solver1, solver2)
+        merge_two_solvers(solver1, solver2)
         new_positions = get_simulated_positions()
 
         # Verify
@@ -147,7 +147,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         old_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
 
         # Act
-        merge_solvers(solvers[0], solvers[1])
+        merge_two_solvers(solvers[0], solvers[1])
 
         # Verify
         self.assertIn(solvers[0], mc.ls(type='zSolverTransform'))
@@ -165,7 +165,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         mc.connectAttr(locator2 + '.visibility', solver2 + '.enable')
 
         # Act
-        merge_solvers(solver1, solver2)
+        merge_two_solvers(solver1, solver2)
 
         # Verify
         input_to_enable = mc.listConnections(solver1 + '.enable', d=False, s=True, p=True)

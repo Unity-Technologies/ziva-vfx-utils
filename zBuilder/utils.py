@@ -503,12 +503,12 @@ def listConnectionPlugs(node, destination=True, source=True):
     return zip(plugs[0::2], plugs[1::2])
 
 
-def merge_solvers(solver_transform1, solver_transform2):
+def merge_two_solvers(solver_transform1, solver_transform2):
     # type: (str, str) -> None
     """ 
     Given two solvers. 
     Take everything from the second and put it into the first, then delete the second.
-    e.g. merge_solvers('zSolver1', 'zSolver2')
+    e.g. merge_two_solvers('zSolver1', 'zSolver2')
     """
     ####################################################################
     # Checking inputs
