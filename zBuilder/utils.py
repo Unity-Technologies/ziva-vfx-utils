@@ -551,11 +551,10 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         new_dst = dst.replace(solver2, solver1, 1)
         new_dst = next_free_plug_in_array(new_dst)
         try:
-            # TODO: do not print errors for plugs we expect to fail (i.e. iSolverParams)
-            # TODO: Change zSolver arrays to allow use of nextAvailable?
             mc.connectAttr(src, new_dst)
         except:
-            print('Skipped new connection {} {}'.format(src, new_dst))
+            if not new_dst.endswith('iSolverParams'): # We _expect_ this plug to fail.
+                print('Skipped new connection {} {}'.format(src, new_dst))
 
     ####################################################################
     # print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
