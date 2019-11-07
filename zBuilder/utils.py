@@ -462,6 +462,7 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
 
 
 def next_free_plug_in_array(dst_plug):
+    # type: (str) -> str
     """ Use this to work around the fact that zSolver.iGeo (and other attrs)
     have indexMatters=True even though the index doesn't matter. As a result,
     connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
