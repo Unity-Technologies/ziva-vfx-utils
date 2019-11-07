@@ -485,6 +485,24 @@ def next_free_plug_in_array(dst_plug):
     return dst_plug
 
 
+def listConnectionPlugs(node, destination=True, source=True):
+    # type: (str, bool, bool) -> List[Tuple[basestring,basestring]]
+    """ Get all of the connections with 'node' as a list of pairs of plugs.
+    The first plug in each pair is a plug on 'node'. The second plug in each
+    pair is a plug the first is connected to. """
+    assert isinstance(node, basestring), 'Arguments #1 is not a string'
+    assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
+    assert isinstance(source, bool), 'Arguments "source" is not a bool'
+    plugs = mc.listConnections(node,
+                               plugs=True,
+                               connections=True,
+                               source=source,
+                               destination=destination)
+    plugs = plugs if plugs else []  # Convert Maya's None result to an empty list
+    assert len(plugs) % 2 == 0, "List does not have an even number of elements " + str(plugs)
+    return zip(plugs[0::2], plugs[1::2])
+
+
 def merge_solvers(solver_transform1, solver_transform2):
     # type: (str, str) -> None
     """ 
@@ -512,31 +530,14 @@ def merge_solvers(solver_transform1, solver_transform2):
     except:
         pass
 
-    def pairwise(s):
-        """[s0,s1,s2,s3,...] -> [(s0,s1), (s2,s3), (s4, s5), ...], or  None -> []"""
-        if not s:  # Maya returns None instead of empty lists, so work around that.
-            return []
-        assert len(s) % 2 == 0, "List does not have an even number of elements " + str(s)
-        return zip(s[0::2], s[1::2])
-
     # print('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
-    for src, dst in pairwise(
-            mc.listConnections(solver2,
-                               plugs=True,
-                               connections=True,
-                               source=False,
-                               destination=True)):
+    for src, dst in listConnectionPlugs(solver2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver2, solver1, 1)
         mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
 
     # print('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
-    for dst, src in pairwise(
-            mc.listConnections(solver2,
-                               plugs=True,
-                               connections=True,
-                               source=True,
-                               destination=False)):
+    for dst, src in listConnectionPlugs(solver2, destination=False):
         mc.disconnectAttr(src, dst)
         new_dst = dst.replace(solver2, solver1, 1)
         new_dst = next_free_plug_in_array(new_dst)
@@ -548,12 +549,7 @@ def merge_solvers(solver_transform1, solver_transform2):
             print('Skipped new connection {} {}'.format(src, new_dst))
 
     #print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
-    for src, dst in pairwise(
-            mc.listConnections(solver_transform2,
-                               plugs=True,
-                               connections=True,
-                               source=False,
-                               destination=True)):
+    for src, dst in listConnectionPlugs(solver_transform2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver_transform2, solver_transform1, 1)
         mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
