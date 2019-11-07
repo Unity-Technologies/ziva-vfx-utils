@@ -190,4 +190,3 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         self.assertEqual(1, len(mc.ls(type='zSolverTransform')))
         self.assertEqual(1, len(mc.ls(type='zEmbedder')))
         self.assertEqual(1, len(mc.ls(type='zSolver')))
-        self.assertEqual(1, len(mc.ls(type='zSolverTransform')))
