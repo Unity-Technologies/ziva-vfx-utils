@@ -510,6 +510,8 @@ def merge_solvers(solver_transform1, solver_transform2):
     Take everything from the second and put it into the first, then delete the second.
     e.g. merge_solvers('zSolver1', 'zSolver2')
     """
+    ####################################################################
+    # Checking inputs
     assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
     assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
     assert mc.nodeType(
@@ -523,19 +525,26 @@ def merge_solvers(solver_transform1, solver_transform2):
     embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
     embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
 
-    # TODO: use SolverDisbler to do this 'right'
+    ####################################################################
+    # For speed and to reduce noise, try to disable the solvers
+    # TODO: use SolverDisabler to do this 'right'
     try:
         mc.setAttr('{}.enable'.format(solver_transform1), False)
         mc.setAttr('{}.enable'.format(solver_transform2), False)
     except:
         pass
 
+    ####################################################################
     # print('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
     for src, dst in listConnectionPlugs(solver2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver2, solver1, 1)
-        mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
+        try:
+            mc.connectAttr(new_src, dst)
+        except:
+            print('Skipped new connection {} {}'.format(src, dst))
 
+    ####################################################################
     # print('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
     for dst, src in listConnectionPlugs(solver2, destination=False):
         mc.disconnectAttr(src, dst)
@@ -548,17 +557,20 @@ def merge_solvers(solver_transform1, solver_transform2):
         except:
             print('Skipped new connection {} {}'.format(src, new_dst))
 
-    #print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+    ####################################################################
+    # print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
     for src, dst in listConnectionPlugs(solver_transform2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver_transform2, solver_transform1, 1)
-        mc.connectAttr(new_src, dst)  # TODO: use nextAvailable?
+        try:
+            mc.connectAttr(new_src, dst)
+        except:
+            print('Skipped new connection {} {}'.format(src, dst))
 
-    print('Adding shapes from {} to {}'.format(embedder2, embedder1))
+    ####################################################################
+    # print('Adding shapes from {} to {}'.format(embedder2, embedder1))
 
-    # TODO: Wow, this is WAY too complicated
-
-    # From solver2, find all of the embedded meshes and which zGeoNode they're deformed by.
+    # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
     tissue_geo_plugs = mz.none_to_empty(
         mc.listConnections('{}.iGeo'.format(embedder2), plugs=True, source=True, destination=False))
     meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
@@ -566,7 +578,6 @@ def merge_solvers(solver_transform1, solver_transform2):
 
     # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
     for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
-        #print('deform mesh {} according to tissue {}'.format(mesh, geo_plug))
         mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
         mc.deformer(embedder1, edit=True, before=True, geometry=mesh)  # "-before" for referencing
         # TODO: how do I get the index of a mesh without this mess?
