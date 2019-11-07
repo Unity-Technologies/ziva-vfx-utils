@@ -8,10 +8,24 @@ def make_a_simple_test_scene():
     """ return [solver_transform, a_tissue_mesh]"""
     solver = mm.eval('ziva -solver')[1]
     solver = mc.rename(solver, 'bob_solver')  # to make sure we're not depending on names
+    bone1 = mc.polyCube(name='bone1_1', sx=1, sy=2, sz=1)[0]
+    tissue1 = mc.polyCube(name='tissue1_1', sx=1, sy=3, sz=1)[0]
+    mm.eval('ziva -b {} {}'.format(solver, bone1))
+    mm.eval('ziva -t {} {}'.format(solver, tissue1))
+    mm.eval('ziva -a {} {} {}'.format(solver, tissue1, bone1))
+    fiber = mm.eval('ziva -f {} {}'.format(solver, tissue1))[0]
+    mc.setAttr('{}.excitation'.format(fiber), 0.7)
+    return [solver, tissue1]
+
+
+def make_another_simple_test_scene():
+    """ return [solver_transform, a_tissue_mesh]"""
+    solver = mm.eval('ziva -solver')[1]
+    solver = mc.rename(solver, 'bob_solver')  # to make sure we're not depending on names
     bone1 = mc.polySphere(name='bone1_1', sx=4, sy=4)[0]
     bone2 = mc.polySphere(name='bone2_1', sx=4, sy=4)[0]
-    tissue2 = mc.polySphere(name='tissue1_1', sx=4, sy=4)[0]
-    tissue1 = mc.polySphere(name='tissue2_1', sx=4, sy=3)[0]
+    tissue1 = mc.polySphere(name='tissue1_1', sx=4, sy=4)[0]
+    tissue2 = mc.polySphere(name='tissue2_1', sx=4, sy=3)[0]
     embedd1 = mc.polySphere(name='embedded1_1', sx=3, sy=2)[0]
     mm.eval('ziva -b {} {} {}'.format(solver, bone1, bone2))
     mm.eval('ziva -t {} {} {}'.format(solver, tissue1, tissue2))
@@ -65,7 +79,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
             merge_solvers('zSolver1Shape', 'zSolver2Shape')
 
     def test_merge_solvers_can_merge_two_empty_solvers(self):
-        # Setup        
+        # Setup
         solver1 = mc.rename(mm.eval('ziva -solver')[1], 'foo_solver')
         solver2 = mc.rename(mm.eval('ziva -solver')[1], 'bar_solver')
 
@@ -80,7 +94,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
     def test_merge_solvers_can_merge_two_simple_solvers(self):
         # Setup
         solver1, _ = make_a_simple_test_scene()
-        solver2, _ = make_a_simple_test_scene()
+        solver2, _ = make_another_simple_test_scene()
 
         # Act
         merge_solvers(solver1, solver2)
@@ -96,7 +110,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
     def test_tissues_in_merged_solvers_can_be_attached_together(self):
         # Setup
         solver1, tissue1 = make_a_simple_test_scene()
-        solver2, tissue2 = make_a_simple_test_scene()
+        solver2, tissue2 = make_another_simple_test_scene()
         attachments_orig = set(mc.ls(type='zAttachment'))
 
         # Act
@@ -111,7 +125,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
     def test_merged_solvers_sim_result_matches_original_result(self):
         # Setup
         solver1, _ = make_a_simple_test_scene()
-        solver2, _ = make_a_simple_test_scene()
+        solver2, _ = make_another_simple_test_scene()
         old_positions = get_simulated_positions()
 
         # Act
@@ -119,4 +133,21 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         new_positions = get_simulated_positions()
 
         # Verify
-        self.assertAllApproxEqual(old_positions, new_positions)
+        self.assertAllApproxEqual(old_positions, new_positions, 1e-4)
+
+    def test_merge_referenced_solvers(self):
+        # Setup
+        make_another_simple_test_scene()  # Make a simple scene and save it to a file.
+        mc.file(rename='tempfile')
+        filepath = mc.file(force=True, save=True)
+        mc.file(force=True, new=True)
+        mc.file(filepath, r=True, namespace='ns1')  # Into a new file, reference it twice,
+        mc.file(filepath, r=True, namespace='ns2')  # so there are two solvers.
+        solvers = mc.ls(type='zSolverTransform')
+
+        # Act
+        merge_solvers(solvers[0], solvers[1])
+
+        # Verify
+        self.assertIn(solvers[0], mc.ls(type='zSolverTransform'))
+        # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.

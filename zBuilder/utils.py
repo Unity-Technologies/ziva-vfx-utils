@@ -559,7 +559,7 @@ def merge_solvers(solver_transform1, solver_transform2):
 
     # From solver2, find all of the embedded meshes and which zGeoNode they're deformed by.
     tissue_geo_plugs = mz.none_to_empty(
-        mc.listConnections('zEmbedder2.iGeo', plugs=True, source=True, destination=False))
+        mc.listConnections('{}.iGeo'.format(embedder2), plugs=True, source=True, destination=False))
     meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
     indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
 
@@ -576,7 +576,8 @@ def merge_solvers(solver_transform1, solver_transform2):
 
     # TODO: restore saved state, don't just set enable=True
     mc.setAttr('{}.enable'.format(solver_transform1), True)
-
-    mc.delete(solver2)
-    mc.delete(solver_transform2)
-    mc.delete(embedder2)
+        
+    for node in [solver2, solver_transform2, embedder2]:
+        # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
+        if not mc.ls(node, readOnly=True):
+            mc.delete(node)
