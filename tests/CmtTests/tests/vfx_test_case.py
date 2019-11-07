@@ -17,6 +17,15 @@ def get_mesh_vertex_positions(mesh):
     return cmds.xform(mesh+'.vtx[*]', q=True, ws=True, t=True)
 
 
+def get_all_mesh_vertex_positions():
+    """ Concatenation of all mesh vertex positions in the scene """
+    pos = []
+    meshes = cmds.ls(dag=True, type='mesh', noIntermediate=True)
+    meshes.sort() # So we get the same order between calls
+    for mesh in meshes:
+        pos.extend(get_mesh_vertex_positions(mesh))
+    return pos
+
 def attr_values_from_zbuilder_nodes(nodes):
     """ From a list of zBuilder nodes get all of the attributes and their values as a dict.
     e.g. Input: builder.get_scene_items(type_filter="zTissue")

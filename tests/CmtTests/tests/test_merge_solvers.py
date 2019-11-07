@@ -1,7 +1,7 @@
 import maya.cmds as mc
 import maya.mel as mm
 from zBuilder.utils import merge_solvers
-from vfx_test_case import VfxTestCase
+import vfx_test_case
 
 
 def make_a_simple_test_scene():
@@ -22,7 +22,19 @@ def make_a_simple_test_scene():
     return [solver, tissue1]
 
 
-class MergeSolversTestCase(VfxTestCase):
+def get_simulated_positions():
+    """ Simulate a few frames, then return the position of all vertices """
+    solvers = mc.ls(type='zSolver')
+    end_frame = 3
+    for i in range(1, end_frame + 1):
+        mc.currentTime(i)
+        for s in solvers:
+            # Pull on the solver each frame, to make sure it computes.
+            mc.getAttr(s + '.oSolved', silent=True)
+    return vfx_test_case.get_all_mesh_vertex_positions()
+
+
+class MergeSolversTestCase(vfx_test_case.VfxTestCase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -53,11 +65,9 @@ class MergeSolversTestCase(VfxTestCase):
             merge_solvers('zSolver1Shape', 'zSolver2Shape')
 
     def test_merge_solvers_can_merge_two_empty_solvers(self):
-        # Setup
-        mm.eval('ziva -solver')
-        solver1 = mc.rename('zSolver1', 'foo_solver')
-        mm.eval('ziva -solver')
-        solver2 = mc.rename('zSolver1', 'bar_solver')
+        # Setup        
+        solver1 = mc.rename(mm.eval('ziva -solver')[1], 'foo_solver')
+        solver2 = mc.rename(mm.eval('ziva -solver')[1], 'bar_solver')
 
         # Act
         merge_solvers(solver1, solver2)
@@ -97,3 +107,16 @@ class MergeSolversTestCase(VfxTestCase):
         attachments_expected = attachments_orig.union({attachment_new})
         attachments_new = set(mc.ls(type='zAttachment'))
         self.assertEqual(attachments_expected, attachments_new)
+
+    def test_merged_solvers_sim_result_matches_original_result(self):
+        # Setup
+        solver1, _ = make_a_simple_test_scene()
+        solver2, _ = make_a_simple_test_scene()
+        old_positions = get_simulated_positions()
+
+        # Act
+        merge_solvers(solver1, solver2)
+        new_positions = get_simulated_positions()
+
+        # Verify
+        self.assertAllApproxEqual(old_positions, new_positions)
