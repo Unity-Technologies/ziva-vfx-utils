@@ -563,11 +563,11 @@ def merge_solvers(solver_transform1, solver_transform2):
     meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
     indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
 
-    # First add all of those embedded meshes to embedder1 while removing them from embedder2
+    # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
     for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
         #print('deform mesh {} according to tissue {}'.format(mesh, geo_plug))
         mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
-        mc.deformer(embedder1, edit=True, geometry=mesh)
+        mc.deformer(embedder1, edit=True, before=True, geometry=mesh)  # "-before" for referencing
         # TODO: how do I get the index of a mesh without this mess?
         new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
         new_index = list(new_indices - indices)[0]
@@ -576,7 +576,7 @@ def merge_solvers(solver_transform1, solver_transform2):
 
     # TODO: restore saved state, don't just set enable=True
     mc.setAttr('{}.enable'.format(solver_transform1), True)
-        
+
     for node in [solver2, solver_transform2, embedder2]:
         # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
         if not mc.ls(node, readOnly=True):

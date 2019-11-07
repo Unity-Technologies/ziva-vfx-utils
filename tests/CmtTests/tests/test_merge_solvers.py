@@ -144,10 +144,13 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         mc.file(filepath, r=True, namespace='ns1')  # Into a new file, reference it twice,
         mc.file(filepath, r=True, namespace='ns2')  # so there are two solvers.
         solvers = mc.ls(type='zSolverTransform')
+        old_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
 
         # Act
         merge_solvers(solvers[0], solvers[1])
 
         # Verify
         self.assertIn(solvers[0], mc.ls(type='zSolverTransform'))
+        new_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
+        self.assertItemsEqual(old_meshes, new_meshes)
         # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
