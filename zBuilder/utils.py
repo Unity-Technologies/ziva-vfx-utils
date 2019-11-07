@@ -596,3 +596,18 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
         if not mc.ls(node, readOnly=True):
             mc.delete(node)
+
+
+def merge_solvers(solver_transforms):
+    # type: (List[str]) -> None
+    """ 
+    Given a list of zSolverTransform nodes, merge them all into the first node.
+    e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
+    """
+    assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
+
+    if len(solver_transforms) < 2:
+        return
+    solver1 = solver_transforms[0]
+    for solver2 in solver_transforms[1:]:
+        merge_two_solvers(solver1, solver2)

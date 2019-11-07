@@ -1,6 +1,6 @@
 import maya.cmds as mc
 import maya.mel as mm
-from zBuilder.utils import merge_two_solvers
+from zBuilder.utils import merge_two_solvers, merge_solvers
 import vfx_test_case
 
 
@@ -170,3 +170,24 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         # Verify
         input_to_enable = mc.listConnections(solver1 + '.enable', d=False, s=True, p=True)
         self.assertEqual(input_to_enable, [locator1 + '.visibility'])
+
+    def test_can_merge_many_solvers(self):
+        # Setup
+        solvers = []
+        solvers.append(make_a_simple_test_scene()[0])
+        solvers.append(make_a_simple_test_scene()[0])
+        solvers.append(make_a_simple_test_scene()[0])
+        solvers.append(make_a_simple_test_scene()[0])
+        old_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
+
+        # Act
+        merge_solvers(solvers)
+
+        # Verify
+        new_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
+        self.assertItemsEqual(old_meshes, new_meshes)
+        self.assertIn(solvers[0], mc.ls(type='zSolverTransform'))
+        self.assertEqual(1, len(mc.ls(type='zSolverTransform')))
+        self.assertEqual(1, len(mc.ls(type='zEmbedder')))
+        self.assertEqual(1, len(mc.ls(type='zSolver')))
+        self.assertEqual(1, len(mc.ls(type='zSolverTransform')))
