@@ -553,7 +553,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         try:
             mc.connectAttr(src, new_dst)
         except:
-            if not new_dst.endswith('iSolverParams'): # We _expect_ this plug to fail.
+            if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
                 print('Skipped new connection {} {}'.format(src, new_dst))
 
     ####################################################################
@@ -585,16 +585,19 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         indices = new_indices
         mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
-    # TODO: use SolverDisbler to do this 'right'
-    try:
-        mc.setAttr('{}.enable'.format(solver_transform1), True)
-    except:
-        pass
+    ####################################################################
+    # print('Trying to delete stale solver {}'.format(solver_transform2))
 
     for node in [solver2, solver_transform2, embedder2]:
         # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
         if not mc.ls(node, readOnly=True):
             mc.delete(node)
+
+    # TODO: use SolverDisbler to do this 'right'
+    try:
+        mc.setAttr('{}.enable'.format(solver_transform1), True)
+    except:
+        pass
 
 
 def merge_solvers(solver_transforms):
