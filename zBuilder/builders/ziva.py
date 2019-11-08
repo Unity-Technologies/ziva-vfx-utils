@@ -589,17 +589,12 @@ class Ziva(Builder):
             node_types_to_build.append('zFieldAdaptor')
 
         # build the nodes by calling build method on each one
-        build_type_list = []  # keep track of types built to not print it over for each item.
         for node_type in node_types_to_build:
-            for scene_item in self.get_scene_items(type_filter=node_type,
-                                                   association_filter=association_filter):
-
-                # This is checking if we already built a particular type so we only print it out
-                # once.
-                if scene_item.type not in build_type_list:
-                    logger.info('Building: {}'.format(node_type))
-                build_type_list.append(scene_item.type)
-
+            scene_items = self.get_scene_items(type_filter=node_type,
+                                               association_filter=association_filter)
+            if scene_items:
+                logger.info('Building: {}'.format(node_type))
+            for scene_item in scene_items:
                 scene_item.build(attr_filter=attr_filter,
                                  permissive=permissive,
                                  interp_maps=interp_maps)
