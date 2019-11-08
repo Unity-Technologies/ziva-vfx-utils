@@ -609,9 +609,11 @@ class Ziva(Builder):
 
             # build the nodes by calling build method on each one
             for node_type in node_types_to_build:
-                logger.info('Building: {}'.format(node_type))
-                for scene_item in self.get_scene_items(type_filter=node_type,
-                                                       association_filter=association_filter):
+                scene_items = self.get_scene_items(type_filter=node_type,
+                                                   association_filter=association_filter)
+                if scene_items:
+                    logger.info('Building: {}'.format(node_type))
+                for scene_item in scene_items:
                     scene_item.build(attr_filter=attr_filter,
                                      permissive=permissive,
                                      interp_maps=interp_maps)
