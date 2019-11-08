@@ -73,6 +73,7 @@ menuItem -label "Save..." -ec true -ecr true -c "ZivaSaveCache" -ann "Saves the 
 menuItem -label "Select" -ec true -ecr true -c "select -r `zQuery -t zCacheTransform`" -ann "Select the solver's simulation cache node.";
 
 menuItem -divider true;
+menuItem -label "Register License" -ec true -ecr true -c "python(\"from utility.licenseRegister import licenseRegisterWidget; licenseRegisterWidget.main()\")" -ann "Register Ziva VFX license.";
 menuItem -label "About" -ec true -ecr true -c "ziva -z" -ann "About the Ziva Maya plug-in.";
 menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http://zivadynamics.com/resource-library\"";
 
