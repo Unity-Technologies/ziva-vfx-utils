@@ -570,9 +570,10 @@ class Ziva(Builder):
             solvers.append('zSolverTransform')
 
             # build the nodes by calling build method on each one
-            # logger.info('Building: {}'.format(node_type))
+
             for scene_item in self.get_scene_items(type_filter=solvers,
                                                    association_filter=association_filter):
+                logger.info('Building: {}'.format(scene_item.type))
                 scene_item.build(attr_filter=attr_filter,
                                  permissive=permissive,
                                  interp_maps=interp_maps)
