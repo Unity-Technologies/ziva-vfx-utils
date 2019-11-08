@@ -10,6 +10,7 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 
 from vfx_test_case import VfxTestCase
+from zBuilder.builders.ziva import SolverDisabler
 
 
 class ZivaMirrorTestCase(VfxTestCase):
@@ -239,3 +240,33 @@ class ZivaSolverDisableTestCase(VfxTestCase):
 
         current_connection = mc.listConnections('zSolver1.enable', plugs=True)[0]
         self.assertEqual(current_connection, '{}.translateX'.format(loc))
+
+    def test_the_connected_thing(self):
+        mm.eval('ziva -s')
+        loc = mc.spaceLocator()[0]
+        mc.setAttr('{}.translateX'.format(loc), 1)  # So that enable will start off being True!
+        mc.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
+
+        self.assertTrue(mc.getAttr('zSolver1.enable'))
+        self.assertTrue(mc.listConnections('zSolver1.enable'))
+
+        with SolverDisabler('zSolver1'):
+            self.assertFalse(mc.getAttr('zSolver1.enable'))
+            self.assertFalse(mc.listConnections('zSolver1.enable'))
+
+        self.assertTrue(mc.getAttr('zSolver1.enable'))
+        self.assertTrue(mc.listConnections('zSolver1.enable'))
+
+    def test_the_disconnected_thing(self):
+        mm.eval('ziva -s')
+        self.assertTrue(mc.getAttr('zSolver1.enable'))
+        with SolverDisabler('zSolver1'):
+            self.assertFalse(mc.getAttr('zSolver1.enable'))
+        self.assertTrue(mc.getAttr('zSolver1.enable'))
+
+    def test_SolverDisabler_does_not_enable_a_disabled_solver(self):
+        mm.eval('ziva -s')
+        mc.setAttr('zSolver1.enable', False)
+        with SolverDisabler('zSolver1'):
+            self.assertFalse(mc.getAttr('zSolver1.enable'))
+        self.assertFalse(mc.getAttr('zSolver1.enable'))
