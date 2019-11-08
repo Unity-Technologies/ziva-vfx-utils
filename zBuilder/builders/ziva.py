@@ -20,6 +20,27 @@ ZNODES = [
 ]
 
 
+class SolverDisabler:
+    def __init__(self, solver_name):
+        self.enable_plug = solver_name + '.enable'
+        self.connection_source = None
+        self.enable_value = True
+
+    def __enter__(self):
+        self.enable_value = mc.getAttr(self.enable_plug)
+        self.connection_source = mc.listConnections(self.enable_plug, plugs=True)
+        if self.connection_source:
+            mc.disconnectAttr(self.connection_source[0], self.enable_plug)
+
+        mc.setAttr(self.enable_plug, False)
+
+    def __exit__(self, type, value, traceback):
+        mc.setAttr(self.enable_plug, self.enable_value)
+
+        if self.connection_source:
+            mc.connectAttr(self.connection_source[0], self.enable_plug)
+
+
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
