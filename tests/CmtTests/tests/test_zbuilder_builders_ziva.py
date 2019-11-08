@@ -224,3 +224,18 @@ class ZivaBuildTestCase(VfxTestCase):
 
         # this list should all be None
         self.assertTrue(all(x is not 'str' for x in mobjects))
+
+
+class ZivaSolverDisableTestCase(VfxTestCase):
+    def test_enable_connected(self):
+        # build scene and connect the enable to something
+        test_utils.build_generic_scene()
+        loc = mc.spaceLocator()[0]
+        mc.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
+
+        retrieved_builder = test_utils.retrieve_builder_from_scene()
+
+        retrieved_builder.build()
+
+        current_connection = mc.listConnections('zSolver1.enable', plugs=True)[0]
+        self.assertEqual(current_connection, '{}.translateX'.format(loc))
