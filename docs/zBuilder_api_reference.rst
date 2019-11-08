@@ -7,7 +7,7 @@ API Reference
 
     .. automethod:: retrieve_from_scene(get_parameters)
 
-    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True, check_meshes=True)
+    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True)
 
 .. currentmodule:: zBuilder.builders.ziva
 

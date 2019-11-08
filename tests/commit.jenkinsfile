@@ -5,7 +5,7 @@ pipeline {
     options {
         skipDefaultCheckout true
         timestamps()
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 2, unit: 'HOURS') // long in case it needs to wait for machines
     }
     stages {
         stage('get sources') {
@@ -19,7 +19,6 @@ pipeline {
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
             }
             post {
-                always {  bitbucketStatusNotify(buildState: 'INPROGRESS') }
                 cleanup { cleanWs() } 
             }
         }
@@ -27,53 +26,47 @@ pipeline {
             failFast true
             parallel {
                 stage('windows') {
-                    options { timeout(time: 15, unit: 'MINUTES') }
                     agent { label 'windows && vfx && maya2019' }
                     environment {
                         mayaVersion = "2018" // variations: 2016, 2016.5, 2017, 2018, 2019
                     }
                     steps {
-                        unstash 'main'
-                        runWindowsTestStage()
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runWindowsTestStage()
+                        }
                     }
                     post { cleanup { cleanWs() } }
                 }
 
                 stage('centos7') {
-                    options { timeout(time: 15, unit: 'MINUTES') }
                     agent { label 'linux && centos7 && maya2019' }
                     environment {
                         mayaVersion = "2019"
                     }
                     steps {
-                        unstash 'main'
-                        runLinuxTestStage()
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
                     }
                     post { cleanup { cleanWs() } }
                 }
 
                 stage('centos6') {
-                    options { timeout(time: 15, unit: 'MINUTES') }
                     agent { label 'centos6 && vfx' }
                     environment {
                         mayaVersion = "2016"
                     }
                     steps {
-                        unstash 'main'
-                        runLinuxTestStage()
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
                     }
                     post { cleanup { cleanWs() } }
                 }
             }
-        }
-    }
-
-    post {
-        unsuccessful {
-            bitbucketStatusNotify(buildState: 'FAILED')
-        }
-        success {
-            bitbucketStatusNotify(buildState: 'SUCCESSFUL')
         }
     }
 }
