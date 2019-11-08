@@ -535,17 +535,17 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         pass
 
     ####################################################################
-    # print('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
+    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
     for src, dst in listConnectionPlugs(solver2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver2, solver1, 1)
         try:
             mc.connectAttr(new_src, dst)
         except:
-            print('Skipped new connection {} {}'.format(src, dst))
+            logger.info('Skipped new connection {} {}'.format(src, dst))
 
     ####################################################################
-    # print('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
+    # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
     for dst, src in listConnectionPlugs(solver2, destination=False):
         mc.disconnectAttr(src, dst)
         new_dst = dst.replace(solver2, solver1, 1)
@@ -554,20 +554,20 @@ def merge_two_solvers(solver_transform1, solver_transform2):
             mc.connectAttr(src, new_dst)
         except:
             if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
-                print('Skipped new connection {} {}'.format(src, new_dst))
+                logger.info('Skipped new connection {} {}'.format(src, new_dst))
 
     ####################################################################
-    # print('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
     for src, dst in listConnectionPlugs(solver_transform2, source=False):
         mc.disconnectAttr(src, dst)
         new_src = src.replace(solver_transform2, solver_transform1, 1)
         try:
             mc.connectAttr(new_src, dst)
         except:
-            print('Skipped new connection {} {}'.format(src, dst))
+            logger.info('Skipped new connection {} {}'.format(src, dst))
 
     ####################################################################
-    # print('Adding shapes from {} to {}'.format(embedder2, embedder1))
+    # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
 
     # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
     tissue_geo_plugs = mz.none_to_empty(
@@ -586,7 +586,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
     ####################################################################
-    # print('Trying to delete stale solver {}'.format(solver_transform2))
+    # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
 
     for node in [solver2, solver_transform2, embedder2]:
         # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
