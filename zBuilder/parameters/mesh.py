@@ -172,9 +172,8 @@ def get_mesh_info(mesh_name):
 
     polygon_counts_list = list()
     polygon_connects_list = list()
-    point_list = list()
 
-    point_list = get_mesh_vertex_positions(mesh_name)
+    point_list = get_mesh_vertex_positions(mz.get_name_from_m_object(mesh_to_rebuild_m_dag_path))
 
     while not mesh_to_rebuild_poly_iter.isDone():
         num_polygons += 1
@@ -193,7 +192,20 @@ def get_mesh_info(mesh_name):
 def get_mesh_vertex_positions(mesh):
     """ Given the name of a mesh, return a flat list of its world-space vertex positions."""
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
-    return mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+    points = mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+    return chunks(points)
+
+
+def chunks(l):
+    """This takes a list and breaks it into sublists of size 3 and returns 1 list containing them
+    
+    Args:
+        l (list): list to break up into chunks of 3
+    
+    Returns:
+        list(): list of lists of size 3
+    """
+    return [l[x:x + 3] for x in xrange(0, len(l), 3)]
 
 
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
