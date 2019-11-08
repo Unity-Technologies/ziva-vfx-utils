@@ -167,22 +167,14 @@ def get_mesh_info(mesh_name):
         mesh_to_rebuild_m_dag_path.extendToShape()
 
     mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
-    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
 
     num_polygons = 0
-    num_vertices = 0
 
     polygon_counts_list = list()
     polygon_connects_list = list()
     point_list = list()
 
-    while not mesh_to_rebuild_vert_iter.isDone():
-        num_vertices += 1
-        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
-        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y, pos_m_point.z)
-
-        point_list.append([pos_m_float_point[0], pos_m_float_point[1], pos_m_float_point[2]])
-        mesh_to_rebuild_vert_iter.next()
+    point_list = get_mesh_vertex_positions(mesh_name)
 
     while not mesh_to_rebuild_poly_iter.isDone():
         num_polygons += 1
