@@ -24,8 +24,8 @@ class SolverDisabler:
     def __init__(self, solver_name):
         """SolverDisabler is a context manager object that disables a solver for the duration of
         the context and then restores its initial state. This is useful for improving the
-        performance of a code block that’s making many changes to a solver. This manager object
-        is preferable to doing it ‘by hand’ because it handles exceptions and DG connections that
+        performance of a code block that's making many changes to a solver. This manager object
+        is preferable to doing it 'by hand' because it handles exceptions and DG connections that
         the naive solution (getAttr/setAttr) would fail to handle."""
 
         self.enable_plug = solver_name + '.enable'
