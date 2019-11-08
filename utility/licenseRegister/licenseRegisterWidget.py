@@ -1,21 +1,21 @@
 try:
-    from PySide2.QtCore import * 
-    from PySide2.QtGui import * 
+    from PySide2.QtCore import *
+    from PySide2.QtGui import *
     from PySide2.QtWidgets import *
     from PySide2 import __version__
-    from shiboken2 import wrapInstance 
+    from shiboken2 import wrapInstance
 except ImportError:
-    from PySide.QtCore import * 
-    from PySide.QtGui import * 
+    from PySide.QtCore import *
+    from PySide.QtGui import *
     from PySide import __version__
-    from shiboken import wrapInstance 
+    from shiboken import wrapInstance
 
 from maya import OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
 
-
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
+
 
 class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
@@ -26,7 +26,6 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.setObjectName(self.WIDGET_NAME)
         self.setupControls()
         self.setupSlots()
-
 
     def setupControls(self):
         # Node-based license group
@@ -39,7 +38,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         nbLayout.addLayout(nbFormLayout)
         nbGroup = QGroupBox()
         nbGroup.setLayout(nbLayout)
-        
+
         # Floating license group
         self.rdoFloatingLic = QRadioButton('Floating License')
         self.edtServerAddr = QLineEdit()
@@ -53,7 +52,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         fltLayout.addLayout(fltFormLayout)
         fltGroup = QGroupBox()
         fltGroup.setLayout(fltLayout)
-        
+
         # RadioButton exclusive group
         rdoLicType = QButtonGroup(self)
         rdoLicType.addButton(self.rdoNodeBasedLic)
@@ -84,16 +83,13 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.edtServerPort.setEnabled(False)
         self.edtServerPort.setText('5053')
 
-
     def setupSlots(self):
         self.btnRegister.clicked.connect(self.onRegister)
         self.rdoNodeBasedLic.clicked.connect(self.onLicenseTypeChange)
         self.rdoFloatingLic.clicked.connect(self.onLicenseTypeChange)
 
-    
     def onRegister(self):
         self.lblStatus.setText('register')
-
 
     def onLicenseTypeChange(self):
         if self.rdoNodeBasedLic.isChecked():
