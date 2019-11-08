@@ -561,67 +561,61 @@ class Ziva(Builder):
         logger.info('Building Ziva Rig.')
         sel = mc.ls(sl=True)
 
-        # Let's build the solver first, so we can turn it off to build the rest of the scene.
-        # This speeds up the process.
+        # get stored solver enable value to build later. The solver comes in OFF
+        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
+
         solvers = list()
         if solver:
             solvers.append('zSolver')
             solvers.append('zSolverTransform')
 
-        # build the nodes by calling build method on each one
-        for node_type in solvers:
-            logger.info('Building: {}'.format(node_type))
-            for scene_item in self.get_scene_items(type_filter=node_type):
-                scene_item.build(attr_filter=attr_filter, permissive=permissive)
-
-        # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
-        sn = None
-        if solver_transform:
-            sn = solver_transform[0].name
-            solver_value = solver_transform[0].attrs['enable']['value']
-
-        # generate list of node types to build
-        node_types_to_build = list()
-
-        if bones:
-            node_types_to_build.append('zBone')
-        if tissues:
-            node_types_to_build.append('zTissue')
-            node_types_to_build.append('zTet')
-        if cloth:
-            node_types_to_build.append('zCloth')
-        if materials:
-            node_types_to_build.append('zMaterial')
-        if attachments:
-            node_types_to_build.append('zAttachment')
-        if fibers:
-            node_types_to_build.append('zFiber')
-        if lineOfActions:
-            node_types_to_build.append('zLineOfAction')
-        if rivetToBone:
-            node_types_to_build.append('zRivetToBone')
-        if restShape:
-            node_types_to_build.append('zRestShape')
-        if embedder:
-            node_types_to_build.append('zEmbedder')
-        if fields:
-            node_types_to_build.extend(Field.TYPES)
-            node_types_to_build.append('zFieldAdaptor')
-
-        # build the nodes by calling build method on each one
-        for node_type in node_types_to_build:
-            logger.info('Building: {}'.format(node_type))
-            for scene_item in self.get_scene_items(type_filter=node_type,
+            # build the nodes by calling build method on each one
+            # logger.info('Building: {}'.format(node_type))
+            for scene_item in self.get_scene_items(type_filter=solvers,
                                                    association_filter=association_filter):
                 scene_item.build(attr_filter=attr_filter,
                                  permissive=permissive,
                                  interp_maps=interp_maps)
 
-        # turn on solver
+        with SolverDisabler(solver_transform[0].name):
+
+            # generate list of node types to build
+            node_types_to_build = list()
+            if bones:
+                node_types_to_build.append('zBone')
+            if tissues:
+                node_types_to_build.append('zTissue')
+                node_types_to_build.append('zTet')
+            if cloth:
+                node_types_to_build.append('zCloth')
+            if materials:
+                node_types_to_build.append('zMaterial')
+            if attachments:
+                node_types_to_build.append('zAttachment')
+            if fibers:
+                node_types_to_build.append('zFiber')
+            if lineOfActions:
+                node_types_to_build.append('zLineOfAction')
+            if rivetToBone:
+                node_types_to_build.append('zRivetToBone')
+            if restShape:
+                node_types_to_build.append('zRestShape')
+            if embedder:
+                node_types_to_build.append('zEmbedder')
+            if fields:
+                node_types_to_build.extend(Field.TYPES)
+                node_types_to_build.append('zFieldAdaptor')
+
+            # build the nodes by calling build method on each one
+            for node_type in node_types_to_build:
+                logger.info('Building: {}'.format(node_type))
+                for scene_item in self.get_scene_items(type_filter=node_type,
+                                                       association_filter=association_filter):
+                    scene_item.build(attr_filter=attr_filter,
+                                     permissive=permissive,
+                                     interp_maps=interp_maps)
+
         mc.select(sel, r=True)
-        if sn:
-            mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
