@@ -198,6 +198,12 @@ def get_mesh_info(mesh_name):
     return polygon_counts_list, polygon_connects_list, point_list
 
 
+def get_mesh_vertex_positions(mesh):
+    """ Given the name of a mesh, return a flat list of its world-space vertex positions."""
+    # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
+    return mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+
+
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
     """ Builds mesh in maya scene.
     Args:
