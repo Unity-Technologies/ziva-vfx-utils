@@ -78,10 +78,11 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.setWindowTitle('Register Ziva VFX License')
         self.setFixedSize(350, 300)
 
-        # Setup controls init state
+        # Setup controls init state and value
         self.rdoNodeBasedLic.setChecked(True)
         self.edtServerAddr.setEnabled(False)
         self.edtServerPort.setEnabled(False)
+        self.edtServerPort.setText('5053')
 
 
     def setupSlots(self):
