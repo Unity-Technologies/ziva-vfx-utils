@@ -504,8 +504,7 @@ class Ziva(Builder):
               rivetToBone=True,
               restShape=True,
               mirror=False,
-              permissive=True,
-              check_meshes=False):
+              permissive=True):
         """
         This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
         that the geometry is in the scene.
@@ -537,9 +536,6 @@ class Ziva(Builder):
         if mirror:
             for item in self.get_scene_items(type_filter='mesh'):
                 item.mirror()
-
-        if check_meshes:
-            logger.info('DEPRECATED FLAG:check_meshes not used.  Use ziva -mq.')
 
         logger.info('Building Ziva Rig.')
         sel = mc.ls(sl=True)
