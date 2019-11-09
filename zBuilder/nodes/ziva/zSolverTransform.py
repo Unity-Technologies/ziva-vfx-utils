@@ -39,7 +39,3 @@ class SolverTransformNode(Ziva):
             self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
-
-        # ----------------------------------------------------------------------
-        # turn off solver to speed up build
-        mc.setAttr(solver_name + '.enable', 0)

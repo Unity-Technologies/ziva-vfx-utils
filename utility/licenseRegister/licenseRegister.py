@@ -29,7 +29,6 @@ def register_floating_license(module_path, server, host_id, host_port):
     Add new license server info to MODULE_PATH/zivavfx.lic
     '''
     new_content = 'HOST {} {} {}'.format(server, host_id, host_port)
-
     '''
     If MODULE_PATH/zivavfx.lic exists, prepend new HOST line to the existing file,
     create the file and add new content to it otherwise.
