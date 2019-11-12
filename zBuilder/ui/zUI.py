@@ -270,17 +270,20 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
+        map_ = None
         if len(indexes) == 1:
             node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
             menu = QtWidgets.QMenu(self)
 
             maps = self.get_maps_from_node(node)
+            if maps:
+                map_ = maps[0]
 
             menu_dict = {
-                'zTet': [self.open_tet_menu, menu, maps[0]],
+                'zTet': [self.open_tet_menu, menu, map_],
                 'zFiber': [self.open_fiber_menu, menu] + maps,
-                'zMaterial': [self.open_material_menu, menu, maps[0]],
+                'zMaterial': [self.open_material_menu, menu, map_],
                 'zAttachment': [self.open_attachment_menu, menu] + node.long_association + maps,
                 'zTissue': [self.open_tissue_menu, menu],
                 'zBone': [self.open_bone_menu, menu],
