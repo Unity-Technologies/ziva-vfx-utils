@@ -167,7 +167,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.treeView)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-        
+
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
@@ -175,8 +175,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
-                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
@@ -247,9 +246,8 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mesh = node.long_association[association_idx]
         mc.select(mesh, r=True)
-        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type,
-                                                                            node.long_name,
-                                                                            attribute)
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
+            node.type, node.long_name, attribute)
         mm.eval(cmd)
 
     def select_source_and_target(self):
@@ -343,8 +341,8 @@ class MyDockingUI(QtWidgets.QWidget):
         weight_map_menu.addAction(self.actionPaintSource)
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name,
-                             source_map, target_map):
+    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name, source_map,
+                             target_map):
         self.add_attributes_menu(menu)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
@@ -417,21 +415,17 @@ class MyDockingUI(QtWidgets.QWidget):
             self.expand(names_to_expand)
         else:
             indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.sortRole,
-                                              "zSolverTransform",
-                                              -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                                              model.SceneGraphModel.sortRole, "zSolverTransform",
+                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)
 
         sel = mc.ls(sl=True, long=True)
-        # select item in treeview that is selected in maya to begin with and 
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
             checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.longNameRole,
-                                              sel[0],
-                                              -1,
+                                              model.SceneGraphModel.longNameRole, sel[0], -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
