@@ -190,13 +190,26 @@ def get_mesh_info(mesh_name):
 
 
 def get_mesh_vertex_positions(mesh):
-    """ Given the name of a mesh, return a list of lists of its world-space vertex positions."""
+    """Given the name of a mesh, return a list of lists of its world-space vertex positions
+
+    Args:
+        mesh (str): The mesh to aquire vertex positions
+
+    Raises:
+        StandardError: If list cannot be divided by 3
+
+    Returns:
+        list of lists: List of vertex positions in x,y, z world positions.
+    """
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
     points = mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
 
     # convert flat list of points to list containing 3 element lists.  Each 3 element list is
     # x, y, z worldspace coordinate of vert
-    points = [points[x:x + 3] for x in xrange(0, len(points), 3)]
+    if len(points) % 3 != 0:
+        raise StandardError('List not divisable by 3.')
+
+    points = list(zip(points[0::3], points[1::3], points[2::3]))
 
     return points
 
