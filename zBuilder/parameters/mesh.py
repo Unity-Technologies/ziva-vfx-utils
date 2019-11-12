@@ -209,7 +209,7 @@ def get_mesh_vertex_positions(mesh):
     if len(points) % 3 != 0:
         raise StandardError('List not divisable by 3.')
 
-    points = list(zip(points[0::3], points[1::3], points[2::3]))
+    points = [list(x) for x in zip(points[0::3], points[1::3], points[2::3])]
 
     return points
 
