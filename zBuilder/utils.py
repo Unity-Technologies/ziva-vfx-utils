@@ -589,7 +589,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
     # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
 
     for node in [solver2, solver_transform2, embedder2]:
-        # Referened nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
+        # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
         if not mc.ls(node, readOnly=True):
             mc.delete(node)
 
