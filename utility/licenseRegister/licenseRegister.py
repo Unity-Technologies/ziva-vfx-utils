@@ -21,7 +21,7 @@ def register_node_based_license(module_path, new_license_path):
     try:
         copy2(new_license_path, dst_path)
     except Exception as e:
-        raise RuntimeError("Fail to copy input license file: {}, {}".format(
+        raise RuntimeError("Failed to copy input license file: {}, {}".format(
             new_license_path, str(e)))
 
 
@@ -44,10 +44,10 @@ def register_floating_license(module_path, server, host_id, host_port):
                 existing_content = lic_file.read()
                 merged_content = '{}\n{}'.format(new_content, existing_content)
         except:
-            raise RuntimeError("Fail to read {} file content.".format(license_path))
+            raise RuntimeError("Failed to read {} file content.".format(license_path))
 
     try:
         with open(license_path, 'w') as lic_file:
             lic_file.write(merged_content)
     except:
-        raise RuntimeError("Fail to write new license server info to {}.".format(license_path))
+        raise RuntimeError("Failed to write new license server info to {}.".format(license_path))

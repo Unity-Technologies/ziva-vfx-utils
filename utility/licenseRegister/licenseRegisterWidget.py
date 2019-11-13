@@ -31,7 +31,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     MSG_EMPTY_FILE_PATH = 'Empty license file path.'
     MSG_EMPTY_SERVER_ADDR = 'Empty server address.'
     MSG_INVALID_SERVER_ADDR = 'Invalid server address. Should be a computer name or IP address.'
-    MSG_INVALID_SERVER_PORT = 'Invalid server port. Should be a number between 0 ~ 65536.'
+    MSG_INVALID_SERVER_PORT = 'Invalid server port. Should be a number between 0 ~ 65535.'
 
     def __init__(self, *args, **kwargs):
         super(LicenseRegisterWidget, self).__init__(*args, **kwargs)
@@ -120,10 +120,10 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
             if isNodeBasedMode:
                 fileName = path.basename(self.licFilePath)
-                self.lblStatus.setText('License file copies to {} successfully.'.format(
+                self.lblStatus.setText('License file copied to {} successfully.'.format(
                     path.join(modulePath, fileName)))
             else:
-                self.lblStatus.setText('License server info adds to {} successfully.'.format(
+                self.lblStatus.setText('License server info added to {} successfully.'.format(
                     path.join(modulePath, LICENSE_FILE_NAME)))
 
     def onLicenseTypeChange(self):
