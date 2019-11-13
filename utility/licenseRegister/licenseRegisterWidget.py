@@ -32,6 +32,8 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     MSG_EMPTY_SERVER_ADDR = 'Empty server address.'
     MSG_INVALID_SERVER_ADDR = 'Invalid server address. Should be a computer name or IP address.'
     MSG_INVALID_SERVER_PORT = 'Invalid server port. Should be a number between 0 ~ 65535.'
+    MSG_SUCCEED_REGISTER_NODE_BASED_LIC = 'Success: license file copied to {}.'
+    MSG_SUCCEED_REGISTER_FLOATING_LIC = 'Success: license server info added to {}.'
 
     def __init__(self, *args, **kwargs):
         super(LicenseRegisterWidget, self).__init__(*args, **kwargs)
@@ -120,11 +122,13 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
             if isNodeBasedMode:
                 fileName = path.basename(self.licFilePath)
-                self.lblStatus.setText('License file copied to {} successfully.'.format(
-                    path.join(modulePath, fileName)))
+                self.lblStatus.setText(
+                    self.MSG_SUCCEED_REGISTER_NODE_BASED_LIC.format(path.join(modulePath,
+                                                                              fileName)))
             else:
-                self.lblStatus.setText('License server info added to {} successfully.'.format(
-                    path.join(modulePath, LICENSE_FILE_NAME)))
+                self.lblStatus.setText(
+                    self.MSG_SUCCEED_REGISTER_FLOATING_LIC.format(
+                        path.join(modulePath, LICENSE_FILE_NAME)))
 
     def onLicenseTypeChange(self):
         isNodeBasedMode = self.rdoNodeBasedLic.isChecked()
@@ -152,13 +156,9 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
         # Validate floating license server inputs
         self.srvAddr = self.edtServerAddr.text()
-        if not self.srvAddr:
-            self.lblStatus.setText(self.MSG_EMPTY_SERVER_ADDR)
-            return False
-
-        validHostName = self._validateHostName(self.srvAddr)
+        validHostName, errMsg = self._validateHostName(self.srvAddr)
         if not validHostName:
-            self.lblStatus.setText(self.MSG_INVALID_SERVER_ADDR)
+            self.lblStatus.setText(errMsg if errMsg else self.MSG_INVALID_SERVER_ADDR)
             return False
 
         strSrvPort = self.edtServerPort.text()
@@ -180,16 +180,26 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
     def _validateHostName(self, hostname):
         '''
-        Refer to following links,
+        Validate input hostname string, refer to following links for the implementation details,
             http://man7.org/linux/man-pages/man7/hostname.7.html
             https://stackoverflow.com/questions/2532053/validate-a-hostname-string
+
+        hostname (str): Input hostname, can be a computer name or IP address
+
+        Returns: bool, str(optional)
+            True for valid inputs to proceed, False otherwise.
+            An optional error message string may come with the result.
         '''
+        if not hostname:
+            return False, self.MSG_EMPTY_SERVER_ADDR
+
         if len(hostname) > 255:
-            return False
-        if hostname[-1] == ".":
+            return False, ''
+
+        if hostname[-1] == '.':
             hostname = hostname[:-1]  # strip exactly one dot from the right, if present
-        allowed = re.compile(r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
-        return all(allowed.match(x) for x in hostname.split("."))
+        allowed = re.compile(r'(?!-)[A-Z\d-]{1,63}(?<!-)$', re.IGNORECASE)
+        return all(allowed.match(x) for x in hostname.split('.')), ''
 
 
 def main():
