@@ -1,5 +1,6 @@
 import logging
-import copy as copy
+import re
+import copy
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -458,3 +459,157 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
         for item in builder.get_scene_items(type_filter=displayed_node_type):
             # Add each mesh of this type to selection.
             mc.select(item.long_association, add=True)
+
+
+def next_free_plug_in_array(dst_plug):
+    # type: (str) -> str
+    """ Use this to work around the fact that zSolver.iGeo (and other attrs)
+    have indexMatters=True even though the index doesn't matter. As a result,
+    connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
+    find a specific array element to connect to instead.
+    
+    This function takes a plug name, and if it's an element of an array,
+    sets the index to a free index. Else, it's the identity function.
+    
+    next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
+    next_free_plug_in_array('foo.bar') --> 'foo.bar'
+    """
+
+    array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
+    if array_match:
+        plug = array_match.group(1)
+        indices = mc.getAttr(plug, multiIndices=True)
+        new_index = indices[-1] + 1 if indices else 0  # [-1] assumes indices are sorted
+        new_dst = '{}[{}]'.format(plug, new_index)
+        return new_dst
+    return dst_plug
+
+
+def listConnectionPlugs(node, destination=True, source=True):
+    # type: (str, bool, bool) -> List[Tuple[basestring,basestring]]
+    """ Get all of the connections with 'node' as a list of pairs of plugs.
+    The first plug in each pair is a plug on 'node'. The second plug in each
+    pair is a plug the first is connected to. """
+    assert isinstance(node, basestring), 'Arguments #1 is not a string'
+    assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
+    assert isinstance(source, bool), 'Arguments "source" is not a bool'
+    plugs = mc.listConnections(node,
+                               plugs=True,
+                               connections=True,
+                               source=source,
+                               destination=destination)
+    plugs = plugs if plugs else []  # Convert Maya's None result to an empty list
+    assert len(plugs) % 2 == 0, "List does not have an even number of elements " + str(plugs)
+    return zip(plugs[0::2], plugs[1::2])
+
+
+def merge_two_solvers(solver_transform1, solver_transform2):
+    # type: (str, str) -> None
+    """ 
+    Given two solvers. 
+    Take everything from the second and put it into the first, then delete the second.
+    e.g. merge_two_solvers('zSolver1', 'zSolver2')
+    """
+    ####################################################################
+    # Checking inputs
+    assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
+    assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
+    assert mc.nodeType(
+        solver_transform1) == 'zSolverTransform', 'Argument #1 is not a zSolverTransform'
+    assert mc.nodeType(
+        solver_transform2) == 'zSolverTransform', 'Argument #2 is not a zSolverTransform'
+    assert solver_transform1 != solver_transform2, 'The two solvers are not different'
+
+    solver1 = mm.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
+    solver2 = mm.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
+    embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
+    embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
+
+    ####################################################################
+    # For speed and to reduce noise, try to disable the solvers
+    # TODO: use SolverDisabler to do this 'right'
+    try:
+        mc.setAttr('{}.enable'.format(solver_transform1), False)
+        mc.setAttr('{}.enable'.format(solver_transform2), False)
+    except:
+        pass
+
+    ####################################################################
+    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
+    for src, dst in listConnectionPlugs(solver2, source=False):
+        mc.disconnectAttr(src, dst)
+        new_src = src.replace(solver2, solver1, 1)
+        try:
+            mc.connectAttr(new_src, dst)
+        except:
+            logger.info('Skipped new connection {} {}'.format(src, dst))
+
+    ####################################################################
+    # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
+    for dst, src in listConnectionPlugs(solver2, destination=False):
+        mc.disconnectAttr(src, dst)
+        new_dst = dst.replace(solver2, solver1, 1)
+        new_dst = next_free_plug_in_array(new_dst)
+        try:
+            mc.connectAttr(src, new_dst)
+        except:
+            if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
+                logger.info('Skipped new connection {} {}'.format(src, new_dst))
+
+    ####################################################################
+    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+    for src, dst in listConnectionPlugs(solver_transform2, source=False):
+        mc.disconnectAttr(src, dst)
+        new_src = src.replace(solver_transform2, solver_transform1, 1)
+        try:
+            mc.connectAttr(new_src, dst)
+        except:
+            logger.info('Skipped new connection {} {}'.format(src, dst))
+
+    ####################################################################
+    # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
+
+    # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
+    tissue_geo_plugs = mz.none_to_empty(
+        mc.listConnections('{}.iGeo'.format(embedder2), plugs=True, source=True, destination=False))
+    meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
+    indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
+
+    # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
+    for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
+        mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
+        mc.deformer(embedder1, edit=True, before=True, geometry=mesh)  # "-before" for referencing
+        # TODO: how do I get the index of a mesh without this mess?
+        new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+        new_index = list(new_indices - indices)[0]
+        indices = new_indices
+        mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
+
+    ####################################################################
+    # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
+
+    for node in [solver2, solver_transform2, embedder2]:
+        # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
+        if not mc.ls(node, readOnly=True):
+            mc.delete(node)
+
+    # TODO: use SolverDisbler to do this 'right'
+    try:
+        mc.setAttr('{}.enable'.format(solver_transform1), True)
+    except:
+        pass
+
+
+def merge_solvers(solver_transforms):
+    # type: (List[str]) -> None
+    """ 
+    Given a list of zSolverTransform nodes, merge them all into the first node.
+    e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
+    """
+    assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
+
+    if len(solver_transforms) < 2:
+        return
+    solver1 = solver_transforms[0]
+    for solver2 in solver_transforms[1:]:
+        merge_two_solvers(solver1, solver2)
