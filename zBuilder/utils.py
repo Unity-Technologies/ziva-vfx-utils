@@ -471,8 +471,8 @@ def next_free_plug_in_array(dst_plug):
     This function takes a plug name, and if it's an element of an array,
     sets the index to a free index. Else, it's the identity function.
     
-    next_free_dst('foo.bar[7]') --> 'foo.bar[42]'
-    next_free_dst('foo.bar') --> 'foo.bar'
+    next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
+    next_free_plug_in_array('foo.bar') --> 'foo.bar'
     """
 
     array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
