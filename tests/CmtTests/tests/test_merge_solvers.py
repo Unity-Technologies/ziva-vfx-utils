@@ -36,6 +36,16 @@ def make_another_simple_test_scene():
     return [solver, tissue1]
 
 
+def make_scene_with_referenced_and_typical_solver():
+    make_another_simple_test_scene()  # Make a simple scene and save it to a file.
+    mc.file(rename='tempfile')
+    filepath = mc.file(force=True, save=True)
+
+    mc.file(force=True, new=True)  # Into a new file, make a new solver and reference one in.
+    make_a_simple_test_scene()
+    mc.file(filepath, r=True, namespace='ns1')
+
+
 def get_simulated_positions():
     """ Simulate a few frames, then return the position of all vertices """
     solvers = mc.ls(type='zSolver')
@@ -154,6 +164,27 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         new_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
         self.assertItemsEqual(old_meshes, new_meshes)
         # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
+
+    def test_merge_referenced_and_typical_solver(self):
+        # merge the referenced solver into the typical one, and the other way around.
+        for i in range(2):
+            # Setup
+            mc.file(force=True, new=True)
+            make_scene_with_referenced_and_typical_solver()
+            old_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
+            solvers = mc.ls(type='zSolverTransform')
+            solver_to_keep = solvers[i]
+            solver_to_lose = solvers[(i + 1) % 2]
+            print((solver_to_keep, solver_to_lose))  # so we know which test failed
+
+            # Act
+            merge_two_solvers(solver_to_keep, solver_to_lose)
+
+            # Verify
+            self.assertIn(solver_to_keep, mc.ls(type='zSolverTransform'))
+            new_meshes = mc.ls(dag=True, type='mesh', noIntermediate=True)
+            self.assertItemsEqual(old_meshes, new_meshes)
+            # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
 
     def test_merge_solvers_can_handle_connection_to_enabled(self):
         # Setup
