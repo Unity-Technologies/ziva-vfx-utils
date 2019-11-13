@@ -207,7 +207,7 @@ def get_mesh_vertex_positions(mesh):
     # convert flat list of points to list containing 3 element lists.  Each 3 element list is
     # x, y, z worldspace coordinate of vert
     if len(points) % 3 != 0:
-        raise StandardError('List not divisable by 3.')
+        raise StandardError('List not divisible by 3.')
 
     points = [points[x:x + 3] for x in xrange(0, len(points), 3)]
 
