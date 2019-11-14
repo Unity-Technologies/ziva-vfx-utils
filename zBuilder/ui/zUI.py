@@ -269,30 +269,25 @@ class MyDockingUI(QtWidgets.QWidget):
         """
         indexes = self.treeView.selectedIndexes()
 
-        if len(indexes) == 1:
-            node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if len(indexes) != 1:
+            return
 
+        menu_dict = {
+            'zTet': self.open_tet_menu,
+            'zFiber': self.open_fiber_menu,
+            'zMaterial': self.open_material_menu,
+            'zAttachment': self.open_attachment_menu,
+            'zTissue': self.open_tissue_menu,
+            'zBone': self.open_bone_menu,
+            'zLineOfAction': self.open_line_of_action_menu,
+            'zRestShape': self.open_rest_shape_menu
+        }
+
+        node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if node.type in menu_dict:
             menu = QtWidgets.QMenu(self)
-
-            maps = self.get_maps_from_node(node)
-            map0 = maps[0] if maps else None
-
-            menu_dict = {
-                'zTet': [self.open_tet_menu, menu, map0],
-                'zFiber': [self.open_fiber_menu, menu] + maps,
-                'zMaterial': [self.open_material_menu, menu, map0],
-                'zAttachment': [self.open_attachment_menu, menu] + node.long_association + maps,
-                'zTissue': [self.open_tissue_menu, menu],
-                'zBone': [self.open_bone_menu, menu],
-                'zLineOfAction': [self.open_line_of_action_menu, menu],
-                'zRestShape': [self.open_rest_shape_menu, menu]
-            }
-
-            if node.type in menu_dict:
-                method = menu_dict[node.type][0]
-                args = menu_dict[node.type][1:]
-                method(*args)
-
+            method = menu_dict[node.type]
+            method(menu, node)
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     # TODO: Implement this functionality in zBuilder core
@@ -319,32 +314,44 @@ class MyDockingUI(QtWidgets.QWidget):
         attrs_menu.addAction(self.actionCopyAttrs)
         attrs_menu.addAction(self.actionPasteAttrs)
 
-    def open_tet_menu(self, menu, weight_map):
+    def open_tet_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+        weight_map = self.get_maps_from_node(node)[0]
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-    def open_fiber_menu(self, menu, weight_map, end_points_map):
+    def open_fiber_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+
+        maps = self.get_maps_from_node(node)
+        weight_map = maps[0]
+        end_points_map = maps[1]
+
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
         end_points_map_menu = menu.addMenu('EndPoints')
         end_points_map_menu.addAction(self.actionPaintEndPoints)
         self.add_invert_action_to_menu(end_points_map_menu, end_points_map)
 
-    def open_material_menu(self, menu, weight_map):
+    def open_material_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map_menu.addAction(self.actionPaintSource)
+        weight_map = self.get_maps_from_node(node)[0]
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-    def open_attachment_menu(self, menu, source_mesh_name, target_mesh_name, source_map,
-                             target_map):
+    def open_attachment_menu(self, menu, node):
+        source_mesh_name = node.long_association[0]
+        target_mesh_name = node.long_association[1]
+        maps = self.get_maps_from_node(node)
+        source_map = maps[0]
+        target_map = maps[1]
+
         self.add_attributes_menu(menu)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
@@ -365,16 +372,16 @@ class MyDockingUI(QtWidgets.QWidget):
         action_paint_by_prox.setDefaultWidget(prox_widget)
         proximity_menu.addAction(action_paint_by_prox)
 
-    def open_tissue_menu(self, menu):
+    def open_tissue_menu(self, menu, _):
         self.add_attributes_menu(menu)
 
-    def open_bone_menu(self, menu):
+    def open_bone_menu(self, menu, _):
         self.add_attributes_menu(menu)
 
-    def open_line_of_action_menu(self, menu):
+    def open_line_of_action_menu(self, menu, _):
         self.add_attributes_menu(menu)
 
-    def open_rest_shape_menu(self, menu):
+    def open_rest_shape_menu(self, menu, _):
         self.add_attributes_menu(menu)
 
     def tree_changed(self):
