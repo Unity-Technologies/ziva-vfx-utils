@@ -167,22 +167,13 @@ def get_mesh_info(mesh_name):
         mesh_to_rebuild_m_dag_path.extendToShape()
 
     mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
-    mesh_to_rebuild_vert_iter = om.MItMeshVertex(mesh_to_rebuild_m_dag_path)
 
     num_polygons = 0
-    num_vertices = 0
 
     polygon_counts_list = list()
     polygon_connects_list = list()
-    point_list = list()
 
-    while not mesh_to_rebuild_vert_iter.isDone():
-        num_vertices += 1
-        pos_m_point = mesh_to_rebuild_vert_iter.position(space)
-        pos_m_float_point = om.MFloatPoint(pos_m_point.x, pos_m_point.y, pos_m_point.z)
-
-        point_list.append([pos_m_float_point[0], pos_m_float_point[1], pos_m_float_point[2]])
-        mesh_to_rebuild_vert_iter.next()
+    point_list = get_mesh_vertex_positions(mz.get_name_from_m_object(mesh_to_rebuild_m_dag_path))
 
     while not mesh_to_rebuild_poly_iter.isDone():
         num_polygons += 1
@@ -196,6 +187,31 @@ def get_mesh_info(mesh_name):
         mesh_to_rebuild_poly_iter.next()
 
     return polygon_counts_list, polygon_connects_list, point_list
+
+
+def get_mesh_vertex_positions(mesh):
+    """Given the name of a mesh, return a list of lists of its world-space vertex positions
+
+    Args:
+        mesh (str): The mesh to aquire vertex positions
+
+    Raises:
+        StandardError: If list cannot be divided by 3
+
+    Returns:
+        list of lists: List of vertex positions in x,y, z world positions.
+    """
+    # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
+    points = mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+
+    # convert flat list of points to list containing 3 element lists.  Each 3 element list is
+    # x, y, z worldspace coordinate of vert
+    if len(points) % 3 != 0:
+        raise StandardError('List not divisible by 3.')
+
+    points = [points[x:x + 3] for x in xrange(0, len(points), 3)]
+
+    return points
 
 
 def build_mesh(name, polygonCounts, polygonConnects, vertexArray):

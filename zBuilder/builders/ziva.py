@@ -50,7 +50,6 @@ class SolverDisabler:
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
-
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -313,6 +312,9 @@ class Ziva(Builder):
         * Curve reference to drive zLineOfAction. (Not actual curve)
         * Relevant zSolver for each node.
         * Mesh information used for world space lookup to interpolate maps if needed.
+
+        Existing scene items are retained. If this retrieve finds a scene items
+        with the same long name as an existing scene item, it replaces the old one.
 
         Args:
             get_parameters (bool): To get parameters or not.

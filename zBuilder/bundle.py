@@ -8,7 +8,6 @@ class Bundle(object):
     """Mixin class to deal with storing node data and component data.  meant to
     be inherited by main.
     """
-
     def __init__(self):
         self.scene_items = list()
 
@@ -100,32 +99,34 @@ class Bundle(object):
             logger.info('{} {}'.format(key, len(tmp[key])))
 
     def append_scene_item(self, scene_item):
-        """
-        appends a scene_item to the scene_item list.  Checks if scene_item is
-        already in list, if it is it overrides the previous one.
-
-        Args:
-            scene_item (:obj:`obj`): the scene_item to append to collection list.
-        """
-
-        if scene_item in self.scene_items:
-            self.scene_items = [
-                scene_item if item == scene_item else item for item in self.scene_items
-            ]
-        else:
-            self.scene_items.append(scene_item)
+        """ Deprecated. Use extend_scene_items instead, because batch processing is faster. """
+        self.extend_scene_items(self, [scene_item])
 
     def extend_scene_items(self, scene_items):
         """
+        Add a list of scene items into this bundle.
+        Any duplicates with existing scene items replace the existing item.
+        Duplicates are identified by long name.
 
         Args:
-            scene_items:
-
-        Returns:
-
+            scene_items: List of objects derived from zBuilder.nodes.Base
         """
+
+        # The order of items in self.scene_items is important,
+        # so we must update existing items in place and append new items in the order given.
+        # To easily update existing items, here's an index to lookup where they are by name.
+        old_items = {
+            scene_item.long_name: index
+            for index, scene_item in enumerate(self.scene_items)
+        }
+
+        bad_index = -1
         for scene_item in scene_items:
-            self.append_scene_item(scene_item)
+            index = old_items.get(scene_item.long_name, bad_index)
+            if index != bad_index:
+                self.scene_items[index] = scene_item
+            else:
+                self.scene_items.append(scene_item)
 
     def remove_scene_item(self, scene_item):
         """
