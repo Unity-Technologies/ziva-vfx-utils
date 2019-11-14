@@ -1,7 +1,10 @@
 import copy
 import os
+import maya.cmds as mc
 import zBuilder.zMaya
-from vfx_test_case import VfxTestCase
+import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
+from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 import tests.utils as test_utils
 from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
 
@@ -62,3 +65,36 @@ class ZivaBuilderTestCase(VfxTestCase):
 
         # Verify
         self.assertEqual(builder, builder_orig)
+
+    def test_retrieving_multiple_times_with_new_attributes_gets_the_new_attributes(self):
+        # Setup
+        material_plug = mc.ls(type='zMaterial')[0] + '.youngsModulus'
+        mc.setAttr(material_plug, 111)
+        builder = retrieve_builder_from_scene()
+        old_names = [item.name for item in builder.get_scene_items()]
+
+        # Act
+        mc.setAttr(material_plug, 222)
+        builder = retrieve_builder_from_scene()
+
+        # Verify
+        new_names = [item.name for item in builder.get_scene_items()]
+        material_items = builder.get_scene_items(type_filter='zMaterial')
+        attrs = attr_values_from_zbuilder_nodes(material_items)
+        self.assertEqual(attrs.get(material_plug), 222)
+        self.assertEqual(old_names, new_names)
+
+    def test_retrieving_the_same_scene_with_new_nodes_does_not_change_the_list_of_scene_items(self):
+        # Setup
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        old_names = [item.name for item in builder.get_scene_items()]
+
+        # Act
+        mz.clean_scene()
+        builder.build()  # Make the same scene, but with all new Ziva nodes
+        builder.retrieve_from_scene()
+        new_names = [item.name for item in builder.get_scene_items()]
+
+        # Verify
+        self.assertEqual(old_names, new_names)
