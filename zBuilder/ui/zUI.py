@@ -277,12 +277,12 @@ class MyDockingUI(QtWidgets.QWidget):
             menu = QtWidgets.QMenu(self)
 
             maps = self.get_maps_from_node(node)
-            map_ = maps[0] if maps else None
+            map0 = maps[0] if maps else None
 
             menu_dict = {
-                'zTet': [self.open_tet_menu, menu, map_],
+                'zTet': [self.open_tet_menu, menu, map0],
                 'zFiber': [self.open_fiber_menu, menu] + maps,
-                'zMaterial': [self.open_material_menu, menu, map_],
+                'zMaterial': [self.open_material_menu, menu, map0],
                 'zAttachment': [self.open_attachment_menu, menu] + node.long_association + maps,
                 'zTissue': [self.open_tissue_menu, menu],
                 'zBone': [self.open_bone_menu, menu],
