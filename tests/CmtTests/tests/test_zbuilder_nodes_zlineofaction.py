@@ -59,7 +59,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
 
         # loa.association should have 2 elements.
-        self.assertTrue(len(loa.association) == 2)
+        self.assertEqual(len(loa.association), 2)
 
     def test_build(self):
         mz.clean_scene()
@@ -68,7 +68,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
 
         # after it is built there should be 2 curves hooked up to loa
         curves = mc.listConnections('zLineOfAction1.curves')
-        self.assertTrue(len(curves) == 2)
+        self.assertEqual(len(curves), 2)
 
     def test_retrieve_connections_loa_selected(self):
 
@@ -81,7 +81,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         builder.stats()
         print(builder.get_scene_items())
         # should not be empty
-        self.assertTrue(len(builder.get_scene_items()) > 0)
+        self.assertGreater(len(builder.get_scene_items()), 0)
 
     def test_retrieve_connections_loa_selected_check(self):
 
@@ -96,4 +96,4 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         result = builder.get_scene_items(name_filter=loa.name)
 
         # result will have named loa
-        self.assertTrue(len(result) == 1)
+        self.assertEqual(len(result), 1)

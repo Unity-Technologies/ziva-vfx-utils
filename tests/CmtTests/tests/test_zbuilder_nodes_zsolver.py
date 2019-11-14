@@ -42,9 +42,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver = solver_nodes[0]
 
-        solver_attrs = ['substeps',
-                        'gravityY',
-                        'framesPerSecond']
+        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond']
 
         self.assertEqual(solver.name, name)
         self.assertEqual(solver.type, "zSolver")
@@ -55,7 +53,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                 value = attrs[i]
             else:
                 value = mc.getAttr("{}.{}".format(solver.name, attr))
-            self.assertTrue(value == solver.attrs[attr]['value'])
+            self.assertEqual(value, solver.attrs[attr]['value'])
 
     def check_retrieve_zsolver_transform_looks_good(self, builder, name, attrs):
         """Args:
@@ -71,16 +69,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver_transform = solver_transform_nodes[0]
 
-        solver_transform_attrs = ['enable',
-                                  'startFrame']
+        solver_transform_attrs = ['enable', 'startFrame']
 
-        solver_transform_children_expected = {'zSolver1Shape',
-                                              'r_tissue_2',
-                                              'c_tissue_3',
-                                              'l_tissue_1',
-                                              'bone_1',
-                                              'bone_2',
-                                              'cloth_1'}
+        solver_transform_children_expected = {
+            'zSolver1Shape', 'r_tissue_2', 'c_tissue_3', 'l_tissue_1', 'bone_1', 'bone_2', 'cloth_1'
+        }
 
         self.assertEqual(solver_transform.name, name)
         self.assertEqual(solver_transform.type, "zSolverTransform")
@@ -94,16 +87,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             self.assertEqual(value, solver_transform.attrs[attr]['value'])
 
         solver_transform_children = {obj.name for obj in solver_transform.children}
-        self.assertGreaterEqual(solver_transform_children,
-                                solver_transform_children_expected)
+        self.assertGreaterEqual(solver_transform_children, solver_transform_children_expected)
 
     def test_retrieve(self):
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", [])
         self.check_retrieve_zsolver_transform_looks_good(self.builder, "zSolver1", [])
 
-    def check_solver_and_transform_looks_good(self, builder,
-                                              solver_name,
-                                              solver_transform_name):
+    def check_solver_and_transform_looks_good(self, builder, solver_name, solver_transform_name):
         solver_nodes = builder.get_scene_items(type_filter='zSolver')
         self.assertEqual(len(solver_nodes), 1)
 
@@ -127,12 +117,9 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_build(self):
-        solver_attrs = ['substeps',
-                        'gravityY',
-                        'framesPerSecond']
+        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond']
 
-        solver_transform_attrs = ['enable',
-                                  'startFrame']
+        solver_transform_attrs = ['enable', 'startFrame']
 
         solver_values = []
         for attr in solver_attrs:
@@ -149,8 +136,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.builder.build()
 
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
-        self.check_retrieve_zsolver_transform_looks_good(self.builder,
-                                                         "zSolver1",
+        self.check_retrieve_zsolver_transform_looks_good(self.builder, "zSolver1",
                                                          solver_transform_values)
 
     def test_build_from_file(self):
@@ -242,8 +228,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         # Verify
         # when done we should have some ziva nodes with a 'warped_' prefix
-        nodes_in_scene = ['warped_zSolver1',
-                          'warped_zSolver1Shape']
+        nodes_in_scene = ['warped_zSolver1', 'warped_zSolver1Shape']
         self.assertSceneHasNodes(nodes_in_scene)
 
 
@@ -277,4 +262,3 @@ class ZivaSolverTestCase(VfxTestCase):
         solver_node = z.get_scene_items(type_filter='zSolver')[0]
 
         self.assertSceneHasNodes([solver_node.name])
-
