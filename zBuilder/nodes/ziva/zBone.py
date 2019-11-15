@@ -39,6 +39,11 @@ class BoneNode(Ziva):
         if self is scene_items[0]:
             build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
 
+            # set the attributes.  This needs to run even if there are no zBone to build. This case happens during during a copy paste.
+            # any time you 'build' when the zCloth is in scene.
+            for scene_item in scene_items:
+                scene_item.set_maya_attrs(attr_filter=attr_filter)
+
 
 def build_multiple(scene_items, attr_filter=None, permissive=False):
     """ Each node can deal with it's own building.  Though, with zBones it is much
@@ -70,9 +75,5 @@ def build_multiple(scene_items, attr_filter=None, permissive=False):
         for new, name, scene_item in zip(results, culled['names'], culled['scene_items']):
             scene_item.mobject = new
             mc.rename(new, name)
-
-    # set the attributes
-    for scene_item in scene_items:
-        scene_item.set_maya_attrs(attr_filter=attr_filter)
 
     mc.select(sel)
