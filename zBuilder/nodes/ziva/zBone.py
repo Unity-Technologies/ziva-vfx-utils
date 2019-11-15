@@ -13,6 +13,7 @@ class BoneNode(Ziva):
     """
     type = 'zBone'
     """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 
@@ -35,8 +36,7 @@ class BoneNode(Ziva):
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.
         # This feels kinda sloppy to me.
-
-        if self == scene_items[0]:  ### VFXACT-409 SUSPICIOUS
+        if self is scene_items[0]:
             build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
 
 

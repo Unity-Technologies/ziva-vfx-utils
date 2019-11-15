@@ -13,6 +13,7 @@ class ClothNode(Ziva):
     """
     type = 'zCloth'
     """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
@@ -35,7 +36,7 @@ class ClothNode(Ziva):
         # all the zCloth and build them together for speed reasons.
         # This feels kinda sloppy to me.
 
-        if self == scene_items[0]:  ### VFXACT-409 SUSPICIOUS
+        if self is scene_items[0]:
             build_multiple(scene_items, attr_filter=attr_filter)
 
 

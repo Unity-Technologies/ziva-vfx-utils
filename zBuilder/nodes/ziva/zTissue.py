@@ -57,7 +57,7 @@ class TissueNode(Ziva):
         tissue_items = self.builder.get_scene_items(type_filter='zTissue', name_filter=name_filter)
         tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
 
-        if self == tissue_items[0]:  ### VFXACT-409 SUSPICIOUS
+        if self is tissue_items[0]: 
             build_multiple(tissue_items,
                            tet_items,
                            attr_filter=attr_filter,
