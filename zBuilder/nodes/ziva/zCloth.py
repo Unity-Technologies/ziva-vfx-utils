@@ -39,7 +39,7 @@ class ClothNode(Ziva):
         if self is scene_items[0]:
             build_multiple(scene_items, attr_filter=attr_filter)
 
-            # set the attributes.  This needs to run even if there are no zCloth to build. This case happens during during a copy paste.
+            # set the attributes.  This needs to run even if there are no zCloth to build. This case happens during a copy paste.
             # any time you 'build' when the zCloth is in scene.
             for item in scene_items:
                 item.set_maya_attrs(attr_filter=attr_filter)
