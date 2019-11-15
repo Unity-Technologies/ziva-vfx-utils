@@ -1,5 +1,6 @@
 import weakref
 from functools import partial
+import copy
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -125,8 +126,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder or zva.Ziva()
+
         # clipboard for copied attributes
         self.attrs_clipboard = {}
+        # clipboard for the maps
+        self.maps_clipboard = {}
 
         root_node = builder.root_node
 
@@ -213,8 +217,56 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
 
     def invert_weights(self, weight_map):
+
         weight_map.invert()
         weight_map.apply_weights()
+
+    def copy_weights(self, weight_map):
+
+        indexes = self.treeView.selectedIndexes()
+        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
+        self.maps_clipboard = {}
+        self.maps_clipboard[node.name] = weight_map
+
+    def paste_weights(self, weight_map):
+        if self.maps_clipboard:
+            copied_weight_map = self.maps_clipboard.values()[0]
+        else:
+            return
+
+        index = self.treeView.selectedIndexes()[0]
+        node = index.data(model.SceneGraphModel.nodeRole)
+
+        # It will be simple for a user to paste the wrong map in worng location
+        # here we are comparing the length of the maps and if they are different we can bring up
+        # a dialog to warn user unexpected results may happen,
+        new_map_length = len(weight_map.values)
+        original_map_length = len(copied_weight_map.values)
+
+        ret = None
+        if new_map_length != original_map_length:
+            msgBox = QtWidgets.QMessageBox()
+            msgBox.setText(
+                "The map you are copying from ({}) and pasting to ({}) have a different length.  Unexpected results may happen."
+                .format(original_map_length, new_map_length))
+            msgBox.setInformativeText("Are you sure you want to continue?")
+            msgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            msgBox.setDefaultButton(QtWidgets.QMessageBox.Yes)
+            ret = msgBox.exec_()
+
+        if ret == QtWidgets.QMessageBox.Yes or new_map_length == original_map_length: 
+
+            # check if node type of map is same as what we are tryiong to paste to
+            if node.type == weight_map.map_type:
+                source_node_name = self.maps_clipboard.keys()[0]
+                target_node_name = node.name
+
+                # Need to make a deep copy of the map.  This is so if it is pasted
+                # on multiple items we need the string_replace to work on original name.  We do not
+                # want anything to change data in buffer
+                weight_map_copy = copy.deepcopy(weight_map)
+                weight_map_copy.string_replace(source_node_name, target_node_name)
+                weight_map_copy.apply_weights()
 
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
