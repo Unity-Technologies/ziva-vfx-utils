@@ -59,6 +59,10 @@ class TissueNode(Ziva):
         tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
 
         if self is tissue_items[0]:
+
+            assert (len(tissue_items) == len(tet_items)
+                    ), 'zTet and zTissue have a different amount.  Not building.'
+
             build_multiple(tissue_items,
                            tet_items,
                            attr_filter=attr_filter,
@@ -66,7 +70,7 @@ class TissueNode(Ziva):
                            solver=solver,
                            interp_maps=interp_maps)
 
-            # we only want to execute this if tissue_items is empty or self is the first tissue. 
+            # we only want to execute this if tissue_items is empty or self is the first tissue.
             # set the attributes in maya
             for ztet, ztissue in zip(tet_items, tissue_items):
                 ztet.set_maya_attrs(attr_filter=attr_filter)
