@@ -215,6 +215,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.setText('Paste')
         self.actionPasteAttrs.setObjectName("actionPasteAttrs")
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
+        self.actionPasteAttrs.setEnabled(False)
 
     def invert_weights(self, weight_map):
 
@@ -281,6 +282,8 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         node = indexes[-1].data(model.SceneGraphModel.nodeRole)
         self.attrs_clipboard[node.type] = node.attrs.copy()
+        # enable paste button
+        self.actionPasteAttrs.setEnabled(True)
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -369,15 +372,19 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addAction(action)
 
     def add_paste_action_to_menu(self, menu, weight_map):
+
         action = QtWidgets.QAction(self)
         action.setText('Paste')
         action.setObjectName("actionPasteWeights")
         action.triggered.connect(partial(self.paste_weights, weight_map))
+        if not self.maps_clipboard:
+            action.setEnabled(False)
         menu.addAction(action)
 
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
+
         attrs_menu.addAction(self.actionPasteAttrs)
 
     def open_tet_menu(self, menu, node):
