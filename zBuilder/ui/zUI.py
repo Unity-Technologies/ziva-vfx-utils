@@ -309,6 +309,20 @@ class MyDockingUI(QtWidgets.QWidget):
         action_invert_weight_map.triggered.connect(partial(self.invert_weights, weight_map))
         menu.addAction(action_invert_weight_map)
 
+    def add_copy_action_to_menu(self, menu, weight_map):
+        action = QtWidgets.QAction(self)
+        action.setText('Copy')
+        action.setObjectName("actionCopyWeights")
+        action.triggered.connect(partial(self.copy_weights, weight_map))
+        menu.addAction(action)
+
+    def add_paste_action_to_menu(self, menu, weight_map):
+        action = QtWidgets.QAction(self)
+        action.setText('Paste')
+        action.setObjectName("actionPasteWeights")
+        action.triggered.connect(partial(self.paste_weights, weight_map))
+        menu.addAction(action)
+
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
         attrs_menu.addAction(self.actionCopyAttrs)
