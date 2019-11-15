@@ -60,6 +60,10 @@ class TissueNode(Ziva):
 
         if self is tissue_items[0]:
 
+            # checking if length of tissue_items and tet_items are the same.  If they are not we
+            # are not going to build.
+            # There is a rare situation where there may be a tet and no tissue and you need
+            # to apply the attributes
             assert (len(tissue_items) == len(tet_items)
                     ), 'zTet and zTissue have a different amount.  Not building.'
 
