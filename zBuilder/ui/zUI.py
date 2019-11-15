@@ -388,6 +388,10 @@ class MyDockingUI(QtWidgets.QWidget):
         weight_map = self.get_maps_from_node(node)[0]
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
+        weight_map_menu.addSeparator()
+        self.add_copy_action_to_menu(weight_map_menu, weight_map)
+        self.add_paste_action_to_menu(weight_map_menu, weight_map)
+
     def open_fiber_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
@@ -399,9 +403,16 @@ class MyDockingUI(QtWidgets.QWidget):
         end_points_map = maps[1]
 
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
+        weight_map_menu.addSeparator()
+        self.add_copy_action_to_menu(weight_map_menu, weight_map)
+        self.add_paste_action_to_menu(weight_map_menu, weight_map)
+
         end_points_map_menu = menu.addMenu('EndPoints')
         end_points_map_menu.addAction(self.actionPaintEndPoints)
         self.add_invert_action_to_menu(end_points_map_menu, end_points_map)
+        end_points_map_menu.addSeparator()
+        self.add_copy_action_to_menu(end_points_map_menu, end_points_map)
+        self.add_paste_action_to_menu(end_points_map_menu, weight_map)
 
     def open_material_menu(self, menu, node):
         self.add_attributes_menu(menu)
@@ -410,6 +421,9 @@ class MyDockingUI(QtWidgets.QWidget):
         weight_map_menu.addAction(self.actionPaintSource)
         weight_map = self.get_maps_from_node(node)[0]
         self.add_invert_action_to_menu(weight_map_menu, weight_map)
+        weight_map_menu.addSeparator()
+        self.add_copy_action_to_menu(weight_map_menu, weight_map)
+        self.add_paste_action_to_menu(weight_map_menu, weight_map)
 
     def open_attachment_menu(self, menu, node):
         source_mesh_name = node.long_association[0]
@@ -425,12 +439,21 @@ class MyDockingUI(QtWidgets.QWidget):
         display_name = lambda x: truncate(x.split('|')[-1])
         source_menu_text = 'Source ({})'.format(display_name(source_mesh_name))
         target_menu_text = 'Target ({})'.format(display_name(target_mesh_name))
+
         source_map_menu = menu.addMenu(source_menu_text)
         source_map_menu.addAction(self.actionPaintSource)
         self.add_invert_action_to_menu(source_map_menu, source_map)
+        source_map_menu.addSeparator()
+        self.add_copy_action_to_menu(source_map_menu, source_map)
+        self.add_paste_action_to_menu(source_map_menu, source_map)
+
         target_map_menu = menu.addMenu(target_menu_text)
         target_map_menu.addAction(self.actionPaintTarget)
         self.add_invert_action_to_menu(target_map_menu, target_map)
+        target_map_menu.addSeparator()
+        self.add_copy_action_to_menu(target_map_menu, target_map)
+        self.add_paste_action_to_menu(target_map_menu, target_map)
+
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
         prox_widget = ProximityWidget()
