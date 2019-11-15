@@ -82,7 +82,7 @@ class ZivaBuildTestCase(VfxTestCase):
         # check amount of zTissue and zTet.  Should be 1 of each
         items = z.get_scene_items(type_filter=['zTet', 'zTissue'])
 
-        self.assertTrue(len(items) == 2)
+        self.assertEqual(len(items), 2)
 
     def test_retrieve_from_scene(self):
         zAttachments = mc.ls(type='zAttachment')
