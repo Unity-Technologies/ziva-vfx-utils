@@ -40,7 +40,7 @@ class BoneNode(Ziva):
             build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
 
             # set the attributes.  This needs to run even if there are no zBone to build. This case happens during during a copy paste.
-            # any time you 'build' when the zCloth is in scene.
+            # any time you 'build' when the zBone is in scene.
             for scene_item in scene_items:
                 scene_item.set_maya_attrs(attr_filter=attr_filter)
 
