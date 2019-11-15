@@ -12,6 +12,7 @@ class TissueNode(Ziva):
     """
     type = 'zTissue'
     """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
@@ -57,7 +58,7 @@ class TissueNode(Ziva):
         tissue_items = self.builder.get_scene_items(type_filter='zTissue', name_filter=name_filter)
         tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
 
-        if self is tissue_items[0]: 
+        if self is tissue_items[0]:
             build_multiple(tissue_items,
                            tet_items,
                            attr_filter=attr_filter,
@@ -65,8 +66,7 @@ class TissueNode(Ziva):
                            solver=solver,
                            interp_maps=interp_maps)
 
-        # we only want to execute this if tissue_items is empty or self is the first tissue.
-        if not tissue_items or self == tissue_items[0]:  ### VFXACT-409 SUSPICIOUS
+            # we only want to execute this if tissue_items is empty or self is the first tissue. 
             # set the attributes in maya
             for ztet, ztissue in zip(tet_items, tissue_items):
                 ztet.set_maya_attrs(attr_filter=attr_filter)
