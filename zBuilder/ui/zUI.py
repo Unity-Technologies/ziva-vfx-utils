@@ -361,7 +361,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
-        invert_action.setObjectName("actionInvertWeights")
+        invert_action.setObjectName('actionInvertWeights')
         invert_action.triggered.connect(partial(self.invert_weights, node, map_))
         menu.addAction(invert_action)
 
@@ -369,13 +369,13 @@ class MyDockingUI(QtWidgets.QWidget):
 
         copy_action = QtWidgets.QAction(self)
         copy_action.setText('Copy')
-        copy_action.setObjectName("actionCopyWeights")
+        copy_action.setObjectName('actionCopyWeights')
         copy_action.triggered.connect(partial(self.copy_weights, node, map_))
         menu.addAction(copy_action)
 
         paste_action = QtWidgets.QAction(self)
         paste_action.setText('Paste')
-        paste_action.setObjectName("actionPasteWeights")
+        paste_action.setObjectName('actionPasteWeights')
         paste_action.triggered.connect(partial(self.paste_weights, node, map_))
         if not self.maps_clipboard:
             paste_action.setEnabled(False)
