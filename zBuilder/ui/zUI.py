@@ -129,7 +129,11 @@ class MyDockingUI(QtWidgets.QWidget):
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
-        # clipboard for the maps
+        # clipboard for the maps.  This is a dictionary whose key is is the node that the map
+        # was copied from and the value is the zBuilder 'map' object to help facilitate
+        # getting and setting of the map.  We need to keep track of the original node
+        # because we need a way to consistently do a string replace.  What goes in the buffer
+        # should not be altered as that will affect multple pastes.
         self.maps_clipboard = {}
 
         root_node = builder.root_node
