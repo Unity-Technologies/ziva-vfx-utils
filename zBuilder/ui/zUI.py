@@ -234,7 +234,7 @@ class MyDockingUI(QtWidgets.QWidget):
         else:
             return
 
-        # It will be simple for a user to paste the wrong map in worng location
+        # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
         new_map_length = len(map_.values)
