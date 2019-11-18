@@ -221,57 +221,46 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPasteAttrs.triggered.connect(self.paste_attrs)
         self.actionPasteAttrs.setEnabled(False)
 
-    def invert_weights(self, weight_map):
+    def invert_weights(self, node, map_):
+        map_.invert()
+        map_.apply_weights()
 
-        weight_map.invert()
-        weight_map.apply_weights()
+    def copy_weights(self, node, map_):
+        self.maps_clipboard = {node.name: map_}
 
-    def copy_weights(self, weight_map):
-
-        indexes = self.treeView.selectedIndexes()
-        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
-        self.maps_clipboard = {}
-        self.maps_clipboard[node.name] = weight_map
-
-    def paste_weights(self, weight_map):
+    def paste_weights(self, node, map_):
         if self.maps_clipboard:
             copied_weight_map = self.maps_clipboard.values()[0]
         else:
             return
 
-        index = self.treeView.selectedIndexes()[0]
-        node = index.data(model.SceneGraphModel.nodeRole)
-
         # It will be simple for a user to paste the wrong map in worng location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
-        new_map_length = len(weight_map.values)
+        new_map_length = len(map_.values)
         original_map_length = len(copied_weight_map.values)
 
         dialog_return = None
         if new_map_length != original_map_length:
-            msgBox = QtWidgets.QMessageBox()
-            msgBox.setText(
+            msg_box = QtWidgets.QMessageBox()
+            msg_box.setText(
                 "The map you are copying from ({}) and pasting to ({}) have a different length.  Unexpected results may happen."
                 .format(original_map_length, new_map_length))
-            msgBox.setInformativeText("Are you sure you want to continue?")
-            msgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            msgBox.setDefaultButton(QtWidgets.QMessageBox.No)
-            dialog_return = msgBox.exec_()
+            msg_box.setInformativeText("Are you sure you want to continue?")
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+            dialog_return = msg_box.exec_()
 
         if dialog_return == QtWidgets.QMessageBox.Yes or new_map_length == original_map_length:
+            source_node_name = self.maps_clipboard.keys()[0]
+            target_node_name = node.name
 
-            # check if node type of map is same as what we are tryiong to paste to
-            if node.type == weight_map.map_type:
-                source_node_name = self.maps_clipboard.keys()[0]
-                target_node_name = node.name
-
-                # Need to make a deep copy of the map.  This is so if it is pasted
-                # on multiple items we need the string_replace to work on original name.  We do not
-                # want anything to change data in buffer
-                weight_map_copy = copy.deepcopy(weight_map)
-                weight_map_copy.string_replace(source_node_name, target_node_name)
-                weight_map_copy.apply_weights()
+            # Need to make a deep copy of the map.  This is so if it is pasted
+            # on multiple items we need the string_replace to work on original name.  We do not
+            # want anything to change data in buffer
+            weight_map_copy = copy.deepcopy(copied_weight_map)
+            weight_map_copy.string_replace(source_node_name, target_node_name)
+            weight_map_copy.apply_weights()
 
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
@@ -359,31 +348,33 @@ class MyDockingUI(QtWidgets.QWidget):
             for value in values:
                 obj = self.builder.parameter_factory(key, value)
                 maps.append(obj)
+
         return maps
 
-    def add_invert_action_to_menu(self, menu, weight_map):
-        action_invert_weight_map = QtWidgets.QAction(self)
-        action_invert_weight_map.setText('Invert')
-        action_invert_weight_map.setObjectName("actionInvertWeights")
-        action_invert_weight_map.triggered.connect(partial(self.invert_weights, weight_map))
-        menu.addAction(action_invert_weight_map)
+    def add_map_actions_to_menu(self, menu, node, map_):
+        menu.addAction(self.actionPaintSource)
 
-    def add_copy_action_to_menu(self, menu, weight_map):
-        action = QtWidgets.QAction(self)
-        action.setText('Copy')
-        action.setObjectName("actionCopyWeights")
-        action.triggered.connect(partial(self.copy_weights, weight_map))
-        menu.addAction(action)
+        invert_action = QtWidgets.QAction(self)
+        invert_action.setText('Invert')
+        invert_action.setObjectName("actionInvertWeights")
+        invert_action.triggered.connect(partial(self.invert_weights, node, map_))
+        menu.addAction(invert_action)
 
-    def add_paste_action_to_menu(self, menu, weight_map):
+        menu.addSeparator()
 
-        action = QtWidgets.QAction(self)
-        action.setText('Paste')
-        action.setObjectName("actionPasteWeights")
-        action.triggered.connect(partial(self.paste_weights, weight_map))
+        copy_action = QtWidgets.QAction(self)
+        copy_action.setText('Copy')
+        copy_action.setObjectName("actionCopyWeights")
+        copy_action.triggered.connect(partial(self.copy_weights, node, map_))
+        menu.addAction(copy_action)
+
+        paste_action = QtWidgets.QAction(self)
+        paste_action.setText('Paste')
+        paste_action.setObjectName("actionPasteWeights")
+        paste_action.triggered.connect(partial(self.paste_weights, node, map_))
         if not self.maps_clipboard:
-            action.setEnabled(False)
-        menu.addAction(action)
+            paste_action.setEnabled(False)
+        menu.addAction(paste_action)
 
     def add_attributes_menu(self, menu):
         attrs_menu = menu.addMenu('Attributes')
@@ -394,76 +385,53 @@ class MyDockingUI(QtWidgets.QWidget):
     def open_tet_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
-        weight_map_menu = menu.addMenu('Weight')
-        weight_map_menu.addAction(self.actionPaintSource)
-        weight_map = self.get_maps_from_node(node)[0]
-        self.add_invert_action_to_menu(weight_map_menu, weight_map)
 
-        weight_map_menu.addSeparator()
-        self.add_copy_action_to_menu(weight_map_menu, weight_map)
-        self.add_paste_action_to_menu(weight_map_menu, weight_map)
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        weight_map_menu = menu.addMenu('Weight')
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
     def open_fiber_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
+
         weight_map_menu = menu.addMenu('Weight')
-        weight_map_menu.addAction(self.actionPaintSource)
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        endpoints_map = self.get_maps_from_node(node)[1]  # endpoints map @ index 1
 
-        maps = self.get_maps_from_node(node)
-        weight_map = maps[0]
-        end_points_map = maps[1]
-
-        self.add_invert_action_to_menu(weight_map_menu, weight_map)
-        weight_map_menu.addSeparator()
-        self.add_copy_action_to_menu(weight_map_menu, weight_map)
-        self.add_paste_action_to_menu(weight_map_menu, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
         end_points_map_menu = menu.addMenu('EndPoints')
-        end_points_map_menu.addAction(self.actionPaintEndPoints)
-        self.add_invert_action_to_menu(end_points_map_menu, end_points_map)
-        end_points_map_menu.addSeparator()
-        self.add_copy_action_to_menu(end_points_map_menu, end_points_map)
-        self.add_paste_action_to_menu(end_points_map_menu, weight_map)
+        self.add_map_actions_to_menu(end_points_map_menu, node, endpoints_map)
 
     def open_material_menu(self, menu, node):
         self.add_attributes_menu(menu)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map_menu.addAction(self.actionPaintSource)
-        weight_map = self.get_maps_from_node(node)[0]
-        self.add_invert_action_to_menu(weight_map_menu, weight_map)
-        weight_map_menu.addSeparator()
-        self.add_copy_action_to_menu(weight_map_menu, weight_map)
-        self.add_paste_action_to_menu(weight_map_menu, weight_map)
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
     def open_attachment_menu(self, menu, node):
-        source_mesh_name = node.long_association[0]
-        target_mesh_name = node.long_association[1]
+        source_mesh_name = node.association[0]
+        target_mesh_name = node.association[1]
+
+        # TODO Add the ability to get map by name instead of index
         maps = self.get_maps_from_node(node)
-        source_map = maps[0]
-        target_map = maps[1]
+        source_map = maps[0]  # source map @ index 0
+        target_map = maps[1]  # target map @ index 1
 
         self.add_attributes_menu(menu)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
         truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
-        display_name = lambda x: truncate(x.split('|')[-1])
-        source_menu_text = 'Source ({})'.format(display_name(source_mesh_name))
-        target_menu_text = 'Target ({})'.format(display_name(target_mesh_name))
+        source_menu_text = 'Source ({})'.format(truncate(source_mesh_name))
+        target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
 
         source_map_menu = menu.addMenu(source_menu_text)
-        source_map_menu.addAction(self.actionPaintSource)
-        self.add_invert_action_to_menu(source_map_menu, source_map)
-        source_map_menu.addSeparator()
-        self.add_copy_action_to_menu(source_map_menu, source_map)
-        self.add_paste_action_to_menu(source_map_menu, source_map)
+        self.add_map_actions_to_menu(source_map_menu, node, source_map)
 
         target_map_menu = menu.addMenu(target_menu_text)
-        target_map_menu.addAction(self.actionPaintTarget)
-        self.add_invert_action_to_menu(target_map_menu, target_map)
-        target_map_menu.addSeparator()
-        self.add_copy_action_to_menu(target_map_menu, target_map)
-        self.add_paste_action_to_menu(target_map_menu, target_map)
+        self.add_map_actions_to_menu(target_map_menu, node, target_map)
 
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
