@@ -229,38 +229,43 @@ class MyDockingUI(QtWidgets.QWidget):
         self.maps_clipboard = {node.name: map_}
 
     def paste_weights(self, node, map_):
+        """Pasting the maps.  Terms used here
+            orig/new.  
+            The map/node the items were copied from are prefixed with orig.
+            The map/node the items are going to be pasted onto are prefixed with new
+
+        """
+
         if self.maps_clipboard:
-            copied_weight_map = self.maps_clipboard.values()[0]
+            # Need to make a deep copy of the map.  This is so if it is pasted
+            # on multiple items we need the string_replace to work on original name.  We do not
+            # want anything to change data in buffer
+            orig_map = copy.deepcopy(self.maps_clipboard.values()[0])
+            orig_node_name = self.maps_clipboard.keys()[0]
         else:
             return
-
         # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
+        orig_map_length = len(orig_map.values)
         new_map_length = len(map_.values)
-        original_map_length = len(copied_weight_map.values)
 
         dialog_return = None
-        if new_map_length != original_map_length:
+        if orig_map_length != new_map_length:
             msg_box = QtWidgets.QMessageBox()
             msg_box.setText(
                 "The map you are copying from ({}) and pasting to ({}) have a different length.  Unexpected results may happen."
-                .format(original_map_length, new_map_length))
+                .format(orig_map_length, new_map_length))
             msg_box.setInformativeText("Are you sure you want to continue?")
             msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
             dialog_return = msg_box.exec_()
 
-        if dialog_return == QtWidgets.QMessageBox.Yes or new_map_length == original_map_length:
-            source_node_name = self.maps_clipboard.keys()[0]
-            target_node_name = node.name
+        if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
+            new_node_name = node.name
 
-            # Need to make a deep copy of the map.  This is so if it is pasted
-            # on multiple items we need the string_replace to work on original name.  We do not
-            # want anything to change data in buffer
-            weight_map_copy = copy.deepcopy(copied_weight_map)
-            weight_map_copy.string_replace(source_node_name, target_node_name)
-            weight_map_copy.apply_weights()
+            orig_map.string_replace(orig_node_name, new_node_name)
+            orig_map.apply_weights()
 
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
