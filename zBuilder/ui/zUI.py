@@ -273,8 +273,8 @@ class MyDockingUI(QtWidgets.QWidget):
             mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
 
     def copy_attrs(self, node):
-        self.attrs_clipboard[node.type] = {node.type: node.attrs.copy()}
-        # enable paste button
+        self.attrs_clipboard = {}
+        self.attrs_clipboard[node.type] = node.attrs.copy()
         self.actionPasteAttrs.setEnabled(True)
 
     def paint_weights(self, association_idx, attribute):
