@@ -235,20 +235,18 @@ class MyDockingUI(QtWidgets.QWidget):
             The map/node the items are going to be pasted onto are prefixed with new
 
         """
-
         if self.maps_clipboard:
-            # Need to make a deep copy of the map.  This is so if it is pasted
-            # on multiple items we need the string_replace to work on original name.  We do not
-            # want anything to change data in buffer
-            orig_map = copy.deepcopy(self.maps_clipboard.values()[0])
-            orig_node_name = self.maps_clipboard.keys()[0]
+            orig_map = self.maps_clipboard.values()[0]
         else:
             return
+
+        new_map = map_
+
         # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
         orig_map_length = len(orig_map.values)
-        new_map_length = len(map_.values)
+        new_map_length = len(new_map.values)
 
         dialog_return = None
         if orig_map_length != new_map_length:
@@ -262,10 +260,8 @@ class MyDockingUI(QtWidgets.QWidget):
             dialog_return = msg_box.exec_()
 
         if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
-            new_node_name = node.name
-
-            orig_map.string_replace(orig_node_name, new_node_name)
-            orig_map.apply_weights()
+            new_map.copy_values_from(self.maps_clipboard.values()[0])
+            new_map.apply_weights()
 
     def paste_attrs(self):
         indexes = self.treeView.selectedIndexes()
