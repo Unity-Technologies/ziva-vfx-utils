@@ -267,19 +267,13 @@ class MyDockingUI(QtWidgets.QWidget):
             orig_map.string_replace(orig_node_name, new_node_name)
             orig_map.apply_weights()
 
-    def paste_attrs(self):
-        indexes = self.treeView.selectedIndexes()
-        for index in indexes:
-            node = index.data(model.SceneGraphModel.nodeRole)
-            for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
-                mc.setAttr("{}.{}".format(node.name, attr), lock=False)
-                mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+    def paste_attrs(self, node):
+        for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
+            mc.setAttr("{}.{}".format(node.name, attr), lock=False)
+            mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
 
-    def copy_attrs(self):
-        self.attrs_clipboard = {}
-        indexes = self.treeView.selectedIndexes()
-        node = indexes[-1].data(model.SceneGraphModel.nodeRole)
-        self.attrs_clipboard[node.type] = node.attrs.copy()
+    def copy_attrs(self, node):
+        self.attrs_clipboard[node.type] = {node.type: node.attrs.copy()}
         # enable paste button
         self.actionPasteAttrs.setEnabled(True)
 
@@ -381,14 +375,13 @@ class MyDockingUI(QtWidgets.QWidget):
             paste_action.setEnabled(False)
         menu.addAction(paste_action)
 
-    def add_attributes_menu(self, menu):
+    def add_attribute_actions_to_menu(self, menu, node):
         attrs_menu = menu.addMenu('Attributes')
-        attrs_menu.addAction(self.actionCopyAttrs)
-
-        attrs_menu.addAction(self.actionPasteAttrs)
+        attrs_menu.addAction(partial(self.actionCopyAttrs, node))
+        attrs_menu.addAction(partial(self.actionPasteAttrs, node))
 
     def open_tet_menu(self, menu, node):
-        self.add_attributes_menu(menu)
+        self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
         weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
@@ -396,7 +389,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
     def open_fiber_menu(self, menu, node):
-        self.add_attributes_menu(menu)
+        self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
@@ -409,7 +402,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_map_actions_to_menu(end_points_map_menu, node, endpoints_map)
 
     def open_material_menu(self, menu, node):
-        self.add_attributes_menu(menu)
+        self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
         weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
@@ -425,7 +418,7 @@ class MyDockingUI(QtWidgets.QWidget):
         source_map = maps[0]  # source map @ index 0
         target_map = maps[1]  # target map @ index 1
 
-        self.add_attributes_menu(menu)
+        self.add_attribute_actions_to_menu(menu, node)
         menu.addAction(self.actionSelectST)
         menu.addSection('Maps')
         truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
@@ -445,17 +438,17 @@ class MyDockingUI(QtWidgets.QWidget):
         action_paint_by_prox.setDefaultWidget(prox_widget)
         proximity_menu.addAction(action_paint_by_prox)
 
-    def open_tissue_menu(self, menu, _):
-        self.add_attributes_menu(menu)
+    def open_tissue_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
-    def open_bone_menu(self, menu, _):
-        self.add_attributes_menu(menu)
+    def open_bone_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
-    def open_line_of_action_menu(self, menu, _):
-        self.add_attributes_menu(menu)
+    def open_line_of_action_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
-    def open_rest_shape_menu(self, menu, _):
-        self.add_attributes_menu(menu)
+    def open_rest_shape_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
