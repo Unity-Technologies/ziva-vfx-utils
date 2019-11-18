@@ -244,7 +244,7 @@ class MyDockingUI(QtWidgets.QWidget):
         new_map_length = len(weight_map.values)
         original_map_length = len(copied_weight_map.values)
 
-        ret = None
+        dialog_return = None
         if new_map_length != original_map_length:
             msgBox = QtWidgets.QMessageBox()
             msgBox.setText(
@@ -252,10 +252,10 @@ class MyDockingUI(QtWidgets.QWidget):
                 .format(original_map_length, new_map_length))
             msgBox.setInformativeText("Are you sure you want to continue?")
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            msgBox.setDefaultButton(QtWidgets.QMessageBox.Yes)
-            ret = msgBox.exec_()
+            msgBox.setDefaultButton(QtWidgets.QMessageBox.No)
+            dialog_return = msgBox.exec_()
 
-        if ret == QtWidgets.QMessageBox.Yes or new_map_length == original_map_length: 
+        if dialog_return == QtWidgets.QMessageBox.Yes or new_map_length == original_map_length:
 
             # check if node type of map is same as what we are tryiong to paste to
             if node.type == weight_map.map_type:
