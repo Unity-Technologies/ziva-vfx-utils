@@ -210,17 +210,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
-        self.actionCopyAttrs = QtWidgets.QAction(self)
-        self.actionCopyAttrs.setText('Copy')
-        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
-        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
-
-        self.actionPasteAttrs = QtWidgets.QAction(self)
-        self.actionPasteAttrs.setText('Paste')
-        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
-        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
-        self.actionPasteAttrs.setEnabled(False)
-
     def invert_weights(self, node, map_):
         map_.invert()
         map_.apply_weights()
@@ -268,14 +257,18 @@ class MyDockingUI(QtWidgets.QWidget):
             orig_map.apply_weights()
 
     def paste_attrs(self, node):
-        for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
-            mc.setAttr("{}.{}".format(node.name, attr), lock=False)
-            mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+        """ This pastes the attributes from the copy buffer onto current node. The paste 
+        button is only enabled when the types match so we do not need to do that here
+        """
+        orig_node = self.attrs_clipboard.get(node.type, None)
+        # update the model
+        node.attrs = orig_node.attrs
+        # set the attributes in maya.
+        node.set_maya_attrs()
 
     def copy_attrs(self, node):
         self.attrs_clipboard = {}
-        self.attrs_clipboard[node.type] = node.attrs.copy()
-        self.actionPasteAttrs.setEnabled(True)
+        self.attrs_clipboard[node.type] = node
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -377,8 +370,22 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def add_attribute_actions_to_menu(self, menu, node):
         attrs_menu = menu.addMenu('Attributes')
-        attrs_menu.addAction(partial(self.actionCopyAttrs, node))
-        attrs_menu.addAction(partial(self.actionPasteAttrs, node))
+
+        copy_attrs_action = QtWidgets.QAction(self)
+        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setObjectName("actionCopyAttrs")
+        copy_attrs_action.triggered.connect(partial(self.copy_attrs, node))
+
+        paste_attrs_action = QtWidgets.QAction(self)
+        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setObjectName("actionPasteAttrs")
+        paste_attrs_action.triggered.connect(partial(self.paste_attrs, node))
+
+        # only enable 'paste' IF it is same type as what is in buffer
+        paste_attrs_action.setEnabled(node.type in self.attrs_clipboard)
+
+        attrs_menu.addAction(copy_attrs_action)
+        attrs_menu.addAction(paste_attrs_action)
 
     def open_tet_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
