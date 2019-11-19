@@ -146,6 +146,9 @@ class Map(Base):
             if mc.objExists(self.name):
                 mc.setAttr(self.name, self.values, type='doubleArray')
 
+    def copy_values_from(self, map_parameter):
+        self.values = map_parameter.values
+
 
 def invert_weights(weights):
     """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
