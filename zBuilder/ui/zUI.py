@@ -470,8 +470,13 @@ class MyDockingUI(QtWidgets.QWidget):
         if not root_node:
             # clean builder
             # TODO: this line should be changed after VFXACT-388 to make more efficient
+
+            # This is using zBuilder to build the model data for the UI.  Currently the model data
+            # excludes Mpas and Meshes.  This is strictly a performance issue.  With this included
+            # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
+            # is the argument that tells zBuilder to not get maps, meshes.
             self.builder = zva.Ziva()
-            self.builder.retrieve_connections()
+            self.builder.retrieve_connections(get_parameters=False)
             root_node = self.builder.root_node
 
         # remember names of items to expand
