@@ -267,6 +267,10 @@ class MyDockingUI(QtWidgets.QWidget):
         node.set_maya_attrs()
 
     def copy_attrs(self, node):
+        """Adding the node to the attribute clipboard.  Then when we paste we can extract what want 
+        and apply.
+        
+        """
         self.attrs_clipboard = {}
         self.attrs_clipboard[node.type] = node
 
