@@ -129,12 +129,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
-        # clipboard for the maps.  This is a dictionary whose key is is the node that the map
-        # was copied from and the value is the zBuilder 'map' object to help facilitate
-        # getting and setting of the map.  We need to keep track of the original node
-        # because we need a way to consistently do a string replace.  What goes in the buffer
-        # should not be altered as that will affect multple pastes.
-        self.maps_clipboard = {}
+        # clipboard for the maps.  This is either a zBuilder Map object or None.
+        self.maps_clipboard = None
 
         root_node = builder.root_node
 
@@ -226,7 +222,7 @@ class MyDockingUI(QtWidgets.QWidget):
         map_.apply_weights()
 
     def copy_weights(self, node, map_):
-        self.maps_clipboard = {node.name: map_}
+        self.maps_clipboard = map_
 
     def paste_weights(self, node, map_):
         """Pasting the maps.  Terms used here
@@ -236,7 +232,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         """
         if self.maps_clipboard:
-            orig_map = self.maps_clipboard.values()[0]
+            orig_map = self.maps_clipboard
         else:
             return
 
@@ -260,7 +256,7 @@ class MyDockingUI(QtWidgets.QWidget):
             dialog_return = msg_box.exec_()
 
         if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
-            new_map.copy_values_from(self.maps_clipboard.values()[0])
+            new_map.copy_values_from(orig_map)
             new_map.apply_weights()
 
     def paste_attrs(self):
