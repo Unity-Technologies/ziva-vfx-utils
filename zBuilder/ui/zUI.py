@@ -224,7 +224,7 @@ class MyDockingUI(QtWidgets.QWidget):
     def copy_weights(self, node, map_):
         self.maps_clipboard = map_
 
-    def paste_weights(self, node, map_):
+    def paste_weights(self, node, new_map):
         """Pasting the maps.  Terms used here
             orig/new.  
             The map/node the items were copied from are prefixed with orig.
@@ -235,8 +235,6 @@ class MyDockingUI(QtWidgets.QWidget):
             orig_map = self.maps_clipboard
         else:
             return
-
-        new_map = map_
 
         # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
