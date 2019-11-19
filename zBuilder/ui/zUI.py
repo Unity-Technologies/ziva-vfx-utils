@@ -369,8 +369,7 @@ class MyDockingUI(QtWidgets.QWidget):
         paste_action.setText('Paste')
         paste_action.setObjectName('actionPasteWeights')
         paste_action.triggered.connect(partial(self.paste_weights, node, map_))
-        if not self.maps_clipboard:
-            paste_action.setEnabled(False)
+        paste_action.setEnabled(bool(self.maps_clipboard))
         menu.addAction(paste_action)
 
     def add_attributes_menu(self, menu):
