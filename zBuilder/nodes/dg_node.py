@@ -197,6 +197,18 @@ class DGNode(Base):
 
         return name
 
+    def get_maya_attrs(self):
+        """ Get attribute values from maya and update self.
+        """
+
+        # build the attribute list to aquire from scene
+        attr_list = mz.build_attr_list(self.name)
+        if self.EXTEND_ATTR_LIST:
+            attr_list.extend(self.EXTEND_ATTR_LIST)
+
+        # with attribute list, get values in dictionary format and update node.
+        self.attrs = mz.build_attr_key_values(self.name, attr_list)
+
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
         scene.  It first does a mObject check to see if it has been tracked, if
