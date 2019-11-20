@@ -1,5 +1,36 @@
 Release Notes
 =============
+
+1.0.10
+======
+
+Functionality
+-------------
+- **Scene Panel:** Right click menu updated.  Added copy/paste/invert and paint to maps. Added copy/paste for attributes.  
+- **Scene Panel:** Appearence changes to Scene Panel
+- **Ziva VFX Utils:** Added a merge solvers function.
+- **Ziva VFX Utils:** Added license Register module with UI to help
+- **zBuilder:** Added a Solver Disabler context manager to help facilitate turning off solver during a build.  
+- **zBuilder:** Removed deprecated check_mesh flag from .build()
+- **zBuilder:** Added apply_weights() to Map class.
+- **zBuilder:** Added ability to invert maps in Map class.
+- **zBuilder:** Rename "Cache" to "Simulation RAM Cache" in menu.
+- **zBuilder:** Added ability to compare zBuilder objects. if builder1 == builder2:
+- **zBuilder:** Changed newton iterations in demo arm from 2 to 10.
+- **zBuilder:** Unit tests can run in linux.
+- **zBuilder:** Move unit tests outside of zBuilder module.
+- **zBuilder:** Speed increase to retrieve when dealing with meshes.
+
+Bug Fixes
+---------
+- **zBuilder:** When retrieving multiple times in a scene strange things could end up in builder.
+- **zBuilder:** zBuilder build() would fail when something was connected to .enable
+- **zBuilder:** zBuilder being too chatty when building by printing out every node type.  Now only the ones it operated on.
+- **zBuilder:** Prefix or Suffix could mess up string_replace in zBuilder and menu.
+- **zBuilder:** Speed slow down when building.
+- **zBuilder:** When using retrieve_scene_selection() when selecting only one out of multiple restShapes
+- **zBuilder:** When you tried to copy in menu with you have a non-restShaped tissue selected
+
 1.0.9
 -----
 * Fix for Copy/Paste transfer menu items.
