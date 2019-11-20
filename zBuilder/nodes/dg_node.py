@@ -129,11 +129,7 @@ class DGNode(Base):
         maya_node = mz.check_maya_node(maya_node)
         self.name = maya_node
         self.type = mc.objectType(maya_node)
-        attr_list = mz.build_attr_list(maya_node)
-        if self.EXTEND_ATTR_LIST:
-            attr_list.extend(self.EXTEND_ATTR_LIST)
-        attrs = mz.build_attr_key_values(maya_node, attr_list)
-        self.attrs = attrs
+        self.get_maya_attrs()
         self.mobject = maya_node
 
     def build(self, *args, **kwargs):
