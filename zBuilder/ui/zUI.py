@@ -129,12 +129,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
-        # clipboard for the maps.  This is a dictionary whose key is is the node that the map
-        # was copied from and the value is the zBuilder 'map' object to help facilitate
-        # getting and setting of the map.  We need to keep track of the original node
-        # because we need a way to consistently do a string replace.  What goes in the buffer
-        # should not be altered as that will affect multple pastes.
-        self.maps_clipboard = {}
+        # clipboard for the maps.  This is either a zBuilder Map object or None.
+        self.maps_clipboard = None
 
         root_node = builder.root_node
 
@@ -215,29 +211,25 @@ class MyDockingUI(QtWidgets.QWidget):
         map_.apply_weights()
 
     def copy_weights(self, node, map_):
-        self.maps_clipboard = {node.name: map_}
+        self.maps_clipboard = map_
 
-    def paste_weights(self, node, map_):
+    def paste_weights(self, node, new_map):
         """Pasting the maps.  Terms used here
             orig/new.  
             The map/node the items were copied from are prefixed with orig.
             The map/node the items are going to be pasted onto are prefixed with new
 
         """
-
         if self.maps_clipboard:
-            # Need to make a deep copy of the map.  This is so if it is pasted
-            # on multiple items we need the string_replace to work on original name.  We do not
-            # want anything to change data in buffer
-            orig_map = copy.deepcopy(self.maps_clipboard.values()[0])
-            orig_node_name = self.maps_clipboard.keys()[0]
+            orig_map = self.maps_clipboard
         else:
             return
+
         # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
         orig_map_length = len(orig_map.values)
-        new_map_length = len(map_.values)
+        new_map_length = len(new_map.values)
 
         dialog_return = None
         if orig_map_length != new_map_length:
@@ -251,10 +243,8 @@ class MyDockingUI(QtWidgets.QWidget):
             dialog_return = msg_box.exec_()
 
         if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
-            new_node_name = node.name
-
-            orig_map.string_replace(orig_node_name, new_node_name)
-            orig_map.apply_weights()
+            new_map.copy_values_from(orig_map)
+            new_map.apply_weights()
 
     def paste_attrs(self, node):
         """ This pastes the attributes from the copy buffer onto current node. The paste 
@@ -352,7 +342,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
-        invert_action.setObjectName("actionInvertWeights")
+        invert_action.setObjectName('actionInvertWeights')
         invert_action.triggered.connect(partial(self.invert_weights, node, map_))
         menu.addAction(invert_action)
 
@@ -360,16 +350,15 @@ class MyDockingUI(QtWidgets.QWidget):
 
         copy_action = QtWidgets.QAction(self)
         copy_action.setText('Copy')
-        copy_action.setObjectName("actionCopyWeights")
+        copy_action.setObjectName('actionCopyWeights')
         copy_action.triggered.connect(partial(self.copy_weights, node, map_))
         menu.addAction(copy_action)
 
         paste_action = QtWidgets.QAction(self)
         paste_action.setText('Paste')
-        paste_action.setObjectName("actionPasteWeights")
+        paste_action.setObjectName('actionPasteWeights')
         paste_action.triggered.connect(partial(self.paste_weights, node, map_))
-        if not self.maps_clipboard:
-            paste_action.setEnabled(False)
+        paste_action.setEnabled(bool(self.maps_clipboard))
         menu.addAction(paste_action)
 
     def add_attribute_actions_to_menu(self, menu, node):
@@ -485,8 +474,13 @@ class MyDockingUI(QtWidgets.QWidget):
         if not root_node:
             # clean builder
             # TODO: this line should be changed after VFXACT-388 to make more efficient
+
+            # This is using zBuilder to build the model data for the UI.  Currently the model data
+            # excludes Mpas and Meshes.  This is strictly a performance issue.  With this included
+            # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
+            # is the argument that tells zBuilder to not get maps, meshes.
             self.builder = zva.Ziva()
-            self.builder.retrieve_connections()
+            self.builder.retrieve_connections(get_parameters=False)
             root_node = self.builder.root_node
 
         # remember names of items to expand

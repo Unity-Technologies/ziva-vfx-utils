@@ -44,7 +44,7 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # check that 2 rivets are in zBuilder
         rivets = z.get_scene_items(type_filter='zRivetToBone')
-        self.assertTrue(len(rivets) == 2)
+        self.assertEqual(len(rivets), 2)
 
     def test_retrieve_rivet_selection(self):
         # use builder to retrieve from scene-----------------------------------
@@ -54,7 +54,7 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # check that 2 rivets are in zBuilder
         rivets = z.get_scene_items(type_filter='zRivetToBone')
-        self.assertTrue(len(rivets) == 2)
+        self.assertEqual(len(rivets), 2)
 
     def test_retrieve_rivet_selection_none(self):
         # use builder to retrieve from scene-----------------------------------
@@ -64,7 +64,7 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # check that there are 0 rivets in scene (based on selection)
         rivets = z.get_scene_items(type_filter='zRivetToBone')
-        self.assertTrue(len(rivets) == 0)
+        self.assertEqual(len(rivets), 0)
 
     def test_build_rivet(self):
         # use builder to retrieve from scene-----------------------------------
@@ -77,7 +77,7 @@ class ZivaRivetTestCase(VfxTestCase):
         z.build()
 
         # should be 2 in scene
-        self.assertTrue(len(mc.ls(type='zRivetToBone')) == 2)
+        self.assertEqual(len(mc.ls(type='zRivetToBone')), 2)
 
     def test_retrieve_rivet_scene_multiple_cvs(self):
         # create a rivetToBone driving 2 cv's
@@ -94,7 +94,7 @@ class ZivaRivetTestCase(VfxTestCase):
 
         # check that 3 rivets are in zBuilder
         rivets = z.get_scene_items(type_filter='zRivetToBone')
-        self.assertTrue(len(rivets) == 3)
+        self.assertEqual(len(rivets), 3)
 
     def test_build_rivet_multiple_cvs(self):
         # create a rivetToBone driving 2 cv's
@@ -115,7 +115,7 @@ class ZivaRivetTestCase(VfxTestCase):
         z.build()
 
         # should be 2 in scene
-        self.assertTrue(len(mc.ls(type='zRivetToBone')) == 3)
+        self.assertEqual(len(mc.ls(type='zRivetToBone')), 3)
 
     def test_retrieve_connections_rivet(self):
         # this tests if retrieve_connections works if a rivet is selected
@@ -136,7 +136,7 @@ class ZivaRivetTestCase(VfxTestCase):
         result = builder.get_scene_items(name_filter=self.riv1)
 
         # result will have named loa
-        self.assertTrue(len(result) == 1)
+        self.assertEqual(len(result), 1)
 
     def test_delete_solver_with_rivet(self):
         mc.select('zSolver1')
