@@ -250,20 +250,18 @@ class MyDockingUI(QtWidgets.QWidget):
         """ This pastes the attributes from the copy buffer onto current node. The paste 
         button is only enabled when the types match so we do not need to do that here
         """
-        orig_node = self.attrs_clipboard.get(node.type, None)
+        orig_node_attrs = self.attrs_clipboard.get(node.type, None)
         # update the model
-        node.attrs = orig_node.attrs.copy()
+        node.attrs = orig_node_attrs.copy()
         # set the attributes in maya.
         node.set_maya_attrs()
 
     def copy_attrs(self, node):
-
         # update the model in case maya updated
         node.get_maya_attrs()
 
-        # add node to clipboard.  We are using full node to get and set attributes
         self.attrs_clipboard = {}
-        self.attrs_clipboard[node.type] = copy.deepcopy(node)
+        self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
