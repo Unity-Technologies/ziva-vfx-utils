@@ -20,6 +20,7 @@ Functionality
 - **zBuilder:** Unit tests can run in linux.
 - **zBuilder:** Move unit tests outside of zBuilder module.
 - **zBuilder:** Speed increase to retrieve when dealing with meshes.
+-**zBuilder:** Added a bunch of tests.
 
 Bug Fixes
 ---------
