@@ -16,10 +16,5 @@ cd ${SCRIPT_DIR}
 # ../zBuilder/ui : Skip this module, because shiboken and PySide break the doc gen.
 sphinx-apidoc --force -o . ../zBuilder ../zBuilder/ui*
 
-# sphinx-build installed into alternative location in order to use python 2.7.14 instead of system default 2.6.6
-# Explictly call /usr/local/bin/sphinx-build or not?
-
-# TODO: Verify that we're using the correct sphinx-build and Python version
-
 rm -rf _build
 sphinx-build -W --keep-going -b html . _build
