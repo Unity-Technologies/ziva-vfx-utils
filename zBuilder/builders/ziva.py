@@ -340,7 +340,7 @@ class Ziva(Builder):
         if solver:
             solver = solver[0]
         else:
-            raise StandardError('zSolver not connected to selection.  Please try again.')
+            raise Exception('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.node_factory(solver, parent=None)
         self.bundle.extend_scene_items(b_solver)

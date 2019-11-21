@@ -61,7 +61,7 @@ class Ziva(Deformer):
             meshes (list): list of meshes to check
 
         Raises:
-            StandardError: if any mesh fails a check
+            Exception: if any mesh fails a check
         '''
         mc.select(meshes, r=True)
 
@@ -81,6 +81,6 @@ class Ziva(Deformer):
                 '''.format(str(bad_meshes))
 
                 mc.select(bad_meshes)
-                raise StandardError(error_message)
+                raise Exception(error_message)
         else:
             return None
