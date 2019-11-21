@@ -18,6 +18,7 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.parameters.maps as mp
+from zBuilder.nodes.base import Base
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
@@ -247,13 +248,23 @@ class MyDockingUI(QtWidgets.QWidget):
             new_map.apply_weights()
 
     def paste_attrs(self, node):
-        """ This pastes the attributes from the copy buffer onto current node. The paste 
-        button is only enabled when the types match so we do not need to do that here
+        # type: (zBuilder.whatever.Base) -> None
+        """ Paste the attributes from the clipboard onto given node.
+        @pre The node's type has an entry in the clipboard.
         """
-        orig_node_attrs = self.attrs_clipboard.get(node.type, None)
-        # update the model
-        node.attrs = orig_node_attrs.copy()
-        # set the attributes in maya.
+        assert isinstance(
+            node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+        assert node.type in self.attrs_clipboard, "Precondition violated: node type is not in the clipboard"
+        orig_node_attrs = self.attrs_clipboard[node.type]
+        assert isinstance(orig_node_attrs,
+                          dict), "Invariant violated: value in attrs clipboard must be a dict"
+
+        # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
+        assert set(node.attrs) == set(
+            orig_node_attrs
+        ), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+        node.attrs = orig_node_attrs.copy(
+        )  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
         node.set_maya_attrs()
 
     def copy_attrs(self, node):
