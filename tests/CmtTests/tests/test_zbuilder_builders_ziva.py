@@ -126,7 +126,6 @@ class ZivaBuildTestCase(VfxTestCase):
         mc.setAttr('r_bicep_muscle.scaleX', 0)
         mc.setAttr('r_bicep_muscle.scaleY', 0)
 
-        # now build should raise a standard error
         with self.assertRaises(Exception):
             self.builder.build()
 
