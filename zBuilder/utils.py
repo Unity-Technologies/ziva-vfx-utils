@@ -506,8 +506,10 @@ def listConnectionPlugs(node, destination=True, source=True):
 def merge_two_solvers(solver_transform1, solver_transform2):
     # type: (str, str) -> None
     """ 
-    Given two solvers. 
-    Take everything from the second and put it into the first, then delete the second.
+    Given two solvers,
+    take everything from the second solver and put it into the first solver.
+    Then, delete the second solver.
+    See 'merge_solvers' for details.
     e.g. merge_two_solvers('zSolver1', 'zSolver2')
     """
     ####################################################################
@@ -603,7 +605,20 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 def merge_solvers(solver_transforms):
     # type: (List[str]) -> None
     """ 
-    Given a list of zSolverTransform nodes, merge them all into the first node.
+    Given a list of zSolverTransform nodes, merge them all into the first solver.
+
+    The zSolverTransform, zSolver, and zEmbedder nodes for all but the first solver
+    in the list will be deleted. If that's not possible, such as when the solvers are
+    referenced nodes, those solvers will remain in the scene but be empty.
+    They will have no bones, tissues, cloth, attachments, etc.
+
+    The first solver keeps all of its attribute values and connections.
+    Any differences between this solver and the others is ignored.
+
+    All other nodes (besides the zSolverTransform, zSolver, and zEmbedder) are
+    re-wired to connect to the first solver. All existing attributes, connections,
+    or any other properties remain unchanged.
+
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
     assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
