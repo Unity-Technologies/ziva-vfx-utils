@@ -41,8 +41,9 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         try:
             self.modulePath = cmds.getModulePath(moduleName='ZivaVFX')
         except:
-            # Ziva VFX module path is not set, resort to Maya work directory
-            self.modulePath = '.'
+            # Ziva VFX module path is not set, resort to Ziva VFX plugin path
+            pluginPath = cmds.pluginInfo("ziva", query=True, path=True)
+            self.modulePath = path.dirname(pluginPath)
 
         self.setupControls()
         self.setupSlots()
