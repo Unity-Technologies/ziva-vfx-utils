@@ -7,7 +7,7 @@ import maya.mel as mm
 try:
     from shiboken2 import wrapInstance
 except ImportError:
-    raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+    raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window

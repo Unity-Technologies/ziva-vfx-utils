@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 class Mesh(Base):
     type = 'mesh'
     """ Type of node. """
-
     def __init__(self, *args, **kwargs):
         super(Mesh, self).__init__(*args, **kwargs)
 
@@ -196,7 +195,7 @@ def get_mesh_vertex_positions(mesh):
         mesh (str): The mesh to aquire vertex positions
 
     Raises:
-        StandardError: If list cannot be divided by 3
+        Exception: If list cannot be divided by 3
 
     Returns:
         list of lists: List of vertex positions in x,y, z world positions.
@@ -207,7 +206,7 @@ def get_mesh_vertex_positions(mesh):
     # convert flat list of points to list containing 3 element lists.  Each 3 element list is
     # x, y, z worldspace coordinate of vert
     if len(points) % 3 != 0:
-        raise StandardError('List not divisible by 3.')
+        raise Exception('List not divisible by 3.')
 
     points = [points[x:x + 3] for x in xrange(0, len(points), 3)]
 

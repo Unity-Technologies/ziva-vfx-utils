@@ -318,7 +318,7 @@ def rig_update(solvers=None):
     # zQuery gives an error if no solvers though it does not stop script
     # this is to stop script
     if solvers is None:
-        raise StandardError("No solver in scene.")
+        raise Exception("No solver in scene.")
 
     for solver in solvers:
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
