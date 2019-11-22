@@ -14,7 +14,7 @@ from maya import OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
 import maya.cmds as cmds
 
-from licenseRegister import register_node_based_license, register_floating_license, LICENSE_FILE_NAME
+from licenseRegister import register_node_locked_license, register_floating_license, LICENSE_FILE_NAME
 from os import path
 import re
 
@@ -32,7 +32,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     MSG_EMPTY_SERVER_ADDR = 'Empty server address.'
     MSG_INVALID_SERVER_ADDR = 'Invalid server address. Should be a computer name or IP address.'
     MSG_INVALID_SERVER_PORT = 'Invalid server port. Should be a number between 0 ~ 65535.'
-    MSG_SUCCEED_REGISTER_NODE_BASED_LIC = 'Success: license file copied to {}.'
+    MSG_SUCCEED_REGISTER_NODE_LOCKED_LIC = 'Success: license file copied to {}.'
     MSG_SUCCEED_REGISTER_FLOATING_LIC = 'Success: license server info added to {}.'
 
     def __init__(self, *args, **kwargs):
@@ -50,7 +50,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
     def setupControls(self):
         # Node-locked license group
-        self.rdoNodeBasedLic = QRadioButton('Node-locked License')
+        self.rdoNodeLockedLic = QRadioButton('Node-locked License')
         self.edtFilePath = QLineEdit()
         self.btnBrowse = QPushButton('Browse')
         filePathLayout = QHBoxLayout()
@@ -58,7 +58,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         filePathLayout.addWidget(self.edtFilePath)
         filePathLayout.addWidget(self.btnBrowse)
         nbLayout = QVBoxLayout()
-        nbLayout.addWidget(self.rdoNodeBasedLic)
+        nbLayout.addWidget(self.rdoNodeLockedLic)
         nbLayout.addLayout(filePathLayout)
         nbGroup = QGroupBox()
         nbGroup.setLayout(nbLayout)
@@ -78,7 +78,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
 
         # RadioButton exclusive group
         rdoLicType = QButtonGroup(self)
-        rdoLicType.addButton(self.rdoNodeBasedLic)
+        rdoLicType.addButton(self.rdoNodeLockedLic)
         rdoLicType.addButton(self.rdoFloatingLic)
         rdoLicType.setExclusive(True)
 
@@ -102,7 +102,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.setFixedWidth(400)
 
         # Setup controls init state and value
-        self.rdoNodeBasedLic.setChecked(True)
+        self.rdoNodeLockedLic.setChecked(True)
         self.edtServerAddr.setEnabled(False)
         self.edtServerPort.setEnabled(False)
         self.edtServerPort.setPlaceholderText(str(self.DEFAULT_SERVER_PORT))
@@ -115,7 +115,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     def setupSlots(self):
         self.btnBrowse.clicked.connect(self.onBrowse)
         self.btnRegister.clicked.connect(self.onRegister)
-        self.rdoNodeBasedLic.clicked.connect(self.onLicenseTypeChange)
+        self.rdoNodeLockedLic.clicked.connect(self.onLicenseTypeChange)
         self.rdoFloatingLic.clicked.connect(self.onLicenseTypeChange)
 
     def onBrowse(self):
@@ -124,21 +124,21 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.edtFilePath.setText(retVal[0])
 
     def onRegister(self):
-        isNodeBasedMode = self.rdoNodeBasedLic.isChecked()
-        if self._validateInputs(isNodeBasedMode):
+        isNodeLockedMode = self.rdoNodeLockedLic.isChecked()
+        if self._validateInputs(isNodeLockedMode):
             try:
-                if isNodeBasedMode:
-                    register_node_based_license(self.modulePath, self.licFilePath)
+                if isNodeLockedMode:
+                    register_node_locked_license(self.modulePath, self.licFilePath)
                 else:
                     register_floating_license(self.modulePath, self.srvAddr, 'ANY', self.srvPort)
             except Exception as e:
                 self.lblStatus.setText(str(e))
                 return
 
-            if isNodeBasedMode:
+            if isNodeLockedMode:
                 fileName = path.basename(self.licFilePath)
                 self.lblStatus.setText(
-                    self.MSG_SUCCEED_REGISTER_NODE_BASED_LIC.format(
+                    self.MSG_SUCCEED_REGISTER_NODE_LOCKED_LIC.format(
                         path.join(self.modulePath, fileName)))
             else:
                 self.lblStatus.setText(
@@ -146,22 +146,22 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
                         path.join(self.modulePath, LICENSE_FILE_NAME)))
 
     def onLicenseTypeChange(self):
-        isNodeBasedMode = self.rdoNodeBasedLic.isChecked()
-        self.edtFilePath.setEnabled(isNodeBasedMode)
-        self.btnBrowse.setEnabled(isNodeBasedMode)
-        self.edtServerAddr.setEnabled(not isNodeBasedMode)
-        self.edtServerPort.setEnabled(not isNodeBasedMode)
+        isNodeLockedMode = self.rdoNodeLockedLic.isChecked()
+        self.edtFilePath.setEnabled(isNodeLockedMode)
+        self.btnBrowse.setEnabled(isNodeLockedMode)
+        self.edtServerAddr.setEnabled(not isNodeLockedMode)
+        self.edtServerPort.setEnabled(not isNodeLockedMode)
 
-    def _validateInputs(self, isNodeBasedMode):
+    def _validateInputs(self, isNodeLockedMode):
         '''
         Validate user inputs and show error message through status label.
         
-        isNodeBasedMode (bool): Which license type to validate
+        isNodeLockedMode (bool): Which license type to validate
 
         Returns: bool
             True for valid inputs to proceed, False otherwise.
         '''
-        if isNodeBasedMode:
+        if isNodeLockedMode:
             self.licFilePath = self.edtFilePath.text()
             if not self.licFilePath:
                 self.lblStatus.setText(self.MSG_EMPTY_FILE_PATH)
