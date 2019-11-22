@@ -49,8 +49,8 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.setupSlots()
 
     def setupControls(self):
-        # Node-based license group
-        self.rdoNodeBasedLic = QRadioButton('Node-based License')
+        # Node-locked license group
+        self.rdoNodeBasedLic = QRadioButton('Node-locked License')
         self.edtFilePath = QLineEdit()
         self.btnBrowse = QPushButton('Browse')
         filePathLayout = QHBoxLayout()
@@ -166,7 +166,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
             if not self.licFilePath:
                 self.lblStatus.setText(self.MSG_EMPTY_FILE_PATH)
                 return False
-            # Delegate node based license input validation to backend,
+            # Delegate node-locked license input validation to backend,
             # it throws when file operation failed.
             return True
 
