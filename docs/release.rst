@@ -1,58 +1,68 @@
 Release Notes
 =============
 
+.. == STYLE ==
+.. For consistency, prefer to use an imperative stlye, like:
+.. - Add a new widget for pies.
+.. - Fix broken rendering.
+.. - Allow foo.
+.. For bug fixes, just say what the bug was. e.g.
+.. - Broken rendering on tissue blah blah.
+.. - Fibers will not generate on tissues with multiple components.
+
 1.0.10
 ======
 
 Functionality
 -------------
-- **Scene Panel:** Right click menu updated.  Added copy/paste/invert and paint to maps. Added copy/paste for attributes.  
-- **Scene Panel:** Appearence changes to Scene Panel
-- **Ziva VFX Utils:** Added a merge solvers function.
-- **Ziva VFX Utils:** Added license Register module with UI to help
-- **zBuilder:** Added a Solver Disabler context manager to help facilitate turning off solver during a build.  
-- **zBuilder:** Removed deprecated check_mesh flag from .build()
-- **zBuilder:** Added apply_weights() to Map class.
+- **Scene Panel:** Updated the right-click menu: added copy/paste/invert and paint to maps; added copy/paste for attributes.
+- **Scene Panel:** Changed appearance of the Scene Panel.
+- **Ziva VFX Utils:** Added ``utils.merge_solvers()`` function.
+- **Ziva VFX Utils:** Added License Register module with UI.
+- **zBuilder:** Added ``SolverDisabler`` context manager to help facilitate turning off solver during a build.
+- **zBuilder:** Removed deprecated check_mesh flag from ``.build()``.
+- **zBuilder:** Added ``apply_weights()`` to Map class.
 - **zBuilder:** Added ability to invert maps in Map class.
-- **zBuilder:** Rename "Cache" to "Simulation RAM Cache" in menu.
-- **zBuilder:** Added ability to compare zBuilder objects. if builder1 == builder2:
-- **zBuilder:** Changed newton iterations in demo arm from 2 to 10.
-- **zBuilder:** Unit tests can run in linux.
+- **zBuilder:** Rename "Cache" to "Simulation RAM Cache" in the menu.
+- **zBuilder:** Added ability to compare zBuilder objects.
+- **zBuilder:** Changed Newton iterations in demo arm from 2 to 10.
+- **zBuilder:** Unit tests can run in Linux.
 - **zBuilder:** Move unit tests outside of zBuilder module.
 - **zBuilder:** Speed increase to retrieve when dealing with meshes.
 
+  Benchmark Runtimes (in seconds, lower is better):
 
-+-------------------+------------------------+--------------------+-------------------+
-|                   | Action                 | 1.0.9              | 1.0.10            |
-+===================+========================+====================+===================+
-|   **Demo Arm**    | build()                | 2.80               | 1.70              |
-+-------------------+------------------------+--------------------+-------------------+
-|                   | retrieve()             | 0.42               | 0.37              |
-+                   +------------------------+--------------------+-------------------+
-|                   | retrieve_from_file()   | 0.07               | 0.06              |
-+                   +------------------------+--------------------+-------------------+
-|                   | write()                | 0.35               | 0.36              |
-+-------------------+------------------------+--------------------+-------------------+
-|   **Jellyphant**  | build()                | 9.27               | 7.05              |
-+-------------------+------------------------+--------------------+-------------------+
-|                   | retrieve()             | 1.11               | 0.96              |
-+                   +------------------------+--------------------+-------------------+
-|                   | retrieve_from_file()   | 0.22               | 0.18              |
-+                   +------------------------+--------------------+-------------------+
-|                   | write()                | 1.17               | 1.16              |
-+-------------------+------------------------+--------------------+-------------------+
+  +-------------------+------------------------+--------------------+-------------------+
+  |                   | Action                 | 1.0.9              | 1.0.10            |
+  +===================+========================+====================+===================+
+  |   **Demo Arm**    | build()                | 2.80               | 1.70              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | retrieve()             | 0.42               | 0.37              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | retrieve_from_file()   | 0.07               | 0.06              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | write()                | 0.35               | 0.36              |
+  +-------------------+------------------------+--------------------+-------------------+
+  |   **Jellyphant**  | build()                | 9.27               | 7.05              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | retrieve()             | 1.11               | 0.96              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | retrieve_from_file()   | 0.22               | 0.18              |
+  +                   +------------------------+--------------------+-------------------+
+  |                   | write()                | 1.17               | 1.16              |
+  +-------------------+------------------------+--------------------+-------------------+
 
-- **zBuilder:** Added a bunch of tests.
+- **zBuilder:** Added a bunch of unit tests.
 
 Bug Fixes
 ---------
 - **zBuilder:** When retrieving multiple times in a scene strange things could end up in builder.
-- **zBuilder:** zBuilder build() would fail when something was connected to .enable
-- **zBuilder:** zBuilder being too chatty when building by printing out every node type.  Now only the ones it operated on.
-- **zBuilder:** Prefix or Suffix could mess up string_replace in zBuilder and menu.
+- **zBuilder:** zBuilder ``build()`` would fail when something was connected to ``enable`` attribute.
+- **zBuilder:** zBuilder being too chatty when building by printing out every node type. Now only the ones it operated on.
+- **zBuilder:** Prefix or suffix could mess up string_replace in zBuilder and menu.
 - **zBuilder:** Speed slow down when building.
-- **zBuilder:** When using retrieve_scene_selection() when selecting only one out of multiple restShapes
-- **zBuilder:** When you tried to copy in menu with you have a non-restShaped tissue selected
+- **zBuilder:** When using ``retrieve_scene_selection()`` when selecting only one out of multiple restShapes.
+- **zBuilder:** When you tried to copy in menu with you have a non-restShaped tissue selected.
 
 1.0.9
 -----
