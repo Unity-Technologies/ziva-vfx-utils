@@ -20,7 +20,7 @@ Functionality
 - **Ziva VFX Utils:** Added ``utils.merge_solvers()`` function.
 - **Ziva VFX Utils:** Added License Register module with UI.
 - **zBuilder:** Added ``SolverDisabler`` context manager to help facilitate turning off solver during a build.
-- **zBuilder:** Removed deprecated check_mesh flag from ``.build()``.
+- **zBuilder:** Removed deprecated ``check_mesh`` flag from ``build()``.
 - **zBuilder:** Added ``apply_weights()`` to Map class.
 - **zBuilder:** Added ability to invert maps in Map class.
 - **zBuilder:** Rename "Cache" to "Simulation RAM Cache" in the menu.
