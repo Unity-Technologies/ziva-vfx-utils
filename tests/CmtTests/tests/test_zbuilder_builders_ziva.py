@@ -113,7 +113,7 @@ class ZivaBuildTestCase(VfxTestCase):
         # now lets delete bicep to see how build handles it
         mc.delete('r_bicep_muscle')
 
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             self.builder.build(permissive=False)
 
     def test_bad_mesh_error(self):
@@ -126,8 +126,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mc.setAttr('r_bicep_muscle.scaleX', 0)
         mc.setAttr('r_bicep_muscle.scaleY', 0)
 
-        # now build should raise a standard error
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             self.builder.build()
 
     def test_tissue_attrs_not_updating(self):

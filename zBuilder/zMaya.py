@@ -536,7 +536,7 @@ def check_mesh_quality(meshes):
         meshes (list): A list of meshes you want to check
 
     Raises:
-        StandardError: If any mesh does not pass mesh check
+        Exception: If any mesh does not pass mesh check
     """
 
     tmp = []
@@ -549,7 +549,7 @@ def check_mesh_quality(meshes):
 
     if tmp:
         mc.select(tmp)
-        raise StandardError('check meshes!')
+        raise Exception('check meshes!')
     else:
         mc.select(meshes)
 
@@ -573,7 +573,7 @@ def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid
     maya objects in the current scene.  If any of the passed names are not in
-    the  it raises a StandardError.  If nothing is passed it looks at what is
+    the  it raises a Exception.  If nothing is passed it looks at what is
     actively selected in scene to get selection.  This way it functions like a
     lot of the maya tools, uses what is passed OR it uses what is selected.
 
@@ -597,7 +597,7 @@ def parse_maya_node_for_selection(args):
             if mc.objExists(sel):
                 tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError('{} does not exist in scene, stopping!'.format(sel))
+                raise Exception('{} does not exist in scene, stopping!'.format(sel))
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -606,7 +606,7 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise StandardError(
+            raise Exception(
                 'Nothing selected or passed, please select something and try again.')
     return selection
 
@@ -776,7 +776,7 @@ def cull_creation_nodes(scene_items, permissive=True):
                 results['scene_items'].append(scene_item)
         else:
             if not permissive:
-                raise StandardError(
+                raise Exception(
                     '{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.
                     format(mesh, type_))
             logger.warning(mesh + ' does not exist in scene, skipping ' + type_ + ' creation')

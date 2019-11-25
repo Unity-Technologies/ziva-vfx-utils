@@ -12,7 +12,6 @@ class RivetToBoneNode(Ziva):
     """
     type = 'zRivetToBone'
     """ The type of node. """
-
     def __init__(self, parent=None, builder=None):
         super(RivetToBoneNode, self).__init__(parent=parent, builder=builder)
         self.cv_indices = []
@@ -87,7 +86,7 @@ class RivetToBoneNode(Ziva):
             if permissive:
                 logger.warning(message)
             else:
-                raise StandardError(message)
+                raise Exception(message)
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

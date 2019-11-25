@@ -15,7 +15,6 @@ class AttachmentNode(Ziva):
     """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
     """ List of maps to store. """
-
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 
@@ -85,6 +84,5 @@ class AttachmentNode(Ziva):
             if permissive:
                 logger.info('skipping attachment creation...' + name)
             else:
-                raise StandardError(
-                    'Cannot create attachment between {} and {}.  Check meshes.'.format(
-                        source_mesh, target_mesh))
+                raise Exception('Cannot create attachment between {} and {}.  Check meshes.'.format(
+                    source_mesh, target_mesh))

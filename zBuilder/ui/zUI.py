@@ -7,7 +7,7 @@ import maya.mel as mm
 try:
     from shiboken2 import wrapInstance
 except ImportError:
-    raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+    raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
@@ -18,6 +18,7 @@ import icons
 import os
 import zBuilder.builders.ziva as zva
 import zBuilder.parameters.maps as mp
+from zBuilder.nodes.base import Base
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
@@ -206,17 +207,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionPaintEndPoints.setObjectName("paintEndPoints")
         self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
 
-        self.actionCopyAttrs = QtWidgets.QAction(self)
-        self.actionCopyAttrs.setText('Copy')
-        self.actionCopyAttrs.setObjectName("actionCopyAttrs")
-        self.actionCopyAttrs.triggered.connect(self.copy_attrs)
-
-        self.actionPasteAttrs = QtWidgets.QAction(self)
-        self.actionPasteAttrs.setText('Paste')
-        self.actionPasteAttrs.setObjectName("actionPasteAttrs")
-        self.actionPasteAttrs.triggered.connect(self.paste_attrs)
-        self.actionPasteAttrs.setEnabled(False)
-
     def invert_weights(self, node, map_):
         map_.invert()
         map_.apply_weights()
@@ -258,14 +248,31 @@ class MyDockingUI(QtWidgets.QWidget):
             new_map.apply_weights()
 
     def paste_attrs(self, node):
-        for attr, entry in self.attrs_clipboard.get(node.type, {}).iteritems():
-            mc.setAttr("{}.{}".format(node.name, attr), lock=False)
-            mc.setAttr("{}.{}".format(node.name, attr), entry['value'], lock=entry['locked'])
+        # type: (zBuilder.whatever.Base) -> None
+        """ Paste the attributes from the clipboard onto given node.
+        @pre The node's type has an entry in the clipboard.
+        """
+        assert isinstance(
+            node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+        assert node.type in self.attrs_clipboard, "Precondition violated: node type is not in the clipboard"
+        orig_node_attrs = self.attrs_clipboard[node.type]
+        assert isinstance(orig_node_attrs,
+                          dict), "Invariant violated: value in attrs clipboard must be a dict"
+
+        # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
+        assert set(node.attrs) == set(
+            orig_node_attrs
+        ), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+        node.attrs = orig_node_attrs.copy(
+        )  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
+        node.set_maya_attrs()
 
     def copy_attrs(self, node):
+        # update the model in case maya updated
+        node.get_maya_attrs()
+
         self.attrs_clipboard = {}
         self.attrs_clipboard[node.type] = node.attrs.copy()
-        self.actionPasteAttrs.setEnabled(True)
 
     def paint_weights(self, association_idx, attribute):
         """Paint weights menu command.
@@ -366,8 +373,22 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def add_attribute_actions_to_menu(self, menu, node):
         attrs_menu = menu.addMenu('Attributes')
-        attrs_menu.addAction(partial(self.actionCopyAttrs, node))
-        attrs_menu.addAction(partial(self.actionPasteAttrs, node))
+
+        copy_attrs_action = QtWidgets.QAction(self)
+        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setObjectName("actionCopyAttrs")
+        copy_attrs_action.triggered.connect(partial(self.copy_attrs, node))
+
+        paste_attrs_action = QtWidgets.QAction(self)
+        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setObjectName("actionPasteAttrs")
+        paste_attrs_action.triggered.connect(partial(self.paste_attrs, node))
+
+        # only enable 'paste' IF it is same type as what is in buffer
+        paste_attrs_action.setEnabled(node.type in self.attrs_clipboard)
+
+        attrs_menu.addAction(copy_attrs_action)
+        attrs_menu.addAction(paste_attrs_action)
 
     def open_tet_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)

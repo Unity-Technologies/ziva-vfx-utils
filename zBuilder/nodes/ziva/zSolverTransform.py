@@ -13,7 +13,6 @@ class SolverTransformNode(Ziva):
     """
     type = 'zSolverTransform'
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zSolverTransform in maya scene.
 
@@ -32,7 +31,7 @@ class SolverTransformNode(Ziva):
 
         if not mc.objExists(solver_name):
             if not permissive:
-                raise StandardError('zSolverTransform not in scene.  please check.')
+                raise Exception('zSolverTransform not in scene.  please check.')
 
         else:
             new_name = mc.rename(solver_name, self.name)

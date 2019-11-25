@@ -217,7 +217,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
     def test_rig_copy_without_selection_should_raise(self):
         mc.select(cl=True)
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             utils.rig_copy()
 
     def test_save_rig(self):
@@ -295,7 +295,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
 class BuilderUtilsTestCase(VfxTestCase):
     def test_builder_factory_throws_when_class_is_not_found(self):
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             bld.builder_factory('class_not_found_error')
 
     def test_remove_all_solvers(self):
@@ -315,7 +315,7 @@ class BuilderUtilsTestCase(VfxTestCase):
 
     def test_update_no_solvers(self):
         # scene is empty with no solvers, this should raise an error with update
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             utils.rig_update()
 
     def test_rig_transfer_warped_prefix(self):

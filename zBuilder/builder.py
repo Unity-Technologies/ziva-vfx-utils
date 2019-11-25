@@ -19,7 +19,6 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
-
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -52,7 +51,7 @@ class Builder(object):
         try:
             import zBuilder.ui.reader as reader
         except ImportError:
-            raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+            raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
         reader.view(root_node=self.root_node)
 
@@ -134,7 +133,6 @@ class Builder(object):
         """
         A decorator to time functions.
         """
-
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -292,4 +290,4 @@ def builder_factory(class_name):
             if class_name == obj.__name__:
                 return obj()
 
-    raise StandardError('Cannot find class in zBuilder.builders')
+    raise Exception('Cannot find class in zBuilder.builders')
