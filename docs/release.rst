@@ -11,7 +11,7 @@ Release Notes
 .. - Fibers will not generate on tissues with multiple components.
 
 1.0.10
-======
+------
 
 Functionality
 -------------
