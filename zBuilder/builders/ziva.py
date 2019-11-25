@@ -643,15 +643,14 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
         selection ([str]): List of items in mayas scene
 
     Returns:
-        list(): Selection list with item types in 'type_' replaced with 
-        corresponding tissued mesh.
+        list: Selection list with item replaced with corresponding tissued mesh, or as is.
     """
     # these are the types we need to find the tissued mesh for.
-    type_ = ['zLineOfAction', 'zRivetToBone']
+    node_type_to_replace = ['zLineOfAction', 'zRivetToBone']
 
     output = []
     for item in selection:
-        if mc.objectType(item) in type_:
+        if mc.objectType(item) in node_type_to_replace:
             history = mc.listHistory(item, future=True)
             fiber = mc.ls(history, type='zFiber')
             mc.select(fiber)
