@@ -38,6 +38,13 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     def __init__(self, *args, **kwargs):
         super(LicenseRegisterWidget, self).__init__(*args, **kwargs)
         self.setObjectName(self.WIDGET_NAME)
+        try:
+            self.modulePath = cmds.getModulePath(moduleName='ZivaVFX')
+        except:
+            # Ziva VFX module path is not set, resort to Ziva VFX plugin path
+            pluginPath = cmds.pluginInfo("ziva", query=True, path=True)
+            self.modulePath = path.dirname(pluginPath)
+
         self.setupControls()
         self.setupSlots()
 
@@ -45,11 +52,14 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         # Node-based license group
         self.rdoNodeBasedLic = QRadioButton('Node-based License')
         self.edtFilePath = QLineEdit()
-        nbFormLayout = QFormLayout()
-        nbFormLayout.addRow('License File Path:', self.edtFilePath)
+        self.btnBrowse = QPushButton('Browse')
+        filePathLayout = QHBoxLayout()
+        filePathLayout.addWidget(QLabel('License File Path:'))
+        filePathLayout.addWidget(self.edtFilePath)
+        filePathLayout.addWidget(self.btnBrowse)
         nbLayout = QVBoxLayout()
         nbLayout.addWidget(self.rdoNodeBasedLic)
-        nbLayout.addLayout(nbFormLayout)
+        nbLayout.addLayout(filePathLayout)
         nbGroup = QGroupBox()
         nbGroup.setLayout(nbLayout)
 
@@ -89,7 +99,7 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         layout.addWidget(self.btnRegister)
         self.setLayout(layout)
         self.setWindowTitle('Register Ziva VFX License')
-        self.setFixedWidth(350)
+        self.setFixedWidth(400)
 
         # Setup controls init state and value
         self.rdoNodeBasedLic.setChecked(True)
@@ -103,19 +113,24 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
         self.srvPort = self.DEFAULT_SERVER_PORT
 
     def setupSlots(self):
+        self.btnBrowse.clicked.connect(self.onBrowse)
         self.btnRegister.clicked.connect(self.onRegister)
         self.rdoNodeBasedLic.clicked.connect(self.onLicenseTypeChange)
         self.rdoFloatingLic.clicked.connect(self.onLicenseTypeChange)
 
+    def onBrowse(self):
+        retVal = QFileDialog.getOpenFileName(self, 'Locate RLM License File', self.modulePath,
+                                             'RLM License File (*.lic)')
+        self.edtFilePath.setText(retVal[0])
+
     def onRegister(self):
         isNodeBasedMode = self.rdoNodeBasedLic.isChecked()
         if self._validateInputs(isNodeBasedMode):
-            modulePath = cmds.getModulePath(moduleName='ZivaVFX')
             try:
                 if isNodeBasedMode:
-                    register_node_based_license(modulePath, self.licFilePath)
+                    register_node_based_license(self.modulePath, self.licFilePath)
                 else:
-                    register_floating_license(modulePath, self.srvAddr, 'ANY', self.srvPort)
+                    register_floating_license(self.modulePath, self.srvAddr, 'ANY', self.srvPort)
             except Exception as e:
                 self.lblStatus.setText(str(e))
                 return
@@ -123,16 +138,17 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
             if isNodeBasedMode:
                 fileName = path.basename(self.licFilePath)
                 self.lblStatus.setText(
-                    self.MSG_SUCCEED_REGISTER_NODE_BASED_LIC.format(path.join(modulePath,
-                                                                              fileName)))
+                    self.MSG_SUCCEED_REGISTER_NODE_BASED_LIC.format(
+                        path.join(self.modulePath, fileName)))
             else:
                 self.lblStatus.setText(
                     self.MSG_SUCCEED_REGISTER_FLOATING_LIC.format(
-                        path.join(modulePath, LICENSE_FILE_NAME)))
+                        path.join(self.modulePath, LICENSE_FILE_NAME)))
 
     def onLicenseTypeChange(self):
         isNodeBasedMode = self.rdoNodeBasedLic.isChecked()
         self.edtFilePath.setEnabled(isNodeBasedMode)
+        self.btnBrowse.setEnabled(isNodeBasedMode)
         self.edtServerAddr.setEnabled(not isNodeBasedMode)
         self.edtServerPort.setEnabled(not isNodeBasedMode)
 

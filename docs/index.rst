@@ -9,4 +9,4 @@
     zBuilder_menu
     release
     glossary
-    zBuilder
+    modules

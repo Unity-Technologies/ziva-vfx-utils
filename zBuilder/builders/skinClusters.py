@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 class SkinCluster(Builder):
     """Capturing Maya skinClusters
     """
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
@@ -21,7 +20,7 @@ class SkinCluster(Builder):
         skin_clusters = mc.ls(history, type='skinCluster')[::-1]
 
         if not skin_clusters:
-            raise StandardError('No skinClusters found, aborting!')
+            raise Exception('No skinClusters found, aborting!')
 
         for skin_cluster in skin_clusters:
             scene_item = self.node_factory(skin_cluster)

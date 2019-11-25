@@ -66,6 +66,17 @@ pipeline {
                     }
                     post { cleanup { cleanWs() } }
                 }
+
+                stage('doc generation') {
+                    agent { label 'linux && sphinx' }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
             }
         }
     }

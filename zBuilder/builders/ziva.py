@@ -340,7 +340,7 @@ class Ziva(Builder):
         if solver:
             solver = solver[0]
         else:
-            raise StandardError('zSolver not connected to selection.  Please try again.')
+            raise Exception('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.node_factory(solver, parent=None)
         self.bundle.extend_scene_items(b_solver)
@@ -643,14 +643,14 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
         selection ([str]): List of items in mayas scene
 
     Returns:
-        list: Selection list with item replaced with corresponding tissued mesh, or as is.
+        list(): Selection list with some items replaced.
     """
-    # these are the types we need to find the tissued mesh for.
-    node_type_to_replace = ['zLineOfAction', 'zRivetToBone']
+    # these are the types we need to find the tissue mesh for.
+    type_ = ['zLineOfAction', 'zRivetToBone']
 
     output = []
     for item in selection:
-        if mc.objectType(item) in node_type_to_replace:
+        if mc.objectType(item) in type_:
             history = mc.listHistory(item, future=True)
             fiber = mc.ls(history, type='zFiber')
             mc.select(fiber)

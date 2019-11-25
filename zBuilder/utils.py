@@ -318,7 +318,7 @@ def rig_update(solvers=None):
     # zQuery gives an error if no solvers though it does not stop script
     # this is to stop script
     if solvers is None:
-        raise StandardError("No solver in scene.")
+        raise Exception("No solver in scene.")
 
     for solver in solvers:
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
@@ -506,8 +506,10 @@ def listConnectionPlugs(node, destination=True, source=True):
 def merge_two_solvers(solver_transform1, solver_transform2):
     # type: (str, str) -> None
     """ 
-    Given two solvers. 
-    Take everything from the second and put it into the first, then delete the second.
+    Given two solvers,
+    take everything from the second solver and put it into the first solver.
+    Then, delete the second solver.
+    See 'merge_solvers' for details.
     e.g. merge_two_solvers('zSolver1', 'zSolver2')
     """
     ####################################################################
@@ -527,83 +529,93 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 
     ####################################################################
     # For speed and to reduce noise, try to disable the solvers
-    # TODO: use SolverDisabler to do this 'right'
-    try:
-        mc.setAttr('{}.enable'.format(solver_transform1), False)
-        mc.setAttr('{}.enable'.format(solver_transform2), False)
-    except:
-        pass
 
-    ####################################################################
-    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
-    for src, dst in listConnectionPlugs(solver2, source=False):
-        mc.disconnectAttr(src, dst)
-        new_src = src.replace(solver2, solver1, 1)
-        try:
-            mc.connectAttr(new_src, dst)
-        except:
-            logger.info('Skipped new connection {} {}'.format(src, dst))
+    # SolverDisabler's __enter__ will do what we want for solver2,
+    # but we're going to delete solver2, so we do not want __exit__ to be called. Thus:
+    zva.SolverDisabler(solver_transform2).__enter__()
 
-    ####################################################################
-    # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
-    for dst, src in listConnectionPlugs(solver2, destination=False):
-        mc.disconnectAttr(src, dst)
-        new_dst = dst.replace(solver2, solver1, 1)
-        new_dst = next_free_plug_in_array(new_dst)
-        try:
-            mc.connectAttr(src, new_dst)
-        except:
-            if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
-                logger.info('Skipped new connection {} {}'.format(src, new_dst))
+    with zva.SolverDisabler(solver_transform1):
+        ####################################################################
+        # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
+        for src, dst in listConnectionPlugs(solver2, source=False):
+            mc.disconnectAttr(src, dst)
+            new_src = src.replace(solver2, solver1, 1)
+            try:
+                mc.connectAttr(new_src, dst)
+            except:
+                logger.info('Skipped new connection {} {}'.format(src, dst))
 
-    ####################################################################
-    # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
-    for src, dst in listConnectionPlugs(solver_transform2, source=False):
-        mc.disconnectAttr(src, dst)
-        new_src = src.replace(solver_transform2, solver_transform1, 1)
-        try:
-            mc.connectAttr(new_src, dst)
-        except:
-            logger.info('Skipped new connection {} {}'.format(src, dst))
+        ####################################################################
+        # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
+        for dst, src in listConnectionPlugs(solver2, destination=False):
+            mc.disconnectAttr(src, dst)
+            new_dst = dst.replace(solver2, solver1, 1)
+            new_dst = next_free_plug_in_array(new_dst)
+            try:
+                mc.connectAttr(src, new_dst)
+            except:
+                if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
+                    logger.info('Skipped new connection {} {}'.format(src, new_dst))
 
-    ####################################################################
-    # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
+        ####################################################################
+        # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+        for src, dst in listConnectionPlugs(solver_transform2, source=False):
+            mc.disconnectAttr(src, dst)
+            new_src = src.replace(solver_transform2, solver_transform1, 1)
+            try:
+                mc.connectAttr(new_src, dst)
+            except:
+                logger.info('Skipped new connection {} {}'.format(src, dst))
 
-    # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
-    tissue_geo_plugs = mz.none_to_empty(
-        mc.listConnections('{}.iGeo'.format(embedder2), plugs=True, source=True, destination=False))
-    meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
-    indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
+        ####################################################################
+        # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
 
-    # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
-    for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
-        mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
-        mc.deformer(embedder1, edit=True, before=True, geometry=mesh)  # "-before" for referencing
-        # TODO: how do I get the index of a mesh without this mess?
-        new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
-        new_index = list(new_indices - indices)[0]
-        indices = new_indices
-        mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
+        # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
+        tissue_geo_plugs = mz.none_to_empty(
+            mc.listConnections('{}.iGeo'.format(embedder2),
+                               plugs=True,
+                               source=True,
+                               destination=False))
+        meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
+        indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
 
-    ####################################################################
-    # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
+        # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
+        for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
+            mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
+            mc.deformer(embedder1, edit=True, before=True,
+                        geometry=mesh)  # "-before" for referencing
+            # TODO: how do I get the index of a mesh without this mess?
+            new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+            new_index = list(new_indices - indices)[0]
+            indices = new_indices
+            mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
-    for node in [solver2, solver_transform2, embedder2]:
-        # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
-        if not mc.ls(node, readOnly=True):
-            mc.delete(node)
+        ####################################################################
+        # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
 
-    # TODO: use SolverDisbler to do this 'right'
-    try:
-        mc.setAttr('{}.enable'.format(solver_transform1), True)
-    except:
-        pass
+        for node in [solver2, solver_transform2, embedder2]:
+            # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
+            if not mc.ls(node, readOnly=True):
+                mc.delete(node)
 
 
 def merge_solvers(solver_transforms):
     # type: (List[str]) -> None
     """ 
-    Given a list of zSolverTransform nodes, merge them all into the first node.
+    Given a list of zSolverTransform nodes, merge them all into the first solver.
+
+    The zSolverTransform, zSolver, and zEmbedder nodes for all but the first solver
+    in the list will be deleted. If that's not possible, such as when the solvers are
+    referenced nodes, those solvers will remain in the scene but be empty.
+    They will have no bones, tissues, cloth, attachments, etc.
+
+    The first solver keeps all of its attribute values and connections.
+    Any differences between this solver and the others is ignored.
+
+    All other nodes (besides the zSolverTransform, zSolver, and zEmbedder) are
+    re-wired to connect to the first solver. All existing attributes, connections,
+    or any other properties remain unchanged.
+
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
     assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
@@ -611,5 +623,7 @@ def merge_solvers(solver_transforms):
     if len(solver_transforms) < 2:
         return
     solver1 = solver_transforms[0]
-    for solver2 in solver_transforms[1:]:
-        merge_two_solvers(solver1, solver2)
+
+    with zva.SolverDisabler(solver1):
+        for solver2 in solver_transforms[1:]:
+            merge_two_solvers(solver1, solver2)
