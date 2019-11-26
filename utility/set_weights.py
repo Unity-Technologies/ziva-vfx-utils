@@ -1,0 +1,176 @@
+import maya.cmds as mc
+import maya.mel as mm
+import maya.OpenMaya as OpenMaya
+import maya.OpenMayaAnim as OpenMayaAnim
+import re
+
+
+def set_weights(node_name, attr_name, new_weights):
+    # type: (str, str, List[float]) -> None
+    """
+    Set an array of weights on some node.
+    This will work for array plugs (e.g. Deformer.weightList[7].weights),
+    and for typed attributes with array type (e.g. zFiber.endPoints).
+
+    For deformer weightLists, this code requires that the deformed mesh has a DagPath.
+    It's also generally assumed that the weights are not sparse, even though
+    that's the way Maya's weightLists generally work, because that's not the way
+    ZivaVFX generally works.
+
+    This function inspects the attribute to figure out what type it is,
+    and uses the fastest method we've found for each type.
+
+    The _real_ reason this is important is that on referenced nodes,
+    some of obvious methods for setting weights take time O(N^2) in the length of the array.
+    For example, using mel: "setAttr node.weightList[0].weights[0:1] 1 2 0 1 2 1 1 1 2 2 2 ...".
+    These O(N^2) routines can easily take tens of minutes on a few 100k vertices.
+
+    Example inputs (node_name, attr_name) values:
+        - (zTet1, weightList[0].weights)
+        - (zAttachment2, weightList[1].weights)
+        - (zFiber1, endPoints)
+        - (zBoneWarp1, landmarkList[0].landmarks)
+    """
+
+    # There are 3 cases we need to distinguish between:
+    # 1) attribute is a kFooArray
+    # 2) attribute is deformer weightList[i].weights
+    # 3) attribute is a another multi-array (with UseArrayBuilder=true)
+    # Multi-arrays with UseArrayBuilder=False are a mistake and we are okay to fail.
+    # These are all of the array-like paintable things.
+
+    # Attribute query is a natural way to find out if something is a multi,
+    # but this syntax doesn't work: <<attributeQuery -node "zFiber1" -m "weightList[0].weights">>
+    # So we need to pull out the child-most part.
+    child_attr = attr_name.split('.')[-1]  # 'weightList[0].weights' --> 'weights'
+    is_multi = mc.attributeQuery(child_attr, node=node_name, multi=True)
+
+    if is_multi:
+        is_deformer = 'weightGeometryFilter' in mc.nodeType(node_name, inherited=True)
+        if is_deformer and child_attr == 'weights':
+            set_weights_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
+        else:
+            set_weights_by_ArrayDataBuilder(node_name, attr_name, new_weights)
+    else:
+        set_weights_by_setAttr_numericArray(node_name, attr_name, new_weights)
+
+
+def set_weights_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
+    """ 
+    Like ``set_weights``, but this only works for deformer weightList attributes.
+    This works on zTet.weightList[i].weights, or zAttachment, etc.
+    """
+    # To use MFnWeightGeometryFilter.setWeight is the fastest way we've found to
+    # set weights from Python. To call that function we need the DagPath
+    # and Components for the mesh we're setting the weights for.
+    # Unfortunately, there's no easy way to get that information.
+    # The deformerSetFn.getMembers can get be used to get all of the meshes and
+    # components that a deformer is deforming, but they don't come out in the
+    # same order as the deformer index. The solution used here is to search through
+    # this list, looking for the expected DagPath. This is O(numMeshes) instead of O(1) :(
+
+    # Get the index in the weightList
+    m = re.search(r'^weightList\[(\d+)\].weights$', attr_name)
+    if not m:
+        raise Exception(
+            'MFnWeightGeometryFilter only works on deformer weighlists, but {} does not appear to be a weights attribute'
+            .format(attr_name))
+    index = int(m.group(1))  # group(0) is the whole match. group(1) is the index
+
+    # Convert the Python list to an MFloatArray
+    weightList = OpenMaya.MFloatArray()
+    weightList.setLength(len(new_weights))
+    for i, w in enumerate(new_weights):
+        weightList[i] = w
+
+    # Which DagPath of the thing we're _supposed_ to be setting weights for
+    deformerObj = get_MObject(node_name)
+    deformerFn = OpenMayaAnim.MFnWeightGeometryFilter(deformerObj)
+    dagPath = OpenMaya.MDagPath()
+    deformerFn.getPathAtIndex(index, dagPath)
+
+    # Now find the components for that mesh.
+    # This assumes that each mesh is in the deformer only once.
+    # All this DagPath stuff is also assuming that the mesh is in the Dag.
+    deformerSetObj = deformerFn.deformerSet()
+    deformerSetFn = OpenMaya.MFnSet(deformerSetObj)
+    deformerSetSel = OpenMaya.MSelectionList()
+    deformerSetFn.getMembers(deformerSetSel, False)
+    deformerSetPath = OpenMaya.MDagPath()
+    deformerSetComp = OpenMaya.MObject()
+    for i in range(deformerSetSel.length()):
+        deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
+        if deformerSetPath == dagPath:
+            break
+    assert (deformerSetPath == dagPath)  # This shouldn't be possible.
+
+    deformerFn.setWeight(deformerSetPath, index, deformerSetComp, weightList)
+
+
+def set_weights_by_ArrayDataBuilder(node_name, attr_name, new_weights):
+    """ 
+    Like ``set_weights``, but this only works for multi/array attributes,
+    e.g. zTet.weightList[i].weights and zBoneWarp.landmarkList[i].landmarks.
+    Note that weightList.weights can also be set with ``set_weights_by_MFnWeightGeometryFilter``,
+    which is faster in benchmarks.
+    """
+    set_func_lookup = {
+        OpenMaya.MFnNumericData.kFloat: OpenMaya.MDataHandle.setFloat,
+        OpenMaya.MFnNumericData.kDouble: OpenMaya.MDataHandle.setDouble,
+        OpenMaya.MFnNumericData.kInt: OpenMaya.MDataHandle.setInt
+    }  # add other types as needed
+
+    weights_plug = get_MPlug(node_name, attr_name)
+    mfnattr = OpenMaya.MFnNumericAttribute(weights_plug.attribute())
+    set_value = set_func_lookup[mfnattr.unitType()]
+
+    dataHandle = weights_plug.asMDataHandle()
+    try:
+        arrayDataHandle = OpenMaya.MArrayDataHandle(dataHandle)
+        builder = arrayDataHandle.builder()
+
+        current_size = builder.elementCount()
+        builder.growArray(max(0, len(new_weights) - current_size))
+
+        for i in xrange(len(new_weights)):
+            dataHandle_i = builder.addElement(i)
+            set_value(dataHandle_i, new_weights[i])
+
+        arrayDataHandle.set(builder)
+        weights_plug.setMDataHandle(dataHandle)
+    finally:
+        weights_plug.destructHandle(dataHandle)
+
+
+def set_weights_by_setAttr_numericArray(node_name, attr_name, new_weights):
+    """ 
+    Like ``set_weights``, but this only works for attributes of type kFooArray (e.g. kFloatArray, etc). 
+    This works on zFiber.endPoints.
+    """
+    node_dot_attr = '{}.{}'.format(node_name, attr_name)
+    datatype = mc.getAttr(node_dot_attr, type=True)
+    if not datatype.endswith('Array'):
+        raise AttributeError('Unsupported: {} is type {}, not some sort of array'.format(
+            node_dot_attr, datatype))
+    mc.setAttr(node_dot_attr, new_weights, type=datatype)
+
+
+def get_MObject(node_name):
+    """ From a node name, get the MObject for that node. """
+    sel = OpenMaya.MSelectionList()
+    sel.add(node_name)
+    node_obj = OpenMaya.MObject()
+    sel.getDependNode(0, node_obj)
+    return node_obj
+
+
+def get_MPlug(node_name, attr_name):
+    """
+    Given a node name (e.g. "zBoneWarp1") and a plug name (e.g. "weightList[0].weights"), 
+    get on OpenMaya.MPlug for that plug (e.g for "zBoneWarp1.weightList[0].weights").
+    """
+    sel = OpenMaya.MSelectionList()
+    sel.add(node_name + '.' + attr_name)
+    plug = OpenMaya.MPlug()
+    sel.getPlug(0, plug)
+    return plug
