@@ -114,12 +114,11 @@ def remove_solver(solvers=None, askForConfirmation=False):
 
     # Convert any solver transform nodes to solver shape nodes.
     solvers = mm.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
+    solver_transforms = mm.eval('zQuery -t "zSolverTransform" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
-    for solver in solvers:
-        short_solver_name = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
-        message += short_solver_name + ', '
-    message += 'including all Ziva rigs in them. Proceed?'
+    message += ', '.join(solver_transforms)  # The transforms have nicer names.
+    message += ', including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
         response = mc.confirmDialog(title='Remove Ziva solver(s)',
                                     message=message,
