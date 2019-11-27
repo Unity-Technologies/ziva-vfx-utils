@@ -24,9 +24,9 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.builder.retrieve_from_scene()
 
     def tearDown(self):
-        super(ZivaSolverGenericTestCase, self).tearDown()
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
+        super(ZivaSolverGenericTestCase, self).tearDown()
 
     def check_retrieve_zsolver_looks_good(self, builder, name, attrs):
         """Args:
@@ -233,17 +233,9 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
 
 class ZivaSolverTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaSolverTestCase, self).setUp()
-
         self.results = mm.eval('ziva -s')
-
-    def tearDown(self):
-        super(ZivaSolverTestCase, self).tearDown()
 
     def test_rebuild_solver_shape_name(self):
         # tests the shape name when re-building a solver via zBuilder.

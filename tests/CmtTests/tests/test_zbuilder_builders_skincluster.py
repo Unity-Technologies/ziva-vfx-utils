@@ -5,10 +5,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaSkinClusterTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaSkinClusterTestCase, self).setUp()
 

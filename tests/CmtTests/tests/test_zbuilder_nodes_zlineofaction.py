@@ -11,10 +11,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaMultiCurveLoaTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaMultiCurveLoaTestCase, self).setUp()
         # setup a scene with 2 curves on 1 zLineOfAction

@@ -14,10 +14,6 @@ from zBuilder.builders.ziva import SolverDisabler
 
 
 class ZivaMirrorTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaMirrorTestCase, self).setUp()
         # Build a basic setup
@@ -33,9 +29,6 @@ class ZivaMirrorTestCase(VfxTestCase):
         # string replace
         self.z.string_replace('^r_', 'l_')
 
-    def tearDown(self):
-        super(ZivaMirrorTestCase, self).tearDown()
-
     def test_mirror_existing_scene(self):
         # # build it on live scene
         self.z.build()
@@ -45,10 +38,6 @@ class ZivaMirrorTestCase(VfxTestCase):
 
 
 class ZivaBuildTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaBuildTestCase, self).setUp()
 
@@ -61,9 +50,6 @@ class ZivaBuildTestCase(VfxTestCase):
         # use builder to retrieve from scene-----------------------------------
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-
-    def tearDown(self):
-        super(ZivaBuildTestCase, self).tearDown()
 
     def test_retrieve_selected(self):
         # This builds the Zivas anatomical arm demo with no pop up dialog.

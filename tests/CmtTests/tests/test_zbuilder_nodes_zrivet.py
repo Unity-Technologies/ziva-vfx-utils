@@ -13,10 +13,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaRivetTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaRivetTestCase, self).setUp()
 
@@ -32,9 +28,6 @@ class ZivaRivetTestCase(VfxTestCase):
         self.riv2 = mm.eval('zRivetToBone')
         mc.select('r_tricepsLong_muscle', crv)
         mm.eval('ziva -loa;')
-
-    def tearDown(self):
-        super(ZivaRivetTestCase, self).tearDown()
 
     def test_retrieve_rivet_scene(self):
         # use builder to retrieve from scene-----------------------------------

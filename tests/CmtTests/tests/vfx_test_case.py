@@ -3,6 +3,7 @@ import sys
 import maya.cmds as cmds
 from cmt.test import TestCase
 
+
 def isApprox(a, b, eps=1e-6):
     if hasattr(type(a), '__iter__'):
         if len(a) != len(b):
@@ -11,20 +12,22 @@ def isApprox(a, b, eps=1e-6):
     else:
         return abs(a - b) <= eps
 
+
 def get_mesh_vertex_positions(mesh):
     """ Given the name of a mesh, return a flat list of its world-space vertex positions."""
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
-    return cmds.xform(mesh+'.vtx[*]', q=True, ws=True, t=True)
+    return cmds.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
 
 
 def get_all_mesh_vertex_positions():
     """ Concatenation of all mesh vertex positions in the scene """
     pos = []
     meshes = cmds.ls(dag=True, type='mesh', noIntermediate=True)
-    meshes.sort() # So we get the same order between calls
+    meshes.sort()  # So we get the same order between calls
     for mesh in meshes:
         pos.extend(get_mesh_vertex_positions(mesh))
     return pos
+
 
 def attr_values_from_zbuilder_nodes(nodes):
     """ From a list of zBuilder nodes get all of the attributes and their values as a dict.
@@ -45,7 +48,7 @@ def attr_values_from_scene(plug_names):
     e.g Input: ['zTissue1.collisions', 'my_zTetNode.tetSize', ...]
         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
     """
-    return {plug_name:cmds.getAttr(plug_name) for plug_name in plug_names}
+    return {plug_name: cmds.getAttr(plug_name) for plug_name in plug_names}
 
 
 class VfxTestCase(TestCase):
@@ -54,14 +57,10 @@ class VfxTestCase(TestCase):
     pluginPath = None
 
     def setUp(self):
-        pass
+        super(VfxTestCase, self).setUp()
 
     def tearDown(self):
-        # We do not unload the plugin here on purpose.
-        # because Maya goes wrong when load/unload plugin repeatedly.
-        # We only clear the scene here.
-        cmds.file(f=True, new=True)
-
+        super(VfxTestCase, self).tearDown()
 
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
@@ -73,8 +72,9 @@ class VfxTestCase(TestCase):
     def assertApproxEqual(self, a, b, eps=1e-6):
         """Fail iff |a-b|>eps"""
         # all this negation is to make sure that NaN fails.
-        if not (a>=b-eps) or not (a<=b+eps):
-            raise AssertionError("{} and {} are not approximately equal, with tolerance {}".format(a,b,eps))
+        if not (a >= b - eps) or not (a <= b + eps):
+            raise AssertionError("{} and {} are not approximately equal, with tolerance {}".format(
+                a, b, eps))
 
     def assertAllApproxEqual(self, a, b, eps=1e-6):
         """Fail iff |a[i]-b[i]|>eps for all i"""

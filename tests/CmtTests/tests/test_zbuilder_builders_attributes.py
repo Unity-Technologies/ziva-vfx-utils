@@ -11,16 +11,6 @@ from vfx_test_case import VfxTestCase
 
 
 class AttributesBuilderTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
-    def setUp(self):
-        super(AttributesBuilderTestCase, self).setUp()
-
-    def tearDown(self):
-        super(AttributesBuilderTestCase, self).tearDown()
-
     def test_retrieve_build(self):
         grp = mc.group(em=True)
         mc.setAttr(grp + '.translateX', 20)

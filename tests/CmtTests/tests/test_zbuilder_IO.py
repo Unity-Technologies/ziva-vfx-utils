@@ -13,10 +13,6 @@ from vfx_test_case import VfxTestCase
 
 
 class IOTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(IOTestCase, self).setUp()
         # Build a basic setup
@@ -32,12 +28,11 @@ class IOTestCase(VfxTestCase):
         self.temp_files = []
 
     def tearDown(self):
-        super(IOTestCase, self).tearDown()
-
         # delete temp files
         for temp_file in self.temp_files:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
+        super(IOTestCase, self).tearDown()
 
     def test_builder_write(self):
         # find a temp file location

@@ -136,11 +136,7 @@ class BuilderMayaTestCase(VfxTestCase):
 class BuilderUtilsTestCaseArm(VfxTestCase):
     def setUp(self):
         super(BuilderUtilsTestCaseArm, self).setUp()
-
         test_utils.build_anatomical_arm_with_no_popup()
-
-    def tearDown(self):
-        super(BuilderUtilsTestCaseArm, self).tearDown()
 
     def test_copy_paste(self):
         mc.select(cl=True)

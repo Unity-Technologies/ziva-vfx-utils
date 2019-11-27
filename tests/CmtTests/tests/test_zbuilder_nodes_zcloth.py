@@ -11,10 +11,6 @@ from vfx_test_case import VfxTestCase
 
 
 class ZivaClothTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(ZivaClothTestCase, self).setUp()
 
@@ -25,9 +21,6 @@ class ZivaClothTestCase(VfxTestCase):
         mc.setAttr(b_cloth + '.translateX', -10)
         mc.select('l_arm')
         mm.eval('ziva -c')
-
-    def tearDown(self):
-        super(ZivaClothTestCase, self).tearDown()
 
     def test_mirror_cloth(self):
         # this is a test for a bug in VFXACT-120

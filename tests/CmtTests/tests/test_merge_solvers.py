@@ -59,13 +59,6 @@ def get_simulated_positions():
 
 
 class MergeSolversTestCase(vfx_test_case.VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
-    def setUp(self):
-        pass
-
     def test_merge_solvers_will_not_merge_gibberish_arguments(self):
         # Act & Verify
         with self.assertRaises(Exception):
