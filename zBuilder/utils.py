@@ -143,6 +143,8 @@ def remove_solver(solvers=None, askForConfirmation=False):
                     maya_mesh = mm.eval('zQuery -m ' + item)[0]
                     meshes_to_unlock.append(maya_mesh)
 
+    # If anything is referenced, we won't be able to delete it.
+    # So, don't start making any changes to the scene if we know it's going to fail.
     has_referenced = any(mc.referenceQuery(node, isNodeReferenced=True) for node in to_erase)
     if has_referenced:
         mm.eval('error -n "Cannot delete solvers with referenced nodes"')
