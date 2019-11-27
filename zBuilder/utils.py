@@ -138,12 +138,12 @@ def remove_solver(solvers=None, askForConfirmation=False):
                 solver_of_this_item = solver_of_this_item[0]
             if solver_of_this_item in solvers:
                 to_erase.append(item)
-            # unlock the transform attributes
-            if (node == 'zTissue') or (node == 'zCloth'):
-                maya_mesh = mm.eval('zQuery -m ' + item)[0]
-                attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-                for attr in attrs:
-                    mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
+                # unlock the transform attributes
+                if (node == 'zTissue') or (node == 'zCloth'):
+                    maya_mesh = mm.eval('zQuery -m ' + item)[0]
+                    attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
+                    for attr in attrs:
+                        mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
 
     mz.delete_rivet_from_solver(solvers)
     mm.eval('select -cl;')  # needed to avoid Maya error messages
