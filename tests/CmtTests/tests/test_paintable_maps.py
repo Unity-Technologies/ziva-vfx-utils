@@ -1,6 +1,6 @@
 import maya.cmds as mc
 import maya.mel as mm
-from utility.set_weights import set_weights
+from utility.paintable_maps import set_paintable_map
 import vfx_test_case
 
 
@@ -18,7 +18,7 @@ def get_weights(map_name, vert_count):
 
 
 class SetWeightsTestCase(vfx_test_case.VfxTestCase):
-    def test_set_weights_on_ziva_vfx_node(self):
+    def test_set_paintable_map_on_ziva_vfx_node(self):
         ## SETUP MAYA #############################################################################
 
         # Test everything all together in one test, for speed :)
@@ -26,7 +26,7 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         mc.polyCube(name='Tissue2')  # Many tissues, so we have a long array
         mc.polyCube(name='Tissue3')  # of weights on the embedder node.
         mc.polyCube(name='Tissue4')  # Letting us test that we handle those arrays well --
-        mc.polyCube(name='Tissue5')  # the code in set_weights_by_MFnWeight... is kinda scary.
+        mc.polyCube(name='Tissue5')  # the code in set_paintable_map_by_MFnWeight... is kinda scary.
         mc.polyPlane(name='Bone')
         mm.eval('ziva -s')  # makes zSolver1
         mc.setAttr('zSolver1.enable', False)  # Go faster. We don't need to do sims.
@@ -50,9 +50,9 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
 
         ## ACT & VERIFY ###########################################################################
 
-        self.check_set_weights(test_cases)
+        self.check_set_paintable_map(test_cases)
 
-    def test_set_weights_bonewarp(self):
+    def test_set_paintable_map_bonewarp(self):
         # We need to test zBoneWarp.landmarkList.landmarks because it's an array attribute,
         # but not a deformer weightList. It takes a different code path than deformer weighLists.
         warp_res = 4
@@ -63,12 +63,12 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         warp_weights = make_weights(mc.polyEvaluate('BoneWarpThing', vertex=True), 0.5)
 
         test_cases = [('zBoneWarp1', 'landmarkList[0].landmarks', warp_weights)]
-        self.check_set_weights(test_cases)
+        self.check_set_paintable_map(test_cases)
 
-    def check_set_weights(self, test_cases):
+    def check_set_paintable_map(self, test_cases):
         ## SETUP was done by caller.
         for node, attr, weights in test_cases:
             print('node, attr = {}, {}'.format(node, attr))  # so we can tell what failed
-            set_weights(node, attr, weights)  ## ACT ##############################################
-            observed_weights = get_weights(node + '.' + attr, len(weights))
+            set_paintable_map(node, attr, weights)
+            observed_weights = get_weights(node + '.' + attr, len(weights))  ## ACT ###############
             self.assertAllApproxEqual(weights, observed_weights)  ## VERIFY #######################

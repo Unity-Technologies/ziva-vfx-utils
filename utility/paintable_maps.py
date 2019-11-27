@@ -5,10 +5,10 @@ import maya.OpenMayaAnim as OpenMayaAnim
 import re
 
 
-def set_weights(node_name, attr_name, new_weights):
+def set_paintable_map(node_name, attr_name, new_weights):
     # type: (str, str, List[float]) -> None
     """
-    Set an array of weights on some node.
+    Set an array of paintable weights on some node.
     This will work for array plugs (e.g. Deformer.weightList[7].weights),
     and for typed attributes with array type (e.g. zFiber.endPoints).
 
@@ -48,16 +48,24 @@ def set_weights(node_name, attr_name, new_weights):
     if is_multi:
         is_deformer = 'weightGeometryFilter' in mc.nodeType(node_name, inherited=True)
         if is_deformer and child_attr == 'weights':
-            set_weights_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
+            set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         else:
-            set_weights_by_ArrayDataBuilder(node_name, attr_name, new_weights)
+            set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights)
     else:
-        set_weights_by_setAttr_numericArray(node_name, attr_name, new_weights)
+        set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
 
 
-def set_weights_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
+def get_MObject(node_name):
+    sel = OpenMaya.MSelectionList()
+    sel.add(node_name)
+    node_obj = OpenMaya.MObject()
+    sel.getDependNode(0, node_obj)
+    return node_obj
+
+
+def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
     """ 
-    Like ``set_weights``, but this only works for deformer weightList attributes.
+    Like ``set_paintable_map``, but this only works for deformer weightList attributes.
     This works on zTet.weightList[i].weights, or zAttachment, etc.
     """
     # To use MFnWeightGeometryFilter.setWeight is the fastest way we've found to
@@ -107,11 +115,11 @@ def set_weights_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
     deformerFn.setWeight(deformerSetPath, index, deformerSetComp, weightList)
 
 
-def set_weights_by_ArrayDataBuilder(node_name, attr_name, new_weights):
+def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
     """ 
-    Like ``set_weights``, but this only works for multi/array attributes,
+    Like ``set_paintable_map``, but this only works for multi/array attributes,
     e.g. zTet.weightList[i].weights and zBoneWarp.landmarkList[i].landmarks.
-    Note that weightList.weights can also be set with ``set_weights_by_MFnWeightGeometryFilter``,
+    Note that weightList.weights can also be set with ``set_paintable_map_by_MFnWeightGeometryFilter``,
     which is faster in benchmarks.
     """
     set_func_lookup = {
@@ -142,9 +150,9 @@ def set_weights_by_ArrayDataBuilder(node_name, attr_name, new_weights):
         weights_plug.destructHandle(dataHandle)
 
 
-def set_weights_by_setAttr_numericArray(node_name, attr_name, new_weights):
+def set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights):
     """ 
-    Like ``set_weights``, but this only works for attributes of type kFooArray (e.g. kFloatArray, etc). 
+    Like ``set_paintable_map``, but this only works for attributes of type kFooArray (e.g. kFloatArray, etc). 
     This works on zFiber.endPoints.
     """
     node_dot_attr = '{}.{}'.format(node_name, attr_name)
@@ -155,19 +163,12 @@ def set_weights_by_setAttr_numericArray(node_name, attr_name, new_weights):
     mc.setAttr(node_dot_attr, new_weights, type=datatype)
 
 
-def get_MObject(node_name):
-    """ From a node name, get the MObject for that node. """
-    sel = OpenMaya.MSelectionList()
-    sel.add(node_name)
-    node_obj = OpenMaya.MObject()
-    sel.getDependNode(0, node_obj)
-    return node_obj
-
-
 def get_MPlug(node_name, attr_name):
     """
-    Given a node name (e.g. "zBoneWarp1") and a plug name (e.g. "weightList[0].weights"), 
-    get on OpenMaya.MPlug for that plug (e.g for "zBoneWarp1.weightList[0].weights").
+    Given a node name (e.g. "zBoneWarp1") and 
+    a plug name (e.g. "weightList[0].weights"), 
+    get on OpenMaya.MPlug for that plug
+    (e.g for "zBoneWarp1.weightList[0].weights")
     """
     sel = OpenMaya.MSelectionList()
     sel.add(node_name + '.' + attr_name)
