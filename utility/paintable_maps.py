@@ -55,14 +55,6 @@ def set_paintable_map(node_name, attr_name, new_weights):
         set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
 
 
-def get_MObject(node_name):
-    sel = OpenMaya.MSelectionList()
-    sel.add(node_name)
-    node_obj = OpenMaya.MObject()
-    sel.getDependNode(0, node_obj)
-    return node_obj
-
-
 def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
     """ 
     Like ``set_paintable_map``, but this only works for deformer weightList attributes.
@@ -92,7 +84,7 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
         weightList[i] = w
 
     # Which DagPath of the thing we're _supposed_ to be setting weights for
-    deformerObj = get_MObject(node_name)
+    deformerObj = _get_MObject(node_name)
     deformerFn = OpenMayaAnim.MFnWeightGeometryFilter(deformerObj)
     dagPath = OpenMaya.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
@@ -128,7 +120,7 @@ def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
         OpenMaya.MFnNumericData.kInt: OpenMaya.MDataHandle.setInt
     }  # add other types as needed
 
-    weights_plug = get_MPlug(node_name, attr_name)
+    weights_plug = _get_MPlug(node_name, attr_name)
     mfnattr = OpenMaya.MFnNumericAttribute(weights_plug.attribute())
     set_value = set_func_lookup[mfnattr.unitType()]
 
@@ -163,7 +155,15 @@ def set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
     mc.setAttr(node_dot_attr, new_weights, type=datatype)
 
 
-def get_MPlug(node_name, attr_name):
+def _get_MObject(node_name):
+    sel = OpenMaya.MSelectionList()
+    sel.add(node_name)
+    node_obj = OpenMaya.MObject()
+    sel.getDependNode(0, node_obj)
+    return node_obj
+
+
+def _get_MPlug(node_name, attr_name):
     """
     Given a node name (e.g. "zBoneWarp1") and 
     a plug name (e.g. "weightList[0].weights"), 
