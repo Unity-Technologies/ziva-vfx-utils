@@ -129,6 +129,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
             return
 
     to_erase = []
+    meshes_to_unlock = []
     for node in mz.ZNODES:
         nodes_in_scene = mc.ls(type=node)
         for item in nodes_in_scene:
@@ -140,9 +141,17 @@ def remove_solver(solvers=None, askForConfirmation=False):
                 # unlock the transform attributes
                 if (node == 'zTissue') or (node == 'zCloth'):
                     maya_mesh = mm.eval('zQuery -m ' + item)[0]
-                    attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-                    for attr in attrs:
-                        mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
+                    meshes_to_unlock.append(maya_mesh)
+
+    has_referenced = any(mc.referenceQuery(node, isNodeReferenced=True) for node in to_erase)
+    if has_referenced:
+        mm.eval('error -n "Cannot delete solvers with referenced nodes"')
+        return
+
+    for maya_mesh in meshes_to_unlock:
+        for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']:
+            # TODO: this can fail on referenced geo
+            mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
 
     mz.delete_rivet_from_solver(solvers)
     mm.eval('select -cl;')  # needed to avoid Maya error messages
