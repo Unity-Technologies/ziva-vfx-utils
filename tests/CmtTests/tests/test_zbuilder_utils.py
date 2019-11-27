@@ -306,6 +306,18 @@ class BuilderUtilsTestCase(VfxTestCase):
 
         self.assertEqual(mc.ls(type='zSolver'), [])
 
+    def test_remove_referenced_solver(self):
+        mm.eval('ziva -s')
+        mc.file(rename='tempfile')
+        filepath = mc.file(force=True, save=True)
+        mc.file(force=True, new=True)
+        mc.file(filepath, r=True, namespace='ns')
+
+        with self.assertRaisesRegexp(Exception, 'reference'):
+            utils.remove_solver(solvers=['ns:zSolver1'])
+
+        self.assertEqual(mc.ls(type='zSolverTransform'), ['ns:zSolver1'])
+
     def test_remove_single_solver(self):
         mm.eval('ziva -s')
         mm.eval('ziva -s')

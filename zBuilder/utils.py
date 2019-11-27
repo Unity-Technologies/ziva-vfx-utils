@@ -114,12 +114,11 @@ def remove_solver(solvers=None, askForConfirmation=False):
 
     # Convert any solver transform nodes to solver shape nodes.
     solvers = mm.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
+    solver_transforms = mm.eval('zQuery -t "zSolverTransform" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
-    for solver in solvers:
-        short_solver_name = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
-        message += short_solver_name + ', '
-    message += 'including all Ziva rigs in them. Proceed?'
+    message += ', '.join(mc.ls(s)[0] for s in solver_transforms)  # The transforms have nicer names.
+    message += ', including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
         response = mc.confirmDialog(title='Remove Ziva solver(s)',
                                     message=message,
@@ -130,6 +129,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
             return
 
     to_erase = []
+    meshes_to_unlock = []
     for node in mz.ZNODES:
         nodes_in_scene = mc.ls(type=node)
         for item in nodes_in_scene:
@@ -138,12 +138,22 @@ def remove_solver(solvers=None, askForConfirmation=False):
                 solver_of_this_item = solver_of_this_item[0]
             if solver_of_this_item in solvers:
                 to_erase.append(item)
-            # unlock the transform attributes
-            if (node == 'zTissue') or (node == 'zCloth'):
-                maya_mesh = mm.eval('zQuery -m ' + item)[0]
-                attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-                for attr in attrs:
-                    mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
+                # unlock the transform attributes
+                if (node == 'zTissue') or (node == 'zCloth'):
+                    maya_mesh = mm.eval('zQuery -m ' + item)[0]
+                    meshes_to_unlock.append(maya_mesh)
+
+    # If anything is referenced, we won't be able to delete it.
+    # So, don't start making any changes to the scene if we know it's going to fail.
+    has_referenced = any(mc.referenceQuery(node, isNodeReferenced=True) for node in to_erase)
+    if has_referenced:
+        mm.eval('error -n "Cannot delete solvers with referenced nodes"')
+        return
+
+    for maya_mesh in meshes_to_unlock:
+        for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']:
+            # unlock can fail on referenced transforms, so 'catchQuiet' to ignore that
+            mm.eval('catchQuiet(`setAttr -lock 0 ' + maya_mesh + '.' + attr + '`)')
 
     mz.delete_rivet_from_solver(solvers)
     mm.eval('select -cl;')  # needed to avoid Maya error messages
