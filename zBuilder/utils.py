@@ -150,8 +150,8 @@ def remove_solver(solvers=None, askForConfirmation=False):
 
     for maya_mesh in meshes_to_unlock:
         for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']:
-            # TODO: this can fail on referenced geo
-            mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
+            # unlock can fail on referenced transforms, so 'catchQuiet' to ignore that
+            mm.eval('catchQuiet(`setAttr -lock 0 ' + maya_mesh + '.' + attr + '`)')
 
     mz.delete_rivet_from_solver(solvers)
     mm.eval('select -cl;')  # needed to avoid Maya error messages
