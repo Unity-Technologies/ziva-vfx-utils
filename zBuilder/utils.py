@@ -117,7 +117,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
     solver_transforms = mm.eval('zQuery -t "zSolverTransform" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
-    message += ', '.join(solver_transforms)  # The transforms have nicer names.
+    message += ', '.join(mc.ls(s)[0] for s in solver_transforms)  # The transforms have nicer names.
     message += ', including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
         response = mc.confirmDialog(title='Remove Ziva solver(s)',
