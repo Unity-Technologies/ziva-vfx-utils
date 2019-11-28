@@ -53,15 +53,6 @@ def attr_values_from_scene(plug_names):
 
 class VfxTestCase(TestCase):
     """Base class for unit test cases run for ZivaVFX plugin."""
-
-    pluginPath = None
-
-    def setUp(self):
-        super(VfxTestCase, self).setUp()
-
-    def tearDown(self):
-        super(VfxTestCase, self).tearDown()
-
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
