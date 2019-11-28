@@ -18,7 +18,6 @@ def delete_file(file_path):
 
 
 class TestLicenseRegister(VfxTestCase):
-
     @classmethod
     def setUpClass(cls):
         # setup module path
@@ -62,23 +61,21 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
   ABCDEF123456ABCDEF123456ABCDEF123456"
 '''.strip()
 
-
     @classmethod
     def tearDownClass(cls):
         delete_file(cls.new_license_file_in_module_path)
         delete_file(cls.new_license_file_path)
         delete_file(cls.exist_node_based_license_file_path)
         delete_file(cls.new_license_file_path)
-        
+
         if path.exists(cls.module_path) and path.isdir(cls.module_path):
             os.removedirs(cls.module_path)
 
-
     def tearDown(self):
-        super(TestLicenseRegister, self).tearDown()
         # delete these files as their content changes between test cases
         delete_file(self.floating_license_file_path)
         delete_file(self.new_license_file_in_module_path)
+        super(TestLicenseRegister, self).tearDown()
 
     # --------------------------------------------------------------------------------
 
@@ -89,7 +86,6 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
 
         with self.assertRaises(RuntimeError):
             register_node_based_license(self.module_path, self.module_path)
-
 
     def test_register_node_based_license(self):
         '''
@@ -115,7 +111,6 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
         with open(self.new_license_file_in_module_path, 'r') as lic_file:
             generated_content = lic_file.read()
             self.assertEqual(self.new_node_based_license_content1, generated_content)
-
 
     def test_overriding_existing_node_based_license(self):
         '''
@@ -145,7 +140,6 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
             generated_content = lic_file.read()
             self.assertEqual(self.new_node_based_license_content2, generated_content)
 
-
     def test_register_floating_license(self):
         '''
         Test registering a floating license, no existing license file
@@ -155,14 +149,13 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
 
         # Act
         register_floating_license(self.module_path, 'localhost', 'ANY', 5053)
-        
+
         # Verify
         self.assertTrue(path.exists(self.floating_license_file_path))
         self.assertTrue(path.isfile(self.floating_license_file_path))
         with open(self.floating_license_file_path, 'r') as lic_file:
             generated_content = lic_file.read()
             self.assertEqual(expected_floating_license_content, generated_content)
-
 
     def test_merge_floating_lic_with_existing_file(self):
         '''
@@ -171,11 +164,12 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
         # Setup
         create_file(self.floating_license_file_path, self.floating_lic_content)
         expected_floating_license_content = 'HOST localhost ANY 5053'
-        expected_merged_content = '{}\n{}'.format(expected_floating_license_content, self.floating_lic_content)
+        expected_merged_content = '{}\n{}'.format(expected_floating_license_content,
+                                                  self.floating_lic_content)
 
         # Act
         register_floating_license(self.module_path, 'localhost', 'ANY', 5053)
-        
+
         # Verify
         self.assertTrue(path.exists(self.floating_license_file_path))
         self.assertTrue(path.isfile(self.floating_license_file_path))

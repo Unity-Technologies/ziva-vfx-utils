@@ -6,13 +6,6 @@ import tests.utils as test_utils
 
 
 class ZivaBaseTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
-    def setUp(self):
-        pass
-
     def test_node_compares(self):
         """ Getting the generic scene and writing out a zBuilder file.  This will
         allow us to retrieve file and copmpare it against scene.

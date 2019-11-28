@@ -10,11 +10,8 @@ from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
 
 
 class ZivaBuilderTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
+        super(ZivaBuilderTestCase, self).setUp()
         test_utils.build_generic_scene()
 
     def test_builders_built_the_same_way_are_equal_until_modified(self):
