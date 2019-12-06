@@ -64,8 +64,8 @@ def get_ziva_node_names_from_builder(builder):
     return node_names
 
 
-def build_generic_scene(new_scene=True):
-    path = CURRENT_DIRECTORY_PATH + "/assets/generic.ma"
+def build_generic_scene(new_scene=True, scene_name='generic.ma'):
+    path = CURRENT_DIRECTORY_PATH + "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
     if new_scene:
         mc.file(new=True, force=True)
     # import with no namespace
