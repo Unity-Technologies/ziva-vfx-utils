@@ -319,11 +319,11 @@ class MyDockingUI(QtWidgets.QWidget):
             node (zBuilder object): zBuilder.nodes object
             map_ (map object): zBuilder.parameters.maps object
         """
-        actionPaint = QtWidgets.QAction(self)
-        actionPaint.setText('Paint')
-        actionPaint.setObjectName("actionPaint")
-        actionPaint.triggered.connect(partial(map_.open_paint_tool, node))
-        menu.addAction(actionPaint)
+        paint_action = QtWidgets.QAction(self)
+        paint_action.setText('Paint')
+        paint_action.setObjectName("actionPaint")
+        paint_action.triggered.connect(partial(map_.open_paint_tool, node))
+        menu.addAction(paint_action)
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
