@@ -149,6 +149,20 @@ class Map(Base):
     def copy_values_from(self, map_parameter):
         self.values = map_parameter.values
 
+    def paint_weights(self, node):
+        """Open paint tool for the map
+        Args:
+            node (zBuilder object): zBuilder.nodes object
+        """
+        # sourcing the mel command so we have access to it
+        mm.eval('source "artAttrCreateMenuItems"')
+
+        mc.select(self._mesh, r=True)
+        # get map name without node name
+        map_name = self.name.split(".")[-1]
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
+            node.type, node.long_name, map_name)
+        mm.eval(cmd)
 
 def invert_weights(weights):
     """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
