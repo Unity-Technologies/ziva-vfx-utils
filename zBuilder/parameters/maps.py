@@ -161,7 +161,7 @@ class Map(Base):
         # get map name without node name
         map_name = self.name.split(".")[-1]
         cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
-            node.type, node.long_name, map_name)
+            self.map_type, node.long_name, map_name)
         mm.eval(cmd)
 
 def invert_weights(weights):
