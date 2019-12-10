@@ -152,7 +152,8 @@ class Map(Base):
     def paint_weights(self, node):
         """Open paint tool for the map
         Args:
-            node (zBuilder object): zBuilder.nodes object
+            node (zBuilder object): zBuilder.nodes object of the current Map, supports:
+            zAttachment, zFiber, zMaterial, zTet
         """
         # sourcing the mel command so we have access to it
         mm.eval('source "artAttrCreateMenuItems"')
