@@ -192,21 +192,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionPaintSource = QtWidgets.QAction(self)
-        self.actionPaintSource.setText('Paint')
-        self.actionPaintSource.setObjectName("paintSource")
-        self.actionPaintSource.triggered.connect(partial(self.paint_weights, 0, 'weights'))
-
-        self.actionPaintTarget = QtWidgets.QAction(self)
-        self.actionPaintTarget.setText('Paint')
-        self.actionPaintTarget.setObjectName("paintTarget")
-        self.actionPaintTarget.triggered.connect(partial(self.paint_weights, 1, 'weights'))
-
-        self.actionPaintEndPoints = QtWidgets.QAction(self)
-        self.actionPaintEndPoints.setText('Paint')
-        self.actionPaintEndPoints.setObjectName("paintEndPoints")
-        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights, 0, 'endPoints'))
-
     def invert_weights(self, node, map_):
         map_.invert()
         map_.apply_weights()
@@ -274,26 +259,6 @@ class MyDockingUI(QtWidgets.QWidget):
         self.attrs_clipboard = {}
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
-    def paint_weights(self, association_idx, attribute):
-        """Paint weights menu command.
-
-        This is checking item selected in treeView to get zBuilder node.
-
-        Args:
-            association_idx (int): The index of mesh to use in node association
-            attribute (string): The name of the attribute to paint.
-        """
-        # sourcing the mel command so we have access to it
-        mm.eval('source "artAttrCreateMenuItems"')
-
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mesh = node.long_association[association_idx]
-        mc.select(mesh, r=True)
-        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
-            node.type, node.long_name, attribute)
-        mm.eval(cmd)
-
     def select_source_and_target(self):
         """Selects the source and target mesh of an attachment. This is a menu 
         command.
@@ -348,7 +313,17 @@ class MyDockingUI(QtWidgets.QWidget):
         return maps
 
     def add_map_actions_to_menu(self, menu, node, map_):
-        menu.addAction(self.actionPaintSource)
+        """Add map actions to the menu
+        Args:
+            menu (QMenu): menu to add option to
+            node (zBuilder object): zBuilder.nodes object
+            map_ (map object): zBuilder.parameters.maps object
+        """
+        actionPaint = QtWidgets.QAction(self)
+        actionPaint.setText('Paint')
+        actionPaint.setObjectName("actionPaint")
+        actionPaint.triggered.connect(partial(map_.paint_weights, node))
+        menu.addAction(actionPaint)
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
