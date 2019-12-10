@@ -322,7 +322,7 @@ class MyDockingUI(QtWidgets.QWidget):
         actionPaint = QtWidgets.QAction(self)
         actionPaint.setText('Paint')
         actionPaint.setObjectName("actionPaint")
-        actionPaint.triggered.connect(partial(map_.paint_weights, node))
+        actionPaint.triggered.connect(partial(map_.open_paint_tool, node))
         menu.addAction(actionPaint)
 
         invert_action = QtWidgets.QAction(self)
