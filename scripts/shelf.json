@@ -88,6 +88,12 @@
                 "commandType": "mel",
                 "command": "zRivetToBone;"
             },
+            "addCache": {
+                "help": "Add zCache",
+                "image": "zCache.png",
+                "commandType": "mel",
+                "command": "ziva -acn;"
+            },
             "shelfSep_3": {
                 "separator": true,
                 "width": 25
