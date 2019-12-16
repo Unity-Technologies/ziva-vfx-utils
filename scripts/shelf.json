@@ -100,13 +100,13 @@
             },
             "removeBody": {
                 "help": "Remove zTissue/zBone/zCloth from selected mesh",
-                "image": "remove_body_1.png",
+                "image": "remove_body.png",
                 "commandType": "mel",
                 "command": "ziva -rm;"
             },
             "clearCache": {
                 "help": "Clear zCache",
-                "image": "clear_zCache_1.png",
+                "image": "clear_zCache.png",
                 "commandType": "mel",
                 "command": "zCache -c;"
             },
