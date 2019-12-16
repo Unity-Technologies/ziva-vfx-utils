@@ -41,8 +41,7 @@ def _shelf_dict():
     fpath = os.path.join(os.path.dirname(__file__), "shelf.json")
     try:
         shelf_dict = load_json_file(fpath)
-    except Exception as e:
-        print e
+    except:
         raise Exception('Could not read standard shelf "%s"' % fpath)
 
     return shelf_dict
