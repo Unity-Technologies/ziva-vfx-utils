@@ -65,14 +65,6 @@ def _add_buttons(parent, desc):
             _setup_button(but, ctl)
 
 
-def _update_buttons(desc):
-    print 'Creating {0} shelf'.format(_SHELFNAME_)
-
-    for ctl, but in desc['shelf']['buttons'].iteritems():
-        if mc.control(ctl, q=True, exists=True):
-            _setup_button(but, ctl)
-
-
 def build_shelf():
     """Build the Ziva shelf.
     """
