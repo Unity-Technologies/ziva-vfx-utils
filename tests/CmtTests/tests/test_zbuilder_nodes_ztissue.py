@@ -1,9 +1,9 @@
 import os
-import copy
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
+import maya.cmds as mc
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
 
@@ -67,3 +67,56 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         attrs_after = attr_values_from_scene(plug_names)
         self.assertEqual(attrs_before, attrs_after)
+
+    def test_remove(self):
+        ## SETUP
+        tissue_nodes = self.builder.get_scene_items(type_filter="zTissue")
+        # clear selection
+        mc.select(cl=True)
+        for tissue in tissue_nodes:
+            mc.select(tissue.long_association, add=True)
+
+        ## ACT
+        mc.ziva(rm=True)
+
+        ## VERIFY
+        mc.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
+        self.assertEqual(tissue_nodes, [])
+
+    def test_builder_has_same_tissue_nodes_after_writing_to_disk(self):
+        self.builder.write(self.temp_file_path)
+        self.assertTrue(os.path.exists(self.temp_file_path))
+
+        builder = zva.Ziva()
+        builder.retrieve_from_file(self.temp_file_path)
+        self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_build(self):
+        ## SETUP
+        mz.clean_scene()
+
+        ## ACT
+        self.builder.build()
+
+        ## VERIFY
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_build_from_file(self):
+        ## SETUP
+        self.builder.write(self.temp_file_path)
+        mz.clean_scene()
+
+        ## ACT
+        builder = zva.Ziva()
+        builder.retrieve_from_file(self.temp_file_path)
+        builder.build()
+
+        ## VERIFY
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_ztissue_looks_good(builder, {})
