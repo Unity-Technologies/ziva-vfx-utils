@@ -35,14 +35,12 @@ def _shelf_dict():
 
 def _setup_button(desc, ctl):
     # set the icon
-    if 'image' in desc:
-        mc.shelfButton(ctl, edit=True, image=desc['image'])
+    mc.shelfButton(ctl, edit=True, image=desc['image'])
 
     # set the command
-    if 'command' in desc:
-        command_type = desc.get('commandType', 'python')
-        mc.shelfButton(ctl, edit=True,
-                       command=desc['command'], sourceType=command_type)
+    command_type = desc.get('commandType', 'python')
+    mc.shelfButton(ctl, edit=True,
+                   command=desc['command'], sourceType=command_type)
 
 
 def _add_buttons(parent, desc):
