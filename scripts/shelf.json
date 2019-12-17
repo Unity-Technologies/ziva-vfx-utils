@@ -5,8 +5,8 @@
             "openScenePanel": {
                 "help": "Open Scene Panel",
                 "image": "scene_panel.png",
-                "command": "from zBuilder.ui import zUI;zUI.run();",
-                "commandType": "python"
+                "commandType": "python",
+                "command": "from zBuilder.ui import zUI;zUI.run();"
             },
             "shelfSep_1": {
                 "separator": true,
@@ -15,8 +15,8 @@
             "createSolver": {
                 "help": "Create zSolver",
                 "image": "zSolver.png",
-                "command": "ziva -s;",
-                "commandType": "mel"
+                "commandType": "mel",
+                "command": "ziva -s;"
             },
             "createTissue": {
                 "help": "Create zTissue",
