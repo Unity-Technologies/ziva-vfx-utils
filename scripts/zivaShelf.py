@@ -42,7 +42,7 @@ def _shelf_dict():
     try:
         shelf_dict = load_json_file(fpath)
     except:
-        raise Exception('Could not read standard shelf "%s"' % fpath)
+        raise Exception('Could not read standard shelf "{0}"'.format(fpath))
 
     return shelf_dict
 
@@ -100,7 +100,7 @@ def build_shelf():
         shelves.remove(_SHELFNAME_)
 
     if _SHELFNAME_ not in shelves:
-        shelf = mel.eval('addNewShelfTab("%s")' % _SHELFNAME_)
+        shelf = mel.eval('addNewShelfTab({0})'.format(_SHELFNAME_))
         lyt = mc.layout(shelf, q=True, ca=True)
         if lyt:
             for item in lyt:
