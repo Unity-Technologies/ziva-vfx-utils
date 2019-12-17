@@ -6,6 +6,7 @@ import json
 from collections import OrderedDict
 
 _SHELFNAME_ = "Ziva"
+_JSONFILE_ = "shelf.json"
 
 
 def _shelf_root():
@@ -22,7 +23,7 @@ def _shelf_dict():
     - Exception: If the standard shelf can not be loaded.
     """
 
-    fpath = os.path.join(os.path.dirname(__file__), "shelf.json")
+    fpath = os.path.join(os.path.dirname(__file__), _JSONFILE_)
     try:
         with open(fpath) as fh:
             shelf_dict = json.load(fh, object_pairs_hook=OrderedDict)
