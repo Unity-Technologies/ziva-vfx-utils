@@ -1,5 +1,4 @@
 import os
-import copy
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
