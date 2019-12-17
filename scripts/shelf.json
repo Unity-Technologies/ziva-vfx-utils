@@ -59,7 +59,7 @@
                 "command": "ziva -f;"
             },
             "addSubtissue": {
-                "help": "Add Subtissue: select parent and then child tissue",
+                "help": "Add Subtissue: select parent and then child tissue mesh",
                 "image": "subtissue.png",
                 "commandType": "mel",
                 "command": "ziva -ast;"
