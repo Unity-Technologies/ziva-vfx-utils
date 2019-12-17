@@ -8,22 +8,6 @@ from collections import OrderedDict
 _SHELFNAME_ = "Ziva"
 
 
-def load_json_file(file_path):
-    """Load a JSON file from disk.
-
-    Args:
-    - file_path (FilePath): The fully qualified file path.
-
-    Returns:
-    - dict: The JSON data
-    """
-
-    fh = open(file_path, mode='r')
-    data = json.load(fh, object_pairs_hook=OrderedDict)
-    fh.close()
-    return data
-
-
 def _shelf_root():
     return mel.eval('global string $gShelfTopLevel;$tmp = $gShelfTopLevel;')
 
@@ -40,7 +24,8 @@ def _shelf_dict():
 
     fpath = os.path.join(os.path.dirname(__file__), "shelf.json")
     try:
-        shelf_dict = load_json_file(fpath)
+        with open(fpath) as fh:
+            shelf_dict = json.load(fh, object_pairs_hook=OrderedDict)
     except:
         raise Exception('Could not read standard shelf "{0}"'.format(fpath))
 
@@ -99,14 +84,9 @@ def build_shelf():
         mc.deleteUI(root + '|' + _SHELFNAME_, layout=True)
         shelves.remove(_SHELFNAME_)
 
-    if _SHELFNAME_ not in shelves:
-        shelf = mel.eval('addNewShelfTab({0})'.format(_SHELFNAME_))
-        lyt = mc.layout(shelf, q=True, ca=True)
-        if lyt:
-            for item in lyt:
-                mc.deleteUI(item)
-        _add_buttons(shelf, desc)
-    else:
-        p = mc.setParent(q=True)
-        _update_buttons(desc)
-        mc.setParent(p)
+    shelf = mel.eval('addNewShelfTab("{0}")'.format(_SHELFNAME_))
+    lyt = mc.layout(shelf, q=True, ca=True)
+    if lyt:
+        for item in lyt:
+            mc.deleteUI(item)
+    _add_buttons(shelf, desc)
