@@ -1,6 +1,7 @@
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
+import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 import maya.OpenMaya as om
 import maya.cmds as mc
@@ -32,7 +33,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
         """Args:
             builder (builders.ziva.Ziva()): builder object
-            attrs (dict): A dict of expected attribute/value pairs.
+            expected_plugs (dict): A dict of expected attribute/value pairs.
                           {'zTissue1.collisions':True, ...}.
                           If None/empty/False, then attributes are taken from zBuilder
                           and values are taken from the scene.
@@ -120,3 +121,68 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_rename(self):
+        ## SETUP
+        mc.select("r_tissue_1")
+        mc.ziva(t=True)
+
+        ## ACT
+        mz.rename_ziva_nodes()
+
+        ## VERIFY
+        self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
+
+    def test_string_replace(self):
+        ## ACT
+        self.builder.string_replace("^r_", "l_")
+
+        ## VERIFY
+        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
+        self.assertEqual(r_tissue, [])
+
+    def test_cut_paste(self):
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.rig_cut()
+
+        ## VERIFY
+        self.assertEqual(mc.ls("l_tissue_1_zTissue"), [])
+
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.rig_paste()
+
+        ## VERIFY
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_copy_paste(self):
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.rig_copy()
+
+        ## VERIFY
+        # check that zTissue was not removed
+        self.assertEqual(len(mc.ls("l_tissue_1_zTissue")), 1)
+
+        ## SETUP
+        mc.ziva(rm=True)
+
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.rig_paste()
+
+        ## VERIFY
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_copy_paste_with_name_substitution(self):
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+
+        ## VERIFY
+        self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
