@@ -33,7 +33,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
         """Args:
             builder (builders.ziva.Ziva()): builder object
-            attrs (dict): A dict of expected attribute/value pairs.
+            expected_plugs (dict): A dict of expected attribute/value pairs.
                           {'zTissue1.collisions':True, ...}.
                           If None/empty/False, then attributes are taken from zBuilder
                           and values are taken from the scene.
@@ -138,7 +138,8 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.builder.string_replace("^r_", "l_")
 
         ## VERIFY
-        self.assertEqual(mc.ls("r_tissue_2_zTissue"), [])
+        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
+        self.assertEqual(r_tissue, [])
 
     def test_cut_paste(self):
         ## ACT
@@ -147,9 +148,6 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         ## VERIFY
         self.assertEqual(mc.ls("l_tissue_1_zTissue"), [])
-
-        ## SETUP
-        mz.clean_scene()
 
         ## ACT
         mc.select("l_tissue_1")
@@ -170,7 +168,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(len(mc.ls("l_tissue_1_zTissue")), 1)
 
         ## SETUP
-        mz.clean_scene()
+        mc.ziva(rm=True)
 
         ## ACT
         mc.select("l_tissue_1")
