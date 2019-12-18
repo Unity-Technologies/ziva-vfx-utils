@@ -180,3 +180,11 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_copy_paste_with_name_substitution(self):
+        ## ACT
+        mc.select("l_tissue_1")
+        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+
+        ## VERIFY
+        self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
