@@ -34,11 +34,11 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         """Args:
             builder (builders.ziva.Ziva()): builder object
             expected_plugs (dict): A dict of expected attribute/value pairs.
-                          {'zTissue1.collisions':True, ...}.
-                          If None/empty/False, then attributes are taken from zBuilder
-                          and values are taken from the scene.
-                          Test fails if zBuilder is missing any of the keys
-                          or has any keys with different values.
+                                   {'zTissue1.collisions':True, ...}.
+                                   If None/empty/False, then attributes are taken from zBuilder
+                                   and values are taken from the scene.
+                                   Test fails if zBuilder is missing any of the keys
+                                   or has any keys with different values.
         """
         tissue_nodes = builder.get_scene_items(type_filter="zTissue")
 
