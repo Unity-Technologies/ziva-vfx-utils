@@ -81,3 +81,6 @@ menuItem -label "Online Resources" -ec true -ecr true -c "launch -webPage \"http
 // source other menu files
 source "zivaToolsMenu";
 source "zivaTransferMenu";
+
+// load the shelf
+python("import zivaShelf;zivaShelf.build_shelf();");
