@@ -127,6 +127,10 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         mc.select("r_tissue_1")
         mc.ziva(t=True)
 
+        ## VERIFY
+        # check if an item exists before renaming
+        self.assertEqual(mc.ls("r_tissue_1_zTissue"), [])
+
         ## ACT
         mz.rename_ziva_nodes()
 
@@ -134,6 +138,11 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
 
     def test_string_replace(self):
+        ## VERIFY
+        # check if an item exists before string_replace
+        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
+        self.assertGreaterEqual(len(r_tissue), 1)
+
         ## ACT
         self.builder.string_replace("^r_", "l_")
 
@@ -160,6 +169,8 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def test_copy_paste(self):
         ## ACT
+        # check if zTissue exists
+        self.assertEqual(len(mc.ls("l_tissue_1_zTissue")), 1)
         mc.select("l_tissue_1")
         utils.rig_copy()
 
@@ -180,6 +191,10 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
+        ## VERIFY
+        # check if zTissue does not exist before making it
+        self.assertEqual(mc.ls("r_tissue_1_zTissue"), [])
+
         ## ACT
         mc.select("l_tissue_1")
         utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
