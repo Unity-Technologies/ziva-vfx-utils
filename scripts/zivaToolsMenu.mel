@@ -8,8 +8,6 @@ setParent -menu zivaToolMenu;
 menuItem -label "Interactive Playback" -ec true -ecr true -c "play -record" -ann "Starts interactive playback mode. In this mode, you can manipulate the bones using standard Maya tools (move, rotate, etc.), and see an interactive response.";
 menuItem -divider true;
 menuItem -label "Toggle Enabled Bodies" -ec true -ecr true -c "ZivaToggleEnabled" -ann "Toggles the active state of the selected Ziva objects.";
-menuItem -divider true;
-menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"from zBuilder import utils as zutils;import maya.cmds as mc;zutils.merge_solvers(mc.ls(sl=True));\")" -ann "Merges selected solvers into one.";
 
 menuItem -label "Help" -divider true;
 menuItem -label "Ziva Command Help" -ec true -ecr true -c "ziva -h" -ann "Print Ziva command help to the Maya script editor.";
