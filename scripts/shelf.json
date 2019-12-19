@@ -78,7 +78,7 @@
             },
             "addFiberCurve": {
                 "help": "Add Fiber Curve: select zFiber",
-                "image": "ui_curve_body.png",
+                "image": "curve.png",
                 "commandType": "mel",
                 "command": "zLineOfActionUtil;"
             },
