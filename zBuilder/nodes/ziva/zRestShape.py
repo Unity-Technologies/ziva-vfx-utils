@@ -44,7 +44,6 @@ class RestShapeNode(Ziva):
             # there is an existing zRestShape on it.
 
             existing_restshape = mm.eval('zQuery -type zRestShape {}'.format(mesh))
-            print 'EXISTING RESTSHAPES ', existing_restshape
 
             if not existing_restshape:
                 # there is not a zRestShape so we need to create one
