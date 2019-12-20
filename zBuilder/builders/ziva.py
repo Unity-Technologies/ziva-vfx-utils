@@ -165,7 +165,6 @@ class Ziva(Builder):
                 grp = DGNode()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
-                grp.depends_on = item.mobject
                 parent_node.add_child(grp)
                 grp.parent = parent_node
 
