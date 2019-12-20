@@ -1,3 +1,4 @@
+icons     .
 scripts   .
 demos     .
 zBuilder  scripts
