@@ -16,7 +16,7 @@ menuItem -label "Select" -ec true -ecr true -c "ziva -sel" -ann "Selects (via Ma
 menuItem -ob yes -ann "options" -c "ziva_selectSolver(0)";
 menuItem -label "Set Default" -ec true -ecr true -c "ziva -def" -ann "Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.";
 menuItem -ob yes -ann "options" -c "ziva_selectSolver(1)";
-menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"from zBuilder import utils as zutils;import maya.cmds as mc;zutils.merge_solvers(mc.ls(sl=True));\")" -ann "Merges selected solvers into one.";
+menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"from zBuilder import utils;from maya import cmds;utils.merge_solvers(cmds.ls(sl=True));\")" -ann "Merges selected solvers into one.";
 menuItem -label "Launch Scene Panel" -ec true -ecr true -c "python(\"from zBuilder.ui import zUI;zUI.run()\")" -ann "Launches a Scene Panel for inspecting the solver components.";
 
 menuItem -label "Add Simulation Component" -divider true;
