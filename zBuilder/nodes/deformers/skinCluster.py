@@ -43,9 +43,6 @@ class SkinCluster(DGNode):
         if not mc.objExists(name):
             mc.select(self.influences, self.association, r=True)
             skin_cluster = mc.skinCluster(tsb=True, n=name)
-            self.mobject = skin_cluster[0]
-        else:
-            self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
         apply_weights(self.name, self.association, self.influences, self.weights)

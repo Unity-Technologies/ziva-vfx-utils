@@ -78,7 +78,6 @@ class FieldAdaptorNode(Ziva):
             # then hook it up.
             results_ = mc.createNode('zFieldAdaptor', name=name)
             clt = mc.ls(results_, type='zFieldAdaptor')[0]
-            self.mobject = clt
             mc.rename(clt, name)
 
         # check if field exists and if it does hook it up

@@ -42,9 +42,6 @@ class BlendShape(Deformer):
             mc.select(self.association, add=True)
 
             results = mc.blendShape(name=self.name)
-            self.mobject = results[0]
-        else:
-            self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)

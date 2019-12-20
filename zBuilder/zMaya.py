@@ -606,8 +606,7 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise Exception(
-                'Nothing selected or passed, please select something and try again.')
+            raise Exception('Nothing selected or passed, please select something and try again.')
     return selection
 
 
@@ -769,7 +768,6 @@ def cull_creation_nodes(scene_items, permissive=True):
             existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
                 out = mc.rename(existing, name)
-                scene_item.mobject = out
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)

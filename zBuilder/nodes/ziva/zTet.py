@@ -15,6 +15,7 @@ class TetNode(Ziva):
 
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
+
     def __init__(self, parent=None, builder=None):
         super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
@@ -94,7 +95,6 @@ class TetNode(Ziva):
                         format(mesh))
             else:
                 new_name = mc.rename(name, self.name)
-                self.mobject = new_name
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)
