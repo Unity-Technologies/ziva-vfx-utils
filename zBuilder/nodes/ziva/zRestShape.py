@@ -32,8 +32,10 @@ class RestShapeNode(Ziva):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
+        # this is the mesh with zTissue that will have the zRestShape node
         mesh = self.association[0]
-        # for this we are using short name of targets
+
+        # get a list of the short names of all the targets
         targets = [x.split('|')[-1] for x in self.targets]
 
         if mc.objExists(mesh):
