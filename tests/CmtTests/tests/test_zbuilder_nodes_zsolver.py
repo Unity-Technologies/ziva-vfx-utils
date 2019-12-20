@@ -46,7 +46,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         self.assertEqual(solver.name, name)
         self.assertEqual(solver.type, "zSolver")
-        self.assertIsInstance(solver.mobject, om.MObject)
 
         for i, attr in enumerate(solver_attrs):
             if attrs:
@@ -77,7 +76,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         self.assertEqual(solver_transform.name, name)
         self.assertEqual(solver_transform.type, "zSolverTransform")
-        self.assertIsInstance(solver_transform.mobject, om.MObject)
 
         for i, attr in enumerate(solver_transform_attrs):
             if attrs:
