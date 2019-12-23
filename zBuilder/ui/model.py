@@ -1,5 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
+import zBuilder.zMaya as mz
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -9,6 +10,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     nodeRole = QtCore.Qt.UserRole + 1
     # long name of scene_item object in the scene
     longNameRole = QtCore.Qt.UserRole + 2
+    # is node enabled
+    envRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -69,6 +72,31 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.longNameRole:
             return node.long_name
 
+        if role == SceneGraphModel.envRole:
+            env = True
+            node = index.internalPointer()
+            # If node is a mesh, then take envelope status from it's child
+            if hasattr(node, 'depends_on'):
+                mobject = node.depends_on
+                # Get associated node name with a mesh
+                # e.g. for the tissue mesh find zTissue node name
+                name = mz.get_name_from_m_object(mobject)
+                # search through the children for the expected node.
+                for child in node.children:
+                    if child.name == name:
+                        node = child
+                        break
+
+            if hasattr(node, 'attrs'):
+                attrs = node.attrs
+                if "envelope" in attrs:
+                    if not attrs["envelope"]["value"]:
+                        env = False
+                elif "enable" in attrs:
+                    if not attrs["enable"]["value"]:
+                        env = False
+            return env
+
     def parent(self, index):
 
         node = self.getNode(index)
@@ -97,3 +125,23 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return node
 
         return self.root_node
+
+
+class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super(TreeItemDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        proxy_model = index.model()
+        index_model = proxy_model.mapToSource(index)
+
+        if index_model.isValid():
+            model = index_model.model()
+            env = model.data(index_model, model.envRole)
+            if not env:
+                if option.state & QtWidgets.QStyle.State_Selected:
+                    option.state &= ~QtWidgets.QStyle.State_Selected
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
+                else:
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
+        QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)
