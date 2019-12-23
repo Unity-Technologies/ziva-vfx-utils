@@ -14,7 +14,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
     def setUpClass(cls):
         cls.temp_file_path = test_utils.get_tmp_file_location()
         cls.bone_names = [
-            "bone_1_zBone", "bone_2_zBone"
+            "c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"
         ]
         cls.bone_attrs = ["contactSliding", "contactStiffnessExp", "collisions"]
 
@@ -131,7 +131,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
         self.assertEqual(mc.ls("r_bone_1_zBone"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        mz.rename_ziva_nodes([])
 
         ## VERIFY
         self.assertEqual(len(mc.ls("r_bone_1_zBone")), 1)
@@ -192,7 +192,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
         # check if zBone does not exist before making it
-        self.assertEqual(mc.ls("l_bone_1_zBone"), [])
+        self.assertEqual(mc.ls("r_bone_1_zBone"), [])
 
         ## ACT
         mc.select("l_bone_1")
