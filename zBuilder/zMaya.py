@@ -433,12 +433,13 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     * zTissue: <meshName>_zTissue
     * zBone: <meshName>_zBone
     * zCloth: <meshName>_zCloth
+    * zRestShape: <meshName>_zRestShape
     * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     """
     sel = mc.ls(sl=True)
     solver = mm.eval('zQuery -t "zSolver"')
 
-    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth']
+    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
     for zNode in zNodes:
         items = mm.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
