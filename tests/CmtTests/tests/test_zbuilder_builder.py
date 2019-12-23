@@ -65,7 +65,7 @@ class ZivaBuilderTestCase(VfxTestCase):
 
     def test_retrieving_multiple_times_with_new_attributes_gets_the_new_attributes(self):
         # Setup
-        material_plug = mc.ls(type='zMaterial')[0] + '.youngsModulus'
+        material_plug = mc.ls(type='zMaterial')[0] + '.restScale'
         mc.setAttr(material_plug, 111)
         builder = retrieve_builder_from_scene()
         old_names = [item.name for item in builder.get_scene_items()]
