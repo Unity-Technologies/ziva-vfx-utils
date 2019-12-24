@@ -185,9 +185,6 @@ class DGNode(Base):
         """
         name = self.long_name
 
-        if self.mobject:
-            name = mz.get_name_from_m_object(self.mobject, long_name=True)
-
         if not long_name:
             name = name.split('|')[-1]
 
