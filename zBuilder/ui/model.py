@@ -87,6 +87,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                         node = child
                         break
 
+            # Maya nodes have either of two attributes showing if node is enabled
+            # need to check both of them
             attrs = node.attrs
             if "envelope" in attrs:
                 enable = attrs["envelope"]["value"]
