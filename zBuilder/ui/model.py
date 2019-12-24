@@ -11,7 +11,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     # long name of scene_item object in the scene
     longNameRole = QtCore.Qt.UserRole + 2
     # is node enabled
-    envRole = QtCore.Qt.UserRole + 3
+    envelopeRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -72,8 +72,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.longNameRole:
             return node.long_name
 
-        if role == SceneGraphModel.envRole:
-            env = True
+        if role == SceneGraphModel.envelopeRole:
+            envelope = True
             node = index.internalPointer()
             # If node is a mesh, then take envelope status from it's child
             if hasattr(node, 'depends_on'):
@@ -87,15 +87,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                         node = child
                         break
 
-            if hasattr(node, 'attrs'):
-                attrs = node.attrs
-                if "envelope" in attrs:
-                    if not attrs["envelope"]["value"]:
-                        env = False
-                elif "enable" in attrs:
-                    if not attrs["enable"]["value"]:
-                        env = False
-            return env
+            attrs = node.attrs
+            if "envelope" in attrs:
+                envelope = attrs["envelope"]["value"]
+            elif "enable" in attrs:
+                envelope = attrs["enable"]["value"]
+
+            return envelope
 
     def parent(self, index):
 
@@ -137,8 +135,8 @@ class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
 
         if index_model.isValid():
             model = index_model.model()
-            env = model.data(index_model, model.envRole)
-            if not env:
+            envelope = model.data(index_model, model.envelopeRole)
+            if not envelope:
                 if option.state & QtWidgets.QStyle.State_Selected:
                     option.state &= ~QtWidgets.QStyle.State_Selected
                     option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
