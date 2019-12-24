@@ -61,6 +61,18 @@ class RestShapeNode(Ziva):
                 # Update name of tissue.  If a 'string_replace' was applied to scene_items
                 # this could get out of sync so lets double check it.
                 self.tissue_name = get_rest_shape_tissue(self.name)
+            else:
+                # The rest shape node exists on mesh so now lets update it.
+                # First lets remove existing targets
+                for target in self.targets:
+                    mm.eval('zRestShape -r {} {};'.format(self.association[0], target))
+
+                # now lets add back what is in self
+                for target in self.targets:
+                    mm.eval('zRestShape -a {} {};'.format(self.association[0], target))
+
+                # update name of node to that which is on mesh.
+                self.name = existing_restshape[0]
 
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')
