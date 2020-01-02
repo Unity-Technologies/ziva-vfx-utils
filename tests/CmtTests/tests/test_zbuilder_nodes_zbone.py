@@ -45,7 +45,6 @@ class ZivaBoneGenericTestCase(VfxTestCase):
 
         for node in bone_nodes:
             self.assertEqual(node.type, "zBone")
-            self.assertIsInstance(node.mobject, om.MObject)
 
         zbuilder_plugs = attr_values_from_zbuilder_nodes(bone_nodes)
         expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
