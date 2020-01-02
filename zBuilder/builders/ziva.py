@@ -98,7 +98,7 @@ class Ziva(Builder):
             grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-
+            grp.depends_on = item
             self.bodies[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
@@ -164,6 +164,7 @@ class Ziva(Builder):
                 grp = DGNode()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
+                grp.depends_on = item
                 parent_node.add_child(grp)
                 grp.parent = parent_node
 

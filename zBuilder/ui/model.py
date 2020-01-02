@@ -75,17 +75,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.enableRole:
             enable = True
             node = index.internalPointer()
-            # If node is a mesh, then take enable status from it's child
+
+            # If node is a mesh/curve, then take enable status from it's child
             if hasattr(node, 'depends_on'):
-                mobject = node.depends_on
-                # Get associated node name with a mesh
-                # e.g. for the tissue mesh find zTissue node name
-                name = mz.get_name_from_m_object(mobject)
-                # search through the children for the expected node.
-                for child in node.children:
-                    if child.name == name:
-                        node = child
-                        break
+                node = node.depends_on
 
             # Maya nodes have either of two attributes showing if node is enabled
             # need to check both of them
