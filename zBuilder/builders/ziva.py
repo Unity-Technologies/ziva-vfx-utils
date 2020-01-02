@@ -146,7 +146,6 @@ class Ziva(Builder):
                 grp = DGNode()
                 grp.name = target
                 grp.type = 'ui_target_body'
-                grp.mobject = target
                 grp.parent = item
                 item.add_child(grp)
 
