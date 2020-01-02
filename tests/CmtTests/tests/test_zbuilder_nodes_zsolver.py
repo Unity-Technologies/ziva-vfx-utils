@@ -71,7 +71,8 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_transform_attrs = ['enable', 'startFrame']
 
         solver_transform_children_expected = {
-            'zSolver1Shape', 'r_tissue_2', 'c_tissue_3', 'l_tissue_1', 'bone_1', 'bone_2', 'cloth_1'
+            'zSolver1Shape', 'r_tissue_2', 'c_tissue_3', 'l_tissue_1', 'c_bone_1', 'c_bone_2',
+            'c_cloth_1', 'l_bone_1'
         }
 
         self.assertEqual(solver_transform.name, name)

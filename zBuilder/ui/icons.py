@@ -1,4 +1,5 @@
 import os
+import maya.cmds as mc
 
 
 def get_icon_path_from_node(node):
@@ -22,5 +23,5 @@ def get_icon_path_from_name(name):
     Returns:
         str: The path to the matching icon.
     """
-    dirname = os.path.dirname(__file__)
+    dirname = mc.moduleInfo(moduleName='ZivaVFX', path=True)
     return os.path.join(dirname, 'icons', '{name}.png'.format(name=name))
