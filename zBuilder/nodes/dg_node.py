@@ -79,10 +79,8 @@ class DGNode(Base):
     def serialize(self):
         """  Makes node serializable.
 
-        This replaces an mObject with the name of the object in scene to make it
-        serializable for writing out to json.  Then it loops through keys in
-        dict and saves out a temp dict of items that can be serializable and
-        returns that temp dict for json writing purposes.
+        It loops through keys in dict and saves out a temp dict of items that 
+        can be serializable and returns that temp dict for json writing purposes.
 
         Returns:
             dict: of serializable items
@@ -161,8 +159,7 @@ class DGNode(Base):
                               '\tscene value:', scene_val)
 
     def get_scene_name(self, long_name=False):
-        """This checks stored mObject and gets name of maya object in scene.  If no
-        mObject it returns parameter name.
+        """This returns either long name or short name.
 
         Args:
             long_name (bool): Return the fullpath or not. Defaults to False.
@@ -191,8 +188,7 @@ class DGNode(Base):
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored name.
+        scene. 
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to set.

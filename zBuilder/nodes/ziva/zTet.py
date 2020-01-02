@@ -61,7 +61,7 @@ class TetNode(Ziva):
 
         These get built after the tissues so it is assumed they are in scene.
         This just checks what tet is associated with mesh and uses that one,
-        renames it and stores mObject then changes attributes.
+        renames it and then changes attributes.
         There is only ever 1 per mesh so no need to worry about multiple tets
 
         Args:
