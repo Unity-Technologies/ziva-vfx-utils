@@ -536,7 +536,7 @@ def check_mesh_quality(meshes):
         meshes (list): A list of meshes you want to check
 
     Raises:
-        StandardError: If any mesh does not pass mesh check
+        Exception: If any mesh does not pass mesh check
     """
 
     tmp = []
@@ -549,7 +549,7 @@ def check_mesh_quality(meshes):
 
     if tmp:
         mc.select(tmp)
-        raise StandardError('check meshes!')
+        raise Exception('check meshes!')
     else:
         mc.select(meshes)
 
@@ -573,7 +573,7 @@ def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid
     maya objects in the current scene.  If any of the passed names are not in
-    the  it raises a StandardError.  If nothing is passed it looks at what is
+    the  it raises a Exception.  If nothing is passed it looks at what is
     actively selected in scene to get selection.  This way it functions like a
     lot of the maya tools, uses what is passed OR it uses what is selected.
 
@@ -597,7 +597,7 @@ def parse_maya_node_for_selection(args):
             if mc.objExists(sel):
                 tmp.extend(mc.ls(sel, l=True))
             else:
-                raise StandardError('{} does not exist in scene, stopping!'.format(sel))
+                raise Exception('{} does not exist in scene, stopping!'.format(sel))
         selection = tmp
 
     # if nothing valid has been passed then we check out active selection in
@@ -606,7 +606,8 @@ def parse_maya_node_for_selection(args):
         selection = mc.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise StandardError('Nothing selected or passed, please select something and try again.')
+            raise Exception(
+                'Nothing selected or passed, please select something and try again.')
     return selection
 
 
@@ -682,23 +683,38 @@ def replace_long_name(search, replace, long_name):
     returns:
         str: result of search and replace
     """
-    items = long_name.split('|')
     new_name = ''
-    for item in items:
-        matches = re.finditer(search, item)
-        for match_num, match in enumerate(matches):
-            if match.groups():
-                with_this = item[match.span(1)[0]:match.
-                                 span(1)[1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
-                item = item[:match.start()] + with_this + item[match.end():]
-            else:
-                item = re.sub(search, replace, item)
+    # check if long_name is valid.  If it is not, return itself
+    if long_name and long_name != ' ':
+        items = long_name.split('|')
+        for item in items:
+            # This checks if the item is an empty string.  If this check is not made
+            # it will, under certain circumstances, add a prefex to an empty string
+            # and make the long name invalid.
+            if item:
+                matches = re.finditer(search, item)
+                for match in matches:
+                    if match.groups():
+                        # if there are groups in the regular expression, (), this splits them up and
+                        # creates a new replace string based on the groups and what is between them.
+                        # on this string: '|l_loa_curve'
+                        # This expression: "(^|_)l($|_)"
+                        # yeilds this replace string: "l_"
+                        # as it found an "_" at end of string.
+                        # then it performs a match replace on original string
+                        with_this = item[match.span(1)[0]:match.span(1)
+                                         [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                        item = item[:match.start()] + with_this + item[match.end():]
+                    else:
+                        item = re.sub(search, replace, item)
 
-        # reconstruct long name if applicable
-        if '|' in long_name and item != '':
-            new_name += '|' + item
-        else:
-            new_name += item
+                # reconstruct long name if applicable
+                if '|' in long_name and item != '':
+                    new_name += '|' + item
+                else:
+                    new_name += item
+    else:
+        return long_name
 
     return new_name
 
@@ -723,7 +739,7 @@ def replace_dict_keys(search, replace, dictionary):
     return tmp
 
 
-def cull_creation_nodes(parameters, permissive=True):
+def cull_creation_nodes(scene_items, permissive=True):
     """ To help speed up the build of a Ziva setup we are creating the bones and
     the tissues with one command.  Given a list of zBuilder nodes this checks
     if a given node needs to be created in scene.  Checks to see if it
@@ -732,7 +748,7 @@ def cull_creation_nodes(parameters, permissive=True):
 
     Args:
         permissive (bool):
-        parameters (object): the zBuilder nodes to check.
+        scene_items (object): the zBuilder nodes to check.
     Returns:
         dict: Dictionary of non culled
     """
@@ -740,27 +756,27 @@ def cull_creation_nodes(parameters, permissive=True):
     results = dict()
     results['meshes'] = []
     results['names'] = []
-    results['parameters'] = []
+    results['scene_items'] = []
 
     # -----------------------------------------------------------------------
     # check meshes for existing zBones or zTissue
-    for i, parameter in enumerate(parameters):
-        type_ = parameter.type
-        mesh = parameter.association[0]
-        name = parameter.name
+    for i, scene_item in enumerate(scene_items):
+        type_ = scene_item.type
+        mesh = scene_item.association[0]
+        name = scene_item.name
 
         if mc.objExists(mesh):
             existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
                 out = mc.rename(existing, name)
-                parameter.mobject = out
+                scene_item.mobject = out
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
-                results['parameters'].append(parameter)
+                results['scene_items'].append(scene_item)
         else:
             if not permissive:
-                raise StandardError(
+                raise Exception(
                     '{} does not exist in scene.  Trying to make a {}.  Please check meshes.'.
                     format(mesh, type_))
             logger.warning(mesh + ' does not exist in scene, skipping ' + type_ + ' creation')

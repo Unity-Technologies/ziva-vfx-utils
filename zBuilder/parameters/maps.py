@@ -13,6 +13,7 @@ class Map(Base):
     type = 'map'
 
     def __init__(self, *args, **kwargs):
+        super(Map, self).__init__(*args, **kwargs)
         self._mesh = None
         #: list of str: Doc comment *before* attribute, with type specified
         self.values = None
@@ -20,7 +21,6 @@ class Map(Base):
 
         self.map_type = None
 
-        Base.__init__(self, *args, **kwargs)
         if args:
             map_name = args[0]
             mesh_name = args[1]
@@ -127,6 +127,55 @@ class Map(Base):
             self.values = weight_list
 
             mc.delete(created_mesh)
+
+    def invert(self):
+        """Invert the map.
+        """
+        self.values = invert_weights(self.values)
+
+    def apply_weights(self):
+        """This applies the weight from this node to the maya scene.
+        """
+        if mc.objExists('%s[0]' % self.name):
+            if not mc.getAttr('%s[0]' % self.name, l=True):
+                val = ' '.join([str(w) for w in self.values])
+                cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
+                mm.eval(cmd)
+        else:
+            # applying doubleArray maps
+            if mc.objExists(self.name):
+                mc.setAttr(self.name, self.values, type='doubleArray')
+
+    def copy_values_from(self, map_parameter):
+        self.values = map_parameter.values
+
+    def open_paint_tool(self):
+        """Open paint tool for the map
+        """
+        # sourcing the mel command so we have access to it
+        mm.eval('source "artAttrCreateMenuItems"')
+
+        mc.select(self._mesh, r=True)
+        # get map name without node name
+        map_name = self.name.split(".")[-1]
+        # get node name without map name
+        node_name = self.name.split(".")[0]
+        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
+            self.map_type, node_name, map_name)
+        mm.eval(cmd)
+
+
+def invert_weights(weights):
+    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
+    
+    Args:
+        weights (list): Weight list, a list of floats or ints.
+    
+    Returns:
+        list: list of floats
+    """
+    weights = [1.0 - x for x in weights]
+    return weights
 
 
 def get_weights(map_name, mesh_name):

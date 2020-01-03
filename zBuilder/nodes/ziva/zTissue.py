@@ -13,11 +13,10 @@ class TissueNode(Ziva):
     type = 'zTissue'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
+        super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
         self.parent_tissue = None
-
-        Ziva.__init__(self, *args, **kwargs)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -59,7 +58,15 @@ class TissueNode(Ziva):
         tissue_items = self.builder.get_scene_items(type_filter='zTissue', name_filter=name_filter)
         tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
 
-        if self == tissue_items[0]:
+        if self is tissue_items[0]:
+
+            # checking if length of tissue_items and tet_items are the same.  If they are not we
+            # are not going to build.
+            # There is a rare situation where there may be a tet and no tissue and you need
+            # to apply the attributes
+            assert (len(tissue_items) == len(tet_items)
+                    ), 'zTet and zTissue have a different amount.  Not building.'
+
             build_multiple(tissue_items,
                            tet_items,
                            attr_filter=attr_filter,
@@ -67,11 +74,12 @@ class TissueNode(Ziva):
                            solver=solver,
                            interp_maps=interp_maps)
 
-        # set the attributes in maya
-        for ztet, ztissue in zip(tet_items, tissue_items):
-            ztet.set_maya_attrs(attr_filter=attr_filter)
-            ztissue.set_maya_attrs(attr_filter=attr_filter)
-            ztet.set_maya_weights(interp_maps=interp_maps)
+            # we only want to execute this if tissue_items is empty or self is the first tissue.
+            # set the attributes in maya
+            for ztet, ztissue in zip(tet_items, tissue_items):
+                ztet.set_maya_attrs(attr_filter=attr_filter)
+                ztissue.set_maya_attrs(attr_filter=attr_filter)
+                ztet.set_maya_weights(interp_maps=interp_maps)
 
 
 def build_multiple(tissue_items,
@@ -111,11 +119,11 @@ def build_multiple(tissue_items,
 
         # rename zTissues and zTets-----------------------------------------
         for new, name, node in zip(outs[1::4], tissue_results['names'],
-                                   tissue_results['parameters']):
+                                   tissue_results['scene_items']):
             node.mobject = new
             mc.rename(new, name)
 
-        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['parameters']):
+        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['scene_items']):
             node.mobject = new
             mc.rename(new, name)
 

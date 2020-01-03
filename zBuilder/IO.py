@@ -123,7 +123,9 @@ def load_base_node(json_object):
 
         # this catches the scene items for ui that slip in.
         try:
-            scene_item = obj(deserialize=json_object)
+            scene_item = obj()
+            scene_item.deserialize(json_object)
+
             return scene_item
         except TypeError:
             return json_object

@@ -15,11 +15,9 @@ class TetNode(Ziva):
 
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
+        super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
-
-        Ziva.__init__(self, *args, **kwargs)
 
     def set_user_tet_mesh(self, mesh):
         """ Setting of the user tet mesh.
@@ -86,7 +84,7 @@ class TetNode(Ziva):
                 if permissive:
                     name = mm.eval('zQuery -t zTet ' + mesh)[0]
                 else:
-                    raise StandardError('{} does not exist in scene.  Check meshes.'.format(mesh))
+                    raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
 
         if name:
             if not mc.objExists(name):

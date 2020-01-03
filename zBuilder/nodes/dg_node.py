@@ -17,14 +17,9 @@ class DGNode(Base):
     """ The base node for the node functionality of all nodes
 
     Args:
-        maya_node (str, optional): maya node to populate parameter with.
         builder (object, optional): The builder object for reference.
-        deserialize (dict, optional): if given a dictionary to deserialize it
-            fills hte parameter with contents of dictionary using the deserialize
-            method.
 
     Attributes:
-        
         :rtype: :func:`type` (str): type of parameter.  Tied with maya node type.
         attrs (dict): A place for the maya attributes dictionary.
 
@@ -42,15 +37,12 @@ class DGNode(Base):
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
 
-    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, builder=None):
+        super(DGNode, self).__init__(parent=parent, builder=builder)
+
         self.attrs = {}
         self._association = []
-        self.__mobject_handle = None
-
-        Base.__init__(self, parent=parent, deserialize=deserialize, builder=builder)
-
-        if maya_node:
-            self.populate(maya_node=maya_node)
+        self._mobject_handle = None
 
     def __str__(self):
         if self.name:
@@ -74,7 +66,7 @@ class DGNode(Base):
     def __deepcopy__(self, memo):
         # Some attributes cannot be deepcopied so define a listy of attributes
         # to ignore.
-        non_copyable_attrs = ('_DGNode__mobject_handle', 'depends_on')
+        non_copyable_attrs = ('_mobject_handle', 'depends_on')
 
         result = type(self)()
 
@@ -100,11 +92,11 @@ class DGNode(Base):
             dict: of serializable items
         """
         # convert mObjectHandle to name of maya object (str)
-        self.__mobject_handle = mz.get_name_from_m_object(self.mobject)
+        self._mobject_handle = mz.get_name_from_m_object(self.mobject)
 
         output = serialize_object(self)
 
-        self.mobject = self.__mobject_handle
+        self.mobject = self._mobject_handle
 
         return output
 
@@ -120,7 +112,7 @@ class DGNode(Base):
         self.__dict__ = json_data
 
         # Finding the mObject in scene if it exists
-        self.mobject = self.__mobject_handle
+        self.mobject = self._mobject_handle
 
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
@@ -137,11 +129,7 @@ class DGNode(Base):
         maya_node = mz.check_maya_node(maya_node)
         self.name = maya_node
         self.type = mc.objectType(maya_node)
-        attr_list = mz.build_attr_list(maya_node)
-        if self.EXTEND_ATTR_LIST:
-            attr_list.extend(self.EXTEND_ATTR_LIST)
-        attrs = mz.build_attr_key_values(maya_node, attr_list)
-        self.attrs = attrs
+        self.get_maya_attrs()
         self.mobject = maya_node
 
     def build(self, *args, **kwargs):
@@ -205,6 +193,18 @@ class DGNode(Base):
 
         return name
 
+    def get_maya_attrs(self):
+        """ Get attribute values from maya and update self.
+        """
+
+        # build the attribute list to aquire from scene
+        attr_list = mz.build_attr_list(self.name)
+        if self.EXTEND_ATTR_LIST:
+            attr_list.extend(self.EXTEND_ATTR_LIST)
+
+        # with attribute list, get values in dictionary format and update node.
+        self.attrs = mz.build_attr_key_values(self.name, attr_list)
+
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
         scene.  It first does a mObject check to see if it has been tracked, if
@@ -266,10 +266,10 @@ class DGNode(Base):
             mObject
 
         """
-        if not isinstance(self.__mobject_handle, str):
-            if self.__mobject_handle:
-                if self.__mobject_handle.isValid():
-                    return self.__mobject_handle.object()
+        if not isinstance(self._mobject_handle, str):
+            if self._mobject_handle:
+                if self._mobject_handle.isValid():
+                    return self._mobject_handle.object()
 
         return None
 
@@ -286,16 +286,16 @@ class DGNode(Base):
             Nothing
 
         """
-        self.__mobject_handle = None
+        self._mobject_handle = None
         if mc.objExists(maya_node):
             selection_list = om.MSelectionList()
             selection_list.add(maya_node)
             mobject = om.MObject()
             selection_list.getDependNode(0, mobject)
-            self.__mobject_handle = om.MObjectHandle(mobject)
+            self._mobject_handle = om.MObjectHandle(mobject)
 
     def break_connection_to_scene(self):
         """Sets the mObject for the node to None.  This is useful if you want to break the 
         connection between the node and what is in the scene.
         """
-        self.__mobject_handle = None
+        self._mobject_handle = None

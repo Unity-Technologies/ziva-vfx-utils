@@ -11,10 +11,6 @@ logger = logging.getLogger(__name__)
 class DeltaMush(Builder):
     """To capture a deltaMush
     """
-
-    def __init__(self):
-        Builder.__init__(self)
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
@@ -28,7 +24,7 @@ class DeltaMush(Builder):
         delta_mushes = mc.ls(hist, type='deltaMush')[::-1]
 
         if not delta_mushes:
-            raise StandardError('No delta mushes found, aborting!')
+            raise Exception('No delta mushes found, aborting!')
 
         for delta_mush in delta_mushes:
             parameter = self.node_factory(delta_mush)
@@ -42,6 +38,5 @@ class DeltaMush(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
 
-        parameters = self.get_scene_items(name_filter=name_filter, type_filter='deltaMush')
-        for parameter in parameters:
-            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
+        for scene_item in self.get_scene_items(name_filter=name_filter, type_filter='deltaMush'):
+            scene_item.build(attr_filter=attr_filter, interp_maps=interp_maps)

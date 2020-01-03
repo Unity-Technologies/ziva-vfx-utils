@@ -1212,7 +1212,7 @@ global proc ziva_main_anatomicalArmDemo(int $newScene)
   // set the solver node attributes
   setAttr zSolver1.collisionDetection on; // enable collision detection and response
   setAttr zSolver1.substeps 1; // two simulation steps per graphical frame
-  setAttr zSolver1.maxNewtonIterations 2; // maximum of two internal iterations per simulation step
+  setAttr zSolver1.maxNewtonIterations 10; // maximum of two internal iterations per simulation step
 
   // set the camera view
   setAttr "persp.translateX" -19;

@@ -1,27 +1,111 @@
 import weakref
 from functools import partial
+import copy
 
 import maya.cmds as mc
 import maya.mel as mm
 try:
     from shiboken2 import wrapInstance
 except ImportError:
-    raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+    raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
-import zBuilder.ui.model as model
-import zBuilder.ui.icons as icons
+import model
+import view
+import icons
+import os
 import zBuilder.builders.ziva as zva
+import zBuilder.parameters.maps as mp
+from zBuilder.nodes.base import Base
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 
 # Show window with docking ability
 def run():
-    z = zva.Ziva()
-    z.retrieve_connections()
+    builder = zva.Ziva()
+    builder.retrieve_connections()
 
-    dock_window(MyDockingUI, root_node=z.root_node)
+    dock_window(MyDockingUI, builder=builder)
+
+
+class MenuLineEdit(QtWidgets.QLineEdit):
+    """
+    Groups LineEdits together so after you press Tab it switch focus to sibling_right.
+    If Shift+Tab pressed it uses sibling_left.
+    Sends acceptSignal when Enter or Return button is pressed.
+    This is for use in Menus, where tab navigation is broken out of the box,
+    and the 'entered pressed' action undesirably causes the menu to close sometimes.
+    """
+    acceptSignal = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(MenuLineEdit, self).__init__(parent)
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
+            self.nextInFocusChain().setFocus()
+            return True
+        if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
+            # PySide bug, have to use this number instead of Key_Tab with modifiers
+            if event.key() == 16777218:
+                self.previousInFocusChain().setFocus()
+                return True
+
+        if event.type() == QtCore.QEvent.KeyPress and event.key() in [
+                QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
+        ]:
+            self.acceptSignal.emit()
+            # This will prevent menu to close after Enter/Return is pressed
+            return True
+
+        return super(MenuLineEdit, self).event(event)
+
+
+class ProximityWidget(QtWidgets.QWidget):
+    """
+    Widget in right-click menu to change map weights for attachments
+    """
+
+    def __init__(self, parent=None):
+        super(ProximityWidget, self).__init__(parent)
+        h_layout = QtWidgets.QHBoxLayout(self)
+        h_layout.setContentsMargins(15, 15, 15, 15)
+        self.from_edit = MenuLineEdit()
+        self.from_edit.setFixedHeight(24)
+        self.from_edit.setPlaceholderText("From")
+        self.from_edit.setText("0.1")
+        self.from_edit.setFixedWidth(40)
+        self.to_edit = MenuLineEdit()
+        self.to_edit.setFixedHeight(24)
+        self.to_edit.setPlaceholderText("To")
+        self.to_edit.setText("0.2")
+        self.to_edit.setFixedWidth(40)
+        ok_button = QtWidgets.QPushButton()
+        ok_button.setText("Ok")
+        h_layout.addWidget(self.from_edit)
+        h_layout.addWidget(self.to_edit)
+        h_layout.addWidget(ok_button)
+        ok_button.clicked.connect(self.paint_by_prox)
+        # setTabOrder doesn't work when used for menu
+        # need to use next 2 lines as a workaround
+        self.setFocusProxy(self.to_edit)
+        ok_button.setFocusProxy(self.from_edit)
+        self.from_edit.acceptSignal.connect(self.paint_by_prox)
+        self.to_edit.acceptSignal.connect(self.paint_by_prox)
+
+    def paint_by_prox(self):
+        """Paints attachment map by proximity.
+        """
+        # to_edit can't have smaller value then from_edit
+        from_value = float(self.from_edit.text())
+        to_value = float(self.to_edit.text())
+        if to_value < from_value:
+            self.to_edit.setText(str(from_value))
+        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
+                                                                      self.to_edit.text()))
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -29,7 +113,7 @@ class MyDockingUI(QtWidgets.QWidget):
     CONTROL_NAME = 'zivaScenePanel'
     DOCK_LABEL_NAME = 'Ziva Scene Panel'
 
-    def __init__(self, parent=None, root_node=None):
+    def __init__(self, parent=None, builder=None):
         super(MyDockingUI, self).__init__(parent)
 
         self.__copy_buffer = None
@@ -39,154 +123,141 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.window_name = self.CONTROL_NAME
         self.ui = parent
+        self.ui.setStyleSheet(open(os.path.join(DIR_PATH, "style.css"), "r").read())
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
+        self.builder = builder or zva.Ziva()
 
-        self.treeView = QtWidgets.QTreeView()
+        # clipboard for copied attributes
+        self.attrs_clipboard = {}
+        # clipboard for the maps.  This is either a zBuilder Map object or None.
+        self.maps_clipboard = None
+
+        root_node = builder.root_node
+
+        self._proxy_model = QtCore.QSortFilterProxyModel()
+        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._proxy_model.setSourceModel(self._model)
+        self._proxy_model.setDynamicSortFilter(True)
+        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self.treeView = view.SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.treeView.setModel(self._proxy_model)
+        self.treeView.setIndentation(15)
 
-        self._proxy_model = QtCore.QSortFilterProxyModel()
-        self.root_node = root_node
-        self.reset_tree(root_node=self.root_node)
+        # must be after .setModel because assigning model resets item expansion
+        self.set_root_node(root_node=root_node)
+
+        # changing header size
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle dazzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        header = self.treeView.header()
+        header.setOffset(-self.treeView.offset)
+        header.setFixedHeight(10)
 
         self.tool_bar = QtWidgets.QToolBar(self)
-        self.tool_bar.setIconSize(QtCore.QSize(32, 32))
+        self.tool_bar.setIconSize(QtCore.QSize(27, 27))
         self.tool_bar.setObjectName("toolBar")
 
-        self.main_layout.addWidget(self.tool_bar)
+        self.top_layout = QtWidgets.QHBoxLayout()
+        self.top_layout.addWidget(self.tool_bar)
+        self.top_layout.setContentsMargins(15, 0, 0, 0)
+        self.main_layout.addLayout(self.top_layout)
         self.main_layout.addWidget(self.treeView)
 
         self.treeView.selectionModel().selectionChanged.connect(self.tree_changed)
-        
+
         self._setup_actions()
 
         self.tool_bar.addAction(self.actionRefresh)
 
     def _setup_actions(self):
-
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path),
-                               QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
-        self.actionRefresh.setObjectName("actionUndo")
-        self.actionRefresh.triggered.connect(self.reset_tree)
-
-        self.actionCopy = QtWidgets.QAction(self)
-        self.actionCopy.setText('Copy')
-        self.actionCopy.setObjectName("actionCopy")
-
-        self.actionPaste = QtWidgets.QAction(self)
-        self.actionPaste.setText('Paste')
-        self.actionPaste.setObjectName("actionPaste")
-
-        self.actionPasteSansMaps = QtWidgets.QAction(self)
-        self.actionPasteSansMaps.setText('Paste without maps')
-        self.actionPasteSansMaps.setObjectName("actionPasteSansMaps")
-
-        self.actionRemoveSolver = QtWidgets.QAction(self)
-        self.actionRemoveSolver.setText('Remove Solver')
-        self.actionRemoveSolver.setObjectName("actionRemove")
-        self.actionRemoveSolver.triggered.connect(self.reset_tree)
+        self.actionRefresh.setObjectName("actionRefresh")
+        self.actionRefresh.triggered.connect(self.set_root_node)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-        self.actionSelectFiberCurve = QtWidgets.QAction(self)
-        self.actionSelectFiberCurve.setText('Select Curve')
-        self.actionSelectFiberCurve.setObjectName("selectCurve")
-        self.actionSelectFiberCurve.triggered.connect(self.select_source_and_target)
+    def invert_weights(self, node, map_):
+        map_.invert()
+        map_.apply_weights()
 
-        self.actionPaintByProx = QtWidgets.QAction(self)
-        self.actionPaintByProx.setText('Paint By Proximity UI')
-        self.actionPaintByProx.setObjectName("actionPaint")
-        self.actionPaintByProx.triggered.connect(self.paint_by_prox_options)
+    def copy_weights(self, node, map_):
+        self.maps_clipboard = map_
 
-        self.actionPaintByProx_1_2 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_2.setText('Paint By Proximity .1 - .2')
-        self.actionPaintByProx_1_2.setObjectName("actionPaint12")
-        self.actionPaintByProx_1_2.triggered.connect(partial(self.paint_by_prox,
-                                                             .1,
-                                                             .2))
+    def paste_weights(self, node, new_map):
+        """Pasting the maps.  Terms used here
+            orig/new.  
+            The map/node the items were copied from are prefixed with orig.
+            The map/node the items are going to be pasted onto are prefixed with new
 
-        self.actionPaintByProx_1_10 = QtWidgets.QAction(self)
-        self.actionPaintByProx_1_10.setText('Paint By Proximity .1 - 1.0')
-        self.actionPaintByProx_1_10.setObjectName("actionPaint110")
-        self.actionPaintByProx_1_10.triggered.connect(partial(self.paint_by_prox,
-                                                              .1,
-                                                              10))
-        self.actionPaintSource = QtWidgets.QAction(self)
-        self.actionPaintSource.setText('Paint - source weights')
-        self.actionPaintSource.setObjectName("paintSource")
-        self.actionPaintSource.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
-
-        self.actionPaintTarget = QtWidgets.QAction(self)
-        self.actionPaintTarget.setText('Paint - target weights')
-        self.actionPaintTarget.setObjectName("paintTarget")
-        self.actionPaintTarget.triggered.connect(partial(self.paint_weights,
-                                                         1,
-                                                         'weights'))
-
-        self.actionPaintWeight = QtWidgets.QAction(self)
-        self.actionPaintWeight.setText('Paint - weights')
-        self.actionPaintWeight.setObjectName("paintWeight")
-        self.actionPaintWeight.triggered.connect(partial(self.paint_weights,
-                                                         0,
-                                                         'weights'))
-
-        self.actionPaintEndPoints = QtWidgets.QAction(self)
-        self.actionPaintEndPoints.setText('Paint - endPoints')
-        self.actionPaintEndPoints.setObjectName("paintEndPoints")
-        self.actionPaintEndPoints.triggered.connect(partial(self.paint_weights,
-                                                            0,
-                                                            'endPoints'))
-
-    def paint_by_prox_options(self):
-        """Brings up UI for painting by proximity.
         """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('ZivaPaintAttachmentsByProximityOptions;')
+        if self.maps_clipboard:
+            orig_map = self.maps_clipboard
+        else:
+            return
 
-    def paint_by_prox(self, minimum, maximum):
-        """Paints attachment map by proximity.
-        
-        Args:
-            minimum ([float]): minimum
-            maximum ([float]): maximum
+        # It will be simple for a user to paste the wrong map in wrong location
+        # here we are comparing the length of the maps and if they are different we can bring up
+        # a dialog to warn user unexpected results may happen,
+        orig_map_length = len(orig_map.values)
+        new_map_length = len(new_map.values)
+
+        dialog_return = None
+        if orig_map_length != new_map_length:
+            msg_box = QtWidgets.QMessageBox()
+            msg_box.setText(
+                "The map you are copying from ({}) and pasting to ({}) have a different length.  Unexpected results may happen."
+                .format(orig_map_length, new_map_length))
+            msg_box.setInformativeText("Are you sure you want to continue?")
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+            dialog_return = msg_box.exec_()
+
+        if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
+            new_map.copy_values_from(orig_map)
+            new_map.apply_weights()
+
+    def paste_attrs(self, node):
+        # type: (zBuilder.whatever.Base) -> None
+        """ Paste the attributes from the clipboard onto given node.
+        @pre The node's type has an entry in the clipboard.
         """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.name, r=True)
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(str(minimum), str(maximum)))
+        assert isinstance(
+            node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+        assert node.type in self.attrs_clipboard, "Precondition violated: node type is not in the clipboard"
+        orig_node_attrs = self.attrs_clipboard[node.type]
+        assert isinstance(orig_node_attrs,
+                          dict), "Invariant violated: value in attrs clipboard must be a dict"
 
-    def paint_weights(self, association_idx, attribute):
-        """Paint weights menu command.
+        # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
+        assert set(node.attrs) == set(
+            orig_node_attrs
+        ), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+        node.attrs = orig_node_attrs.copy(
+        )  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
+        node.set_maya_attrs()
 
-        This is checking item selected in treeView to get zBuilder node.
+    def copy_attrs(self, node):
+        # update the model in case maya updated
+        node.get_maya_attrs()
 
-        Args:
-            association_idx (int): The index of mesh to use in node association
-            attribute (string): The name of the attribute to paint.
-        """
-        # sourcing the mel command so we have access to it
-        mm.eval('source "artAttrCreateMenuItems"')
-
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mesh = node.long_association[association_idx]
-        mc.select(mesh, r=True)
-        cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(node.type, node.long_name, attribute)
-        mm.eval(cmd)
+        self.attrs_clipboard = {}
+        self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def select_source_and_target(self):
         """Selects the source and target mesh of an attachment. This is a menu 
@@ -197,14 +268,6 @@ class MyDockingUI(QtWidgets.QWidget):
         node = indexes.data(model.SceneGraphModel.nodeRole)
         mc.select(node.long_association)
 
-    def select_fiber_curve(self):
-        """Selects fiber curve based on item selected in tree.  This is a menu
-        command.
-        """
-        indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.curve)
-
     def open_menu(self, position):
         """Generates menu for tree items
 
@@ -214,52 +277,174 @@ class MyDockingUI(QtWidgets.QWidget):
         on a single selection.
         """
         indexes = self.treeView.selectedIndexes()
-        if len(indexes) == 1:
-            node = indexes[0].data(model.SceneGraphModel.nodeRole)
 
-            menu = QtWidgets.QMenu()
+        if len(indexes) != 1:
+            return
 
-            if node.type == 'zTet':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
+        menu_dict = {
+            'zTet': self.open_tet_menu,
+            'zFiber': self.open_fiber_menu,
+            'zMaterial': self.open_material_menu,
+            'zAttachment': self.open_attachment_menu,
+            'zTissue': self.open_tissue_menu,
+            'zBone': self.open_bone_menu,
+            'zLineOfAction': self.open_line_of_action_menu,
+            'zRestShape': self.open_rest_shape_menu
+        }
 
-            if node.type == 'zFiber':
-                menu.addAction(self.actionPaintWeight)
-                menu.addAction(self.actionPaintEndPoints)
-                menu.addSection('')
-
-            if node.type == 'zMaterial':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zEmbedder':
-                menu.addAction(self.actionPaintWeight)
-                menu.addSection('')
-
-            if node.type == 'zAttachment':
-                menu.addAction(self.actionPaintSource)
-                menu.addAction(self.actionPaintTarget)
-                menu.addSection('')
-                menu.addAction(self.actionPaintByProx)
-                menu.addAction(self.actionPaintByProx_1_2)
-                menu.addAction(self.actionPaintByProx_1_10)
-                menu.addAction(self.actionSelectST)
-
-            if node.type == 'zLineOfAction':
-                menu.addAction(self.actionSelectFiberCurve)
-
+        node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        if node.type in menu_dict:
+            menu = QtWidgets.QMenu(self)
+            method = menu_dict[node.type]
+            method(menu, node)
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
+
+    # TODO: Implement this functionality in zBuilder core
+    def get_maps_from_node(self, node):
+        maps = []
+        # get node parameters
+        param_dict = node.spawn_parameters()
+        param_dict.pop('mesh', None)
+        for key, values in param_dict.iteritems():
+            for value in values:
+                obj = self.builder.parameter_factory(key, value)
+                maps.append(obj)
+
+        return maps
+
+    def add_map_actions_to_menu(self, menu, node, map_):
+        """Add map actions to the menu
+        Args:
+            menu (QMenu): menu to add option to
+            node (zBuilder object): zBuilder.nodes object
+            map_ (map object): zBuilder.parameters.maps object
+        """
+        paint_action = QtWidgets.QAction(self)
+        paint_action.setText('Paint')
+        paint_action.setObjectName("actionPaint")
+        paint_action.triggered.connect(map_.open_paint_tool)
+        menu.addAction(paint_action)
+
+        invert_action = QtWidgets.QAction(self)
+        invert_action.setText('Invert')
+        invert_action.setObjectName('actionInvertWeights')
+        invert_action.triggered.connect(partial(self.invert_weights, node, map_))
+        menu.addAction(invert_action)
+
+        menu.addSeparator()
+
+        copy_action = QtWidgets.QAction(self)
+        copy_action.setText('Copy')
+        copy_action.setObjectName('actionCopyWeights')
+        copy_action.triggered.connect(partial(self.copy_weights, node, map_))
+        menu.addAction(copy_action)
+
+        paste_action = QtWidgets.QAction(self)
+        paste_action.setText('Paste')
+        paste_action.setObjectName('actionPasteWeights')
+        paste_action.triggered.connect(partial(self.paste_weights, node, map_))
+        paste_action.setEnabled(bool(self.maps_clipboard))
+        menu.addAction(paste_action)
+
+    def add_attribute_actions_to_menu(self, menu, node):
+        attrs_menu = menu.addMenu('Attributes')
+
+        copy_attrs_action = QtWidgets.QAction(self)
+        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setObjectName("actionCopyAttrs")
+        copy_attrs_action.triggered.connect(partial(self.copy_attrs, node))
+
+        paste_attrs_action = QtWidgets.QAction(self)
+        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setObjectName("actionPasteAttrs")
+        paste_attrs_action.triggered.connect(partial(self.paste_attrs, node))
+
+        # only enable 'paste' IF it is same type as what is in buffer
+        paste_attrs_action.setEnabled(node.type in self.attrs_clipboard)
+
+        attrs_menu.addAction(copy_attrs_action)
+        attrs_menu.addAction(paste_attrs_action)
+
+    def open_tet_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        weight_map_menu = menu.addMenu('Weight')
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+
+    def open_fiber_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        endpoints_map = self.get_maps_from_node(node)[1]  # endpoints map @ index 1
+
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+
+        end_points_map_menu = menu.addMenu('EndPoints')
+        self.add_map_actions_to_menu(end_points_map_menu, node, endpoints_map)
+
+    def open_material_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+
+        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+
+    def open_attachment_menu(self, menu, node):
+        source_mesh_name = node.association[0]
+        target_mesh_name = node.association[1]
+
+        # TODO Add the ability to get map by name instead of index
+        maps = self.get_maps_from_node(node)
+        source_map = maps[0]  # source map @ index 0
+        target_map = maps[1]  # target map @ index 1
+
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
+        source_menu_text = 'Source ({})'.format(truncate(source_mesh_name))
+        target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
+
+        source_map_menu = menu.addMenu(source_menu_text)
+        self.add_map_actions_to_menu(source_map_menu, node, source_map)
+
+        target_map_menu = menu.addMenu(target_menu_text)
+        self.add_map_actions_to_menu(target_map_menu, node, target_map)
+
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
+
+    def open_tissue_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_bone_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_line_of_action_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_rest_shape_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
-        corrisponding item in Maya scene.
+        corresponding item in Maya scene.
         """
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
             mc.select(nodes)
 
-    def reset_tree(self, root_node=None):
+    def set_root_node(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
         is a zBuilder object that the tree is built from.  If None is passed
         it uses the scene selection to build a new root_node.
@@ -272,46 +457,78 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not root_node:
-            import zBuilder.builders.ziva as zva
-            z = zva.Ziva()
-            z.retrieve_connections()
-            root_node = z.root_node
+            # clean builder
+            # TODO: this line should be changed after VFXACT-388 to make more efficient
 
-        self._model = model.SceneGraphModel(root_node)
+            # This is using zBuilder to build the model data for the UI.  Currently the model data
+            # excludes Mpas and Meshes.  This is strictly a performance issue.  With this included
+            # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
+            # is the argument that tells zBuilder to not get maps, meshes.
+            self.builder = zva.Ziva()
+            self.builder.retrieve_connections(get_parameters=False)
+            root_node = self.builder.root_node
 
-        self._proxy_model.setSourceModel(self._model)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self.treeView.setModel(self._proxy_model)
+        # remember names of items to expand
+        names_to_expand = self.get_expanded()
 
-        # Expand all zSolverTransform tree items-------------------------------
-        proxy_model = self.treeView.model()
-        for row in range(proxy_model.rowCount()):
-            index = proxy_model.index(row, 0)
-            node = index.data(model.SceneGraphModel.nodeRole)
-            if node.type == 'zSolverTransform':
+        self._model.beginResetModel()
+        self._model.root_node = root_node
+        self._model.endResetModel()
+
+        # restore previous expansion in treeView or expand all zSolverTransform items
+        if names_to_expand:
+            self.expand(names_to_expand)
+        else:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.sortRole, "zSolverTransform",
+                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
-        # select item in treeview that is selected in maya to begin with and 
+        sel = mc.ls(sl=True, long=True)
+        # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = proxy_model.match(proxy_model.index(0, 0),
-                                        QtCore.Qt.DisplayRole,
-                                        sel[0].split('|')[-1],
-                                        -1,
-                                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.longNameRole, sel[0], -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
-                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.SelectCurrent)
+                self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
-            # this works for a zBuilder view.  This is expanding the item 
-            # selected and it's parent if any.  This makes it possible if you 
-            # have a material or attachment selected, it will become visable in 
+            # this works for a zBuilder view.  This is expanding the item
+            # selected and it's parent if any.  This makes it possible if you
+            # have a material or attachment selected, it will become visible in
             # UI
             if checked:
                 self.treeView.expand(checked[-1])
                 self.treeView.expand(checked[-1].parent())
 
+    def get_expanded(self):
+        """
+        Returns: array of item names that are currently expanded in treeView
+        """
+        # store currently expanded items
+        expanded = []
+        for index in self._proxy_model.persistentIndexList():
+            if self.treeView.isExpanded(index):
+                expanded.append(index.data(model.SceneGraphModel.longNameRole))
+
+        return expanded
+
+    def expand(self, names):
+        """
+        Args:
+            names (list): names to expand in treeView
+        """
+        # collapseAll added in case refreshing of treeView needed
+        # otherwise new items might not be displayed ( Qt bug )
+        self.treeView.collapseAll()
+        for name in names:
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              model.SceneGraphModel.longNameRole, name, -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in indexes:
+                self.treeView.expand(index)
 
     @staticmethod
     def delete_instances():
@@ -320,7 +537,7 @@ class MyDockingUI(QtWidgets.QWidget):
                 ins.setParent(None)
                 ins.deleteLater()
             except:
-                # ignore the fact that the actual parent has already been 
+                # ignore the fact that the actual parent has already been
                 # deleted by Maya...
                 pass
 
@@ -329,4 +546,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def run(self):
         return self
-

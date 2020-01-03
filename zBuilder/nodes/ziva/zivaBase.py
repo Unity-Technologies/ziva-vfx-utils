@@ -20,13 +20,9 @@ class Ziva(Deformer):
     except RuntimeError:
         pass
 
-    def __init__(self, parent=None, maya_node=None, builder=None, deserialize=None):
+    def __init__(self, parent=None, builder=None):
+        super(Ziva, self).__init__(parent=parent, builder=builder)
         self.solver = None
-        Deformer.__init__(self,
-                          maya_node=maya_node,
-                          builder=builder,
-                          deserialize=deserialize,
-                          parent=parent)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -65,7 +61,7 @@ class Ziva(Deformer):
             meshes (list): list of meshes to check
 
         Raises:
-            StandardError: if any mesh fails a check
+            Exception: if any mesh fails a check
         '''
         mc.select(meshes, r=True)
 
@@ -85,6 +81,6 @@ class Ziva(Deformer):
                 '''.format(str(bad_meshes))
 
                 mc.select(bad_meshes)
-                raise StandardError(error_message)
+                raise Exception(error_message)
         else:
             return None

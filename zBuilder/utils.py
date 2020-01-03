@@ -1,5 +1,6 @@
 import logging
-import copy as copy
+import re
+import copy
 
 import maya.cmds as mc
 import maya.mel as mm
@@ -169,12 +170,21 @@ def remove_all_solvers(confirmation=False):
 
 
 def rig_cut_copy(cut=False):
-    # Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
-    # Selection cannot be empty; otherwise an error is reported.
-    # Selection can contain zero or one solver node; otherwise an error is reported
-    # (it does not matter if the solver node is a solver transform node, or solver shape node).
-    # The selected objects must all come from exactly one solver; otherwise an error is reported.
-    # If cut is True, the Ziva rig is removed from the selection after being copied (i.e., perform a cut).
+    """    Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
+    Selection cannot be empty; otherwise an error is reported.
+    Selection can contain zero or one solver node; otherwise an error is reported
+    (it does not matter if the solver node is a solver transform node, or solver shape node).
+    The selected objects must all come from exactly one solver; otherwise an error is reported.
+
+
+    Args:
+        cut (bool, optional): If cut is True, the Ziva rig is removed from the selection after being
+                              copied (i.e., perform a cut). Defaults to False.
+
+    Returns:
+        bool: True if successful
+    """
+
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
@@ -182,18 +192,18 @@ def rig_cut_copy(cut=False):
     selection = mc.ls(sl=True)
     if not selection:
         mm.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
-        return
+        return False
 
     # Enforce that the selected objects come from exactly one solver.
     selected_solvers = mm.eval('zQuery -t "zSolver" -l')
     if selected_solvers is None:
         mm.eval('error -n "Selected objects are not connected to a solver."')
-        return
+        return False
     if len(selected_solvers) >= 2:
         mm.eval(
             'error -n "Selected objects come from two or more solvers. Inputs to cut/copy must come from only one solver."'
         )
-        return
+        return False
 
     # Record if selection contains a solver node.
     # We'll need this information when pasting.
@@ -208,7 +218,7 @@ def rig_cut_copy(cut=False):
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
         mm.eval('error -n "Selection contains more than one solver node. "')
-        return
+        return False
 
     ZIVA_CLIPBOARD_ZBUILDER = zva.Ziva()
     ZIVA_CLIPBOARD_ZBUILDER.retrieve_from_scene_selection()
@@ -218,15 +228,29 @@ def rig_cut_copy(cut=False):
     if cut:
         remove(selection)
 
+    return True
+
 
 def rig_cut():
+    """ Cut selected.
+    
+    Returns:
+        bool: True if successful
+    """
     # Cut Ziva rig. See rig_cut_copy for instructions.
-    rig_cut_copy(cut=True)
+    result = rig_cut_copy(cut=True)
+    return result
 
 
 def rig_copy():
+    """Copy selected.
+    
+    Returns:
+        bool: True if successful
+    """
     # Copy Ziva rig. See rig_cut_copy for instructions.
-    rig_cut_copy(cut=False)
+    result = rig_cut_copy(cut=False)
+    return result
 
 
 def rig_paste():
@@ -294,7 +318,7 @@ def rig_update(solvers=None):
     # zQuery gives an error if no solvers though it does not stop script
     # this is to stop script
     if solvers is None:
-        raise StandardError("No solver in scene.")
+        raise Exception("No solver in scene.")
 
     for solver in solvers:
         solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
@@ -435,3 +459,171 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
         for item in builder.get_scene_items(type_filter=displayed_node_type):
             # Add each mesh of this type to selection.
             mc.select(item.long_association, add=True)
+
+
+def next_free_plug_in_array(dst_plug):
+    # type: (str) -> str
+    """ Use this to work around the fact that zSolver.iGeo (and other attrs)
+    have indexMatters=True even though the index doesn't matter. As a result,
+    connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
+    find a specific array element to connect to instead.
+    
+    This function takes a plug name, and if it's an element of an array,
+    sets the index to a free index. Else, it's the identity function.
+    
+    next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
+    next_free_plug_in_array('foo.bar') --> 'foo.bar'
+    """
+
+    array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
+    if array_match:
+        plug = array_match.group(1)
+        indices = mc.getAttr(plug, multiIndices=True)
+        new_index = indices[-1] + 1 if indices else 0  # [-1] assumes indices are sorted
+        new_dst = '{}[{}]'.format(plug, new_index)
+        return new_dst
+    return dst_plug
+
+
+def listConnectionPlugs(node, destination=True, source=True):
+    # type: (str, bool, bool) -> List[Tuple[basestring,basestring]]
+    """ Get all of the connections with 'node' as a list of pairs of plugs.
+    The first plug in each pair is a plug on 'node'. The second plug in each
+    pair is a plug the first is connected to. """
+    assert isinstance(node, basestring), 'Arguments #1 is not a string'
+    assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
+    assert isinstance(source, bool), 'Arguments "source" is not a bool'
+    plugs = mc.listConnections(node,
+                               plugs=True,
+                               connections=True,
+                               source=source,
+                               destination=destination)
+    plugs = plugs if plugs else []  # Convert Maya's None result to an empty list
+    assert len(plugs) % 2 == 0, "List does not have an even number of elements " + str(plugs)
+    return zip(plugs[0::2], plugs[1::2])
+
+
+def merge_two_solvers(solver_transform1, solver_transform2):
+    # type: (str, str) -> None
+    """ 
+    Given two solvers,
+    take everything from the second solver and put it into the first solver.
+    Then, delete the second solver.
+    See 'merge_solvers' for details.
+    e.g. merge_two_solvers('zSolver1', 'zSolver2')
+    """
+    ####################################################################
+    # Checking inputs
+    assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
+    assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
+    assert mc.nodeType(
+        solver_transform1) == 'zSolverTransform', 'Argument #1 is not a zSolverTransform'
+    assert mc.nodeType(
+        solver_transform2) == 'zSolverTransform', 'Argument #2 is not a zSolverTransform'
+    assert solver_transform1 != solver_transform2, 'The two solvers are not different'
+
+    solver1 = mm.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
+    solver2 = mm.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
+    embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
+    embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
+
+    ####################################################################
+    # For speed and to reduce noise, try to disable the solvers
+
+    # SolverDisabler's __enter__ will do what we want for solver2,
+    # but we're going to delete solver2, so we do not want __exit__ to be called. Thus:
+    zva.SolverDisabler(solver_transform2).__enter__()
+
+    with zva.SolverDisabler(solver_transform1):
+        ####################################################################
+        # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
+        for src, dst in listConnectionPlugs(solver2, source=False):
+            mc.disconnectAttr(src, dst)
+            new_src = src.replace(solver2, solver1, 1)
+            try:
+                mc.connectAttr(new_src, dst)
+            except:
+                logger.info('Skipped new connection {} {}'.format(src, dst))
+
+        ####################################################################
+        # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
+        for dst, src in listConnectionPlugs(solver2, destination=False):
+            mc.disconnectAttr(src, dst)
+            new_dst = dst.replace(solver2, solver1, 1)
+            new_dst = next_free_plug_in_array(new_dst)
+            try:
+                mc.connectAttr(src, new_dst)
+            except:
+                if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
+                    logger.info('Skipped new connection {} {}'.format(src, new_dst))
+
+        ####################################################################
+        # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
+        for src, dst in listConnectionPlugs(solver_transform2, source=False):
+            mc.disconnectAttr(src, dst)
+            new_src = src.replace(solver_transform2, solver_transform1, 1)
+            try:
+                mc.connectAttr(new_src, dst)
+            except:
+                logger.info('Skipped new connection {} {}'.format(src, dst))
+
+        ####################################################################
+        # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
+
+        # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
+        tissue_geo_plugs = mz.none_to_empty(
+            mc.listConnections('{}.iGeo'.format(embedder2),
+                               plugs=True,
+                               source=True,
+                               destination=False))
+        meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
+        indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
+
+        # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
+        for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
+            mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
+            mc.deformer(embedder1, edit=True, before=True,
+                        geometry=mesh)  # "-before" for referencing
+            # TODO: how do I get the index of a mesh without this mess?
+            new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+            new_index = list(new_indices - indices)[0]
+            indices = new_indices
+            mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
+
+        ####################################################################
+        # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
+
+        for node in [solver2, solver_transform2, embedder2]:
+            # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
+            if not mc.ls(node, readOnly=True):
+                mc.delete(node)
+
+
+def merge_solvers(solver_transforms):
+    # type: (List[str]) -> None
+    """ 
+    Given a list of zSolverTransform nodes, merge them all into the first solver.
+
+    The zSolverTransform, zSolver, and zEmbedder nodes for all but the first solver
+    in the list will be deleted. If that's not possible, such as when the solvers are
+    referenced nodes, those solvers will remain in the scene but be empty.
+    They will have no bones, tissues, cloth, attachments, etc.
+
+    The first solver keeps all of its attribute values and connections.
+    Any differences between this solver and the others is ignored.
+
+    All other nodes (besides the zSolverTransform, zSolver, and zEmbedder) are
+    re-wired to connect to the first solver. All existing attributes, connections,
+    or any other properties remain unchanged.
+
+    e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
+    """
+    assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
+
+    if len(solver_transforms) < 2:
+        return
+    solver1 = solver_transforms[0]
+
+    with zva.SolverDisabler(solver1):
+        for solver2 in solver_transforms[1:]:
+            merge_two_solvers(solver1, solver2)

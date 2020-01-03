@@ -14,9 +14,6 @@ class BoneNode(Ziva):
     type = 'zBone'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
-        Ziva.__init__(self, *args, **kwargs)
-
     def build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 
@@ -33,18 +30,22 @@ class BoneNode(Ziva):
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        parameters = self.builder.bundle.get_scene_items(type_filter='zBone',
-                                                         name_filter=name_filter)
+        scene_items = self.builder.bundle.get_scene_items(type_filter='zBone',
+                                                          name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.
         # This feels kinda sloppy to me.
+        if self is scene_items[0]:
+            build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
 
-        if self == parameters[0]:
-            build_multiple(parameters, attr_filter=attr_filter, permissive=permissive)
+            # set the attributes.  This needs to run even if there are no zBone to build. This case happens during a copy paste.
+            # any time you 'build' when the zBone is in scene.
+            for scene_item in scene_items:
+                scene_item.set_maya_attrs(attr_filter=attr_filter)
 
 
-def build_multiple(parameters, attr_filter=None, permissive=False):
+def build_multiple(scene_items, attr_filter=None, permissive=False):
     """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
@@ -59,7 +60,7 @@ def build_multiple(parameters, attr_filter=None, permissive=False):
     """
     sel = mc.ls(sl=True)
     # cull none buildable------------------------------------------------------
-    culled = mz.cull_creation_nodes(parameters)
+    culled = mz.cull_creation_nodes(scene_items)
 
     # build bones all at once--------------------------------------------------
     results = None
@@ -71,12 +72,8 @@ def build_multiple(parameters, attr_filter=None, permissive=False):
     # rename zBones------------------------------------------------------------
     if results:
         results = mc.ls(results, type='zBone')
-        for new, name, parameter in zip(results, culled['names'], culled['parameters']):
-            parameter.mobject = new
+        for new, name, scene_item in zip(results, culled['names'], culled['scene_items']):
+            scene_item.mobject = new
             mc.rename(new, name)
-
-    # set the attributes
-    for parameter in parameters:
-        parameter.set_maya_attrs(attr_filter=attr_filter)
 
     mc.select(sel)

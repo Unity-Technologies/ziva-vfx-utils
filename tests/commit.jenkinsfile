@@ -1,0 +1,107 @@
+#!/usr/bin/env groovy
+
+pipeline {
+    agent none
+    options {
+        skipDefaultCheckout true
+        timestamps()
+        timeout(time: 2, unit: 'HOURS') // long in case it needs to wait for machines
+    }
+    stages {
+        stage('get sources') {
+            agent { label 'git' && 'linux' }  // must checkout to a linux machine to avoid line ending issue
+            steps {
+                echo 'running checkout ziva-vfx-utils stage'
+
+                dir('ziva-vfx-utils') {
+                    checkout scm
+                }
+                stash(name: 'main', includes: 'ziva-vfx-utils/**')
+            }
+            post {
+                cleanup { cleanWs() } 
+            }
+        }
+        stage('run tests for ziva-vfx-utils') {
+            failFast true
+            parallel {
+                stage('windows') {
+                    agent { label 'windows && vfx && maya2019' }
+                    environment {
+                        mayaVersion = "2018" // variations: 2016, 2016.5, 2017, 2018, 2019
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runWindowsTestStage()
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
+
+                stage('centos7') {
+                    agent { label 'linux && centos7 && maya2019' }
+                    environment {
+                        mayaVersion = "2019"
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
+
+                stage('centos6') {
+                    agent { label 'centos6 && vfx' }
+                    environment {
+                        mayaVersion = "2016"
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
+
+                stage('doc generation') {
+                    agent { label 'linux && sphinx' }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
+            }
+        }
+    }
+}
+
+def runWindowsTestStage() {
+    echo "running windows test stage"
+
+    environment {
+        zivadyn_LICENSE="${env.zivadyn_LICENSE};C:\\ziva"
+    }
+
+    dir('ziva-vfx-utils') {
+        bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+    }
+}
+
+def runLinuxTestStage() {
+    echo "running linux test stage"
+
+    dir('ziva-vfx-utils') {
+        withEnv([
+          "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
+        ]) {
+            sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+        }
+    }
+}

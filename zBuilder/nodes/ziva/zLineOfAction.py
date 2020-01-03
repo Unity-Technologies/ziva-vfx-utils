@@ -14,10 +14,9 @@ class LineOfActionNode(Ziva):
     type = 'zLineOfAction'
     """ The type of node. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent=None, builder=None):
+        super(LineOfActionNode, self).__init__(parent=parent, builder=builder)
         self.fiber = None
-
-        Ziva.__init__(self, *args, **kwargs)
 
     def spawn_parameters(self):
         return {}

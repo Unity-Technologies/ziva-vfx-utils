@@ -378,7 +378,7 @@ Let's run a little test scene that sets up 2 spheres and a cube with 1 attachmen
 
 .. code-block:: python
 
-    import zBuilder.tests.utils as utl
+    import tests.utils as utl
 
     utl.build_mirror_sample_geo()
     utl.ziva_mirror_sample_geo()

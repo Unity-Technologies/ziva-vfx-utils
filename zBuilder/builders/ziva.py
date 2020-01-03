@@ -20,10 +20,36 @@ ZNODES = [
 ]
 
 
+class SolverDisabler:
+    def __init__(self, solver_name):
+        """SolverDisabler is a context manager object that disables a solver for the duration of
+        the context and then restores its initial state. This is useful for improving the
+        performance of a code block that's making many changes to a solver. This manager object
+        is preferable to doing it 'by hand' because it handles exceptions and DG connections that
+        the naive solution (getAttr/setAttr) would fail to handle."""
+
+        self.enable_plug = solver_name + '.enable'
+        self.connection_source = None
+        self.enable_value = True
+
+    def __enter__(self):
+        self.enable_value = mc.getAttr(self.enable_plug)
+        self.connection_source = mc.listConnections(self.enable_plug, plugs=True)
+        if self.connection_source:
+            mc.disconnectAttr(self.connection_source[0], self.enable_plug)
+
+        mc.setAttr(self.enable_plug, False)
+
+    def __exit__(self, type, value, traceback):
+        mc.setAttr(self.enable_plug, self.enable_value)
+
+        if self.connection_source:
+            mc.connectAttr(self.connection_source[0], self.enable_plug)
+
+
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
-
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -37,7 +63,10 @@ class Ziva(Builder):
                 self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
                 continue
 
-    def get_parent(self):
+    def setup_tree_hierarchy(self):
+        """Sets up hierarchy for a tree view.  This will look at items and assign the proper 
+        children, parent for QT.
+        """
         from zBuilder.nodes.base import Base
         from zBuilder.nodes.dg_node import DGNode
 
@@ -107,8 +136,9 @@ class Ziva(Builder):
 
         # rest shapes
         for item in self.get_scene_items(type_filter=['zRestShape']):
-            parent_node = self.get_scene_items(name_filter=item.tissue_name)[0]
+            parent_node = self.get_scene_items(name_filter=item.tissue_name)
             if parent_node:
+                parent_node = parent_node[0]
                 parent_node.add_child(item)
                 item.parent = parent_node
 
@@ -258,7 +288,7 @@ class Ziva(Builder):
 
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
-            self.get_parent()
+            self.setup_tree_hierarchy()
 
         mc.select(scene_selection)
         self.stats()
@@ -282,6 +312,9 @@ class Ziva(Builder):
         * Curve reference to drive zLineOfAction. (Not actual curve)
         * Relevant zSolver for each node.
         * Mesh information used for world space lookup to interpolate maps if needed.
+
+        Existing scene items are retained. If this retrieve finds a scene items
+        with the same long name as an existing scene item, it replaces the old one.
 
         Args:
             get_parameters (bool): To get parameters or not.
@@ -307,7 +340,7 @@ class Ziva(Builder):
         if solver:
             solver = solver[0]
         else:
-            raise StandardError('zSolver not connected to selection.  Please try again.')
+            raise Exception('zSolver not connected to selection.  Please try again.')
 
         b_solver = self.node_factory(solver, parent=None)
         self.bundle.extend_scene_items(b_solver)
@@ -332,7 +365,7 @@ class Ziva(Builder):
         nodes = zQuery(node_types, solver)
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
-            self.get_parent()
+            self.setup_tree_hierarchy()
 
         self.stats()
 
@@ -432,7 +465,8 @@ class Ziva(Builder):
                     if loas:
                         nodes.append(loas)
             if restShape:
-                rest_shapes = mm.eval('zQuery -t zRestShape {}'.format(sol[0]))
+                mc.select(selection)
+                rest_shapes = mm.eval('zQuery -t zRestShape')
                 if rest_shapes:
                     nodes.extend(rest_shapes)
             if embedder:
@@ -447,7 +481,7 @@ class Ziva(Builder):
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
         mc.select(sel, r=True)
-        self.get_parent()
+        self.setup_tree_hierarchy()
         self.stats()
 
     def _populate_nodes(self, nodes, get_parameters=True):
@@ -478,8 +512,8 @@ class Ziva(Builder):
         # reset the solver nodes' mobjects
         for node_type in solvers:
             logger.info('Resetting: {}'.format(node_type))
-            for parameter in self.get_scene_items(type_filter=node_type):
-                parameter.mobject_reset()
+            for scene_item in self.get_scene_items(type_filter=node_type):
+                scene_item.mobject_reset()
 
     @Builder.time_this
     def build(self,
@@ -499,8 +533,7 @@ class Ziva(Builder):
               rivetToBone=True,
               restShape=True,
               mirror=False,
-              permissive=True,
-              check_meshes=False):
+              permissive=True):
         """
         This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
         that the geometry is in the scene.
@@ -533,73 +566,67 @@ class Ziva(Builder):
             for item in self.get_scene_items(type_filter='mesh'):
                 item.mirror()
 
-        if check_meshes:
-            logger.info('DEPRECATED FLAG:check_meshes not used.  Use ziva -mq.')
-
         logger.info('Building Ziva Rig.')
         sel = mc.ls(sl=True)
 
-        # Let's build the solver first, so we can turn it off to build the rest of the scene.
-        # This speeds up the process.
+        # get stored solver enable value to build later. The solver comes in OFF
+        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
+
         solvers = list()
         if solver:
             solvers.append('zSolver')
             solvers.append('zSolverTransform')
 
-        # build the nodes by calling build method on each one
-        for node_type in solvers:
-            logger.info('Building: {}'.format(node_type))
-            for parameter in self.get_scene_items(type_filter=node_type):
-                parameter.build(attr_filter=attr_filter, permissive=permissive)
+            # build the nodes by calling build method on each one
 
-        # get stored solver enable value to build later. The solver comes in OFF
-        solver_transform = self.get_scene_items(type_filter='zSolverTransform')
-        sn = None
-        if solver_transform:
-            sn = solver_transform[0].name
-            solver_value = solver_transform[0].attrs['enable']['value']
-
-        # generate list of node types to build
-        node_types_to_build = list()
-
-        if bones:
-            node_types_to_build.append('zBone')
-        if tissues:
-            node_types_to_build.append('zTissue')
-            node_types_to_build.append('zTet')
-        if cloth:
-            node_types_to_build.append('zCloth')
-        if materials:
-            node_types_to_build.append('zMaterial')
-        if attachments:
-            node_types_to_build.append('zAttachment')
-        if fibers:
-            node_types_to_build.append('zFiber')
-        if lineOfActions:
-            node_types_to_build.append('zLineOfAction')
-        if rivetToBone:
-            node_types_to_build.append('zRivetToBone')
-        if restShape:
-            node_types_to_build.append('zRestShape')
-        if embedder:
-            node_types_to_build.append('zEmbedder')
-        if fields:
-            node_types_to_build.extend(Field.TYPES)
-            node_types_to_build.append('zFieldAdaptor')
-
-        # build the nodes by calling build method on each one
-        for node_type in node_types_to_build:
-            logger.info('Building: {}'.format(node_type))
-            for scene_item in self.get_scene_items(type_filter=node_type,
+            for scene_item in self.get_scene_items(type_filter=solvers,
                                                    association_filter=association_filter):
+                logger.info('Building: {}'.format(scene_item.type))
                 scene_item.build(attr_filter=attr_filter,
                                  permissive=permissive,
                                  interp_maps=interp_maps)
 
-        # turn on solver
+        with SolverDisabler(solver_transform[0].name):
+
+            # generate list of node types to build
+            node_types_to_build = list()
+            if bones:
+                node_types_to_build.append('zBone')
+            if tissues:
+                node_types_to_build.append('zTissue')
+                node_types_to_build.append('zTet')
+            if cloth:
+                node_types_to_build.append('zCloth')
+            if materials:
+                node_types_to_build.append('zMaterial')
+            if attachments:
+                node_types_to_build.append('zAttachment')
+            if fibers:
+                node_types_to_build.append('zFiber')
+            if lineOfActions:
+                node_types_to_build.append('zLineOfAction')
+            if rivetToBone:
+                node_types_to_build.append('zRivetToBone')
+            if restShape:
+                node_types_to_build.append('zRestShape')
+            if embedder:
+                node_types_to_build.append('zEmbedder')
+            if fields:
+                node_types_to_build.extend(Field.TYPES)
+                node_types_to_build.append('zFieldAdaptor')
+
+            # build the nodes by calling build method on each one
+            for node_type in node_types_to_build:
+                scene_items = self.get_scene_items(type_filter=node_type,
+                                                   association_filter=association_filter)
+                if scene_items:
+                    logger.info('Building: {}'.format(node_type))
+                for scene_item in scene_items:
+                    scene_item.build(attr_filter=attr_filter,
+                                     permissive=permissive,
+                                     interp_maps=interp_maps)
+
         mc.select(sel, r=True)
-        if sn:
-            mc.setAttr(sn + '.enable', solver_value)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
@@ -616,10 +643,9 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
         selection ([str]): List of items in mayas scene
 
     Returns:
-        list(): Selection list with item types in 'type_' replaced with 
-        corresponding tissued mesh.
+        list(): Selection list with some items replaced.
     """
-    # these are the types we need to find the tissued mesh for.
+    # these are the types we need to find the tissue mesh for.
     type_ = ['zLineOfAction', 'zRivetToBone']
 
     output = []

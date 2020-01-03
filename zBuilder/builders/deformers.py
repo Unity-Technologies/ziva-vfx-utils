@@ -12,9 +12,6 @@ class Deformers(Builder):
     """Test setup to play with deformers and how they are ordered on a mesh.
     """
 
-    def __init__(self):
-        Builder.__init__(self)
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args-----------------------------------------------------------
@@ -46,6 +43,6 @@ class Deformers(Builder):
         interp_maps = kwargs.get('interp_maps', 'auto')
         name_filter = kwargs.get('name_filter', list())
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
-        parameters = self.get_scene_items(name_filter=name_filter, type_filter=acquire)
-        for parameter in parameters:
-            parameter.build(attr_filter=attr_filter, interp_maps=interp_maps)
+
+        for scene_item in self.get_scene_items(name_filter=name_filter, type_filter=acquire):
+            scene_item.build(attr_filter=attr_filter, interp_maps=interp_maps)

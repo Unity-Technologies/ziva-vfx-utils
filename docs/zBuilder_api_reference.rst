@@ -4,10 +4,13 @@ API Reference
 .. currentmodule:: zBuilder.builders.ziva
 
 .. autoclass:: Ziva
+   :noindex:
 
     .. automethod:: retrieve_from_scene(get_parameters)
+       :noindex:
 
-    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True, check_meshes=True)
+    .. automethod:: build(name_filter=None, attr_filter=None, interp_maps='auto', mirror=False, permissive=True)
+       :noindex:
 
 .. currentmodule:: zBuilder.builders.ziva
 

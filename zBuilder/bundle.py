@@ -8,15 +8,14 @@ class Bundle(object):
     """Mixin class to deal with storing node data and component data.  meant to
     be inherited by main.
     """
-
     def __init__(self):
         self.scene_items = list()
 
     def __iter__(self):
-        """ This iterates through the parameters.
+        """ This iterates through the scene_items.
 
         Returns:
-            Iterator of parameters.
+            Iterator of scene_items.
 
         """
         return iter(self.scene_items)
@@ -24,10 +23,21 @@ class Bundle(object):
     def __len__(self):
         """
 
-        Returns: Length of parameters.
+        Returns: Length of scene_items.
 
         """
         return len(self.scene_items)
+
+    def __eq__(self, other):
+        """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
+        is equal.
+        """
+        return self.scene_items == other.scene_items
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self == other
 
     def print_(self, type_filter=list(), name_filter=list()):
         """
@@ -35,9 +45,9 @@ class Bundle(object):
         information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
+            type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
+            name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
                 Defaults to :obj:`list`
         """
 
@@ -51,9 +61,9 @@ class Bundle(object):
         Compares info in memory with that which is in scene.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
+            type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
+            name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
                 Defaults to :obj:`list`
 
         """
@@ -66,7 +76,7 @@ class Bundle(object):
         Prints out basic information in Maya script editor.  Information is scene item types and counts.
 
         Args:
-            type_filter (:obj:`str`): filter by parameter type.
+            type_filter (:obj:`str`): filter by scene_item type.
                 Defaults to :obj:`str`
         """
 
@@ -89,32 +99,34 @@ class Bundle(object):
             logger.info('{} {}'.format(key, len(tmp[key])))
 
     def append_scene_item(self, scene_item):
-        """
-        appends a parameter to the parameter list.  Checks if parameter is
-        already in list, if it is it overrides the previous one.
-
-        Args:
-            scene_item (:obj:`obj`): the parameter to append to collection list.
-        """
-
-        if scene_item in self.scene_items:
-            self.scene_items = [
-                scene_item if item == scene_item else item for item in self.scene_items
-            ]
-        else:
-            self.scene_items.append(scene_item)
+        """ Deprecated. Use extend_scene_items instead, because batch processing is faster. """
+        self.extend_scene_items(self, [scene_item])
 
     def extend_scene_items(self, scene_items):
         """
+        Add a list of scene items into this bundle.
+        Any duplicates with existing scene items replace the existing item.
+        Duplicates are identified by long name.
 
         Args:
-            scene_items:
-
-        Returns:
-
+            scene_items: List of objects derived from zBuilder.nodes.Base
         """
+
+        # The order of items in self.scene_items is important,
+        # so we must update existing items in place and append new items in the order given.
+        # To easily update existing items, here's an index to lookup where they are by name.
+        old_items = {
+            scene_item.long_name: index
+            for index, scene_item in enumerate(self.scene_items)
+        }
+
+        bad_index = -1
         for scene_item in scene_items:
-            self.append_scene_item(scene_item)
+            index = old_items.get(scene_item.long_name, bad_index)
+            if index != bad_index:
+                self.scene_items[index] = scene_item
+            else:
+                self.scene_items.append(scene_item)
 
     def remove_scene_item(self, scene_item):
         """
@@ -135,15 +147,15 @@ class Bundle(object):
         Gets the scene items from builder for further inspection or modification.
 
         Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``type``.
                 Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``name``.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``name``.
                 Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by parameter name by regular expression.
+            name_regex (:obj:`str`): filter by scene_item name by regular expression.
                 Defaults to ``None``.
-            association_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``association``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``association``.
                 Defaults to :obj:`list`.
-            association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
+            association_regex (:obj:`str`): filter by scene_item ``association`` by regular expression.
                 Defaults to ``None``.
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``

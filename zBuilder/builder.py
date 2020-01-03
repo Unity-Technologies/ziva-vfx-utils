@@ -19,7 +19,6 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
-
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -35,6 +34,16 @@ class Builder(object):
         self.info['maya_version'] = mc.about(v=True)
         self.info['operating_system'] = mc.about(os=True)
 
+    def __eq__(self, other):
+        """ Compares the builders.
+        """
+        return type(other) == type(self) and self.bundle == other.bundle
+
+    def __ne__(self, other):
+        """ Define a non-equality test
+        """
+        return not self == other
+
     def log(self):
         self.root_node.log()
 
@@ -42,7 +51,7 @@ class Builder(object):
         try:
             import zBuilder.ui.reader as reader
         except ImportError:
-            raise StandardError("Ziva Scene Panel supported on Maya 2017+")
+            raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
         reader.view(root_node=self.root_node)
 
@@ -65,13 +74,19 @@ class Builder(object):
             if inspect.isclass(obj):
                 if obj.TYPES:
                     if type_ in obj.TYPES:
-                        item_list.append(obj(parent=parent, maya_node=node, builder=self))
+                        obb = obj(parent=parent, builder=self)
+                        obb.populate(maya_node=node)
+                        item_list.append(obb)
                 if type_ == obj.type:
 
-                    objct = obj(parent=parent, maya_node=node, builder=self)
+                    objct = obj(parent=parent, builder=self)
+                    objct.populate(maya_node=node)
+
                     item_list.append(objct)
         if not item_list:
-            item_list.append(zBuilder.nodes.DGNode(parent=parent, maya_node=node, builder=self))
+            objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
+            objct.populate(maya_node=node)
+            item_list.append(objct)
 
         if get_parameters:
             for obj__ in item_list:
@@ -118,7 +133,6 @@ class Builder(object):
         """
         A decorator to time functions.
         """
-
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -132,9 +146,8 @@ class Builder(object):
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        parameters = self.bundle.get_scene_items()
-        for parameter in parameters:
-            parameter.build(*args, **kwargs)
+        for scene_item in self.bundle.get_scene_items():
+            scene_item.build(*args, **kwargs)
 
     def retrieve_from_scene(self, *args, **kwargs):
         """
@@ -208,9 +221,9 @@ class Builder(object):
         information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
-            type_filter (:obj:`list` or :obj:`str`): filter by parameter type.
+            type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
                 Defaults to :obj:`list`
-            name_filter (:obj:`list` or :obj:`str`): filter by parameter name.
+            name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
                 Defaults to :obj:`list`
         """
         self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
@@ -226,15 +239,15 @@ class Builder(object):
         Gets the scene items from builder for further inspection or modification.
 
         Args:
-            type_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``type``.
+            type_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``type``.
                 Defaults to :obj:`list`.
-            name_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``name``.
+            name_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``name``.
                 Defaults to :obj:`list`.
-            name_regex (:obj:`str`): filter by parameter name by regular expression.
+            name_regex (:obj:`str`): filter by scene_item name by regular expression.
                 Defaults to ``None``.
-            association_filter (:obj:`str` or :obj:`list`, optional): filter by parameter ``association``.
+            association_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``association``.
                 Defaults to :obj:`list`.
-            association_regex (:obj:`str`): filter by parameter ``association`` by regular expression.
+            association_regex (:obj:`str`): filter by scene_item ``association`` by regular expression.
                 Defaults to ``None``.
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
@@ -277,4 +290,4 @@ def builder_factory(class_name):
             if class_name == obj.__name__:
                 return obj()
 
-    raise StandardError('Cannot find class in zBuilder.builders')
+    raise Exception('Cannot find class in zBuilder.builders')
