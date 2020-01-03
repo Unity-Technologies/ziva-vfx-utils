@@ -39,11 +39,7 @@ class SolverNode(Ziva):
             mc.rename(solverTransform, st.name)
             solverTransform_child = mc.listRelatives(st.name, c=True)[0]
             mc.rename(solverTransform_child, solver_name.split('|')[-1])
-            self.mobject = solver_name.split('|')[-1]
-
-            st.mobject = st.name
         else:
             new_name = mc.rename(solver_name, self.name)
-            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)

@@ -18,7 +18,7 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
-    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', '_mobject_handle']
+    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
@@ -228,8 +228,7 @@ def serialize_object(obj):
 
     # clearing these attributes for now as they are causing issues with serilization as they are
     # python objects and they are not needed in this context.  These attributes are used
-    # for the QTreeView to define the tree layout.  If we want to seralize this we will
-    # need to treat these similiar to .mobject.
+    # for the QTreeView to define the tree layout.
     obj.parent = None
     obj.children = None
 

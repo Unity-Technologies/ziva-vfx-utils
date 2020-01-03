@@ -73,7 +73,6 @@ def build_multiple(scene_items, attr_filter=None, permissive=False):
     if results:
         results = mc.ls(results, type='zBone')
         for new, name, scene_item in zip(results, culled['names'], culled['scene_items']):
-            scene_item.mobject = new
             mc.rename(new, name)
 
     mc.select(sel)

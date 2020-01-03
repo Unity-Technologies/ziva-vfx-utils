@@ -15,6 +15,7 @@ class AttachmentNode(Ziva):
     """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
     """ List of maps to store. """
+
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 
@@ -61,19 +62,16 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    self.mobject = existing[d_index]
                     mc.rename(existing[d_index], name)
                 else:
                     mc.select(source_mesh, r=True)
                     mc.select(target_mesh, add=True)
                     new_att = mm.eval('ziva -a')
-                    self.mobject = new_att[0]
                     mc.rename(new_att[0], name)
             else:
                 mc.select(source_mesh, r=True)
                 mc.select(target_mesh, add=True)
                 new_att = mm.eval('ziva -a')
-                self.mobject = new_att[0]
                 mc.rename(new_att[0], name)
 
             # set the attributes

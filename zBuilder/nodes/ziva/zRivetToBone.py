@@ -12,6 +12,7 @@ class RivetToBoneNode(Ziva):
     """
     type = 'zRivetToBone'
     """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(RivetToBoneNode, self).__init__(parent=parent, builder=builder)
         self.cv_indices = []
@@ -79,7 +80,6 @@ class RivetToBoneNode(Ziva):
                     mc.select('{}.cv[{}]'.format(crv, i), add=True)
                 mc.select(bone, add=True)
                 results = mm.eval('zRivetToBone')
-                self.mobject = results[0]
                 mc.rename(results[0], self.name)
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)

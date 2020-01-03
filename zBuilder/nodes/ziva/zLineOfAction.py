@@ -52,10 +52,7 @@ class LineOfActionNode(Ziva):
                 mc.select(self.fiber, self.association)
                 results_ = mm.eval('ziva -lineOfAction')
                 clt = mc.ls(results_, type='zLineOfAction')[0]
-                self.mobject = clt
                 mc.rename(clt, self.name)
-            else:
-                self.mobject = existing[0]
         else:
             mc.warning(self.association[0] +
                        ' mesh does not exists in scene, skippings line of action')

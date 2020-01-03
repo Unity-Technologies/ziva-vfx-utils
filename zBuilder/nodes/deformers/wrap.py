@@ -35,10 +35,6 @@ class Wrap(Deformer):
 
             results = mm.eval(cmd)
             mc.rename(results[0], self.name)
-            # print cmd
-            #self.mobject = delta_mush
-        else:
-            self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
         # self.set_maya_weights(interp_maps=interp_maps)
