@@ -3,7 +3,6 @@ import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
-import maya.OpenMaya as om
 import maya.cmds as mc
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
@@ -12,7 +11,6 @@ from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_
 class ZivaBoneGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.temp_file_path = test_utils.get_tmp_file_location()
         cls.bone_names = [
             "c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"
         ]
@@ -39,86 +37,27 @@ class ZivaBoneGenericTestCase(VfxTestCase):
                                    Test fails if zBuilder is missing any of the keys
                                    or has any keys with different values.
         """
-        bone_nodes = builder.get_scene_items(type_filter="zBone")
-
-        self.assertItemsEqual(self.bone_names, [x.name for x in bone_nodes])
-
-        for node in bone_nodes:
-            self.assertEqual(node.type, "zBone")
-            self.assertIsInstance(node.mobject, om.MObject)
-
-        zbuilder_plugs = attr_values_from_zbuilder_nodes(bone_nodes)
-        expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
-        self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
+        self.check_retrieve_looks_good(builder, expected_plugs, self.bone_names, "zBone")
 
     def test_retrieve(self):
         self.check_retrieve_zbone_looks_good(self.builder, {})
 
     def test_build_restores_attr_values(self):
-        plug_names = {
-            '{}.{}'.format(geo, attr)
-            for geo in self.bone_names for attr in self.bone_attrs
-        }
-        attrs_before = attr_values_from_scene(plug_names)
-
-        # remove all Ziva nodes from the scene and build them
-        mz.clean_scene()
-        self.builder.build()
-
-        attrs_after = attr_values_from_scene(plug_names)
-        self.assertEqual(attrs_before, attrs_after)
+        self.check_build_restores_attr_values(self.builder, self.bone_names, self.bone_attrs)
 
     def test_remove(self):
-        ## SETUP
-        tissue_nodes = self.builder.get_scene_items(type_filter="zBone")
-        # clear selection
-        mc.select(cl=True)
-        for tissue in tissue_nodes:
-            mc.select(tissue.long_association, add=True)
-
-        ## ACT
-        mc.ziva(rm=True)
-
-        ## VERIFY
-        mc.select(cl=True)
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
-        tissue_nodes = builder.get_scene_items(type_filter="zBone")
-        self.assertEqual(tissue_nodes, [])
+        self.check_ziva_remove_command(self.builder, "zBone")
 
     def test_builder_has_same_tissue_nodes_after_writing_to_disk(self):
-        self.builder.write(self.temp_file_path)
-        self.assertTrue(os.path.exists(self.temp_file_path))
-
-        builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        builder = self.check_builder_has_same_nodes_after_writing_to_disk(self.builder)
         self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_build(self):
-        ## SETUP
-        mz.clean_scene()
-
-        ## ACT
-        self.builder.build()
-
-        ## VERIFY
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
+        builder = self.check_can_build_node(self.builder)
         self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_build_from_file(self):
-        ## SETUP
-        self.builder.write(self.temp_file_path)
-        mz.clean_scene()
-
-        ## ACT
-        builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
-        builder.build()
-
-        ## VERIFY
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
+        builder = self.check_can_build_from_file(self.builder)
         self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_rename(self):
@@ -150,43 +89,11 @@ class ZivaBoneGenericTestCase(VfxTestCase):
         self.assertEqual(r_tissue, [])
 
     def test_cut_paste(self):
-        ## ACT
-        mc.select("l_bone_1")
-        utils.rig_cut()
-
-        ## VERIFY
-        self.assertEqual(mc.ls("l_bone_1_zBone"), [])
-
-        ## ACT
-        mc.select("l_bone_1")
-        utils.rig_paste()
-
-        ## VERIFY
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
+        builder = self.check_can_cut_paste("l_bone_1", "l_bone_1_zBone")
         self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_copy_paste(self):
-        ## ACT
-        # check if zBone exists
-        self.assertEqual(len(mc.ls("l_bone_1_zBone")), 1)
-        mc.select("l_bone_1")
-        utils.rig_copy()
-
-        ## VERIFY
-        # check that zBone was not removed
-        self.assertEqual(len(mc.ls("l_bone_1_zBone")), 1)
-
-        ## SETUP
-        mc.ziva(rm=True)
-
-        ## ACT
-        mc.select("l_bone_1")
-        utils.rig_paste()
-
-        ## VERIFY
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
+        builder = self.check_can_copy_paste("l_bone_1", "l_bone_1_zBone")
         self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
