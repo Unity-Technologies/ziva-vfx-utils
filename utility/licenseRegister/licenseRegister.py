@@ -7,9 +7,9 @@ from shutil import copy2
 LICENSE_FILE_NAME = 'zivavfx.lic'
 
 
-def register_node_based_license(module_path, new_license_path):
+def register_node_locked_license(module_path, new_license_path):
     '''
-    Copy new node-based license to module path
+    Copy new node-locked license to module path
     '''
     if not path.exists(new_license_path):
         raise RuntimeError("Input license file path: {} does not exist.".format(new_license_path))

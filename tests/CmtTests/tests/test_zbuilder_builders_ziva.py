@@ -12,6 +12,36 @@ import zBuilder.utils as utils
 from vfx_test_case import VfxTestCase
 from zBuilder.builders.ziva import SolverDisabler
 
+import maya.cmds as mc
+
+
+class ZivaMirrorSelectedTestCase(VfxTestCase):
+    def setUp(self):
+        super(ZivaMirrorSelectedTestCase, self).setUp()
+        test_utils.build_generic_scene(scene_name='mirror_example.ma')
+
+    def test_mirror_selection(self):
+        mc.select('l_arm_muscles')
+
+        builder = zva.Ziva()
+        builder.retrieve_from_scene_selection()
+        # before we build we want to mirror just the center geo
+        for item in builder.get_scene_items(name_filter='c_chest_bone'):
+            item.mirror()
+
+        # and we want to interpolate any map associated with the center geo
+        for item in builder.get_scene_items(type_filter='map'):
+            if 'c_chest_bone' in item._mesh:
+                item.interpolate()
+
+        # now a simple string replace
+        builder.string_replace('^l_', 'r_')
+
+        builder.build()
+
+        self.assertSceneHasNodes(['zAttachment2', 'zMaterial3', 'zMaterial4'])
+        
+
 
 class ZivaMirrorTestCase(VfxTestCase):
     def setUp(self):
