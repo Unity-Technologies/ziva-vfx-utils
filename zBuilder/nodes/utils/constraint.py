@@ -44,10 +44,8 @@ class Constraint(DGNode):
                 constraint = mc.ls(results, type='orientConstraint')[0]
 
             mc.rename(constraint, name)
-            self.mobject = name
         else:
             new_name = mc.rename(self.name, self.name)
-            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

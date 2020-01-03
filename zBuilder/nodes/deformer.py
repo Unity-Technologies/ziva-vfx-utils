@@ -116,8 +116,7 @@ class Deformer(DGNode):
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored scene_name.
+        scene.
 
         Args:
             interp_maps (str): Do you want maps interpolated?

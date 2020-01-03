@@ -13,6 +13,7 @@ class SolverTransformNode(Ziva):
     """
     type = 'zSolverTransform'
     """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zSolverTransform in maya scene.
 
@@ -35,6 +36,5 @@ class SolverTransformNode(Ziva):
 
         else:
             new_name = mc.rename(solver_name, self.name)
-            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)

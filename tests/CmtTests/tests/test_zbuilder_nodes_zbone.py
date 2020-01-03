@@ -9,18 +9,17 @@ import maya.cmds as mc
 from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
 
 
-class ZivaTissueGenericTestCase(VfxTestCase):
+class ZivaBoneGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.temp_file_path = test_utils.get_tmp_file_location()
-        cls.tissue_names = [
-            "l_tissue_1_zTissue", "r_tissue_2_zTissue", "c_tissue_3_zTissue",
-            "r_subtissue_1_zTissue"
+        cls.bone_names = [
+            "c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"
         ]
-        cls.tissue_attrs = ["inertialDamping", "pressureEnvelope", "collisions"]
+        cls.bone_attrs = ["contactSliding", "contactStiffnessExp", "collisions"]
 
     def setUp(self):
-        super(ZivaTissueGenericTestCase, self).setUp()
+        super(ZivaBoneGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -28,36 +27,36 @@ class ZivaTissueGenericTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaTissueGenericTestCase, self).tearDown()
+        super(ZivaBoneGenericTestCase, self).tearDown()
 
-    def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
+    def check_retrieve_zbone_looks_good(self, builder, expected_plugs):
         """Args:
             builder (builders.ziva.Ziva()): builder object
             expected_plugs (dict): A dict of expected attribute/value pairs.
-                                   {'zTissue1.collisions':True, ...}.
+                                   {'zBone1.collisions':True, ...}.
                                    If None/empty/False, then attributes are taken from zBuilder
                                    and values are taken from the scene.
                                    Test fails if zBuilder is missing any of the keys
                                    or has any keys with different values.
         """
-        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
+        bone_nodes = builder.get_scene_items(type_filter="zBone")
 
-        self.assertItemsEqual(self.tissue_names, [x.name for x in tissue_nodes])
+        self.assertItemsEqual(self.bone_names, [x.name for x in bone_nodes])
 
-        for node in tissue_nodes:
-            self.assertEqual(node.type, "zTissue")
+        for node in bone_nodes:
+            self.assertEqual(node.type, "zBone")
 
-        zbuilder_plugs = attr_values_from_zbuilder_nodes(tissue_nodes)
+        zbuilder_plugs = attr_values_from_zbuilder_nodes(bone_nodes)
         expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
         self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
 
     def test_retrieve(self):
-        self.check_retrieve_ztissue_looks_good(self.builder, {})
+        self.check_retrieve_zbone_looks_good(self.builder, {})
 
     def test_build_restores_attr_values(self):
         plug_names = {
             '{}.{}'.format(geo, attr)
-            for geo in self.tissue_names for attr in self.tissue_attrs
+            for geo in self.bone_names for attr in self.bone_attrs
         }
         attrs_before = attr_values_from_scene(plug_names)
 
@@ -70,7 +69,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def test_remove(self):
         ## SETUP
-        tissue_nodes = self.builder.get_scene_items(type_filter="zTissue")
+        tissue_nodes = self.builder.get_scene_items(type_filter="zBone")
         # clear selection
         mc.select(cl=True)
         for tissue in tissue_nodes:
@@ -83,7 +82,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         mc.select(cl=True)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        tissue_nodes = builder.get_scene_items(type_filter="zTissue")
+        tissue_nodes = builder.get_scene_items(type_filter="zBone")
         self.assertEqual(tissue_nodes, [])
 
     def test_builder_has_same_tissue_nodes_after_writing_to_disk(self):
@@ -92,7 +91,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_build(self):
         ## SETUP
@@ -104,7 +103,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_build_from_file(self):
         ## SETUP
@@ -119,84 +118,84 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_rename(self):
         ## SETUP
-        mc.select("r_tissue_1")
-        mc.ziva(t=True)
+        mc.select("r_bone_1")
+        mc.ziva(b=True)
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(mc.ls("r_tissue_1_zTissue"), [])
+        self.assertEqual(mc.ls("r_bone_1_zBone"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        mz.rename_ziva_nodes([])
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
+        self.assertEqual(len(mc.ls("r_bone_1_zBone")), 1)
 
     def test_string_replace(self):
         ## VERIFY
         # check if an item exists before string_replace
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
+        r_tissue = self.builder.get_scene_items(name_filter="l_bone_1_zBone")
         self.assertGreaterEqual(len(r_tissue), 1)
 
         ## ACT
-        self.builder.string_replace("^r_", "l_")
+        self.builder.string_replace("^l_", "r_")
 
         ## VERIFY
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
+        r_tissue = self.builder.get_scene_items(name_filter="l_bone_1_zBone")
         self.assertEqual(r_tissue, [])
 
     def test_cut_paste(self):
         ## ACT
-        mc.select("l_tissue_1")
+        mc.select("l_bone_1")
         utils.rig_cut()
 
         ## VERIFY
-        self.assertEqual(mc.ls("l_tissue_1_zTissue"), [])
+        self.assertEqual(mc.ls("l_bone_1_zBone"), [])
 
         ## ACT
-        mc.select("l_tissue_1")
+        mc.select("l_bone_1")
         utils.rig_paste()
 
         ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_copy_paste(self):
         ## ACT
-        # check if zTissue exists
-        self.assertEqual(len(mc.ls("l_tissue_1_zTissue")), 1)
-        mc.select("l_tissue_1")
+        # check if zBone exists
+        self.assertEqual(len(mc.ls("l_bone_1_zBone")), 1)
+        mc.select("l_bone_1")
         utils.rig_copy()
 
         ## VERIFY
-        # check that zTissue was not removed
-        self.assertEqual(len(mc.ls("l_tissue_1_zTissue")), 1)
+        # check that zBone was not removed
+        self.assertEqual(len(mc.ls("l_bone_1_zBone")), 1)
 
         ## SETUP
         mc.ziva(rm=True)
 
         ## ACT
-        mc.select("l_tissue_1")
+        mc.select("l_bone_1")
         utils.rig_paste()
 
         ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        self.check_retrieve_zbone_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
-        # check if zTissue does not exist before making it
-        self.assertEqual(mc.ls("r_tissue_1_zTissue"), [])
+        # check if zBone does not exist before making it
+        self.assertEqual(mc.ls("r_bone_1_zBone"), [])
 
         ## ACT
-        mc.select("l_tissue_1")
+        mc.select("l_bone_1")
         utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_tissue_1_zTissue")), 1)
+        self.assertEqual(len(mc.ls("r_bone_1_zBone")), 1)

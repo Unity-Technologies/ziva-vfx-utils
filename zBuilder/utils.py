@@ -383,10 +383,6 @@ def rig_transfer(source_solver, prefix, target_solver=""):
         '^' + prefix + source_solver,
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
-    # we need to clear the stored mobjects.  Without doing this it keeps a pointer to original object
-    # and uses that instead of creating a new object.  This makes sure it is a new setup with new nodes.
-    builder.break_connection_to_scene()
-
     # build the transferred solver
     mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
     builder.build()

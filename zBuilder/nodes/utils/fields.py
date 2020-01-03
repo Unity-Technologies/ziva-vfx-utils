@@ -42,11 +42,9 @@ class Field(DGNode):
                 'vortexField': mc.vortex
             }
             results = factory[self.type](n=name)
-            self.mobject = name
 
         else:
             new_name = mc.rename(name, self.name)
-            self.mobject = new_name
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

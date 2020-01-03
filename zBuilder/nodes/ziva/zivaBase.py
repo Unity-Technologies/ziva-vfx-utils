@@ -40,7 +40,6 @@ class Ziva(Deformer):
             attr_list.extend(self.EXTEND_ATTR_LIST)
         attrs = mz.build_attr_key_values(maya_node, attr_list)
         self.attrs = attrs
-        self.mobject = maya_node
 
         mesh = mz.get_association(maya_node)
         self.association = mesh

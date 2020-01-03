@@ -42,7 +42,6 @@ class DGNode(Base):
 
         self.attrs = {}
         self._association = []
-        self._mobject_handle = None
 
     def __str__(self):
         if self.name:
@@ -66,7 +65,7 @@ class DGNode(Base):
     def __deepcopy__(self, memo):
         # Some attributes cannot be deepcopied so define a listy of attributes
         # to ignore.
-        non_copyable_attrs = ('_mobject_handle', 'depends_on')
+        non_copyable_attrs = ('depends_on')
 
         result = type(self)()
 
@@ -80,39 +79,25 @@ class DGNode(Base):
     def serialize(self):
         """  Makes node serializable.
 
-        This replaces an mObject with the name of the object in scene to make it
-        serializable for writing out to json.  Then it loops through keys in
-        dict and saves out a temp dict of items that can be serializable and
-        returns that temp dict for json writing purposes.
-
-        Replaces .mobject mobject with a string name before serilization.
-        Afterwords it converts it back to an mObject.
+        It loops through keys in dict and saves out a temp dict of items that 
+        can be serializable and returns that temp dict for json writing purposes.
 
         Returns:
             dict: of serializable items
         """
-        # convert mObjectHandle to name of maya object (str)
-        self._mobject_handle = mz.get_name_from_m_object(self.mobject)
-
         output = serialize_object(self)
-
-        self.mobject = self._mobject_handle
 
         return output
 
     def deserialize(self, json_data):
         """ Deserializes a node with given dict.
 
-        Assigns a dictionary to __dict__.  Adds an mObject to the .mobject if 
-        applicable.
+        Assigns a dictionary to __dict__.
 
         Args:
             json_data(dict): The given dict.
         """
         self.__dict__ = json_data
-
-        # Finding the mObject in scene if it exists
-        self.mobject = self._mobject_handle
 
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
@@ -130,7 +115,6 @@ class DGNode(Base):
         self.name = maya_node
         self.type = mc.objectType(maya_node)
         self.get_maya_attrs()
-        self.mobject = maya_node
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
@@ -171,11 +155,11 @@ class DGNode(Base):
                     scene_val = mc.getAttr(name + '.' + attr)
                     obj_val = self.attrs[attr]['value']
                     if scene_val != obj_val:
-                        print('DIFF:', name + '.' + attr, '\tobject value:', obj_val, '\tscene value:', scene_val)
+                        print('DIFF:', name + '.' + attr, '\tobject value:', obj_val,
+                              '\tscene value:', scene_val)
 
     def get_scene_name(self, long_name=False):
-        """This checks stored mObject and gets name of maya object in scene.  If no
-        mObject it returns parameter name.
+        """This returns either long name or short name.
 
         Args:
             long_name (bool): Return the fullpath or not. Defaults to False.
@@ -204,8 +188,7 @@ class DGNode(Base):
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored name.
+        scene. 
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to set.
@@ -254,45 +237,3 @@ class DGNode(Base):
                         mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
                     except RuntimeError:
                         pass
-
-    @property
-    def mobject(self):
-        """
-        Gets mObject out of mObjectHandle.  Checks if it is valid before releasing it.
-        Returns:
-            mObject
-
-        """
-        if not isinstance(self._mobject_handle, str):
-            if self._mobject_handle:
-                if self._mobject_handle.isValid():
-                    return self._mobject_handle.object()
-
-        return None
-
-    @mobject.setter
-    def mobject(self, maya_node):
-        """
-        Tracks an mObject with a builder node.  Given a maya node it looks up
-        its mobject and stores that in a list that corresponds with the
-        builder node list.
-        Args:
-            maya_node (str): The maya node to track.
-
-        Returns:
-            Nothing
-
-        """
-        self._mobject_handle = None
-        if mc.objExists(maya_node):
-            selection_list = om.MSelectionList()
-            selection_list.add(maya_node)
-            mobject = om.MObject()
-            selection_list.getDependNode(0, mobject)
-            self._mobject_handle = om.MObjectHandle(mobject)
-
-    def break_connection_to_scene(self):
-        """Sets the mObject for the node to None.  This is useful if you want to break the 
-        connection between the node and what is in the scene.
-        """
-        self._mobject_handle = None

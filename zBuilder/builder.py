@@ -19,6 +19,7 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
+
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -133,6 +134,7 @@ class Builder(object):
         """
         A decorator to time functions.
         """
+
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -261,13 +263,6 @@ class Builder(object):
                                            association_filter=association_filter,
                                            association_regex=association_regex,
                                            invert_match=invert_match)
-
-    def break_connection_to_scene(self):
-        """Sets the mObject for all scene items to None.  This is useful if you want to break the 
-        connection between the node and what is in the scene.
-        """
-        for item in self.get_scene_items(type_filter=['map', 'mesh'], invert_match=True):
-            item.break_connection_to_scene()
 
 
 def builder_factory(class_name):

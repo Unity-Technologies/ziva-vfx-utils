@@ -1,5 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
+import zBuilder.zMaya as mz
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -9,6 +10,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     nodeRole = QtCore.Qt.UserRole + 1
     # long name of scene_item object in the scene
     longNameRole = QtCore.Qt.UserRole + 2
+    # is node enabled
+    enableRole = QtCore.Qt.UserRole + 3
 
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
@@ -69,6 +72,24 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.longNameRole:
             return node.long_name
 
+        if role == SceneGraphModel.enableRole:
+            enable = True
+            node = index.internalPointer()
+
+            # If node is a mesh/curve, then take enable status from it's child
+            if hasattr(node, 'depends_on'):
+                node = node.depends_on
+
+            # Maya nodes have either of two attributes showing if node is enabled
+            # need to check both of them
+            attrs = node.attrs
+            if "envelope" in attrs:
+                enable = attrs["envelope"]["value"]
+            elif "enable" in attrs:
+                enable = attrs["enable"]["value"]
+
+            return enable
+
     def parent(self, index):
 
         node = self.getNode(index)
@@ -97,3 +118,23 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return node
 
         return self.root_node
+
+
+class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super(TreeItemDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        proxy_model = index.model()
+        index_model = proxy_model.mapToSource(index)
+
+        if index_model.isValid():
+            model = index_model.model()
+            enable = model.data(index_model, model.enableRole)
+            if not enable:
+                if option.state & QtWidgets.QStyle.State_Selected:
+                    option.state &= ~QtWidgets.QStyle.State_Selected
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(28, 96, 164))
+                else:
+                    option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(100, 100, 100))
+        QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

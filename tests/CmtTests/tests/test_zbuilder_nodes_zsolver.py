@@ -46,7 +46,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         self.assertEqual(solver.name, name)
         self.assertEqual(solver.type, "zSolver")
-        self.assertIsInstance(solver.mobject, om.MObject)
 
         for i, attr in enumerate(solver_attrs):
             if attrs:
@@ -72,12 +71,12 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_transform_attrs = ['enable', 'startFrame']
 
         solver_transform_children_expected = {
-            'zSolver1Shape', 'r_tissue_2', 'c_tissue_3', 'l_tissue_1', 'bone_1', 'bone_2', 'cloth_1'
+            'zSolver1Shape', 'r_tissue_2', 'c_tissue_3', 'l_tissue_1', 'c_bone_1', 'c_bone_2',
+            'c_cloth_1', 'l_bone_1'
         }
 
         self.assertEqual(solver_transform.name, name)
         self.assertEqual(solver_transform.type, "zSolverTransform")
-        self.assertIsInstance(solver_transform.mobject, om.MObject)
 
         for i, attr in enumerate(solver_transform_attrs):
             if attrs:
