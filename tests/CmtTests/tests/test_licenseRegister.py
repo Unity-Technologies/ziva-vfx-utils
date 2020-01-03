@@ -4,7 +4,7 @@ from os import path
 import tempfile
 from vfx_test_case import VfxTestCase
 from utility.licenseRegister.licenseRegister import LICENSE_FILE_NAME
-from utility.licenseRegister.licenseRegister import register_node_based_license, register_floating_license
+from utility.licenseRegister.licenseRegister import register_node_locked_license, register_floating_license
 
 
 def create_file(file_path, file_content):
@@ -35,27 +35,28 @@ HOST localhost ANY 5054
 HOST localhost ANY 5055
 '''.strip()
 
-        # create existing node based license file
-        cls.exist_node_based_license_file_path = path.join(cls.module_path, 'exist_node_based.lic')
-        cls.exist_node_based_license_content = '''
+        # create existing node locked license file
+        cls.exist_node_locked_license_file_path = path.join(cls.module_path,
+                                                            'exist_node_locked.lic')
+        cls.exist_node_locked_license_content = '''
 LICENSE zivadyn ziva-vfx-author 1.99 1-jan-2020 uncounted hostid=ANY
   _ck=abcde12345 sig="AABBCCDDEEFF112233445566AABBCCDDEEFF112233445566
   ABCDEF123456ABCDEF123456ABCDEF123456"
 '''.strip()
-        create_file(cls.exist_node_based_license_file_path, cls.exist_node_based_license_content)
+        create_file(cls.exist_node_locked_license_file_path, cls.exist_node_locked_license_content)
 
-        # create new node based license file
-        cls.new_license_file_name = 'new_node_based_license.lic'
+        # create new node locked license file
+        cls.new_license_file_name = 'new_node_locked_license.lic'
         cls.new_license_file_path = path.join(cls.temp_dir, cls.new_license_file_name)
         cls.new_license_file_in_module_path = path.join(cls.module_path, cls.new_license_file_name)
-        cls.new_node_based_license_content1 = '''
+        cls.new_node_locked_license_content1 = '''
 LICENSE zivadyn ziva-vfx-author 1.99 1-feb-2020 uncounted hostid=ANY
   _ck=abcde12345 sig="AABBCCDDEEFF112233445566AABBCCDDEEFF112233445566
   ABCDEF123456ABCDEF123456ABCDEF123456"
 '''.strip()
 
-        # setup another node based license content, for overriding test
-        cls.new_node_based_license_content2 = '''
+        # setup another node locked license content, for overriding test
+        cls.new_node_locked_license_content2 = '''
 LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
   _ck=abcde12345 sig="AABBCCDDEEFF112233445566AABBCCDDEEFF112233445566
   ABCDEF123456ABCDEF123456ABCDEF123456"
@@ -65,7 +66,7 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
     def tearDownClass(cls):
         delete_file(cls.new_license_file_in_module_path)
         delete_file(cls.new_license_file_path)
-        delete_file(cls.exist_node_based_license_file_path)
+        delete_file(cls.exist_node_locked_license_file_path)
         delete_file(cls.new_license_file_path)
 
         if path.exists(cls.module_path) and path.isdir(cls.module_path):
@@ -79,66 +80,67 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
 
     # --------------------------------------------------------------------------------
 
-    def test_non_exist_input_node_based_file(self):
+    def test_non_exist_input_node_locked_file(self):
         # Act
         with self.assertRaises(RuntimeError):
-            register_node_based_license(self.module_path, "non/exist/file/path")
+            register_node_locked_license(self.module_path, "non/exist/file/path")
 
         with self.assertRaises(RuntimeError):
-            register_node_based_license(self.module_path, self.module_path)
+            register_node_locked_license(self.module_path, self.module_path)
 
-    def test_register_node_based_license(self):
+    def test_register_node_locked_license(self):
         '''
-        Test registering node-based license
+        Test registering node-locked license
         '''
         # Setup
-        create_file(self.new_license_file_path, self.new_node_based_license_content1)
+        create_file(self.new_license_file_path, self.new_node_locked_license_content1)
 
         # Act
-        register_node_based_license(self.module_path, self.new_license_file_path)
+        register_node_locked_license(self.module_path, self.new_license_file_path)
 
         # Verify
         # Existing file unaffected
-        self.assertTrue(path.exists(self.exist_node_based_license_file_path))
-        self.assertTrue(path.isfile(self.exist_node_based_license_file_path))
-        with open(self.exist_node_based_license_file_path, 'r') as lic_file:
+        self.assertTrue(path.exists(self.exist_node_locked_license_file_path))
+        self.assertTrue(path.isfile(self.exist_node_locked_license_file_path))
+        with open(self.exist_node_locked_license_file_path, 'r') as lic_file:
             generated_content = lic_file.read()
-            self.assertEqual(self.exist_node_based_license_content, generated_content)
+            self.assertEqual(self.exist_node_locked_license_content, generated_content)
 
         # New file is copied to module path
         self.assertTrue(path.exists(self.new_license_file_in_module_path))
         self.assertTrue(path.isfile(self.new_license_file_in_module_path))
         with open(self.new_license_file_in_module_path, 'r') as lic_file:
             generated_content = lic_file.read()
-            self.assertEqual(self.new_node_based_license_content1, generated_content)
+            self.assertEqual(self.new_node_locked_license_content1, generated_content)
+
 
     def test_overriding_existing_node_based_license(self):
         '''
-        Test overriding existing node based license file.
-        This should not happen as each node based license file name is unique.
+        Test overriding existing node locked license file.
+        This should not happen as each node locked license file name is unique.
         '''
         # Setup
         # Create new license file in source and destination path
-        create_file(self.new_license_file_in_module_path, self.new_node_based_license_content1)
-        create_file(self.new_license_file_path, self.new_node_based_license_content2)
+        create_file(self.new_license_file_in_module_path, self.new_node_locked_license_content1)
+        create_file(self.new_license_file_path, self.new_node_locked_license_content2)
 
         # Act
-        register_node_based_license(self.module_path, self.new_license_file_path)
+        register_node_locked_license(self.module_path, self.new_license_file_path)
 
         # Verify
         # Existing file unaffected
-        self.assertTrue(path.exists(self.exist_node_based_license_file_path))
-        self.assertTrue(path.isfile(self.exist_node_based_license_file_path))
-        with open(self.exist_node_based_license_file_path, 'r') as lic_file:
+        self.assertTrue(path.exists(self.exist_node_locked_license_file_path))
+        self.assertTrue(path.isfile(self.exist_node_locked_license_file_path))
+        with open(self.exist_node_locked_license_file_path, 'r') as lic_file:
             generated_content = lic_file.read()
-            self.assertEqual(self.exist_node_based_license_content, generated_content)
+            self.assertEqual(self.exist_node_locked_license_content, generated_content)
 
         # New file overrides same name file
         self.assertTrue(path.exists(self.new_license_file_in_module_path))
         self.assertTrue(path.isfile(self.new_license_file_in_module_path))
         with open(self.new_license_file_in_module_path, 'r') as lic_file:
             generated_content = lic_file.read()
-            self.assertEqual(self.new_node_based_license_content2, generated_content)
+            self.assertEqual(self.new_node_locked_license_content2, generated_content)
 
     def test_register_floating_license(self):
         '''

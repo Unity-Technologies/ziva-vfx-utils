@@ -128,11 +128,14 @@ class Deformer(DGNode):
             nothing.
         """
         maps = self.get_map_names()
+        scene_name = self.get_scene_name()
+        original_name = self.name
 
         self.check_map_interpolation(interp_maps)
         for map_ in maps:
             map_data = self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_)
             if map_data:
+                map_data[0].string_replace(original_name, scene_name)
                 map_data[0].apply_weights()
 
     def check_map_interpolation(self, interp_maps):
