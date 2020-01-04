@@ -73,7 +73,6 @@ def build_multiple(scene_items, attr_filter=None):
     if results:
         results = mc.ls(results, type='zCloth')
         for new, name, item in zip(results, culled['names'], culled['scene_items']):
-            item.mobject = new
             mc.rename(new, name)
 
     mc.select(sel)

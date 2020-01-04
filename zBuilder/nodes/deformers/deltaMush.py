@@ -17,9 +17,6 @@ class DeltaMush(Deformer):
         if not mc.objExists(name):
             mc.select(self.long_association, r=True)
             delta_mush = mc.deltaMush(name=name)
-            self.mobject = delta_mush[0]
-        else:
-            self.mobject = name
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)

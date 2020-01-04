@@ -50,6 +50,7 @@ class SolverDisabler:
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
+
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -97,9 +98,7 @@ class Ziva(Builder):
             grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            grp.depends_on = item.mobject
-            grp.mobject = item.long_association[0]
-
+            grp.depends_on = item
             self.bodies[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
@@ -147,7 +146,6 @@ class Ziva(Builder):
                 grp = DGNode()
                 grp.name = target
                 grp.type = 'ui_target_body'
-                grp.mobject = target
                 grp.parent = item
                 item.add_child(grp)
 
@@ -166,7 +164,7 @@ class Ziva(Builder):
                 grp = DGNode()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
-                grp.depends_on = item.mobject
+                grp.depends_on = item
                 parent_node.add_child(grp)
                 grp.parent = parent_node
 
@@ -498,22 +496,6 @@ class Ziva(Builder):
         for node in nodes:
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
-
-    def reset_solvers(self):
-        """
-         This resets the solvers stored in the zBuilder. Specifically, it removes
-         any stored MObjects from the solvers.
-        """
-
-        solvers = list()
-        solvers.append('zSolver')
-        solvers.append('zSolverTransform')
-
-        # reset the solver nodes' mobjects
-        for node_type in solvers:
-            logger.info('Resetting: {}'.format(node_type))
-            for scene_item in self.get_scene_items(type_filter=node_type):
-                scene_item.mobject_reset()
 
     @Builder.time_this
     def build(self,

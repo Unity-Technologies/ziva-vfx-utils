@@ -41,7 +41,6 @@ class RestShapeNode(Ziva):
                 mc.select(mesh)
                 mc.select(targets, add=True)
                 results = mm.eval('zRestShape -a')[0]
-                self.mobject = results
                 mc.rename(results, self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')

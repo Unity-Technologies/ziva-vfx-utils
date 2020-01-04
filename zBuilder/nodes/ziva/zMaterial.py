@@ -56,12 +56,10 @@ class MaterialNode(Ziva):
             # if there are enough existing materials use those
             # or else create a new material
             if d_index < len(existing_materials):
-                self.mobject = existing_materials[d_index]
                 mc.rename(existing_materials[d_index], name)
             else:
                 mc.select(mesh, r=True)
                 results = mm.eval('ziva -m')
-                self.mobject = results[0]
                 mc.rename(results[0], name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zMaterial creation')

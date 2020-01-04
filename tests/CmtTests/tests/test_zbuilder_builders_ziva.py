@@ -12,6 +12,36 @@ import zBuilder.utils as utils
 from vfx_test_case import VfxTestCase
 from zBuilder.builders.ziva import SolverDisabler
 
+import maya.cmds as mc
+
+
+class ZivaMirrorSelectedTestCase(VfxTestCase):
+    def setUp(self):
+        super(ZivaMirrorSelectedTestCase, self).setUp()
+        test_utils.build_generic_scene(scene_name='mirror_example.ma')
+
+    def test_mirror_selection(self):
+        mc.select('l_arm_muscles')
+
+        builder = zva.Ziva()
+        builder.retrieve_from_scene_selection()
+        # before we build we want to mirror just the center geo
+        for item in builder.get_scene_items(name_filter='c_chest_bone'):
+            item.mirror()
+
+        # and we want to interpolate any map associated with the center geo
+        for item in builder.get_scene_items(type_filter='map'):
+            if 'c_chest_bone' in item._mesh:
+                item.interpolate()
+
+        # now a simple string replace
+        builder.string_replace('^l_', 'r_')
+
+        builder.build()
+
+        self.assertSceneHasNodes(['zAttachment2', 'zMaterial3', 'zMaterial4'])
+        
+
 
 class ZivaMirrorTestCase(VfxTestCase):
     def setUp(self):
@@ -171,45 +201,6 @@ class ZivaBuildTestCase(VfxTestCase):
         z.retrieve_connections()
 
         self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
-
-    def test_retrieving_invalid_mobjects(self):
-        # remove ziva nodes from scene so all we have left is geo
-        mz.clean_scene()
-
-        mobjects = []
-        # return mobjects from items, lets do all zAttachments
-        # since the scene has been cleaned this should return no mobjects
-        for item in self.builder.get_scene_items(type_filter='zAttachment'):
-            mobjects.append(item.mobject)
-
-        # this list should all be None
-        self.assertTrue(all(x is None for x in mobjects))
-
-    def test_retrieving_serialize_mobject(self):
-        # testing retrieving, serializing then checking mobjects
-
-        type_filter = ['zAttachment', 'zTissue', 'zBone', 'zSolverTransform', 'zSolver', 'zFiber']
-
-        mobjects = []
-        # loop through and serialize
-        for item in self.builder.get_scene_items(type_filter=type_filter):
-            item.serialize()
-            mobjects.append(item)
-
-        # this list should all be None
-        self.assertTrue(all(x is not None for x in mobjects))
-
-    def test_retrieving_writing_mobject_string(self):
-        # testing retrieving, building then checking mobjects
-
-        type_filter = ['zAttachment', 'zTissue', 'zBone', 'zSolverTransform', 'zSolver', 'zFiber']
-
-        mobjects = []
-        for item in self.builder.get_scene_items(type_filter=type_filter):
-            mobjects.append(type(item.mobject))
-
-        # this list should all be None
-        self.assertTrue(all(x is not 'str' for x in mobjects))
 
 
 class ZivaSolverDisableTestCase(VfxTestCase):
