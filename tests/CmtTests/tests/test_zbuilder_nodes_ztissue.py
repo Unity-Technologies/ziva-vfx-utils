@@ -11,7 +11,6 @@ from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_
 class ZivaTissueGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.temp_file_path = test_utils.get_tmp_file_location()
         cls.tissue_names = [
             "l_tissue_1_zTissue", "r_tissue_2_zTissue", "c_tissue_3_zTissue",
             "r_subtissue_1_zTissue"
