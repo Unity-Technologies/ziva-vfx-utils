@@ -162,6 +162,9 @@ class Base(object):
         are either strings or list of strings.  More specific searches should be
         overridden here.
 
+        note: This can potentialy get contents in an unreliable state.  After this
+        is done it will be unreliable for a comparison.
+        
         Args:
             search (str): string to search for.
             replace (str): string to replace it with.
