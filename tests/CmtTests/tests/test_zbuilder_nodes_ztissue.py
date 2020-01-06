@@ -50,15 +50,15 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.check_ziva_remove_command(self.builder, "zTissue")
 
     def test_builder_has_same_tissue_nodes_after_writing_to_disk(self):
-        builder = self.check_builder_has_same_nodes_after_writing_to_disk(self.builder)
+        builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_build(self):
-        builder = self.check_can_build_node(self.builder)
+        builder = self.get_builder_after_clean_and_build(self.builder)
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_build_from_file(self):
-        builder = self.check_can_build_from_file(self.builder)
+        builder = self.get_builder_after_write_and_retrieve_from_file(self.builder)
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_rename(self):
@@ -90,11 +90,11 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(r_tissue, [])
 
     def test_cut_paste(self):
-        builder = self.check_can_cut_paste("l_tissue_1", "l_tissue_1_zTissue")
+        builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zTissue")
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_copy_paste(self):
-        builder = self.check_can_copy_paste("l_tissue_1", "l_tissue_1_zTissue")
+        builder = self.get_builder_after_copy_paste("l_tissue_1", "l_tissue_1_zTissue")
         self.check_retrieve_ztissue_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):

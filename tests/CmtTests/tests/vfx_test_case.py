@@ -136,7 +136,7 @@ class VfxTestCase(TestCase):
         tissue_nodes = builder.get_scene_items(type_filter=node_type)
         self.assertEqual(tissue_nodes, [])
 
-    def check_builder_has_same_nodes_after_writing_to_disk(self, builder):
+    def get_builder_after_writing_and_reading_from_disk(self, builder):
         builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
@@ -144,19 +144,18 @@ class VfxTestCase(TestCase):
         builder.retrieve_from_file(self.temp_file_path)
         return builder
 
-    def check_can_build_node(self, builder):
+    def get_builder_after_clean_and_build(self, builder):
         ## SETUP
         mz.clean_scene()
 
         ## ACT
         builder.build()
 
-        ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
 
-    def check_can_build_from_file(self, builder):
+    def get_builder_after_write_and_retrieve_from_file(self, builder):
         ## SETUP
         builder.write(self.temp_file_path)
         mz.clean_scene()
@@ -166,12 +165,11 @@ class VfxTestCase(TestCase):
         builder.retrieve_from_file(self.temp_file_path)
         builder.build()
 
-        ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
         
-    def check_can_cut_paste(self, mesh_name, node_name):
+    def get_builder_after_cut_paste(self, mesh_name, node_name):
         """
         Checks if node can be cut and pasted from and to the mesh
         Args:
@@ -189,12 +187,11 @@ class VfxTestCase(TestCase):
         mc.select(mesh_name)
         utils.rig_paste()
 
-        ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
 
-    def check_can_copy_paste(self, mesh_name, node_name):
+    def get_builder_after_copy_paste(self, mesh_name, node_name):
         """
         Checks if node can be copy and pasted from and to the mesh
         Args:
@@ -202,13 +199,13 @@ class VfxTestCase(TestCase):
             node_name (string): Ziva node to check
         """
         ## ACT
-        # check if zBone exists
+        # check if node exists
         self.assertEqual(len(mc.ls(node_name)), 1)
         mc.select(mesh_name)
         utils.rig_copy()
 
         ## VERIFY
-        # check that zBone was not removed
+        # check that node was not removed
         self.assertEqual(len(mc.ls(node_name)), 1)
 
         ## SETUP
@@ -218,7 +215,6 @@ class VfxTestCase(TestCase):
         mc.select(mesh_name)
         utils.rig_paste()
 
-        ## VERIFY
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
