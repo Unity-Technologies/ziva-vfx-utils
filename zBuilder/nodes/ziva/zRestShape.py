@@ -43,9 +43,9 @@ class RestShapeNode(Ziva):
             # We know what mesh should have the zRestShape at this point so lets check if
             # there is an existing zRestShape on it.
 
-            existing_restshape = mm.eval('zQuery -type zRestShape {}'.format(mesh))
+            existing_restshape_node = mm.eval('zQuery -type zRestShape {}'.format(mesh))
 
-            if not existing_restshape:
+            if not existing_restshape_node:
                 # there is not a zRestShape so we need to create one
                 mc.select(mesh)
                 mc.select(targets, add=True)
@@ -71,7 +71,7 @@ class RestShapeNode(Ziva):
                     mm.eval('zRestShape -a {} {};'.format(self.association[0], target))
 
                 # update name of node to that which is on mesh.
-                self.name = existing_restshape[0]
+                self.name = existing_restshape_node[0]
 
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')
