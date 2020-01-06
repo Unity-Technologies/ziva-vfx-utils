@@ -133,7 +133,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # clipboard for the maps.  This is either a zBuilder Map object or None.
         self.maps_clipboard = None
 
-        root_node = builder.root_node
+        root_node = self.builder.root_node
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
         self._model = model.SceneGraphModel(root_node, self._proxy_model)
