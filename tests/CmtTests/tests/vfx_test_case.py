@@ -171,7 +171,7 @@ class VfxTestCase(TestCase):
         
     def get_builder_after_cut_paste(self, mesh_name, node_name):
         """
-        Checks if node can be cut and pasted from and to the mesh
+        Get builder after node cut and pasted from and to the mesh
         Args:
             mesh_name (string): mesh name to cut from
             node_name (string): Ziva node to check
@@ -193,7 +193,7 @@ class VfxTestCase(TestCase):
 
     def get_builder_after_copy_paste(self, mesh_name, node_name):
         """
-        Checks if node can be copy and pasted from and to the mesh
+        Get builder after node copy and pasted from and to the mesh
         Args:
             mesh_name (string): mesh name to cut from
             node_name (string): Ziva node to check
