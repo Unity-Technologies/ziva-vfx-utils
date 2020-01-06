@@ -158,6 +158,7 @@ class VfxTestCase(TestCase):
     def get_builder_after_write_and_retrieve_from_file(self, builder):
         ## SETUP
         builder.write(self.temp_file_path)
+        self.assertTrue(os.path.exists(self.temp_file_path))
         mz.clean_scene()
 
         ## ACT
