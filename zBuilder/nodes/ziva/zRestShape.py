@@ -50,8 +50,7 @@ class RestShapeNode(Ziva):
                 mc.select(mesh)
                 mc.select(targets, add=True)
                 results = mm.eval('zRestShape -a')[0]
-                self.mobject = results
-
+                
                 # Rename the zRestShape node based on the name of scene_item.
                 # If this name is elsewhere in scene (on another mesh) it will not
                 # be able to name it so we capture return and rename scene_item
