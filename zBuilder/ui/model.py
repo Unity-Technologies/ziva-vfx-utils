@@ -1,4 +1,7 @@
-from PySide2 import QtGui, QtWidgets, QtCore
+try:
+    from PySide2 import QtGui, QtWidgets, QtCore
+except ImportError:
+    from PySide import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import zBuilder.zMaya as mz
 
