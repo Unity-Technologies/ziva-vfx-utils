@@ -1,7 +1,10 @@
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-from PySide2 import QtCore
+try:
+    from PySide2 import QtCore
+except ImportError:
+    from PySide import QtCore
 from zBuilder.ui import model
 from vfx_test_case import VfxTestCase
 from zBuilder.nodes import base
