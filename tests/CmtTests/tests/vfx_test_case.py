@@ -6,6 +6,7 @@ import maya.cmds as mc
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
+from zBuilder.nodes import base
 
 
 def isApprox(a, b, eps=1e-6):
@@ -99,6 +100,8 @@ class VfxTestCase(TestCase):
 
         for node in nodes:
             self.assertEqual(node.type, node_type)
+            if hasattr(node, 'depends_on') and node_type == 'mesh':
+                self.assertIsInstance(node, base.Base)
 
         zbuilder_plugs = attr_values_from_zbuilder_nodes(nodes)
         expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
