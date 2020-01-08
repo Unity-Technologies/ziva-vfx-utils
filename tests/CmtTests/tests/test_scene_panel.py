@@ -10,13 +10,16 @@ try:
 except ImportError:
     wrong_maya_version = True
 
-from zBuilder.nodes import base
+from zBuilder.nodes.dg_node import DGNode
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         if wrong_maya_version:
-            self.skipTest('Maya version is not supported')
+            cls.skipTest('Maya version is not supported')
+
+    def setUp(self):
         super(ZivaScenePanelTestCase, self).setUp()
         test_utils.build_generic_scene()
         builder = zva.Ziva()
@@ -36,7 +39,7 @@ class ZivaScenePanelTestCase(VfxTestCase):
         self.assertIn(type(node_type), [unicode, str])
 
         node = self.model.data(index, self.model.nodeRole)
-        self.assertIsInstance(node, base.Base)
+        self.assertIsInstance(node, DGNode)
 
         long_name = self.model.data(index, self.model.longNameRole)
         self.assertIn(type(long_name), [unicode, str])
