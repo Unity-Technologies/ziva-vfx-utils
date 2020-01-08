@@ -1,9 +1,7 @@
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
-import maya.cmds as mc
+from zBuilder.nodes.dg_node import DGNode
 
 from vfx_test_case import VfxTestCase
 
@@ -37,6 +35,11 @@ class ZivaMeshTestCase(VfxTestCase):
             builder (builders.ziva.Ziva()): builder object
         """
         self.check_retrieve_looks_good(builder, {}, self.mesh_names, 'mesh')
+        nodes = builder.bodies
+        for node in nodes.values():
+            self.assertTrue(hasattr(node, 'depends_on'))
+            self.assertIsInstance(node, DGNode)
+        self.assertItemsEqual(self.mesh_names, [x.name for x in nodes.values()])
 
     def test_retrieve(self):
         self.check_retrieve_mesh_looks_good(self.builder)

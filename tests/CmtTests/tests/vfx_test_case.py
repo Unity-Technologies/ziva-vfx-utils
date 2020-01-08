@@ -6,7 +6,6 @@ import maya.cmds as mc
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
-from zBuilder.nodes import base
 
 
 def isApprox(a, b, eps=1e-6):
@@ -94,23 +93,16 @@ class VfxTestCase(TestCase):
             node_names (list): A list of expected node names like zTissue1, zBone1, ...
             node_type (string): Node type to check: zTissue, zBone, ...
         """
-        if node_type == 'mesh':
-            nodes = builder.bodies
-            for node in nodes.values():
-                self.assertTrue(hasattr(node, 'depends_on'))
-                self.assertIsInstance(node, base.Base)
-            self.assertItemsEqual(node_names, [x.name for x in nodes.values()])
-        else:
-            nodes = builder.get_scene_items(type_filter=node_type)
+        nodes = builder.get_scene_items(type_filter=node_type)
 
-            self.assertItemsEqual(node_names, [x.name for x in nodes])
+        self.assertItemsEqual(node_names, [x.name for x in nodes])
 
-            for node in nodes:
-                self.assertEqual(node.type, node_type)
+        for node in nodes:
+            self.assertEqual(node.type, node_type)
 
-            zbuilder_plugs = attr_values_from_zbuilder_nodes(nodes)
-            expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
-            self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
+        zbuilder_plugs = attr_values_from_zbuilder_nodes(nodes)
+        expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
+        self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
 
     def check_build_restores_attr_values(self, builder, node_names, node_attrs):
         plug_names = {
