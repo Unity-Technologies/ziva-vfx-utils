@@ -14,12 +14,9 @@ from zBuilder.nodes.dg_node import DGNode
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        if wrong_maya_version:
-            cls.skipTest('Maya version is not supported')
-
     def setUp(self):
+        if wrong_maya_version:
+            ZivaScenePanelTestCase.skipTest('Maya version is not supported')
         super(ZivaScenePanelTestCase, self).setUp()
         test_utils.build_generic_scene()
         builder = zva.Ziva()
