@@ -175,7 +175,7 @@ class Ziva(Builder):
                     for rivet in rivet_items:
                         grp.add_child(rivet)
                         rivet.parent = grp
-                self.geo[item.long_association[0]].add_child(item)
+                self.geo[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
