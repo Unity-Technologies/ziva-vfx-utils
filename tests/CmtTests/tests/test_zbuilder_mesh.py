@@ -34,7 +34,6 @@ class ZivaMeshTestCase(VfxTestCase):
         """Args:
             builder (builders.ziva.Ziva()): builder object
         """
-        self.check_retrieve_looks_good(builder, {}, self.mesh_names, 'mesh')
         nodes = builder.bodies
         for node in nodes.values():
             self.assertTrue(hasattr(node, 'depends_on'))
