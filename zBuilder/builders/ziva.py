@@ -54,7 +54,7 @@ class Ziva(Builder):
     def __init__(self):
         super(Ziva, self).__init__()
 
-        self.bodies = {}
+        self.geo = {}
 
         for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
             cmds = mc.pluginInfo(plugin, q=True, c=True)
@@ -99,37 +99,37 @@ class Ziva(Builder):
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
             grp.depends_on = item
-            self.bodies[item.long_association[0]] = grp
+            self.geo[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             if item.type == 'zTissue':
                 if item.parent_tissue:
                     bd = mm.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
-                    parent_node = self.bodies.get(bd, self.root_node)
+                    parent_node = self.geo.get(bd, self.root_node)
                 else:
                     parent_node = solver.get(item.solver, self.root_node)
             else:
                 parent_node = solver.get(item.solver, self.root_node)
 
-            self.bodies[item.long_association[0]].parent = parent_node
-            parent_node.add_child(self.bodies[item.long_association[0]])
+            self.geo[item.long_association[0]].parent = parent_node
+            parent_node.add_child(self.geo[item.long_association[0]])
 
-            self.bodies[item.long_association[0]].add_child(item)
-            item.parent = self.bodies[item.long_association[0]]
+            self.geo[item.long_association[0]].add_child(item)
+            item.parent = self.geo[item.long_association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
-            parent_node = self.bodies.get(item.long_association[0], self.root_node)
+            parent_node = self.geo.get(item.long_association[0], self.root_node)
             parent_node.add_child(item)
             item.parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = self.bodies.get(item.long_association[0], None)
+            parent_node = self.geo.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
                 item.parent = parent_node
 
             if item.type == 'zAttachment':
-                parent_node = self.bodies.get(item.long_association[1], None)
+                parent_node = self.geo.get(item.long_association[1], None)
                 if parent_node:
                     parent_node.add_child(item)
 

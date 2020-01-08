@@ -34,7 +34,7 @@ class ZivaMeshTestCase(VfxTestCase):
         """Args:
             builder (builders.ziva.Ziva()): builder object
         """
-        nodes = builder.bodies
+        nodes = builder.geo
         for node in nodes.values():
             self.assertTrue(hasattr(node, 'depends_on'))
             self.assertIsInstance(node, DGNode)
