@@ -16,7 +16,8 @@ class ZivaMeshTestCase(VfxTestCase):
                           'r_subtissue_1',
                           'c_bone_1',
                           'c_bone_2',
-                          'r_tissue_2']
+                          'r_tissue_2',
+                          'l_loa_curve']
         cls.mesh_attrs = []
 
     def setUp(self):
