@@ -37,6 +37,8 @@ class ZivaGeoTestCase(VfxTestCase):
         """
         nodes = builder.geo
         for node in nodes.values():
+            # curve object does not have depends_on
+            # because zLineOfAction node does not have enable/envelope attribute
             if node.type != 'ui_curve_body':
                 self.assertTrue(hasattr(node, 'depends_on'))
             self.assertIsInstance(node, DGNode)

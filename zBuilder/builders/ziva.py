@@ -93,11 +93,14 @@ class Ziva(Builder):
             parent_node.add_child(item)
             item.parent = parent_node
 
-        # get bodies-----------------------------------------------------------
+        # get geometry-----------------------------------------------------------
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
+            # proxy object to represent geometry
             grp = DGNode()
             grp.name = item.long_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
+            # store ziva node this geometry depends on
+            # to synchronize enable/envelope behaviour in the scene panel
             grp.depends_on = item
             self.geo[item.long_association[0]] = grp
 
@@ -161,6 +164,9 @@ class Ziva(Builder):
             parent_node = self.get_scene_items(name_filter=item.fiber)[0]
 
             for crv in item.long_association:
+                # proxy object to represent geometry
+                # curve geometry does not need depends_on parameter
+                # because zLineOfAction does not have enable/envelope attribute
                 grp = DGNode()
                 grp.name = crv
                 grp.type = 'ui_curve_body'
