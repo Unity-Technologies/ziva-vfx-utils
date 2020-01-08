@@ -1,17 +1,22 @@
 import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
+from vfx_test_case import VfxTestCase
+
 try:
     from PySide2 import QtCore
+    from zBuilder.ui import model
+    wrong_maya_version = False
 except ImportError:
-    from PySide import QtCore
-from zBuilder.ui import model
-from vfx_test_case import VfxTestCase
+    wrong_maya_version = True
+
 from zBuilder.nodes import base
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
     def setUp(self):
+        if wrong_maya_version:
+            self.skipTest('Maya version is not supported')
         super(ZivaScenePanelTestCase, self).setUp()
         test_utils.build_generic_scene()
         builder = zva.Ziva()
