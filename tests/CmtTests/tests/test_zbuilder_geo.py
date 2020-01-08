@@ -37,7 +37,8 @@ class ZivaGeoTestCase(VfxTestCase):
         """
         nodes = builder.geo
         for node in nodes.values():
-            self.assertTrue(hasattr(node, 'depends_on'))
+            if node.type != 'ui_curve_body':
+                self.assertTrue(hasattr(node, 'depends_on'))
             self.assertIsInstance(node, DGNode)
         self.assertItemsEqual(self.geo_names, [x.name for x in nodes.values()])
 
