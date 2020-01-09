@@ -85,7 +85,7 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
 
     # Which DagPath of the thing we're _supposed_ to be setting weights for
     deformerObj = _get_MObject(node_name)
-    deformerFn = omanim.MFnWeightGeometryFilter(deformerObj)
+    deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
     dagPath = om.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
 
