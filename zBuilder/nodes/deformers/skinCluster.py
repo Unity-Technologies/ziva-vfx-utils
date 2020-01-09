@@ -80,14 +80,14 @@ def apply_weights(skin_cluster, mesh, influences, weights):
 
 def get_weights(skin_cluster):
     # get the MFnSkinCluster for skinCluster
-    selList = OpenMaya.MSelectionList()
+    selList = om.MSelectionList()
     selList.add(skin_cluster)
-    clusterNode = OpenMaya.MObject()
+    clusterNode = om.MObject()
     selList.getDependNode(0, clusterNode)
-    skinFn = OpenMayaAnim.MFnSkinCluster(clusterNode)
+    skinFn = oma.MFnSkinCluster(clusterNode)
 
     # get the MDagPath for all influence
-    infDags = OpenMaya.MDagPathArray()
+    infDags = om.MDagPathArray()
     skinFn.influenceObjects(infDags)
 
     # create a dictionary whose key is the MPlug indice id and
@@ -105,7 +105,7 @@ def get_weights(skin_cluster):
     wPlug = skinFn.findPlug('weights')
     wlAttr = wlPlug.attribute()
     wAttr = wPlug.attribute()
-    wInfIds = OpenMaya.MIntArray()
+    wInfIds = om.MIntArray()
 
     # the weights are stored in dictionary, the key is the vertId,
     # the value is another dictionary whose key is the influence id and
@@ -120,7 +120,7 @@ def get_weights(skin_cluster):
         wPlug.getExistingArrayAttributeIndices(wInfIds)
 
         # create a copy of the current wPlug
-        infPlug = OpenMaya.MPlug(wPlug)
+        infPlug = om.MPlug(wPlug)
         for infId in wInfIds:
             # tell the infPlug it represents the current influence id
             infPlug.selectAncestorLogicalIndex(infId, wAttr)
