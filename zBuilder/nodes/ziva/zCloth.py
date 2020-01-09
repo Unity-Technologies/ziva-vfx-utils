@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes import Ziva
@@ -58,7 +58,7 @@ def build_multiple(scene_items, attr_filter=None):
 
             tmp = {'zSolver':['substeps']}
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
     culled = mz.cull_creation_nodes(scene_items)
 
@@ -66,13 +66,13 @@ def build_multiple(scene_items, attr_filter=None):
     results = None
     if culled['meshes']:
         Ziva.check_meshes(culled['meshes'])
-        mc.select(culled['meshes'], r=True)
-        results = mm.eval('ziva -c')
+        cmds.select(culled['meshes'], r=True)
+        results = mel.eval('ziva -c')
 
     # rename zCloth------------------------------------------------------------
     if results:
-        results = mc.ls(results, type='zCloth')
+        results = cmds.ls(results, type='zCloth')
         for new, name, item in zip(results, culled['names'], culled['scene_items']):
-            mc.rename(new, name)
+            cmds.rename(new, name)
 
-    mc.select(sel)
+    cmds.select(sel)

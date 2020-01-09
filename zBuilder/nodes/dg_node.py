@@ -2,9 +2,9 @@ import logging
 import inspect
 import copy
 
-import maya.OpenMaya as om
-import maya.cmds as mc
-import maya.mel as mm
+from maya import OpenMaya as om
+from maya import cmds
+from maya import mel
 
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
@@ -113,7 +113,7 @@ class DGNode(Base):
         # selection = mz.parse_maya_node_for_selection(maya_node)
         maya_node = mz.check_maya_node(maya_node)
         self.name = maya_node
-        self.type = mc.objectType(maya_node)
+        self.type = cmds.objectType(maya_node)
         self.get_maya_attrs()
 
     def build(self, *args, **kwargs):
@@ -132,7 +132,7 @@ class DGNode(Base):
 
     @association.setter
     def association(self, association):
-        self._association = mc.ls(association, long=True)
+        self._association = cmds.ls(association, long=True)
 
     @property
     def long_association(self):
@@ -149,10 +149,10 @@ class DGNode(Base):
         name = self.name
 
         attr_list = self.attrs.keys()
-        if mc.objExists(name):
+        if cmds.objExists(name):
             if attr_list:
                 for attr in attr_list:
-                    scene_val = mc.getAttr(name + '.' + attr)
+                    scene_val = cmds.getAttr(name + '.' + attr)
                     obj_val = self.attrs[attr]['value']
                     if scene_val != obj_val:
                         print('DIFF:', name + '.' + attr, '\tobject value:', obj_val,
@@ -210,19 +210,20 @@ class DGNode(Base):
 
         for attr in node_attrs:
             if self.attrs[attr]['type'] == 'doubleArray':
-                if mc.objExists('{}.{}'.format(scene_name, attr)):
-                    if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
-                        mc.setAttr('{}.{}'.format(scene_name, attr),
-                                   self.attrs[attr]['value'],
-                                   type='doubleArray')
+                if cmds.objExists('{}.{}'.format(scene_name, attr)):
+                    if not cmds.getAttr('{}.{}'.format(scene_name, attr), l=True):
+                        cmds.setAttr('{}.{}'.format(scene_name, attr),
+                                     self.attrs[attr]['value'],
+                                     type='doubleArray')
                 else:
                     text = '{}.{} not found, skipping.'.format(scene_name, attr)
                     logger.info(text)
             else:
-                if mc.objExists('{}.{}'.format(scene_name, attr)):
-                    if not mc.getAttr('{}.{}'.format(scene_name, attr), l=True):
+                if cmds.objExists('{}.{}'.format(scene_name, attr)):
+                    if not cmds.getAttr('{}.{}'.format(scene_name, attr), l=True):
                         try:
-                            mc.setAttr('{}.{}'.format(scene_name, attr), self.attrs[attr]['value'])
+                            cmds.setAttr('{}.{}'.format(scene_name, attr),
+                                         self.attrs[attr]['value'])
                         except:
                             pass
                 else:
@@ -230,10 +231,10 @@ class DGNode(Base):
                     logger.info(text)
 
             # check the alias
-            if mc.objExists('{}.{}'.format(scene_name, attr)):
+            if cmds.objExists('{}.{}'.format(scene_name, attr)):
                 alias = self.attrs[attr].get('alias', None)
                 if alias:
                     try:
-                        mc.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
+                        cmds.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
                     except RuntimeError:
                         pass

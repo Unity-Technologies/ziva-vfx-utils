@@ -1,7 +1,7 @@
 from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
-import maya.cmds as mc
+from maya import cmds
 
 import logging
 
@@ -23,12 +23,12 @@ class Deformers(Builder):
 
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
         tmp = list()
-        history = mc.listHistory(selection, f=True)
-        history.extend(mc.listHistory(selection))
+        history = cmds.listHistory(selection, f=True)
+        history.extend(cmds.listHistory(selection))
         history = list(set(history))[::-1]
 
         for hist in history:
-            if mc.objectType(hist) in acquire:
+            if cmds.objectType(hist) in acquire:
                 tmp.append(hist)
 
         for item in tmp:

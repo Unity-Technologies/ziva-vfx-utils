@@ -1,8 +1,8 @@
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
 import logging
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class TetNode(Ziva):
         if self.get_user_tet_mesh():
             name = self.get_scene_name()
             try:
-                mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh', name + '.iTet', f=True)
+                cmds.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh', name + '.iTet', f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
@@ -79,22 +79,22 @@ class TetNode(Ziva):
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.name
-        if not mc.objExists(name):
+        if not cmds.objExists(name):
             mesh = self.association[0]
-            if mc.objExists(mesh):
+            if cmds.objExists(mesh):
                 if permissive:
-                    name = mm.eval('zQuery -t zTet ' + mesh)[0]
+                    name = mel.eval('zQuery -t zTet ' + mesh)[0]
                 else:
                     raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
 
         if name:
-            if not mc.objExists(name):
+            if not cmds.objExists(name):
                 if permissive:
                     logger.info(
                         '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
                         format(mesh))
             else:
-                new_name = mc.rename(name, self.name)
+                new_name = cmds.rename(name, self.name)
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)

@@ -1,6 +1,6 @@
 import logging
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 from zBuilder.nodes.deformer import Deformer
 
@@ -16,10 +16,10 @@ class ZRelaxerNode(Deformer):
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.get_scene_name()
-        if not mc.objExists(name):
-            mc.select(self.association, r=True)
-            results = mm.eval('zRelaxer')
-            mc.rename(results[0], self.name)
+        if not cmds.objExists(name):
+            cmds.select(self.association, r=True)
+            results = mel.eval('zRelaxer')
+            cmds.rename(results[0], self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)

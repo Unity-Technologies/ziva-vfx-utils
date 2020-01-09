@@ -3,7 +3,7 @@ import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
-import maya.cmds as mc
+from maya import cmds
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
 
@@ -62,18 +62,18 @@ class ZivaBoneGenericTestCase(VfxTestCase):
 
     def test_rename(self):
         ## SETUP
-        mc.select("r_bone_1")
-        mc.ziva(b=True)
+        cmds.select("r_bone_1")
+        cmds.ziva(b=True)
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(mc.ls("r_bone_1_zBone"), [])
+        self.assertEqual(cmds.ls("r_bone_1_zBone"), [])
 
         ## ACT
         mz.rename_ziva_nodes([])
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_bone_1_zBone")), 1)
+        self.assertEqual(len(cmds.ls("r_bone_1_zBone")), 1)
 
     def test_string_replace(self):
         ## VERIFY
@@ -99,11 +99,11 @@ class ZivaBoneGenericTestCase(VfxTestCase):
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
         # check if zBone does not exist before making it
-        self.assertEqual(mc.ls("r_bone_1_zBone"), [])
+        self.assertEqual(cmds.ls("r_bone_1_zBone"), [])
 
         ## ACT
-        mc.select("l_bone_1")
+        cmds.select("l_bone_1")
         utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_bone_1_zBone")), 1)
+        self.assertEqual(len(cmds.ls("r_bone_1_zBone")), 1)

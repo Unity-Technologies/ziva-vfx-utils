@@ -1,5 +1,5 @@
 from zBuilder.builder import Builder
-import maya.cmds as mc
+from maya import cmds
 
 
 class Selection(Builder):
@@ -8,7 +8,7 @@ class Selection(Builder):
 
     @Builder.time_this
     def retrieve_from_scene(self):
-        selection = mc.ls(sl=True, l=True)
+        selection = cmds.ls(sl=True, l=True)
 
         for item in selection:
             scene_item = self.node_factory(item)
@@ -22,5 +22,5 @@ class Selection(Builder):
             tmp.append(node.get_scene_name())
 
         if select:
-            mc.select(tmp)
+            cmds.select(tmp)
         return tmp

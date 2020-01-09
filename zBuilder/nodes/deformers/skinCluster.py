@@ -1,7 +1,7 @@
 from zBuilder.nodes.dg_node import DGNode
-import maya.cmds as mc
-import maya.OpenMaya as OpenMaya
-import maya.OpenMayaAnim as OpenMayaAnim
+from maya import cmds
+from maya import OpenMaya as om
+from maya import OpenMayaAnim as oma
 
 
 class SkinCluster(DGNode):
@@ -40,42 +40,42 @@ class SkinCluster(DGNode):
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.name
-        if not mc.objExists(name):
-            mc.select(self.influences, self.association, r=True)
-            skin_cluster = mc.skinCluster(tsb=True, n=name)
+        if not cmds.objExists(name):
+            cmds.select(self.influences, self.association, r=True)
+            skin_cluster = cmds.skinCluster(tsb=True, n=name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         apply_weights(self.name, self.association, self.influences, self.weights)
 
 
 def get_associations(skin_cluster):
-    return mc.skinCluster(skin_cluster, g=True, q=True)
+    return cmds.skinCluster(skin_cluster, g=True, q=True)
 
 
 def get_influences(skin_cluster):
-    return mc.skinCluster(skin_cluster, q=True, influence=True)
+    return cmds.skinCluster(skin_cluster, q=True, influence=True)
 
 
 def apply_weights(skin_cluster, mesh, influences, weights):
     # unlock influences used by skincluster
     for inf in influences:
-        mc.setAttr('%s.liw' % inf, 0)
+        cmds.setAttr('%s.liw' % inf, 0)
 
     # normalize needs turned off for the prune to work
-    skinNorm = mc.getAttr('%s.normalizeWeights' % skin_cluster)
+    skinNorm = cmds.getAttr('%s.normalizeWeights' % skin_cluster)
     if skinNorm != 0:
-        mc.setAttr('%s.normalizeWeights' % skin_cluster, 0)
-    mc.skinPercent(skin_cluster, mesh, nrm=False, prw=100)
+        cmds.setAttr('%s.normalizeWeights' % skin_cluster, 0)
+    cmds.skinPercent(skin_cluster, mesh, nrm=False, prw=100)
 
     # restore normalize setting
     if skinNorm != 0:
-        mc.setAttr('%s.normalizeWeights' % skin_cluster, skinNorm)
+        cmds.setAttr('%s.normalizeWeights' % skin_cluster, skinNorm)
 
     # set the weights
     for attr, vals in weights.items():
         for idx, val in vals.items():
             # print cluster,attr,idx,val
-            mc.setAttr('%s.%s[%s]' % (skin_cluster, attr, str(idx)), val)
+            cmds.setAttr('%s.%s[%s]' % (skin_cluster, attr, str(idx)), val)
 
 
 def get_weights(skin_cluster):

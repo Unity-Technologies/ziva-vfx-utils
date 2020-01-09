@@ -4,7 +4,7 @@ import zBuilder
 import zBuilder.IO as io
 import zBuilder.zMaya as mz
 
-import maya.cmds as mc
+from maya import cmds
 
 import time
 import json
@@ -37,8 +37,8 @@ class Base(object):
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = mc.about(v=True)
-        self.info['operating_system'] = mc.about(os=True)
+        self.info['maya_version'] = cmds.about(v=True)
+        self.info['operating_system'] = cmds.about(os=True)
 
         if self.parent is not None:
             self.parent.add_child(self)
@@ -125,8 +125,8 @@ class Base(object):
 
     @name.setter
     def name(self, name):
-        if mc.ls(name, long=True):
-            self._name = mc.ls(name, long=True)[0]
+        if cmds.ls(name, long=True):
+            self._name = cmds.ls(name, long=True)[0]
         else:
             self._name = name
 

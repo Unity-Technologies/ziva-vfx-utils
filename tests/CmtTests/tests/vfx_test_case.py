@@ -1,8 +1,8 @@
 import os
-import maya.cmds as cmds
+from maya import cmds
 from cmt.test import TestCase
 import zBuilder.zMaya as mz
-import maya.cmds as mc
+from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
@@ -57,8 +57,8 @@ def attr_values_from_scene(plug_names):
 
 class VfxTestCase(TestCase):
     temp_file_path = test_utils.get_tmp_file_location()
-
     """Base class for unit test cases run for ZivaVFX plugin."""
+
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -105,10 +105,7 @@ class VfxTestCase(TestCase):
         self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
 
     def check_build_restores_attr_values(self, builder, node_names, node_attrs):
-        plug_names = {
-            '{}.{}'.format(geo, attr)
-            for geo in node_names for attr in node_attrs
-        }
+        plug_names = {'{}.{}'.format(geo, attr) for geo in node_names for attr in node_attrs}
         attrs_before = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
@@ -122,15 +119,15 @@ class VfxTestCase(TestCase):
         ## SETUP
         tissue_nodes = builder.get_scene_items(type_filter=node_type)
         # clear selection
-        mc.select(cl=True)
+        cmds.select(cl=True)
         for tissue in tissue_nodes:
-            mc.select(tissue.long_association, add=True)
+            cmds.select(tissue.long_association, add=True)
 
         ## ACT
-        mc.ziva(rm=True)
+        cmds.ziva(rm=True)
 
         ## VERIFY
-        mc.select(cl=True)
+        cmds.select(cl=True)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         tissue_nodes = builder.get_scene_items(type_filter=node_type)
@@ -169,7 +166,7 @@ class VfxTestCase(TestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
-        
+
     def get_builder_after_cut_paste(self, mesh_name, node_name):
         """
         Get builder after node cut and pasted from and to the mesh
@@ -178,14 +175,14 @@ class VfxTestCase(TestCase):
             node_name (string): Ziva node to check
         """
         ## ACT
-        mc.select(mesh_name)
+        cmds.select(mesh_name)
         utils.rig_cut()
 
         ## VERIFY
-        self.assertEqual(mc.ls(node_name), [])
+        self.assertEqual(cmds.ls(node_name), [])
 
         ## ACT
-        mc.select(mesh_name)
+        cmds.select(mesh_name)
         utils.rig_paste()
 
         builder = zva.Ziva()
@@ -201,19 +198,19 @@ class VfxTestCase(TestCase):
         """
         ## ACT
         # check if node exists
-        self.assertEqual(len(mc.ls(node_name)), 1)
-        mc.select(mesh_name)
+        self.assertEqual(len(cmds.ls(node_name)), 1)
+        cmds.select(mesh_name)
         utils.rig_copy()
 
         ## VERIFY
         # check that node was not removed
-        self.assertEqual(len(mc.ls(node_name)), 1)
+        self.assertEqual(len(cmds.ls(node_name)), 1)
 
         ## SETUP
-        mc.ziva(rm=True)
+        cmds.ziva(rm=True)
 
         ## ACT
-        mc.select(mesh_name)
+        cmds.select(mesh_name)
         utils.rig_paste()
 
         builder = zva.Ziva()

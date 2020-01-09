@@ -1,6 +1,6 @@
 import copy
 import os
-import maya.cmds as mc
+from maya import cmds
 import zBuilder.zMaya
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
@@ -65,13 +65,13 @@ class ZivaBuilderTestCase(VfxTestCase):
 
     def test_retrieving_multiple_times_with_new_attributes_gets_the_new_attributes(self):
         # Setup
-        material_plug = mc.ls(type='zMaterial')[0] + '.restScale'
-        mc.setAttr(material_plug, 111)
+        material_plug = cmds.ls(type='zMaterial')[0] + '.restScale'
+        cmds.setAttr(material_plug, 111)
         builder = retrieve_builder_from_scene()
         old_names = [item.name for item in builder.get_scene_items()]
 
         # Act
-        mc.setAttr(material_plug, 222)
+        cmds.setAttr(material_plug, 222)
         builder = retrieve_builder_from_scene()
 
         # Verify

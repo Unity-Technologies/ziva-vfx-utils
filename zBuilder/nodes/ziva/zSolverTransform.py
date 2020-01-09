@@ -1,6 +1,5 @@
-import maya.cmds as mc
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 from zBuilder.nodes import Ziva
 import logging
@@ -30,11 +29,11 @@ class SolverTransformNode(Ziva):
 
         solver_name = self.get_scene_name()
 
-        if not mc.objExists(solver_name):
+        if not cmds.objExists(solver_name):
             if not permissive:
                 raise Exception('zSolverTransform not in scene.  please check.')
 
         else:
-            new_name = mc.rename(solver_name, self.name)
+            new_name = cmds.rename(solver_name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
