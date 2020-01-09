@@ -57,8 +57,8 @@ class Ziva(Builder):
         self.geo = {}
 
         for plugin in cmds.pluginInfo(query=True, listPluginsPath=True):
-            cmds = cmds.pluginInfo(plugin, q=True, c=True)
-            if cmds and 'ziva' in cmds:
+            commands = cmds.pluginInfo(plugin, q=True, c=True)
+            if commands and 'ziva' in commands:
                 self.info['plugin_name'] = plugin
                 self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, v=True)
                 self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, p=True)
@@ -108,7 +108,7 @@ class Ziva(Builder):
             if item.type == 'zTissue':
                 if item.parent_tissue:
                     bd = mel.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
-                    parent_node = self.bodies.get(bd, self.root_node)
+                    parent_node = self.geo.get(bd, self.root_node)
                 else:
                     parent_node = solver.get(item.solver, self.root_node)
             else:
