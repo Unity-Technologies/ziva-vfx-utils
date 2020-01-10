@@ -66,18 +66,18 @@ class ZivaClothTestCase(VfxTestCase):
 
     def test_rename(self):
         ## SETUP
-        mc.select("r_cloth_1")
-        mc.ziva(c=True)
+        cmds.select("r_cloth_1")
+        cmds.ziva(c=True)
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(mc.ls("r_cloth_1_zCloth"), [])
+        self.assertEqual(cmds.ls("r_cloth_1_zCloth"), [])
 
         ## ACT
         mz.rename_ziva_nodes()
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_cloth_1_zCloth")), 1)
+        self.assertEqual(len(cmds.ls("r_cloth_1_zCloth")), 1)
 
     def test_string_replace(self):
         ## VERIFY
@@ -103,30 +103,30 @@ class ZivaClothTestCase(VfxTestCase):
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
         # check if zCloth does not exist before making it
-        self.assertEqual(mc.ls("r_cloth_1_zCloth"), [])
+        self.assertEqual(cmds.ls("r_cloth_1_zCloth"), [])
 
         ## ACT
-        mc.select("l_cloth_1")
+        cmds.select("l_cloth_1")
         utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(mc.ls("r_cloth_1_zCloth")), 1)
+        self.assertEqual(len(cmds.ls("r_cloth_1_zCloth")), 1)
 
     def test_mirror_cloth(self):
         # this is a test for a bug in VFXACT-120
         # if you mirror a zCloth and it is not named with a side prefix it would get
         # confused and assert.  This should not assert now and result in a mirror
         # there should be 2 zCloth nodes in scene when done.
-        
+
         # build a simple cloth scene
-        a_cloth = mc.polySphere(n='l_arm')[0]
-        mc.setAttr(a_cloth + '.translateX', 10)
-        b_cloth = mc.polySphere(n='r_arm')[0]
-        mc.setAttr(b_cloth + '.translateX', -10)
-        mc.select('l_arm')
-        mm.eval('ziva -c')
-        
-        mc.select('l_arm')
+        a_cloth = cmds.polySphere(n='l_arm')[0]
+        cmds.setAttr(a_cloth + '.translateX', 10)
+        b_cloth = cmds.polySphere(n='r_arm')[0]
+        cmds.setAttr(b_cloth + '.translateX', -10)
+        cmds.select('l_arm')
+        mel.eval('ziva -c')
+
+        cmds.select('l_arm')
 
         z = zva.Ziva()
 
