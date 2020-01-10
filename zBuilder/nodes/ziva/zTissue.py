@@ -118,12 +118,13 @@ def build_multiple(tissue_items,
         outs = mel.eval('ziva -t')
 
         # rename zTissues and zTets-----------------------------------------
-        for new, name, node in zip(outs[1::4], tissue_results['names'],
-                                   tissue_results['scene_items']):
-            cmds.rename(new, name)
+        for new_name, name_in_builder, node in zip(outs[1::4], tissue_results['names'],
+                                                   tissue_results['scene_items']):
+            node.name = cmds.rename(new_name, name_in_builder)
 
-        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['scene_items']):
-            cmds.rename(new, name)
+        for new_name, name_in_builder, node in zip(outs[2::4], tet_results['names'],
+                                                   tet_results['scene_items']):
+            node.name = cmds.rename(new_name, name_in_builder)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()
