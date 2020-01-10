@@ -23,7 +23,7 @@ def dock_window(dialog_class, *args, **kwargs):
                                          label=dialog_class.DOCK_LABEL_NAME)
 
     # now lets get a C++ pointer to it using OpenMaya
-    control_widget = omui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
+    control_widget = mui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
     # conver the C++ pointer to Qt object we can use
     control_wrap = wrapInstance(long(control_widget), QtWidgets.QWidget)
 
