@@ -34,4 +34,4 @@ def dock_window(dialog_class, *args, **kwargs):
     # after maya is ready we should restore the window since it may not be visible
     cmds.evalDeferred(lambda *args: cmds.workspaceControl(main_control, e=True, rs=True))
 
-    return win.run()
+    return win
