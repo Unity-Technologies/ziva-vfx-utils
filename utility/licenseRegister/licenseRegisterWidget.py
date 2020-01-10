@@ -18,7 +18,7 @@ from licenseRegister import register_node_locked_license, register_floating_lice
 from os import path
 import re
 
-mayaMainWindowPtr = omui.MQtUtil.mainWindow()
+mayaMainWindowPtr = mui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
 
 
