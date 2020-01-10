@@ -28,7 +28,7 @@ def run():
     builder = zva.Ziva()
     builder.retrieve_connections()
 
-    dock_window(MyDockingUI, builder=builder)
+    return dock_window(MyDockingUI, builder=builder)
 
 
 class MenuLineEdit(QtWidgets.QLineEdit):
