@@ -1,8 +1,8 @@
 from zBuilder.nodes import Ziva
 import logging
 import zBuilder.zMaya as mz
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class TissueNode(Ziva):
         """
         solver = None
         if args:
-            solver = mm.eval('zQuery -t zSolver {}'.format(args[0]))
+            solver = mel.eval('zQuery -t zSolver {}'.format(args[0]))
 
         if not solver:
             solver = self.solver
@@ -104,7 +104,7 @@ def build_multiple(tissue_items,
     Returns:
 
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
     tet_results = mz.cull_creation_nodes(tet_items, permissive=permissive)
     tissue_results = mz.cull_creation_nodes(tissue_items, permissive=permissive)
@@ -114,16 +114,16 @@ def build_multiple(tissue_items,
 
         Ziva.check_meshes(tissue_results['meshes'])
 
-        mc.select(tissue_results['meshes'], r=True)
-        outs = mm.eval('ziva -t')
+        cmds.select(tissue_results['meshes'], r=True)
+        outs = mel.eval('ziva -t')
 
         # rename zTissues and zTets-----------------------------------------
         for new, name, node in zip(outs[1::4], tissue_results['names'],
                                    tissue_results['scene_items']):
-            mc.rename(new, name)
+            cmds.rename(new, name)
 
         for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['scene_items']):
-            mc.rename(new, name)
+            cmds.rename(new, name)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()
@@ -137,14 +137,14 @@ def build_multiple(tissue_items,
                 if children_parms:
                     children = [x.association[0] for x in children_parms]
                 else:
-                    mc.select(ztissue.children_tissues, r=True)
-                    children = mm.eval('zQuery -type zTissue -m ')
+                    cmds.select(ztissue.children_tissues, r=True)
+                    children = mel.eval('zQuery -type zTissue -m ')
 
-                mc.select(ztissue.association)
-                mc.select(children, add=True)
-                mm.eval('ziva -ast')
+                cmds.select(ztissue.association)
+                cmds.select(children, add=True)
+                mel.eval('ziva -ast')
 
-    mc.select(sel)
+    cmds.select(sel)
 
 
 def get_tissue_children(ztissue):
@@ -156,16 +156,16 @@ def get_tissue_children(ztissue):
         (str) Children mesh of zTissue, or None if none found.
     """
     tmp = []
-    if mc.objectType(ztissue) == 'zTissue':
+    if cmds.objectType(ztissue) == 'zTissue':
         child_attr = '{}.oChildTissue'.format(ztissue)
-        if mc.objExists(child_attr):
-            children = mc.listConnections(child_attr)
+        if cmds.objExists(child_attr):
+            children = cmds.listConnections(child_attr)
 
             if children:
-                # sel = mc.ls(sl=True)
-                # mc.select(children)
-                # tmp.extend(mm.eval('zQuery -t zTissue -m -l'))
-                # mc.select(sel)
+                # sel = cmds.ls(sl=True)
+                # cmds.select(children)
+                # tmp.extend(mel.eval('zQuery -t zTissue -m -l'))
+                # cmds.select(sel)
                 return children
     return None
 
@@ -178,11 +178,11 @@ def get_tissue_parent(ztissue):
     Returns:
         (str) Parent mesh of zTissue, or None if none found
     """
-    if mc.objectType(ztissue) == 'zTissue':
+    if cmds.objectType(ztissue) == 'zTissue':
         parent_attr = '{}.iParentTissue'.format(ztissue)
-        if mc.objExists(parent_attr):
-            parent = mc.listConnections(parent_attr)
+        if cmds.objExists(parent_attr):
+            parent = cmds.listConnections(parent_attr)
             if parent:
-                # parent = mm.eval('zQuery -t zTissue -m -l')
+                # parent = mel.eval('zQuery -t zTissue -m -l')
                 return parent[0]
     return None

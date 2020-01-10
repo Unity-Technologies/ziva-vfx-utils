@@ -2,8 +2,8 @@ import weakref
 from functools import partial
 import copy
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -104,7 +104,7 @@ class ProximityWidget(QtWidgets.QWidget):
         to_value = float(self.to_edit.text())
         if to_value < from_value:
             self.to_edit.setText(str(from_value))
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
+        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
                                                                       self.to_edit.text()))
 
 
@@ -267,7 +267,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.long_association)
+        cmds.select(node.long_association)
 
     def open_menu(self, position):
         """Generates menu for tree items
@@ -443,7 +443,7 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            cmds.select(nodes)
 
     def set_root_node(self, root_node=None):
         """This builds and/or resets the tree given a root_node.  The root_node
@@ -486,7 +486,7 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in indexes:
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True, long=True)
+        sel = cmds.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:

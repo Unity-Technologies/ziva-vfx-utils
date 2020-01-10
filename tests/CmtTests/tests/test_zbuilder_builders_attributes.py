@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import os
 import logging
 import sys
@@ -12,16 +12,16 @@ from vfx_test_case import VfxTestCase
 
 class AttributesBuilderTestCase(VfxTestCase):
     def test_retrieve_build(self):
-        grp = mc.group(em=True)
-        mc.setAttr(grp + '.translateX', 20)
-        mc.select(grp)
+        grp = cmds.group(em=True)
+        cmds.setAttr(grp + '.translateX', 20)
+        cmds.select(grp)
 
         # use builder to retrieve from scene-----------------------------------
         z = atr.Attributes()
         z.retrieve_from_scene()
 
-        mc.setAttr(grp + '.translateX', 0)
+        cmds.setAttr(grp + '.translateX', 0)
 
         z.build()
 
-        self.assertTrue(mc.getAttr(grp + '.translateX') == 20)
+        self.assertTrue(cmds.getAttr(grp + '.translateX') == 20)

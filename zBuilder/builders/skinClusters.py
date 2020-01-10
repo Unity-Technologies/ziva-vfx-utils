@@ -1,7 +1,7 @@
 from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
-import maya.cmds as mc
+from maya import cmds
 
 import logging
 
@@ -16,8 +16,8 @@ class SkinCluster(Builder):
         # parse args------------------------------------------------------------
         selection = mz.parse_maya_node_for_selection(args)
 
-        history = mc.listHistory(selection)
-        skin_clusters = mc.ls(history, type='skinCluster')[::-1]
+        history = cmds.listHistory(selection)
+        skin_clusters = cmds.ls(history, type='skinCluster')[::-1]
 
         if not skin_clusters:
             raise Exception('No skinClusters found, aborting!')

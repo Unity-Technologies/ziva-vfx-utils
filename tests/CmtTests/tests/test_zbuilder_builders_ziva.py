@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import os
 import logging
 import sys
@@ -12,7 +12,7 @@ import zBuilder.utils as utils
 from vfx_test_case import VfxTestCase
 from zBuilder.builders.ziva import SolverDisabler
 
-import maya.cmds as mc
+from maya import cmds
 
 
 class ZivaMirrorSelectedTestCase(VfxTestCase):
@@ -21,7 +21,7 @@ class ZivaMirrorSelectedTestCase(VfxTestCase):
         test_utils.build_generic_scene(scene_name='mirror_example.ma')
 
     def test_mirror_selection(self):
-        mc.select('l_arm_muscles')
+        cmds.select('l_arm_muscles')
 
         builder = zva.Ziva()
         builder.retrieve_from_scene_selection()
@@ -50,7 +50,7 @@ class ZivaMirrorTestCase(VfxTestCase):
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
 
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene
         self.z = zva.Ziva()
@@ -64,7 +64,7 @@ class ZivaMirrorTestCase(VfxTestCase):
         self.z.build()
 
         # check if left muscle is connected to zGeo
-        self.assertTrue(len(mc.listConnections('l_muscle', type='zGeo')))
+        self.assertTrue(len(cmds.listConnections('l_muscle', type='zGeo')))
 
 
 class ZivaBuildTestCase(VfxTestCase):
@@ -75,7 +75,7 @@ class ZivaBuildTestCase(VfxTestCase):
         test_utils.build_anatomical_arm_with_no_popup()
 
         # clear selection.  It should retrieve whole scene
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene-----------------------------------
         self.builder = zva.Ziva()
@@ -86,7 +86,7 @@ class ZivaBuildTestCase(VfxTestCase):
         test_utils.build_anatomical_arm_with_no_popup()
 
         # select a muscle geo
-        mc.select('r_bicep_muscle')
+        cmds.select('r_bicep_muscle')
 
         # use builder to retrieve from scene-----------------------------------
         z = zva.Ziva()
@@ -101,19 +101,19 @@ class ZivaBuildTestCase(VfxTestCase):
         self.assertEqual(len(items), 2)
 
     def test_retrieve_from_scene(self):
-        zAttachments = mc.ls(type='zAttachment')
+        zAttachments = cmds.ls(type='zAttachment')
         # remove ziva nodes from scene so all we have left is geo
         mz.clean_scene()
 
         # build
         self.builder.build()
-        self.assertTrue(len(zAttachments) == len(mc.ls(type='zAttachment')))
+        self.assertTrue(len(zAttachments) == len(cmds.ls(type='zAttachment')))
 
     def test_string_replace(self):
         # remove ziva nodes from scene so all we have left is geo
         mz.clean_scene()
 
-        mc.rename('r_bicep_muscle', 'r_biceps_muscle')
+        cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
         self.builder.string_replace('r_bicep_muscle', 'r_biceps_muscle')
 
         # build
@@ -127,7 +127,7 @@ class ZivaBuildTestCase(VfxTestCase):
         mz.clean_scene()
 
         # now lets delete bicep to see how build handles it
-        mc.delete('r_bicep_muscle')
+        cmds.delete('r_bicep_muscle')
 
         with self.assertRaises(Exception):
             self.builder.build(permissive=False)
@@ -137,10 +137,10 @@ class ZivaBuildTestCase(VfxTestCase):
         mz.clean_scene()
 
         # now lets scale muscle to make it invalid
-        mc.setAttr('r_bicep_muscle.scaleX', l=False)
-        mc.setAttr('r_bicep_muscle.scaleY', l=False)
-        mc.setAttr('r_bicep_muscle.scaleX', 0)
-        mc.setAttr('r_bicep_muscle.scaleY', 0)
+        cmds.setAttr('r_bicep_muscle.scaleX', l=False)
+        cmds.setAttr('r_bicep_muscle.scaleY', l=False)
+        cmds.setAttr('r_bicep_muscle.scaleX', 0)
+        cmds.setAttr('r_bicep_muscle.scaleY', 0)
 
         with self.assertRaises(Exception):
             self.builder.build()
@@ -151,13 +151,13 @@ class ZivaBuildTestCase(VfxTestCase):
         # changing.  As seen in VFXACT-89
 
         # to test this lets change an attribute on a tissue
-        mc.setAttr("r_bicep_muscle_zTissue.inertialDamping", .5)
+        cmds.setAttr("r_bicep_muscle_zTissue.inertialDamping", .5)
 
         # now build from the zBuilder
         self.builder.build()
 
         # if the attribute is 0 we know it worked
-        self.assertTrue(mc.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
+        self.assertTrue(cmds.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
 
     def test_getting_intermediate_shape(self):
         # this tests getting intermediate shape if there is one instead
@@ -167,14 +167,14 @@ class ZivaBuildTestCase(VfxTestCase):
         test_utils.build_anatomical_arm_with_no_popup()
 
         # capture point position of first vert at rest
-        rest_point_position = mc.pointPosition('r_bicep_muscle.vtx[0]')
+        rest_point_position = cmds.pointPosition('r_bicep_muscle.vtx[0]')
 
         # advance a few frames to change it
-        mc.currentTime(2)
-        mc.currentTime(3)
+        cmds.currentTime(2)
+        cmds.currentTime(3)
 
         # retrrieve from scene
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         import zBuilder.builders.ziva as zva
         z = zva.Ziva()
         z.retrieve_from_scene()
@@ -193,9 +193,9 @@ class ZivaBuildTestCase(VfxTestCase):
         # getting whole scene.
 
         # the arm is built in scene so all we need to do is create sphere and retrieve
-        sph = mc.polySphere()
-        mm.eval('ziva -t')
-        mc.select(sph)
+        sph = cmds.polySphere()
+        mel.eval('ziva -t')
+        cmds.select(sph)
 
         z = zva.Ziva()
         z.retrieve_connections()
@@ -207,42 +207,42 @@ class ZivaSolverDisableTestCase(VfxTestCase):
     def test_enable_connected(self):
         # build scene and connect the enable to something
         test_utils.build_generic_scene()
-        loc = mc.spaceLocator()[0]
-        mc.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
+        loc = cmds.spaceLocator()[0]
+        cmds.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
 
         retrieved_builder = test_utils.retrieve_builder_from_scene()
 
         retrieved_builder.build()
 
-        current_connection = mc.listConnections('zSolver1.enable', plugs=True)[0]
+        current_connection = cmds.listConnections('zSolver1.enable', plugs=True)[0]
         self.assertEqual(current_connection, '{}.translateX'.format(loc))
 
     def test_SolverDisabler_class_connected(self):
-        mm.eval('ziva -s')
-        loc = mc.spaceLocator()[0]
-        mc.setAttr('{}.translateX'.format(loc), 1)  # So that enable will start off being True!
-        mc.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
+        mel.eval('ziva -s')
+        loc = cmds.spaceLocator()[0]
+        cmds.setAttr('{}.translateX'.format(loc), 1)  # So that enable will start off being True!
+        cmds.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
 
-        self.assertTrue(mc.getAttr('zSolver1.enable'))
-        self.assertTrue(mc.listConnections('zSolver1.enable'))
+        self.assertTrue(cmds.getAttr('zSolver1.enable'))
+        self.assertTrue(cmds.listConnections('zSolver1.enable'))
 
         with SolverDisabler('zSolver1'):
-            self.assertFalse(mc.getAttr('zSolver1.enable'))
-            self.assertFalse(mc.listConnections('zSolver1.enable'))
+            self.assertFalse(cmds.getAttr('zSolver1.enable'))
+            self.assertFalse(cmds.listConnections('zSolver1.enable'))
 
-        self.assertTrue(mc.getAttr('zSolver1.enable'))
-        self.assertTrue(mc.listConnections('zSolver1.enable'))
+        self.assertTrue(cmds.getAttr('zSolver1.enable'))
+        self.assertTrue(cmds.listConnections('zSolver1.enable'))
 
     def test_SolverDisabler_class_not_connected(self):
-        mm.eval('ziva -s')
-        self.assertTrue(mc.getAttr('zSolver1.enable'))
+        mel.eval('ziva -s')
+        self.assertTrue(cmds.getAttr('zSolver1.enable'))
         with SolverDisabler('zSolver1'):
-            self.assertFalse(mc.getAttr('zSolver1.enable'))
-        self.assertTrue(mc.getAttr('zSolver1.enable'))
+            self.assertFalse(cmds.getAttr('zSolver1.enable'))
+        self.assertTrue(cmds.getAttr('zSolver1.enable'))
 
     def test_SolverDisabler_does_not_enable_a_disabled_solver(self):
-        mm.eval('ziva -s')
-        mc.setAttr('zSolver1.enable', False)
+        mel.eval('ziva -s')
+        cmds.setAttr('zSolver1.enable', False)
         with SolverDisabler('zSolver1'):
-            self.assertFalse(mc.getAttr('zSolver1.enable'))
-        self.assertFalse(mc.getAttr('zSolver1.enable'))
+            self.assertFalse(cmds.getAttr('zSolver1.enable'))
+        self.assertFalse(cmds.getAttr('zSolver1.enable'))

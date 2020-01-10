@@ -10,15 +10,15 @@ except ImportError:
     from PySide import __version__
     from shiboken import wrapInstance
 
-from maya import OpenMayaUI as omui
+from maya import OpenMayaUI as mui
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
-import maya.cmds as cmds
+from maya import cmds
 
 from licenseRegister import register_node_locked_license, register_floating_license, LICENSE_FILE_NAME
 from os import path
 import re
 
-mayaMainWindowPtr = omui.MQtUtil.mainWindow()
+mayaMainWindowPtr = mui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
 
 

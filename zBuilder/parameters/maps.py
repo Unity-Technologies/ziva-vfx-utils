@@ -1,6 +1,6 @@
-import maya.cmds as mc
-import maya.mel as mm
-import maya.OpenMaya as om
+from maya import cmds
+from maya import mel
+from maya import OpenMaya as om
 
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
@@ -60,7 +60,7 @@ class Map(Base):
             mesh_name: Name of mesh to populate it with.
 
         """
-        map_type = mc.objectType(map_name)
+        map_type = cmds.objectType(map_name)
         weight_value = get_weights(map_name, mesh_name)
 
         self.name = map_name
@@ -120,13 +120,13 @@ class Map(Base):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
 
-        if mc.objExists(mesh_data.name):
+        if cmds.objExists(mesh_data.name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
             weight_list = interpolate_values(created_mesh, mesh_data.name, self.values)
             self.values = weight_list
 
-            mc.delete(created_mesh)
+            cmds.delete(created_mesh)
 
     def invert(self):
         """Invert the map.
@@ -136,15 +136,15 @@ class Map(Base):
     def apply_weights(self):
         """This applies the weight from this node to the maya scene.
         """
-        if mc.objExists('%s[0]' % self.name):
-            if not mc.getAttr('%s[0]' % self.name, l=True):
+        if cmds.objExists('%s[0]' % self.name):
+            if not cmds.getAttr('%s[0]' % self.name, l=True):
                 val = ' '.join([str(w) for w in self.values])
                 cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
-                mm.eval(cmd)
+                mel.eval(cmd)
         else:
             # applying doubleArray maps
-            if mc.objExists(self.name):
-                mc.setAttr(self.name, self.values, type='doubleArray')
+            if cmds.objExists(self.name):
+                cmds.setAttr(self.name, self.values, type='doubleArray')
 
     def copy_values_from(self, map_parameter):
         self.values = map_parameter.values
@@ -153,16 +153,16 @@ class Map(Base):
         """Open paint tool for the map
         """
         # sourcing the mel command so we have access to it
-        mm.eval('source "artAttrCreateMenuItems"')
+        mel.eval('source "artAttrCreateMenuItems"')
 
-        mc.select(self._mesh, r=True)
+        cmds.select(self._mesh, r=True)
         # get map name without node name
         map_name = self.name.split(".")[-1]
         # get node name without map name
         node_name = self.name.split(".")[0]
         cmd = 'artSetToolAndSelectAttr( "artAttrCtx", "{}.{}.{}" );'.format(
             self.map_type, node_name, map_name)
-        mm.eval(cmd)
+        mel.eval(cmd)
 
 
 def invert_weights(weights):
@@ -190,11 +190,11 @@ def get_weights(map_name, mesh_name):
     Raises:
         ValueError: if there is a problem getting map.
     """
-    vert_count = mc.polyEvaluate(mesh_name, v=True)
+    vert_count = cmds.polyEvaluate(mesh_name, v=True)
     try:
-        value = mc.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
+        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
     except ValueError:
-        value = mc.getAttr(map_name)
+        value = cmds.getAttr(map_name)
     return value
 
 

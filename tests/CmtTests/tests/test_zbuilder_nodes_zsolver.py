@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 import os
 import zBuilder.builders.ziva as zva
@@ -7,7 +7,7 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 
-import maya.OpenMaya as om
+from maya import OpenMaya as om
 
 from vfx_test_case import VfxTestCase
 
@@ -51,7 +51,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             if attrs:
                 value = attrs[i]
             else:
-                value = mc.getAttr("{}.{}".format(solver.name, attr))
+                value = cmds.getAttr("{}.{}".format(solver.name, attr))
             self.assertEqual(value, solver.attrs[attr]['value'])
 
     def check_retrieve_zsolver_transform_looks_good(self, builder, name, attrs):
@@ -82,7 +82,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             if attrs:
                 value = attrs[i]
             else:
-                value = mc.getAttr("{}.{}".format(solver_transform.name, attr))
+                value = cmds.getAttr("{}.{}".format(solver_transform.name, attr))
             self.assertEqual(value, solver_transform.attrs[attr]['value'])
 
         solver_transform_children = {obj.name for obj in solver_transform.children}
@@ -122,12 +122,12 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver_values = []
         for attr in solver_attrs:
-            value = mc.getAttr("{}.{}".format("zSolver1Shape", attr))
+            value = cmds.getAttr("{}.{}".format("zSolver1Shape", attr))
             solver_values.append(value)
 
         solver_transform_values = []
         for attr in solver_transform_attrs:
-            value = mc.getAttr("{}.{}".format("zSolver1", attr))
+            value = cmds.getAttr("{}.{}".format("zSolver1", attr))
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
@@ -149,14 +149,14 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def test_remove_solver(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
-        mc.select("zSolver1")
+        cmds.select("zSolver1")
         utils.remove_solver(askForConfirmation=False)
-        self.assertEqual(mc.ls(node_names), [])
+        self.assertEqual(cmds.ls(node_names), [])
 
     def test_remove_all_solvers(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
         utils.remove_all_solvers(confirmation=False)
-        self.assertEqual(mc.ls(node_names), [])
+        self.assertEqual(cmds.ls(node_names), [])
 
     def test_string_replace(self):
         self.builder.string_replace("zSolver1", "zSolver2")
@@ -174,11 +174,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def test_cut_paste(self):
         # Act
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         utils.rig_cut()
 
         # Verify
-        self.assertEqual(mc.ls("zSolver1"), [])
+        self.assertEqual(cmds.ls("zSolver1"), [])
 
         # Act
         utils.rig_paste()
@@ -191,7 +191,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def test_copy_paste(self):
         # Act
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         utils.rig_copy()
 
         # Verify
@@ -209,13 +209,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def test_transfer(self):
         # Setup
-        meshes = mc.ls(type="mesh")
-        meshes_transforms = mc.listRelatives(meshes, p=True)
+        meshes = cmds.ls(type="mesh")
+        meshes_transforms = cmds.listRelatives(meshes, p=True)
         # exclude duplicates
         meshes_transforms = list(set(meshes_transforms))
 
         for item in meshes_transforms:
-            mc.rename(item, 'warped_{}'.format(item))
+            cmds.rename(item, 'warped_{}'.format(item))
 
         mz.clean_scene()
 
@@ -234,18 +234,18 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 class ZivaSolverTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaSolverTestCase, self).setUp()
-        self.results = mm.eval('ziva -s')
+        self.results = mel.eval('ziva -s')
 
     def test_rebuild_solver_shape_name(self):
         # tests the shape name when re-building a solver via zBuilder.
 
-        mc.rename(self.results[1], 'zSolver_fat')
+        cmds.rename(self.results[1], 'zSolver_fat')
 
         # use builder to retrieve from scene-----------------------------------
         z = zva.Ziva()
         z.retrieve_from_scene()
 
-        mc.delete('zSolver_fat')
+        cmds.delete('zSolver_fat')
 
         z.build()
 

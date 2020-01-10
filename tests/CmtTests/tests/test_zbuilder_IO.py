@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 import os
 import logging
 import sys
@@ -19,7 +19,7 @@ class IOTestCase(VfxTestCase):
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
 
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene
         self.z = zva.Ziva()
@@ -67,10 +67,10 @@ class IOTestCase(VfxTestCase):
         # find a temp file location
         temp = tempfile.TemporaryFile()
 
-        mc.file(new=True, f=True)
+        cmds.file(new=True, f=True)
         test_utils.build_anatomical_arm_with_no_popup()
 
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
         # build it on live scene

@@ -1,4 +1,4 @@
-import maya.cmds as mc
+from maya import cmds
 
 import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase
@@ -16,12 +16,12 @@ class ZivaBundleTestCase(VfxTestCase):
         test_utils.build_generic_scene()
         file_name = test_utils.get_tmp_file_location()
 
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         builder_orig = zva.Ziva()
         builder_orig.retrieve_from_scene()
         builder_orig.write(file_name)
         # compare against this one
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         builder_from_file = zva.Ziva()
         builder_from_file.retrieve_from_file(file_name)
 

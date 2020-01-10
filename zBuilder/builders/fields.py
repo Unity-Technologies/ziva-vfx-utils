@@ -1,5 +1,5 @@
 from zBuilder.builder import Builder
-import maya.cmds as mc
+from maya import cmds
 import zBuilder.zMaya as mz
 
 
@@ -19,7 +19,7 @@ class Fields(Builder):
     def retrieve_from_scene(self, *args, **kwargs):
         selection = mz.parse_maya_node_for_selection(args)
 
-        nodes_to_acquire = [x for x in selection if mc.objectType(x) in self.acquire]
+        nodes_to_acquire = [x for x in selection if cmds.objectType(x) in self.acquire]
 
         for item in nodes_to_acquire:
             parameter = self.node_factory(item)

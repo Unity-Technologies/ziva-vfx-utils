@@ -1,7 +1,7 @@
 from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
-import maya.cmds as mc
+from maya import cmds
 
 import logging
 
@@ -20,8 +20,8 @@ class DeltaMush(Builder):
         get_mesh = kwargs.get('get_mesh', True)
         get_maps = kwargs.get('get_map_names', True)
 
-        hist = mc.listHistory(selection)
-        delta_mushes = mc.ls(hist, type='deltaMush')[::-1]
+        hist = cmds.listHistory(selection)
+        delta_mushes = cmds.ls(hist, type='deltaMush')[::-1]
 
         if not delta_mushes:
             raise Exception('No delta mushes found, aborting!')

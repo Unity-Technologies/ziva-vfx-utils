@@ -23,7 +23,7 @@ class Builder(object):
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
-        import maya.cmds as mc
+        from maya import cmds
         from zBuilder.nodes.base import Base
 
         self.root_node = Base()
@@ -32,8 +32,8 @@ class Builder(object):
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = mc.about(v=True)
-        self.info['operating_system'] = mc.about(os=True)
+        self.info['maya_version'] = cmds.about(v=True)
+        self.info['operating_system'] = cmds.about(os=True)
 
     def __eq__(self, other):
         """ Compares the builders.
