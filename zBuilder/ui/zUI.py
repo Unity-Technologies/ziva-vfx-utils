@@ -544,6 +544,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
             MyDockingUI.instances.remove(ins)
             del ins
-
-    def run(self):
-        return self
