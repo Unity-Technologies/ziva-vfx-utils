@@ -26,6 +26,11 @@ class ZivaClothTestCase(VfxTestCase):
             os.remove(self.temp_file_path)
         super(ZivaClothTestCase, self).tearDown()
 
+    def tearDown(self):
+        if os.path.exists(self.temp_file_path):
+            os.remove(self.temp_file_path)
+        super(ZivaClothTestCase, self).tearDown()
+
     def check_retrieve_zcloth_looks_good(self, builder, expected_plugs):
         """Args:
             builder (builders.ziva.Ziva()): builder object
@@ -115,13 +120,13 @@ class ZivaClothTestCase(VfxTestCase):
         
         # build a simple cloth scene
         a_cloth = mc.polySphere(n='l_arm')[0]
+        mc.setAttr(a_cloth + '.translateX', 10)
         b_cloth = mc.polySphere(n='r_arm')[0]
-        cmds.setAttr(b_cloth + '.translateX', -10)
-        cmds.select('l_arm')
-        mel.eval('ziva -c')
+        mc.setAttr(b_cloth + '.translateX', -10)
+        mc.select('l_arm')
+        mm.eval('ziva -c')
         
-        cmds.select('l_arm')
-        cmds.setAttr(a_cloth + '.translateX', 10)
+        mc.select('l_arm')
 
         z = zva.Ziva()
 
