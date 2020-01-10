@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
@@ -14,18 +14,18 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         # setup simple scene
         # build simple zRestShape scene
-        self.tissue_mesh = mc.polySphere(name='tissue_mesh')[0]
-        target_a = mc.polySphere(name='a')[0]
-        target_b = mc.polySphere(name='b')[0]
+        self.tissue_mesh = cmds.polySphere(name='tissue_mesh')[0]
+        target_a = cmds.polySphere(name='a')[0]
+        target_b = cmds.polySphere(name='b')[0]
 
-        mc.select(self.tissue_mesh)
-        mm.eval('ziva -t')
-        mc.select(self.tissue_mesh, target_a, target_b)
-        mm.eval('zRestShape -a')
+        cmds.select(self.tissue_mesh)
+        mel.eval('ziva -t')
+        cmds.select(self.tissue_mesh, target_a, target_b)
+        mel.eval('zRestShape -a')
 
     def test_retrieve(self):
 
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
@@ -38,7 +38,7 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
     def test_retrieve_build_clean(self):
 
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
@@ -48,11 +48,11 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         builder.build()
 
-        self.assertTrue(mc.objExists('zRestShape1'))
+        self.assertTrue(cmds.objExists('zRestShape1'))
 
     def test_retrieve_selection(self):
 
-        mc.select(self.tissue_mesh)
+        cmds.select(self.tissue_mesh)
 
         # use builder to retrieve from scene-----------------------------------
         builder = zva.Ziva()
@@ -66,27 +66,27 @@ class ZivaRestShapeTestCase(VfxTestCase):
     def test_copy_non_restshape_selected(self):
         # make sure VFXACT-347 stays functional
         # create a tissue with no restShapes then select that and copy
-        non_rest_tissue = mc.polySphere(name='c')[0]
-        mc.select(non_rest_tissue)
-        mm.eval('ziva -t')
+        non_rest_tissue = cmds.polySphere(name='c')[0]
+        cmds.select(non_rest_tissue)
+        mel.eval('ziva -t')
 
-        mc.select(non_rest_tissue)
+        cmds.select(non_rest_tissue)
 
         self.assertTrue(utils.rig_copy())
 
     def test_restshape_selected_with_unwanted_restshapes(self):
         # make sure VFXACT-358 stays functional
-        tis2 = mc.polySphere(name='tissue_mesh2')[0]
-        target_c = mc.polySphere(name='c')[0]
+        tis2 = cmds.polySphere(name='tissue_mesh2')[0]
+        target_c = cmds.polySphere(name='c')[0]
 
-        mc.select(tis2)
-        mm.eval('ziva -t')
-        mc.select(tis2, target_c)
-        mm.eval('zRestShape -a')
+        cmds.select(tis2)
+        mel.eval('ziva -t')
+        cmds.select(tis2, target_c)
+        mel.eval('zRestShape -a')
 
         # now we have 2 tissue and 2 restShapes.
         # select one and check contents of zBuilder.
-        mc.select(tis2)
+        cmds.select(tis2)
 
         builder = zva.Ziva()
         builder.retrieve_from_scene_selection()

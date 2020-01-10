@@ -9,15 +9,10 @@ from vfx_test_case import VfxTestCase
 class ZivaGeoTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.geo_names = ['c_cloth_1',
-                          'l_tissue_1',
-                          'c_tissue_3',
-                          'l_bone_1',
-                          'r_subtissue_1',
-                          'c_bone_1',
-                          'c_bone_2',
-                          'r_tissue_2',
-                          'l_loa_curve']
+        cls.geo_names = [
+            'c_cloth_1', 'l_tissue_1', 'c_tissue_3', 'l_bone_1', 'r_subtissue_1', 'c_bone_1',
+            'c_bone_2', 'r_tissue_2', 'l_loa_curve', 'l_cloth_1'
+        ]
         cls.geo_attrs = []
 
     def setUp(self):

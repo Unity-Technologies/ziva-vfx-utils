@@ -1,7 +1,7 @@
-import maya.cmds as mc
-import maya.mel as mm
-import maya.OpenMaya as OpenMaya
-import maya.OpenMayaAnim as OpenMayaAnim
+from maya import cmds
+from maya import mel
+from maya import OpenMaya as om
+from maya import OpenMayaAnim as oma
 import re
 
 
@@ -43,10 +43,10 @@ def set_paintable_map(node_name, attr_name, new_weights):
     # but this syntax doesn't work: <<attributeQuery -node "zFiber1" -m "weightList[0].weights">>
     # So we need to pull out the child-most part.
     child_attr = attr_name.split('.')[-1]  # 'weightList[0].weights' --> 'weights'
-    is_multi = mc.attributeQuery(child_attr, node=node_name, multi=True)
+    is_multi = cmds.attributeQuery(child_attr, node=node_name, multi=True)
 
     if is_multi:
-        is_deformer = 'weightGeometryFilter' in mc.nodeType(node_name, inherited=True)
+        is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
         if is_deformer and child_attr == 'weights':
             set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         else:
@@ -78,26 +78,26 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
     index = int(m.group(1))  # group(0) is the whole match. group(1) is the index
 
     # Convert the Python list to an MFloatArray
-    weightList = OpenMaya.MFloatArray()
+    weightList = om.MFloatArray()
     weightList.setLength(len(new_weights))
     for i, w in enumerate(new_weights):
         weightList[i] = w
 
     # Which DagPath of the thing we're _supposed_ to be setting weights for
     deformerObj = _get_MObject(node_name)
-    deformerFn = OpenMayaAnim.MFnWeightGeometryFilter(deformerObj)
-    dagPath = OpenMaya.MDagPath()
+    deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
+    dagPath = om.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
 
     # Now find the components for that mesh.
     # This assumes that each mesh is in the deformer only once.
     # All this DagPath stuff is also assuming that the mesh is in the Dag.
     deformerSetObj = deformerFn.deformerSet()
-    deformerSetFn = OpenMaya.MFnSet(deformerSetObj)
-    deformerSetSel = OpenMaya.MSelectionList()
+    deformerSetFn = om.MFnSet(deformerSetObj)
+    deformerSetSel = om.MSelectionList()
     deformerSetFn.getMembers(deformerSetSel, False)
-    deformerSetPath = OpenMaya.MDagPath()
-    deformerSetComp = OpenMaya.MObject()
+    deformerSetPath = om.MDagPath()
+    deformerSetComp = om.MObject()
     for i in range(deformerSetSel.length()):
         deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
         if deformerSetPath == dagPath:
@@ -115,18 +115,18 @@ def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
     which is faster in benchmarks.
     """
     set_func_lookup = {
-        OpenMaya.MFnNumericData.kFloat: OpenMaya.MDataHandle.setFloat,
-        OpenMaya.MFnNumericData.kDouble: OpenMaya.MDataHandle.setDouble,
-        OpenMaya.MFnNumericData.kInt: OpenMaya.MDataHandle.setInt
+        om.MFnNumericData.kFloat: om.MDataHandle.setFloat,
+        om.MFnNumericData.kDouble: om.MDataHandle.setDouble,
+        om.MFnNumericData.kInt: om.MDataHandle.setInt
     }  # add other types as needed
 
     weights_plug = _get_MPlug(node_name, attr_name)
-    mfnattr = OpenMaya.MFnNumericAttribute(weights_plug.attribute())
+    mfnattr = om.MFnNumericAttribute(weights_plug.attribute())
     set_value = set_func_lookup[mfnattr.unitType()]
 
     dataHandle = weights_plug.asMDataHandle()
     try:
-        arrayDataHandle = OpenMaya.MArrayDataHandle(dataHandle)
+        arrayDataHandle = om.MArrayDataHandle(dataHandle)
         builder = arrayDataHandle.builder()
 
         current_size = builder.elementCount()
@@ -148,17 +148,17 @@ def set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
     This works on zFiber.endPoints.
     """
     node_dot_attr = '{}.{}'.format(node_name, attr_name)
-    datatype = mc.getAttr(node_dot_attr, type=True)
+    datatype = cmds.getAttr(node_dot_attr, type=True)
     if not datatype.endswith('Array'):
         raise AttributeError('Unsupported: {} is type {}, not some sort of array'.format(
             node_dot_attr, datatype))
-    mc.setAttr(node_dot_attr, new_weights, type=datatype)
+    cmds.setAttr(node_dot_attr, new_weights, type=datatype)
 
 
 def _get_MObject(node_name):
-    sel = OpenMaya.MSelectionList()
+    sel = om.MSelectionList()
     sel.add(node_name)
-    node_obj = OpenMaya.MObject()
+    node_obj = om.MObject()
     sel.getDependNode(0, node_obj)
     return node_obj
 
@@ -167,11 +167,11 @@ def _get_MPlug(node_name, attr_name):
     """
     Given a node name (e.g. "zBoneWarp1") and 
     a plug name (e.g. "weightList[0].weights"), 
-    get on OpenMaya.MPlug for that plug
+    get on om.MPlug for that plug
     (e.g for "zBoneWarp1.weightList[0].weights")
     """
-    sel = OpenMaya.MSelectionList()
+    sel = om.MSelectionList()
     sel.add(node_name + '.' + attr_name)
-    plug = OpenMaya.MPlug()
+    plug = om.MPlug()
     sel.getPlug(0, plug)
     return plug

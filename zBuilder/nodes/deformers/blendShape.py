@@ -1,5 +1,5 @@
 import logging
-import maya.cmds as mc
+from maya import cmds
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes.deformer import Deformer
@@ -37,11 +37,11 @@ class BlendShape(Deformer):
 
         name = self.get_scene_name()
 
-        if not mc.objExists(name):
-            mc.select(self.target, r=True)
-            mc.select(self.association, add=True)
+        if not cmds.objExists(name):
+            cmds.select(self.target, r=True)
+            cmds.select(self.association, add=True)
 
-            results = mc.blendShape(name=self.name)
+            results = cmds.blendShape(name=self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
@@ -52,7 +52,7 @@ class BlendShape(Deformer):
 
         name = self.get_scene_name()
 
-        num_weights = mc.blendShape(name, q=True, wc=True)
+        num_weights = cmds.blendShape(name, q=True, wc=True)
         attr_list = ['weight[' + str(i) + ']' for i in range(0, num_weights)]
         attrs = mz.build_attr_key_values(name, attr_list)
         self.attrs.update(attrs)
@@ -63,7 +63,7 @@ class BlendShape(Deformer):
 
     @target.setter
     def target(self, target_mesh):
-        self._target = mc.ls(target_mesh, long=True)[0]
+        self._target = cmds.ls(target_mesh, long=True)[0]
 
     @property
     def long_target(self):
@@ -71,5 +71,5 @@ class BlendShape(Deformer):
 
 
 def get_target(blend_shape):
-    target = mc.blendShape(blend_shape, q=True, t=True)
+    target = cmds.blendShape(blend_shape, q=True, t=True)
     return target

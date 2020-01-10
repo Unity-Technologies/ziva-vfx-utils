@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes import Ziva
@@ -40,12 +40,12 @@ class AttachmentNode(Ziva):
         if mz.check_body_type([source_mesh, target_mesh]):
             # check existing attachments in scene
             cmd = 'zQuery -t zAttachment {}'.format(source_mesh)
-            existing_attachments = mm.eval(cmd)
+            existing_attachments = mel.eval(cmd)
             existing = []
             if existing_attachments:
                 for existing_attachment in existing_attachments:
-                    att_s = mm.eval('zQuery -as ' + existing_attachment)[0]
-                    att_t = mm.eval('zQuery -at ' + existing_attachment)[0]
+                    att_s = mel.eval('zQuery -as ' + existing_attachment)[0]
+                    att_t = mel.eval('zQuery -at ' + existing_attachment)[0]
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
@@ -62,17 +62,17 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    mc.rename(existing[d_index], name)
+                    cmds.rename(existing[d_index], name)
                 else:
-                    mc.select(source_mesh, r=True)
-                    mc.select(target_mesh, add=True)
-                    new_att = mm.eval('ziva -a')
-                    mc.rename(new_att[0], name)
+                    cmds.select(source_mesh, r=True)
+                    cmds.select(target_mesh, add=True)
+                    new_att = mel.eval('ziva -a')
+                    cmds.rename(new_att[0], name)
             else:
-                mc.select(source_mesh, r=True)
-                mc.select(target_mesh, add=True)
-                new_att = mm.eval('ziva -a')
-                mc.rename(new_att[0], name)
+                cmds.select(source_mesh, r=True)
+                cmds.select(target_mesh, add=True)
+                new_att = mel.eval('ziva -a')
+                cmds.rename(new_att[0], name)
 
             # set the attributes
             self.set_maya_attrs(attr_filter=attr_filter)

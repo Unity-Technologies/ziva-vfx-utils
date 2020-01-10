@@ -1,6 +1,6 @@
 from zBuilder.nodes import Ziva
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 import logging
 
@@ -46,9 +46,9 @@ class FiberNode(Ziva):
         name = self.name
         mesh = self.association[0]
 
-        if mc.objExists(mesh):
+        if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
+            existing_fibers = mel.eval('zQuery -t zFiber {}'.format(mesh))
             data_fibers = self.builder.bundle.get_scene_items(type_filter='zFiber',
                                                               association_filter=mesh)
 
@@ -56,15 +56,15 @@ class FiberNode(Ziva):
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    mc.rename(existing_fibers[d_index], name)
+                    cmds.rename(existing_fibers[d_index], name)
                 else:
-                    mc.select(mesh, r=True)
-                    results = mm.eval('ziva -f')
-                    mc.rename(results[0], name)
+                    cmds.select(mesh, r=True)
+                    results = mel.eval('ziva -f')
+                    cmds.rename(results[0], name)
             else:
-                mc.select(mesh, r=True)
-                results = mm.eval('ziva -f')
-                mc.rename(results[0], name)
+                cmds.select(mesh, r=True)
+                results = mel.eval('ziva -f')
+                cmds.rename(results[0], name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 

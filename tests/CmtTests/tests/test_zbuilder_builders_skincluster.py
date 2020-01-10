@@ -1,4 +1,4 @@
-import maya.cmds as mc
+from maya import cmds
 import zBuilder.builders.skinClusters as skn
 
 from vfx_test_case import VfxTestCase
@@ -9,22 +9,22 @@ class ZivaSkinClusterTestCase(VfxTestCase):
         super(ZivaSkinClusterTestCase, self).setUp()
 
         # Building a simple skinCluster scene to test.
-        mc.select(cl=True)
-        mc.joint(name='jnt')
-        mc.polySphere(name='sph')
+        cmds.select(cl=True)
+        cmds.joint(name='jnt')
+        cmds.polySphere(name='sph')
 
-        mc.skinCluster('jnt', 'sph')
+        cmds.skinCluster('jnt', 'sph')
 
-        mc.select(cl=True)
-        mc.joint(name='warped_jnt')
-        mc.polySphere(name='warped_sph')
+        cmds.select(cl=True)
+        cmds.joint(name='warped_jnt')
+        cmds.polySphere(name='warped_sph')
 
         # clear selection.
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
     def test_string_replace_add_prefix(self):
         # select the sphere with skinCluster
-        mc.select('sph')
+        cmds.select('sph')
 
         # transfer it by prefix (as trasnfer menu does)
 
@@ -39,12 +39,12 @@ class ZivaSkinClusterTestCase(VfxTestCase):
 
     def test_retrieve_and_build_clean(self):
         # select the sphere with skinCluster
-        mc.select('sph')
+        cmds.select('sph')
 
         builder = skn.SkinCluster()
         builder.retrieve_from_scene()
 
-        mc.delete('skinCluster1')
+        cmds.delete('skinCluster1')
 
         builder.build()
 
@@ -52,15 +52,15 @@ class ZivaSkinClusterTestCase(VfxTestCase):
 
     def test_retrieve_and_build_changed(self):
         # select the sphere with skinCluster
-        mc.select('sph')
+        cmds.select('sph')
 
         builder = skn.SkinCluster()
         builder.retrieve_from_scene()
 
         # change a value
-        mc.setAttr('skinCluster1.useComponents', 1)
+        cmds.setAttr('skinCluster1.useComponents', 1)
 
         builder.build()
 
         # if built properly value should be False
-        self.assertFalse(mc.getAttr('skinCluster1.useComponents'))
+        self.assertFalse(cmds.getAttr('skinCluster1.useComponents'))

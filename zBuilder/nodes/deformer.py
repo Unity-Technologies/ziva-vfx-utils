@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes.dg_node import DGNode
@@ -93,7 +93,7 @@ class Deformer(DGNode):
         """
         map_names = []
         for map_ in self.MAP_LIST:
-            map_names.extend(mc.ls('{}.{}'.format(self.name, map_)))
+            map_names.extend(cmds.ls('{}.{}'.format(self.name, map_)))
 
         return map_names
 
@@ -107,11 +107,11 @@ class Deformer(DGNode):
         Returns:
             list od strings: list of strings of mesh names.
         """
-        meshes = mc.deformer(node, query=True, g=True)
+        meshes = cmds.deformer(node, query=True, g=True)
         tmp = list()
         for mesh in meshes:
-            parent = mc.listRelatives(mesh, p=True)
-            tmp.extend(mc.ls(parent, long=True))
+            parent = cmds.listRelatives(mesh, p=True)
+            tmp.extend(cmds.ls(parent, long=True))
         return tmp
 
     def set_maya_weights(self, interp_maps=False):

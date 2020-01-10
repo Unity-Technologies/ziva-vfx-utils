@@ -1,7 +1,7 @@
 import logging
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 import zBuilder.zMaya as mz
 from zBuilder.builder import Builder
@@ -10,7 +10,7 @@ from zBuilder.nodes.utils.fields import Field
 logger = logging.getLogger(__name__)
 
 try:
-    mc.loadPlugin('ziva', qt=True)
+    cmds.loadPlugin('ziva', qt=True)
 except RuntimeError:
     pass
 
@@ -33,18 +33,18 @@ class SolverDisabler:
         self.enable_value = True
 
     def __enter__(self):
-        self.enable_value = mc.getAttr(self.enable_plug)
-        self.connection_source = mc.listConnections(self.enable_plug, plugs=True)
+        self.enable_value = cmds.getAttr(self.enable_plug)
+        self.connection_source = cmds.listConnections(self.enable_plug, plugs=True)
         if self.connection_source:
-            mc.disconnectAttr(self.connection_source[0], self.enable_plug)
+            cmds.disconnectAttr(self.connection_source[0], self.enable_plug)
 
-        mc.setAttr(self.enable_plug, False)
+        cmds.setAttr(self.enable_plug, False)
 
     def __exit__(self, type, value, traceback):
-        mc.setAttr(self.enable_plug, self.enable_value)
+        cmds.setAttr(self.enable_plug, self.enable_value)
 
         if self.connection_source:
-            mc.connectAttr(self.connection_source[0], self.enable_plug)
+            cmds.connectAttr(self.connection_source[0], self.enable_plug)
 
 
 class Ziva(Builder):
@@ -56,12 +56,12 @@ class Ziva(Builder):
 
         self.geo = {}
 
-        for plugin in mc.pluginInfo(query=True, listPluginsPath=True):
-            cmds = mc.pluginInfo(plugin, q=True, c=True)
-            if cmds and 'ziva' in cmds:
+        for plugin in cmds.pluginInfo(query=True, listPluginsPath=True):
+            commands = cmds.pluginInfo(plugin, q=True, c=True)
+            if commands and 'ziva' in commands:
                 self.info['plugin_name'] = plugin
-                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, v=True)
-                self.info['plugin_version'] = mc.pluginInfo(plugin, q=True, p=True)
+                self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, v=True)
+                self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, p=True)
                 continue
 
     def setup_tree_hierarchy(self):
@@ -107,7 +107,7 @@ class Ziva(Builder):
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             if item.type == 'zTissue':
                 if item.parent_tissue:
-                    bd = mm.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
+                    bd = mel.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
                     parent_node = self.geo.get(bd, self.root_node)
                 else:
                     parent_node = solver.get(item.solver, self.root_node)
@@ -204,22 +204,22 @@ class Ziva(Builder):
         '''
 
         # query all the ziva nodes---------------------------------------------
-        mc.select(bodies)
-        nodes = mm.eval('zQuery -a')
+        cmds.select(bodies)
+        nodes = mel.eval('zQuery -a')
 
         if nodes:
             # find zFiber---------------------------------------------
-            fiber_names = [x for x in nodes if mc.objectType(x) == 'zFiber']
+            fiber_names = [x for x in nodes if cmds.objectType(x) == 'zFiber']
             if fiber_names:
                 # find line of action----------------------------------------
-                line_of_actions = mc.listHistory(fiber_names)
-                line_of_actions = mc.ls(line_of_actions, type='zLineOfAction')
+                line_of_actions = cmds.listHistory(fiber_names)
+                line_of_actions = cmds.ls(line_of_actions, type='zLineOfAction')
                 nodes.extend(line_of_actions)
 
-            tet_names = [x for x in nodes if mc.objectType(x) == 'zTet']
+            tet_names = [x for x in nodes if cmds.objectType(x) == 'zTet']
             for tet_name in tet_names:
                 # find the rest shape--------------------------------------
-                rest_shape = mc.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
+                rest_shape = cmds.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
                 if rest_shape:
                     nodes.extend(rest_shape)
 
@@ -243,10 +243,10 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------
         # ---------------------------------------------------------------------
-        scene_selection = mc.ls(sl=True, l=True)
+        scene_selection = cmds.ls(sl=True, l=True)
         if args:
             selection = args[0]
-            mc.select(selection)
+            cmds.select(selection)
         else:
             selection = scene_selection
 
@@ -256,45 +256,45 @@ class Ziva(Builder):
         nodes.extend(self.__add_bodies(selection))
 
         # find attahment source and or targets to add to nodes.................
-        attachment_names = [x for x in nodes if mc.objectType(x) == 'zAttachment']
+        attachment_names = [x for x in nodes if cmds.objectType(x) == 'zAttachment']
         meshes = []
         if attachment_names:
             for attachment in attachment_names:
-                meshes.extend(mm.eval('zQuery -as -l {}'.format(attachment)))
-                meshes.extend(mm.eval('zQuery -at -l {}'.format(attachment)))
+                meshes.extend(mel.eval('zQuery -as -l {}'.format(attachment)))
+                meshes.extend(mel.eval('zQuery -at -l {}'.format(attachment)))
 
         if meshes:
             nodes.extend(self.__add_bodies(meshes))
 
         # # find attahment source and or targets to add to nodes.................
-        tissue_names = [x for x in nodes if mc.objectType(x) == 'zTissue']
+        tissue_names = [x for x in nodes if cmds.objectType(x) == 'zTissue']
 
         children = []
         for tissue in tissue_names:
-            children.extend(mz.none_to_empty(mc.listConnections(tissue + '.oChildTissue')))
+            children.extend(mz.none_to_empty(cmds.listConnections(tissue + '.oChildTissue')))
 
         if children:
             nodes.extend(self.__add_bodies(children))
 
-        body_names = [x for x in nodes if mc.objectType(x) in ['zCloth', 'zTissue']]
+        body_names = [x for x in nodes if cmds.objectType(x) in ['zCloth', 'zTissue']]
         if body_names:
-            history = mc.listHistory(body_names)
+            history = cmds.listHistory(body_names)
             types = []
             types.append('zFieldAdaptor')
             types.extend(Field.TYPES)
-            fields = mc.ls(history, type=types)
+            fields = cmds.ls(history, type=types)
             nodes.extend(fields)
 
         fibers = mz.get_zFibers(selection)
         if fibers:
-            hist = mc.listHistory(fibers)
-            nodes.extend(mc.ls(hist, type='zRivetToBone'))
+            hist = cmds.listHistory(fibers)
+            nodes.extend(cmds.ls(hist, type='zRivetToBone'))
 
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.setup_tree_hierarchy()
 
-        mc.select(scene_selection)
+        cmds.select(scene_selection)
         self.stats()
 
     @Builder.time_this
@@ -334,9 +334,9 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         solver = None
         if args:
-            solver = mm.eval('zQuery -t "zSolver" {}'.format(args[0]))
+            solver = mel.eval('zQuery -t "zSolver" {}'.format(args[0]))
         else:
-            solver = mm.eval('zQuery -t "zSolver"')
+            solver = mel.eval('zQuery -t "zSolver"')
 
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
@@ -399,13 +399,13 @@ class Ziva(Builder):
         """
 
         # get current selection to re-apply
-        sel = mc.ls(sl=True)
+        sel = cmds.ls(sl=True)
 
         # args
         if args:
-            selection = mc.ls(args[0], l=True)
+            selection = cmds.ls(args[0], l=True)
         else:
-            selection = mc.ls(sl=True, l=True)
+            selection = cmds.ls(sl=True, l=True)
 
         # kwargs
         connections = kwargs.get('connections', True)
@@ -461,21 +461,21 @@ class Ziva(Builder):
             if rivetToBone:
                 fibers = mz.get_zFibers(selection)
                 if fibers:
-                    hist = mc.listHistory(fibers)
-                    nodes.extend(mc.ls(hist, type='zRivetToBone'))
+                    hist = cmds.listHistory(fibers)
+                    nodes.extend(cmds.ls(hist, type='zRivetToBone'))
             if lineOfAction:
                 for fiber in mz.get_zFibers(selection):
                     loas = mz.get_fiber_lineofaction(fiber)
                     if loas:
                         nodes.append(loas)
             if restShape:
-                mc.select(selection)
-                rest_shapes = mm.eval('zQuery -t zRestShape')
+                cmds.select(selection)
+                rest_shapes = mel.eval('zQuery -t zRestShape')
                 if rest_shapes:
                     nodes.extend(rest_shapes)
             if embedder:
-                mc.select(selection)
-                embedder = mm.eval('zQuery -t "zEmbedder"')
+                cmds.select(selection)
+                embedder = mel.eval('zQuery -t "zEmbedder"')
                 if embedder:
                     nodes.extend(embedder)
         else:
@@ -484,7 +484,7 @@ class Ziva(Builder):
         if nodes:
             self._populate_nodes(nodes, get_parameters=get_parameters)
 
-        mc.select(sel, r=True)
+        cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
         self.stats()
 
@@ -555,7 +555,7 @@ class Ziva(Builder):
                 item.mirror()
 
         logger.info('Building Ziva Rig.')
-        sel = mc.ls(sl=True)
+        sel = cmds.ls(sl=True)
 
         # get stored solver enable value to build later. The solver comes in OFF
         solver_transform = self.get_scene_items(type_filter='zSolverTransform')
@@ -614,7 +614,7 @@ class Ziva(Builder):
                                      permissive=permissive,
                                      interp_maps=interp_maps)
 
-        mc.select(sel, r=True)
+        cmds.select(sel, r=True)
 
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
@@ -638,11 +638,11 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
 
     output = []
     for item in selection:
-        if mc.objectType(item) in type_:
-            history = mc.listHistory(item, future=True)
-            fiber = mc.ls(history, type='zFiber')
-            mc.select(fiber)
-            meshes = mm.eval('zQuery -t zTissue -m -l')
+        if cmds.objectType(item) in type_:
+            history = cmds.listHistory(item, future=True)
+            fiber = cmds.ls(history, type='zFiber')
+            cmds.select(fiber)
+            meshes = mel.eval('zQuery -t zTissue -m -l')
             output.append(meshes[0])
         else:
             output.append(item)
@@ -651,14 +651,14 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
 
 def zQuery(types, solver):
 
-    solver_history = mc.listHistory(solver)
+    solver_history = cmds.listHistory(solver)
     types_not_in_znodes = set(types) - set(ZNODES)
-    nodes = [x for x in solver_history if mc.objectType(x) in types_not_in_znodes]
+    nodes = [x for x in solver_history if cmds.objectType(x) in types_not_in_znodes]
 
     types_in_znodes = list(set(ZNODES) & set(types))
 
     for node_type in types_in_znodes:
-        tmp = mm.eval('zQuery -t "{}" {}'.format(node_type, solver))
+        tmp = mel.eval('zQuery -t "{}" {}'.format(node_type, solver))
         if tmp:
             nodes.extend(tmp)
 

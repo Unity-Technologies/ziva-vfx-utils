@@ -1,6 +1,6 @@
 from zBuilder.nodes import Ziva
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 import logging
 
@@ -106,18 +106,18 @@ class EmbedderNode(Ziva):
         if collision_meshes:
             for mesh in collision_meshes:
                 for item in collision_meshes[mesh]:
-                    history = mc.listHistory(item)
-                    if not mc.ls(history, type='zEmbedder'):
-                        mc.select(mesh, item, r=True)
-                        mm.eval('ziva -tcm')
+                    history = cmds.listHistory(item)
+                    if not cmds.ls(history, type='zEmbedder'):
+                        cmds.select(mesh, item, r=True)
+                        mel.eval('ziva -tcm')
 
         if embedded_meshes:
             for mesh in embedded_meshes:
                 for item in embedded_meshes[mesh]:
-                    history = mc.listHistory(item)
-                    if not mc.ls(history, type='zEmbedder'):
-                        mc.select(mesh, item, r=True)
-                        mm.eval('ziva -e')
+                    history = cmds.listHistory(item)
+                    if not cmds.ls(history, type='zEmbedder'):
+                        cmds.select(mesh, item, r=True)
+                        mel.eval('ziva -e')
 
 
 def get_embedded_meshes(bodies):
@@ -131,8 +131,8 @@ def get_embedded_meshes(bodies):
     collision_meshes = {}
     embedded_meshes = {}
     for body in bodies:
-        col_mesh = mm.eval('zQuery -cm -l ' + body)
-        em_mesh = mm.eval('zQuery -em -l ' + body)
+        col_mesh = mel.eval('zQuery -cm -l ' + body)
+        em_mesh = mel.eval('zQuery -em -l ' + body)
         if em_mesh and col_mesh:
             em_mesh = list(set(set(em_mesh) - set(col_mesh)))
             if em_mesh == []:

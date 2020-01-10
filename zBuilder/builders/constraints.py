@@ -1,7 +1,7 @@
 from zBuilder.builder import Builder
 import zBuilder.zMaya as mz
 
-import maya.cmds as mc
+from maya import cmds
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,9 +22,9 @@ class Constraints(Builder):
         selection = mz.parse_maya_node_for_selection(args)
 
         tmp = list()
-        connections = list(set(mc.listConnections(selection)))
+        connections = list(set(cmds.listConnections(selection)))
 
-        tmp.extend([x for x in connections if mc.objectType(x) in self.acquire])
+        tmp.extend([x for x in connections if cmds.objectType(x) in self.acquire])
 
         for item in tmp:
             parameter = self.node_factory(item)

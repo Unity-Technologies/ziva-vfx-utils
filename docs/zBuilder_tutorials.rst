@@ -90,8 +90,8 @@ This comes in handy if you want to mirror the setup, for example.
 
 .. code-block:: python
 
-    import maya.cmds as mc
-    mc.select('r_bicep_muscle')
+    from maya import cmds
+    cmds.select('r_bicep_muscle')
     import zBuilder.builders.ziva as zva
     z = zva.Ziva()
     z.retrieve_from_scene_selection()
@@ -347,7 +347,7 @@ To represent a model name change let's clean the scene and change the name of on
     import zBuilder.zMaya as mz
     mz.clean_scene()
 
-    mc.rename('r_bicep_muscle', 'r_biceps_muscle')
+    cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
 
 Now the information in the builder is out of sync with the geometry in the scene.
 We can update it by doing the following:

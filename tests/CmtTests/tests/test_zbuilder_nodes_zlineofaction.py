@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import os
 import logging
 import sys
@@ -16,36 +16,36 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         # setup a scene with 2 curves on 1 zLineOfAction
 
         # create geometry
-        mc.polySphere(name='bone')
-        mc.setAttr('bone.translateY', 2)
-        mc.polySphere(name='tissue')
+        cmds.polySphere(name='bone')
+        cmds.setAttr('bone.translateY', 2)
+        cmds.polySphere(name='tissue')
 
         # create zTissue and zBone
-        mc.select('tissue')
-        mm.eval('ziva -t')
+        cmds.select('tissue')
+        mel.eval('ziva -t')
 
-        mc.select('bone')
-        mm.eval('ziva -b')
+        cmds.select('bone')
+        mel.eval('ziva -b')
 
         # create an attachment, probably not needed
-        mc.select('tissue', 'bone')
-        mm.eval('ziva -a')
+        cmds.select('tissue', 'bone')
+        mel.eval('ziva -a')
 
         # create teh fiber
-        mc.select('tissue')
-        fiber = mm.eval('ziva -f')[0]
+        cmds.select('tissue')
+        fiber = mel.eval('ziva -f')[0]
 
         # create 2 curves on fiber and create a loa
-        mc.select(fiber)
-        curve1 = mm.eval('zLineOfActionUtil')[0]
-        mc.select(fiber)
-        curve2 = mm.eval('zLineOfActionUtil')[0]
+        cmds.select(fiber)
+        curve1 = mel.eval('zLineOfActionUtil')[0]
+        cmds.select(fiber)
+        curve2 = mel.eval('zLineOfActionUtil')[0]
         curve1 = curve1.replace('Shape', '')
         curve2 = curve2.replace('Shape', '')
-        mc.select(fiber, curve1, curve2)
-        mm.eval('ziva -loa')
+        cmds.select(fiber, curve1, curve2)
+        mel.eval('ziva -loa')
 
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -63,7 +63,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         self.builder.build()
 
         # after it is built there should be 2 curves hooked up to loa
-        curves = mc.listConnections('zLineOfAction1.curves')
+        curves = cmds.listConnections('zLineOfAction1.curves')
         self.assertEqual(len(curves), 2)
 
     def test_retrieve_connections_loa_selected(self):
@@ -71,7 +71,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
 
         # now retrieve
-        mc.select(loa.name)
+        cmds.select(loa.name)
         builder = zva.Ziva()
         builder.retrieve_connections()
         builder.stats()
@@ -84,7 +84,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         loa = self.builder.get_scene_items(type_filter='zLineOfAction')[0]
 
         # now retrieve
-        mc.select(loa.name)
+        cmds.select(loa.name)
         builder = zva.Ziva()
         builder.retrieve_connections()
 
