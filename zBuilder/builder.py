@@ -99,11 +99,12 @@ class Builder(object):
                         for parameter_arg in parameter_args:
                             parameter = self.parameter_factory(parameter_type, parameter_arg)
                             if parameter:
+                                node.link_parameter(parameter)
                                 zbuilder_nodes.append(parameter)
 
         return zbuilder_nodes
 
-    def parameter_factory(self, parameter_type, parameter_names):
+    def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
         desired one based on arguments.
         
@@ -120,16 +121,16 @@ class Builder(object):
             object: zBuilder parameter object
         '''
         # put association filter in a list if it isn't
-        if not isinstance(parameter_names, list):
-            parameter_names = [parameter_names]
+        if not isinstance(parameter_args, list):
+            parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if parameter_type == obj.type:
                     scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
                     scene_items = [x.long_name for x in scene_items]
-                    if any(x not in scene_items for x in parameter_names):
-                        return obj(*parameter_names, builder=self)
+                    if any(x not in scene_items for x in parameter_args):
+                        return obj(*parameter_args, builder=self)
 
     @staticmethod
     def time_this(original_function):
