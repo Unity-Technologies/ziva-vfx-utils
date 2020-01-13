@@ -14,6 +14,11 @@ class Deformer(DGNode):
 
         self.parameters = {}
 
+    def link_parameter(self, parameter):
+        if parameter.type not in self.parameters:
+            self.parameters[parameter.type] = []
+        self.parameters[parameter.type].append(parameter)
+
     def spawn_parameters(self):
         """
 
