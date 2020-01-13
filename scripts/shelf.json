@@ -6,7 +6,7 @@
                 "help": "Open Scene Panel",
                 "image": "scene_panel.png",
                 "commandType": "python",
-                "command": "from zBuilder.ui import zUI;zUI.run();"
+                "command": "from zBuilder.ui import zUI;zivaUI = zUI.run();"
             },
             "shelfSep_1": {
                 "separator": true,

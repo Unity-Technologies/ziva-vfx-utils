@@ -22,6 +22,9 @@ def dock_window(dialog_class, *args, **kwargs):
                                          wp='preferred',
                                          label=dialog_class.DOCK_LABEL_NAME)
 
+    # after maya is ready we should restore the window since it may not be visible
+    cmds.evalDeferred(lambda *args: cmds.workspaceControl(main_control, e=True, rs=True))
+
     # now lets get a C++ pointer to it using OpenMaya
     control_widget = mui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
     # conver the C++ pointer to Qt object we can use
@@ -30,8 +33,4 @@ def dock_window(dialog_class, *args, **kwargs):
     # control_wrap is the widget of the docking window and now we can start working with it:
     control_wrap.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-    win = dialog_class(control_wrap, *args, **kwargs)
-    # after maya is ready we should restore the window since it may not be visible
-    cmds.evalDeferred(lambda *args: cmds.workspaceControl(main_control, e=True, rs=True))
-
-    win.run()
+    return dialog_class(control_wrap, *args, **kwargs)
