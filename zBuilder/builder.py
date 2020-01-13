@@ -92,13 +92,14 @@ class Builder(object):
         if get_parameters:
             for node in zbuilder_nodes:
                 if hasattr(node, 'spawn_parameters'):
+                    # get the parameter info for a node in a dict format
                     node_parameter_info = node.spawn_parameters()
+
                     for parameter_type, parameter_args in node_parameter_info.iteritems():
-                        
                         for parameter_arg in parameter_args:
-                            value = self.parameter_factory(parameter_type, parameter_arg)
-                            if value:
-                                zbuilder_nodes.append(value)
+                            parameter = self.parameter_factory(parameter_type, parameter_arg)
+                            if parameter:
+                                zbuilder_nodes.append(parameter)
 
         return zbuilder_nodes
 
