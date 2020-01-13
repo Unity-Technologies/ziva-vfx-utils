@@ -300,19 +300,6 @@ class MyDockingUI(QtWidgets.QWidget):
             method(menu, node)
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    # TODO: Implement this functionality in zBuilder core
-    def get_maps_from_node(self, node):
-        maps = []
-        # get node parameters
-        param_dict = node.spawn_parameters()
-        param_dict.pop('mesh', None)
-        for key, values in param_dict.iteritems():
-            for value in values:
-                obj = self.builder.parameter_factory(key, value)
-                maps.append(obj)
-
-        return maps
-
     def add_map_actions_to_menu(self, menu, node, map_):
         """Add map actions to the menu
         Args:
@@ -370,7 +357,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        weight_map = node.parameters['map'][0]  # weight map @ index 0
         weight_map_menu = menu.addMenu('Weight')
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -379,8 +366,8 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
-        endpoints_map = self.get_maps_from_node(node)[1]  # endpoints map @ index 1
+        weight_map = node.parameters['map'][0]# weight map @ index 0
+        endpoints_map = node.parameters['map'][1]  # endpoints map @ index 1
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -391,7 +378,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
+        weight_map = node.parameters['map'][0] # weight map @ index 0
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -400,7 +387,7 @@ class MyDockingUI(QtWidgets.QWidget):
         target_mesh_name = node.association[1]
 
         # TODO Add the ability to get map by name instead of index
-        maps = self.get_maps_from_node(node)
+        maps = node.parameters['map']
         source_map = maps[0]  # source map @ index 0
         target_map = maps[1]  # target map @ index 1
 
