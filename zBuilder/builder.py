@@ -130,8 +130,11 @@ class Builder(object):
                     scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
                     scene_items = [x.long_name for x in scene_items]
                     if any(x not in scene_items for x in parameter_args):
+                        # return the instantiated object
                         return obj(*parameter_args, builder=self)
                     else:
+                        # If there is already a paremeter it will not instantiate one.  
+                        # this is where we return the already instantiated one.
                         return x
 
     @staticmethod
