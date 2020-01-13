@@ -12,6 +12,8 @@ class Deformer(DGNode):
     def __init__(self, parent=None, builder=None):
         super(Deformer, self).__init__(parent=parent, builder=builder)
 
+        self.parameters = {}
+
     def spawn_parameters(self):
         """
 

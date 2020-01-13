@@ -30,7 +30,7 @@ class DGNode(Base):
         if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
     """ List of maya node attribute names that represent the paintable map. """
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
     EXTEND_ATTR_LIST = list()
