@@ -131,6 +131,8 @@ class Builder(object):
                     scene_items = [x.long_name for x in scene_items]
                     if any(x not in scene_items for x in parameter_args):
                         return obj(*parameter_args, builder=self)
+                    else:
+                        return x
 
     @staticmethod
     def time_this(original_function):
