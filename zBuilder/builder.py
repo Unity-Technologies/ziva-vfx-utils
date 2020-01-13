@@ -70,36 +70,37 @@ class Builder(object):
         if not parent:
             parent = self.root_node
 
-        item_list = []
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
-            if inspect.isclass(obj):
-                if obj.TYPES:
-                    if type_ in obj.TYPES:
-                        obb = obj(parent=parent, builder=self)
+        zbuilder_nodes = []
+        for name, value in inspect.getmembers(sys.modules['zBuilder.nodes']):
+            if inspect.isclass(value):
+                if value.TYPES:
+                    if type_ in value.TYPES:
+                        obb = value(parent=parent, builder=self)
                         obb.populate(maya_node=node)
-                        item_list.append(obb)
-                if type_ == obj.type:
+                        zbuilder_nodes.append(obb)
+                if type_ == value.type:
 
-                    objct = obj(parent=parent, builder=self)
+                    objct = value(parent=parent, builder=self)
                     objct.populate(maya_node=node)
 
-                    item_list.append(objct)
-        if not item_list:
+                    zbuilder_nodes.append(objct)
+        if not zbuilder_nodes:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
-            item_list.append(objct)
+            zbuilder_nodes.append(objct)
 
         if get_parameters:
-            for obj__ in item_list:
-                if hasattr(obj__, 'spawn_parameters'):
-                    others = obj__.spawn_parameters()
-                    for k, values in others.iteritems():
-                        for v in values:
-                            obj = self.parameter_factory(k, v)
-                            if obj:
-                                item_list.append(obj)
+            for node in zbuilder_nodes:
+                if hasattr(node, 'spawn_parameters'):
+                    node_parameter_info = node.spawn_parameters()
+                    for parameter_type, parameter_args in node_parameter_info.iteritems():
+                        
+                        for parameter_arg in parameter_args:
+                            value = self.parameter_factory(parameter_type, parameter_arg)
+                            if value:
+                                zbuilder_nodes.append(value)
 
-        return item_list
+        return zbuilder_nodes
 
     def parameter_factory(self, parameter_type, parameter_names):
         ''' This looks for zBuilder objects in sys.modules and instantiates
