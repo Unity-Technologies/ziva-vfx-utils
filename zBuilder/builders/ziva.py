@@ -80,7 +80,6 @@ class Ziva(Builder):
         # solver transforms
         for item in self.get_scene_items(type_filter='zSolverTransform'):
             self.root_node.add_child(item)
-            item.parent = self.root_node
 
         # solvers
         solver = {}
@@ -91,7 +90,6 @@ class Ziva(Builder):
                     solver[item.name] = x
 
             parent_node.add_child(item)
-            item.parent = parent_node
 
         # get geometry-----------------------------------------------------------
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
@@ -118,18 +116,15 @@ class Ziva(Builder):
             parent_node.add_child(self.geo[item.long_association[0]])
 
             self.geo[item.long_association[0]].add_child(item)
-            item.parent = self.geo[item.long_association[0]]
 
         for item in self.get_scene_items(type_filter=['zTet']):
             parent_node = self.geo.get(item.long_association[0], self.root_node)
             parent_node.add_child(item)
-            item.parent = parent_node
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
             parent_node = self.geo.get(item.long_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
-                item.parent = parent_node
 
             if item.type == 'zAttachment':
                 parent_node = self.geo.get(item.long_association[1], None)
@@ -142,7 +137,6 @@ class Ziva(Builder):
             if parent_node:
                 parent_node = parent_node[0]
                 parent_node.add_child(item)
-                item.parent = parent_node
 
             # targets ----------------------
             for target in item.targets:
@@ -171,7 +165,6 @@ class Ziva(Builder):
                 grp.name = crv
                 grp.type = 'ui_curve_body'
                 parent_node.add_child(grp)
-                grp.parent = parent_node
 
                 grp.add_child(item)
                 item.parent = parent_node
@@ -179,18 +172,15 @@ class Ziva(Builder):
                 if rivet_items:
                     for rivet in rivet_items:
                         grp.add_child(rivet)
-                        rivet.parent = grp
                 self.geo[item.long_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
-            item.parent = self.root_node
 
         # assign zFieldAdapter to solver
         for item in self.get_scene_items(type_filter=['zFieldAdaptor']):
             parent_node = self.get_scene_items(name_filter=item.input_field)[0]
             parent_node.add_child(item)
-            item.parent = parent_node
 
     def __add_bodies(self, bodies):
         '''This is using zQuery -a under the hood.  It queries everything connected to bodies.
