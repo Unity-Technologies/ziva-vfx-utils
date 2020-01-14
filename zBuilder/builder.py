@@ -126,22 +126,21 @@ class Builder(object):
             parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
-            if inspect.isclass(obj):
-                if parameter_type == obj.type:
-                    scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
-                    scene_item_names = [y.long_name for y in scene_item_nodes]
-                    
-                    # the first element in parameter_args is the name.
-                    parameter_name = parameter_args[0]
-                    try:
-                        # There is an existing scene item for this item so lets just 
-                        # return that.
-                        index = scene_item_names.index(parameter_name)
-                        return scene_item_nodes[index]
-                    except ValueError:
-                        # When valueerror there is no exisitng scene item with that name
-                        # so lets create one and return that.
-                        return obj(*parameter_args, builder=self)
+            if inspect.isclass(obj) and parameter_type == obj.type:
+                scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
+                scene_item_names = [y.long_name for y in scene_item_nodes]
+                
+                # the first element in parameter_args is the name.
+                parameter_name = parameter_args[0]
+                try:
+                    # There is an existing scene item for this item so lets just 
+                    # return that.
+                    index = scene_item_names.index(parameter_name)
+                    return scene_item_nodes[index]
+                except ValueError:
+                    # When valueerror there is no exisitng scene item with that name
+                    # so lets create one and return that.
+                    return obj(*parameter_args, builder=self)
 
     @staticmethod
     def time_this(original_function):
