@@ -73,17 +73,10 @@ class Builder(object):
         item_list = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
-                if obj.TYPES:
-                    if type_ in obj.TYPES:
-                        obb = obj(parent=parent, builder=self)
-                        obb.populate(maya_node=node)
-                        item_list.append(obb)
-                if type_ == obj.type:
-
-                    objct = obj(parent=parent, builder=self)
-                    objct.populate(maya_node=node)
-
-                    item_list.append(objct)
+                if type_ in obj.TYPES or type_ == obj.type:
+                    obb = obj(parent=parent, builder=self)
+                    obb.populate(maya_node=node)
+                    item_list.append(obb)
         if not item_list:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
