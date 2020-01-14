@@ -57,7 +57,9 @@ class Base(object):
         return not self == other
 
     def add_child(self, child):
-        self.children.append(child)
+        if child not in self.children:
+            self.children.append(child)
+            child.parent = self
 
     def child(self, row):
         return self._children[row]
