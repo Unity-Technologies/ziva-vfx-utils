@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
+    type = None
     TYPES = []
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to

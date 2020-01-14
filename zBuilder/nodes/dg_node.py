@@ -24,8 +24,7 @@ class DGNode(Base):
         attrs (dict): A place for the maya attributes dictionary.
 
     """
-    type = None
-    TYPES = []
+    
     """ Types of maya nodes this parameter is aware of.  Only needed 
         if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
