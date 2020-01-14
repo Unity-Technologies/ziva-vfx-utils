@@ -98,9 +98,9 @@ class Builder(object):
                     for parameter_type, parameter_args in node_parameter_info.iteritems():
                         for parameter_arg in parameter_args:
                             parameter = self.parameter_factory(parameter_type, parameter_arg)
-                            if parameter:
-                                node.link_parameter(parameter)
-                                zbuilder_nodes.append(parameter)
+                            
+                            node.link_parameter(parameter)
+                            zbuilder_nodes.append(parameter)
 
         return zbuilder_nodes
 
