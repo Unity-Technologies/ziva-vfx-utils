@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    TYPES = None
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
+    TYPES = []
+    type = None
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
     COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', 'parameters']
