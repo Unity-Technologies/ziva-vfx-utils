@@ -31,6 +31,6 @@ def get_icon_path_from_name(name):
         try:
             icons_folder = cmds.moduleInfo(moduleName='ZivaVFX', path=True)
         except RuntimeError:
-            icons_folder = ''
+            return ''
 
     return os.path.join(icons_folder, 'icons', '{name}.png'.format(name=name))
