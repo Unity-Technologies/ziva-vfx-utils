@@ -23,5 +23,14 @@ def get_icon_path_from_name(name):
     Returns:
         str: The path to the matching icon.
     """
-    dirname = cmds.moduleInfo(moduleName='ZivaVFX', path=True)
-    return os.path.join(dirname, 'icons', '{name}.png'.format(name=name))
+    # look for repo icons first
+    icons_folder = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                                 '../..'))
+    # if repo does not exist try to use Ziva module folder else ignore it
+    if not os.path.exists(icons_folder):
+        try:
+            icons_folder = cmds.moduleInfo(moduleName='ZivaVFX', path=True)
+        except RuntimeError:
+            icons_folder = ''
+
+    return os.path.join(icons_folder, 'icons', '{name}.png'.format(name=name))
