@@ -147,8 +147,6 @@ def find_class(module_, type_):
     """
     for name, obj in inspect.getmembers(sys.modules[module_]):
         if inspect.isclass(obj):
-            if obj.TYPES:
-                if type_ in obj.TYPES:
-                    return obj
-            if type_ == obj.type:
+            if type_ in obj.TYPES or type_ == obj.type:
                 return obj
+
