@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    TYPES = None
+    type = None
+    TYPES = []
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     """ A list of attribute names in __dict__ to
             exclude from the string_replace method. """
@@ -57,7 +58,9 @@ class Base(object):
         return not self == other
 
     def add_child(self, child):
-        self.children.append(child)
+        if child not in self.children:
+            self.children.append(child)
+            child.parent = self
 
     def child(self, row):
         return self._children[row]
