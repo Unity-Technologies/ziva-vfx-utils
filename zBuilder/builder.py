@@ -118,7 +118,8 @@ class Builder(object):
                 whereas the first is the name.
         
         Returns:
-            object: zBuilder parameter object
+            object: zBuilder parameter object, either one created or an existing one that has 
+            already been created.
         '''
         # put association filter in a list if it isn't
         if not isinstance(parameter_args, list):
@@ -127,15 +128,20 @@ class Builder(object):
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj):
                 if parameter_type == obj.type:
-                    scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
-                    scene_items = [x.long_name for x in scene_items]
-                    if any(x not in scene_items for x in parameter_args):
-                        # return the instantiated object
+                    scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
+                    scene_item_names = [y.long_name for y in scene_item_nodes]
+                    
+                    # the first element in parameter_args is the name.
+                    parameter_name = parameter_args[0]
+                    try:
+                        # There is an existing scene item for this item so lets just 
+                        # return that.
+                        index = scene_item_names.index(parameter_name)
+                        return scene_item_nodes[index]
+                    except ValueError:
+                        # When valueerror there is no exisitng scene item with that name
+                        # so lets create one and return that.
                         return obj(*parameter_args, builder=self)
-                    else:
-                        # If there is already a paremeter it will not instantiate one.  
-                        # this is where we return the already instantiated one.
-                        return x
 
     @staticmethod
     def time_this(original_function):
