@@ -25,7 +25,7 @@ class DGNode(Base):
 
     """
     type = None
-    TYPES = None
+    TYPES = []
     """ Types of maya nodes this parameter is aware of.  Only needed 
         if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
