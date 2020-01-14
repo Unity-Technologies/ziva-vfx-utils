@@ -70,14 +70,14 @@ class Builder(object):
         if not parent:
             parent = self.root_node
 
-        item_list = []
+        zbuilder_nodes = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if type_ in obj.TYPES or type_ == obj.type:
                     obb = obj(parent=parent, builder=self)
                     obb.populate(maya_node=node)
-                    item_list.append(obb)
-        if not item_list:
+                    zbuilder_nodes.append(obb)
+        if not zbuilder_nodes:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
             zbuilder_nodes.append(objct)
