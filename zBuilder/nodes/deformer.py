@@ -14,12 +14,12 @@ class Deformer(DGNode):
 
         self.parameters = {}
 
-    def link_parameter(self, parameter):
+    def add_parameter(self, parameter):
         """ This takes a zBuilder parameter and adds it to the node.  This is effectively
         a pointer to original parameter for later retrieval
 
         args: 
-            parameter: obj the parameter to link to node
+            parameter: obj the parameter to add to node
         """
         if parameter.type not in self.parameters:
             self.parameters[parameter.type] = []
