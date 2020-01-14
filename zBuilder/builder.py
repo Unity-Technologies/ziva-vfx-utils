@@ -99,7 +99,7 @@ class Builder(object):
                         for parameter_arg in parameter_args:
                             parameter = self.parameter_factory(parameter_type, parameter_arg)
                             
-                            node.link_parameter(parameter)
+                            node.add_parameter(parameter)
                             zbuilder_nodes.append(parameter)
 
         return zbuilder_nodes
