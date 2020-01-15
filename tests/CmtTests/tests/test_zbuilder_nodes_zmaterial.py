@@ -49,7 +49,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
     def test_remove(self):
         self.check_ziva_remove_command(self.builder, "zMaterial")
 
-    def test_builder_has_same_tet_nodes_after_writing_to_disk(self):
+    def test_builder_has_same_material_nodes_after_writing_to_disk(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
         self.check_retrieve_zmaterial_looks_good(builder, {})
 
@@ -79,15 +79,15 @@ class ZivaTetGenericTestCase(VfxTestCase):
     def test_string_replace(self):
         ## VERIFY
         # check if an item exists before string_replace
-        r_tet = self.builder.get_scene_items(name_filter="r_tissue_2_zMaterial")
-        self.assertGreaterEqual(len(r_tet), 1)
+        r_material = self.builder.get_scene_items(name_filter="r_tissue_2_zMaterial")
+        self.assertGreaterEqual(len(r_material), 1)
 
         ## ACT
         self.builder.string_replace("^r_", "l_")
 
         ## VERIFY
-        r_tet = self.builder.get_scene_items(name_filter="r_tissue_2_zMaterial")
-        self.assertEqual(r_tet, [])
+        r_material = self.builder.get_scene_items(name_filter="r_tissue_2_zMaterial")
+        self.assertEqual(r_material, [])
 
     def test_cut_paste(self):
         builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zMaterial")
