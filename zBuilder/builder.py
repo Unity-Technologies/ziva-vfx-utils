@@ -70,31 +70,34 @@ class Builder(object):
         if not parent:
             parent = self.root_node
 
-        item_list = []
+        zbuilder_nodes = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if type_ in obj.TYPES or type_ == obj.type:
                     obb = obj(parent=parent, builder=self)
                     obb.populate(maya_node=node)
-                    item_list.append(obb)
-        if not item_list:
+                    zbuilder_nodes.append(obb)
+        if not zbuilder_nodes:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
-            item_list.append(objct)
+            zbuilder_nodes.append(objct)
 
         if get_parameters:
-            for obj__ in item_list:
-                if hasattr(obj__, 'spawn_parameters'):
-                    others = obj__.spawn_parameters()
-                    for k, values in others.iteritems():
-                        for v in values:
-                            obj = self.parameter_factory(k, v)
-                            if obj:
-                                item_list.append(obj)
+            for node in zbuilder_nodes:
+                if hasattr(node, 'spawn_parameters'):
+                    # get the parameter info for a node in a dict format
+                    node_parameter_info = node.spawn_parameters()
 
-        return item_list
+                    for parameter_type, parameter_args in node_parameter_info.iteritems():
+                        for parameter_arg in parameter_args:
+                            parameter = self.parameter_factory(parameter_type, parameter_arg)
+                            
+                            node.add_parameter(parameter)
+                            zbuilder_nodes.append(parameter)
 
-    def parameter_factory(self, parameter_type, parameter_names):
+        return zbuilder_nodes
+
+    def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
         desired one based on arguments.
         
@@ -108,19 +111,29 @@ class Builder(object):
                 whereas the first is the name.
         
         Returns:
-            object: zBuilder parameter object
+            object: zBuilder parameter object, either one created or an existing one that has 
+            already been created.
         '''
         # put association filter in a list if it isn't
-        if not isinstance(parameter_names, list):
-            parameter_names = [parameter_names]
+        if not isinstance(parameter_args, list):
+            parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
-            if inspect.isclass(obj):
-                if parameter_type == obj.type:
-                    scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
-                    scene_items = [x.long_name for x in scene_items]
-                    if any(x not in scene_items for x in parameter_names):
-                        return obj(*parameter_names, builder=self)
+            if inspect.isclass(obj) and parameter_type == obj.type:
+                scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
+                scene_item_names = [y.long_name for y in scene_item_nodes]
+                
+                # the first element in parameter_args is the name.
+                parameter_name = parameter_args[0]
+                try:
+                    # There is an existing scene item for this item so lets just 
+                    # return that.
+                    index = scene_item_names.index(parameter_name)
+                    return scene_item_nodes[index]
+                except ValueError:
+                    # When valueerror there is no exisitng scene item with that name
+                    # so lets create one and return that.
+                    return obj(*parameter_args, builder=self)
 
     @staticmethod
     def time_this(original_function):

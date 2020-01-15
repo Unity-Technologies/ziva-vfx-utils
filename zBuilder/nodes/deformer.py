@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from maya import cmds
 from maya import mel
 import zBuilder.zMaya as mz
@@ -11,6 +13,17 @@ logger = logging.getLogger(__name__)
 class Deformer(DGNode):
     def __init__(self, parent=None, builder=None):
         super(Deformer, self).__init__(parent=parent, builder=builder)
+
+        self.parameters = defaultdict(list)
+
+    def add_parameter(self, parameter):
+        """ This takes a zBuilder parameter and adds it to the node.  This is effectively
+        a pointer to original parameter for later retrieval
+
+        args: 
+            parameter: obj the parameter to add to node
+        """
+        self.parameters[parameter.type].append(parameter)
 
     def spawn_parameters(self):
         """
