@@ -123,12 +123,12 @@ class VfxTestCase(TestCase):
         cmds.select(cl=True)
         for node in nodes:
             # need to find an associated mesh
-            # for zMaterial, zTet, zTissue, ... it is a parent name
-            # for zLineOfAction, zRestShape, ... it is a parent's associated mesh
             parent = node.parent
             if type(parent) == DGNode:
+                # for zMaterial, zTet, zTissue, ... it is a parent name
                 cmds.select(parent.long_name, add=True)
             else:
+                # for zLineOfAction, zRestShape, ... it is a parent's associated mesh
                 cmds.select(parent.long_association, add=True)
 
         ## ACT
