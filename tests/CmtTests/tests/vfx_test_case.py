@@ -6,6 +6,7 @@ from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
+from zBuilder.nodes.dg_node import DGNode
 
 
 def isApprox(a, b, eps=1e-6):
@@ -117,11 +118,15 @@ class VfxTestCase(TestCase):
 
     def check_ziva_remove_command(self, builder, node_type):
         ## SETUP
-        tissue_nodes = builder.get_scene_items(type_filter=node_type)
+        nodes = builder.get_scene_items(type_filter=node_type)
         # clear selection
         cmds.select(cl=True)
-        for tissue in tissue_nodes:
-            cmds.select(tissue.long_association, add=True)
+        for node in nodes:
+            parent = node.parent
+            if type(parent) == DGNode:
+                cmds.select(parent.long_name, add=True)
+            else:
+                cmds.select(parent.long_association, add=True)
 
         ## ACT
         cmds.ziva(rm=True)
@@ -130,8 +135,8 @@ class VfxTestCase(TestCase):
         cmds.select(cl=True)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        tissue_nodes = builder.get_scene_items(type_filter=node_type)
-        self.assertEqual(tissue_nodes, [])
+        nodes = builder.get_scene_items(type_filter=node_type)
+        self.assertEqual(nodes, [])
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
         builder.write(self.temp_file_path)
