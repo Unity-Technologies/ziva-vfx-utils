@@ -119,10 +119,11 @@ class VfxTestCase(TestCase):
     def find_body(self, node):
         # Find the body for the given zbuilder node
         # body includes meshes for the nodes: zTissue, zBone, zCloth
-        if hasattr(node.parent, "depends_on"):
-            return node.parent
-        else:
-            return self.find_body(node.parent)
+        if hasattr(node, "parent"):
+            if hasattr(node.parent, "depends_on"):
+                return node.parent
+            else:
+                return self.find_body(node.parent)
 
     def check_ziva_remove_command(self, builder, node_type):
         ## SETUP
