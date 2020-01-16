@@ -78,9 +78,9 @@ class RivetToBoneNode(Ziva):
             if not is_cv_connected_to_rivet(crv, cv_index):
                 for i in cv_index:
                     cmds.select('{}.cv[{}]'.format(crv, i), add=True)
-                cmds.select(bone, add=True)
+                self.name = cmds.select(bone, add=True)
                 results = mel.eval('zRivetToBone')
-                cmds.rename(results[0], self.name)
+                self.name = cmds.rename(results[0], self.name)
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
             if permissive:
