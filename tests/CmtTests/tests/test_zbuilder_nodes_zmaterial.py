@@ -8,7 +8,7 @@ from maya import cmds
 from vfx_test_case import VfxTestCase
 
 
-class ZivaTetGenericTestCase(VfxTestCase):
+class ZivaMaterialGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.material_names = [
@@ -18,7 +18,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
         cls.material_attrs = ["youngsModulus", "massDensity", "restScale"]
 
     def setUp(self):
-        super(ZivaTetGenericTestCase, self).setUp()
+        super(ZivaMaterialGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -26,7 +26,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaTetGenericTestCase, self).tearDown()
+        super(ZivaMaterialGenericTestCase, self).tearDown()
 
     def check_retrieve_zmaterial_looks_good(self, builder, expected_plugs):
         """Args:
