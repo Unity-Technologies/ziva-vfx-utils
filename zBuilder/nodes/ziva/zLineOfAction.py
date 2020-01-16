@@ -29,8 +29,11 @@ class LineOfActionNode(Ziva):
         """
         super(LineOfActionNode, self).populate(maya_node=maya_node)
 
-        self.fiber = mz.get_lineOfAction_fiber(self.get_scene_name())
-        self.fiber = self.builder.get_scene_items(name_filter=self.fiber)[0]
+        fiber_name = mz.get_lineOfAction_fiber(self.get_scene_name())
+
+        scene_item = self.builder.get_scene_items(name_filter=fiber_name)
+        if scene_item:
+            self.fiber = scene_item[0]
 
     def build(self, *args, **kwargs):
         """ Builds the Line of Actions in maya scene.
