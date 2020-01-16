@@ -140,16 +140,15 @@ class Deformer(DGNode):
         Returns:
             nothing.
         """
-        maps = self.get_map_names()
-        scene_name = self.get_scene_name()
-        original_name = self.name
-
         self.check_map_interpolation(interp_maps)
-        for map_ in maps:
-            map_data = self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_)
-            if map_data:
-                map_data[0].string_replace(original_name, scene_name)
-                map_data[0].apply_weights()
+
+        # Cycle through the maps stored in the node.
+        for item in self.parameters['map']:
+            # We are replacing the name in the map node (first part) with the name of
+            # the node it is coming from.
+            item.string_replace(item.name.split('.')[0], self.name)
+            # apply the weights
+            item.apply_weights()
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
