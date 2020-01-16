@@ -24,33 +24,6 @@ class ZivaRestShapeTestCase(VfxTestCase):
         cmds.select(self.tissue_mesh, target_a, target_b)
         mel.eval('zRestShape -a')
 
-    def test_retrieve(self):
-
-        cmds.select(cl=True)
-
-        # use builder to retrieve from scene-----------------------------------
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
-
-        # check amount of zTissue and zTet.  Should be 1 of each
-        items = builder.get_scene_items(type_filter=['zRestShape'])
-
-        self.assertTrue(len(items) == 1)
-
-    def test_retrieve_build_clean(self):
-
-        cmds.select(cl=True)
-
-        # use builder to retrieve from scene-----------------------------------
-        builder = zva.Ziva()
-        builder.retrieve_from_scene()
-
-        mz.clean_scene()
-
-        builder.build()
-
-        self.assertTrue(cmds.objExists('zRestShape1'))
-
     def test_retrieve_selection(self):
 
         cmds.select(self.tissue_mesh)
