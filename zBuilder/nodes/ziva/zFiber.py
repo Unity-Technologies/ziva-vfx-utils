@@ -56,15 +56,15 @@ class FiberNode(Ziva):
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    cmds.rename(existing_fibers[d_index], name)
+                    self.name = cmds.rename(existing_fibers[d_index], name)
                 else:
                     cmds.select(mesh, r=True)
                     results = mel.eval('ziva -f')
-                    cmds.rename(results[0], name)
+                    self.name = cmds.rename(results[0], name)
             else:
                 cmds.select(mesh, r=True)
                 results = mel.eval('ziva -f')
-                cmds.rename(results[0], name)
+                self.name = cmds.rename(results[0], name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 
