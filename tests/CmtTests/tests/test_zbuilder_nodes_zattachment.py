@@ -8,7 +8,7 @@ from maya import cmds
 from vfx_test_case import VfxTestCase
 
 
-class ZivaTetGenericTestCase(VfxTestCase):
+class ZivaAttachmentGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.attachment_names = [
@@ -21,7 +21,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
         cls.attachment_attrs = ["attachmentMode", "stiffness", "show"]
 
     def setUp(self):
-        super(ZivaTetGenericTestCase, self).setUp()
+        super(ZivaAttachmentGenericTestCase, self).setUp()
         test_utils.build_generic_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -29,7 +29,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaTetGenericTestCase, self).tearDown()
+        super(ZivaAttachmentGenericTestCase, self).tearDown()
 
     def check_retrieve_zattachment_looks_good(self, builder, expected_plugs):
         """Args:
