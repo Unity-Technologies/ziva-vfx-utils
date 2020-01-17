@@ -105,6 +105,11 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_rest_shape_looks_good(self.builder, {})
 
+    def test_retrieve_connections(self):
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        self.check_retrieve_rest_shape_looks_good(builder, {})
+
     def test_build_restores_attr_values(self):
         self.check_build_restores_attr_values(self.builder, self.rest_shape_names, self.rest_shape_attrs)
 

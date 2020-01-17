@@ -43,6 +43,11 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
     def test_retrieve(self):
         self.check_retrieve_rivet_to_bone_looks_good(self.builder, {})
 
+    def test_retrieve_connections(self):
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        self.check_retrieve_rivet_to_bone_looks_good(builder, {})
+
     def test_build_restores_attr_values(self):
         self.check_build_restores_attr_values(self.builder, self.rivet_to_bone_names, self.rivet_to_bone_attrs)
 
