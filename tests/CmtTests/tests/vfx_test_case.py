@@ -116,20 +116,23 @@ class VfxTestCase(TestCase):
         attrs_after = attr_values_from_scene(plug_names)
         self.assertEqual(attrs_before, attrs_after)
 
+    def find_body(self, node):
+        # Find the body for the given zbuilder node
+        # body includes meshes for the nodes: zTissue, zBone, zCloth
+        if hasattr(node, "parent"):
+            if hasattr(node.parent, "depends_on"):
+                return node.parent
+            else:
+                return self.find_body(node.parent)
+
     def check_ziva_remove_command(self, builder, node_type):
         ## SETUP
         nodes = builder.get_scene_items(type_filter=node_type)
         # clear selection
         cmds.select(cl=True)
         for node in nodes:
-            # need to find an associated mesh
-            parent = node.parent
-            if type(parent) == DGNode:
-                # for zMaterial, zTet, zTissue, ... it is a parent name
-                cmds.select(parent.long_name, add=True)
-            else:
-                # for zLineOfAction, zRestShape, ... it is a parent's associated mesh
-                cmds.select(parent.long_association, add=True)
+            body = self.find_body(node)
+            cmds.select(body.long_name, add=True)
 
         ## ACT
         cmds.ziva(rm=True)
