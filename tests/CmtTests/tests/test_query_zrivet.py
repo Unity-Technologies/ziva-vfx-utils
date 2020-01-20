@@ -17,7 +17,7 @@ class QueryRivetTestCase(VfxTestCase):
 
     def create_bone(self, name, position):
         '''
-        Create a cube zBone wit specified name and position
+        Create a cube zBone with specified name and position
         Args:
             name(string): Cube mesh name
             position(list): Cube mesh position coordinates
@@ -38,9 +38,10 @@ class QueryRivetTestCase(VfxTestCase):
         Returns:
             Created line name, may different from the input if it exists in the scene.
         '''
-        strPt1 = ' '.join(str(i) for i in point1)
-        strPt2 = ' '.join(str(i) for i in point2)
-        line = mel.eval('curve -d 1 -p {} -p {} -k 0 -k 1 -n {}'.format(strPt1, strPt2, name))
+        pt1_string = ' '.join(str(i) for i in point1)
+        pt2_string = ' '.join(str(i) for i in point2)
+        line = mel.eval('curve -d 1 -p {} -p {} -k 0 -k 1 -n {}'.format(
+            pt1_string, pt2_string, name))
         return line
 
     def create_rivet(self, cv, bone):
@@ -56,17 +57,12 @@ class QueryRivetTestCase(VfxTestCase):
 
     def test_empty_scene_and_solver(self):
         # Empty scene
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
         self.assertIsNone(query_result)
 
         # One empty solver
         mel.eval('ziva -s')
-        query_result = mel.eval('zQuery -rvt')
-        self.assertIsNone(query_result)
-
-        # Two empty solvers
-        mel.eval('ziva -s')
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
         self.assertIsNone(query_result)
 
     def test_one_solver_one_bone(self):
@@ -79,7 +75,7 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Clear the selection to collect all rivets.
         cmds.select(clear=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet2[0]])
@@ -87,7 +83,7 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Select the bone
         cmds.select('bone1', r=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet2[0]])
@@ -95,7 +91,7 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Select the curve
         cmds.select('line1', r=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         # Query does not take account the curve selection
@@ -119,7 +115,7 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Clear the selection to collect all rivets.
         cmds.select(clear=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet2[0], rivet3[0], rivet4[0]])
@@ -127,14 +123,14 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Select one bone
         cmds.select('bone1', r=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet3[0]])
 
         # Select the other bone
         cmds.select('bone2', r=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet2[0], rivet4[0]])
@@ -172,7 +168,7 @@ class QueryRivetTestCase(VfxTestCase):
         # Action
         # Clear the selection to collect all rivets.
         cmds.select(clear=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet2[0], rivet3[0], rivet4[0]])
@@ -187,14 +183,14 @@ class QueryRivetTestCase(VfxTestCase):
 
         # Select the other bone
         cmds.select('bone2', r=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet2[0], rivet4[0]])
 
         # Follow previous selection, select both bones
         cmds.select('bone1', add=True)
-        query_result = mel.eval('zQuery -rvt')
+        query_result = mel.eval('zQuery -rtb')
 
         # Verify
         self.assertEqual(sorted(query_result), [rivet1[0], rivet2[0], rivet3[0], rivet4[0]])
