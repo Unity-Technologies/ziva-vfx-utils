@@ -1,12 +1,10 @@
 import os
-from maya import cmds
 from cmt.test import TestCase
 import zBuilder.zMaya as mz
 from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
-from zBuilder.nodes.dg_node import DGNode
 
 
 def isApprox(a, b, eps=1e-6):
@@ -37,7 +35,7 @@ def get_all_mesh_vertex_positions():
 def attr_values_from_zbuilder_nodes(nodes):
     """ From a list of zBuilder nodes get all of the attributes and their values as a dict.
     e.g. Input: builder.get_scene_items(type_filter="zTissue")
-         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... }
     """
     result = {}
     for node in nodes:
@@ -51,7 +49,7 @@ def attr_values_from_zbuilder_nodes(nodes):
 def attr_values_from_scene(plug_names):
     """ From a collection of attribute names, get a dict of attr/value pairs.
     e.g Input: ['zTissue1.collisions', 'my_zTetNode.tetSize', ...]
-        Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+        Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... }
     """
     return {plug_name: cmds.getAttr(plug_name) for plug_name in plug_names}
 
@@ -59,7 +57,6 @@ def attr_values_from_scene(plug_names):
 class VfxTestCase(TestCase):
     temp_file_path = test_utils.get_tmp_file_location()
     """Base class for unit test cases run for ZivaVFX plugin."""
-
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -143,6 +140,24 @@ class VfxTestCase(TestCase):
         builder.retrieve_from_scene()
         nodes = builder.get_scene_items(type_filter=node_type)
         self.assertEqual(nodes, [])
+
+    def check_map_interpolation(self, builder, node_name, expected_weights, map_index):
+        """Args:
+            builder (builders.ziva.Ziva()): builder object
+            node_name (string): name of the Ziva node with a map
+            expected_weights (list): list if expected weights for the map
+            map_index (int): map index, 0 or 1, to choose between source/target, source/endPoints
+                             weights
+        """
+        ## ACT
+        builder.build(interp_maps=True)
+
+        ## VERIFY
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        node = builder.get_scene_items(name_filter=node_name)[0]
+        self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values)
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
         builder.write(self.temp_file_path)
