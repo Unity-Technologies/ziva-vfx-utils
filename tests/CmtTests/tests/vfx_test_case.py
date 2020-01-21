@@ -1,12 +1,11 @@
 import os
-from maya import cmds
 from cmt.test import TestCase
 import zBuilder.zMaya as mz
 from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
-from zBuilder.nodes.dg_node import DGNode
+
 
 
 def isApprox(a, b, eps=1e-6):
