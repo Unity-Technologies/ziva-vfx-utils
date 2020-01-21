@@ -156,10 +156,8 @@ class VfxTestCase(TestCase):
         cmds.select(cl=True)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        attachment = builder.get_scene_items(name_filter=node_name)[0]
-        self.assertAllApproxEqual(expected_weights,
-                                  attachment.parameters["map"][map_index].values,
-                                  eps=1e-5)
+        node = builder.get_scene_items(name_filter=node_name)[0]
+        self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values)
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
         builder.write(self.temp_file_path)
