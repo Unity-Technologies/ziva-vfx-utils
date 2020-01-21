@@ -115,6 +115,8 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
         ## VERIFY
         skin_cluster = self.builder.get_scene_items(name_filter="skinCluster1")
         self.assertEqual(skin_cluster, [])
+        skin_cluster = self.builder.get_scene_items(name_filter="skinCluster2")
+        self.assertEqual(len(skin_cluster), 1)
 
 
 class ZivaSkinClusterTestCase(VfxTestCase):
