@@ -470,6 +470,14 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             if crv:
                 cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
 
+    # rename zRivetToBone nodes
+    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
+    if rtbs:
+        for rtb in rtbs:
+            crv = cmds.listConnections(rtb + '.outputGeometry')
+            if crv:
+                cmds.rename(rtb, crv[0] + '_zRivetToBone1')
+
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
         for attachment in attachments:
