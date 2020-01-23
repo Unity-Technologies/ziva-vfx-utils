@@ -123,7 +123,20 @@ class Map(Base):
         if cmds.objExists(mesh_data.name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
-            weight_list = interpolate_values(created_mesh, mesh_data.name, self.values)
+            weight_interp = interpolate_values(created_mesh, mesh_data.name, self.values)
+            weight_list = []
+            if ".endPoints" in self.name:
+                eps = 1e-4
+                for weight in weight_interp:
+                    if weight <= 0.0 + eps:
+                        weight_list.append(0.0)
+                    elif weight >= 1.0 - eps:
+                        weight_list.append(1.0)
+                    else:
+                        weight_list.append(0.5)
+            else:
+                weight_list = weight_interp
+
             self.values = weight_list
 
             cmds.delete(created_mesh)
