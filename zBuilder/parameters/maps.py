@@ -179,11 +179,11 @@ class Map(Base):
 
 
 def invert_weights(weights):
-    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
-    
+    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.
+
     Args:
         weights (list): Weight list, a list of floats or ints.
-    
+
     Returns:
         list: list of floats
     """
