@@ -436,7 +436,6 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     * zRestShape: <meshName>_zRestShape
     * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     """
-    sel = cmds.ls(sl=True)
     solver = mel.eval('zQuery -t "zSolver"')
 
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
