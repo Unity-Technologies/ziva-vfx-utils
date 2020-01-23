@@ -438,59 +438,61 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     """
     solver = mel.eval('zQuery -t "zSolver"')
 
-    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
+    if solver:
+        zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
-    for zNode in zNodes:
-        items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+        for zNode in zNodes:
+            items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
+            if items:
+                for item in items:
+                    mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+                    for r in replace:
+                        mesh = mesh.replace(r, '')
+                    if item != '{}_{}'.format(mesh, zNode):
+                        cmds.rename(item, '{}_{}tmp'.format(mesh, zNode))
+
+            # looping through this twice to get around how maya renames stuff
+            items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
+            if items:
+                for item in items:
+                    mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+                    for r in replace:
+                        mesh = mesh.replace(r, '')
+                    if item != '{}_{}'.format(mesh, zNode):
+                        cmds.rename(item, '{}_{}'.format(mesh, zNode))
+                        print('rename: ', item, '{}_{}'.format(mesh, zNode))
+
+        # rename zLineOfAction nodes
+        loas = mel.eval('zQuery -loa {}'.format(solver[0]))
+        if loas:
+            for loa in loas:
+                crv = cmds.listConnections(loa + '.oLineOfActionData')
+                if crv:
+                    cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
+
+        # rename zRivetToBone nodes
+        rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
+        if rtbs:
+            for rtb in rtbs:
+                crv = cmds.listConnections(rtb + '.outputGeometry')
+                if crv:
+                    cmds.rename(rtb, crv[0] + '_zRivetToBone1')
+
+        attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
+        if attachments:
+            for attachment in attachments:
+                s = mel.eval('zQuery -as {}'.format(attachment))[0]
                 for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}tmp'.format(mesh, zNode))
-
-        # looping through this twice to get around how maya renames stuff
-        items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+                    s = s.replace(r, '')
+                t = mel.eval('zQuery -at {}'.format(attachment))[0]
                 for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}'.format(mesh, zNode))
-                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
-
-    # rename zLineOfAction nodes
-    loas = mel.eval('zQuery -loa {}'.format(solver[0]))
-    if loas:
-        for loa in loas:
-            crv = cmds.listConnections(loa + '.oLineOfActionData')
-            if crv:
-                cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
-
-    # rename zRivetToBone nodes
-    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
-    if rtbs:
-        for rtb in rtbs:
-            crv = cmds.listConnections(rtb + '.outputGeometry')
-            if crv:
-                cmds.rename(rtb, crv[0] + '_zRivetToBone1')
-
-    attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
-    if attachments:
-        for attachment in attachments:
-            s = mel.eval('zQuery -as {}'.format(attachment))[0]
-            for r in replace:
-                s = s.replace(r, '')
-            t = mel.eval('zQuery -at {}'.format(attachment))[0]
-            for r in replace:
-                t = t.replace(r, '')
-            if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
-                cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-
-    logger.info('finished renaming.... ')
+                    t = t.replace(r, '')
+                if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
+                    cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+                    print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+        logger.info('finished renaming.... ')
+    else:
+        cmds.error("No solver found for current selection !")
 
 
 def select_tissue_meshes():
