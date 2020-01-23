@@ -440,7 +440,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
 
     if not solver:
         logger.error("No solver found for current selection !")
-        return 
+        return
 
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
@@ -494,7 +494,6 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
                 print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
     logger.info('finished renaming.... ')
-
 
 
 def select_tissue_meshes():
@@ -713,8 +712,8 @@ def replace_long_name(search, replace, long_name):
                         # yeilds this replace string: "l_"
                         # as it found an "_" at end of string.
                         # then it performs a match replace on original string
-                        with_this = item[match.span(1)[0]:match.span(1)
-                                         [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                        with_this = item[match.span(1)[0]:match.span(1)[1]] + replace + item[
+                            match.span(2)[0]:match.span(2)[1]]
                         item = item[:match.start()] + with_this + item[match.end():]
                     else:
                         item = re.sub(search, replace, item)
