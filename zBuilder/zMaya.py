@@ -462,8 +462,8 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     cmds.rename(item, '{}_{}'.format(mesh, zNode))
                     print('rename: ', item, '{}_{}'.format(mesh, zNode))
 
-    # for now doing an ls type for lineOfActions until with have zQuery support
-    loas = cmds.ls(type='zLineOfAction')
+    # rename zLineOfAction nodes
+    loas = mel.eval('zQuery -loa {}'.format(solver[0]))
     if loas:
         for loa in loas:
             crv = cmds.listConnections(loa + '.oLineOfActionData')
