@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 from maya import cmds
 from maya import mel
@@ -640,16 +641,42 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
 
 
 def zQuery(types, solver):
+    """ This is a wrapper around Ziva VFX zQuery as currently it does not handle 
+    all the queries needed.  This will sort through the types and if given a type that
+    zQuery is unfamiliar with it searches solver for it by history instead.
+    
+    Args:
+        types (list() of str()): The types of nodes to get information about
+        solver (str()): The solver to query.
+    
+    Returns:
+        list() of str(): 
+    """
+    return_value = []
 
+    # Full history of solver
     solver_history = cmds.listHistory(solver)
+
+    # Types that are not in ZNODES.  This means that zQuery will not know what to do with it.
     types_not_in_znodes = set(types) - set(ZNODES)
-    nodes = [x for x in solver_history if cmds.objectType(x) in types_not_in_znodes]
+    types_in_znodes = list(set(ZNODES).intersection(set(types)))
 
-    types_in_znodes = list(set(ZNODES) & set(types))
+    # Dictionary to hold used types not in ZNODES (The actual ones we currently cannot zQuery)
+    solver_history_dict = defaultdict(list)
 
-    for node_type in types_in_znodes:
-        tmp = mel.eval('zQuery -t "{}" {}'.format(node_type, solver))
-        if tmp:
-            nodes.extend(tmp)
+    # Go through the full solver history and put items in a dictionary with type as key.
+    for item in solver_history:
+        item_type = cmds.objectType(item)
+        if item_type in types_not_in_znodes:
+            solver_history_dict[item_type].append(item)
 
-    return nodes
+    # go through ordered 'types' list and fill up the return_value in a nice ordered manner
+    for type_ in types:
+        if type_ in types_in_znodes:
+            tmp = mel.eval('zQuery -t "{}" {}'.format(type_, solver))
+            if tmp:
+                return_value.extend(tmp)
+        else:
+            return_value.extend(solver_history_dict[type_])
+
+    return return_value
