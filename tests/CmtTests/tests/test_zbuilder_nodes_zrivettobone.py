@@ -57,7 +57,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
         ## VERIFY
         rivet_to_bone = cmds.zQuery(rtb=True)
-        self.assertEqual(rivet_to_bone, None)
+        self.assertIsNone(rivet_to_bone)
 
     def test_builder_has_same_rivet_to_bone_nodes_after_writing_to_disk(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
