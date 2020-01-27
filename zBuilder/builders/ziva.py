@@ -104,9 +104,13 @@ class Ziva(Builder):
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             if item.type == 'zTissue':
+                # if it is a zTissue node we need to check if it is part of a subTissue
                 if item.parent_tissue:
-                    bd = mel.eval('zQuery -t zTissue -l -m {}'.format(item.parent_tissue))[0]
-                    parent_node = self.geo.get(bd, self.root_node)
+                    # This node has a parent subTissue, so lets find the parents mesh
+                    # for proper parenting.
+                    parent_tissue_scene_item = self.get_scene_items(name_filter=item.parent_tissue)
+                    parent_tissue_mesh = parent_tissue_scene_item[0].long_association[0]
+                    parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
                     parent_node = solver.get(item.solver, self.root_node)
             else:
