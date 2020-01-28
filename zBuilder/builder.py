@@ -91,7 +91,7 @@ class Builder(object):
                     for parameter_type, parameter_args in node_parameter_info.iteritems():
                         for parameter_arg in parameter_args:
                             parameter = self.parameter_factory(parameter_type, parameter_arg)
-                            
+
                             node.add_parameter(parameter)
                             zbuilder_nodes.append(parameter)
 
@@ -122,11 +122,11 @@ class Builder(object):
             if inspect.isclass(obj) and parameter_type == obj.type:
                 scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
-                
+
                 # the first element in parameter_args is the name.
                 parameter_name = parameter_args[0]
                 try:
-                    # There is an existing scene item for this item so lets just 
+                    # There is an existing scene item for this item so lets just
                     # return that.
                     index = scene_item_names.index(parameter_name)
                     return scene_item_nodes[index]
