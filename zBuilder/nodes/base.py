@@ -263,7 +263,7 @@ def serialize_object(obj):
             except TypeError:
                 pass
     else:
-        print 'NON SERIALIZEABLE', obj.__repr__
+        print('NON SERIALIZEABLE', obj.__repr__)
 
     return output
 
