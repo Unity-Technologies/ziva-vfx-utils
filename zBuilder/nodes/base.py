@@ -22,6 +22,8 @@ class Base(object):
     COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', 'parameters']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
+    SCENE_ITEM_ATTRIBUTES = ['parameters', '_children', '_parent']
+    """ The attributes that contain a scene item """
 
     def __init__(self, *args, **kwargs):
         self._name = None
