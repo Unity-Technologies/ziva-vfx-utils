@@ -277,16 +277,16 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
 
 def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
-    """
-    Description:
-        Will transfer values between similar meshes with differing topology.
+    """ Will transfer values between similar meshes with differing topology.
         Takes value from the closest point on mesh.
-
-    Accepts:
-        sourceMeshName, destinationMeshName - strings for each mesh transform
+    Args:
+        source_mesh(string): name on the mesh transform to interpolate from
+        destination_mesh(string): name of the mesh transform to interpolate to
+        weight_list(list): weights to interpolate
+        clamp(list): values to use for clamping
 
     Returns:
-
+        list of interpolated weights
     """
     source_mesh_m_dag_path = mz.get_mdagpath_from_mesh(source_mesh)
     destination_mesh_m_dag_path = mz.get_mdagpath_from_mesh(destination_mesh)
@@ -304,37 +304,41 @@ def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp
     int_util = om.MScriptUtil()
 
     interpolated_weights = []
+    # store closest vertex for clamping
     closest_vtx = []
 
     while not destination_mesh_m_it_mesh_vertex.isDone():
-
         closest_m_point_on_mesh = om.MPointOnMesh()
         pos = destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
         source_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
 
+        # closest polygon
         source_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
                                                int_util.asIntPtr())
 
-        point_array = om.MPointArray()
-        int_array = om.MIntArray()
+        closest_polygon_point_array = om.MPointArray()
+        closest_polygon_vtx_id_array = om.MIntArray()
 
-        source_mesh_m_it_mesh_polygon.getPoints(point_array, om.MSpace.kWorld)
-        source_mesh_m_it_mesh_polygon.getVertices(int_array)
+        source_mesh_m_it_mesh_polygon.getPoints(closest_polygon_point_array, om.MSpace.kWorld)
+        source_mesh_m_it_mesh_polygon.getVertices(closest_polygon_vtx_id_array)
 
+        # iterate through vertices on the polygon and find closest one
         closest = 0
-        for i in range(1, point_array.length()):
-            if pos.distanceTo(point_array[i]) < pos.distanceTo(point_array[closest]):
+        for i in range(1, closest_polygon_point_array.length()):
+            if pos.distanceTo(closest_polygon_point_array[i]) < pos.distanceTo(closest_polygon_point_array[closest]):
                 closest = i
 
-        interpolated_weights.append(weight_list[int_array[closest]])
-        closest_vtx.append(int_array[closest])
+        interpolated_weights.append(weight_list[closest_polygon_vtx_id_array[closest]])
+        closest_vtx.append(closest_polygon_vtx_id_array[closest])
         destination_mesh_m_it_mesh_vertex.next()
 
+    # recursively search connected vertices to find the right list of indices to clamp
     def search_connected(vtx_id, searched_values):
         connected_vtx = om.MIntArray()
         source_mesh_m_it_mesh_vertex.setIndex(vtx_id, int_util.asIntPtr())
         source_mesh_m_it_mesh_vertex.getConnectedVertices(connected_vtx)
         for idx in connected_vtx:
+            # return if any of the connected vertices were found as closest before
             related_idx = [closest_vtx.index(i) for i in closest_vtx if i == idx]
             if related_idx:
                 return related_idx
@@ -347,13 +351,16 @@ def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp
     if clamp:
         interpolated_weights = [max(min(x, clamp[-1]), clamp[0]) for x in interpolated_weights]
 
+        # check that every clamp value present in interpolated weights
         for val in clamp:
+            # if not find closest vertices and set a new value
             if val not in interpolated_weights:
+                # find closest index to the current clamp value
                 source_closest_index = min(range(len(weight_list)),
                                            key=lambda i: abs(weight_list[i] - val))
+                # to prevent cycle store indices that are already checked
                 searched_vals = [source_closest_index]
                 vtx_to_clamp = search_connected(source_closest_index, searched_vals)
-                print vtx_to_clamp
                 for vtx in vtx_to_clamp:
                     interpolated_weights[vtx] = val
 
