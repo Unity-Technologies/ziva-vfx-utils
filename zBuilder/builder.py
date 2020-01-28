@@ -194,6 +194,33 @@ class Builder(object):
         before = datetime.datetime.now()
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
+
+        # Run setup tree hiearchy if applicable
+        if hasattr(self, 'setup_tree_hierarchy'):
+            self.setup_tree_hierarchy()
+
+        # The json data is now loaded.  We need to go through the defined scene item attributes
+        # (The attributes that hold un-serializable scene items) and replace the string name
+        # with the proper scene item.
+
+        # loop through the scene items
+        for item in self.get_scene_items():
+            # loop through scene item attributes as defined by each scene item
+            for attr in item.SCENE_ITEM_ATTRIBUTES:
+                if attr in item.__dict__:
+                    # if attribute is a list assume it is a list of scene items and replace
+                    if isinstance(item.__dict__[attr], list):
+                        item.__dict__[attr] = self.get_scene_items(name_filter=item.__dict__[attr])
+                    # if attribute is a dict, assume format is a dict with key being parameter type and
+                    # value a list of scene items.
+                    elif isinstance(item.__dict__[attr], dict):
+                        for parm in item.__dict__[attr]:
+                            item.__dict__[attr][parm] = self.get_scene_items(
+                                name_filter=item.__dict__[attr][parm])
+                    # defaults to a stright replace
+                    else:
+                        item.__dict__[attr] = self.get_scene_items(name_filter=item.__dict__[attr])
+
         self.bundle.stats()
         after = datetime.datetime.now()
         logger.info('Read File: {} in {}'.format(file_path, after - before))
