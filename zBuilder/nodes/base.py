@@ -249,23 +249,21 @@ def serialize_object(obj):
     Returns:
         dict: Of serializable obj
     """
-
-    # clearing these attributes for now as they are causing issues with serilization as they are
-    # python objects and they are not needed in this context.  These attributes are used
-    # for the QTreeView to define the tree layout.
-    obj.parent = None
-    obj.children = None
-
     output = dict()
-    for key in obj.__dict__:
-        if hasattr(obj.__dict__[key], '_class') and (hasattr(obj.__dict__[key], 'serialize')
-                                                     and callable(obj.serialize)):
-            output[key] = obj.__dict__[key].serialize()
-        try:
-            json.dumps(obj.__dict__[key])
-            output[key] = obj.__dict__[key]
-        except TypeError:
-            pass
+
+    if hasattr(obj, 'serialize'):
+        for key in obj.__dict__:
+            if key in Base.SCENE_ITEM_ATTRIBUTES:
+                obj.__dict__[key] = replace_scene_items_with_string(obj.__dict__[key])
+
+            try:
+                json.dumps(obj.__dict__[key])
+                output[key] = obj.__dict__[key]
+
+            except TypeError:
+                pass
+    else:
+        print 'NON SERIALIZEABLE', obj.__repr__
 
     return output
 
