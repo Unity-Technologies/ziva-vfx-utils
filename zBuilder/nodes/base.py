@@ -221,6 +221,22 @@ class Base(object):
             logger.info('Wrote File: %s' % file_path)
 
 
+def replace_scene_items_with_string(item):
+    # This takes a scene item, and replaces each instance with an embedded scene item
+    # with the scene items name. The reason for this is scene items are not serializable
+    # by themselves.  This enables is to "re-apply" them after it is loaded from disk
+    if isinstance(item, list):
+        item = [x.name for x in item]
+    elif isinstance(item, dict):
+        for key in item:
+            item[key] = [x.name for x in item[key]]
+    else:
+        if item:
+            item = item.name
+
+    return item
+
+
 def serialize_object(obj):
     """ Takes in a python obj and scrubs through the __dict__ and returns a serializable
     dictionary.
