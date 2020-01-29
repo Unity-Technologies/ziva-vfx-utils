@@ -30,7 +30,10 @@ class FiberNode(Ziva):
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
-                objs['map'].append([map_name, mesh_name, "closest", [0, 0.5, 1]])
+                if '.endPoints' in map_name:
+                    objs['map'].append([map_name, mesh_name, 'closest', [0, 0.5, 1]])
+                else:
+                    objs['map'].append([map_name, mesh_name, "barycentric", [0, 1]])
         return objs
 
     def get_map_meshes(self):
