@@ -127,10 +127,10 @@ class Map(Base):
             interp_weights = self.values
             if self.interp_method == "barycentric":
                 interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values,
-                                                 self.clamp_values)
+                                                    self.clamp_values)
             elif self.interp_method == "closest":
-                interp_weights = interpolate_values_closest(created_mesh, mesh_data.name, self.values,
-                                                         self.clamp_values)
+                interp_weights = interpolate_values_closest(created_mesh, mesh_data.name,
+                                                            self.values, self.clamp_values)
             self.values = interp_weights
 
             cmds.delete(created_mesh)
@@ -277,7 +277,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
 
 def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
-    """ Will transfer values between similar meshes with differing topology.
+    """ Will transfer values between similar meshes with differing topology. \
         Takes value from the closest point on mesh.
     Args:
         source_mesh(string): name on the mesh transform to interpolate from
@@ -325,7 +325,8 @@ def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp
         # iterate through vertices on the polygon and find closest one
         closest = 0
         for i in range(1, closest_polygon_point_array.length()):
-            if pos.distanceTo(closest_polygon_point_array[i]) < pos.distanceTo(closest_polygon_point_array[closest]):
+            if pos.distanceTo(closest_polygon_point_array[i]) < pos.distanceTo(
+                    closest_polygon_point_array[closest]):
                 closest = i
 
         interpolated_weights.append(weight_list[closest_polygon_vtx_id_array[closest]])
