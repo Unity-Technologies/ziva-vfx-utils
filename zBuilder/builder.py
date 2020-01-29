@@ -184,6 +184,14 @@ class Builder(object):
             self.bundle.stats()
             logger.info('Wrote File: %s' % file_path)
 
+        # loop through the scene items
+        for scene_item in self.get_scene_items():
+            # loop through scene item attributes as defined by each scene item
+            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+                if attr in scene_item.__dict__:
+                    restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                    scene_item.__dict__[attr] = restored
+
     def retrieve_from_file(self, file_path):
         """ Reads scene items from a given file.  The items get placed in the bundle.
 
@@ -196,30 +204,20 @@ class Builder(object):
         io.unpack_zbuilder_contents(self, json_data)
 
         # Run setup tree hiearchy if applicable
-        if hasattr(self, 'setup_tree_hierarchy'):
-            self.setup_tree_hierarchy()
+        # if hasattr(self, 'setup_tree_hierarchy'):
+        #     self.setup_tree_hierarchy()
 
         # The json data is now loaded.  We need to go through the defined scene item attributes
         # (The attributes that hold un-serializable scene items) and replace the string name
         # with the proper scene item.
 
         # loop through the scene items
-        for item in self.get_scene_items():
+
+        for scene_item in self.get_scene_items():
             # loop through scene item attributes as defined by each scene item
-            for attr in item.SCENE_ITEM_ATTRIBUTES:
-                if attr in item.__dict__:
-                    # if attribute is a list assume it is a list of scene items and replace
-                    if isinstance(item.__dict__[attr], list):
-                        item.__dict__[attr] = self.get_scene_items(name_filter=item.__dict__[attr])
-                    # if attribute is a dict, assume format is a dict with key being parameter type and
-                    # value a list of scene items.
-                    elif isinstance(item.__dict__[attr], dict):
-                        for parm in item.__dict__[attr]:
-                            item.__dict__[attr][parm] = self.get_scene_items(
-                                name_filter=item.__dict__[attr][parm])
-                    # defaults to a stright replace
-                    else:
-                        item.__dict__[attr] = self.get_scene_items(name_filter=item.__dict__[attr])
+            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+                if attr in scene_item.__dict__:
+                    restore_scene_items_from_string(scene_item.__dict__[attr], self)
 
         self.bundle.stats()
         after = datetime.datetime.now()
@@ -296,6 +294,18 @@ class Builder(object):
                                            association_filter=association_filter,
                                            association_regex=association_regex,
                                            invert_match=invert_match)
+
+
+def restore_scene_items_from_string(item, builder):
+    if isinstance(item, list):
+        if item:
+            item = builder.get_scene_items(name_filter=item)
+    elif isinstance(item, dict):
+        for parm in item:
+            item[parm] = builder.get_scene_items(name_filter=item[parm])
+    else:
+        item = builder.get_scene_items(name_filter=item)
+    return item
 
 
 def builder_factory(class_name):
