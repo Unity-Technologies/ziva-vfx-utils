@@ -17,11 +17,12 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
     TYPES = []
     type = None
-    """ A list of attribute names in __dict__ to
-            exclude from the string_replace method. """
-    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', 'parameters']
+    """ type of scene item """
+
+    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent', 'depends_on']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
+
     SCENE_ITEM_ATTRIBUTES = ['parameters', '_children', '_parent']
     """ The attributes that contain a scene item """
 
