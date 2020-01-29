@@ -19,7 +19,7 @@ class Base(object):
     type = None
     """ type of scene item """
 
-    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent', 'depends_on']
+    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
