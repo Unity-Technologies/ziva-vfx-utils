@@ -203,10 +203,6 @@ class Builder(object):
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
 
-        # Run setup tree hiearchy if applicable
-        # if hasattr(self, 'setup_tree_hierarchy'):
-        #     self.setup_tree_hierarchy()
-
         # The json data is now loaded.  We need to go through the defined scene item attributes
         # (The attributes that hold un-serializable scene items) and replace the string name
         # with the proper scene item.
