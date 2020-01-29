@@ -333,19 +333,29 @@ def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp
         destination_mesh_m_it_mesh_vertex.next()
 
     # recursively search connected vertices to find the right list of indices to clamp
-    def search_connected(vtx_id, searched_values):
-        connected_vtx = om.MIntArray()
-        source_mesh_m_it_mesh_vertex.setIndex(vtx_id, int_util.asIntPtr())
-        source_mesh_m_it_mesh_vertex.getConnectedVertices(connected_vtx)
-        for idx in connected_vtx:
-            # return if any of the connected vertices were found as closest before
-            related_idx = [closest_vtx.index(i) for i in closest_vtx if i == idx]
-            if related_idx:
-                return related_idx
-        for idx in connected_vtx:
+    # search runs by loops from specified vertices
+    def search_connected(vtx_ids, searched_values):
+        related_idx = []
+        for idx in vtx_ids:
+            # check if any of the connected vertices were found as closest before
+            related_idx.extend([closest_vtx.index(i) for i in closest_vtx if i == idx])
+        if related_idx:
+            return related_idx
+        all_connected_vtx = []
+        for idx in vtx_ids:
+            connected_vtx = om.MIntArray()
+            source_mesh_m_it_mesh_vertex.setIndex(idx, int_util.asIntPtr())
+            source_mesh_m_it_mesh_vertex.getConnectedVertices(connected_vtx)
+            all_connected_vtx.extend(connected_vtx)
+        vtx_to_search = []
+        for idx in all_connected_vtx:
             if idx not in searched_values:
                 searched_values.append(idx)
-                return search_connected(idx, searched_values)
+                vtx_to_search.append(idx)
+        if vtx_to_search:
+            return search_connected(vtx_to_search, searched_values)
+        else:
+            return []
 
     # clamp the values if needed
     if clamp:
@@ -360,7 +370,7 @@ def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp
                                            key=lambda i: abs(weight_list[i] - val))
                 # to prevent cycle store indices that are already checked
                 searched_vals = [source_closest_index]
-                vtx_to_clamp = search_connected(source_closest_index, searched_vals)
+                vtx_to_clamp = search_connected([source_closest_index], searched_vals)
                 for vtx in vtx_to_clamp:
                     interpolated_weights[vtx] = val
 
