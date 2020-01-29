@@ -75,29 +75,6 @@ class DGNode(Base):
 
         return result
 
-    def serialize(self):
-        """  Makes node serializable.
-
-        It loops through keys in dict and saves out a temp dict of items that 
-        can be serializable and returns that temp dict for json writing purposes.
-
-        Returns:
-            dict: of serializable items
-        """
-        output = serialize_object(self)
-
-        return output
-
-    def deserialize(self, json_data):
-        """ Deserializes a node with given dict.
-
-        Assigns a dictionary to __dict__.
-
-        Args:
-            json_data(dict): The given dict.
-        """
-        self.__dict__ = json_data
-
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
