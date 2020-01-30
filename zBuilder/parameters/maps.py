@@ -303,7 +303,7 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
 
     int_util = om.MScriptUtil()
 
-    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
+    interpolated_weights = [clamp[1]] * target_mesh_m_it_mesh_vertex.count()
     while not source_mesh_m_it_mesh_vertex.isDone():
         current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
         # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
