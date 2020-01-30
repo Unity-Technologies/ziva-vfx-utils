@@ -208,12 +208,12 @@ class Builder(object):
         # with the proper scene item.
 
         # loop through the scene items
-
         for scene_item in self.get_scene_items():
             # loop through scene item attributes as defined by each scene item
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
-                    restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                    restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                    scene_item.__dict__[attr] = restored
 
         self.bundle.stats()
         after = datetime.datetime.now()
