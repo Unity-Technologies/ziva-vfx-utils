@@ -277,7 +277,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
 
 def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 0.5, 1]):
-    """ Will transfer values between similar meshes with differing topology.
+    """ Will transfer values between similar meshes with differing topology. \
         Takes value from the closest point on mesh.
     Args:
         source_mesh(string): name on the mesh transform to interpolate from
@@ -312,7 +312,8 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
             # allow 10 percent difference but clamp it to the right value
             threshold_val = max_val * 0.1
             for value in clamp:
-                if (current_weight <= value + threshold_val) and (current_weight >= value - threshold_val):
+                if (current_weight <= value + threshold_val) and (current_weight >=
+                                                                  value - threshold_val):
                     current_weight = value
 
         if current_weight in [clamp[0], clamp[-1]]:
