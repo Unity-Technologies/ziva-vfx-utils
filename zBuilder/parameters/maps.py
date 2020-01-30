@@ -329,7 +329,7 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
             distance_array = [distance_sum]
             # iterate through vertices on the polygon and get sum distance and distance to
             # each vertex
-            for i in range(1, closest_polygon_point_array.length()):
+            for i in xrange(1, closest_polygon_point_array.length()):
                 distance = pos.distanceTo(closest_polygon_point_array[i])
                 distance_sum += distance
                 distance_array.append(distance)
