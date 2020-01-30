@@ -51,6 +51,14 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
     def test_build_restores_attr_values(self):
         self.check_build_restores_attr_values(self.builder, self.rivet_to_bone_names, self.rivet_to_bone_attrs)
 
+    def test_remove(self):
+        ## ACT
+        mz.clean_scene()
+
+        ## VERIFY
+        rivet_to_bone = cmds.zQuery(rtb=True)
+        self.assertIsNone(rivet_to_bone)
+
     def test_builder_has_same_rivet_to_bone_nodes_after_writing_to_disk(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
         self.check_retrieve_rivet_to_bone_looks_good(builder, {})
@@ -62,6 +70,22 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
     def test_build_from_file(self):
         builder = self.get_builder_after_write_and_retrieve_from_file(self.builder)
         self.check_retrieve_rivet_to_bone_looks_good(builder, {})
+
+    def test_rename(self):
+        ## SETUP
+        cmds.select(["r_loa_curve.cv[0]", "c_bone_1"])
+        cmds.zRivetToBone()
+
+        ## VERIFY
+        # check if an item exists before renaming
+        self.assertEqual(cmds.ls("r_loa_curve_zRivetToBone1"), [])
+
+        ## ACT
+        cmds.select(cl=True)
+        mz.rename_ziva_nodes([])
+
+        ## VERIFY
+        self.assertEqual(len(cmds.ls("r_loa_curve_zRivetToBone1")), 1)
 
     def test_string_replace(self):
         ## VERIFY
@@ -75,6 +99,29 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         ## VERIFY
         r_rivet_to_bone = self.builder.get_scene_items(name_filter="l_loa_curve_zRivetToBone1")
         self.assertEqual(r_rivet_to_bone, [])
+
+    def test_copy_paste(self):
+        ## VERIFY
+        # check if node exists
+        self.assertEqual(len(cmds.ls("l_loa_curve_zRivetToBone1")), 1)
+        ## ACT
+        cmds.select("l_tissue_1")
+        utils.rig_copy()
+
+        ## VERIFY
+        # check that node was not removed
+        self.assertEqual(len(cmds.ls("l_loa_curve_zRivetToBone1")), 1)
+
+        ## SETUP
+        mz.clean_scene()
+
+        ## ACT
+        cmds.select("l_tissue_1")
+        utils.rig_paste()
+
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        self.check_retrieve_rivet_to_bone_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
