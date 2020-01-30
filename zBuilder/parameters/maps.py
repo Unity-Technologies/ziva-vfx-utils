@@ -25,7 +25,6 @@ class Map(Base):
             map_name = args[0]
             mesh_name = args[1]
             self.interp_method = args[2]
-            self.clamp_values = args[3]
             if map_name and mesh_name:
                 self.populate(map_name, mesh_name)
 
@@ -126,11 +125,10 @@ class Map(Base):
             created_mesh = mesh_data.build_mesh()
             interp_weights = self.values
             if self.interp_method == "barycentric":
-                interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values,
-                                                    self.clamp_values)
-            elif self.interp_method == "closest":
-                interp_weights = interpolate_values_closest(created_mesh, mesh_data.name,
-                                                            self.values, self.clamp_values)
+                interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values)
+            elif self.interp_method == "endPoints":
+                interp_weights = interpolate_end_points_weights(created_mesh, mesh_data.name,
+                                                                self.values)
             self.values = interp_weights
 
             cmds.delete(created_mesh)
@@ -276,14 +274,13 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     return interpolated_weights
 
 
-def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 0.5, 1]):
+def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
     """ Will transfer values between similar meshes with differing topology. \
-        Takes value from the closest point on mesh.
+        Takes value from the closest point on mesh. Works only for zFiber.endPoints map.
     Args:
         source_mesh(string): name on the mesh transform to interpolate from
         target_mesh(string): name of the mesh transform to interpolate to
         weight_list(list): weights to interpolate
-        clamp(list): values to use for clamping. List size should be 2 or 3.
 
     Returns:
         list of interpolated weights
@@ -303,20 +300,17 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
 
     int_util = om.MScriptUtil()
 
-    interpolated_weights = [clamp[1]] * target_mesh_m_it_mesh_vertex.count()
+    # fill the map with 0.5 values
+    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
     while not source_mesh_m_it_mesh_vertex.isDone():
         current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
         # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
-        if current_weight not in clamp:
-            max_val = max(clamp)
-            # allow 10 percent difference but clamp it to the right value
-            threshold_val = max_val * 0.1
-            for value in clamp:
-                if (current_weight <= value + threshold_val) and (current_weight >=
-                                                                  value - threshold_val):
-                    current_weight = value
+        if current_weight >= 0.9:
+            current_weight = 1.0
+        elif current_weight <= 0.1:
+            current_weight = 0.0
 
-        if current_weight in [clamp[0], clamp[-1]]:
+        if current_weight in [0, 1]:
             closest_m_point_on_mesh = om.MPointOnMesh()
             pos = source_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
             target_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
@@ -343,10 +337,16 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
             average_distance = distance_sum / closest_polygon_point_array.length()
 
             # if distance from projected point to face vertex is less or equal then average
-            # distance, then store this vertex index to set corresponding weight value
+            # distance, then set corresponding weight value
+            found = False
             for i in xrange(closest_polygon_point_array.length()):
                 if distance_array[i] <= average_distance:
                     interpolated_weights[closest_polygon_vtx_id_array[i]] = current_weight
+                    found = True
+            # make sure that at least one vertex has a new value
+            if not found:
+                closest_index = distance_array.index(min(distance_array))
+                interpolated_weights[closest_polygon_vtx_id_array[closest_index]] = current_weight
 
         source_mesh_m_it_mesh_vertex.next()
 
