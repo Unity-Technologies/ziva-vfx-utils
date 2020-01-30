@@ -351,7 +351,6 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
     target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
 
     interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
-    print target_mesh_m_it_mesh_vertex.count()
     for index in interpolated_dict:
         interpolated_weights[index] = interpolated_dict[index]
 
