@@ -160,7 +160,7 @@ class Ziva(Builder):
 
         # line of actions
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
-            parent_node = item.fiber
+            parent_node = item.fiber_item
 
             for crv in item.long_association:
                 # proxy object to represent geometry
