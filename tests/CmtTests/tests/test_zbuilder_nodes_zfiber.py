@@ -162,7 +162,10 @@ class ZivaFiberGenericTestCase(VfxTestCase):
 
     def test_weight_closest_interpolation_with_low_res_mesh(self):
         ## SETUP
-        weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0, 0, 0.5, 1, 1, 0.5]
+        weights = [
+            0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.0,
+            0.5, 0.5, 0.5
+        ]
         self.builder.string_replace("l_tissue_1", "l_tissue_1_low")
         # Rest shape has to be removed from the build list because there is no rest shape for
         # l_tissue_1_low mesh in the scene
@@ -210,6 +213,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
             0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
             0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
         ]
+
         self.builder.string_replace("l_tissue_1", "l_tissue_1_high")
         # Rest shape has to be removed from the build list because there is no rest shape for
         # l_tissue_1_high mesh in the scene

@@ -276,103 +276,83 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     return interpolated_weights
 
 
-def interpolate_values_closest(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
-    """ Will transfer values between similar meshes with differing topology. \
+def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 0.5, 1]):
+    """ Will transfer values between similar meshes with differing topology.
         Takes value from the closest point on mesh.
     Args:
         source_mesh(string): name on the mesh transform to interpolate from
-        destination_mesh(string): name of the mesh transform to interpolate to
+        target_mesh(string): name of the mesh transform to interpolate to
         weight_list(list): weights to interpolate
-        clamp(list): values to use for clamping
+        clamp(list): values to use for clamping. List size should be 2 or 3.
 
     Returns:
         list of interpolated weights
     """
+    target_mesh_m_dag_path = mz.get_mdagpath_from_mesh(target_mesh)
     source_mesh_m_dag_path = mz.get_mdagpath_from_mesh(source_mesh)
-    destination_mesh_m_dag_path = mz.get_mdagpath_from_mesh(destination_mesh)
-    source_mesh_shape_m_dag_path = om.MDagPath(source_mesh_m_dag_path)
-    source_mesh_shape_m_dag_path.extendToShape()
+    target_mesh_shape_m_dag_path = om.MDagPath(target_mesh_m_dag_path)
+    target_mesh_shape_m_dag_path.extendToShape()
 
-    source_mesh_m_mesh_intersector = om.MMeshIntersector()
-    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node(),
-                                          source_mesh_m_dag_path.inclusiveMatrix())
+    target_mesh_m_mesh_intersector = om.MMeshIntersector()
+    target_mesh_m_mesh_intersector.create(target_mesh_shape_m_dag_path.node(),
+                                          target_mesh_m_dag_path.inclusiveMatrix())
 
-    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
     source_mesh_m_it_mesh_vertex = om.MItMeshVertex(source_mesh_m_dag_path)
-    source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
+    target_mesh_m_it_mesh_polygon = om.MItMeshPolygon(target_mesh_m_dag_path)
 
     int_util = om.MScriptUtil()
+    interpolated_dict = {}
+    while not source_mesh_m_it_mesh_vertex.isDone():
+        current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
+        # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
+        if current_weight not in clamp:
+            max_val = max(clamp)
+            min_val = min(clamp)
+            # allow 10 percent difference but clamp it to the right value
+            threshold_val = max_val * 0.1
+            for value in clamp:
+                if (current_weight <= value + threshold_val) and (current_weight >= value - threshold_val):
+                    current_weight = value
 
-    interpolated_weights = []
-    # store closest vertex for clamping
-    closest_vtx = []
+        if current_weight in [clamp[0], clamp[-1]]:
+            closest_m_point_on_mesh = om.MPointOnMesh()
+            pos = source_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
+            target_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
 
-    while not destination_mesh_m_it_mesh_vertex.isDone():
-        closest_m_point_on_mesh = om.MPointOnMesh()
-        pos = destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
-        source_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
+            # closest polygon
+            target_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
+                                                   int_util.asIntPtr())
 
-        # closest polygon
-        source_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
-                                               int_util.asIntPtr())
+            closest_polygon_point_array = om.MPointArray()
+            closest_polygon_vtx_id_array = om.MIntArray()
 
-        closest_polygon_point_array = om.MPointArray()
-        closest_polygon_vtx_id_array = om.MIntArray()
+            target_mesh_m_it_mesh_polygon.getPoints(closest_polygon_point_array, om.MSpace.kWorld)
+            target_mesh_m_it_mesh_polygon.getVertices(closest_polygon_vtx_id_array)
 
-        source_mesh_m_it_mesh_polygon.getPoints(closest_polygon_point_array, om.MSpace.kWorld)
-        source_mesh_m_it_mesh_polygon.getVertices(closest_polygon_vtx_id_array)
+            distance_sum = pos.distanceTo(closest_polygon_point_array[0])
+            distance_array = [distance_sum]
+            # iterate through vertices on the polygon and get sum distance and distance to
+            # each vertex
+            for i in range(1, closest_polygon_point_array.length()):
+                distance = pos.distanceTo(closest_polygon_point_array[i])
+                distance_sum += distance
+                distance_array.append(distance)
 
-        # iterate through vertices on the polygon and find closest one
-        closest = 0
-        for i in range(1, closest_polygon_point_array.length()):
-            if pos.distanceTo(closest_polygon_point_array[i]) < pos.distanceTo(
-                    closest_polygon_point_array[closest]):
-                closest = i
+            average_distance = distance_sum / closest_polygon_point_array.length()
 
-        interpolated_weights.append(weight_list[closest_polygon_vtx_id_array[closest]])
-        closest_vtx.append(closest_polygon_vtx_id_array[closest])
-        destination_mesh_m_it_mesh_vertex.next()
+            # if distance from projected point to face vertex is less or equal then average
+            # distance, then store this vertex index to set corresponding weight value
+            for i in xrange(closest_polygon_point_array.length()):
+                if distance_array[i] <= average_distance:
+                    interpolated_dict[closest_polygon_vtx_id_array[i]] = round(current_weight, 1)
 
-    # recursively search connected vertices to find the right list of indices to clamp
-    # search runs by loops from specified vertices
-    def search_connected(vtx_ids, searched_values):
-        related_idx = []
-        for idx in vtx_ids:
-            # check if any of the connected vertices were found as closest before
-            related_idx.extend([closest_vtx.index(i) for i in closest_vtx if i == idx])
-        if related_idx:
-            return related_idx
-        all_connected_vtx = []
-        for idx in vtx_ids:
-            connected_vtx = om.MIntArray()
-            source_mesh_m_it_mesh_vertex.setIndex(idx, int_util.asIntPtr())
-            source_mesh_m_it_mesh_vertex.getConnectedVertices(connected_vtx)
-            all_connected_vtx.extend(connected_vtx)
-        vtx_to_search = []
-        for idx in all_connected_vtx:
-            if idx not in searched_values:
-                searched_values.append(idx)
-                vtx_to_search.append(idx)
-        if vtx_to_search:
-            return search_connected(vtx_to_search, searched_values)
-        else:
-            return []
+        source_mesh_m_it_mesh_vertex.next()
 
-    # clamp the values if needed
-    if clamp:
-        interpolated_weights = [max(min(x, clamp[-1]), clamp[0]) for x in interpolated_weights]
+    target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
 
-        # check that every clamp value present in interpolated weights
-        for val in clamp:
-            # if not find closest vertices and set a new value
-            if val not in interpolated_weights:
-                # find closest index to the current clamp value
-                source_closest_index = min(range(len(weight_list)),
-                                           key=lambda i: abs(weight_list[i] - val))
-                # to prevent cycle store indices that are already checked
-                searched_vals = [source_closest_index]
-                vtx_to_clamp = search_connected([source_closest_index], searched_vals)
-                for vtx in vtx_to_clamp:
-                    interpolated_weights[vtx] = val
+    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
+    print target_mesh_m_it_mesh_vertex.count()
+    for index in interpolated_dict:
+        interpolated_weights[index] = interpolated_dict[index]
 
     return interpolated_weights
