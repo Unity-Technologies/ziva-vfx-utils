@@ -16,7 +16,7 @@ class LineOfActionNode(Ziva):
 
     def __init__(self, parent=None, builder=None):
         super(LineOfActionNode, self).__init__(parent=parent, builder=builder)
-        self.fiber = None
+        self.fiber_item = None
 
     def spawn_parameters(self):
         return {}
@@ -33,7 +33,7 @@ class LineOfActionNode(Ziva):
 
         scene_item = self.builder.get_scene_items(name_filter=fiber_name)
         if scene_item:
-            self.fiber = scene_item[0]
+            self.fiber_item = scene_item[0]
 
     def build(self, *args, **kwargs):
         """ Builds the Line of Actions in maya scene.
@@ -48,12 +48,12 @@ class LineOfActionNode(Ziva):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
-        if cmds.objExists(self.association[0]) and cmds.objExists(self.fiber.name):
+        if cmds.objExists(self.association[0]) and cmds.objExists(self.fiber_item.name):
             # check if the zFiber has a lineOf Action on it, if it does that is
             # what we want to use.  If not lets create a new one
-            existing = cmds.listConnections(self.fiber.name, type='zLineOfAction')
+            existing = cmds.listConnections(self.fiber_item.name, type='zLineOfAction')
             if not existing:
-                cmds.select(self.fiber.name, self.association)
+                cmds.select(self.fiber_item.name, self.association)
                 results_ = mel.eval('ziva -lineOfAction')
                 clt = cmds.ls(results_, type='zLineOfAction')[0]
                 self.name = cmds.rename(clt, self.name)
