@@ -300,7 +300,9 @@ def restore_scene_items_from_string(item, builder):
         for parm in item:
             item[parm] = builder.get_scene_items(name_filter=item[parm])
     else:
-        item = builder.get_scene_items(name_filter=item)[0]
+        item = builder.get_scene_items(name_filter=item)
+        if item:
+            item = item[0]
     return item
 
 
