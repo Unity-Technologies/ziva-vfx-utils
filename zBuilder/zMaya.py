@@ -436,8 +436,11 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     * zRestShape: <meshName>_zRestShape
     * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     """
-    sel = cmds.ls(sl=True)
     solver = mel.eval('zQuery -t "zSolver"')
+
+    if not solver:
+        logger.error("No solver found for current selection !")
+        return
 
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
@@ -462,13 +465,21 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     cmds.rename(item, '{}_{}'.format(mesh, zNode))
                     print('rename: ', item, '{}_{}'.format(mesh, zNode))
 
-    # for now doing an ls type for lineOfActions until with have zQuery support
-    loas = cmds.ls(type='zLineOfAction')
+    # rename zLineOfAction nodes
+    loas = mel.eval('zQuery -loa {}'.format(solver[0]))
     if loas:
         for loa in loas:
             crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
                 cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
+
+    # rename zRivetToBone nodes
+    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
+    if rtbs:
+        for rtb in rtbs:
+            crv = cmds.listConnections(rtb + '.outputGeometry')
+            if crv:
+                cmds.rename(rtb, crv[0] + '_zRivetToBone1')
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
@@ -482,7 +493,6 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
                 cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
                 print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-
     logger.info('finished renaming.... ')
 
 
@@ -702,8 +712,8 @@ def replace_long_name(search, replace, long_name):
                         # yeilds this replace string: "l_"
                         # as it found an "_" at end of string.
                         # then it performs a match replace on original string
-                        with_this = item[match.span(1)[0]:match.span(1)
-                                         [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                        with_this = item[match.span(1)[0]:match.span(1)[1]] + replace + item[
+                            match.span(2)[0]:match.span(2)[1]]
                         item = item[:match.start()] + with_this + item[match.end():]
                     else:
                         item = re.sub(search, replace, item)

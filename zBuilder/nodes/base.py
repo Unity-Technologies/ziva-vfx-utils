@@ -17,11 +17,14 @@ class Base(object):
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
     TYPES = []
     type = None
-    """ A list of attribute names in __dict__ to
-            exclude from the string_replace method. """
-    COMPARE_EXCLUDE = ['info', '_parent', '_children', '_class', 'builder', 'parameters']
+    """ type of scene item """
+
+    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
+
+    SCENE_ITEM_ATTRIBUTES = ['parameters', '_children', '_parent']
+    """ The attributes that contain a scene item """
 
     def __init__(self, *args, **kwargs):
         self._name = None
@@ -221,6 +224,22 @@ class Base(object):
             logger.info('Wrote File: %s' % file_path)
 
 
+def replace_scene_items_with_string(item):
+    # This takes a scene item, and replaces each instance with an embedded scene item
+    # with the scene items name. The reason for this is scene items are not serializable
+    # by themselves.  This enables is to "re-apply" them after it is loaded from disk
+    if isinstance(item, list):
+        item = [x.name for x in item]
+    elif isinstance(item, dict):
+        for key in item:
+            item[key] = [x.name for x in item[key]]
+    else:
+        if item:
+            item = item.name
+
+    return item
+
+
 def serialize_object(obj):
     """ Takes in a python obj and scrubs through the __dict__ and returns a serializable
     dictionary.
@@ -231,23 +250,19 @@ def serialize_object(obj):
     Returns:
         dict: Of serializable obj
     """
-
-    # clearing these attributes for now as they are causing issues with serilization as they are
-    # python objects and they are not needed in this context.  These attributes are used
-    # for the QTreeView to define the tree layout.
-    obj.parent = None
-    obj.children = None
-
     output = dict()
-    for key in obj.__dict__:
-        if hasattr(obj.__dict__[key], '_class') and (hasattr(obj.__dict__[key], 'serialize')
-                                                     and callable(obj.serialize)):
-            output[key] = obj.__dict__[key].serialize()
-        try:
-            json.dumps(obj.__dict__[key])
-            output[key] = obj.__dict__[key]
-        except TypeError:
-            pass
+
+    if hasattr(obj, 'serialize'):
+        for key in obj.__dict__:
+            if key in Base.SCENE_ITEM_ATTRIBUTES:
+                obj.__dict__[key] = replace_scene_items_with_string(obj.__dict__[key])
+
+            try:
+                json.dumps(obj.__dict__[key])
+                output[key] = obj.__dict__[key]
+
+            except TypeError:
+                pass
 
     return output
 

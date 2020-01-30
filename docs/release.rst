@@ -13,6 +13,10 @@ Release Notes
 1.0.11
 ------
 
+Functionality
+-------------
+- **zBuilder:** Now storing a link to map and mesh in scene item.
+
 Bug Fixes
 ---------
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.

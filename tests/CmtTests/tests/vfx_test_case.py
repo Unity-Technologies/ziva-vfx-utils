@@ -1,5 +1,4 @@
 import os
-from maya import cmds
 from cmt.test import TestCase
 import zBuilder.zMaya as mz
 from maya import cmds
@@ -36,7 +35,7 @@ def get_all_mesh_vertex_positions():
 def attr_values_from_zbuilder_nodes(nodes):
     """ From a list of zBuilder nodes get all of the attributes and their values as a dict.
     e.g. Input: builder.get_scene_items(type_filter="zTissue")
-         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+         Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... }
     """
     result = {}
     for node in nodes:
@@ -50,7 +49,7 @@ def attr_values_from_zbuilder_nodes(nodes):
 def attr_values_from_scene(plug_names):
     """ From a collection of attribute names, get a dict of attr/value pairs.
     e.g Input: ['zTissue1.collisions', 'my_zTetNode.tetSize', ...]
-        Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... } 
+        Output: {'zTissue1.collisions':True, 'my_zTetNode.tetSize:4.5, ... }
     """
     return {plug_name: cmds.getAttr(plug_name) for plug_name in plug_names}
 
@@ -58,7 +57,6 @@ def attr_values_from_scene(plug_names):
 class VfxTestCase(TestCase):
     temp_file_path = test_utils.get_tmp_file_location()
     """Base class for unit test cases run for ZivaVFX plugin."""
-
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -115,13 +113,23 @@ class VfxTestCase(TestCase):
         attrs_after = attr_values_from_scene(plug_names)
         self.assertEqual(attrs_before, attrs_after)
 
+    def find_body(self, node):
+        # Find the body for the given zbuilder node
+        # body includes meshes for the nodes: zTissue, zBone, zCloth
+        if hasattr(node, "parent"):
+            if hasattr(node.parent, "depends_on"):
+                return node.parent
+            else:
+                return self.find_body(node.parent)
+
     def check_ziva_remove_command(self, builder, node_type):
         ## SETUP
-        tissue_nodes = builder.get_scene_items(type_filter=node_type)
+        nodes = builder.get_scene_items(type_filter=node_type)
         # clear selection
         cmds.select(cl=True)
-        for tissue in tissue_nodes:
-            cmds.select(tissue.long_association, add=True)
+        for node in nodes:
+            body = self.find_body(node)
+            cmds.select(body.long_name, add=True)
 
         ## ACT
         cmds.ziva(rm=True)
@@ -130,8 +138,26 @@ class VfxTestCase(TestCase):
         cmds.select(cl=True)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
-        tissue_nodes = builder.get_scene_items(type_filter=node_type)
-        self.assertEqual(tissue_nodes, [])
+        nodes = builder.get_scene_items(type_filter=node_type)
+        self.assertEqual(nodes, [])
+
+    def check_map_interpolation(self, builder, node_name, expected_weights, map_index):
+        """Args:
+            builder (builders.ziva.Ziva()): builder object
+            node_name (string): name of the Ziva node with a map
+            expected_weights (list): list if expected weights for the map
+            map_index (int): map index, 0 or 1, to choose between source/target, source/endPoints
+                             weights
+        """
+        ## ACT
+        builder.build(interp_maps=True)
+
+        ## VERIFY
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        node = builder.get_scene_items(name_filter=node_name)[0]
+        self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values)
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
         builder.write(self.temp_file_path)
