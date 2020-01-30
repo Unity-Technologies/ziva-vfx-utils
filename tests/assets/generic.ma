@@ -1,6 +1,6 @@
 //Maya ASCII 2019 scene
 //Name: generic.ma
-//Last modified: Wed, Jan 29, 2020 05:44:36 PM
+//Last modified: Wed, Jan 29, 2020 07:04:42 PM
 //Codeset: 1252
 requires maya "2019";
 requires -nodeType "zGeo" -nodeType "zTissue" -nodeType "zBone" -nodeType "zCloth"
@@ -11,7 +11,6 @@ requires -nodeType "zGeo" -nodeType "zTissue" -nodeType "zBone" -nodeType "zClot
 		 -dataType "zAttachmentData" -dataType "zSolverOutputData" -dataType "zMuscleData"
 		 -dataType "zSerializedBinaryData" -dataType "zLineOfActionData" -dataType "zFieldData"
 		 -dataType "zWarpData" "ziva" "1.8";
-requires -nodeType "polyPlatonic" "modelingToolkit" "0.0.0.0";
 currentUnit -l centimeter -a degree -t film;
 fileInfo "application" "maya";
 fileInfo "product" "Maya 2019";
@@ -21,13 +20,13 @@ fileInfo "osv" "Microsoft Windows 10 Technical Preview  (Build 18362)\n";
 createNode transform -s -n "persp";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000233";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" -3.3905534686288492 2.3828745287382551 9.5125230280337583 ;
-	setAttr ".r" -type "double3" -11.73835272960727 -365.39999999994586 1.9967081373051994e-16 ;
+	setAttr ".t" -type "double3" -3.4765471700465858 1.7701857551219156 7.0888505751205733 ;
+	setAttr ".r" -type "double3" -11.738352729607534 -363.79999999993993 -4.9805666234315701e-17 ;
 createNode camera -s -n "perspShape" -p "persp";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000234";
 	setAttr -k off ".v" no;
 	setAttr ".fl" 34.999999999999993;
-	setAttr ".coi" 10.151708955165303;
+	setAttr ".coi" 7.6274806920813782;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
@@ -2919,10 +2918,55 @@ createNode mesh -n "l_tissue_1_lowShape" -p "l_tissue_1_low";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
 	setAttr ".uvst[0].uvsn" -type "string" "map1";
+	setAttr -s 25 ".uvst[0].uvsp[0:24]" -type "float2" 1 0.38386026 0.25
+		 0.11613975 0.19193013 0.5 0.125 0.30408674 0.375 0.30408674 0.5 0.38386026 0.25 0.88386023
+		 0.30806988 0.5 0.125 0.69591326 0.375 0.69591326 1 0.61613977 0.75 0.11613975 0.80806988
+		 0.5 0.875 0.30408674 0.625 0.30408674 0.5 0.61613977 0.75 0.88386023 0.69193012 0.5
+		 0.875 0.69591326 0.625 0.69591326 1.25 0.88386023 1.125 0.69591326 1.25 0.11613975
+		 1.125 0.30408674 1.19193017 0.5;
 	setAttr ".cuvs" -type "string" "map1";
 	setAttr ".dcc" -type "string" "Ambient+Diffuse";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
+	setAttr -s 20 ".vt[0:19]"  0 -0.35682213 -0.93417245 -0.35682213 -0.93417245 0
+		 -0.93417245 0 -0.35682213 -0.57735032 -0.57735032 -0.57735032 -0.57735032 -0.57735032 0.57735032
+		 0 -0.35682213 0.93417245 -0.35682213 0.93417245 0 -0.93417245 0 0.35682213 -0.57735032 0.57735032 -0.57735032
+		 -0.57735032 0.57735032 0.57735032 0 0.35682213 -0.93417245 0.35682213 -0.93417245 0
+		 0.93417245 0 -0.35682213 0.57735032 -0.57735032 -0.57735032 0.57735032 -0.57735032 0.57735032
+		 0 0.35682213 0.93417245 0.35682213 0.93417245 0 0.93417245 0 0.35682213 0.57735032 0.57735032 -0.57735032
+		 0.57735032 0.57735032 0.57735032;
+	setAttr -s 30 ".ed[0:29]"  6 16 0 16 18 0 18 10 0 10 8 0 8 6 0 17 12 0
+		 12 18 0 16 19 0 19 17 0 15 19 0 6 9 0 9 15 0 2 7 0 7 9 0 8 2 0 11 1 0 1 3 0 3 0 0
+		 0 13 0 13 11 0 11 14 0 14 5 0 5 4 0 4 1 0 0 10 0 12 13 0 3 2 0 4 7 0 5 15 0 17 14 0;
+	setAttr -s 12 -ch 60 ".fc[0:11]" -type "polyFaces" 
+		f 5 0 1 2 3 4
+		mu 0 5 20 16 18 10 21
+		f 5 5 6 -2 7 8
+		mu 0 5 17 12 18 16 19
+		f 5 9 -8 -1 10 11
+		mu 0 5 15 19 16 6 9
+		f 5 12 13 -11 -5 14
+		mu 0 5 2 7 9 6 8
+		f 5 15 16 17 18 19
+		mu 0 5 11 22 23 0 13
+		f 5 -16 20 21 22 23
+		mu 0 5 1 11 14 5 4
+		f 5 -19 24 -3 -7 25
+		mu 0 5 13 0 10 18 12
+		f 5 -18 26 -15 -4 -25
+		mu 0 5 0 23 24 21 10
+		f 5 -24 27 -13 -27 -17
+		mu 0 5 1 4 7 2 3
+		f 5 -23 28 -12 -14 -28
+		mu 0 5 4 5 15 9 7
+		f 5 -20 -26 -6 29 -21
+		mu 0 5 11 13 12 17 14
+		f 5 -22 -30 -9 -10 -29
+		mu 0 5 5 14 17 19 15;
+	setAttr ".cd" -type "dataPolyComponent" Index_Data Edge 0 ;
+	setAttr ".cvd" -type "dataPolyComponent" Index_Data Vertex 0 ;
+	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
+	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "l_tissue_1_embedded_cube";
 	rename -uid "7C27FDD0-4D42-01FE-C16F-98B1A09EFF46";
 	setAttr ".t" -type "double3" -3.379 0 0 ;
@@ -78258,18 +78302,21 @@ createNode zFiber -n "l_tissue_1_zFiber";
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.80000001192092896
+		 0.80000001192092896 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+		 0.5 0.85000002384185791 0.80000001192092896 0.80000001192092896 0.5 0.5 0.5 0.5 0.5
+		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.85000002384185791 0.80000001192092896
+		 0.85000002384185791 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+		 0.5 0.80000001192092896 0.85000002384185791 0.85000002384185791 0.5 0.5 0.5 0.5 0.5
+		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.80000001192092896 0.85000002384185791
+		 0.85000002384185791 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
-		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0 ;
+		 0.5 0.5 1 0 ;
 createNode objectSet -n "set28";
 	rename -uid "64CD6BAF-401C-AA48-DFD8-B3B3BC4859BC";
 	setAttr ".ihi" 0;
@@ -82965,9 +83012,6 @@ createNode groupParts -n "groupParts67";
 	rename -uid "47FC8DFA-4C28-0AFF-77F3-248A0C611130";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
-createNode polyPlatonic -n "polyPlatonic1";
-	rename -uid "73A57D56-4D1C-1728-E2A4-B7843676468A";
-	setAttr ".primitive" 3;
 select -ne :time1;
 	setAttr ".o" 1;
 	setAttr ".unw" 1;
@@ -83036,7 +83080,6 @@ connectAttr "set34.mwc" "l_tissue_Shape1.iog.og[27].gco";
 connectAttr "zEmbedder1.og[9]" "l_tissue_Shape1.i";
 connectAttr "tweak11.vl[0].vt[0]" "l_tissue_Shape1.twl";
 connectAttr "polySphere1.out" "l_tissue_Shape1Orig1.i";
-connectAttr "polyPlatonic1.output" "l_tissue_1_lowShape.i";
 connectAttr "groupId55.id" "l_tissue_1_embedded_cubeShape.iog.og[0].gid";
 connectAttr "set3.mwc" "l_tissue_1_embedded_cubeShape.iog.og[0].gco";
 connectAttr "groupId56.id" "l_tissue_1_embedded_cubeShape.iog.og[1].gid";

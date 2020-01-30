@@ -298,16 +298,17 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
                                           target_mesh_m_dag_path.inclusiveMatrix())
 
     source_mesh_m_it_mesh_vertex = om.MItMeshVertex(source_mesh_m_dag_path)
+    target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
     target_mesh_m_it_mesh_polygon = om.MItMeshPolygon(target_mesh_m_dag_path)
 
     int_util = om.MScriptUtil()
-    interpolated_dict = {}
+
+    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
     while not source_mesh_m_it_mesh_vertex.isDone():
         current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
         # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
         if current_weight not in clamp:
             max_val = max(clamp)
-            min_val = min(clamp)
             # allow 10 percent difference but clamp it to the right value
             threshold_val = max_val * 0.1
             for value in clamp:
@@ -344,14 +345,8 @@ def interpolate_values_closest(source_mesh, target_mesh, weight_list, clamp=[0, 
             # distance, then store this vertex index to set corresponding weight value
             for i in xrange(closest_polygon_point_array.length()):
                 if distance_array[i] <= average_distance:
-                    interpolated_dict[closest_polygon_vtx_id_array[i]] = round(current_weight, 1)
+                    interpolated_weights[closest_polygon_vtx_id_array[i]] = current_weight
 
         source_mesh_m_it_mesh_vertex.next()
-
-    target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
-
-    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
-    for index in interpolated_dict:
-        interpolated_weights[index] = interpolated_dict[index]
 
     return interpolated_weights
