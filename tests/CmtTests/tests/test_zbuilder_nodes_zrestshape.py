@@ -81,7 +81,7 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaRestShapeGenericTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.build_generic_scene(scene_name="generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

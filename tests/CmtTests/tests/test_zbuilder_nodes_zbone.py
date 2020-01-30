@@ -18,7 +18,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaBoneGenericTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.build_generic_scene(scene_name="generic_bone.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
