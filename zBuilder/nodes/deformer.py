@@ -40,7 +40,7 @@ class Deformer(DGNode):
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
-                objs['map'].append([map_name, mesh_name])
+                objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
 
     def build(self, *args, **kwargs):

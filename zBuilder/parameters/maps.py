@@ -24,7 +24,7 @@ class Map(Base):
         if args:
             map_name = args[0]
             mesh_name = args[1]
-
+            self.interp_method = args[2]
             if map_name and mesh_name:
                 self.populate(map_name, mesh_name)
 
@@ -123,8 +123,13 @@ class Map(Base):
         if cmds.objExists(mesh_data.name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
-            weight_list = interpolate_values(created_mesh, mesh_data.name, self.values)
-            self.values = weight_list
+            interp_weights = self.values
+            if self.interp_method == "barycentric":
+                interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values)
+            elif self.interp_method == "endPoints":
+                interp_weights = interpolate_end_points_weights(created_mesh, mesh_data.name,
+                                                                self.values)
+            self.values = interp_weights
 
             cmds.delete(created_mesh)
 
@@ -166,11 +171,11 @@ class Map(Base):
 
 
 def invert_weights(weights):
-    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.  
-    
+    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.
+
     Args:
         weights (list): Weight list, a list of floats or ints.
-    
+
     Returns:
         list: list of floats
     """
@@ -216,7 +221,8 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     source_mesh_shape_m_dag_path.extendToShape()
 
     source_mesh_m_mesh_intersector = om.MMeshIntersector()
-    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node())
+    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node(),
+                                          source_mesh_m_dag_path.inclusiveMatrix())
 
     destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
     source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
@@ -264,5 +270,84 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     # clamp the values if needed
     if clamp:
         interpolated_weights = [max(min(x, clamp[1]), clamp[0]) for x in interpolated_weights]
+
+    return interpolated_weights
+
+
+def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
+    """ Will transfer values between similar meshes with differing topology. \
+        Takes value from the closest point on mesh. Works only for zFiber.endPoints map.
+    Args:
+        source_mesh(string): name on the mesh transform to interpolate from
+        target_mesh(string): name of the mesh transform to interpolate to
+        weight_list(list): weights to interpolate
+
+    Returns:
+        list of interpolated weights
+    """
+    target_mesh_m_dag_path = mz.get_mdagpath_from_mesh(target_mesh)
+    source_mesh_m_dag_path = mz.get_mdagpath_from_mesh(source_mesh)
+    target_mesh_shape_m_dag_path = om.MDagPath(target_mesh_m_dag_path)
+    target_mesh_shape_m_dag_path.extendToShape()
+
+    target_mesh_m_mesh_intersector = om.MMeshIntersector()
+    target_mesh_m_mesh_intersector.create(target_mesh_shape_m_dag_path.node(),
+                                          target_mesh_m_dag_path.inclusiveMatrix())
+
+    source_mesh_m_it_mesh_vertex = om.MItMeshVertex(source_mesh_m_dag_path)
+    target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
+    target_mesh_m_it_mesh_polygon = om.MItMeshPolygon(target_mesh_m_dag_path)
+
+    int_util = om.MScriptUtil()
+
+    # fill the map with 0.5 values
+    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
+    while not source_mesh_m_it_mesh_vertex.isDone():
+        current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
+        # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
+        if current_weight >= 0.9:
+            current_weight = 1.0
+        elif current_weight <= 0.1:
+            current_weight = 0.0
+
+        if current_weight in [0, 1]:
+            closest_m_point_on_mesh = om.MPointOnMesh()
+            pos = source_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
+            target_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
+
+            # closest polygon
+            target_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
+                                                   int_util.asIntPtr())
+
+            closest_polygon_point_array = om.MPointArray()
+            closest_polygon_vtx_id_array = om.MIntArray()
+
+            target_mesh_m_it_mesh_polygon.getPoints(closest_polygon_point_array, om.MSpace.kWorld)
+            target_mesh_m_it_mesh_polygon.getVertices(closest_polygon_vtx_id_array)
+
+            distance_sum = pos.distanceTo(closest_polygon_point_array[0])
+            distance_array = [distance_sum]
+            # iterate through vertices on the polygon and get sum distance and distance to
+            # each vertex
+            for i in xrange(1, closest_polygon_point_array.length()):
+                distance = pos.distanceTo(closest_polygon_point_array[i])
+                distance_sum += distance
+                distance_array.append(distance)
+
+            average_distance = distance_sum / closest_polygon_point_array.length()
+
+            # if distance from projected point to face vertex is less or equal then average
+            # distance, then set corresponding weight value
+            found = False
+            for i in xrange(closest_polygon_point_array.length()):
+                if distance_array[i] <= average_distance:
+                    interpolated_weights[closest_polygon_vtx_id_array[i]] = current_weight
+                    found = True
+            # make sure that at least one vertex has a new value
+            if not found:
+                closest_index = distance_array.index(min(distance_array))
+                interpolated_weights[closest_polygon_vtx_id_array[closest_index]] = current_weight
+
+        source_mesh_m_it_mesh_vertex.next()
 
     return interpolated_weights

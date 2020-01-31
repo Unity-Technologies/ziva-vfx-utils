@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 class Mesh(Base):
     type = 'mesh'
     """ Type of node. """
-
     def __init__(self, *args, **kwargs):
         super(Mesh, self).__init__(*args, **kwargs)
 
@@ -133,7 +132,7 @@ def get_intermediate(dagPath):
 
     Args:
         dagPath (MFnDagPath): dag path for mesh to search for intermediate shape
-    
+
     Returns:
         mObject: mObject of intermediate shape or None if none found.
     '''

@@ -15,6 +15,27 @@ class FiberNode(Ziva):
     MAP_LIST = ['weightList[0].weights', 'endPoints']
     """ List of maps to store. """
 
+    def spawn_parameters(self):
+        """
+
+        Returns:
+
+        """
+        objs = {}
+        if self.long_association:
+            objs['mesh'] = self.long_association
+
+        mesh_names = self.get_map_meshes()
+        map_names = self.get_map_names()
+        if map_names and mesh_names:
+            objs['map'] = []
+            for map_name, mesh_name in zip(map_names, mesh_names):
+                if '.endPoints' in map_name:
+                    objs['map'].append([map_name, mesh_name, "endPoints"])
+                else:
+                    objs['map'].append([map_name, mesh_name, "barycentric"])
+        return objs
+
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically
