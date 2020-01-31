@@ -55,8 +55,8 @@ class Base(object):
         to exclude a few keys as they may or may not be equal and that doesn't matter.  For example .info
         has a timestamp, username, maya version, os.  None of those are relevant in this case.
         """
-        return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__,
-                                                         self.COMPARE_EXCLUDE)
+        ignore_list = self.COMPARE_EXCLUDE + self.SCENE_ITEM_ATTRIBUTES
+        return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__, ignore_list)
 
     def __ne__(self, other):
         """ Define a non-equality test
