@@ -19,11 +19,11 @@ class Fields(Builder):
     def retrieve_from_scene(self, *args, **kwargs):
         selection = mz.parse_maya_node_for_selection(args)
 
-        nodes_to_acquire = [x for x in selection if cmds.objectType(x) in self.acquire]
-
-        for item in nodes_to_acquire:
-            parameter = self.node_factory(item)
-            self.bundle.extend_scene_items(parameter)
+        history = cmds.listHistory(selection)
+        fields = cmds.ls(history, type=self.acquire)
+        for field in fields:
+            scene_items = self.node_factory(field)
+            self.bundle.extend_scene_items(scene_items)
         self.stats()
 
     @Builder.time_this
