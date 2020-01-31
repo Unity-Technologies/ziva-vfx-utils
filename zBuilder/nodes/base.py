@@ -23,10 +23,11 @@ class Base(object):
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
-    SCENE_ITEM_ATTRIBUTES = ['parameters', 'fiber_item']
+    SCENE_ITEM_ATTRIBUTES = ['parameters', 'fiber_item', 'tissue_item', 'solver']
     """ The attributes that contain a scene item used as a pointer to the scene item in the bundle.
             This will convert scene items to a string before serialization and resetup the pointer
-            upon deserilization"""
+            upon deserilization,  Note that this attributes values gets added to COMPARE_EXCLUDE for 
+            excluding purposes, else there is a cycle."""
 
     def __init__(self, *args, **kwargs):
         self._name = None
