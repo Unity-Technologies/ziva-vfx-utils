@@ -19,7 +19,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaSolverGenericTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -219,7 +219,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         mz.clean_scene()
 
-        test_utils.build_generic_scene(new_scene=False)
+        test_utils.load_scene(new_scene=False)
 
         # Act
         # now do the trasnfer

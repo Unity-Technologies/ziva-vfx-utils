@@ -16,7 +16,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaFiberGenericTestCase, self).setUp()
-        test_utils.build_generic_scene(scene_name="generic_tissue.ma")
+        test_utils.load_scene(scene_name="generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

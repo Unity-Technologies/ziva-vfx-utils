@@ -17,7 +17,7 @@ class ZivaClothTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaClothTestCase, self).setUp()
-        test_utils.build_generic_scene(scene_name="generic_cloth.ma")
+        test_utils.load_scene(scene_name="generic_cloth.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

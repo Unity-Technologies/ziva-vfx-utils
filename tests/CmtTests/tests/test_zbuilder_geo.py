@@ -17,7 +17,7 @@ class ZivaGeoTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaGeoTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

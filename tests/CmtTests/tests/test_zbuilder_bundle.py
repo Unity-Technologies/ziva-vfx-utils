@@ -13,7 +13,7 @@ class ZivaBundleTestCase(VfxTestCase):
         We are going to compare builder from this setUp and a builder retrieved from 
         the file.
         """
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         file_name = test_utils.get_tmp_file_location()
 
         cmds.select('zSolver1')
