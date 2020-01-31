@@ -7,20 +7,15 @@ class Fields(Builder):
     """Storing maya fields.
     """
 
-    def __init__(self):
-        Builder.__init__(self)
-
-        self.acquire = [
-            'airField', 'dragField', 'gravityField', 'newtonField', 'radialField',
-            'turbulenceField', 'uniformField', 'vortexField'
-        ]
+    MAYA_FIELD_TYPE = ('airField', 'dragField', 'gravityField', 'newtonField', 'radialField',
+                       'turbulenceField', 'uniformField', 'vortexField')
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         selection = mz.parse_maya_node_for_selection(args)
 
         history = cmds.listHistory(selection)
-        fields = cmds.ls(history, type=self.acquire)
+        fields = cmds.ls(history, type=self.MAYA_FIELD_TYPE)
         for field in fields:
             scene_items = self.node_factory(field)
             self.bundle.extend_scene_items(scene_items)
