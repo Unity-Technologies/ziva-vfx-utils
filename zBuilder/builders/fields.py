@@ -7,8 +7,8 @@ class Fields(Builder):
     """Storing maya fields.
     """
 
-    MAYA_FIELD_TYPE = ('airField', 'dragField', 'gravityField', 'newtonField', 'radialField',
-                       'turbulenceField', 'uniformField', 'vortexField')
+    MAYA_FIELD_TYPE = ['airField', 'dragField', 'gravityField', 'newtonField', 'radialField',
+                       'turbulenceField', 'uniformField', 'vortexField']
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):

@@ -4,29 +4,27 @@ from maya import cmds
 from maya import mel
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene
+from zBuilder.builders.fields import Fields
 
 
 class ZivaFieldGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.field_names = ["airField1", "dragField1", "gravityField1", "newtonField1", "radialField1", "turbulenceField1", "uniformField1", "vortexField1"]
+        cls.field_types = Fields.MAYA_FIELD_TYPE
+        cls.field_names = []
+        for field in cls.field_types:
+            cls.field_names.append(field + "1")
         cls.field_attrs = ["magnitude", "attenuation", "useMaxDistance"]
 
     def setUp(self):
         super(ZivaFieldGenericTestCase, self).setUp()
-        # Setup simple scene with 2 spheres and 2 joints
+        # Setup simple scene 1 tissue and all field types
         obj = cmds.polySphere(ch=False, n="field_mesh")
         cmds.select(obj)
         cmds.ziva(t=True)
         mel.eval('source zivaMenuFunctions;')
-        mel.eval('ziva_attachField("air");')
-        mel.eval('ziva_attachField("drag");')
-        mel.eval('ziva_attachField("gravity");')
-        mel.eval('ziva_attachField("newton");')
-        mel.eval('ziva_attachField("radial");')
-        mel.eval('ziva_attachField("turbulence");')
-        mel.eval('ziva_attachField("uniform");')
-        mel.eval('ziva_attachField("vortex");')
+        for field in self.field_types:
+            mel.eval('ziva_attachField("{}");'.format(field.replace("Field", "")))
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -39,8 +37,7 @@ class ZivaFieldGenericTestCase(VfxTestCase):
         """Args:
             builder (builders.fields.Fields()): builder object
         """
-        field_types = ["airField", "dragField", "gravityField", "newtonField", "radialField", "turbulenceField", "uniformField", "vortexField"]
-        self.check_retrieve_looks_good(builder, {}, self.field_names, field_types)
+        self.check_retrieve_looks_good(builder, {}, self.field_names, self.field_types)
 
     def test_retrieve(self):
         self.check_retrieve_field_looks_good(self.builder)
