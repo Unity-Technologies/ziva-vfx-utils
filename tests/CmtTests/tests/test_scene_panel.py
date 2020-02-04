@@ -18,7 +18,7 @@ class ZivaScenePanelTestCase(VfxTestCase):
         if wrong_maya_version:
             self.skipTest('Maya version is not supported')
         super(ZivaScenePanelTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         builder = zva.Ziva()
         builder.retrieve_connections()
         self.model = model.SceneGraphModel(builder.root_node)

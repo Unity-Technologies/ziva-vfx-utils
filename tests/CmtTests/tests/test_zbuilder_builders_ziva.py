@@ -18,7 +18,7 @@ from maya import cmds
 class ZivaMirrorSelectedTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaMirrorSelectedTestCase, self).setUp()
-        test_utils.build_generic_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example.ma')
 
     def test_mirror_selection(self):
         cmds.select('l_arm_muscles')
@@ -206,7 +206,7 @@ class ZivaBuildTestCase(VfxTestCase):
 class ZivaSolverDisableTestCase(VfxTestCase):
     def test_enable_connected(self):
         # build scene and connect the enable to something
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         loc = cmds.spaceLocator()[0]
         cmds.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
 

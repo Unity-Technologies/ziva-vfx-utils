@@ -150,3 +150,11 @@ def find_class(module_, type_):
             if type_ in obj.TYPES or type_ == obj.type:
                 return obj
 
+
+def is_sequence(var):
+    """
+    Returns:
+    True if input is a sequence data type, i.e., list or tuple, but not string type.
+    False otherwise.
+    """
+    return isinstance(var, (list, tuple)) and not isinstance(var, basestring)

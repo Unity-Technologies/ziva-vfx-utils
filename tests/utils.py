@@ -64,7 +64,7 @@ def get_ziva_node_names_from_builder(builder):
     return node_names
 
 
-def build_generic_scene(new_scene=True, scene_name='generic.ma'):
+def load_scene(new_scene=True, scene_name='generic.ma'):
     path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
     if new_scene:
         cmds.file(new=True, force=True)

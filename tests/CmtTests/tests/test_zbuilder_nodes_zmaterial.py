@@ -20,7 +20,7 @@ class ZivaMaterialGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaMaterialGenericTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
