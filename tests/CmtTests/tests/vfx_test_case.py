@@ -5,6 +5,7 @@ from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
+from zBuilder.IO import is_sequence
 
 
 def isApprox(a, b, eps=1e-6):
@@ -91,7 +92,7 @@ class VfxTestCase(TestCase):
             node_names (list): A list of expected node names like zTissue1, zBone1, ...
             node_type (string/list): Node type to check: zTissue, zBone, ...
         """
-        if not isinstance(node_type, list):
+        if not is_sequence(node_type):
             node_type = [node_type]
 
         nodes = builder.get_scene_items(type_filter=node_type)
