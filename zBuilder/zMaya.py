@@ -4,6 +4,8 @@ from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
 
+from zBuilder.IO import is_sequence
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -574,7 +576,7 @@ def check_maya_node(maya_node):
     Returns:
 
     """
-    if isinstance(maya_node, list):
+    if is_sequence(maya_node):
         return maya_node[0]
     else:
         return maya_node
@@ -597,7 +599,7 @@ def parse_maya_node_for_selection(args):
     """
     selection = None
     if len(args) > 0:
-        if isinstance(args[0], (list, tuple)):
+        if is_sequence(args[0]):
             selection = args[0]
         else:
             selection = [args[0]]
