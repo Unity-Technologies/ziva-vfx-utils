@@ -8,6 +8,7 @@ from maya import mel
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 import zBuilder.builders.skinClusters as skn
+from zBuilder.IO import is_sequence
 
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
@@ -624,7 +625,7 @@ def merge_solvers(solver_transforms):
 
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
-    assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
+    assert is_sequence(solver_transforms), 'Arguments #1 is not a list'
 
     if len(solver_transforms) < 2:
         return
