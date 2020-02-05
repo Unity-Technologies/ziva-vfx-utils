@@ -1,6 +1,7 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import zBuilder.zMaya as mz
+from maya import cmds
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -29,7 +30,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -42,7 +43,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
 
                 node = index.internalPointer()
-                node.name = value
+                long_name = node.long_name
+                if value and value != long_name.split('|')[-1]:
+                    name = cmds.rename(long_name, value)
+                    node.name = name
+                    node.long_name = long_name
 
                 return True
 
