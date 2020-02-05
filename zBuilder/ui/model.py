@@ -14,13 +14,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     # is node enabled
     enableRole = QtCore.Qt.UserRole + 3
 
-    def __init__(self, root, parent=None):
+    def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
-        self.root_node = root
+        self.builder = builder
 
     def rowCount(self, parent):
         if not parent.isValid():
-            parentNode = self.root_node
+            parentNode = self.builder.root_node
         else:
             parentNode = parent.internalPointer()
 
@@ -44,10 +44,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
                 node = index.internalPointer()
                 long_name = node.long_name
-                if value and value != long_name.split('|')[-1]:
+                short_name = long_name.split('|')[-1]
+                if value and value != short_name:
                     name = cmds.rename(long_name, value)
+                    self.builder.string_replace("^{}$".format(short_name), name)
                     node.name = name
-                    node.long_name = long_name
 
                 return True
 
@@ -100,7 +101,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = self.getNode(index)
         parentNode = node.parent
 
-        if parentNode == self.root_node or parentNode == None:
+        if parentNode == self.builder.root_node or parentNode == None:
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
@@ -122,7 +123,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if node:
                 return node
 
-        return self.root_node
+        return self.builder.root_node
 
 
 class TreeItemDelegate(QtWidgets.QStyledItemDelegate):

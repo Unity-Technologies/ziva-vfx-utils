@@ -132,10 +132,8 @@ class MyDockingUI(QtWidgets.QWidget):
         # clipboard for the maps.  This is either a zBuilder Map object or None.
         self.maps_clipboard = None
 
-        root_node = self.builder.root_node
-
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._model = model.SceneGraphModel(self.builder, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -149,7 +147,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
-        self.set_root_node(root_node=root_node)
+        self.set_builder(self.builder)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -185,7 +183,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self.set_root_node)
+        self.actionRefresh.triggered.connect(self.set_builder)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
@@ -438,19 +436,19 @@ class MyDockingUI(QtWidgets.QWidget):
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
-    def set_root_node(self, root_node=None):
-        """This builds and/or resets the tree given a root_node.  The root_node
+    def set_builder(self, builder=None):
+        """This builds and/or resets the tree given a builder.  The builder
         is a zBuilder object that the tree is built from.  If None is passed
-        it uses the scene selection to build a new root_node.
+        it uses the scene selection to build a new builder.
 
         This forces a complete redraw of the ui tree.
 
         Args:
-            root_node (:obj:`obj`, optional): The zBuilder root_node to build
+            builder (:obj:`obj`, optional): The zBuilder builder to build
                 tree from.  Defaults to None.
         """
 
-        if not root_node:
+        if not builder:
             # clean builder
             # TODO: this line should be changed after VFXACT-388 to make more efficient
 
@@ -460,13 +458,13 @@ class MyDockingUI(QtWidgets.QWidget):
             # is the argument that tells zBuilder to not get maps, meshes.
             self.builder = zva.Ziva()
             self.builder.retrieve_connections(get_parameters=False)
-            root_node = self.builder.root_node
+            builder = self.builder
 
         # remember names of items to expand
         names_to_expand = self.get_expanded()
 
         self._model.beginResetModel()
-        self._model.root_node = root_node
+        self._model.root_node = builder
         self._model.endResetModel()
 
         # restore previous expansion in treeView or expand all zSolverTransform items
