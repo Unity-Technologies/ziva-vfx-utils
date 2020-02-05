@@ -44,7 +44,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
                 node = index.internalPointer()
                 long_name = node.long_name
-                short_name = long_name.split('|')[-1]
+                short_name = node.name
                 if value and value != short_name:
                     name = cmds.rename(long_name, value)
                     self.builder.string_replace("^{}$".format(short_name), name)
