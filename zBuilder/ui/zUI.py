@@ -68,7 +68,6 @@ class ProximityWidget(QtWidgets.QWidget):
     """
     Widget in right-click menu to change map weights for attachments
     """
-
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
         h_layout = QtWidgets.QHBoxLayout(self)
@@ -104,8 +103,8 @@ class ProximityWidget(QtWidgets.QWidget):
         to_value = float(self.to_edit.text())
         if to_value < from_value:
             self.to_edit.setText(str(from_value))
-        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
-                                                                      self.to_edit.text()))
+        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(
+            self.from_edit.text(), self.to_edit.text()))
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -178,6 +177,21 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
+    def eventFilter(self, obj, event):
+        if event.type() in [QtCore.QEvent.MouseButtonRelease]:
+            if isinstance(obj, QtWidgets.QMenu):
+                action = obj.activeAction()
+                if action:
+                    if action.isCheckable():
+                        # eat the event, but trigger the function
+                        action.trigger()
+                        # trick to update the menu so it displayed properly
+                        obj.hide()
+                        obj.show()
+                        return True
+
+        return super(MyDockingUI, self).eventFilter(obj, event)
+
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
@@ -202,7 +216,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def paste_weights(self, node, new_map):
         """Pasting the maps.  Terms used here
-            orig/new.  
+            orig/new.
             The map/node the items were copied from are prefixed with orig.
             The map/node the items are going to be pasted onto are prefixed with new
 
@@ -261,7 +275,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def select_source_and_target(self):
-        """Selects the source and target mesh of an attachment. This is a menu 
+        """Selects the source and target mesh of an attachment. This is a menu
         command.
         """
 
@@ -273,7 +287,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """Generates menu for tree items
 
         We are getting the zBuilder node in the tree item and checking type.
-        With that we can build a custom menu per type.  If there are more then 
+        With that we can build a custom menu per type.  If there are more then
         one object selected in UI a menu does not appear as items in menu work
         on a single selection.
         """
@@ -290,7 +304,8 @@ class MyDockingUI(QtWidgets.QWidget):
             'zTissue': self.open_tissue_menu,
             'zBone': self.open_bone_menu,
             'zLineOfAction': self.open_line_of_action_menu,
-            'zRestShape': self.open_rest_shape_menu
+            'zRestShape': self.open_rest_shape_menu,
+            'zSolverTransform': self.open_solver_menu
         }
 
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
@@ -366,7 +381,7 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0]# weight map @ index 0
+        weight_map = node.parameters['map'][0]  # weight map @ index 0
         endpoints_map = node.parameters['map'][1]  # endpoints map @ index 1
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
@@ -378,7 +393,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0] # weight map @ index 0
+        weight_map = node.parameters['map'][0]  # weight map @ index 0
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -422,6 +437,85 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def open_rest_shape_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
+
+    def open_solver_menu(self, menu, node):
+        menu.installEventFilter(self)
+        solver_transform = node
+        solver = node.children[0]
+
+        action_enable = QtWidgets.QAction(self)
+        action_enable.setText('Enable')
+        action_enable.setCheckable(True)
+        action_enable.setChecked(solver_transform.attrs['enable']['value'])
+        action_enable.changed.connect(partial(self.toggle_attribute, solver_transform, 'enable'))
+        menu.addAction(action_enable)
+
+        action_collision_detection = QtWidgets.QAction(self)
+        action_collision_detection.setText('Collision Detection')
+        action_collision_detection.setCheckable(True)
+        action_collision_detection.setChecked(solver.attrs['collisionDetection']['value'])
+        action_collision_detection.changed.connect(
+            partial(self.toggle_attribute, solver, 'collisionDetection'))
+        menu.addAction(action_collision_detection)
+
+        action_show_bones = QtWidgets.QAction(self)
+        action_show_bones.setText('Show Bones')
+        action_show_bones.setCheckable(True)
+        action_show_bones.setChecked(solver.attrs['showBones']['value'])
+        action_show_bones.changed.connect(partial(self.toggle_attribute, solver, 'showBones'))
+        menu.addAction(action_show_bones)
+
+        action_show_tet_meshes = QtWidgets.QAction(self)
+        action_show_tet_meshes.setText('Show Tet Meshes')
+        action_show_tet_meshes.setCheckable(True)
+        action_show_tet_meshes.setChecked(solver.attrs['showTetMeshes']['value'])
+        action_show_tet_meshes.changed.connect(
+            partial(self.toggle_attribute, solver, 'showTetMeshes'))
+        menu.addAction(action_show_tet_meshes)
+
+        action_show_muscle_fibers = QtWidgets.QAction(self)
+        action_show_muscle_fibers.setText('Show Muscle Fibers')
+        action_show_muscle_fibers.setCheckable(True)
+        action_show_muscle_fibers.setChecked(solver.attrs['showMuscleFibers']['value'])
+        action_show_muscle_fibers.changed.connect(
+            partial(self.toggle_attribute, solver, 'showMuscleFibers'))
+        menu.addAction(action_show_muscle_fibers)
+
+        action_show_attachments = QtWidgets.QAction(self)
+        action_show_attachments.setText('Show Attachments')
+        action_show_attachments.setCheckable(True)
+        action_show_attachments.setChecked(solver.attrs['showAttachments']['value'])
+        action_show_attachments.changed.connect(
+            partial(self.toggle_attribute, solver, 'showAttachments'))
+        menu.addAction(action_show_attachments)
+
+        action_show_collisions = QtWidgets.QAction(self)
+        action_show_collisions.setText('Show Collisions')
+        action_show_collisions.setCheckable(True)
+        action_show_collisions.setChecked(solver.attrs['showCollisions']['value'])
+        action_show_collisions.changed.connect(
+            partial(self.toggle_attribute, solver, 'showCollisions'))
+        menu.addAction(action_show_collisions)
+
+        action_show_materials = QtWidgets.QAction(self)
+        action_show_materials.setText('Show Materials')
+        action_show_materials.setCheckable(True)
+        action_show_materials.setChecked(solver.attrs['showMaterials']['value'])
+        action_show_materials.changed.connect(
+            partial(self.toggle_attribute, solver, 'showMaterials'))
+        menu.addAction(action_show_materials)
+
+    def toggle_attribute(self, node, attr):
+        value = node.attrs[attr]['value']
+        if isinstance(value, bool):
+            value = not value
+        elif isinstance(value, int):
+            value = 1 - value
+        else:
+            cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
+            return
+        node.attrs[attr]['value'] = value
+        cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
