@@ -177,21 +177,6 @@ class MyDockingUI(QtWidgets.QWidget):
 
         self.tool_bar.addAction(self.actionRefresh)
 
-    def eventFilter(self, obj, event):
-        if event.type() in [QtCore.QEvent.MouseButtonRelease]:
-            if isinstance(obj, QtWidgets.QMenu):
-                action = obj.activeAction()
-                if action:
-                    if action.isCheckable():
-                        # eat the event, but trigger the function
-                        action.trigger()
-                        # trick to update the menu so it displayed properly
-                        obj.hide()
-                        obj.show()
-                        return True
-
-        return super(MyDockingUI, self).eventFilter(obj, event)
-
     def _setup_actions(self):
         refresh_path = icons.get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
