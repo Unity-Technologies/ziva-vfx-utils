@@ -284,38 +284,38 @@ class Ziva(Builder):
             hist = cmds.listHistory(fibers)
             nodes.extend(cmds.ls(hist, type='zRivetToBone'))
 
+        def reorder_items_from_retrieve_connnections(nodes):
+            """The items coming from retrieve_connections are coming in at wrong order.
+            order should be same as what is listed in ZNODES.  THis conforms nodes to
+            that order.
+            
+            Args:
+                nodes (list): list of node names to re-order
+            
+            Returns:
+                list: ordered list
+            """
+
+            nodes_reordered = []
+            tmp = []
+            for item in ZNODES:
+                for x in nodes:
+                    if cmds.objectType(x) == item:
+                        nodes_reordered.append(x)
+                    elif cmds.objectType(x) == 'zGeo':
+                        nodes.remove(x)
+                    else:
+                        tmp.append(x)
+            nodes = nodes_reordered + tmp
+            return nodes
+
         if nodes:
-            nodes = self.reorder_items_from_retrieve_connnections(nodes)
+            nodes = reorder_items_from_retrieve_connnections(nodes)
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.setup_tree_hierarchy()
 
         cmds.select(scene_selection)
         self.stats()
-
-    def reorder_items_from_retrieve_connnections(self, nodes):
-        """The items coming from retrieve_connections are coming in at wrong order.
-        order should be same as what is listed in ZNODES.  THis conforms nodes to
-        that order.
-        
-        Args:
-            nodes (list): list of node names to re-order
-        
-        Returns:
-            list: ordered list
-        """
-
-        nodes_reordered = []
-        tmp = []
-        for item in ZNODES:
-            for x in nodes:
-                if cmds.objectType(x) == item:
-                    nodes_reordered.append(x)
-                elif cmds.objectType(x) == 'zGeo':
-                    nodes.remove(x)
-                else:
-                    tmp.append(x)
-        nodes = nodes_reordered + tmp
-        return nodes
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
