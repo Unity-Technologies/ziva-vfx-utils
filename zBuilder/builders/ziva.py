@@ -26,6 +26,11 @@ ZNODES = [
     'zFiber',
     'zEmbedder',
 ]
+"""This is order that the Ziva nodes get retrieved and built.  We need to have solver first 
+then the bodies.  After that the order is not so crutial.  
+This is an uncomplete list as of now.  Some nodes get added on after, that will be changed in
+VFXACT-578
+"""
 
 
 class SolverDisabler:
