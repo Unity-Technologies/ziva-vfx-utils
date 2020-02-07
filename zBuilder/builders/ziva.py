@@ -315,6 +315,10 @@ class Ziva(Builder):
                     else:
                         tmp.append(x)
             nodes = nodes_reordered + tmp
+            # remove duplicates
+            seen = set()
+            seen_add = seen.add
+            nodes = [x for x in nodes if not (x in seen or seen_add(x))]
             return nodes
 
         if nodes:
