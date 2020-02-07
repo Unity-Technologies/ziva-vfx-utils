@@ -1,6 +1,5 @@
 import weakref
 from functools import partial
-import copy
 
 from maya import cmds
 from maya import mel
@@ -17,7 +16,6 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
-import zBuilder.parameters.maps as mp
 from zBuilder.nodes.base import Base
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
@@ -26,7 +24,6 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 # Show window with docking ability
 def run():
     builder = zva.Ziva()
-    builder.retrieve_connections()
 
     return dock_window(MyDockingUI, builder=builder)
 
@@ -126,6 +123,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder or zva.Ziva()
+        self.builder.retrieve_connections()
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
@@ -464,7 +462,7 @@ class MyDockingUI(QtWidgets.QWidget):
         names_to_expand = self.get_expanded()
 
         self._model.beginResetModel()
-        self._model.root_node = builder
+        self._model.builder = builder
         self._model.endResetModel()
 
         # restore previous expansion in treeView or expand all zSolverTransform items

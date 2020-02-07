@@ -16,6 +16,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
+        assert builder, "Missing builder parameter in SceneGraphModel"
         self.builder = builder
 
     def rowCount(self, parent):
