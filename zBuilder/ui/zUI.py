@@ -1,6 +1,5 @@
 import weakref
 from functools import partial
-import copy
 
 from maya import cmds
 from maya import mel
@@ -17,7 +16,6 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
-import zBuilder.parameters.maps as mp
 from zBuilder.nodes.base import Base
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
@@ -26,7 +24,6 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 # Show window with docking ability
 def run():
     builder = zva.Ziva()
-    builder.retrieve_connections()
 
     return dock_window(MyDockingUI, builder=builder)
 
@@ -68,7 +65,6 @@ class ProximityWidget(QtWidgets.QWidget):
     """
     Widget in right-click menu to change map weights for attachments
     """
-
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
         h_layout = QtWidgets.QHBoxLayout(self)
@@ -104,8 +100,8 @@ class ProximityWidget(QtWidgets.QWidget):
         to_value = float(self.to_edit.text())
         if to_value < from_value:
             self.to_edit.setText(str(from_value))
-        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
-                                                                      self.to_edit.text()))
+        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(
+            self.from_edit.text(), self.to_edit.text()))
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -127,16 +123,15 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder or zva.Ziva()
+        self.builder.retrieve_connections()
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
         # clipboard for the maps.  This is either a zBuilder Map object or None.
         self.maps_clipboard = None
 
-        root_node = self.builder.root_node
-
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._model = model.SceneGraphModel(self.builder, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -150,7 +145,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
-        self.set_root_node(root_node=root_node)
+        self.set_builder(self.builder)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -186,7 +181,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self.set_root_node)
+        self.actionRefresh.triggered.connect(self.set_builder)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
@@ -202,7 +197,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def paste_weights(self, node, new_map):
         """Pasting the maps.  Terms used here
-            orig/new.  
+            orig/new.
             The map/node the items were copied from are prefixed with orig.
             The map/node the items are going to be pasted onto are prefixed with new
 
@@ -261,7 +256,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def select_source_and_target(self):
-        """Selects the source and target mesh of an attachment. This is a menu 
+        """Selects the source and target mesh of an attachment. This is a menu
         command.
         """
 
@@ -273,7 +268,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """Generates menu for tree items
 
         We are getting the zBuilder node in the tree item and checking type.
-        With that we can build a custom menu per type.  If there are more then 
+        With that we can build a custom menu per type.  If there are more then
         one object selected in UI a menu does not appear as items in menu work
         on a single selection.
         """
@@ -366,7 +361,7 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0]# weight map @ index 0
+        weight_map = node.parameters['map'][0]  # weight map @ index 0
         endpoints_map = node.parameters['map'][1]  # endpoints map @ index 1
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
@@ -378,7 +373,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0] # weight map @ index 0
+        weight_map = node.parameters['map'][0]  # weight map @ index 0
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -430,21 +425,28 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            cmds.select(nodes)
+            # find nodes that exist in the scene
+            scene_nodes = cmds.ls(nodes, l=True)
+            if scene_nodes:
+                cmds.select(scene_nodes)
+            not_found_nodes = [node for node in nodes if node not in scene_nodes]
+            if not_found_nodes:
+                cmds.warning(
+                    "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
-    def set_root_node(self, root_node=None):
-        """This builds and/or resets the tree given a root_node.  The root_node
+    def set_builder(self, builder=None):
+        """This builds and/or resets the tree given a builder.  The builder
         is a zBuilder object that the tree is built from.  If None is passed
-        it uses the scene selection to build a new root_node.
+        it uses the scene selection to build a new builder.
 
         This forces a complete redraw of the ui tree.
 
         Args:
-            root_node (:obj:`obj`, optional): The zBuilder root_node to build
+            builder (:obj:`obj`, optional): The zBuilder builder to build
                 tree from.  Defaults to None.
         """
 
-        if not root_node:
+        if not builder:
             # clean builder
             # TODO: this line should be changed after VFXACT-388 to make more efficient
 
@@ -454,13 +456,13 @@ class MyDockingUI(QtWidgets.QWidget):
             # is the argument that tells zBuilder to not get maps, meshes.
             self.builder = zva.Ziva()
             self.builder.retrieve_connections(get_parameters=False)
-            root_node = self.builder.root_node
+            builder = self.builder
 
         # remember names of items to expand
         names_to_expand = self.get_expanded()
 
         self._model.beginResetModel()
-        self._model.root_node = root_node
+        self._model.builder = builder
         self._model.endResetModel()
 
         # restore previous expansion in treeView or expand all zSolverTransform items

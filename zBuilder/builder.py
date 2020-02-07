@@ -115,7 +115,7 @@ class Builder(object):
             already been created.
         '''
         # put association filter in a list if it isn't
-        if not isinstance(parameter_args, list):
+        if not io.is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
@@ -293,7 +293,7 @@ class Builder(object):
 
 
 def restore_scene_items_from_string(item, builder):
-    if isinstance(item, list):
+    if io.is_sequence(item):
         if item:
             item = builder.get_scene_items(name_filter=item)
     elif isinstance(item, dict):

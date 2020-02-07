@@ -2,6 +2,7 @@ import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 from vfx_test_case import VfxTestCase
+from maya import cmds
 
 try:
     from PySide2 import QtCore
@@ -18,10 +19,10 @@ class ZivaScenePanelTestCase(VfxTestCase):
         if wrong_maya_version:
             self.skipTest('Maya version is not supported')
         super(ZivaScenePanelTestCase, self).setUp()
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         builder = zva.Ziva()
         builder.retrieve_connections()
-        self.model = model.SceneGraphModel(builder.root_node)
+        self.model = model.SceneGraphModel(builder)
 
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
@@ -57,3 +58,25 @@ class ZivaScenePanelTestCase(VfxTestCase):
     def test_model_data_returns_right_types(self):
         root_index = self.model.index(0, 0, QtCore.QModelIndex())
         self.recursive_check_model_data_returns_right_types(root_index)
+
+    def test_set_data_rename_node(self):
+        ## SETUP
+        root_index = self.model.index(0, 0, QtCore.QModelIndex())
+        # This should be zSolver transform
+        child_index = root_index.child(1, 0)
+        ## VERIFY
+        self.assertEqual(len(cmds.ls("zSolver1")), 1)
+        self.assertEqual(len(cmds.ls("renamed_zSolver")), 0)
+
+        ## ACT
+        result = self.model.setData(child_index, "renamed_zSolver")
+
+        ## VERIFY
+        # check if index is valid
+        self.assertTrue(result)
+        # new node exists
+        self.assertEqual(len(cmds.ls("renamed_zSolver")), 1)
+        # zBuilder node has a new name
+        node = child_index.internalPointer()
+        self.assertEqual(node.name, "renamed_zSolver")
+
