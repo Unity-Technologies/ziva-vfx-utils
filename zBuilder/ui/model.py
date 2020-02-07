@@ -1,6 +1,7 @@
 from PySide2 import QtGui, QtWidgets, QtCore
 from icons import get_icon_path_from_node
 import zBuilder.zMaya as mz
+from maya import cmds
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -13,13 +14,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     # is node enabled
     enableRole = QtCore.Qt.UserRole + 3
 
-    def __init__(self, root, parent=None):
+    def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
-        self.root_node = root
+        assert builder, "Missing builder parameter in SceneGraphModel"
+        self.builder = builder
 
     def rowCount(self, parent):
         if not parent.isValid():
-            parentNode = self.root_node
+            parentNode = self.builder.root_node
         else:
             parentNode = parent.internalPointer()
 
@@ -29,7 +31,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return 1
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -42,7 +44,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
 
                 node = index.internalPointer()
-                node.name = value
+                long_name = node.long_name
+                short_name = node.name
+                if value and value != short_name:
+                    name = cmds.rename(long_name, value)
+                    self.builder.string_replace("^{}$".format(short_name), name)
+                    node.name = name
 
                 return True
 
@@ -95,7 +102,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = self.getNode(index)
         parentNode = node.parent
 
-        if parentNode == self.root_node or parentNode == None:
+        if parentNode == self.builder.root_node or parentNode == None:
             return QtCore.QModelIndex()
 
         return self.createIndex(parentNode.row(), 0, parentNode)
@@ -117,7 +124,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if node:
                 return node
 
-        return self.root_node
+        return self.builder.root_node
 
 
 class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
