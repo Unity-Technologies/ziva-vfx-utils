@@ -15,8 +15,16 @@ except RuntimeError:
     pass
 
 ZNODES = [
-    'zSolver', 'zSolverTransform', 'zTet', 'zTissue', 'zBone', 'zCloth', 'zSolver', 'zEmbedder',
-    'zAttachment', 'zMaterial', 'zFiber'
+    'zSolver',
+    'zSolverTransform',
+    'zTet',
+    'zTissue',
+    'zBone',
+    'zCloth',
+    'zAttachment',
+    'zMaterial',
+    'zFiber',
+    'zEmbedder',
 ]
 
 
