@@ -81,19 +81,6 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
 
-    def test_string_replace(self):
-        ## VERIFY
-        # check if an item exists before string_replace
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
-        self.assertGreaterEqual(len(r_tissue), 1)
-
-        ## ACT
-        self.builder.string_replace("^r_", "l_")
-
-        ## VERIFY
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
-        self.assertEqual(r_tissue, [])
-
     def test_cut_paste(self):
         builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zTissue")
         self.check_retrieve_ztissue_looks_good(builder, {})
@@ -113,3 +100,88 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
+
+
+class ZivaTissueMirrorTestCase(VfxTestCase):
+    def setUp(self):
+        super(ZivaTissueMirrorTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        # gather info
+        self.tissue_items = self.builder.get_scene_items(type_filter='zTissue')
+        self.l_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('l_')]
+
+    def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
+        """Args:
+            builder (builders.ziva.Ziva()): builder object
+            expected_plugs (dict): A dict of expected attribute/value pairs.
+                                   {'zTissue1.collisions':True, ...}.
+                                   If None/empty/False, then attributes are taken from zBuilder
+                                   and values are taken from the scene.
+                                   Test fails if zBuilder is missing any of the keys
+                                   or has any keys with different values.
+        """
+        tissue_names = [x.name for x in self.tissue_items]
+        self.check_retrieve_looks_good(builder, expected_plugs, tissue_names, "zTissue")
+
+    def test_builder_change_with_string_replace(self):
+        ## VERIFY
+
+        # find left and right tissue items regardless of name, by looking at mesh they
+        # are tied to
+        r_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('r_')]
+        self.assertNotEqual(len(self.l_tissue_geo), 0)
+        self.assertEqual(r_tissue_geo, [])
+
+        ## ACT
+        self.builder.string_replace("^l_", "r_")
+
+        ## VERIFY
+        new_left_geo = [x for x in self.tissue_items if x.association[0].startswith('l_')]
+        r_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('r_')]
+        self.assertEqual(len(self.l_tissue_geo), len(r_tissue_geo))
+        self.assertEqual(new_left_geo, [])
+
+    def test_builder_build_with_string_replace(self):
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        tissue_names_in_builder = [x.name for x in self.tissue_items]
+        self.assertSceneHasNodes(tissue_names_in_builder)
+
+        for item in self.tissue_items:
+            scene_name = item.name
+            for attr in item.attrs.keys():
+                scene_value = cmds.getAttr('{}.{}'.format(scene_name, attr))
+                self.assertTrue(scene_value == item.attrs[attr]['value'])
+
+
+# class ZivaMirrorSelectedTestCase(VfxTestCase):
+#     def setUp(self):
+#         super(ZivaMirrorSelectedTestCase, self).setUp()
+#         test_utils.load_scene(scene_name='mirror_example.ma')
+
+#     def test_mirror_selection(self):
+#         cmds.select('l_arm_muscles')
+
+#         builder = zva.Ziva()
+#         builder.retrieve_from_scene_selection()
+#         # before we build we want to mirror just the center geo
+#         for item in builder.get_scene_items(name_filter='c_chest_bone'):
+#             item.mirror()
+
+#         # and we want to interpolate any map associated with the center geo
+#         for item in builder.get_scene_items(type_filter='map'):
+#             if 'c_chest_bone' in item._mesh:
+#                 item.interpolate()
+
+#         # now a simple string replace
+#         builder.string_replace('^l_', 'r_')
+
+#         builder.build()
+
+#         self.assertSceneHasNodes(['zAttachment2', 'zMaterial3', 'zMaterial4'])
