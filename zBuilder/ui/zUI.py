@@ -424,71 +424,25 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
 
     def open_solver_menu(self, menu, node):
-        menu.installEventFilter(self)
         solver_transform = node
         solver = node.children[0]
 
-        action_enable = QtWidgets.QAction(self)
-        action_enable.setText('Enable')
-        action_enable.setCheckable(True)
-        action_enable.setChecked(solver_transform.attrs['enable']['value'])
-        action_enable.changed.connect(partial(self.toggle_attribute, solver_transform, 'enable'))
-        menu.addAction(action_enable)
+        self.add_zsolver_menu_action(menu, solver_transform, 'Enable', 'enable')
+        self.add_zsolver_menu_action(menu, solver, 'Collision Detection', 'collisionDetection')
+        self.add_zsolver_menu_action(menu, solver, 'Show Bones', 'showBones')
+        self.add_zsolver_menu_action(menu, solver, 'Show Tet Meshes', 'showTetMeshes')
+        self.add_zsolver_menu_action(menu, solver, 'Show Muscle Fibers', 'showMuscleFibers')
+        self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
+        self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
+        self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
 
-        action_collision_detection = QtWidgets.QAction(self)
-        action_collision_detection.setText('Collision Detection')
-        action_collision_detection.setCheckable(True)
-        action_collision_detection.setChecked(solver.attrs['collisionDetection']['value'])
-        action_collision_detection.changed.connect(
-            partial(self.toggle_attribute, solver, 'collisionDetection'))
-        menu.addAction(action_collision_detection)
-
-        action_show_bones = QtWidgets.QAction(self)
-        action_show_bones.setText('Show Bones')
-        action_show_bones.setCheckable(True)
-        action_show_bones.setChecked(solver.attrs['showBones']['value'])
-        action_show_bones.changed.connect(partial(self.toggle_attribute, solver, 'showBones'))
-        menu.addAction(action_show_bones)
-
-        action_show_tet_meshes = QtWidgets.QAction(self)
-        action_show_tet_meshes.setText('Show Tet Meshes')
-        action_show_tet_meshes.setCheckable(True)
-        action_show_tet_meshes.setChecked(solver.attrs['showTetMeshes']['value'])
-        action_show_tet_meshes.changed.connect(
-            partial(self.toggle_attribute, solver, 'showTetMeshes'))
-        menu.addAction(action_show_tet_meshes)
-
-        action_show_muscle_fibers = QtWidgets.QAction(self)
-        action_show_muscle_fibers.setText('Show Muscle Fibers')
-        action_show_muscle_fibers.setCheckable(True)
-        action_show_muscle_fibers.setChecked(solver.attrs['showMuscleFibers']['value'])
-        action_show_muscle_fibers.changed.connect(
-            partial(self.toggle_attribute, solver, 'showMuscleFibers'))
-        menu.addAction(action_show_muscle_fibers)
-
-        action_show_attachments = QtWidgets.QAction(self)
-        action_show_attachments.setText('Show Attachments')
-        action_show_attachments.setCheckable(True)
-        action_show_attachments.setChecked(solver.attrs['showAttachments']['value'])
-        action_show_attachments.changed.connect(
-            partial(self.toggle_attribute, solver, 'showAttachments'))
-        menu.addAction(action_show_attachments)
-
-        action_show_collisions = QtWidgets.QAction(self)
-        action_show_collisions.setText('Show Collisions')
-        action_show_collisions.setCheckable(True)
-        action_show_collisions.setChecked(solver.attrs['showCollisions']['value'])
-        action_show_collisions.changed.connect(
-            partial(self.toggle_attribute, solver, 'showCollisions'))
-        menu.addAction(action_show_collisions)
-
-        action_show_materials = QtWidgets.QAction(self)
-        action_show_materials.setText('Show Materials')
-        action_show_materials.setCheckable(True)
-        action_show_materials.setChecked(solver.attrs['showMaterials']['value'])
-        action_show_materials.changed.connect(
-            partial(self.toggle_attribute, solver, 'showMaterials'))
-        menu.addAction(action_show_materials)
+    def add_zsolver_menu_action(self, menu, node, text, attr):
+        action = QtWidgets.QAction(self)
+        action.setText(text)
+        action.setCheckable(True)
+        action.setChecked(node.attrs[attr]['value'])
+        action.changed.connect(partial(self.toggle_attribute, node, attr))
+        menu.addAction(action)
 
     def toggle_attribute(self, node, attr):
         value = node.attrs[attr]['value']
