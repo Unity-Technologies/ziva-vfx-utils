@@ -15,9 +15,22 @@ except RuntimeError:
     pass
 
 ZNODES = [
-    'zSolver', 'zSolverTransform', 'zTet', 'zTissue', 'zBone', 'zCloth', 'zSolver', 'zEmbedder',
-    'zAttachment', 'zMaterial', 'zFiber'
+    'zSolver',
+    'zSolverTransform',
+    'zTet',
+    'zTissue',
+    'zBone',
+    'zCloth',
+    'zAttachment',
+    'zMaterial',
+    'zFiber',
+    'zEmbedder',
 ]
+"""This is order that the Ziva nodes get retrieved and built.  We need to have solver first 
+then the bodies.  After that the order is not so crutial.  
+This is an uncomplete list as of now.  Some nodes get added on after, that will be changed in
+VFXACT-578
+"""
 
 
 class SolverDisabler:
@@ -232,7 +245,7 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # KWARG PARSING--------------------------------------------------------
         # ---------------------------------------------------------------------
-        get_parameters = kwargs.get('get_parameters', False)
+        get_parameters = kwargs.get('get_parameters', True)
 
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------
@@ -284,7 +297,37 @@ class Ziva(Builder):
             hist = cmds.listHistory(fibers)
             nodes.extend(cmds.ls(hist, type='zRivetToBone'))
 
+        def reorder_items_from_retrieve_connnections(nodes):
+            """The items coming from retrieve_connections are coming in at wrong order.
+            order should be same as what is listed in ZNODES.  THis conforms nodes to
+            that order.
+            
+            Args:
+                nodes (list): list of node names to re-order
+            
+            Returns:
+                list: ordered list
+            """
+
+            nodes_reordered = []
+            tmp = []
+            for item in ZNODES:
+                for x in nodes:
+                    if cmds.objectType(x) == item:
+                        nodes_reordered.append(x)
+                    elif cmds.objectType(x) == 'zGeo':
+                        nodes.remove(x)
+                    else:
+                        tmp.append(x)
+            nodes = nodes_reordered + tmp
+            # remove duplicates
+            seen = set()
+            seen_add = seen.add
+            nodes = [x for x in nodes if not (x in seen or seen_add(x))]
+            return nodes
+
         if nodes:
+            nodes = reorder_items_from_retrieve_connnections(nodes)
             self._populate_nodes(nodes, get_parameters=get_parameters)
             self.setup_tree_hierarchy()
 
