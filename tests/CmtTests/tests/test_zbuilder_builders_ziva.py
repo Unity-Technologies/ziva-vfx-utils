@@ -175,6 +175,30 @@ class ZivaBuildTestCase(VfxTestCase):
         self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
 
 
+class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
+    def test_order_retrieved(self):
+        desired_type_order = zva.ZNODES
+
+        test_utils.build_generic_scene()
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        retrieved = builder.get_scene_items()
+        retrieved_type_order = [x.type for x in retrieved]
+
+        # remove duplicates
+        seen = set()
+        seen_add = seen.add
+        retrieved_type_order = [
+            str(x) for x in retrieved_type_order if not (x in seen or seen_add(x))
+        ]
+
+        # the retrieved_type_order is going to have a few extra node types at end of list.
+        # the items NOT in ZNODES needs to be at the end, this is up for refactor
+        # when this ticket is done then this can do a complete equal
+        self.assertEqual(desired_type_order, retrieved_type_order[0:len(desired_type_order)])
+
+
 class ZivaSolverDisableTestCase(VfxTestCase):
     def test_enable_connected(self):
         # build scene and connect the enable to something
