@@ -64,7 +64,7 @@ class DGNode(Base):
         # Some attributes cannot be deepcopied so define a listy of attributes
         # to ignore.  These items are zBuilder scene items.  We need to not copy these
         # attributes and apply them to copy afterwards.
-        non_copyable_attrs = ['depends_on', '_children', '_parent']
+        non_copyable_attrs = ['depends_on']
         non_copyable_attrs.extend(Base.SCENE_ITEM_ATTRIBUTES)
 
         non_copyable_items = {}

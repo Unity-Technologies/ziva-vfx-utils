@@ -19,7 +19,7 @@ class Base(object):
     type = None
     """ type of scene item """
 
-    COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on']
+    COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on', '_children', '_parent']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
@@ -289,4 +289,15 @@ def equal_dicts(dict_1, dict_2, ignore_keys):
     """
     keys_1 = set(dict_1).difference(ignore_keys)
     keys_2 = set(dict_2).difference(ignore_keys)
-    return keys_1 == keys_2 and all(dict_1[k] == dict_2[k] for k in keys_1)
+
+    if keys_1 == keys_2:
+
+        return_results = all(dict_1[k] == dict_2[k] for k in keys_1)
+
+        # for k in keys_1:
+        #     if not dict_1[k] == dict_2[k]:
+        #         print dict_1[k]
+        #         print dict_2[k]
+        return return_results
+    else:
+        return False
