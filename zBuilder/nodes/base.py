@@ -19,11 +19,18 @@ class Base(object):
     type = None
     """ type of scene item """
 
-    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent']
+    COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
-    SCENE_ITEM_ATTRIBUTES = ['parameters', 'fiber_item', 'tissue_item', 'solver']
+    SCENE_ITEM_ATTRIBUTES = [
+        'parameters',
+        'fiber_item',
+        'tissue_item',
+        'solver',
+        'parent_tissue',  # for sub-tissues
+        'children_tissues',  # for sub-tissues
+    ]
     """ The attributes that contain a scene item used as a pointer to the scene item in the bundle.
             This will convert scene items to a string before serialization and resetup the pointer
             upon deserilization,  Note that this attributes values gets added to COMPARE_EXCLUDE for 
