@@ -1,8 +1,9 @@
 //Maya ASCII 2018ff09 scene
 //Name: mirror_example.ma
-//Last modified: Thu, Jan 30, 2020 10:28:23 PM
+//Last modified: Mon, Feb 10, 2020 03:38:55 PM
 //Codeset: 1252
 requires maya "2018ff09";
+requires "stereoCamera" "10.0";
 requires -nodeType "zGeo" -nodeType "zTissue" -nodeType "zBone" -nodeType "zTet"
 		 -nodeType "zEmbedder" -nodeType "zMaterial" -nodeType "zRestShape" -nodeType "zSolverTransform"
 		 -nodeType "zSolver" -dataType "zSolverParamsData" -dataType "zCacheParamsData" -dataType "zGeoData"
@@ -16,27 +17,26 @@ fileInfo "version" "2018";
 fileInfo "cutIdentifier" "201903222215-65bada0e52";
 fileInfo "osv" "Microsoft Windows 8 Business Edition, 64-bit  (Build 9200)\n";
 createNode transform -s -n "persp";
-	rename -uid "0C9BAFA2-4927-835D-F2CA-D8B8358D986B";
+	rename -uid "6976699A-4384-7CB7-B7CA-2DA098478160";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" 1.2236983483826771 2.1983649836651131 2.1712797066678564 ;
-	setAttr ".r" -type "double3" -15.93835272960237 -8.6000000000002572 -1.0052257128342099e-15 ;
+	setAttr ".t" -type "double3" 3.1426275343980179 2.9983617912980201 8.3935576515021459 ;
+	setAttr ".r" -type "double3" -10.538352729602501 15.399999999999993 -2.061877556084679e-16 ;
 createNode camera -s -n "perspShape" -p "persp";
-	rename -uid "E3B4315F-4F7A-86F9-3136-F29CBFDC3A0D";
+	rename -uid "88A6ECD2-4714-5F6D-C6D6-B79B468BD260";
 	setAttr -k off ".v" no;
 	setAttr ".fl" 34.999999999999993;
-	setAttr ".coi" 2.2882817143105321;
+	setAttr ".coi" 9.9951694902063402;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
-	setAttr ".tp" -type "double3" 2.0340284705162048 1.8071434497833252 -1.1920928955078125e-07 ;
 	setAttr ".hc" -type "string" "viewSet -p %camera";
 createNode transform -s -n "top";
-	rename -uid "810E3EB2-4BAD-88F9-9E68-4B9877E3485A";
+	rename -uid "F7C40469-4290-D7A3-E4B4-0C9C71F8F3C5";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 0 1000.1 0 ;
 	setAttr ".r" -type "double3" -89.999999999999986 0 0 ;
 createNode camera -s -n "topShape" -p "top";
-	rename -uid "A6E9D67D-410E-3038-FFCA-79874F03946C";
+	rename -uid "EA7F526C-4C5C-1FFD-A9C2-ADB02FB90BB6";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -47,11 +47,11 @@ createNode camera -s -n "topShape" -p "top";
 	setAttr ".hc" -type "string" "viewSet -t %camera";
 	setAttr ".o" yes;
 createNode transform -s -n "front";
-	rename -uid "DB3CC91B-4BFA-8BAF-01D3-CFAB1CDAEF78";
+	rename -uid "36F94FFE-40C9-A412-BA4A-1386B60B10C1";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 0 0 1000.1 ;
 createNode camera -s -n "frontShape" -p "front";
-	rename -uid "CE44C44A-493A-520D-3233-03B3E718219D";
+	rename -uid "9E87A861-4C5D-5DD7-28B5-1BA381B91DDC";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -62,12 +62,12 @@ createNode camera -s -n "frontShape" -p "front";
 	setAttr ".hc" -type "string" "viewSet -f %camera";
 	setAttr ".o" yes;
 createNode transform -s -n "side";
-	rename -uid "FDCEFC02-4ABE-F71B-4D4B-4EAA8C006821";
+	rename -uid "A134A6B1-4D1C-090F-4CBB-EC81E8EBF337";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 1000.1 0 0 ;
 	setAttr ".r" -type "double3" 0 89.999999999999986 0 ;
 createNode camera -s -n "sideShape" -p "side";
-	rename -uid "8636B67F-4E2F-8B64-BEC4-16BBA21761E6";
+	rename -uid "7A9F04E1-4E03-1F07-D0B4-D288DDC0C76A";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -78,9 +78,9 @@ createNode camera -s -n "sideShape" -p "side";
 	setAttr ".hc" -type "string" "viewSet -s %camera";
 	setAttr ".o" yes;
 createNode transform -n "l_geo";
-	rename -uid "75F0B2B3-429E-03CA-FE34-818386B521AA";
+	rename -uid "33C2FA24-4542-6283-2E3A-61AE0DF71E90";
 createNode transform -n "l_armA_muscle_geo" -p "l_geo";
-	rename -uid "B68F57B3-451A-1119-8252-CABA9A5F250C";
+	rename -uid "0B648217-4DBD-0DBB-980C-4992507E04A1";
 	setAttr -l on ".tx";
 	setAttr -l on ".ty";
 	setAttr -l on ".tz";
@@ -93,7 +93,7 @@ createNode transform -n "l_armA_muscle_geo" -p "l_geo";
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "l_armA_muscle_geoShape" -p "l_armA_muscle_geo";
-	rename -uid "9E06EEED-4B2A-A20C-6B8F-519BF7EAD57C";
+	rename -uid "59DA0157-4468-D37C-2D6B-9AA4B14DB264";
 	setAttr -k off ".v";
 	setAttr -s 10 ".iog[0].og";
 	setAttr ".vir" yes;
@@ -104,7 +104,7 @@ createNode mesh -n "l_armA_muscle_geoShape" -p "l_armA_muscle_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode mesh -n "l_armA_muscle_geoShapeOrig" -p "l_armA_muscle_geo";
-	rename -uid "073BA31B-47DE-E6D4-49C4-AF9F0C037D87";
+	rename -uid "459CFE3E-4454-EC28-D84E-2B9B7D37E73C";
 	setAttr -k off ".v";
 	setAttr ".io" yes;
 	setAttr ".vir" yes;
@@ -115,7 +115,7 @@ createNode mesh -n "l_armA_muscle_geoShapeOrig" -p "l_armA_muscle_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "l_armA_subtissue_geo" -p "l_geo";
-	rename -uid "7F4B6C40-4003-43E3-F6F6-408BD4DE836A";
+	rename -uid "4A89D4E8-4C83-1003-695D-FEB97845BCBA";
 	setAttr -l on ".tx";
 	setAttr -l on ".ty";
 	setAttr -l on ".tz";
@@ -128,7 +128,7 @@ createNode transform -n "l_armA_subtissue_geo" -p "l_geo";
 	setAttr ".rp" -type "double3" 1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 	setAttr ".sp" -type "double3" 1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 createNode mesh -n "l_armA_subtissue_geoShape" -p "l_armA_subtissue_geo";
-	rename -uid "42E8145F-4A59-6DDE-3CC6-0FAA256DFEE1";
+	rename -uid "90F5AED0-48D3-059A-90EB-468E9EB5BB36";
 	setAttr -k off ".v";
 	setAttr -s 8 ".iog[0].og";
 	setAttr ".vir" yes;
@@ -139,7 +139,7 @@ createNode mesh -n "l_armA_subtissue_geoShape" -p "l_armA_subtissue_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode mesh -n "l_armA_subtissue_geoShapeOrig" -p "l_armA_subtissue_geo";
-	rename -uid "AAAE2F74-483F-D53A-C126-DDA6492E9F1C";
+	rename -uid "FC1D57C0-4E23-EBE8-845F-758734D9C967";
 	setAttr -k off ".v";
 	setAttr ".io" yes;
 	setAttr ".vir" yes;
@@ -1416,11 +1416,11 @@ createNode mesh -n "l_armA_subtissue_geoShapeOrig" -p "l_armA_subtissue_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "l_armA_bone_geo" -p "l_geo";
-	rename -uid "8BAEA5C2-4988-ABB6-F933-CDBE70311017";
+	rename -uid "5EC3DA12-4D8C-A7B3-4D58-E0981FB10B68";
 	setAttr ".rp" -type "double3" 1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 	setAttr ".sp" -type "double3" 1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 createNode mesh -n "l_armA_bone_geoShape" -p "l_armA_bone_geo";
-	rename -uid "61221350-410C-3FA3-DA7B-D3B54A21FA9F";
+	rename -uid "5F0287F3-4309-13F3-058A-7C93CA446984";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -1430,11 +1430,11 @@ createNode mesh -n "l_armA_bone_geoShape" -p "l_armA_bone_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "l_armB_bone_geo" -p "l_geo";
-	rename -uid "42168FD4-4AA8-0CEE-3597-798231AB9EF6";
+	rename -uid "B0BB02F7-4470-8CCB-098C-DFABB5BA1FA4";
 	setAttr ".rp" -type "double3" 1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 	setAttr ".sp" -type "double3" 1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 createNode mesh -n "l_armB_bone_geoShape" -p "l_armB_bone_geo";
-	rename -uid "67BDCBC5-47E1-5348-988B-AAB62D83C1B1";
+	rename -uid "9C2308D5-4416-3291-D864-58A430C1D14F";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -2708,11 +2708,11 @@ createNode mesh -n "l_armB_bone_geoShape" -p "l_armB_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "l_armA_restShape" -p "l_geo";
-	rename -uid "388F8991-455B-C3C0-07D2-7EBABB2CE059";
+	rename -uid "B267BC7A-47F7-67BF-BC17-F4BCC3A855C4";
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "l_armA_restShapeShape" -p "l_armA_restShape";
-	rename -uid "62534520-4FC6-F5FC-9233-CAAC2E6D52EA";
+	rename -uid "2A224584-4D37-E327-6DD5-7CA9CC746671";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -2722,13 +2722,13 @@ createNode mesh -n "l_armA_restShapeShape" -p "l_armA_restShape";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "r_geo";
-	rename -uid "2B4DE160-4147-6C9F-A22F-C6BD50CA18B7";
+	rename -uid "E1799519-4F57-1EC8-25F2-2986D638ECE9";
 createNode transform -n "r_armA_muscle_geo" -p "r_geo";
-	rename -uid "03654439-4209-D3DE-298B-BD9FD3DCD597";
+	rename -uid "03C721F6-45F7-BF68-42D7-AC86ADC832CA";
 	setAttr ".rp" -type "double3" -2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" -2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "r_armA_muscle_geoShape" -p "r_armA_muscle_geo";
-	rename -uid "A4445476-4CBC-9F4C-8295-C98328A6E178";
+	rename -uid "D00C0A4A-4CC0-8592-8194-4596163C707B";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -3928,11 +3928,11 @@ createNode mesh -n "r_armA_muscle_geoShape" -p "r_armA_muscle_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_subtissue_geo" -p "r_geo";
-	rename -uid "5D4D2A12-4D04-4164-7958-2F88D70DEADF";
+	rename -uid "3A6515E1-4847-8484-1E3E-95B56328E7FD";
 	setAttr ".rp" -type "double3" -1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 	setAttr ".sp" -type "double3" -1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 createNode mesh -n "r_armA_subtissue_geoShape" -p "r_armA_subtissue_geo";
-	rename -uid "5CDF61DD-4224-2DF9-3BA5-D68F72BFF42C";
+	rename -uid "443CE3FF-417E-F68C-1B01-7DB2FFCF0989";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -5208,11 +5208,11 @@ createNode mesh -n "r_armA_subtissue_geoShape" -p "r_armA_subtissue_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_bone_geo" -p "r_geo";
-	rename -uid "ECD02603-4990-F2A1-4C6A-948F200EDF4F";
+	rename -uid "450F6E38-47C1-59CB-D843-188D81EDAFCB";
 	setAttr ".rp" -type "double3" -1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 	setAttr ".sp" -type "double3" -1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 createNode mesh -n "r_armA_bone_geoShape" -p "r_armA_bone_geo";
-	rename -uid "69693FBE-454A-990D-29E8-9AAB586190EA";
+	rename -uid "C6E2DB85-4EB1-509F-BE98-F2AA5979F819";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -6412,11 +6412,11 @@ createNode mesh -n "r_armA_bone_geoShape" -p "r_armA_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armB_bone_geo" -p "r_geo";
-	rename -uid "09BE59EA-4638-222A-C363-E6A1954A11B6";
+	rename -uid "1FAB7016-461E-971D-07E6-EB82A955D39A";
 	setAttr ".rp" -type "double3" -1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 	setAttr ".sp" -type "double3" -1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 createNode mesh -n "r_armB_bone_geoShape" -p "r_armB_bone_geo";
-	rename -uid "D1ECFE88-4BEF-D622-C46F-CB921C1EE9FB";
+	rename -uid "3D641DAB-4146-216C-F28D-529E703295F8";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -7693,7 +7693,7 @@ createNode mesh -n "r_armB_bone_geoShape" -p "r_armB_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_restShape" -p "r_geo";
-	rename -uid "F0954FD2-4943-FF90-69B9-A4AD488800E3";
+	rename -uid "1E90A3C6-49EF-3BFF-823E-98A12CD31F00";
 	setAttr ".r" -type "double3" 0 180 0 ;
 	setAttr ".s" -type "double3" 1 1 -1 ;
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 4.5164500658361733e-16 ;
@@ -7701,7 +7701,7 @@ createNode transform -n "r_armA_restShape" -p "r_geo";
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".spt" -type "double3" 0 0 9.0329001316723466e-16 ;
 createNode mesh -n "r_armA_restShapeShape" -p "r_armA_restShape";
-	rename -uid "0E8DAC81-4079-E949-40D7-20814593D314";
+	rename -uid "75993322-4D8E-D6A7-ACB0-8D8AD60433EB";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -8833,9 +8833,9 @@ createNode mesh -n "r_armA_restShapeShape" -p "r_armA_restShape";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode zSolverTransform -n "zSolver1";
-	rename -uid "17FCC1FC-4836-AD68-BCDE-1B9BE2E5CA59";
+	rename -uid "FB22A05D-47DE-7FDA-B615-9C9D3BC69514";
 createNode zSolver -n "zSolver1Shape" -p "zSolver1";
-	rename -uid "9D15DDBD-47E2-99A9-74D2-75A98DE9FC67";
+	rename -uid "ACB6ABD5-4724-2F40-CBEE-96B7D24B7B32";
 	setAttr -k off ".v";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
@@ -8863,62 +8863,62 @@ createNode zSolver -n "zSolver1Shape" -p "zSolver1";
 	setAttr ".mcr[2].mcri" 2;
 	setAttr ".unL" 4;
 createNode lightLinker -s -n "lightLinker1";
-	rename -uid "818A62F1-4992-38CC-1611-B0AD162068F4";
+	rename -uid "8A6E7ADC-4A66-AF2A-71E8-94A42206005D";
 	setAttr -s 2 ".lnk";
 	setAttr -s 2 ".slnk";
 createNode shapeEditorManager -n "shapeEditorManager";
-	rename -uid "E0B17E90-4950-90FC-5C29-A88658BF9E5C";
+	rename -uid "C7AC2F48-427C-D339-EDA5-1D8D5F3BCBFD";
 createNode poseInterpolatorManager -n "poseInterpolatorManager";
-	rename -uid "ED31278C-4DAB-D5DA-F38B-2BA2A4122A28";
+	rename -uid "4C21EFC9-47A6-DC21-29F9-EFABB4AC847D";
 createNode displayLayerManager -n "layerManager";
-	rename -uid "EC059652-4A0E-10BE-72DC-95ADB88660BB";
+	rename -uid "415C1802-4424-C8CB-9B36-B68FFBD7F5A3";
 createNode displayLayer -n "defaultLayer";
-	rename -uid "37A0011F-405D-9999-FBA3-E0AB8EB549AB";
+	rename -uid "FE18F32B-4997-7D8D-EF17-42A697D4D2F9";
 createNode renderLayerManager -n "renderLayerManager";
-	rename -uid "629C541B-43DA-754D-A300-6CA4C16C4DCE";
+	rename -uid "FD277842-48F0-B46A-2A76-3AAE8C422960";
 createNode renderLayer -n "defaultRenderLayer";
-	rename -uid "C83CC209-4935-B4AD-007D-96B99E24B4C7";
+	rename -uid "69C22F8E-4EC3-8F39-D4CB-57977C315272";
 	setAttr ".g" yes;
 createNode polySphere -n "polySphere1";
-	rename -uid "9AF3B720-4AE5-04D0-681E-3581A8A94D4C";
+	rename -uid "6944BD2B-4081-40D8-1844-698CA4C00CB6";
 createNode polySphere -n "polySphere2";
-	rename -uid "364FA9D8-4E8A-AAD7-97EC-5294B78C160A";
+	rename -uid "5910C45D-4FF0-D325-46C9-A180F0F2311B";
 createNode transformGeometry -n "transformGeometry1";
-	rename -uid "F9D2E322-4FE4-08A1-3ED7-76BABB668260";
+	rename -uid "354E1A0B-4781-306A-6D5A-EE8448C2E4D8";
 	setAttr ".txf" -type "matrix" 1 0 0 0 0 0.61002036162039175 0 0 0 0 1 0 0 1.8071434660858978 -2.0340282833537242 1;
 createNode transformGeometry -n "transformGeometry2";
-	rename -uid "665134A8-4FD5-1968-9B54-ED926D5BB9DE";
+	rename -uid "0D4CB63F-49A9-42C1-EF28-50B641F0B829";
 	setAttr ".txf" -type "matrix" 0.51313602644227829 0 0 0 0 0.26279409002056547 0 0
 		 0 0 0.51313602644227829 0 -0.91899252633054129 1.0282276377273223 -1.9069982110642172 1;
 createNode transformGeometry -n "transformGeometry3";
-	rename -uid "2E4A7F50-4408-40B3-F790-088D9B04E652";
+	rename -uid "67D8AACB-4A11-78F1-11E0-D0A89E937490";
 	setAttr ".txf" -type "matrix" 2.2204460492503131e-16 0 1 0 0 1 0 0 -1 0 2.2204460492503131e-16 0
 		 0 0 0 1;
 createNode transformGeometry -n "transformGeometry4";
-	rename -uid "A2BAFD9B-4387-814C-FE3F-D7AE7B2EBBAD";
+	rename -uid "893B8AB2-47DB-2621-AD9F-ECB131D0F6DB";
 	setAttr ".txf" -type "matrix" 2.2204460492503131e-16 0 1 0 0 1 0 0 -1 0 2.2204460492503131e-16 0
 		 0 0 0 1;
 createNode zEmbedder -n "zEmbedder1";
-	rename -uid "BB7F61FD-4CB1-9334-3001-3C9B0BDAC403";
+	rename -uid "86E36773-4458-F83C-705A-D7ADC2D960A1";
 	setAttr -s 2 ".ip";
 	setAttr -s 2 ".og";
 	setAttr -s 2 ".iGo";
 createNode zGeo -n "zGeo1";
-	rename -uid "F28BC026-46CB-0E29-A36E-D3929271FD9B";
+	rename -uid "EBFD3024-4C8A-3F7A-C450-88BD4E87E96A";
 	setAttr ".ihi" 0;
 	setAttr ".mDe" 1;
 	setAttr ".IDL" 1;
 createNode zBone -n "zBone1";
-	rename -uid "FEF87049-4DC5-9DC2-BADA-019E679E6988";
+	rename -uid "2962BE76-42A4-C91C-AF8D-B5A21E50B140";
 createNode zGeo -n "zGeo2";
-	rename -uid "4500D748-4883-E292-4FCC-92B66B10DB8A";
+	rename -uid "A027F345-45E0-4197-4622-95A6AB5AFEFE";
 	setAttr ".ihi" 0;
 	setAttr ".mDe" 1;
 	setAttr ".IDL" 2;
 createNode zBone -n "zBone2";
-	rename -uid "C2C7A82E-41C9-3EA6-7B42-A69D8E8DDB37";
+	rename -uid "45C11EC4-4C26-9110-D4F6-55BC40ECB66E";
 createNode zGeo -n "zGeo3";
-	rename -uid "AB537AA4-44FC-8B1B-FB8B-EDAE13EBDB86";
+	rename -uid "373F3CD7-4AA4-98C0-72F8-A7B1CC1B5D23";
 	setAttr ".ihi" 0;
 	setAttr ".iNMh" -type "mesh" 
 
@@ -12131,54 +12131,46 @@ createNode zGeo -n "zGeo3";
 		"lt"	3	397	398	438	;
 	setAttr ".IDL" 3;
 createNode zTissue -n "zTissue1";
-	rename -uid "A79A6185-4483-AFB8-E21A-DAADA4E7D515";
+	rename -uid "2EB14DFF-4B23-186F-364E-7DAB195EDC4F";
 	setAttr -cb off ".taf";
-	setAttr ".SzC" -type "zSerializedBinaryData" ("eNqVVG1M1XUU/l94sCuEBpUGIubL7kpQKSi6/1ecWhezGi8uFissx1iS03hR+qBEtbCpTEupKN4swULWVlBmH64428CygAITm4ADKkUgmLoRc53nz7xbjA/05bf/yznPOc/znN8pdIQ4HIqiOByOVEVxxrf31CQursp2RhibD7bMctX5bXcoKNlS70bCyvtUXH8u0UBYwRs60u9OU3Hu0RI3vnM4VSyZIyFtBXeYKAuAAdeNFRbmHZLXV7oetmA8v0mDi0eI71tcSpCGmtZwC1+cL7RwckW7iWwWWspCF8YiTRx79gELzg0pKvZcqNNw40mHicIYQfZ3BWoIC6oz8XGb5NazZDRL/skOzhKqj/Cf++A3MyPCl1FElMh0IbOXZBb25hooKI600K0cNtAwe48bd20Rgg189ePfbfybQZYD5PsYu2pnk5+yyats7U02WUtd/OJFl9aX5ekgoa7n/O3GkSyXCu2qYkHvesrCYH+WiaoFTTru7SzQ8fXZcB3Vb/+m4feCIB0p48MGLsc9Y+GHwB0meqtjdCxv/cNAhzPJgmds3MTGlmZxIa1Nw4HM2TpWjuTqmAier6N0Xo4FRXndQnNpmoV1RS0mtrKDQnbgPRNkojF/rYXMyGATy08VaegkaDJBMwkaz0JVfU+LnLfyTYwMRevoaJSGKlkomYUwRwq9wOKhEyJn4005Puy+/WQXn8FhB08BmGnuaUq3xifnFcrZTZkSKN0lStdE6abL3d2/X0PrrnIN6859r04eq4mybEBQRon8BJHt4E2HRMR6r4jojRFhr9GoYRp1/2tiVAnNm0LfZjRTHmX/Tftf+lXQrQy61UUHN9LBXbT7iG8EfuYITJdrDXvVyWPvsRINdUcrNFzigLyXK6OSdF4GJLjqThOD97ylIbxUhiaR8GtZMoYl7aGZDvlxQoHI9qESfoCD1M1B6uIgfcLh+pGWFVNs+1a4acB0eNG0ZwMt20fLoviaTlN20pRvYm5TfYSNnyaFMg51Dwe9iYPu5aCfqBQyqSQzcVh+eEiwNOcjucTr33XjoZAxE7PSPBa01TDRllOto5LLaIlLLnvYKqeJd8YsCxcdHSbmehJ0xK6XG78q9LiGRKI0EmUn7/7NU8Vu7GPwXwyOYvAiAsRxeXiOz1fx7TUxuWJUjvI+OfJ+laPnM9lcXyLWQqo3Q0PAT7KgvKZ8iyj3NyZDpqQF84fCuBrG2Xstn3utdpnsukruunHyMMjNSW5ucttNWkGkpX8gK81/u2y4iz15BoIZks2QhbmStoZp/7woK/KXPFmRU9q1e6n1rddQrtz+JFm5J0hhPymMktGUDBvlqG8N72C7vWzXRplLlA6i2MhbKV0UpTtAOQcpp4eyG5S9OUz2buBXySpGLssavkUDrtCKpVzcL3XKBu5mRgBRFhDFNmWYwWeY+yBzX6UfWXRmMZk3U7BYMg+gGkPURaNM49tEpvcpxBAlOclCfSzZQM8XNYnnKksOyNL/F9cSSaI=") ;
+	setAttr ".SzC" -type "zSerializedBinaryData" ("eNrtV3lYz+kW/8UnV7aGGVuaYWpUZAlx/b7L+1oS0nW1zMiaLBNSXWUpIvvySGMs2QvJzoMMsmUpZC0GWQZRIUsUIsbcc5gaebjTvc/8ef85z/f7+77nvOf9nM/nvOcXblLVxMRgMJiYmHgaDOUjt57uEBOaYF7eUh/wY0o5m41lBpU1IHLoZiPaNKmlYK9JeQVWVeg1LeRvAktMocPmeWOJGvPpddiV5hJ6n34qHD0qqliTaiEx4/JGFc+7mAiEO9C6sjYVVNSuuFFgWVq4xGYO0IgD3OV4G9hjAC+xLF4ykd12mM0w4rOhXgp2GBboKJMRrCNw+lcS3pxLNmfV2tVDwbn8rwRWd7eTuM9bTubNU4eQ248c4FnQEyNW+dooeJDlK7ByWroKj8JcHbcc/ylxssIogYyVDhoulneTcM8vFBiUclzD31Pv6FiR2ZWSfDNS4PGjRhou/ERuMYPMNLg/DtaAKjU19PVKU1HtNeX8UwGZxTeKngyGCR83ba/8Q+KbbMolr84hDR3vG37/0G++F4GTmCKQ6BAk8fCEhYZcTrdeaEUNkRdDtA/3eLvvJzf6wPzh8cn8rjNM84IJMLdLThKVV1QSePDFFBUWURUFOjM4TgyOA4PzFrCPRXGOi1aB3ETlnVHWRarIZhBvMIhXGMRYBvYU12M6Y6AyBkbG5YNQjU4nK3DNmq0iYtxyFfb82othGs0w7WKY3q7z5CSjgpYSGVzmGhHD3LWyIYJE5EuJeyYXBOw7tdFQt2l5AUemT6dNNRUszyQgTM8Q1xIFMdFyeVkdlb06Sfi1hcCXwSs1tK+aL/DKp7OO8yMmaYjOI4+3biN+JpPwkDFtfE5gN1pIzE70VpG3nkKZ829vOJcczsqaWdz/YqQRNzgXU86lDufyNr/cW0TgpNpE4Abx7gqGc2q+nOTXnMbxIEqjBadhyqkVBpIWFnIujzgrhYNmM9vvbamjoYPvHAVZifdVpPQPF0itvE3BgKgEFbPMdIlN8QESux9RznNa9pIINP2XRPVm9SWE62sBZ784FXVdFRXes5oJ+CwIlrDOjBV42HGNjjCflhLPZlCA82cogH1gX3oqR27XU0mSp3z8JXp94aKi1Xw6TFqTX1Q8uBWloDCyncSJ7xoYMWpeiMSB87E6atxfpmL7MTrq8kXTVYRZeUpY3qsoUW/xER1+C+cKDGGcmz1jiE+GSaw4MVDiVga9tmfsM7MoqOtA2vKUp1Tg1p5+632MUovfHyix2rOZBhPLBjqqWWUJzEnrpWPPAmKshccQgQLnCgI9F5FHaHCRDPzsZ2tYGz9AIulF2O+/ieTxEhlLyNQwo3Vxqqn6HjEPH6IP/nbk0a3eOIk9aWQuvSRzfjj1sHW1Ngh47iLjaL5ZID9vrgZL93AV43OtJNyeVJH4Vt8tMKp2P4G7URQqwZF87Rxo8zxJu+3waSvRMdRPYkgcvY471ozOdpncrF8kCdjeSNGxtJqpQLzTLipUN1ry/CmZLlfHKJjYZrCGezY+Es1dKGjz3rkafmPohjUZKbHvMT2ZT6dSZLBHQg4t2eVJpfUOJ0y7TjCTSLFWBF7M/J66nsFBQG5qTdiPtZaICD6kw7ZdskBoGPlWbUvp1lxATzHplKl7ND2NMZJxzKBQpyLpXvBOryORfWOnwBiv3gIXvRPp6ghsKqgJEqWy+pbR4cw1SmAKKEyBq0yBiJIU2MMUiCtJgfLZtIcbU6Dzd0QBD6bAIKbAGaaAfXeiQMiXRIEDXJkrXBnbIKpMJldmPVdmKFemV0kefN6YeJDOPEgp5oFkHtxmHtRiHqSIEjw4wjyIYR54Mg/uDdyqY84vLzXELkrSsWV4S4Hqn1OhlnHhQ7jwnwkqfDIXPocLv5cL35ALn8+FP8OF71pc+Ggu/DUu/AgufAEXvlx2qITPAPqafNtNxTx7Jw0bVjXUsdGVFbCUjr89gMS+8PZLgR6PqJZfW1MtQzjefG5ah5xGSPjeo30tVEeJ"
+		+ "8ZuJDPXy6UN4FyJIpSrdjLA4Rq8vFtKS8O53NZyN6KdhoCRKLffaL5B+aCzdVuN9jIib3U3Bs2XTSPaHV+lov2a9ij5e1Mdlzm0Nq1wWKXj+mJp+2UPTlXeA5QaU7sq6lVC6dfYnS7euW/Sfrpv60k6Hm2N1AfeN1Llqn7usolYBIbSIwTkSQeCsHltXYt5IYt1WK+p/Vi/pRrQ8WE7A440vCaJanMDSrsTspreYu75/uuW1Y00lCro1kejbdovy3gfPzu4UwHmWjgBnIvqmiG0C/fdvEdQjOJdgYYT5TB9qvvUolyV9xghkl6HNKxRz43QWcWNsY+LGxljixnbmxknmxiSer2K86TBm6dxpssjUsafbfsZ5EtgVfm22pQO9LsgVaD6JhPibSpJcHHZKRVvNVsXgJ3RRdTlO6zz6Ek+3Zn8j0cTnV4Gxo+lOKTxJe7RrHKfD0pae1vovIzgfF9CcEzBNx5lzdUl5sXQpRYzaq747ln/xscxG0LHs+Fg3+Vjr+FilRfIKI/mKkexXEsnujGQLRtKfkRwet1lFu4ETVJxIDTBiew4Z232VjYgNJ5PG9L7P6kli9Rxh9Qxi9YSyehawepJZPUNZPS1YPVOL1TON1bPNvEg9JotoyeQepJ5GP5B6glk92SwciwkkHM8fSDjlokk4dkdIOI5rSTh+LJxd06kX206jatVIpSj7mWa9mWa7mXpLmHq7X1FXnjaTbudWTLi1TLgkpzSB1kfJLXPGZIG5mzaoyIzeq2N58hOBoysO6HDIKp1SMvaUbl2LSTQTJjndEbA624Mmxp6tNNg9ogPW541cas0XqO1iTofJ+i+G1A/Mutvku5bH1dEfmVnTT3WUBkOpgx1cP1xiDUU0YEq6K/WywxTyei6Z7D1BNFMVWqgY2X+g9lFnv4ZZKvJ33tT+16N80nT0uUlDrT/Ro894GgZN6z6mu+/uUInW3v7yL9/t/+avNxeY4Tk8qcxpailgo4/7+Lqj3XfSTIqeOp42n6lhSpC/hqdj6d/Cfw7v6vNSxVd39tAfnlCK7MxjyOXXIQIxg6kHvGBORtVuR+PUcBpvz1r+TJdx2FYV665uouZg6K1gfQh1XbftNG2U404cwT35j/CRGUXKivu16Ol77pIPBlCXDOMu+S13yby91CADuUtWjLenSaWQFpfZcZD+yEx0Ikl12FWZen42/eiwk/pY9WsuJFD3rQpadj+mYf3TotDjytIZeuSXUHPAo6LXqLMU8G3o7ftoEzmTxqHbDO+JV2QuHdzx/vBV/3KxW17R077iM1RqSv/rhl0wSjzIidcQmkiz57Uwgnzm6roqmrhP1dBmagv93zjiBzk=") ;
 createNode zTet -n "zTet1";
-	rename -uid "425B4B59-4295-408B-0551-2EB5E5B754F2";
+	rename -uid "C8892119-4819-6F30-EBAA-8A897DB1FCDB";
 	setAttr -l on -k off ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0
+		 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0
+		 0 0 0 0.97254902 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0
+		 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0
+		 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0
+		 0 0 0 0 0 0.9254902 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.98039216 1 1 1 1 1 0
+		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0
 		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		 0 0 0 0 0 0 0 0 0 0 0 0;
 	setAttr -k off ".wl[0].w";
 	setAttr ".tetSz" 0.57142871618270874;
-	setAttr ".cHash" -type "long2" 372207647 -265528088 ;
+	setAttr ".cHash" -type "long2" 1491413975 733424853 ;
 	setAttr ".iT" -type "mesh" 
 
 
-		"v"	116
+		"v"	240
 		1.8516482	1.2357147	-1.1983848
 		2.3119032	1.2357148	-0.85971659
 		1.9124416	1.5214291	-0.79892319
 		1.9124416	0.95000035	-0.79892319
 		2.2511098	1.5214291	-1.2591782
-		2.7721581	1.2357148	-0.52104849
-		2.3726966	1.5214291	-0.46025503
-		2.3726966	0.95000041	-0.46025503
-		2.7113647	1.5214291	-0.92051005
-		3.2324133	1.2357148	-0.18238033
-		2.8329518	1.5214291	-0.1215869
-		2.8329518	0.95000041	-0.1215869
-		3.1716199	1.5214291	-0.58184189
 		1.5129801	1.2357147	-0.73812973
 		1.4521867	1.5214291	-1.1375914
 		1.9732351	1.2357147	-0.3994616
+		2.3726966	0.95000041	-0.46025503
+		2.3726966	1.5214291	-0.46025503
 		1.5737735	1.5214291	-0.33866817
 		1.5737735	0.95000035	-0.33866817
 		2.43349	1.2357148	-0.060793467
 		2.0340285	0.95000041	-3.5463177e-08
 		2.0340285	1.5214291	-3.5463177e-08
-		2.8937452	1.2357148	0.27787468
-		3.2932067	1.5214291	0.21708123
-		2.4942834	1.5214291	0.33866811
-		2.4942834	0.95000041	0.33866811
 		1.174312	1.2357147	-0.27787474
 		1.1135185	1.5214291	-0.67733634
 		1.6345669	1.2357147	0.060793396
@@ -12187,91 +12179,225 @@ createNode zTet -n "zTet1";
 		2.0948219	1.2357148	0.39946154
 		1.6953604	0.95000035	0.46025497
 		1.6953604	1.5214291	0.46025497
-		2.5550771	1.2357148	0.73812968
-		2.9545386	1.5214291	0.67733622
-		2.1556153	1.5214291	0.79892313
-		2.1556153	0.95000041	0.79892313
 		0.83564383	1.2357147	0.18238026
 		0.77485037	1.5214291	-0.21708131
 		1.2958988	1.2357147	0.52104843
 		0.89643723	1.5214291	0.58184183
 		1.7561538	1.2357147	0.85971653
+		2.1556153	0.95000041	0.79892313
+		2.1556153	1.5214291	0.79892313
 		1.3566922	1.5214291	0.92050999
 		2.2164087	1.2357148	1.1983846
-		2.6158705	1.5214291	1.1375912
 		1.8169472	1.5214291	1.2591782
 		1.8516482	1.8071434	-1.1983848
 		2.3119032	1.8071434	-0.85971659
 		2.6505713	1.8071434	-1.3199716
-		2.7113647	2.0928578	-0.92051005
 		2.2511098	2.0928578	-1.2591782
 		1.9124416	2.0928578	-0.79892319
-		2.7721581	1.8071434	-0.52104849
-		3.1108265	1.8071434	-0.98130345
-		3.1716199	2.0928578	-0.58184189
-		2.3726966	2.0928578	-0.46025503
-		3.2324133	1.8071434	-0.18238033
-		2.8329518	2.0928578	-0.1215869
 		1.5129801	1.8071434	-0.73812973
 		1.4521867	2.0928578	-1.1375914
 		1.0527251	1.8071434	-1.0767978
 		1.1135185	2.0928578	-0.67733634
 		1.9732351	1.8071434	-0.3994616
 		1.5737735	2.0928578	-0.33866817
-		2.43349	1.8071434	-0.060793467
-		2.0340285	2.0928578	-3.5463177e-08
-		2.8937452	1.8071434	0.27787468
-		3.2932067	2.0928578	0.21708123
-		2.4942834	2.0928578	0.33866811
-		3.3540001	1.8071434	0.61654282
-		2.9545386	2.0928578	0.67733622
 		1.174312	1.8071434	-0.27787474
 		0.71405697	1.8071434	-0.61654288
 		0.77485037	2.0928578	-0.21708131
 		1.6345669	1.8071434	0.060793396
+		2.0340285	2.0928578	-3.5463177e-08
 		1.2351054	2.0928578	0.12158683
 		2.0948219	1.8071434	0.39946154
+		2.4942834	1.5214291	0.33866811
 		1.6953604	2.0928578	0.46025497
-		2.5550771	1.8071434	0.73812968
-		2.1556153	2.0928578	0.79892313
-		3.015332	1.8071434	1.0767978
-		2.6158705	2.0928578	1.1375912
 		0.83564383	1.8071434	0.18238026
 		1.2958988	1.8071434	0.52104843
 		0.95723069	1.8071434	0.98130339
 		1.3566922	2.0928578	0.92050999
 		0.89643723	2.0928578	0.58184183
 		1.7561538	1.8071434	0.85971653
+		2.1556153	2.0928578	0.79892313
 		1.4174857	1.8071434	1.3199716
 		1.8169472	2.0928578	1.2591782
 		2.2164087	1.8071434	1.1983846
 		1.8516482	2.3785722	-1.1983848
 		2.3119032	2.3785722	-0.85971659
 		1.9124416	2.6642866	-0.79892319
-		2.7721581	2.3785722	-0.52104849
-		2.3726966	2.6642866	-0.46025503
-		3.2324133	2.3785722	-0.18238033
-		2.8329518	2.6642866	-0.1215869
 		1.5129801	2.3785722	-0.73812973
 		1.9732351	2.3785722	-0.3994616
 		1.5737735	2.6642866	-0.33866817
-		2.43349	2.3785722	-0.060793467
-		2.0340285	2.6642866	-3.5463177e-08
-		2.8937452	2.3785722	0.27787468
-		2.4942834	2.6642866	0.33866811
 		1.174312	2.3785722	-0.27787474
 		1.6345669	2.3785722	0.060793396
 		1.2351054	2.6642866	0.12158683
 		2.0948219	2.3785722	0.39946154
 		1.6953604	2.6642866	0.46025497
-		2.5550771	2.3785722	0.73812968
-		2.1556153	2.6642866	0.79892313
 		0.83564383	2.3785722	0.18238026
 		1.2958988	2.3785722	0.52104843
 		1.7561538	2.3785722	0.85971653
 		2.2164087	2.3785722	1.1983846
+		2.1556153	2.6642866	0.79892313
+		2.8025548	1.3785719	-0.32131767
+		3.0326824	1.3785719	-0.15198362
+		2.8329518	1.5214291	-0.1215869
+		2.8329518	1.2357148	-0.1215869
+		3.0022857	1.5214291	-0.3517144
+		2.6028242	1.2357148	-0.29092097
+		2.6332209	1.0928576	-0.091190182
+		2.6332209	1.3785719	-0.091190182
+		2.4030933	1.3785719	-0.26052424
+		2.6028242	1.5214291	-0.29092097
+		2.5724275	1.3785719	-0.49065176
+		2.8633485	1.3785719	0.078143887
+		3.0630791	1.5214291	0.047747169
+		2.6636176	1.2357148	0.1085406
+		2.4638867	1.3785719	0.13893732
+		2.4638867	1.0928576	0.13893732
+		2.6940143	1.3785719	0.30827138
+		2.4942834	1.2357148	0.33866811
+		2.6636176	1.5214291	0.1085406
+		2.5246801	1.3785719	0.53839886
+		2.9241419	1.3785719	0.47760546
+		2.7548077	1.3785719	0.70773298
+		2.9545386	1.5214291	0.67733622
+		2.724411	1.5214291	0.50800216
+		2.724411	1.2357148	0.50800216
+		2.7721581	1.5214291	-0.52104849
+		2.7721581	1.8071434	-0.52104849
+		2.8025548	1.6642863	-0.32131767
+		2.971889	1.6642863	-0.55144519
+		2.5724275	1.6642863	-0.49065176
+		2.7417614	1.6642863	-0.72077924
+		2.7417614	1.3785719	-0.72077924
+		2.7113647	1.5214291	-0.92051005
+		2.5420308	1.5214291	-0.69038254
+		2.9414923	1.8071434	-0.751176
+		2.971889	1.9500006	-0.55144519
+		2.7417614	1.9500006	-0.72077924
+		2.5420308	1.8071434	-0.69038254
+		2.3422999	1.6642863	-0.65998584
+		2.5116341	1.6642863	-0.89011335
+		2.5116341	1.9500006	-0.89011335
+		2.3422999	1.9500006	-0.65998584
+		2.5724275	1.9500006	-0.49065176
+		2.7113647	2.0928578	-0.92051005
+		2.5420308	2.0928578	-0.69038254
+		2.3726966	2.0928578	-0.46025503
+		2.7113647	1.8071434	-0.92051005
+		3.0326824	1.6642863	-0.15198362
+		3.0022857	1.8071434	-0.3517144
+		2.8025548	1.9500006	-0.32131767
+		3.0326824	1.9500006	-0.15198362
+		2.8329518	2.0928578	-0.1215869
+		2.8329518	1.8071434	-0.1215869
+		3.0022857	2.0928578	-0.3517144
+		2.8937452	1.5214291	0.27787468
+		2.8937452	1.8071434	0.27787468
+		2.9241419	1.6642863	0.47760546
+		3.0934758	1.6642863	0.24747795
+		2.6940143	1.6642863	0.30827138
+		2.8633485	1.6642863	0.078143887
+		3.0630791	1.8071434	0.047747169
+		3.0934758	1.9500006	0.24747795
+		2.8633485	1.9500006	0.078143887
+		3.0630791	2.0928578	0.047747169
+		3.1238725	1.8071434	0.44720873
+		2.9241419	1.9500006	0.47760546
+		2.5550771	1.5214291	0.73812968
+		2.5550771	1.8071434	0.73812968
+		2.5854738	1.6642863	0.93786049
+		2.7548077	1.6642863	0.70773298
+		2.3553462	1.6642863	0.76852638
+		2.3553462	1.3785719	0.76852638
+		2.3857429	1.5214291	0.96825719
+		2.5246801	1.6642863	0.53839886
+		2.3249495	1.5214291	0.56879562
+		2.724411	1.8071434	0.50800216
+		2.7548077	1.9500006	0.70773298
+		2.9545386	1.8071434	0.67733622
+		2.6940143	1.9500006	0.30827138
+		2.5246801	1.9500006	0.53839886
+		2.9545386	2.0928578	0.67733622
+		2.724411	2.0928578	0.50800216
+		2.4942834	2.0928578	0.33866811
+		2.7852044	1.8071434	0.90746373
+		2.5854738	1.9500006	0.93786049
+		2.3857429	1.8071434	0.96825719
+		2.186012	1.6642863	0.99865389
+		2.3553462	1.9500006	0.76852638
+		2.186012	1.9500006	0.99865389
+		2.1556153	1.8071434	0.79892313
+		2.3857429	2.0928578	0.96825719
+		2.3119032	2.0928578	-0.85971659
+		2.3422999	2.2357149	-0.65998584
+		2.5116341	2.2357149	-0.89011335
+		2.7721581	2.0928578	-0.52104849
+		2.8025548	2.2357149	-0.32131767
+		2.5724275	2.2357149	-0.49065176
+		2.6028242	2.0928578	-0.29092097
+		2.7417614	2.2357149	-0.72077924
+		2.5420308	2.3785722	-0.69038254
+		2.3726966	2.3785722	-0.46025503
+		3.0326824	2.2357149	-0.15198362
+		2.8329518	2.3785722	-0.1215869
+		2.43349	1.8071434	-0.060793467
+		2.43349	2.0928578	-0.060793467
+		2.4638867	1.9500006	0.13893732
+		2.6332209	1.9500006	-0.091190182
+		2.43349	2.3785722	-0.060793467
+		2.4638867	2.2357149	0.13893732
+		2.6332209	2.2357149	-0.091190182
+		2.6636176	2.0928578	0.1085406
+		2.2337594	1.9500006	-0.030396752
+		2.2337594	2.2357149	-0.030396752
+		2.2641561	2.0928578	0.16933404
+		2.4030933	1.9500006	-0.26052424
+		2.4030933	2.2357149	-0.26052424
+		2.2033627	2.0928578	-0.23012754
+		2.6028242	2.3785722	-0.29092097
+		2.6332209	2.5214293	-0.091190182
+		2.4030933	2.5214293	-0.26052424
+		2.2033627	2.3785722	-0.23012754
+		2.0036318	2.2357149	-0.19973083
+		2.1729658	2.2357149	-0.42985833
+		2.0036318	2.5214293	-0.19973083
+		2.2337594	2.5214293	-0.030396752
+		2.0340285	2.6642866	-3.5463177e-08
+		2.0340285	2.3785722	-3.5463177e-08
+		2.1729658	2.5214293	-0.42985833
+		2.8937452	2.0928578	0.27787468
+		2.6940143	2.2357149	0.30827138
+		2.9241419	2.2357149	0.47760546
+		2.8633485	2.2357149	0.078143887
+		2.6636176	2.3785722	0.1085406
+		2.4638867	2.5214293	0.13893732
+		2.4942834	2.3785722	0.33866811
+		2.2641561	2.3785722	0.16933404
+		2.2945528	2.2357149	0.36906481
+		2.2945528	2.5214293	0.36906481
+		2.0644252	2.2357149	0.19973075
+		2.0644252	2.5214293	0.19973075
+		2.2641561	2.6642866	0.16933404
+		2.5550771	2.0928578	0.73812968
+		2.3553462	2.2357149	0.76852638
+		2.5246801	2.2357149	0.53839886
+		2.3249495	2.0928578	0.56879562
+		2.7548077	2.2357149	0.70773298
+		2.724411	2.3785722	0.50800216
+		2.3249495	2.3785722	0.56879562
+		2.1252186	2.2357149	0.59919232
+		2.43349	1.5214291	-0.060793467
+		2.4638867	1.6642863	0.13893732
+		2.6332209	1.6642863	-0.091190182
+		2.4030933	1.6642863	-0.26052424
+		2.6028242	1.8071434	-0.29092097
+		2.5246801	1.0928576	0.53839886
+		2.5550771	1.2357148	0.73812968
+		2.6636176	1.8071434	0.1085406
+		2.3726966	1.8071434	-0.46025503
+		2.4942834	1.8071434	0.33866811
+		2.1425691	2.3785722	-0.62958908
+		2.2033627	2.6642866	-0.23012754
 
-		"e"	567
+		"e"	1258
 		2	1	"smooth"
 		1	0	"smooth"
 		0	2	"smooth"
@@ -12281,564 +12407,1255 @@ createNode zTet -n "zTet1";
 		4	1	"smooth"
 		0	4	"smooth"
 		2	4	"smooth"
-		6	5	"smooth"
-		5	1	"smooth"
-		1	6	"smooth"
-		7	6	"smooth"
-		1	7	"smooth"
-		5	7	"smooth"
-		8	5	"smooth"
+		3	5	"smooth"
+		5	0	"smooth"
+		5	2	"smooth"
+		6	2	"smooth"
+		0	6	"smooth"
+		5	6	"smooth"
+		8	7	"smooth"
+		7	1	"smooth"
 		1	8	"smooth"
-		6	8	"smooth"
-		10	9	"smooth"
-		9	5	"smooth"
+		9	8	"smooth"
+		1	9	"smooth"
+		7	9	"smooth"
+		2	7	"smooth"
+		7	3	"smooth"
+		2	9	"smooth"
+		10	7	"smooth"
+		7	5	"smooth"
 		5	10	"smooth"
 		11	10	"smooth"
 		5	11	"smooth"
-		9	11	"smooth"
-		12	9	"smooth"
-		5	12	"smooth"
-		10	12	"smooth"
-		3	13	"smooth"
-		13	0	"smooth"
-		13	2	"smooth"
-		14	2	"smooth"
-		0	14	"smooth"
+		7	11	"smooth"
+		10	2	"smooth"
+		13	12	"smooth"
+		12	7	"smooth"
+		7	13	"smooth"
+		8	13	"smooth"
+		12	8	"smooth"
+		14	12	"smooth"
+		7	14	"smooth"
 		13	14	"smooth"
-		7	15	"smooth"
-		15	1	"smooth"
-		15	6	"smooth"
-		2	15	"smooth"
-		15	3	"smooth"
-		2	6	"smooth"
-		16	15	"smooth"
-		15	13	"smooth"
-		13	16	"smooth"
-		17	16	"smooth"
+		11	15	"smooth"
+		15	5	"smooth"
+		15	10	"smooth"
+		16	10	"smooth"
+		5	16	"smooth"
+		15	16	"smooth"
 		13	17	"smooth"
-		15	17	"smooth"
-		16	2	"smooth"
-		11	18	"smooth"
-		18	5	"smooth"
-		18	10	"smooth"
-		6	18	"smooth"
-		18	7	"smooth"
-		6	10	"smooth"
+		17	7	"smooth"
+		17	14	"smooth"
+		11	17	"smooth"
+		13	11	"smooth"
+		10	17	"smooth"
+		10	14	"smooth"
+		18	17	"smooth"
+		17	15	"smooth"
+		15	18	"smooth"
 		19	18	"smooth"
-		18	15	"smooth"
 		15	19	"smooth"
-		7	19	"smooth"
-		20	18	"smooth"
-		15	20	"smooth"
-		19	20	"smooth"
-		20	6	"smooth"
-		10	21	"smooth"
-		21	9	"smooth"
-		21	11	"smooth"
-		22	21	"smooth"
-		9	22	"smooth"
-		10	22	"smooth"
-		23	21	"smooth"
-		21	18	"smooth"
-		18	23	"smooth"
-		24	23	"smooth"
-		18	24	"smooth"
-		21	24	"smooth"
-		23	10	"smooth"
-		17	25	"smooth"
-		25	13	"smooth"
-		25	16	"smooth"
-		26	16	"smooth"
-		13	26	"smooth"
+		17	19	"smooth"
+		18	10	"smooth"
+		14	20	"smooth"
+		20	12	"smooth"
+		20	13	"smooth"
+		21	20	"smooth"
+		20	17	"smooth"
+		17	21	"smooth"
+		13	21	"smooth"
+		22	20	"smooth"
+		17	22	"smooth"
+		21	22	"smooth"
+		22	14	"smooth"
+		19	23	"smooth"
+		23	15	"smooth"
+		23	18	"smooth"
+		24	18	"smooth"
+		15	24	"smooth"
+		23	24	"smooth"
+		21	25	"smooth"
+		25	17	"smooth"
+		25	22	"smooth"
+		18	25	"smooth"
+		25	19	"smooth"
+		18	22	"smooth"
+		25	23	"smooth"
+		26	18	"smooth"
+		23	26	"smooth"
 		25	26	"smooth"
-		19	27	"smooth"
-		27	15	"smooth"
-		27	20	"smooth"
-		17	27	"smooth"
-		19	17	"smooth"
-		16	27	"smooth"
-		16	20	"smooth"
 		28	27	"smooth"
-		27	25	"smooth"
-		25	28	"smooth"
+		27	20	"smooth"
+		20	28	"smooth"
 		29	28	"smooth"
-		25	29	"smooth"
+		20	29	"smooth"
 		27	29	"smooth"
-		28	16	"smooth"
-		24	30	"smooth"
-		30	18	"smooth"
-		30	23	"smooth"
-		19	30	"smooth"
-		24	19	"smooth"
-		20	30	"smooth"
-		20	23	"smooth"
-		31	30	"smooth"
-		30	27	"smooth"
-		27	31	"smooth"
-		19	31	"smooth"
-		32	30	"smooth"
+		22	27	"smooth"
+		27	21	"smooth"
+		22	29	"smooth"
+		27	25	"smooth"
+		30	22	"smooth"
+		25	30	"smooth"
+		27	30	"smooth"
+		29	31	"smooth"
+		31	27	"smooth"
+		32	29	"smooth"
 		27	32	"smooth"
 		31	32	"smooth"
-		32	20	"smooth"
-		23	33	"smooth"
-		33	21	"smooth"
-		33	24	"smooth"
+		28	31	"smooth"
+		2	33	"smooth"
+		33	0	"smooth"
+		33	4	"smooth"
+		6	33	"smooth"
+		4	34	"smooth"
+		34	1	"smooth"
+		34	2	"smooth"
+		36	34	"smooth"
+		34	35	"smooth"
+		35	36	"smooth"
+		4	36	"smooth"
+		35	4	"smooth"
 		34	33	"smooth"
-		21	34	"smooth"
-		23	34	"smooth"
-		35	33	"smooth"
-		33	30	"smooth"
-		30	35	"smooth"
-		36	35	"smooth"
-		30	36	"smooth"
+		37	34	"smooth"
+		33	37	"smooth"
+		2	37	"smooth"
 		33	36	"smooth"
-		35	23	"smooth"
-		29	37	"smooth"
-		37	25	"smooth"
-		37	28	"smooth"
-		38	28	"smooth"
-		25	38	"smooth"
-		37	38	"smooth"
-		31	39	"smooth"
-		39	27	"smooth"
-		39	32	"smooth"
-		28	39	"smooth"
-		39	29	"smooth"
-		28	32	"smooth"
+		37	36	"smooth"
+		10	38	"smooth"
+		38	5	"smooth"
+		38	2	"smooth"
+		16	38	"smooth"
+		6	38	"smooth"
+		16	6	"smooth"
+		38	33	"smooth"
+		38	37	"smooth"
+		39	38	"smooth"
+		33	39	"smooth"
+		6	39	"smooth"
 		39	37	"smooth"
-		40	28	"smooth"
-		37	40	"smooth"
-		39	40	"smooth"
-		36	41	"smooth"
-		41	30	"smooth"
-		41	35	"smooth"
-		32	41	"smooth"
-		41	31	"smooth"
-		32	35	"smooth"
+		38	40	"smooth"
+		40	16	"smooth"
+		40	6	"smooth"
+		41	38	"smooth"
+		40	41	"smooth"
+		16	41	"smooth"
+		40	39	"smooth"
 		41	39	"smooth"
-		42	32	"smooth"
-		39	42	"smooth"
-		41	42	"smooth"
-		35	43	"smooth"
-		43	33	"smooth"
-		43	36	"smooth"
+		14	42	"smooth"
+		42	7	"smooth"
+		9	14	"smooth"
+		42	9	"smooth"
+		10	42	"smooth"
+		2	42	"smooth"
+		37	42	"smooth"
+		42	34	"smooth"
+		42	38	"smooth"
+		43	42	"smooth"
+		38	43	"smooth"
+		10	43	"smooth"
+		43	37	"smooth"
+		18	44	"smooth"
+		44	15	"smooth"
+		44	10	"smooth"
+		24	44	"smooth"
+		16	44	"smooth"
+		24	16	"smooth"
+		44	38	"smooth"
 		44	43	"smooth"
-		33	44	"smooth"
-		35	44	"smooth"
-		43	41	"smooth"
-		45	35	"smooth"
-		41	45	"smooth"
-		43	45	"smooth"
-		2	46	"smooth"
-		46	0	"smooth"
-		46	4	"smooth"
-		14	46	"smooth"
-		6	47	"smooth"
-		47	1	"smooth"
-		47	8	"smooth"
-		2	47	"smooth"
-		4	47	"smooth"
-		4	8	"smooth"
+		41	44	"smooth"
+		41	43	"smooth"
+		44	45	"smooth"
+		45	24	"smooth"
+		45	16	"smooth"
+		46	44	"smooth"
+		45	46	"smooth"
+		24	46	"smooth"
+		45	41	"smooth"
+		46	41	"smooth"
+		22	47	"smooth"
+		47	17	"smooth"
+		47	14	"smooth"
+		18	47	"smooth"
+		10	47	"smooth"
+		47	42	"smooth"
+		48	14	"smooth"
+		42	48	"smooth"
 		47	48	"smooth"
-		48	8	"smooth"
-		49	8	"smooth"
-		48	49	"smooth"
-		47	49	"smooth"
-		48	4	"smooth"
-		50	47	"smooth"
-		48	50	"smooth"
-		4	50	"smooth"
-		50	49	"smooth"
-		47	46	"smooth"
-		51	47	"smooth"
-		46	51	"smooth"
-		2	51	"smooth"
-		46	50	"smooth"
+		43	47	"smooth"
+		43	48	"smooth"
+		47	44	"smooth"
+		49	47	"smooth"
+		44	49	"smooth"
+		18	49	"smooth"
+		49	43	"smooth"
+		22	50	"smooth"
+		50	20	"smooth"
+		50	29	"smooth"
+		14	50	"smooth"
 		51	50	"smooth"
-		10	52	"smooth"
-		52	5	"smooth"
-		52	12	"smooth"
-		6	52	"smooth"
-		8	52	"smooth"
-		8	12	"smooth"
-		52	53	"smooth"
-		53	12	"smooth"
-		54	12	"smooth"
-		53	54	"smooth"
-		52	54	"smooth"
-		53	8	"smooth"
-		49	52	"smooth"
+		20	51	"smooth"
+		14	51	"smooth"
+		50	47	"smooth"
+		52	50	"smooth"
+		47	52	"smooth"
+		22	52	"smooth"
+		48	50	"smooth"
+		52	48	"smooth"
+		26	53	"smooth"
+		53	23	"smooth"
+		53	18	"smooth"
+		53	24	"smooth"
+		53	44	"smooth"
 		53	49	"smooth"
+		46	53	"smooth"
+		46	49	"smooth"
+		30	54	"smooth"
+		54	25	"smooth"
+		54	22	"smooth"
+		26	54	"smooth"
+		30	26	"smooth"
+		18	54	"smooth"
+		54	47	"smooth"
+		54	52	"smooth"
 		49	54	"smooth"
-		52	47	"smooth"
-		55	52	"smooth"
-		47	55	"smooth"
-		6	55	"smooth"
-		55	49	"smooth"
-		10	56	"smooth"
-		56	9	"smooth"
-		56	22	"smooth"
-		12	56	"smooth"
-		56	52	"smooth"
-		57	56	"smooth"
-		52	57	"smooth"
-		10	57	"smooth"
+		49	52	"smooth"
+		30	55	"smooth"
+		55	54	"smooth"
+		56	30	"smooth"
 		54	56	"smooth"
-		57	54	"smooth"
-		16	58	"smooth"
-		58	13	"smooth"
-		58	2	"smooth"
-		26	58	"smooth"
-		14	58	"smooth"
-		26	14	"smooth"
-		58	46	"smooth"
-		58	51	"smooth"
+		55	56	"smooth"
+		26	55	"smooth"
+		57	55	"smooth"
+		54	57	"smooth"
+		26	57	"smooth"
+		57	56	"smooth"
+		54	53	"smooth"
+		53	57	"smooth"
+		57	49	"smooth"
+		32	58	"smooth"
+		58	27	"smooth"
+		58	29	"smooth"
+		30	58	"smooth"
+		32	30	"smooth"
+		22	58	"smooth"
+		58	50	"smooth"
+		52	58	"smooth"
 		59	58	"smooth"
-		46	59	"smooth"
-		14	59	"smooth"
-		59	51	"smooth"
-		58	60	"smooth"
-		60	26	"smooth"
-		60	14	"smooth"
-		61	58	"smooth"
+		50	59	"smooth"
+		52	59	"smooth"
+		32	60	"smooth"
+		60	58	"smooth"
+		61	32	"smooth"
+		58	61	"smooth"
 		60	61	"smooth"
-		26	61	"smooth"
-		60	59	"smooth"
-		61	59	"smooth"
-		20	62	"smooth"
-		62	15	"smooth"
-		62	6	"smooth"
-		16	62	"smooth"
-		2	62	"smooth"
-		62	47	"smooth"
-		62	55	"smooth"
-		51	62	"smooth"
-		51	55	"smooth"
+		30	60	"smooth"
+		56	60	"smooth"
+		58	56	"smooth"
+		56	61	"smooth"
+		58	54	"smooth"
+		56	52	"smooth"
+		61	62	"smooth"
 		62	58	"smooth"
-		63	62	"smooth"
-		58	63	"smooth"
-		16	63	"smooth"
-		63	51	"smooth"
-		23	64	"smooth"
-		64	18	"smooth"
-		64	10	"smooth"
-		20	64	"smooth"
-		6	64	"smooth"
-		64	52	"smooth"
-		64	57	"smooth"
-		55	64	"smooth"
-		55	57	"smooth"
-		64	62	"smooth"
+		62	32	"smooth"
+		37	63	"smooth"
+		63	33	"smooth"
+		63	36	"smooth"
+		39	63	"smooth"
+		37	64	"smooth"
+		64	63	"smooth"
+		64	36	"smooth"
 		65	64	"smooth"
-		62	65	"smooth"
-		20	65	"smooth"
-		65	55	"smooth"
-		34	66	"smooth"
-		66	21	"smooth"
-		22	34	"smooth"
-		66	22	"smooth"
-		23	66	"smooth"
-		10	66	"smooth"
-		66	56	"smooth"
-		67	22	"smooth"
-		56	67	"smooth"
-		66	67	"smooth"
-		57	66	"smooth"
-		57	67	"smooth"
-		66	64	"smooth"
-		68	66	"smooth"
-		64	68	"smooth"
-		23	68	"smooth"
-		68	57	"smooth"
-		34	69	"smooth"
-		69	66	"smooth"
-		69	22	"smooth"
-		70	69	"smooth"
-		66	70	"smooth"
-		34	70	"smooth"
-		67	69	"smooth"
-		70	67	"smooth"
-		28	71	"smooth"
-		71	25	"smooth"
-		71	16	"smooth"
-		38	71	"smooth"
-		26	71	"smooth"
-		38	26	"smooth"
-		71	58	"smooth"
-		71	63	"smooth"
-		61	71	"smooth"
-		61	63	"smooth"
-		71	72	"smooth"
-		72	38	"smooth"
-		72	26	"smooth"
-		73	71	"smooth"
-		72	73	"smooth"
-		38	73	"smooth"
-		72	61	"smooth"
-		73	61	"smooth"
-		32	74	"smooth"
-		74	27	"smooth"
-		74	20	"smooth"
-		28	74	"smooth"
-		16	74	"smooth"
-		74	62	"smooth"
-		74	65	"smooth"
-		63	74	"smooth"
 		63	65	"smooth"
-		74	71	"smooth"
-		75	74	"smooth"
-		71	75	"smooth"
-		28	75	"smooth"
-		75	63	"smooth"
-		35	76	"smooth"
-		76	30	"smooth"
-		76	23	"smooth"
-		32	76	"smooth"
-		20	76	"smooth"
-		76	64	"smooth"
-		76	68	"smooth"
-		65	76	"smooth"
-		65	68	"smooth"
-		76	74	"smooth"
-		77	76	"smooth"
-		74	77	"smooth"
-		32	77	"smooth"
-		77	65	"smooth"
-		44	78	"smooth"
-		78	33	"smooth"
-		34	44	"smooth"
-		78	34	"smooth"
-		35	78	"smooth"
-		23	78	"smooth"
-		78	66	"smooth"
-		78	70	"smooth"
-		68	78	"smooth"
+		37	65	"smooth"
+		43	66	"smooth"
+		66	38	"smooth"
+		66	37	"smooth"
+		41	66	"smooth"
+		39	66	"smooth"
+		66	63	"smooth"
+		66	65	"smooth"
+		37	67	"smooth"
+		67	42	"smooth"
+		67	43	"smooth"
+		67	66	"smooth"
+		68	67	"smooth"
+		66	68	"smooth"
+		43	68	"smooth"
+		67	65	"smooth"
+		49	69	"smooth"
+		69	44	"smooth"
+		69	43	"smooth"
+		46	69	"smooth"
+		41	69	"smooth"
+		69	66	"smooth"
+		69	68	"smooth"
+		52	70	"smooth"
+		70	47	"smooth"
+		70	48	"smooth"
+		49	70	"smooth"
+		43	70	"smooth"
 		68	70	"smooth"
-		78	76	"smooth"
-		79	78	"smooth"
-		76	79	"smooth"
-		35	79	"smooth"
-		79	68	"smooth"
-		44	80	"smooth"
-		80	78	"smooth"
-		80	34	"smooth"
+		70	67	"smooth"
+		70	69	"smooth"
+		71	70	"smooth"
+		69	71	"smooth"
+		49	71	"smooth"
+		73	72	"smooth"
+		72	70	"smooth"
+		70	73	"smooth"
+		52	73	"smooth"
+		72	52	"smooth"
+		57	74	"smooth"
+		74	53	"smooth"
+		74	49	"smooth"
+		74	46	"smooth"
+		74	69	"smooth"
+		74	71	"smooth"
+		56	75	"smooth"
+		75	54	"smooth"
+		75	52	"smooth"
+		57	75	"smooth"
+		49	75	"smooth"
+		75	70	"smooth"
+		75	73	"smooth"
+		71	75	"smooth"
+		75	74	"smooth"
+		61	76	"smooth"
+		76	58	"smooth"
+		59	61	"smooth"
+		76	59	"smooth"
+		56	76	"smooth"
+		52	76	"smooth"
+		73	76	"smooth"
+		76	72	"smooth"
+		76	75	"smooth"
+		61	77	"smooth"
+		77	76	"smooth"
+		77	59	"smooth"
+		78	59	"smooth"
+		76	78	"smooth"
+		77	78	"smooth"
 		81	80	"smooth"
-		78	81	"smooth"
-		44	81	"smooth"
-		70	80	"smooth"
-		81	70	"smooth"
-		40	82	"smooth"
-		82	37	"smooth"
-		82	28	"smooth"
-		82	38	"smooth"
-		82	71	"smooth"
-		82	75	"smooth"
-		73	82	"smooth"
-		73	75	"smooth"
-		42	83	"smooth"
-		83	39	"smooth"
-		83	32	"smooth"
-		40	83	"smooth"
-		42	40	"smooth"
-		28	83	"smooth"
-		83	74	"smooth"
-		83	77	"smooth"
-		75	83	"smooth"
-		75	77	"smooth"
-		42	84	"smooth"
-		84	83	"smooth"
-		85	42	"smooth"
-		83	85	"smooth"
-		84	85	"smooth"
-		40	84	"smooth"
-		86	84	"smooth"
-		83	86	"smooth"
-		40	86	"smooth"
-		86	85	"smooth"
-		83	82	"smooth"
-		82	86	"smooth"
-		86	75	"smooth"
-		45	87	"smooth"
-		87	41	"smooth"
-		87	35	"smooth"
-		42	87	"smooth"
-		45	42	"smooth"
-		32	87	"smooth"
-		87	76	"smooth"
-		87	79	"smooth"
-		77	87	"smooth"
-		77	79	"smooth"
-		45	88	"smooth"
-		88	87	"smooth"
-		89	45	"smooth"
-		87	89	"smooth"
-		88	89	"smooth"
-		42	88	"smooth"
-		85	88	"smooth"
-		87	85	"smooth"
-		85	89	"smooth"
-		87	83	"smooth"
-		85	77	"smooth"
-		35	90	"smooth"
-		90	43	"smooth"
-		90	45	"smooth"
-		44	90	"smooth"
-		90	78	"smooth"
-		90	81	"smooth"
-		79	90	"smooth"
+		80	79	"smooth"
 		79	81	"smooth"
-		90	87	"smooth"
-		89	90	"smooth"
+		82	81	"smooth"
+		79	82	"smooth"
+		80	82	"smooth"
+		83	80	"smooth"
+		79	83	"smooth"
+		81	83	"smooth"
+		85	12	"smooth"
+		12	84	"smooth"
+		84	85	"smooth"
+		86	85	"smooth"
+		84	86	"smooth"
+		12	86	"smooth"
+		82	86	"smooth"
+		86	79	"smooth"
+		86	81	"smooth"
+		82	84	"smooth"
+		84	79	"smooth"
+		82	85	"smooth"
+		87	86	"smooth"
+		84	87	"smooth"
+		12	87	"smooth"
+		88	81	"smooth"
+		79	88	"smooth"
+		86	88	"smooth"
+		88	87	"smooth"
+		87	89	"smooth"
+		89	88	"smooth"
+		9	88	"smooth"
+		89	9	"smooth"
+		87	9	"smooth"
+		88	84	"smooth"
+		84	89	"smooth"
 		89	79	"smooth"
-		51	91	"smooth"
-		91	46	"smooth"
-		91	50	"smooth"
-		59	91	"smooth"
-		55	92	"smooth"
-		92	47	"smooth"
-		92	49	"smooth"
-		51	92	"smooth"
-		50	92	"smooth"
-		92	91	"smooth"
+		81	90	"smooth"
+		90	80	"smooth"
+		90	82	"smooth"
+		91	90	"smooth"
+		80	91	"smooth"
+		81	91	"smooth"
 		93	92	"smooth"
-		91	93	"smooth"
-		51	93	"smooth"
-		57	94	"smooth"
-		94	52	"smooth"
-		94	54	"smooth"
-		55	94	"smooth"
-		49	94	"smooth"
-		94	92	"smooth"
-		95	94	"smooth"
+		92	12	"smooth"
+		12	93	"smooth"
+		94	93	"smooth"
+		12	94	"smooth"
+		92	94	"smooth"
+		51	95	"smooth"
+		95	93	"smooth"
+		93	51	"smooth"
+		96	51	"smooth"
+		93	96	"smooth"
+		95	96	"smooth"
+		96	92	"smooth"
 		92	95	"smooth"
-		55	95	"smooth"
-		57	96	"smooth"
-		96	56	"smooth"
-		96	67	"smooth"
-		54	96	"smooth"
 		96	94	"smooth"
-		97	96	"smooth"
-		94	97	"smooth"
-		57	97	"smooth"
-		63	98	"smooth"
-		98	58	"smooth"
-		98	51	"smooth"
-		61	98	"smooth"
-		59	98	"smooth"
-		98	91	"smooth"
-		98	93	"smooth"
-		65	99	"smooth"
-		99	62	"smooth"
-		99	55	"smooth"
-		63	99	"smooth"
-		51	99	"smooth"
-		99	92	"smooth"
-		99	95	"smooth"
-		93	99	"smooth"
-		99	98	"smooth"
+		86	92	"smooth"
+		93	86	"smooth"
+		90	86	"smooth"
+		97	81	"smooth"
+		86	97	"smooth"
+		90	97	"smooth"
+		97	95	"smooth"
+		93	97	"smooth"
+		51	97	"smooth"
+		97	92	"smooth"
+		90	95	"smooth"
+		92	90	"smooth"
+		85	92	"smooth"
+		82	92	"smooth"
+		51	98	"smooth"
+		98	95	"smooth"
+		98	96	"smooth"
+		101	100	"smooth"
 		100	99	"smooth"
-		98	100	"smooth"
-		63	100	"smooth"
-		68	101	"smooth"
-		101	64	"smooth"
-		101	57	"smooth"
-		65	101	"smooth"
-		55	101	"smooth"
-		101	94	"smooth"
-		101	97	"smooth"
-		95	101	"smooth"
-		101	99	"smooth"
+		99	101	"smooth"
 		102	101	"smooth"
 		99	102	"smooth"
-		65	102	"smooth"
-		102	95	"smooth"
-		70	103	"smooth"
-		103	66	"smooth"
-		103	67	"smooth"
-		68	103	"smooth"
-		57	103	"smooth"
-		103	96	"smooth"
-		97	103	"smooth"
-		103	101	"smooth"
-		104	103	"smooth"
-		101	104	"smooth"
-		68	104	"smooth"
-		75	105	"smooth"
-		105	71	"smooth"
-		105	63	"smooth"
-		73	105	"smooth"
-		61	105	"smooth"
-		105	98	"smooth"
-		105	100	"smooth"
-		77	106	"smooth"
-		106	74	"smooth"
-		106	65	"smooth"
-		75	106	"smooth"
-		63	106	"smooth"
-		106	99	"smooth"
-		106	102	"smooth"
-		100	106	"smooth"
 		100	102	"smooth"
+		102	98	"smooth"
+		95	102	"smooth"
+		51	102	"smooth"
+		102	103	"smooth"
+		103	95	"smooth"
+		103	98	"smooth"
+		100	98	"smooth"
+		103	100	"smooth"
+		103	99	"smooth"
+		95	99	"smooth"
 		106	105	"smooth"
+		105	104	"smooth"
+		104	106	"smooth"
 		107	106	"smooth"
+		104	107	"smooth"
 		105	107	"smooth"
-		75	107	"smooth"
-		79	108	"smooth"
-		108	76	"smooth"
-		108	68	"smooth"
-		77	108	"smooth"
-		65	108	"smooth"
-		108	101	"smooth"
-		108	104	"smooth"
-		102	108	"smooth"
-		102	104	"smooth"
-		108	106	"smooth"
-		109	108	"smooth"
-		106	109	"smooth"
-		77	109	"smooth"
-		109	102	"smooth"
-		81	110	"smooth"
-		110	78	"smooth"
-		110	70	"smooth"
-		79	110	"smooth"
-		68	110	"smooth"
-		110	103	"smooth"
+		81	106	"smooth"
+		106	79	"smooth"
+		106	83	"smooth"
+		107	83	"smooth"
+		83	104	"smooth"
+		104	79	"smooth"
+		108	105	"smooth"
+		104	108	"smooth"
+		106	108	"smooth"
+		9	108	"smooth"
+		108	89	"smooth"
+		108	88	"smooth"
+		88	106	"smooth"
+		88	104	"smooth"
+		104	89	"smooth"
+		109	105	"smooth"
+		104	109	"smooth"
+		108	109	"smooth"
+		111	109	"smooth"
+		109	110	"smooth"
+		110	111	"smooth"
+		112	111	"smooth"
+		110	112	"smooth"
+		109	112	"smooth"
+		112	108	"smooth"
+		89	112	"smooth"
+		9	112	"smooth"
+		112	104	"smooth"
 		104	110	"smooth"
-		110	108	"smooth"
-		111	110	"smooth"
-		108	111	"smooth"
-		79	111	"smooth"
-		86	112	"smooth"
-		112	82	"smooth"
-		112	75	"smooth"
-		112	73	"smooth"
-		112	105	"smooth"
-		112	107	"smooth"
-		85	113	"smooth"
-		113	83	"smooth"
-		113	77	"smooth"
-		86	113	"smooth"
-		75	113	"smooth"
-		113	106	"smooth"
+		89	110	"smooth"
+		109	107	"smooth"
+		105	113	"smooth"
+		113	107	"smooth"
+		114	107	"smooth"
+		113	114	"smooth"
+		105	114	"smooth"
 		113	109	"smooth"
-		107	113	"smooth"
-		113	112	"smooth"
-		89	114	"smooth"
-		114	87	"smooth"
-		114	79	"smooth"
-		85	114	"smooth"
-		77	114	"smooth"
-		114	108	"smooth"
-		114	111	"smooth"
-		109	114	"smooth"
-		114	113	"smooth"
-		79	115	"smooth"
-		115	90	"smooth"
-		115	89	"smooth"
-		81	115	"smooth"
-		115	110	"smooth"
-		111	115	"smooth"
+		115	105	"smooth"
+		113	115	"smooth"
+		109	115	"smooth"
 		115	114	"smooth"
+		117	116	"smooth"
+		116	34	"smooth"
+		34	117	"smooth"
+		118	117	"smooth"
+		34	118	"smooth"
+		116	118	"smooth"
+		105	116	"smooth"
+		116	108	"smooth"
+		116	109	"smooth"
+		108	117	"smooth"
+		117	9	"smooth"
+		117	112	"smooth"
+		109	118	"smooth"
+		118	112	"smooth"
+		118	111	"smooth"
+		112	116	"smooth"
+		119	116	"smooth"
+		34	119	"smooth"
+		120	119	"smooth"
+		34	120	"smooth"
+		116	120	"smooth"
+		116	115	"smooth"
+		121	115	"smooth"
+		116	121	"smooth"
+		105	121	"smooth"
+		122	115	"smooth"
+		115	119	"smooth"
+		119	122	"smooth"
+		123	122	"smooth"
+		119	123	"smooth"
+		115	123	"smooth"
+		123	121	"smooth"
+		121	120	"smooth"
+		120	123	"smooth"
+		124	123	"smooth"
+		120	124	"smooth"
+		121	124	"smooth"
+		123	116	"smooth"
+		119	118	"smooth"
+		119	125	"smooth"
+		125	116	"smooth"
+		125	115	"smooth"
+		125	109	"smooth"
+		125	118	"smooth"
+		81	126	"smooth"
+		126	80	"smooth"
+		126	91	"smooth"
+		83	126	"smooth"
+		106	127	"smooth"
+		127	105	"smooth"
+		127	107	"smooth"
+		126	106	"smooth"
+		83	127	"smooth"
+		127	126	"smooth"
+		128	127	"smooth"
+		105	128	"smooth"
+		106	128	"smooth"
+		130	129	"smooth"
+		129	128	"smooth"
+		128	130	"smooth"
+		131	130	"smooth"
+		128	131	"smooth"
+		129	131	"smooth"
+		131	126	"smooth"
+		106	131	"smooth"
+		81	131	"smooth"
+		131	127	"smooth"
+		129	126	"smooth"
+		127	129	"smooth"
+		114	127	"smooth"
+		128	114	"smooth"
+		132	129	"smooth"
+		128	132	"smooth"
+		130	132	"smooth"
+		132	127	"smooth"
+		114	132	"smooth"
+		135	134	"smooth"
+		134	133	"smooth"
+		133	135	"smooth"
+		136	135	"smooth"
+		133	136	"smooth"
+		134	136	"smooth"
+		137	134	"smooth"
+		133	137	"smooth"
+		135	137	"smooth"
+		51	137	"smooth"
+		137	95	"smooth"
+		137	102	"smooth"
+		102	135	"smooth"
+		135	99	"smooth"
+		135	101	"smooth"
+		102	133	"smooth"
+		133	99	"smooth"
+		133	95	"smooth"
+		138	134	"smooth"
+		133	138	"smooth"
+		137	138	"smooth"
+		81	138	"smooth"
+		138	90	"smooth"
+		138	97	"smooth"
+		97	137	"smooth"
+		97	133	"smooth"
+		133	90	"smooth"
+		138	136	"smooth"
+		91	138	"smooth"
+		91	133	"smooth"
+		91	136	"smooth"
+		134	139	"smooth"
+		139	136	"smooth"
+		140	136	"smooth"
+		139	140	"smooth"
+		134	140	"smooth"
+		139	138	"smooth"
+		138	126	"smooth"
+		91	139	"smooth"
+		139	126	"smooth"
+		141	134	"smooth"
+		139	141	"smooth"
+		138	141	"smooth"
+		130	141	"smooth"
+		141	129	"smooth"
+		141	131	"smooth"
+		131	138	"smooth"
+		131	139	"smooth"
+		139	129	"smooth"
+		141	140	"smooth"
+		142	141	"smooth"
+		129	142	"smooth"
+		130	142	"smooth"
+		142	139	"smooth"
+		142	140	"smooth"
+		135	143	"smooth"
+		143	134	"smooth"
+		143	136	"smooth"
+		144	143	"smooth"
+		134	144	"smooth"
+		135	144	"smooth"
+		140	143	"smooth"
+		144	140	"smooth"
+		147	146	"smooth"
+		146	145	"smooth"
+		145	147	"smooth"
+		148	147	"smooth"
+		145	148	"smooth"
+		146	148	"smooth"
+		149	146	"smooth"
+		145	149	"smooth"
+		147	149	"smooth"
+		29	149	"smooth"
+		149	150	"smooth"
+		150	29	"smooth"
+		151	29	"smooth"
+		150	151	"smooth"
+		149	151	"smooth"
+		147	151	"smooth"
+		151	145	"smooth"
+		145	150	"smooth"
+		152	146	"smooth"
+		145	152	"smooth"
+		149	152	"smooth"
+		51	152	"smooth"
+		152	98	"smooth"
+		153	51	"smooth"
+		98	153	"smooth"
+		152	153	"smooth"
+		153	149	"smooth"
+		150	153	"smooth"
+		29	153	"smooth"
+		153	145	"smooth"
+		145	98	"smooth"
+		150	98	"smooth"
+		152	148	"smooth"
+		101	148	"smooth"
+		148	100	"smooth"
+		148	102	"smooth"
+		102	152	"smooth"
+		102	145	"smooth"
+		145	100	"smooth"
+		135	154	"smooth"
+		154	134	"smooth"
+		154	144	"smooth"
+		146	154	"smooth"
+		154	148	"smooth"
+		155	148	"smooth"
+		154	155	"smooth"
+		146	155	"smooth"
+		144	156	"smooth"
+		156	154	"smooth"
+		155	144	"smooth"
+		156	155	"smooth"
+		156	148	"smooth"
+		135	148	"smooth"
+		156	135	"smooth"
+		137	154	"smooth"
+		154	152	"smooth"
+		152	137	"smooth"
+		102	154	"smooth"
+		157	144	"smooth"
+		134	157	"smooth"
+		154	157	"smooth"
+		158	155	"smooth"
+		154	158	"smooth"
+		146	158	"smooth"
+		159	155	"smooth"
+		144	159	"smooth"
+		160	159	"smooth"
+		144	160	"smooth"
+		155	160	"smooth"
+		160	158	"smooth"
+		158	157	"smooth"
+		157	160	"smooth"
+		161	160	"smooth"
+		157	161	"smooth"
+		158	161	"smooth"
+		160	154	"smooth"
+		147	162	"smooth"
+		162	146	"smooth"
+		162	148	"smooth"
+		163	162	"smooth"
+		146	163	"smooth"
+		147	163	"smooth"
+		155	162	"smooth"
+		163	155	"smooth"
+		147	164	"smooth"
+		164	146	"smooth"
+		164	163	"smooth"
+		149	164	"smooth"
+		29	165	"smooth"
+		165	149	"smooth"
+		165	151	"smooth"
+		151	164	"smooth"
+		164	165	"smooth"
+		166	164	"smooth"
+		146	166	"smooth"
+		149	166	"smooth"
+		59	167	"smooth"
+		167	166	"smooth"
+		166	59	"smooth"
+		168	59	"smooth"
+		166	168	"smooth"
+		167	168	"smooth"
+		168	165	"smooth"
+		149	168	"smooth"
+		29	168	"smooth"
+		168	164	"smooth"
+		167	165	"smooth"
+		164	167	"smooth"
+		166	163	"smooth"
+		169	167	"smooth"
+		166	169	"smooth"
+		59	169	"smooth"
+		169	164	"smooth"
+		163	169	"smooth"
+		120	170	"smooth"
+		170	34	"smooth"
+		170	119	"smooth"
+		124	171	"smooth"
+		171	120	"smooth"
+		171	123	"smooth"
+		123	172	"smooth"
+		172	119	"smooth"
+		172	122	"smooth"
+		123	170	"smooth"
+		170	172	"smooth"
+		171	172	"smooth"
+		170	171	"smooth"
+		128	173	"smooth"
+		173	105	"smooth"
+		173	114	"smooth"
+		130	174	"smooth"
+		174	128	"smooth"
+		174	132	"smooth"
+		132	173	"smooth"
+		173	174	"smooth"
+		121	173	"smooth"
+		128	121	"smooth"
+		124	175	"smooth"
+		175	121	"smooth"
+		176	124	"smooth"
+		121	176	"smooth"
+		175	176	"smooth"
+		176	174	"smooth"
+		128	176	"smooth"
+		130	176	"smooth"
+		176	173	"smooth"
+		175	174	"smooth"
+		173	175	"smooth"
+		115	173	"smooth"
+		122	177	"smooth"
+		177	115	"smooth"
+		177	123	"smooth"
+		123	175	"smooth"
+		123	173	"smooth"
+		177	175	"smooth"
+		173	177	"smooth"
+		175	171	"smooth"
+		177	172	"smooth"
+		123	178	"smooth"
+		178	172	"smooth"
+		178	177	"smooth"
+		178	175	"smooth"
+		178	171	"smooth"
+		179	175	"smooth"
+		171	179	"smooth"
+		124	179	"smooth"
+		130	180	"smooth"
+		180	129	"smooth"
+		180	142	"smooth"
+		132	180	"smooth"
+		180	174	"smooth"
+		181	180	"smooth"
+		174	181	"smooth"
+		130	181	"smooth"
+		184	183	"smooth"
+		183	182	"smooth"
+		182	184	"smooth"
+		185	184	"smooth"
+		182	185	"smooth"
+		183	185	"smooth"
+		187	186	"smooth"
+		186	183	"smooth"
+		183	187	"smooth"
+		188	187	"smooth"
+		183	188	"smooth"
+		186	188	"smooth"
+		161	187	"smooth"
+		187	184	"smooth"
+		184	161	"smooth"
+		189	161	"smooth"
+		184	189	"smooth"
+		187	189	"smooth"
+		189	188	"smooth"
+		188	185	"smooth"
+		185	189	"smooth"
+		130	189	"smooth"
+		185	130	"smooth"
+		188	130	"smooth"
+		189	183	"smooth"
+		190	183	"smooth"
+		182	190	"smooth"
+		184	190	"smooth"
+		191	186	"smooth"
+		183	191	"smooth"
+		187	191	"smooth"
+		48	191	"smooth"
+		191	190	"smooth"
+		190	48	"smooth"
+		192	48	"smooth"
+		190	192	"smooth"
+		191	192	"smooth"
+		192	187	"smooth"
+		184	192	"smooth"
+		161	192	"smooth"
+		192	183	"smooth"
+		193	183	"smooth"
+		182	193	"smooth"
+		190	193	"smooth"
+		194	186	"smooth"
+		183	194	"smooth"
+		191	194	"smooth"
+		124	194	"smooth"
+		194	193	"smooth"
+		193	124	"smooth"
+		195	124	"smooth"
+		193	195	"smooth"
+		194	195	"smooth"
+		195	191	"smooth"
+		190	195	"smooth"
+		48	195	"smooth"
+		195	183	"smooth"
+		193	185	"smooth"
+		194	188	"smooth"
+		185	176	"smooth"
+		188	176	"smooth"
+		176	194	"smooth"
+		193	176	"smooth"
+		176	183	"smooth"
+		186	196	"smooth"
+		196	188	"smooth"
+		197	188	"smooth"
+		196	197	"smooth"
+		186	197	"smooth"
+		188	174	"smooth"
+		188	181	"smooth"
+		197	181	"smooth"
+		181	196	"smooth"
+		196	174	"smooth"
+		196	194	"smooth"
+		194	175	"smooth"
+		176	196	"smooth"
+		196	175	"smooth"
+		198	186	"smooth"
+		196	198	"smooth"
+		194	198	"smooth"
+		179	194	"smooth"
+		179	196	"smooth"
+		179	198	"smooth"
+		200	199	"smooth"
+		199	67	"smooth"
+		67	200	"smooth"
+		201	200	"smooth"
+		67	201	"smooth"
+		199	201	"smooth"
+		186	199	"smooth"
+		199	191	"smooth"
+		199	194	"smooth"
+		191	200	"smooth"
+		200	48	"smooth"
+		200	195	"smooth"
+		194	201	"smooth"
+		201	195	"smooth"
+		201	124	"smooth"
+		195	199	"smooth"
+		202	199	"smooth"
+		67	202	"smooth"
+		200	202	"smooth"
+		203	186	"smooth"
+		199	203	"smooth"
+		191	203	"smooth"
+		204	203	"smooth"
+		203	202	"smooth"
+		202	204	"smooth"
+		205	204	"smooth"
+		202	205	"smooth"
+		203	205	"smooth"
+		205	191	"smooth"
+		200	205	"smooth"
+		48	205	"smooth"
+		205	199	"smooth"
+		206	201	"smooth"
+		67	206	"smooth"
+		199	206	"smooth"
+		199	198	"smooth"
+		201	179	"smooth"
+		206	179	"smooth"
+		179	199	"smooth"
+		198	206	"smooth"
+		144	207	"smooth"
+		207	134	"smooth"
+		207	140	"smooth"
+		157	207	"smooth"
+		161	208	"smooth"
+		208	157	"smooth"
+		208	160	"smooth"
+		160	209	"smooth"
+		209	144	"smooth"
+		209	159	"smooth"
+		160	207	"smooth"
+		207	209	"smooth"
+		208	209	"smooth"
+		207	208	"smooth"
+		141	207	"smooth"
+		157	141	"smooth"
+		130	210	"smooth"
+		210	141	"smooth"
+		141	189	"smooth"
+		210	189	"smooth"
+		189	208	"smooth"
+		157	189	"smooth"
+		189	207	"smooth"
+		210	208	"smooth"
+		207	210	"smooth"
+		142	210	"smooth"
+		142	207	"smooth"
+		210	180	"smooth"
+		181	210	"smooth"
+		187	211	"smooth"
+		211	186	"smooth"
+		211	188	"smooth"
+		208	187	"smooth"
+		210	188	"smooth"
+		189	211	"smooth"
+		211	210	"smooth"
+		211	208	"smooth"
+		212	211	"smooth"
+		186	212	"smooth"
+		187	212	"smooth"
+		213	208	"smooth"
+		187	213	"smooth"
+		161	213	"smooth"
+		213	211	"smooth"
+		212	213	"smooth"
+		211	197	"smooth"
+		181	211	"smooth"
+		187	214	"smooth"
+		214	186	"smooth"
+		214	212	"smooth"
+		215	72	"smooth"
+		72	214	"smooth"
+		214	215	"smooth"
+		216	215	"smooth"
+		214	216	"smooth"
+		72	216	"smooth"
+		161	215	"smooth"
+		215	187	"smooth"
+		215	213	"smooth"
+		213	214	"smooth"
+		216	212	"smooth"
+		213	216	"smooth"
+		191	214	"smooth"
+		217	72	"smooth"
+		214	217	"smooth"
+		215	217	"smooth"
+		48	217	"smooth"
+		217	191	"smooth"
+		217	192	"smooth"
+		192	215	"smooth"
+		192	214	"smooth"
+		203	214	"smooth"
+		218	72	"smooth"
+		214	218	"smooth"
+		217	218	"smooth"
+		204	218	"smooth"
+		218	203	"smooth"
+		218	205	"smooth"
+		205	217	"smooth"
+		205	214	"smooth"
+		203	212	"smooth"
+		218	216	"smooth"
+		203	219	"smooth"
+		219	214	"smooth"
+		219	218	"smooth"
+		219	216	"smooth"
+		219	212	"smooth"
+		163	220	"smooth"
+		220	146	"smooth"
+		220	155	"smooth"
+		166	220	"smooth"
+		59	221	"smooth"
+		221	166	"smooth"
+		221	169	"smooth"
+		169	220	"smooth"
+		220	221	"smooth"
+		158	220	"smooth"
+		166	158	"smooth"
+		161	222	"smooth"
+		222	158	"smooth"
+		223	161	"smooth"
+		158	223	"smooth"
+		222	223	"smooth"
+		223	221	"smooth"
+		166	223	"smooth"
+		59	223	"smooth"
+		223	220	"smooth"
+		222	221	"smooth"
+		220	222	"smooth"
+		159	224	"smooth"
+		224	155	"smooth"
+		224	160	"smooth"
+		160	222	"smooth"
+		160	220	"smooth"
+		224	222	"smooth"
+		220	224	"smooth"
+		222	208	"smooth"
+		224	209	"smooth"
+		160	225	"smooth"
+		225	209	"smooth"
+		225	224	"smooth"
+		225	222	"smooth"
+		225	208	"smooth"
+		213	222	"smooth"
+		227	226	"smooth"
+		226	72	"smooth"
+		72	227	"smooth"
+		215	227	"smooth"
+		226	215	"smooth"
+		221	227	"smooth"
+		227	59	"smooth"
+		227	223	"smooth"
+		222	215	"smooth"
+		215	223	"smooth"
+		223	226	"smooth"
+		226	222	"smooth"
+		226	221	"smooth"
+		226	216	"smooth"
+		213	226	"smooth"
+		20	93	"smooth"
+		94	20	"smooth"
+		96	20	"smooth"
+		94	13	"smooth"
+		8	87	"smooth"
+		84	8	"smooth"
+		89	8	"smooth"
+		93	228	"smooth"
+		228	12	"smooth"
+		228	86	"smooth"
+		229	182	"smooth"
+		182	228	"smooth"
+		228	229	"smooth"
+		230	229	"smooth"
+		228	230	"smooth"
+		182	230	"smooth"
+		51	229	"smooth"
+		229	93	"smooth"
+		229	97	"smooth"
+		97	230	"smooth"
+		230	86	"smooth"
+		230	81	"smooth"
+		97	228	"smooth"
+		228	87	"smooth"
+		231	230	"smooth"
+		228	231	"smooth"
+		182	231	"smooth"
+		230	88	"smooth"
+		88	231	"smooth"
+		231	87	"smooth"
+		231	9	"smooth"
+		88	228	"smooth"
+		89	1	"smooth"
+		112	1	"smooth"
+		1	110	"smooth"
+		111	1	"smooth"
+		7	87	"smooth"
+		87	14	"smooth"
+		228	14	"smooth"
+		14	231	"smooth"
+		182	14	"smooth"
+		108	232	"smooth"
+		232	105	"smooth"
+		232	106	"smooth"
+		182	232	"smooth"
+		232	231	"smooth"
+		232	230	"smooth"
+		231	108	"smooth"
+		230	106	"smooth"
+		88	232	"smooth"
+		14	93	"smooth"
+		14	229	"smooth"
+		20	98	"smooth"
+		234	233	"smooth"
+		233	98	"smooth"
+		98	234	"smooth"
+		20	234	"smooth"
+		233	20	"smooth"
+		233	96	"smooth"
+		229	235	"smooth"
+		235	182	"smooth"
+		235	230	"smooth"
+		134	235	"smooth"
+		235	137	"smooth"
+		235	138	"smooth"
+		137	229	"smooth"
+		138	230	"smooth"
+		97	235	"smooth"
+		20	150	"smooth"
+		153	20	"smooth"
+		150	234	"smooth"
+		153	50	"smooth"
+		150	28	"smooth"
+		150	31	"smooth"
+		151	31	"smooth"
+		50	152	"smooth"
+		50	149	"smooth"
+		50	146	"smooth"
+		165	31	"smooth"
+		165	32	"smooth"
+		232	128	"smooth"
+		185	230	"smooth"
+		232	185	"smooth"
+		230	131	"smooth"
+		131	185	"smooth"
+		185	128	"smooth"
+		131	232	"smooth"
+		117	120	"smooth"
+		108	121	"smooth"
+		236	124	"smooth"
+		120	236	"smooth"
+		121	236	"smooth"
+		236	108	"smooth"
+		117	236	"smooth"
+		9	236	"smooth"
+		236	116	"smooth"
+		1	118	"smooth"
+		1	117	"smooth"
+		2	117	"smooth"
+		42	120	"smooth"
+		117	42	"smooth"
+		42	236	"smooth"
+		42	124	"smooth"
+		37	120	"smooth"
+		37	124	"smooth"
+		121	232	"smooth"
+		232	193	"smooth"
+		231	193	"smooth"
+		193	121	"smooth"
+		193	236	"smooth"
+		236	231	"smooth"
+		236	232	"smooth"
+		176	232	"smooth"
+		42	190	"smooth"
+		195	42	"smooth"
+		42	193	"smooth"
+		42	182	"smooth"
+		42	231	"smooth"
+		185	235	"smooth"
+		235	184	"smooth"
+		235	141	"smooth"
+		235	157	"smooth"
+		141	185	"smooth"
+		157	184	"smooth"
+		189	235	"smooth"
+		229	184	"smooth"
+		137	157	"smooth"
+		237	161	"smooth"
+		184	237	"smooth"
+		157	237	"smooth"
+		237	137	"smooth"
+		229	237	"smooth"
+		51	237	"smooth"
+		237	235	"smooth"
+		131	235	"smooth"
+		50	184	"smooth"
+		182	50	"smooth"
+		229	50	"smooth"
+		50	237	"smooth"
+		50	161	"smooth"
+		50	190	"smooth"
+		50	192	"smooth"
+		152	158	"smooth"
+		158	237	"smooth"
+		237	152	"smooth"
+		237	154	"smooth"
+		50	166	"smooth"
+		223	50	"smooth"
+		50	158	"smooth"
+		37	170	"smooth"
+		37	171	"smooth"
+		64	171	"smooth"
+		170	64	"smooth"
+		190	14	"smooth"
+		119	35	"smooth"
+		118	35	"smooth"
+		118	4	"smooth"
+		119	36	"smooth"
+		170	36	"smooth"
+		168	50	"smooth"
+		168	58	"smooth"
+		165	62	"smooth"
+		165	58	"smooth"
+		58	167	"smooth"
+		167	62	"smooth"
+		167	77	"smooth"
+		169	77	"smooth"
+		167	61	"smooth"
+		221	77	"smooth"
+		67	238	"smooth"
+		238	201	"smooth"
+		238	206	"smooth"
+		201	171	"smooth"
+		179	238	"smooth"
+		238	171	"smooth"
+		42	201	"smooth"
+		42	200	"smooth"
+		201	37	"smooth"
+		202	206	"smooth"
+		203	198	"smooth"
+		202	239	"smooth"
+		239	199	"smooth"
+		239	203	"smooth"
+		239	198	"smooth"
+		239	206	"smooth"
+		70	202	"smooth"
+		200	70	"smooth"
+		70	205	"smooth"
+		70	204	"smooth"
+		68	202	"smooth"
+		64	238	"smooth"
+		37	238	"smooth"
+		65	238	"smooth"
+		43	200	"smooth"
+		50	217	"smooth"
+		50	215	"smooth"
+		50	72	"smooth"
+		70	218	"smooth"
+		70	217	"smooth"
+		52	217	"smooth"
+		218	73	"smooth"
+		50	227	"smooth"
+		52	227	"smooth"
+		76	227	"smooth"
+		78	226	"smooth"
+		72	78	"smooth"
+		227	78	"smooth"
+		78	221	"smooth"
 
 		"face"	
 		"l"	3	0	1	2	
@@ -12865,364 +13682,376 @@ createNode zTet -n "zTet1";
 		"l"	3	-9	0	-7	
 
 		"face"	
-		"l"	3	9	10	11	
-
-		"face"	
-		"l"	3	12	-12	13	
-
-		"face"	
-		"l"	3	14	-14	-11	
-
-		"face"	
-		"l"	3	-13	-15	-10	
-
-		"face"	
-		"l"	3	15	10	16	
-
-		"face"	
-		"l"	3	17	-17	11	
-
-		"face"	
-		"l"	3	-10	-12	-11	
-
-		"face"	
-		"l"	3	-18	9	-16	
-
-		"face"	
-		"l"	3	18	19	20	
-
-		"face"	
-		"l"	3	21	-21	22	
-
-		"face"	
-		"l"	3	23	-23	-20	
-
-		"face"	
-		"l"	3	-22	-24	-19	
-
-		"face"	
-		"l"	3	24	19	25	
-
-		"face"	
-		"l"	3	26	-26	20	
-
-		"face"	
-		"l"	3	-19	-21	-20	
-
-		"face"	
-		"l"	3	-27	18	-25	
-
-		"face"	
-		"l"	3	27	28	4	
+		"l"	3	9	10	4	
 
 		"face"	
 		"l"	3	-4	-5	2	
 
 		"face"	
-		"l"	3	29	-3	-29	
+		"l"	3	11	-3	-11	
 
 		"face"	
-		"l"	3	3	-30	-28	
+		"l"	3	3	-12	-10	
 
 		"face"	
-		"l"	3	-30	28	2	
+		"l"	3	-12	10	2	
 
 		"face"	
-		"l"	3	30	-3	31	
+		"l"	3	12	-3	13	
 
 		"face"	
-		"l"	3	32	-32	-29	
+		"l"	3	14	-14	-11	
 
 		"face"	
-		"l"	3	-31	-33	29	
+		"l"	3	-13	-15	11	
 
 		"face"	
-		"l"	3	33	34	13	
+		"l"	3	15	16	17	
 
 		"face"	
-		"l"	3	-13	-14	11	
+		"l"	3	18	-18	19	
 
 		"face"	
-		"l"	3	35	-12	-35	
+		"l"	3	20	-20	-17	
 
 		"face"	
-		"l"	3	12	-36	-34	
+		"l"	3	-19	-21	-16	
 
 		"face"	
-		"l"	3	36	34	-1	
+		"l"	3	21	16	-1	
 
 		"face"	
 		"l"	3	3	0	5	
 
 		"face"	
-		"l"	3	37	-6	-35	
+		"l"	3	22	-6	-17	
 
 		"face"	
-		"l"	3	-4	-38	-37	
+		"l"	3	-4	-23	-22	
 
 		"face"	
-		"l"	3	-36	34	11	
+		"l"	3	-21	16	19	
 
 		"face"	
-		"l"	3	38	-12	-1	
+		"l"	3	23	-20	-1	
 
 		"face"	
-		"l"	3	-37	0	-35	
+		"l"	3	-22	0	-17	
 
 		"face"	
-		"l"	3	-39	36	35	
+		"l"	3	-24	21	20	
 
 		"face"	
-		"l"	3	39	40	41	
+		"l"	3	24	25	26	
 
 		"face"	
-		"l"	3	42	-42	43	
+		"l"	3	27	-27	28	
+
+		"face"	
+		"l"	3	29	-29	-26	
+
+		"face"	
+		"l"	3	-28	-30	-25	
+
+		"face"	
+		"l"	3	21	25	11	
+
+		"face"	
+		"l"	3	30	-12	26	
+
+		"face"	
+		"l"	3	-25	-27	-26	
+
+		"face"	
+		"l"	3	-31	24	-22	
+
+		"face"	
+		"l"	3	-23	25	-10	
+
+		"face"	
+		"l"	3	-4	9	11	
+
+		"face"	
+		"l"	3	-22	-12	-26	
+
+		"face"	
+		"l"	3	3	21	22	
+
+		"face"	
+		"l"	3	31	32	33	
+
+		"face"	
+		"l"	3	34	-34	-16	
+
+		"face"	
+		"l"	3	35	15	-33	
+
+		"face"	
+		"l"	3	-35	-36	-32	
+
+		"face"	
+		"l"	3	36	32	37	
+
+		"face"	
+		"l"	3	38	-38	33	
+
+		"face"	
+		"l"	3	-32	-34	-33	
+
+		"face"	
+		"l"	3	-39	31	-37	
+
+		"face"	
+		"l"	3	39	40	28	
+
+		"face"	
+		"l"	3	-28	-29	26	
+
+		"face"	
+		"l"	3	41	-27	-41	
+
+		"face"	
+		"l"	3	27	-42	-40	
+
+		"face"	
+		"l"	3	-42	40	26	
+
+		"face"	
+		"l"	3	42	-27	43	
 
 		"face"	
 		"l"	3	44	-44	-41	
 
 		"face"	
-		"l"	3	-43	-45	-40	
+		"l"	3	-43	-45	41	
 
 		"face"	
-		"l"	3	36	40	29	
+		"l"	3	45	46	33	
 
 		"face"	
-		"l"	3	45	-30	41	
+		"l"	3	-39	-34	37	
 
 		"face"	
-		"l"	3	-40	-42	-41	
+		"l"	3	47	-38	-47	
 
 		"face"	
-		"l"	3	-46	39	-37	
+		"l"	3	38	-48	-46	
 
 		"face"	
-		"l"	3	-38	40	-28	
+		"l"	3	48	46	29	
 
 		"face"	
-		"l"	3	-4	27	29	
+		"l"	3	49	-30	33	
 
 		"face"	
-		"l"	3	-37	-30	-41	
+		"l"	3	-46	-34	-47	
 
 		"face"	
-		"l"	3	3	36	37	
+		"l"	3	-50	45	-49	
 
 		"face"	
-		"l"	3	46	47	22	
+		"l"	3	50	46	-25	
 
 		"face"	
-		"l"	3	-22	-23	20	
+		"l"	3	27	24	29	
 
 		"face"	
-		"l"	3	48	-21	-48	
+		"l"	3	-49	-30	-47	
 
 		"face"	
-		"l"	3	21	-49	-47	
+		"l"	3	-28	48	-51	
 
 		"face"	
-		"l"	3	49	47	-10	
+		"l"	3	-48	46	37	
 
 		"face"	
-		"l"	3	12	9	14	
+		"l"	3	51	-38	-25	
 
 		"face"	
-		"l"	3	50	-15	-48	
+		"l"	3	-51	24	-47	
 
 		"face"	
-		"l"	3	-13	-51	-50	
-
-		"face"	
-		"l"	3	-49	47	20	
-
-		"face"	
-		"l"	3	51	-21	-10	
-
-		"face"	
-		"l"	3	-50	9	-48	
-
-		"face"	
-		"l"	3	-52	49	48	
+		"l"	3	-52	50	47	
 
 		"face"	
 		"l"	3	52	53	54	
 
 		"face"	
-		"l"	3	55	-55	-34	
+		"l"	3	55	-55	56	
 
 		"face"	
-		"l"	3	50	33	-54	
+		"l"	3	57	-57	-54	
 
 		"face"	
-		"l"	3	-56	-51	-53	
+		"l"	3	-56	-58	-53	
 
 		"face"	
-		"l"	3	56	53	57	
+		"l"	3	50	53	41	
 
 		"face"	
-		"l"	3	58	-58	54	
+		"l"	3	58	-42	54	
 
 		"face"	
 		"l"	3	-53	-55	-54	
 
 		"face"	
-		"l"	3	-59	52	-57	
+		"l"	3	-59	52	-51	
 
 		"face"	
-		"l"	3	49	53	35	
+		"l"	3	48	53	-40	
 
 		"face"	
-		"l"	3	59	-36	57	
+		"l"	3	-28	39	41	
 
 		"face"	
-		"l"	3	-57	-58	-54	
+		"l"	3	-51	-42	-54	
 
 		"face"	
-		"l"	3	-60	56	-50	
+		"l"	3	27	50	-49	
 
 		"face"	
-		"l"	3	-51	53	-34	
+		"l"	3	59	60	-37	
 
 		"face"	
-		"l"	3	-13	33	35	
+		"l"	3	38	36	-32	
 
 		"face"	
-		"l"	3	-50	-36	-54	
+		"l"	3	61	31	-61	
 
 		"face"	
-		"l"	3	12	49	50	
+		"l"	3	-39	-62	-60	
 
 		"face"	
-		"l"	3	60	61	-19	
+		"l"	3	62	63	64	
 
 		"face"	
-		"l"	3	21	18	23	
+		"l"	3	65	-65	-46	
 
 		"face"	
-		"l"	3	62	-24	-62	
+		"l"	3	61	45	-64	
 
 		"face"	
-		"l"	3	-22	-63	-61	
+		"l"	3	-66	-62	-63	
 
 		"face"	
-		"l"	3	63	61	64	
+		"l"	3	66	63	67	
 
 		"face"	
-		"l"	3	65	-65	-19	
+		"l"	3	68	-68	64	
 
 		"face"	
-		"l"	3	-61	18	-62	
+		"l"	3	-63	-65	-64	
 
 		"face"	
-		"l"	3	-66	60	-64	
+		"l"	3	-69	62	-67	
 
 		"face"	
-		"l"	3	66	67	68	
+		"l"	3	59	63	47	
 
 		"face"	
-		"l"	3	69	-69	70	
+		"l"	3	69	-48	67	
 
 		"face"	
-		"l"	3	71	-71	-68	
+		"l"	3	-67	-68	-64	
 
 		"face"	
-		"l"	3	-70	-72	-67	
+		"l"	3	-70	66	-60	
 
 		"face"	
-		"l"	3	60	67	48	
+		"l"	3	-62	63	-46	
 
 		"face"	
-		"l"	3	72	-49	68	
+		"l"	3	-39	45	47	
 
 		"face"	
-		"l"	3	-67	-69	-68	
+		"l"	3	-60	-48	-64	
 
 		"face"	
-		"l"	3	-73	66	-61	
+		"l"	3	38	59	61	
 
 		"face"	
-		"l"	3	-63	67	-47	
+		"l"	3	70	71	56	
 
 		"face"	
-		"l"	3	-22	46	48	
+		"l"	3	-56	-57	54	
 
 		"face"	
-		"l"	3	-61	-49	-68	
+		"l"	3	72	-55	-72	
 
 		"face"	
-		"l"	3	21	60	62	
+		"l"	3	55	-73	-71	
 
 		"face"	
-		"l"	3	73	74	43	
+		"l"	3	-73	71	54	
 
 		"face"	
-		"l"	3	-43	-44	41	
+		"l"	3	73	-55	74	
 
 		"face"	
-		"l"	3	75	-42	-75	
+		"l"	3	75	-75	-72	
 
 		"face"	
-		"l"	3	42	-76	-74	
+		"l"	3	-74	-76	72	
 
 		"face"	
-		"l"	3	-76	74	41	
+		"l"	3	76	77	64	
 
 		"face"	
-		"l"	3	76	-42	77	
+		"l"	3	-69	-65	67	
 
 		"face"	
-		"l"	3	78	-78	-75	
+		"l"	3	78	-68	-78	
 
 		"face"	
-		"l"	3	-77	-79	75	
+		"l"	3	68	-79	-77	
 
 		"face"	
-		"l"	3	79	80	54	
+		"l"	3	79	77	-53	
 
 		"face"	
-		"l"	3	-59	-55	57	
+		"l"	3	55	52	57	
 
 		"face"	
-		"l"	3	81	-58	-81	
+		"l"	3	80	-58	-78	
 
 		"face"	
-		"l"	3	58	-82	-80	
+		"l"	3	-56	-81	-80	
 
 		"face"	
-		"l"	3	82	80	44	
+		"l"	3	-79	77	67	
 
 		"face"	
-		"l"	3	83	-45	54	
+		"l"	3	81	-68	-53	
 
 		"face"	
-		"l"	3	-80	-55	-81	
+		"l"	3	-80	52	-78	
 
 		"face"	
-		"l"	3	-84	79	-83	
+		"l"	3	-82	79	78	
 
 		"face"	
-		"l"	3	84	80	-40	
+		"l"	3	79	82	72	
 
 		"face"	
-		"l"	3	42	39	44	
+		"l"	3	83	-73	84	
 
 		"face"	
-		"l"	3	-83	-45	-81	
+		"l"	3	85	-85	-83	
 
 		"face"	
-		"l"	3	-43	82	-85	
+		"l"	3	-84	-86	-80	
 
 		"face"	
-		"l"	3	-82	80	57	
+		"l"	3	-81	82	-71	
 
 		"face"	
-		"l"	3	85	-58	-40	
+		"l"	3	-56	70	72	
 
 		"face"	
-		"l"	3	-85	39	-81	
+		"l"	3	-80	-73	-83	
 
 		"face"	
-		"l"	3	-86	84	81	
+		"l"	3	55	79	80	
 
 		"face"	
 		"l"	3	86	87	88	
@@ -13237,4050 +14066,10050 @@ createNode zTet -n "zTet1";
 		"l"	3	-90	-92	-87	
 
 		"face"	
-		"l"	3	84	87	75	
+		"l"	3	92	87	-67	
 
 		"face"	
-		"l"	3	92	-76	88	
+		"l"	3	68	66	-63	
 
 		"face"	
-		"l"	3	-87	-89	-88	
+		"l"	3	93	62	-88	
 
 		"face"	
-		"l"	3	-93	86	-85	
+		"l"	3	-69	-94	-93	
 
 		"face"	
-		"l"	3	82	87	-74	
+		"l"	3	-92	87	90	
 
 		"face"	
-		"l"	3	-43	73	75	
+		"l"	3	94	-91	-67	
 
 		"face"	
-		"l"	3	-85	-76	-88	
+		"l"	3	-93	66	-88	
 
 		"face"	
-		"l"	3	42	84	-83	
+		"l"	3	-95	92	91	
 
 		"face"	
-		"l"	3	93	94	70	
+		"l"	3	92	95	78	
 
 		"face"	
-		"l"	3	-70	-71	68	
+		"l"	3	96	-79	97	
 
 		"face"	
-		"l"	3	95	-69	-95	
+		"l"	3	98	-98	-96	
 
 		"face"	
-		"l"	3	69	-96	-94	
+		"l"	3	-97	-99	-93	
 
 		"face"	
-		"l"	3	96	94	-53	
+		"l"	3	-94	95	-77	
 
 		"face"	
-		"l"	3	97	52	70	
+		"l"	3	-69	76	78	
 
 		"face"	
-		"l"	3	-94	-71	-95	
+		"l"	3	-93	-79	-96	
 
 		"face"	
-		"l"	3	-98	93	-97	
+		"l"	3	68	92	93	
 
 		"face"	
-		"l"	3	98	94	-57	
+		"l"	3	99	100	91	
 
 		"face"	
-		"l"	3	58	56	-53	
+		"l"	3	101	-92	102	
 
 		"face"	
-		"l"	3	-97	52	-95	
+		"l"	3	103	-103	-101	
 
 		"face"	
-		"l"	3	-59	96	-99	
+		"l"	3	-102	-104	-100	
 
 		"face"	
-		"l"	3	-96	94	68	
-
-		"face"	
-		"l"	3	99	-69	-57	
-
-		"face"	
-		"l"	3	-99	56	-95	
-
-		"face"	
-		"l"	3	-100	98	95	
-
-		"face"	
-		"l"	3	100	101	102	
-
-		"face"	
-		"l"	3	103	-103	-80	
-
-		"face"	
-		"l"	3	-97	79	-102	
-
-		"face"	
-		"l"	3	-104	96	-101	
-
-		"face"	
-		"l"	3	104	101	105	
-
-		"face"	
-		"l"	3	106	-106	102	
-
-		"face"	
-		"l"	3	-101	-103	-102	
-
-		"face"	
-		"l"	3	-107	100	-105	
-
-		"face"	
-		"l"	3	98	101	81	
-
-		"face"	
-		"l"	3	107	-82	105	
-
-		"face"	
-		"l"	3	-105	-106	-102	
-
-		"face"	
-		"l"	3	-108	104	-99	
-
-		"face"	
-		"l"	3	96	101	-80	
-
-		"face"	
-		"l"	3	-59	79	81	
-
-		"face"	
-		"l"	3	-99	-82	-102	
-
-		"face"	
-		"l"	3	58	98	-97	
-
-		"face"	
-		"l"	3	108	109	-67	
-
-		"face"	
-		"l"	3	69	66	71	
-
-		"face"	
-		"l"	3	110	-72	-110	
-
-		"face"	
-		"l"	3	-70	-111	-109	
-
-		"face"	
-		"l"	3	111	109	112	
-
-		"face"	
-		"l"	3	113	-113	-67	
-
-		"face"	
-		"l"	3	-109	66	-110	
-
-		"face"	
-		"l"	3	-114	108	-112	
-
-		"face"	
-		"l"	3	114	115	116	
-
-		"face"	
-		"l"	3	117	-117	118	
-
-		"face"	
-		"l"	3	119	-119	-116	
-
-		"face"	
-		"l"	3	-118	-120	-115	
-
-		"face"	
-		"l"	3	108	115	95	
-
-		"face"	
-		"l"	3	120	-96	116	
-
-		"face"	
-		"l"	3	-115	-117	-116	
-
-		"face"	
-		"l"	3	-121	114	-109	
-
-		"face"	
-		"l"	3	-111	115	-94	
-
-		"face"	
-		"l"	3	-70	93	95	
-
-		"face"	
-		"l"	3	-109	-96	-116	
-
-		"face"	
-		"l"	3	69	108	110	
-
-		"face"	
-		"l"	3	121	122	90	
-
-		"face"	
-		"l"	3	-90	-91	88	
-
-		"face"	
-		"l"	3	123	-89	-123	
-
-		"face"	
-		"l"	3	89	-124	-122	
-
-		"face"	
-		"l"	3	-124	122	88	
-
-		"face"	
-		"l"	3	124	-89	125	
-
-		"face"	
-		"l"	3	126	-126	-123	
-
-		"face"	
-		"l"	3	-125	-127	123	
-
-		"face"	
-		"l"	3	127	128	102	
-
-		"face"	
-		"l"	3	-107	-103	105	
-
-		"face"	
-		"l"	3	129	-106	-129	
-
-		"face"	
-		"l"	3	106	-130	-128	
-
-		"face"	
-		"l"	3	130	128	-87	
+		"l"	3	104	100	-87	
 
 		"face"	
 		"l"	3	89	86	91	
 
 		"face"	
-		"l"	3	131	-92	-129	
+		"l"	3	-100	-92	-101	
 
 		"face"	
-		"l"	3	-90	-132	-131	
+		"l"	3	-90	99	-105	
 
 		"face"	
-		"l"	3	-130	128	105	
-
-		"face"	
-		"l"	3	132	-106	-87	
-
-		"face"	
-		"l"	3	-131	86	-129	
-
-		"face"	
-		"l"	3	-133	130	129	
-
-		"face"	
-		"l"	3	130	133	123	
-
-		"face"	
-		"l"	3	134	-124	135	
-
-		"face"	
-		"l"	3	136	-136	-134	
-
-		"face"	
-		"l"	3	-135	-137	-131	
-
-		"face"	
-		"l"	3	-132	133	-122	
-
-		"face"	
-		"l"	3	-90	121	123	
-
-		"face"	
-		"l"	3	-131	-124	-134	
-
-		"face"	
-		"l"	3	89	130	131	
-
-		"face"	
-		"l"	3	137	138	118	
-
-		"face"	
-		"l"	3	-118	-119	116	
-
-		"face"	
-		"l"	3	139	-117	-139	
-
-		"face"	
-		"l"	3	117	-140	-138	
-
-		"face"	
-		"l"	3	140	138	-105	
-
-		"face"	
-		"l"	3	106	104	-101	
-
-		"face"	
-		"l"	3	141	100	-139	
-
-		"face"	
-		"l"	3	-107	-142	-141	
-
-		"face"	
-		"l"	3	-140	138	116	
-
-		"face"	
-		"l"	3	142	-117	-105	
-
-		"face"	
-		"l"	3	-141	104	-139	
-
-		"face"	
-		"l"	3	-143	140	139	
-
-		"face"	
-		"l"	3	140	143	129	
-
-		"face"	
-		"l"	3	144	-130	145	
-
-		"face"	
-		"l"	3	146	-146	-144	
-
-		"face"	
-		"l"	3	-145	-147	-141	
-
-		"face"	
-		"l"	3	-142	143	-128	
-
-		"face"	
-		"l"	3	-107	127	129	
-
-		"face"	
-		"l"	3	-141	-130	-144	
-
-		"face"	
-		"l"	3	106	140	141	
-
-		"face"	
-		"l"	3	147	148	-115	
-
-		"face"	
-		"l"	3	117	114	119	
-
-		"face"	
-		"l"	3	149	-120	-149	
-
-		"face"	
-		"l"	3	-118	-150	-148	
-
-		"face"	
-		"l"	3	150	148	151	
-
-		"face"	
-		"l"	3	152	-152	-115	
-
-		"face"	
-		"l"	3	-148	114	-149	
-
-		"face"	
-		"l"	3	-153	147	-151	
-
-		"face"	
-		"l"	3	147	153	139	
-
-		"face"	
-		"l"	3	154	-140	155	
-
-		"face"	
-		"l"	3	156	-156	-154	
-
-		"face"	
-		"l"	3	-155	-157	-148	
-
-		"face"	
-		"l"	3	-150	153	-138	
-
-		"face"	
-		"l"	3	-118	137	139	
-
-		"face"	
-		"l"	3	-148	-140	-154	
-
-		"face"	
-		"l"	3	117	147	149	
-
-		"face"	
-		"l"	3	157	158	2	
+		"l"	3	105	106	2	
 
 		"face"	
 		"l"	3	-9	-3	7	
 
 		"face"	
-		"l"	3	159	-8	-159	
+		"l"	3	107	-8	-107	
 
 		"face"	
-		"l"	3	8	-160	-158	
+		"l"	3	8	-108	-106	
 
 		"face"	
-		"l"	3	160	158	31	
+		"l"	3	108	106	13	
 
 		"face"	
-		"l"	3	-31	-32	2	
+		"l"	3	-13	-14	2	
 
 		"face"	
-		"l"	3	-158	-3	-159	
+		"l"	3	-106	-3	-107	
 
 		"face"	
-		"l"	3	30	157	-161	
+		"l"	3	12	105	-109	
 
 		"face"	
-		"l"	3	161	162	11	
-
-		"face"	
-		"l"	3	-18	-12	16	
-
-		"face"	
-		"l"	3	163	-17	-163	
-
-		"face"	
-		"l"	3	17	-164	-162	
-
-		"face"	
-		"l"	3	164	162	-1	
-
-		"face"	
-		"l"	3	-39	0	11	
-
-		"face"	
-		"l"	3	-162	-12	-163	
-
-		"face"	
-		"l"	3	38	161	-165	
-
-		"face"	
-		"l"	3	165	162	-7	
+		"l"	3	109	110	-7	
 
 		"face"	
 		"l"	3	8	6	-1	
 
 		"face"	
-		"l"	3	-165	0	-163	
+		"l"	3	111	0	-111	
 
 		"face"	
-		"l"	3	-9	164	-166	
+		"l"	3	-9	-112	-110	
 
 		"face"	
-		"l"	3	-164	162	16	
+		"l"	3	112	113	114	
 
 		"face"	
-		"l"	3	166	-17	-7	
+		"l"	3	115	-115	116	
 
 		"face"	
-		"l"	3	-166	6	-163	
+		"l"	3	-110	-117	-114	
 
 		"face"	
-		"l"	3	-167	165	163	
+		"l"	3	-116	109	-113	
 
 		"face"	
-		"l"	3	-164	167	168	
+		"l"	3	-112	117	-106	
 
 		"face"	
-		"l"	3	169	-169	170	
+		"l"	3	-9	105	107	
 
 		"face"	
-		"l"	3	171	-171	-168	
+		"l"	3	-110	-108	-118	
 
 		"face"	
-		"l"	3	-170	-172	163	
+		"l"	3	8	109	111	
 
 		"face"	
-		"l"	3	165	167	172	
+		"l"	3	118	117	119	
 
 		"face"	
-		"l"	3	-167	-173	168	
+		"l"	3	120	-120	-106	
 
 		"face"	
-		"l"	3	163	-169	-168	
+		"l"	3	111	105	-118	
 
 		"face"	
-		"l"	3	166	-164	-166	
+		"l"	3	-121	-112	-119	
 
 		"face"	
-		"l"	3	173	167	174	
+		"l"	3	112	117	121	
 
 		"face"	
-		"l"	3	175	-175	172	
+		"l"	3	122	-122	119	
 
 		"face"	
-		"l"	3	-166	-173	-168	
+		"l"	3	-119	-120	-118	
 
 		"face"	
-		"l"	3	-176	165	-174	
+		"l"	3	-123	118	-113	
 
 		"face"	
-		"l"	3	-172	167	170	
+		"l"	3	109	117	107	
 
 		"face"	
-		"l"	3	176	-171	174	
+		"l"	3	-116	-108	121	
 
 		"face"	
-		"l"	3	-174	-175	-168	
+		"l"	3	-113	-122	-118	
 
 		"face"	
-		"l"	3	-177	173	171	
+		"l"	3	115	112	-110	
 
 		"face"	
-		"l"	3	164	177	-158	
+		"l"	3	123	124	26	
 
 		"face"	
-		"l"	3	-9	157	159	
+		"l"	3	-31	-27	11	
 
 		"face"	
-		"l"	3	-166	-160	-178	
+		"l"	3	125	-12	-125	
 
 		"face"	
-		"l"	3	8	165	-165	
+		"l"	3	30	-126	-124	
 
 		"face"	
-		"l"	3	178	177	179	
+		"l"	3	126	124	43	
 
 		"face"	
-		"l"	3	180	-180	-158	
+		"l"	3	-43	-44	26	
 
 		"face"	
-		"l"	3	-165	157	-178	
+		"l"	3	-124	-27	-125	
 
 		"face"	
-		"l"	3	-181	164	-179	
+		"l"	3	42	123	-127	
 
 		"face"	
-		"l"	3	173	177	181	
+		"l"	3	127	124	14	
 
 		"face"	
-		"l"	3	182	-182	179	
+		"l"	3	128	-15	43	
 
 		"face"	
-		"l"	3	-179	-180	-178	
+		"l"	3	-127	-44	-125	
 
 		"face"	
-		"l"	3	-183	178	-174	
+		"l"	3	-129	126	-128	
 
 		"face"	
-		"l"	3	165	177	159	
+		"l"	3	-126	124	11	
 
 		"face"	
-		"l"	3	-176	-160	181	
+		"l"	3	12	-12	14	
 
 		"face"	
-		"l"	3	-174	-182	-178	
+		"l"	3	-128	-15	-125	
 
 		"face"	
-		"l"	3	175	173	-166	
+		"l"	3	-13	127	125	
 
 		"face"	
-		"l"	3	183	184	20	
+		"l"	3	-126	129	-106	
 
 		"face"	
-		"l"	3	-27	-21	25	
+		"l"	3	-121	105	119	
 
 		"face"	
-		"l"	3	185	-26	-185	
+		"l"	3	130	-120	-130	
 
 		"face"	
-		"l"	3	26	-186	-184	
+		"l"	3	120	-131	125	
 
 		"face"	
-		"l"	3	186	184	-10	
+		"l"	3	127	129	-109	
 
 		"face"	
-		"l"	3	-52	9	20	
+		"l"	3	-13	108	-106	
 
 		"face"	
-		"l"	3	-184	-21	-185	
+		"l"	3	125	105	-130	
 
 		"face"	
-		"l"	3	51	183	-187	
+		"l"	3	12	-126	-128	
 
 		"face"	
-		"l"	3	187	184	-16	
+		"l"	3	131	129	132	
 
 		"face"	
-		"l"	3	17	15	-10	
+		"l"	3	133	-133	-109	
 
 		"face"	
-		"l"	3	-187	9	-185	
+		"l"	3	-128	108	-130	
 
 		"face"	
-		"l"	3	-18	186	-188	
+		"l"	3	-134	127	-132	
 
 		"face"	
-		"l"	3	-186	184	25	
+		"l"	3	-131	129	119	
 
 		"face"	
-		"l"	3	188	-26	-16	
+		"l"	3	134	-120	132	
 
 		"face"	
-		"l"	3	-188	15	-185	
+		"l"	3	-132	-133	-130	
 
 		"face"	
-		"l"	3	-189	187	185	
+		"l"	3	-135	131	130	
 
 		"face"	
-		"l"	3	-186	189	190	
+		"l"	3	126	135	136	
 
 		"face"	
-		"l"	3	191	-191	192	
+		"l"	3	-129	-137	137	
 
 		"face"	
-		"l"	3	193	-193	-190	
+		"l"	3	-128	-138	-136	
 
 		"face"	
-		"l"	3	-192	-194	185	
+		"l"	3	128	127	-127	
 
 		"face"	
-		"l"	3	187	189	194	
+		"l"	3	138	135	139	
 
 		"face"	
-		"l"	3	-189	-195	190	
+		"l"	3	140	-140	136	
 
 		"face"	
-		"l"	3	185	-191	-190	
+		"l"	3	-127	-137	-136	
 
 		"face"	
-		"l"	3	188	-186	-188	
+		"l"	3	-141	126	-139	
 
 		"face"	
-		"l"	3	195	189	196	
+		"l"	3	131	135	141	
 
 		"face"	
-		"l"	3	-170	-197	194	
+		"l"	3	142	-142	139	
 
 		"face"	
-		"l"	3	-188	-195	-190	
+		"l"	3	-139	-140	-136	
 
 		"face"	
-		"l"	3	169	187	-196	
+		"l"	3	-143	138	-132	
 
 		"face"	
-		"l"	3	-194	189	192	
+		"l"	3	127	135	137	
 
 		"face"	
-		"l"	3	197	-193	196	
+		"l"	3	-134	-138	141	
 
 		"face"	
-		"l"	3	-196	-197	-190	
+		"l"	3	-132	-142	-136	
 
 		"face"	
-		"l"	3	-198	195	193	
+		"l"	3	133	131	-128	
 
 		"face"	
-		"l"	3	186	198	-162	
+		"l"	3	143	144	37	
 
 		"face"	
-		"l"	3	-18	161	163	
+		"l"	3	145	-38	20	
 
 		"face"	
-		"l"	3	-188	-164	-199	
+		"l"	3	146	-21	-145	
 
 		"face"	
-		"l"	3	17	187	-187	
+		"l"	3	-146	-147	-144	
 
 		"face"	
-		"l"	3	199	198	200	
+		"l"	3	147	144	-25	
 
 		"face"	
-		"l"	3	201	-201	-162	
+		"l"	3	-52	24	37	
 
 		"face"	
-		"l"	3	-187	161	-199	
+		"l"	3	-144	-38	-145	
 
 		"face"	
-		"l"	3	-202	186	-200	
+		"l"	3	51	143	-148	
 
 		"face"	
-		"l"	3	195	198	171	
+		"l"	3	148	144	-22	
 
 		"face"	
-		"l"	3	202	-172	200	
+		"l"	3	30	21	-25	
 
 		"face"	
-		"l"	3	-200	-201	-199	
+		"l"	3	-148	24	-145	
 
 		"face"	
-		"l"	3	-203	199	-196	
+		"l"	3	-31	147	-149	
 
 		"face"	
-		"l"	3	187	198	163	
+		"l"	3	-147	144	20	
 
 		"face"	
-		"l"	3	169	-164	171	
+		"l"	3	23	-21	-22	
 
 		"face"	
-		"l"	3	-196	-172	-199	
+		"l"	3	-149	21	-145	
 
 		"face"	
-		"l"	3	-170	195	-188	
+		"l"	3	-24	148	146	
 
 		"face"	
-		"l"	3	203	204	-19	
+		"l"	3	149	150	-119	
 
 		"face"	
-		"l"	3	-66	18	64	
+		"l"	3	120	118	111	
 
 		"face"	
-		"l"	3	205	-65	-205	
+		"l"	3	-149	-112	-151	
 
 		"face"	
-		"l"	3	65	-206	-204	
+		"l"	3	-121	148	-150	
 
 		"face"	
-		"l"	3	206	204	-25	
+		"l"	3	147	151	-124	
 
 		"face"	
-		"l"	3	26	24	-19	
+		"l"	3	-31	123	125	
 
 		"face"	
-		"l"	3	-204	18	-205	
+		"l"	3	-149	-126	-152	
 
 		"face"	
-		"l"	3	-27	203	-207	
+		"l"	3	30	148	-148	
 
 		"face"	
-		"l"	3	203	207	-184	
+		"l"	3	152	151	153	
 
 		"face"	
-		"l"	3	-27	183	185	
+		"l"	3	154	-154	-124	
 
 		"face"	
-		"l"	3	-207	-186	-208	
+		"l"	3	-148	123	-152	
 
 		"face"	
-		"l"	3	26	206	-204	
+		"l"	3	-155	147	-153	
 
 		"face"	
-		"l"	3	208	207	209	
+		"l"	3	149	151	130	
 
 		"face"	
-		"l"	3	210	-210	-184	
+		"l"	3	155	-131	153	
 
 		"face"	
-		"l"	3	-204	183	-208	
+		"l"	3	-153	-154	-152	
 
 		"face"	
-		"l"	3	-211	203	-209	
+		"l"	3	-156	152	-150	
 
 		"face"	
-		"l"	3	211	207	193	
+		"l"	3	148	151	125	
 
 		"face"	
-		"l"	3	212	-194	209	
+		"l"	3	-121	-126	130	
 
 		"face"	
-		"l"	3	-209	-210	-208	
+		"l"	3	-150	-131	-152	
 
 		"face"	
-		"l"	3	-213	208	-212	
+		"l"	3	120	149	-149	
 
 		"face"	
-		"l"	3	206	207	185	
+		"l"	3	156	157	54	
 
 		"face"	
-		"l"	3	191	-186	193	
+		"l"	3	-59	-55	41	
 
 		"face"	
-		"l"	3	-212	-194	-208	
+		"l"	3	158	-42	-158	
 
 		"face"	
-		"l"	3	-192	211	-207	
+		"l"	3	58	-159	-157	
 
 		"face"	
-		"l"	3	213	214	41	
+		"l"	3	159	157	74	
 
 		"face"	
-		"l"	3	-46	-42	29	
+		"l"	3	-74	-75	54	
 
 		"face"	
-		"l"	3	215	-30	-215	
+		"l"	3	-157	-55	-158	
 
 		"face"	
-		"l"	3	45	-216	-214	
+		"l"	3	73	156	-160	
 
 		"face"	
-		"l"	3	216	214	77	
+		"l"	3	160	157	44	
 
 		"face"	
-		"l"	3	-77	-78	41	
+		"l"	3	161	-45	74	
 
 		"face"	
-		"l"	3	-214	-42	-215	
+		"l"	3	-160	-75	-158	
 
 		"face"	
-		"l"	3	76	213	-217	
+		"l"	3	-162	159	-161	
 
 		"face"	
-		"l"	3	217	214	32	
+		"l"	3	-159	157	41	
 
 		"face"	
-		"l"	3	218	-33	77	
+		"l"	3	42	-42	44	
 
 		"face"	
-		"l"	3	-217	-78	-215	
+		"l"	3	-161	-45	-158	
 
 		"face"	
-		"l"	3	-219	216	-218	
+		"l"	3	-43	160	158	
 
 		"face"	
-		"l"	3	-216	214	29	
+		"l"	3	-159	162	-124	
 
 		"face"	
-		"l"	3	30	-30	32	
+		"l"	3	-155	123	153	
 
 		"face"	
-		"l"	3	-218	-33	-215	
+		"l"	3	163	-154	-163	
 
 		"face"	
-		"l"	3	-31	217	215	
+		"l"	3	154	-164	158	
 
 		"face"	
-		"l"	3	-216	219	-158	
+		"l"	3	160	162	-127	
 
 		"face"	
-		"l"	3	-181	157	179	
+		"l"	3	-43	126	-124	
 
 		"face"	
-		"l"	3	220	-180	-220	
+		"l"	3	158	123	-163	
 
 		"face"	
-		"l"	3	180	-221	215	
+		"l"	3	42	-159	-161	
 
 		"face"	
-		"l"	3	217	219	-161	
+		"l"	3	164	162	-139	
 
 		"face"	
-		"l"	3	-31	160	-158	
+		"l"	3	140	138	-127	
 
 		"face"	
-		"l"	3	215	157	-220	
+		"l"	3	-161	126	-163	
 
 		"face"	
-		"l"	3	30	-216	-218	
+		"l"	3	-141	160	-165	
 
 		"face"	
-		"l"	3	221	219	222	
+		"l"	3	-164	162	153	
 
 		"face"	
-		"l"	3	223	-223	-161	
+		"l"	3	165	-154	-139	
 
 		"face"	
-		"l"	3	-218	160	-220	
+		"l"	3	-165	138	-163	
 
 		"face"	
-		"l"	3	-224	217	-222	
+		"l"	3	-166	164	163	
 
 		"face"	
-		"l"	3	-221	219	179	
+		"l"	3	159	166	167	
 
 		"face"	
-		"l"	3	224	-180	222	
+		"l"	3	-162	-168	168	
 
 		"face"	
-		"l"	3	-222	-223	-220	
+		"l"	3	-161	-169	-167	
 
 		"face"	
-		"l"	3	-225	221	220	
+		"l"	3	161	160	-160	
 
 		"face"	
-		"l"	3	216	225	226	
+		"l"	3	169	166	170	
 
 		"face"	
-		"l"	3	-219	-227	227	
+		"l"	3	171	-171	167	
 
 		"face"	
-		"l"	3	-218	-228	-226	
+		"l"	3	-160	-168	-167	
 
 		"face"	
-		"l"	3	218	217	-217	
+		"l"	3	-172	159	-170	
 
 		"face"	
-		"l"	3	228	225	229	
+		"l"	3	164	166	172	
 
 		"face"	
-		"l"	3	230	-230	226	
+		"l"	3	173	-173	170	
 
 		"face"	
-		"l"	3	-217	-227	-226	
+		"l"	3	-170	-171	-167	
 
 		"face"	
-		"l"	3	-231	216	-229	
+		"l"	3	-174	169	-165	
 
 		"face"	
-		"l"	3	221	225	231	
+		"l"	3	160	166	168	
 
 		"face"	
-		"l"	3	232	-232	229	
+		"l"	3	-141	-169	172	
 
 		"face"	
-		"l"	3	-229	-230	-226	
+		"l"	3	-165	-173	-167	
 
 		"face"	
-		"l"	3	-233	228	-222	
+		"l"	3	140	164	-161	
 
 		"face"	
-		"l"	3	217	225	227	
+		"l"	3	174	175	67	
 
 		"face"	
-		"l"	3	-224	-228	231	
+		"l"	3	-70	-68	47	
 
 		"face"	
-		"l"	3	-222	-232	-226	
+		"l"	3	176	-48	-176	
 
 		"face"	
-		"l"	3	223	221	-218	
+		"l"	3	69	-177	-175	
 
 		"face"	
-		"l"	3	233	234	57	
+		"l"	3	177	175	-53	
 
 		"face"	
-		"l"	3	-60	-58	35	
+		"l"	3	-82	52	67	
 
 		"face"	
-		"l"	3	235	-36	-235	
+		"l"	3	-175	-68	-176	
 
 		"face"	
-		"l"	3	59	-236	-234	
+		"l"	3	81	174	-178	
 
 		"face"	
-		"l"	3	236	234	-40	
+		"l"	3	178	175	-51	
 
 		"face"	
-		"l"	3	-86	39	57	
+		"l"	3	58	50	-53	
 
 		"face"	
-		"l"	3	-234	-58	-235	
+		"l"	3	-178	52	-176	
 
 		"face"	
-		"l"	3	85	233	-237	
+		"l"	3	-59	177	-179	
 
 		"face"	
-		"l"	3	237	234	-37	
+		"l"	3	-177	175	47	
 
 		"face"	
-		"l"	3	45	36	-40	
+		"l"	3	51	-48	-51	
 
 		"face"	
-		"l"	3	-237	39	-235	
+		"l"	3	-179	50	-176	
 
 		"face"	
-		"l"	3	-46	236	-238	
+		"l"	3	-52	178	176	
 
 		"face"	
-		"l"	3	-236	234	35	
+		"l"	3	-177	179	-144	
 
 		"face"	
-		"l"	3	38	-36	-37	
+		"l"	3	180	143	181	
 
 		"face"	
-		"l"	3	-238	36	-235	
+		"l"	3	182	-182	-180	
 
 		"face"	
-		"l"	3	-39	237	235	
+		"l"	3	-181	-183	176	
 
 		"face"	
-		"l"	3	-236	238	-162	
+		"l"	3	178	179	-148	
 
 		"face"	
-		"l"	3	-202	161	200	
+		"l"	3	-52	147	-144	
 
 		"face"	
-		"l"	3	239	-201	-239	
+		"l"	3	176	143	-180	
 
 		"face"	
-		"l"	3	201	-240	235	
+		"l"	3	51	-177	-179	
 
 		"face"	
-		"l"	3	237	238	-165	
+		"l"	3	183	179	-153	
 
 		"face"	
-		"l"	3	-39	164	-162	
+		"l"	3	154	152	-148	
 
 		"face"	
-		"l"	3	235	161	-239	
+		"l"	3	-179	147	-180	
 
 		"face"	
-		"l"	3	38	-236	-238	
+		"l"	3	-155	178	-184	
 
 		"face"	
-		"l"	3	240	238	-179	
+		"l"	3	-183	179	181	
 
 		"face"	
-		"l"	3	180	178	-165	
+		"l"	3	184	-182	-153	
 
 		"face"	
-		"l"	3	-238	164	-239	
+		"l"	3	-184	152	-180	
 
 		"face"	
-		"l"	3	-181	237	-241	
+		"l"	3	-185	183	182	
 
 		"face"	
-		"l"	3	-240	238	200	
+		"l"	3	177	185	-157	
 
 		"face"	
-		"l"	3	241	-201	-179	
+		"l"	3	-59	156	158	
 
 		"face"	
-		"l"	3	-241	178	-239	
+		"l"	3	-179	-159	-186	
 
 		"face"	
-		"l"	3	-242	240	239	
+		"l"	3	58	178	-178	
 
 		"face"	
-		"l"	3	236	242	-214	
+		"l"	3	186	185	187	
 
 		"face"	
-		"l"	3	-46	213	215	
+		"l"	3	188	-188	-157	
 
 		"face"	
-		"l"	3	-238	-216	-243	
+		"l"	3	-178	156	-186	
 
 		"face"	
-		"l"	3	45	237	-237	
+		"l"	3	-189	177	-187	
 
 		"face"	
-		"l"	3	243	242	244	
+		"l"	3	183	185	163	
 
 		"face"	
-		"l"	3	245	-245	-214	
+		"l"	3	189	-164	187	
 
 		"face"	
-		"l"	3	-237	213	-243	
+		"l"	3	-187	-188	-186	
 
 		"face"	
-		"l"	3	-246	236	-244	
+		"l"	3	-190	186	-184	
 
 		"face"	
-		"l"	3	240	242	220	
+		"l"	3	178	185	158	
 
 		"face"	
-		"l"	3	246	-221	244	
+		"l"	3	-155	-159	163	
 
 		"face"	
-		"l"	3	-244	-245	-243	
+		"l"	3	-184	-164	-186	
 
 		"face"	
-		"l"	3	-247	243	-241	
+		"l"	3	154	183	-179	
 
 		"face"	
-		"l"	3	237	242	215	
+		"l"	3	190	191	-67	
 
 		"face"	
-		"l"	3	-181	-216	220	
+		"l"	3	-95	66	90	
 
 		"face"	
-		"l"	3	-241	-221	-243	
+		"l"	3	192	-91	-192	
 
 		"face"	
-		"l"	3	180	240	-238	
+		"l"	3	94	-193	-191	
 
 		"face"	
-		"l"	3	247	248	68	
+		"l"	3	193	191	-60	
 
 		"face"	
-		"l"	3	-73	-69	48	
+		"l"	3	69	59	-67	
 
 		"face"	
-		"l"	3	249	-49	-249	
+		"l"	3	-191	66	-192	
 
 		"face"	
-		"l"	3	72	-250	-248	
+		"l"	3	-70	190	-194	
 
 		"face"	
-		"l"	3	250	248	-57	
+		"l"	3	194	191	195	
 
 		"face"	
-		"l"	3	-100	56	68	
+		"l"	3	196	-196	-60	
 
 		"face"	
-		"l"	3	-248	-69	-249	
+		"l"	3	-194	59	-192	
 
 		"face"	
-		"l"	3	99	247	-251	
+		"l"	3	-197	193	-195	
 
 		"face"	
-		"l"	3	251	248	-50	
+		"l"	3	190	197	-175	
 
 		"face"	
-		"l"	3	59	49	-57	
+		"l"	3	-70	174	176	
 
 		"face"	
-		"l"	3	-251	56	-249	
+		"l"	3	-194	-177	-198	
 
 		"face"	
-		"l"	3	-60	250	-252	
+		"l"	3	69	193	-191	
 
 		"face"	
-		"l"	3	-250	248	48	
+		"l"	3	198	197	199	
 
 		"face"	
-		"l"	3	51	-49	-50	
+		"l"	3	200	-200	-175	
 
 		"face"	
-		"l"	3	-252	49	-249	
+		"l"	3	-191	174	-198	
 
 		"face"	
-		"l"	3	-52	251	249	
+		"l"	3	-201	190	-199	
 
 		"face"	
-		"l"	3	-250	252	-184	
+		"l"	3	201	197	182	
 
 		"face"	
-		"l"	3	-211	183	209	
+		"l"	3	202	-183	199	
 
 		"face"	
-		"l"	3	253	-210	-253	
+		"l"	3	-199	-200	-198	
 
 		"face"	
-		"l"	3	210	-254	249	
+		"l"	3	-203	198	-202	
 
 		"face"	
-		"l"	3	251	252	-187	
+		"l"	3	193	197	176	
 
 		"face"	
-		"l"	3	-52	186	-184	
+		"l"	3	180	-177	182	
 
 		"face"	
-		"l"	3	249	183	-253	
+		"l"	3	-202	-183	-198	
 
 		"face"	
-		"l"	3	51	-250	-252	
+		"l"	3	-181	201	-194	
 
 		"face"	
-		"l"	3	254	252	-200	
+		"l"	3	203	204	84	
 
 		"face"	
-		"l"	3	201	199	-187	
+		"l"	3	-84	-85	72	
 
 		"face"	
-		"l"	3	-252	186	-253	
+		"l"	3	205	-73	-205	
 
 		"face"	
-		"l"	3	-202	251	-255	
+		"l"	3	83	-206	-204	
 
 		"face"	
-		"l"	3	-254	252	209	
+		"l"	3	-206	204	72	
 
 		"face"	
-		"l"	3	255	-210	-200	
+		"l"	3	73	-73	75	
 
 		"face"	
-		"l"	3	-255	199	-253	
+		"l"	3	206	-76	-205	
 
 		"face"	
-		"l"	3	-256	254	253	
+		"l"	3	-74	-207	205	
 
 		"face"	
-		"l"	3	250	256	-234	
+		"l"	3	-206	207	-157	
 
 		"face"	
-		"l"	3	-60	233	235	
+		"l"	3	-189	156	187	
 
 		"face"	
-		"l"	3	-252	-236	-257	
+		"l"	3	208	-188	-208	
 
 		"face"	
-		"l"	3	59	251	-251	
+		"l"	3	188	-209	205	
 
 		"face"	
-		"l"	3	257	256	258	
+		"l"	3	-207	207	-160	
 
 		"face"	
-		"l"	3	259	-259	-234	
+		"l"	3	-74	159	-157	
 
 		"face"	
-		"l"	3	-251	233	-257	
+		"l"	3	205	156	-208	
 
 		"face"	
-		"l"	3	-260	250	-258	
+		"l"	3	73	-206	206	
 
 		"face"	
-		"l"	3	254	256	239	
+		"l"	3	209	207	-170	
 
 		"face"	
-		"l"	3	260	-240	258	
+		"l"	3	171	169	-160	
 
 		"face"	
-		"l"	3	-258	-259	-257	
+		"l"	3	206	159	-208	
 
 		"face"	
-		"l"	3	-261	257	-255	
+		"l"	3	-172	-207	-210	
 
 		"face"	
-		"l"	3	251	256	235	
+		"l"	3	-209	207	187	
 
 		"face"	
-		"l"	3	-202	-236	239	
+		"l"	3	210	-188	-170	
 
 		"face"	
-		"l"	3	-255	-240	-257	
+		"l"	3	-210	169	-208	
 
 		"face"	
-		"l"	3	201	254	-252	
+		"l"	3	-211	209	208	
 
 		"face"	
-		"l"	3	261	262	112	
+		"l"	3	211	212	97	
 
 		"face"	
-		"l"	3	263	-113	-64	
+		"l"	3	-97	-98	78	
 
 		"face"	
-		"l"	3	264	63	-263	
+		"l"	3	213	-79	-213	
 
 		"face"	
-		"l"	3	-264	-265	-262	
+		"l"	3	96	-214	-212	
 
 		"face"	
-		"l"	3	265	262	-67	
+		"l"	3	214	212	85	
 
 		"face"	
-		"l"	3	-114	66	112	
+		"l"	3	215	-86	97	
 
 		"face"	
-		"l"	3	-262	-113	-263	
+		"l"	3	-212	-98	-213	
 
 		"face"	
-		"l"	3	113	261	-266	
+		"l"	3	-216	211	-215	
 
 		"face"	
-		"l"	3	266	262	-61	
+		"l"	3	216	212	-80	
 
 		"face"	
-		"l"	3	72	60	-67	
+		"l"	3	83	79	85	
 
 		"face"	
-		"l"	3	-266	66	-263	
+		"l"	3	-215	-86	-213	
 
 		"face"	
-		"l"	3	-73	265	-267	
+		"l"	3	-84	214	-217	
 
 		"face"	
-		"l"	3	-265	262	-64	
+		"l"	3	-214	212	78	
 
 		"face"	
-		"l"	3	65	63	-61	
+		"l"	3	81	-79	-80	
 
 		"face"	
-		"l"	3	-267	60	-263	
+		"l"	3	-217	79	-213	
 
 		"face"	
-		"l"	3	-66	266	264	
+		"l"	3	-82	216	213	
 
 		"face"	
-		"l"	3	-265	267	205	
+		"l"	3	-214	217	-175	
 
 		"face"	
-		"l"	3	268	-206	269	
+		"l"	3	-201	174	199	
 
 		"face"	
-		"l"	3	270	-270	-268	
+		"l"	3	218	-200	-218	
 
 		"face"	
-		"l"	3	-269	-271	264	
+		"l"	3	200	-219	213	
 
 		"face"	
-		"l"	3	266	267	-204	
+		"l"	3	216	217	-178	
 
 		"face"	
-		"l"	3	-66	203	205	
+		"l"	3	-82	177	-175	
 
 		"face"	
-		"l"	3	264	-206	-268	
+		"l"	3	213	174	-218	
 
 		"face"	
-		"l"	3	65	-265	-267	
+		"l"	3	81	-214	-217	
 
 		"face"	
-		"l"	3	271	267	-209	
+		"l"	3	219	217	-187	
 
 		"face"	
-		"l"	3	210	208	-204	
+		"l"	3	188	186	-178	
 
 		"face"	
-		"l"	3	-267	203	-268	
+		"l"	3	-217	177	-218	
 
 		"face"	
-		"l"	3	-211	266	-272	
+		"l"	3	-189	216	-220	
 
 		"face"	
-		"l"	3	-271	267	269	
+		"l"	3	-219	217	199	
 
 		"face"	
-		"l"	3	272	-270	-209	
+		"l"	3	220	-200	-187	
 
 		"face"	
-		"l"	3	-272	208	-268	
+		"l"	3	-220	186	-218	
 
 		"face"	
-		"l"	3	-273	271	270	
+		"l"	3	-221	219	218	
 
 		"face"	
-		"l"	3	265	273	-248	
+		"l"	3	221	222	-212	
 
 		"face"	
-		"l"	3	-73	247	249	
+		"l"	3	223	211	224	
 
 		"face"	
-		"l"	3	-267	-250	-274	
+		"l"	3	225	-225	-223	
 
 		"face"	
-		"l"	3	72	266	-266	
+		"l"	3	-224	-226	-222	
 
 		"face"	
-		"l"	3	274	273	275	
+		"l"	3	226	222	-215	
 
 		"face"	
-		"l"	3	276	-276	-248	
+		"l"	3	215	214	-212	
 
 		"face"	
-		"l"	3	-266	247	-274	
+		"l"	3	-222	211	-223	
 
 		"face"	
-		"l"	3	-277	265	-275	
+		"l"	3	-216	221	-227	
 
 		"face"	
-		"l"	3	271	273	253	
+		"l"	3	227	222	228	
 
 		"face"	
-		"l"	3	277	-254	275	
+		"l"	3	229	-229	-215	
 
 		"face"	
-		"l"	3	-275	-276	-274	
+		"l"	3	-227	214	-223	
 
 		"face"	
-		"l"	3	-278	274	-272	
+		"l"	3	-230	226	-228	
 
 		"face"	
-		"l"	3	266	273	249	
+		"l"	3	-226	222	224	
 
 		"face"	
-		"l"	3	-211	-250	253	
+		"l"	3	230	-225	228	
 
 		"face"	
-		"l"	3	-272	-254	-274	
+		"l"	3	-228	-229	-223	
 
 		"face"	
-		"l"	3	210	271	-267	
+		"l"	3	-231	227	225	
 
 		"face"	
-		"l"	3	278	279	-262	
+		"l"	3	214	231	-204	
 
 		"face"	
-		"l"	3	263	261	264	
+		"l"	3	-84	203	205	
 
 		"face"	
-		"l"	3	280	-265	-280	
+		"l"	3	-217	-206	-232	
 
 		"face"	
-		"l"	3	-264	-281	-279	
+		"l"	3	83	216	-215	
 
 		"face"	
-		"l"	3	281	279	282	
+		"l"	3	-229	231	232	
 
 		"face"	
-		"l"	3	283	-283	-262	
+		"l"	3	229	-233	-204	
 
 		"face"	
-		"l"	3	-279	261	-280	
+		"l"	3	-215	203	-232	
 
 		"face"	
-		"l"	3	-284	278	-282	
+		"l"	3	-230	214	228	
 
 		"face"	
-		"l"	3	284	279	270	
+		"l"	3	219	231	208	
 
 		"face"	
-		"l"	3	285	-271	282	
+		"l"	3	233	-209	232	
 
 		"face"	
-		"l"	3	-282	-283	-280	
+		"l"	3	228	-233	-232	
 
 		"face"	
-		"l"	3	-286	281	-285	
+		"l"	3	-234	-229	-220	
 
 		"face"	
-		"l"	3	-281	279	264	
+		"l"	3	216	231	205	
 
 		"face"	
-		"l"	3	268	-265	270	
+		"l"	3	-189	-206	208	
 
 		"face"	
-		"l"	3	-285	-271	-280	
+		"l"	3	-220	-209	-232	
 
 		"face"	
-		"l"	3	-269	284	280	
+		"l"	3	188	219	-217	
 
 		"face"	
-		"l"	3	286	287	88	
+		"l"	3	234	235	102	
 
 		"face"	
-		"l"	3	-93	-89	75	
+		"l"	3	-102	-103	91	
 
 		"face"	
-		"l"	3	288	-76	-288	
+		"l"	3	236	-92	-236	
 
 		"face"	
-		"l"	3	92	-289	-287	
+		"l"	3	101	-237	-235	
 
 		"face"	
-		"l"	3	289	287	125	
+		"l"	3	237	235	98	
 
 		"face"	
-		"l"	3	-125	-126	88	
+		"l"	3	238	-99	102	
 
 		"face"	
-		"l"	3	-287	-89	-288	
+		"l"	3	-235	-103	-236	
 
 		"face"	
-		"l"	3	124	286	-290	
+		"l"	3	-239	234	-238	
 
 		"face"	
-		"l"	3	290	287	78	
+		"l"	3	239	235	-93	
 
 		"face"	
-		"l"	3	291	-79	125	
+		"l"	3	96	92	98	
 
 		"face"	
-		"l"	3	-290	-126	-288	
+		"l"	3	-238	-99	-236	
 
 		"face"	
-		"l"	3	-292	289	-291	
+		"l"	3	-97	237	-240	
 
 		"face"	
-		"l"	3	-289	287	75	
+		"l"	3	-237	235	91	
 
 		"face"	
-		"l"	3	76	-76	78	
+		"l"	3	94	-92	-93	
 
 		"face"	
-		"l"	3	-291	-79	-288	
+		"l"	3	-240	92	-236	
 
 		"face"	
-		"l"	3	-77	290	288	
+		"l"	3	-95	239	236	
 
 		"face"	
-		"l"	3	-289	292	-214	
+		"l"	3	239	240	-191	
 
 		"face"	
-		"l"	3	-246	213	244	
+		"l"	3	-95	190	192	
 
 		"face"	
-		"l"	3	293	-245	-293	
+		"l"	3	236	-193	-241	
 
 		"face"	
-		"l"	3	245	-294	288	
+		"l"	3	94	-237	-240	
 
 		"face"	
-		"l"	3	290	292	-217	
+		"l"	3	241	240	-199	
 
 		"face"	
-		"l"	3	-77	216	-214	
+		"l"	3	200	198	-191	
 
 		"face"	
-		"l"	3	288	213	-293	
+		"l"	3	-240	190	-241	
 
 		"face"	
-		"l"	3	76	-289	-291	
+		"l"	3	-201	239	-242	
 
 		"face"	
-		"l"	3	294	292	-229	
+		"l"	3	242	240	243	
 
 		"face"	
-		"l"	3	230	228	-217	
+		"l"	3	244	-244	-199	
 
 		"face"	
-		"l"	3	-291	216	-293	
+		"l"	3	-242	198	-241	
 
 		"face"	
-		"l"	3	-231	290	-295	
+		"l"	3	-245	241	-243	
 
 		"face"	
-		"l"	3	-294	292	244	
+		"l"	3	245	246	-235	
 
 		"face"	
-		"l"	3	295	-245	-229	
+		"l"	3	247	234	248	
 
 		"face"	
-		"l"	3	-295	228	-293	
+		"l"	3	249	-249	-247	
 
 		"face"	
-		"l"	3	-296	294	293	
+		"l"	3	-248	-250	-246	
 
 		"face"	
-		"l"	3	289	296	297	
+		"l"	3	250	246	-238	
 
 		"face"	
-		"l"	3	-292	-298	298	
+		"l"	3	238	237	-235	
 
 		"face"	
-		"l"	3	-291	-299	-297	
+		"l"	3	-246	234	-247	
 
 		"face"	
-		"l"	3	291	290	-290	
+		"l"	3	-239	245	-251	
 
 		"face"	
-		"l"	3	299	296	300	
+		"l"	3	251	246	252	
 
 		"face"	
-		"l"	3	301	-301	297	
+		"l"	3	-224	-253	-238	
 
 		"face"	
-		"l"	3	-290	-298	-297	
+		"l"	3	-251	237	-247	
 
 		"face"	
-		"l"	3	-302	289	-300	
+		"l"	3	223	250	-252	
 
 		"face"	
-		"l"	3	294	296	302	
+		"l"	3	-250	246	248	
 
 		"face"	
-		"l"	3	303	-303	300	
+		"l"	3	253	-249	252	
 
 		"face"	
-		"l"	3	-300	-301	-297	
+		"l"	3	-252	-253	-247	
 
 		"face"	
-		"l"	3	-304	299	-295	
+		"l"	3	-254	251	249	
 
 		"face"	
-		"l"	3	290	296	298	
+		"l"	3	237	254	-212	
 
 		"face"	
-		"l"	3	-231	-299	302	
+		"l"	3	-97	211	213	
 
 		"face"	
-		"l"	3	-295	-303	-297	
+		"l"	3	-240	-214	-255	
 
 		"face"	
-		"l"	3	230	294	-291	
+		"l"	3	96	239	-238	
 
 		"face"	
-		"l"	3	304	305	105	
+		"l"	3	-253	254	224	
 
 		"face"	
-		"l"	3	-108	-106	81	
+		"l"	3	-224	-225	-212	
 
 		"face"	
-		"l"	3	306	-82	-306	
+		"l"	3	-238	211	-255	
 
 		"face"	
-		"l"	3	107	-307	-305	
+		"l"	3	223	237	252	
 
 		"face"	
-		"l"	3	307	305	-87	
+		"l"	3	241	254	218	
 
 		"face"	
-		"l"	3	-133	86	105	
+		"l"	3	255	-219	224	
 
 		"face"	
-		"l"	3	-305	-106	-306	
+		"l"	3	252	-225	-255	
 
 		"face"	
-		"l"	3	132	304	-308	
+		"l"	3	-256	-253	-242	
 
 		"face"	
-		"l"	3	308	305	-85	
+		"l"	3	239	254	213	
 
 		"face"	
-		"l"	3	92	84	-87	
+		"l"	3	-201	-214	218	
 
 		"face"	
-		"l"	3	-308	86	-306	
+		"l"	3	-242	-219	-255	
 
 		"face"	
-		"l"	3	-93	307	-309	
+		"l"	3	200	241	-240	
 
 		"face"	
-		"l"	3	-307	305	81	
+		"l"	3	256	257	248	
 
 		"face"	
-		"l"	3	85	-82	-85	
+		"l"	3	-248	-249	-235	
 
 		"face"	
-		"l"	3	-309	84	-306	
+		"l"	3	258	234	-258	
 
 		"face"	
-		"l"	3	-86	308	306	
+		"l"	3	247	-259	-257	
 
 		"face"	
-		"l"	3	-307	309	-234	
+		"l"	3	259	260	119	
 
 		"face"	
-		"l"	3	-260	233	258	
+		"l"	3	-123	-120	121	
 
 		"face"	
-		"l"	3	310	-259	-310	
+		"l"	3	261	-122	-261	
 
 		"face"	
-		"l"	3	259	-311	306	
+		"l"	3	122	-262	-260	
 
 		"face"	
-		"l"	3	308	309	-237	
+		"l"	3	262	260	132	
 
 		"face"	
-		"l"	3	-86	236	-234	
+		"l"	3	-135	-133	119	
 
 		"face"	
-		"l"	3	306	233	-310	
+		"l"	3	-260	-120	-261	
 
 		"face"	
-		"l"	3	85	-307	-309	
+		"l"	3	134	259	-263	
 
 		"face"	
-		"l"	3	311	309	-244	
+		"l"	3	263	264	-260	
 
 		"face"	
-		"l"	3	245	243	-237	
+		"l"	3	-123	259	261	
 
 		"face"	
-		"l"	3	-309	236	-310	
+		"l"	3	265	-262	-265	
 
 		"face"	
-		"l"	3	-246	308	-312	
+		"l"	3	122	-266	-264	
 
 		"face"	
-		"l"	3	-311	309	258	
+		"l"	3	266	264	267	
 
 		"face"	
-		"l"	3	312	-259	-244	
+		"l"	3	268	-268	-260	
 
 		"face"	
-		"l"	3	-312	243	-310	
+		"l"	3	-264	259	-265	
 
 		"face"	
-		"l"	3	-313	311	310	
+		"l"	3	-269	263	-267	
 
 		"face"	
-		"l"	3	307	313	-287	
+		"l"	3	269	270	153	
 
 		"face"	
-		"l"	3	-93	286	288	
+		"l"	3	-156	-154	130	
 
 		"face"	
-		"l"	3	-309	-289	-314	
+		"l"	3	271	-131	-271	
 
 		"face"	
-		"l"	3	92	308	-308	
+		"l"	3	155	-272	-270	
 
 		"face"	
-		"l"	3	314	313	315	
+		"l"	3	272	270	-139	
 
 		"face"	
-		"l"	3	316	-316	-287	
+		"l"	3	-166	138	153	
 
 		"face"	
-		"l"	3	-308	286	-314	
+		"l"	3	-270	-154	-271	
 
 		"face"	
-		"l"	3	-317	307	-315	
+		"l"	3	165	269	-273	
 
 		"face"	
-		"l"	3	311	313	293	
+		"l"	3	273	270	-132	
 
 		"face"	
-		"l"	3	317	-294	315	
+		"l"	3	142	131	-139	
 
 		"face"	
-		"l"	3	-315	-316	-314	
+		"l"	3	-273	138	-271	
 
 		"face"	
-		"l"	3	-318	314	-312	
+		"l"	3	-143	272	-274	
 
 		"face"	
-		"l"	3	308	313	288	
+		"l"	3	-272	270	130	
 
 		"face"	
-		"l"	3	-246	-289	293	
+		"l"	3	134	-131	-132	
 
 		"face"	
-		"l"	3	-312	-294	-314	
+		"l"	3	-274	131	-271	
 
 		"face"	
-		"l"	3	245	311	-309	
+		"l"	3	-135	273	271	
 
 		"face"	
-		"l"	3	318	319	116	
+		"l"	3	-272	274	-260	
 
 		"face"	
-		"l"	3	-121	-117	95	
+		"l"	3	-269	259	267	
 
 		"face"	
-		"l"	3	320	-96	-320	
+		"l"	3	275	-268	-275	
 
 		"face"	
-		"l"	3	120	-321	-319	
+		"l"	3	268	-276	271	
 
 		"face"	
-		"l"	3	321	319	-105	
+		"l"	3	273	274	-263	
 
 		"face"	
-		"l"	3	-143	104	116	
+		"l"	3	-135	262	-260	
 
 		"face"	
-		"l"	3	-319	-117	-320	
+		"l"	3	271	259	-275	
 
 		"face"	
-		"l"	3	142	318	-322	
+		"l"	3	134	-272	-274	
 
 		"face"	
-		"l"	3	322	319	-99	
+		"l"	3	276	277	-150	
 
 		"face"	
-		"l"	3	107	98	-105	
+		"l"	3	155	149	-153	
 
 		"face"	
-		"l"	3	-322	104	-320	
+		"l"	3	278	152	-278	
 
 		"face"	
-		"l"	3	-108	321	-323	
+		"l"	3	-156	-279	-277	
 
 		"face"	
-		"l"	3	-321	319	95	
+		"l"	3	-279	279	-270	
 
 		"face"	
-		"l"	3	99	-96	-99	
+		"l"	3	-156	269	271	
 
 		"face"	
-		"l"	3	-323	98	-320	
+		"l"	3	-277	-272	-280	
 
 		"face"	
-		"l"	3	-100	322	320	
+		"l"	3	155	276	278	
 
 		"face"	
-		"l"	3	-321	323	-248	
+		"l"	3	280	279	281	
 
 		"face"	
-		"l"	3	-277	247	275	
+		"l"	3	282	-282	-270	
 
 		"face"	
-		"l"	3	324	-276	-324	
+		"l"	3	278	269	-280	
 
 		"face"	
-		"l"	3	276	-325	320	
+		"l"	3	-283	-279	-281	
 
 		"face"	
-		"l"	3	322	323	-251	
+		"l"	3	276	279	271	
 
 		"face"	
-		"l"	3	-100	250	-248	
+		"l"	3	-269	-272	275	
 
 		"face"	
-		"l"	3	320	247	-324	
+		"l"	3	283	-276	-280	
 
 		"face"	
-		"l"	3	99	-321	-323	
+		"l"	3	268	-284	-277	
 
 		"face"	
-		"l"	3	325	323	-258	
+		"l"	3	284	285	187	
 
 		"face"	
-		"l"	3	259	257	-251	
+		"l"	3	-190	-188	163	
 
 		"face"	
-		"l"	3	-323	250	-324	
+		"l"	3	286	-164	-286	
 
 		"face"	
-		"l"	3	-260	322	-326	
+		"l"	3	189	-287	-285	
 
 		"face"	
-		"l"	3	-325	323	275	
+		"l"	3	287	285	-170	
 
 		"face"	
-		"l"	3	326	-276	-258	
+		"l"	3	-211	169	187	
 
 		"face"	
-		"l"	3	-326	257	-324	
+		"l"	3	-285	-188	-286	
 
 		"face"	
-		"l"	3	-327	325	324	
+		"l"	3	210	284	-288	
 
 		"face"	
-		"l"	3	321	327	-305	
+		"l"	3	288	285	-165	
 
 		"face"	
-		"l"	3	-108	304	306	
+		"l"	3	173	164	-170	
 
 		"face"	
-		"l"	3	-323	-307	-328	
+		"l"	3	-288	169	-286	
 
 		"face"	
-		"l"	3	107	322	-322	
+		"l"	3	-174	287	-289	
 
 		"face"	
-		"l"	3	328	327	329	
+		"l"	3	-287	285	163	
 
 		"face"	
-		"l"	3	330	-330	-305	
+		"l"	3	165	-164	-165	
 
 		"face"	
-		"l"	3	-322	304	-328	
+		"l"	3	-289	164	-286	
 
 		"face"	
-		"l"	3	-331	321	-329	
+		"l"	3	-166	288	286	
 
 		"face"	
-		"l"	3	325	327	310	
+		"l"	3	-287	289	-270	
 
 		"face"	
-		"l"	3	331	-311	329	
+		"l"	3	-283	269	281	
 
 		"face"	
-		"l"	3	-329	-330	-328	
+		"l"	3	290	-282	-290	
 
 		"face"	
-		"l"	3	-332	328	-326	
+		"l"	3	282	-291	286	
 
 		"face"	
-		"l"	3	322	327	306	
+		"l"	3	288	289	-273	
 
 		"face"	
-		"l"	3	-260	-307	310	
+		"l"	3	-166	272	-270	
 
 		"face"	
-		"l"	3	-326	-311	-328	
+		"l"	3	286	269	-290	
 
 		"face"	
-		"l"	3	259	325	-323	
+		"l"	3	165	-287	-289	
 
 		"face"	
-		"l"	3	332	333	151	
+		"l"	3	291	292	199	
 
 		"face"	
-		"l"	3	334	-152	-112	
+		"l"	3	-203	-200	182	
 
 		"face"	
-		"l"	3	335	111	-334	
+		"l"	3	293	-183	-293	
 
 		"face"	
-		"l"	3	-335	-336	-333	
+		"l"	3	202	-294	-292	
 
 		"face"	
-		"l"	3	336	333	-115	
+		"l"	3	294	292	-187	
 
 		"face"	
-		"l"	3	-153	114	151	
+		"l"	3	-221	186	199	
 
 		"face"	
-		"l"	3	-333	-152	-334	
+		"l"	3	-292	-200	-293	
 
 		"face"	
-		"l"	3	152	332	-337	
+		"l"	3	220	291	-295	
 
 		"face"	
-		"l"	3	337	333	-109	
+		"l"	3	295	292	-184	
 
 		"face"	
-		"l"	3	120	108	-115	
+		"l"	3	189	183	-187	
 
 		"face"	
-		"l"	3	-337	114	-334	
+		"l"	3	-295	186	-293	
 
 		"face"	
-		"l"	3	-121	336	-338	
+		"l"	3	-190	294	-296	
 
 		"face"	
-		"l"	3	-336	333	-112	
+		"l"	3	-294	292	182	
 
 		"face"	
-		"l"	3	113	111	-109	
+		"l"	3	184	-183	-184	
 
 		"face"	
-		"l"	3	-338	108	-334	
+		"l"	3	-296	183	-293	
 
 		"face"	
-		"l"	3	-114	337	335	
+		"l"	3	-185	295	293	
 
 		"face"	
-		"l"	3	-336	338	-262	
+		"l"	3	296	297	-281	
 
 		"face"	
-		"l"	3	-284	261	282	
+		"l"	3	282	280	278	
 
 		"face"	
-		"l"	3	339	-283	-339	
+		"l"	3	-296	-279	-298	
 
 		"face"	
-		"l"	3	283	-340	335	
+		"l"	3	-283	295	-297	
 
 		"face"	
-		"l"	3	337	338	-266	
+		"l"	3	294	298	-285	
 
 		"face"	
-		"l"	3	-114	265	-262	
+		"l"	3	-190	284	286	
 
 		"face"	
-		"l"	3	335	261	-339	
+		"l"	3	-296	-287	-299	
 
 		"face"	
-		"l"	3	113	-336	-338	
+		"l"	3	189	295	-295	
 
 		"face"	
-		"l"	3	340	338	-275	
+		"l"	3	299	298	300	
 
 		"face"	
-		"l"	3	276	274	-266	
+		"l"	3	301	-301	-285	
 
 		"face"	
-		"l"	3	-338	265	-339	
+		"l"	3	-295	284	-299	
 
 		"face"	
-		"l"	3	-277	337	-341	
+		"l"	3	-302	294	-300	
 
 		"face"	
-		"l"	3	-340	338	282	
+		"l"	3	295	298	286	
 
 		"face"	
-		"l"	3	341	-283	-275	
+		"l"	3	-283	-287	290	
 
 		"face"	
-		"l"	3	-341	274	-339	
+		"l"	3	-297	-291	-299	
 
 		"face"	
-		"l"	3	-342	340	339	
+		"l"	3	282	296	-296	
 
 		"face"	
-		"l"	3	336	342	-319	
+		"l"	3	302	303	304	
 
 		"face"	
-		"l"	3	-121	318	320	
+		"l"	3	305	-305	-292	
 
 		"face"	
-		"l"	3	-338	-321	-343	
+		"l"	3	306	291	-304	
 
 		"face"	
-		"l"	3	120	337	-337	
+		"l"	3	-306	-307	-303	
 
 		"face"	
-		"l"	3	343	342	344	
+		"l"	3	307	308	232	
 
 		"face"	
-		"l"	3	345	-345	-319	
+		"l"	3	-234	-233	208	
 
 		"face"	
-		"l"	3	-337	318	-343	
+		"l"	3	309	-209	-309	
 
 		"face"	
-		"l"	3	-346	336	-344	
+		"l"	3	233	-310	-308	
 
 		"face"	
-		"l"	3	340	342	324	
+		"l"	3	-310	308	208	
 
 		"face"	
-		"l"	3	346	-325	344	
+		"l"	3	210	-209	-210	
 
 		"face"	
-		"l"	3	-344	-345	-343	
+		"l"	3	310	209	-309	
 
 		"face"	
-		"l"	3	-347	343	-341	
+		"l"	3	-211	-311	309	
 
 		"face"	
-		"l"	3	337	342	320	
+		"l"	3	-310	311	-285	
 
 		"face"	
-		"l"	3	-277	-321	324	
+		"l"	3	-302	284	300	
 
 		"face"	
-		"l"	3	-341	-325	-343	
+		"l"	3	312	-301	-312	
 
 		"face"	
-		"l"	3	276	340	-338	
+		"l"	3	301	-313	309	
 
 		"face"	
-		"l"	3	347	348	-333	
+		"l"	3	-311	311	-288	
 
 		"face"	
-		"l"	3	334	332	335	
+		"l"	3	-211	287	-285	
 
 		"face"	
-		"l"	3	349	-336	-349	
+		"l"	3	309	284	-312	
 
 		"face"	
-		"l"	3	-335	-350	-348	
+		"l"	3	210	-310	310	
 
 		"face"	
-		"l"	3	350	348	351	
+		"l"	3	313	314	224	
 
 		"face"	
-		"l"	3	352	-352	-333	
+		"l"	3	-256	-225	218	
 
 		"face"	
-		"l"	3	-348	332	-349	
+		"l"	3	315	-219	-315	
 
 		"face"	
-		"l"	3	-353	347	-351	
+		"l"	3	255	-316	-314	
 
 		"face"	
-		"l"	3	353	348	339	
+		"l"	3	316	314	228	
 
 		"face"	
-		"l"	3	354	-340	351	
+		"l"	3	-231	-229	224	
 
 		"face"	
-		"l"	3	-351	-352	-349	
+		"l"	3	-314	-225	-315	
 
 		"face"	
-		"l"	3	-355	350	-354	
+		"l"	3	230	313	-317	
 
 		"face"	
-		"l"	3	-350	348	335	
+		"l"	3	317	314	-220	
 
 		"face"	
-		"l"	3	-284	-336	339	
+		"l"	3	233	219	228	
 
 		"face"	
-		"l"	3	-354	-340	-349	
+		"l"	3	-317	-229	-315	
 
 		"face"	
-		"l"	3	283	353	349	
+		"l"	3	-234	316	-318	
 
 		"face"	
-		"l"	3	355	356	135	
+		"l"	3	-316	314	218	
 
 		"face"	
-		"l"	3	-135	-136	123	
+		"l"	3	220	-219	-220	
 
 		"face"	
-		"l"	3	357	-124	-357	
+		"l"	3	-318	219	-315	
 
 		"face"	
-		"l"	3	134	-358	-356	
+		"l"	3	-221	317	315	
 
 		"face"	
-		"l"	3	-358	356	123	
+		"l"	3	-316	318	-292	
 
 		"face"	
-		"l"	3	124	-124	126	
+		"l"	3	-306	291	304	
 
 		"face"	
-		"l"	3	358	-127	-357	
+		"l"	3	319	-305	-319	
 
 		"face"	
-		"l"	3	-125	-359	357	
+		"l"	3	305	-320	315	
 
 		"face"	
-		"l"	3	-358	359	-287	
+		"l"	3	317	318	-295	
 
 		"face"	
-		"l"	3	-317	286	315	
+		"l"	3	-221	294	-292	
 
 		"face"	
-		"l"	3	360	-316	-360	
+		"l"	3	315	291	-319	
 
 		"face"	
-		"l"	3	316	-361	357	
+		"l"	3	220	-316	-318	
 
 		"face"	
-		"l"	3	-359	359	-290	
+		"l"	3	320	318	-300	
 
 		"face"	
-		"l"	3	-125	289	-287	
+		"l"	3	301	299	-295	
 
 		"face"	
-		"l"	3	357	286	-360	
+		"l"	3	-318	294	-319	
 
 		"face"	
-		"l"	3	124	-358	358	
+		"l"	3	-302	317	-321	
 
 		"face"	
-		"l"	3	361	359	-300	
+		"l"	3	316	321	-308	
 
 		"face"	
-		"l"	3	301	299	-290	
+		"l"	3	-234	307	309	
 
 		"face"	
-		"l"	3	358	289	-360	
+		"l"	3	-318	-310	-322	
 
 		"face"	
-		"l"	3	-302	-359	-362	
+		"l"	3	233	317	-317	
 
 		"face"	
-		"l"	3	-361	359	315	
+		"l"	3	317	321	309	
 
 		"face"	
-		"l"	3	362	-316	-300	
+		"l"	3	-302	-310	312	
 
 		"face"	
-		"l"	3	-362	299	-360	
+		"l"	3	-321	-313	-322	
 
 		"face"	
-		"l"	3	-363	361	360	
+		"l"	3	301	320	-318	
 
 		"face"	
-		"l"	3	363	364	145	
+		"l"	3	322	323	248	
 
 		"face"	
-		"l"	3	-145	-146	129	
+		"l"	3	324	-249	-243	
 
 		"face"	
-		"l"	3	365	-130	-365	
+		"l"	3	325	242	-324	
 
 		"face"	
-		"l"	3	144	-366	-364	
+		"l"	3	-325	-326	-323	
 
 		"face"	
-		"l"	3	366	364	136	
+		"l"	3	326	323	252	
 
 		"face"	
-		"l"	3	367	-137	145	
+		"l"	3	-254	-253	248	
 
 		"face"	
-		"l"	3	-364	-146	-365	
+		"l"	3	-323	-249	-324	
 
 		"face"	
-		"l"	3	-368	363	-367	
+		"l"	3	253	322	-327	
 
 		"face"	
-		"l"	3	368	364	-131	
+		"l"	3	327	323	-242	
 
 		"face"	
-		"l"	3	134	130	136	
+		"l"	3	255	241	252	
 
 		"face"	
-		"l"	3	-367	-137	-365	
+		"l"	3	-327	-253	-324	
 
 		"face"	
-		"l"	3	-135	366	-369	
+		"l"	3	-256	326	-328	
 
 		"face"	
-		"l"	3	-366	364	129	
+		"l"	3	-326	323	-243	
 
 		"face"	
-		"l"	3	132	-130	-131	
+		"l"	3	244	242	-242	
 
 		"face"	
-		"l"	3	-369	130	-365	
+		"l"	3	-328	241	-324	
 
 		"face"	
-		"l"	3	-133	368	365	
+		"l"	3	-245	327	325	
 
 		"face"	
-		"l"	3	-366	369	-305	
+		"l"	3	328	329	-303	
 
 		"face"	
-		"l"	3	-331	304	329	
+		"l"	3	305	302	306	
 
 		"face"	
-		"l"	3	370	-330	-370	
+		"l"	3	-328	-307	-330	
 
 		"face"	
-		"l"	3	330	-371	365	
+		"l"	3	-306	327	-329	
 
 		"face"	
-		"l"	3	368	369	-308	
+		"l"	3	326	330	-314	
 
 		"face"	
-		"l"	3	-133	307	-305	
+		"l"	3	-256	313	315	
 
 		"face"	
-		"l"	3	365	304	-370	
+		"l"	3	-328	-316	-331	
 
 		"face"	
-		"l"	3	132	-366	-369	
+		"l"	3	255	327	-327	
 
 		"face"	
-		"l"	3	371	369	-315	
+		"l"	3	327	330	315	
 
 		"face"	
-		"l"	3	316	314	-308	
+		"l"	3	-306	-316	319	
 
 		"face"	
-		"l"	3	-369	307	-370	
+		"l"	3	-329	-320	-331	
 
 		"face"	
-		"l"	3	-317	368	-372	
+		"l"	3	305	328	-328	
 
 		"face"	
-		"l"	3	-371	369	329	
+		"l"	3	331	332	-323	
 
 		"face"	
-		"l"	3	372	-330	-315	
+		"l"	3	324	322	325	
 
 		"face"	
-		"l"	3	-372	314	-370	
+		"l"	3	333	-326	-333	
 
 		"face"	
-		"l"	3	-373	371	370	
+		"l"	3	-325	-334	-332	
 
 		"face"	
-		"l"	3	373	374	-364	
+		"l"	3	-334	332	325	
 
 		"face"	
-		"l"	3	375	363	376	
+		"l"	3	334	-326	335	
 
 		"face"	
-		"l"	3	377	-377	-375	
+		"l"	3	336	-336	-333	
 
 		"face"	
-		"l"	3	-376	-378	-374	
+		"l"	3	-335	-337	333	
 
 		"face"	
-		"l"	3	378	374	-367	
+		"l"	3	337	338	339	
 
 		"face"	
-		"l"	3	367	366	-364	
+		"l"	3	340	-340	341	
 
 		"face"	
-		"l"	3	-374	363	-375	
+		"l"	3	342	-342	-339	
 
 		"face"	
-		"l"	3	-368	373	-379	
+		"l"	3	-341	-343	-338	
 
 		"face"	
-		"l"	3	379	374	380	
+		"l"	3	343	338	344	
 
 		"face"	
-		"l"	3	381	-381	-367	
+		"l"	3	345	-345	339	
 
 		"face"	
-		"l"	3	-379	366	-375	
+		"l"	3	-338	-340	-339	
 
 		"face"	
-		"l"	3	-382	378	-380	
+		"l"	3	-346	337	-344	
 
 		"face"	
-		"l"	3	-378	374	376	
+		"l"	3	346	347	348	
 
 		"face"	
-		"l"	3	382	-377	380	
+		"l"	3	349	-349	350	
 
 		"face"	
-		"l"	3	-380	-381	-375	
+		"l"	3	351	-351	-348	
 
 		"face"	
-		"l"	3	-383	379	377	
+		"l"	3	-350	-352	-347	
 
 		"face"	
-		"l"	3	366	383	-356	
+		"l"	3	352	353	341	
 
 		"face"	
-		"l"	3	-135	355	357	
+		"l"	3	-341	-342	339	
 
 		"face"	
-		"l"	3	-369	-358	-384	
+		"l"	3	354	-340	-354	
 
 		"face"	
-		"l"	3	134	368	-367	
+		"l"	3	340	-355	-353	
 
 		"face"	
-		"l"	3	-381	383	384	
+		"l"	3	341	355	356	
 
 		"face"	
-		"l"	3	381	-385	-356	
+		"l"	3	353	-357	350	
 
 		"face"	
-		"l"	3	-367	355	-384	
+		"l"	3	352	-351	-356	
 
 		"face"	
-		"l"	3	-382	366	380	
+		"l"	3	-354	-353	-342	
 
 		"face"	
-		"l"	3	371	383	360	
+		"l"	3	-353	355	350	
 
 		"face"	
-		"l"	3	385	-361	384	
+		"l"	3	-350	-351	348	
 
 		"face"	
-		"l"	3	380	-385	-384	
+		"l"	3	357	-349	-356	
 
 		"face"	
-		"l"	3	-386	-381	-372	
+		"l"	3	349	-358	352	
 
 		"face"	
-		"l"	3	368	383	357	
+		"l"	3	-352	347	350	
 
 		"face"	
-		"l"	3	-317	-358	360	
+		"l"	3	358	-351	359	
 
 		"face"	
-		"l"	3	-372	-361	-384	
+		"l"	3	360	-360	-348	
 
 		"face"	
-		"l"	3	316	371	-369	
+		"l"	3	-359	-361	351	
 
 		"face"	
-		"l"	3	386	387	155	
+		"l"	3	-355	353	339	
 
 		"face"	
-		"l"	3	-155	-156	139	
+		"l"	3	361	-340	362	
 
 		"face"	
-		"l"	3	388	-140	-388	
+		"l"	3	363	-363	-354	
 
 		"face"	
-		"l"	3	154	-389	-387	
+		"l"	3	-362	-364	354	
 
 		"face"	
-		"l"	3	389	387	146	
+		"l"	3	364	365	366	
 
 		"face"	
-		"l"	3	390	-147	155	
+		"l"	3	367	-367	368	
 
 		"face"	
-		"l"	3	-387	-156	-388	
+		"l"	3	369	-369	-366	
 
 		"face"	
-		"l"	3	-391	386	-390	
+		"l"	3	-368	-370	-365	
 
 		"face"	
-		"l"	3	391	387	-141	
+		"l"	3	366	370	371	
 
 		"face"	
-		"l"	3	144	140	146	
+		"l"	3	365	-372	359	
 
 		"face"	
-		"l"	3	-390	-147	-388	
+		"l"	3	364	-360	-371	
 
 		"face"	
-		"l"	3	-145	389	-392	
+		"l"	3	-366	-365	-367	
 
 		"face"	
-		"l"	3	-389	387	139	
+		"l"	3	-365	370	359	
 
 		"face"	
-		"l"	3	142	-140	-141	
+		"l"	3	-359	-360	350	
 
 		"face"	
-		"l"	3	-392	140	-388	
+		"l"	3	-364	-351	-371	
 
 		"face"	
-		"l"	3	-143	391	388	
+		"l"	3	358	363	364	
 
 		"face"	
-		"l"	3	-389	392	-319	
+		"l"	3	363	370	350	
 
 		"face"	
-		"l"	3	-346	318	344	
+		"l"	3	-354	-351	356	
 
 		"face"	
-		"l"	3	393	-345	-393	
+		"l"	3	-363	-357	-371	
 
 		"face"	
-		"l"	3	345	-394	388	
+		"l"	3	353	362	-364	
 
 		"face"	
-		"l"	3	391	392	-322	
+		"l"	3	362	370	356	
 
 		"face"	
-		"l"	3	-143	321	-319	
+		"l"	3	372	-357	371	
 
 		"face"	
-		"l"	3	388	318	-393	
+		"l"	3	-367	-372	-371	
 
 		"face"	
-		"l"	3	142	-389	-392	
+		"l"	3	-373	366	-363	
 
 		"face"	
-		"l"	3	394	392	-329	
+		"l"	3	373	374	-338	
 
 		"face"	
-		"l"	3	330	328	-322	
+		"l"	3	340	337	342	
 
 		"face"	
-		"l"	3	-392	321	-393	
+		"l"	3	375	-343	-375	
 
 		"face"	
-		"l"	3	-331	391	-395	
+		"l"	3	-341	-376	-374	
 
 		"face"	
-		"l"	3	-394	392	344	
+		"l"	3	376	374	377	
 
 		"face"	
-		"l"	3	395	-345	-329	
+		"l"	3	378	-378	-338	
 
 		"face"	
-		"l"	3	-395	328	-393	
+		"l"	3	-374	337	-375	
 
 		"face"	
-		"l"	3	-396	394	393	
+		"l"	3	-379	373	-377	
 
 		"face"	
-		"l"	3	396	397	-387	
+		"l"	3	379	380	381	
 
 		"face"	
-		"l"	3	398	386	399	
+		"l"	3	382	-382	383	
 
 		"face"	
-		"l"	3	400	-400	-398	
+		"l"	3	384	-384	-381	
 
 		"face"	
-		"l"	3	-399	-401	-397	
+		"l"	3	-383	-385	-380	
 
 		"face"	
-		"l"	3	401	397	-390	
+		"l"	3	385	386	387	
 
 		"face"	
-		"l"	3	390	389	-387	
+		"l"	3	388	-388	389	
 
 		"face"	
-		"l"	3	-397	386	-398	
+		"l"	3	390	-390	-387	
 
 		"face"	
-		"l"	3	-391	396	-402	
+		"l"	3	-389	-391	-386	
 
 		"face"	
-		"l"	3	402	397	403	
+		"l"	3	390	391	392	
 
 		"face"	
-		"l"	3	-376	-404	-390	
+		"l"	3	-387	-393	-380	
 
 		"face"	
-		"l"	3	-402	389	-398	
+		"l"	3	-390	379	-392	
 
 		"face"	
-		"l"	3	375	401	-403	
+		"l"	3	386	389	-391	
 
 		"face"	
-		"l"	3	-401	397	399	
+		"l"	3	389	391	-380	
 
 		"face"	
-		"l"	3	404	-400	403	
+		"l"	3	382	379	384	
 
 		"face"	
-		"l"	3	-403	-404	-398	
+		"l"	3	393	-385	-392	
 
 		"face"	
-		"l"	3	-405	402	400	
+		"l"	3	-383	-394	-390	
 
 		"face"	
-		"l"	3	389	405	-364	
+		"l"	3	394	380	351	
 
 		"face"	
-		"l"	3	-145	363	365	
+		"l"	3	395	-352	381	
 
 		"face"	
-		"l"	3	-392	-366	-406	
+		"l"	3	-380	-382	-381	
 
 		"face"	
-		"l"	3	144	391	-390	
+		"l"	3	-396	379	-395	
 
 		"face"	
-		"l"	3	-404	405	376	
+		"l"	3	373	396	354	
 
 		"face"	
-		"l"	3	-376	-377	-364	
+		"l"	3	397	-355	398	
 
 		"face"	
-		"l"	3	-390	363	-406	
+		"l"	3	399	-399	-397	
 
 		"face"	
-		"l"	3	375	389	403	
+		"l"	3	-398	-400	-374	
 
 		"face"	
-		"l"	3	394	405	370	
+		"l"	3	400	386	401	
 
 		"face"	
-		"l"	3	406	-371	376	
+		"l"	3	402	-402	387	
 
 		"face"	
-		"l"	3	403	-377	-406	
+		"l"	3	-386	-388	-387	
 
 		"face"	
-		"l"	3	-407	-404	-395	
+		"l"	3	-403	385	-401	
 
 		"face"	
-		"l"	3	391	405	365	
+		"l"	3	401	403	-380	
 
 		"face"	
-		"l"	3	-331	-366	370	
+		"l"	3	386	379	392	
 
 		"face"	
-		"l"	3	-395	-371	-406	
+		"l"	3	400	-393	-404	
 
 		"face"	
-		"l"	3	330	394	-392	
+		"l"	3	-387	-401	-402	
 
 		"face"	
-		"l"	3	407	408	-148	
+		"l"	3	-401	403	392	
 
 		"face"	
-		"l"	3	154	147	156	
+		"l"	3	404	-393	405	
 
 		"face"	
-		"l"	3	409	-157	-409	
+		"l"	3	-400	-406	-404	
 
 		"face"	
-		"l"	3	-155	-410	-408	
+		"l"	3	-405	399	400	
 
 		"face"	
-		"l"	3	410	408	-151	
+		"l"	3	399	403	405	
 
 		"face"	
-		"l"	3	152	150	-148	
+		"l"	3	-397	-406	-395	
 
 		"face"	
-		"l"	3	-408	147	-409	
+		"l"	3	-399	394	-404	
 
 		"face"	
-		"l"	3	-153	407	-411	
+		"l"	3	396	398	-400	
 
 		"face"	
-		"l"	3	410	411	-333	
+		"l"	3	398	403	-395	
 
 		"face"	
-		"l"	3	-353	332	351	
+		"l"	3	395	394	-380	
 
 		"face"	
-		"l"	3	412	-352	-412	
+		"l"	3	-402	379	-404	
 
 		"face"	
-		"l"	3	352	-413	-411	
+		"l"	3	-396	401	-399	
 
 		"face"	
-		"l"	3	407	411	-337	
+		"l"	3	406	380	-347	
 
 		"face"	
-		"l"	3	-153	336	-333	
+		"l"	3	349	346	351	
 
 		"face"	
-		"l"	3	-411	332	-412	
+		"l"	3	-395	-352	-381	
 
 		"face"	
-		"l"	3	152	410	-408	
+		"l"	3	-350	394	-407	
 
 		"face"	
-		"l"	3	413	411	-344	
+		"l"	3	-376	396	-353	
 
 		"face"	
-		"l"	3	345	343	-337	
+		"l"	3	-341	352	354	
 
 		"face"	
-		"l"	3	-408	336	-412	
+		"l"	3	-374	-355	-397	
 
 		"face"	
-		"l"	3	-346	407	-414	
+		"l"	3	340	373	375	
 
 		"face"	
-		"l"	3	-413	411	351	
+		"l"	3	-353	407	-395	
 
 		"face"	
-		"l"	3	414	-352	-344	
+		"l"	3	396	394	405	
 
 		"face"	
-		"l"	3	-414	343	-412	
+		"l"	3	-376	-406	-408	
 
 		"face"	
-		"l"	3	-415	413	412	
+		"l"	3	-397	375	352	
 
 		"face"	
-		"l"	3	-410	415	-387	
+		"l"	3	-358	407	-407	
 
 		"face"	
-		"l"	3	-155	386	388	
+		"l"	3	349	406	-395	
 
 		"face"	
-		"l"	3	-408	-389	-416	
+		"l"	3	352	394	-408	
 
 		"face"	
-		"l"	3	154	407	409	
+		"l"	3	-350	-353	357	
 
 		"face"	
-		"l"	3	416	415	399	
+		"l"	3	408	409	-386	
 
 		"face"	
-		"l"	3	-399	-400	-387	
+		"l"	3	388	385	390	
 
 		"face"	
-		"l"	3	409	386	-416	
+		"l"	3	410	-391	-410	
 
 		"face"	
-		"l"	3	398	-410	-417	
+		"l"	3	-389	-411	-409	
 
 		"face"	
-		"l"	3	413	415	393	
+		"l"	3	411	412	413	
 
 		"face"	
-		"l"	3	417	-394	399	
+		"l"	3	414	-414	415	
 
 		"face"	
-		"l"	3	-417	-400	-416	
+		"l"	3	416	-416	-413	
 
 		"face"	
-		"l"	3	-418	416	-414	
+		"l"	3	-415	-417	-412	
 
 		"face"	
-		"l"	3	407	415	388	
+		"l"	3	417	409	418	
 
 		"face"	
-		"l"	3	-346	-389	393	
+		"l"	3	419	-419	-386	
 
 		"face"	
-		"l"	3	-414	-394	-416	
+		"l"	3	-409	385	-410	
 
 		"face"	
-		"l"	3	345	413	-408	
+		"l"	3	-420	408	-418	
 
 		"face"	
-		"l"	3	418	419	179	
+		"l"	3	418	420	421	
 
 		"face"	
-		"l"	3	-183	-180	181	
+		"l"	3	409	-422	422	
 
 		"face"	
-		"l"	3	420	-182	-420	
+		"l"	3	417	-423	-421	
 
 		"face"	
-		"l"	3	182	-421	-419	
+		"l"	3	-410	-418	-419	
 
 		"face"	
-		"l"	3	421	419	222	
+		"l"	3	-418	420	422	
 
 		"face"	
-		"l"	3	-225	-223	179	
+		"l"	3	423	-423	424	
 
 		"face"	
-		"l"	3	-419	-180	-420	
+		"l"	3	-417	-425	-421	
 
 		"face"	
-		"l"	3	224	418	-422	
+		"l"	3	-424	416	417	
 
 		"face"	
-		"l"	3	422	423	200	
+		"l"	3	416	420	424	
 
 		"face"	
-		"l"	3	-203	-201	171	
+		"l"	3	-413	-425	425	
 
 		"face"	
-		"l"	3	424	-172	-424	
+		"l"	3	-416	-426	-421	
 
 		"face"	
-		"l"	3	202	-425	-423	
+		"l"	3	412	415	-417	
 
 		"face"	
-		"l"	3	425	423	-179	
+		"l"	3	415	420	425	
 
 		"face"	
-		"l"	3	-242	178	200	
+		"l"	3	426	-426	421	
 
 		"face"	
-		"l"	3	-423	-201	-424	
+		"l"	3	-419	-422	-421	
 
 		"face"	
-		"l"	3	241	422	-426	
+		"l"	3	-427	418	-416	
 
 		"face"	
-		"l"	3	426	423	-174	
+		"l"	3	427	428	429	
 
 		"face"	
-		"l"	3	182	173	-179	
+		"l"	3	430	-430	431	
 
 		"face"	
-		"l"	3	-426	178	-424	
+		"l"	3	432	-432	-429	
 
 		"face"	
-		"l"	3	-183	425	-427	
+		"l"	3	-431	-433	-428	
 
 		"face"	
-		"l"	3	-425	423	171	
+		"l"	3	433	434	339	
 
 		"face"	
-		"l"	3	176	-172	-174	
+		"l"	3	-346	-340	344	
 
 		"face"	
-		"l"	3	-427	173	-424	
+		"l"	3	435	-345	-435	
 
 		"face"	
-		"l"	3	-177	426	424	
+		"l"	3	345	-436	-434	
 
 		"face"	
-		"l"	3	425	427	-419	
+		"l"	3	436	437	431	
 
 		"face"	
-		"l"	3	-183	418	420	
+		"l"	3	-431	-432	429	
 
 		"face"	
-		"l"	3	-427	-421	-428	
+		"l"	3	-436	-430	-438	
 
 		"face"	
-		"l"	3	182	426	-426	
+		"l"	3	430	435	-437	
 
 		"face"	
-		"l"	3	428	427	429	
+		"l"	3	435	437	429	
 
 		"face"	
-		"l"	3	430	-430	-419	
+		"l"	3	-435	-430	438	
 
 		"face"	
-		"l"	3	-426	418	-428	
+		"l"	3	-345	-439	-438	
 
 		"face"	
-		"l"	3	-431	425	-429	
+		"l"	3	434	344	-436	
 
 		"face"	
-		"l"	3	431	432	209	
+		"l"	3	439	428	440	
 
 		"face"	
-		"l"	3	-213	-210	193	
+		"l"	3	441	-441	429	
 
 		"face"	
-		"l"	3	433	-194	-433	
+		"l"	3	-428	-430	-429	
 
 		"face"	
-		"l"	3	212	-434	-432	
+		"l"	3	-442	427	-440	
 
 		"face"	
-		"l"	3	434	432	-200	
+		"l"	3	442	443	368	
 
 		"face"	
-		"l"	3	-256	199	209	
+		"l"	3	-368	-369	366	
 
 		"face"	
-		"l"	3	-432	-210	-433	
+		"l"	3	444	-367	-444	
 
 		"face"	
-		"l"	3	255	431	-435	
+		"l"	3	367	-445	-443	
 
 		"face"	
-		"l"	3	435	432	-196	
+		"l"	3	445	434	362	
 
 		"face"	
-		"l"	3	202	195	-200	
+		"l"	3	-362	-363	339	
 
 		"face"	
-		"l"	3	-435	199	-433	
+		"l"	3	-434	-340	-435	
 
 		"face"	
-		"l"	3	-203	434	-436	
+		"l"	3	361	433	-446	
 
 		"face"	
-		"l"	3	-434	432	193	
+		"l"	3	362	446	438	
 
 		"face"	
-		"l"	3	197	-194	-196	
+		"l"	3	434	-439	429	
 
 		"face"	
-		"l"	3	-436	195	-433	
+		"l"	3	445	-430	-447	
 
 		"face"	
-		"l"	3	-198	435	433	
+		"l"	3	-435	-446	-363	
 
 		"face"	
-		"l"	3	434	436	-423	
+		"l"	3	-446	446	429	
 
 		"face"	
-		"l"	3	-203	422	424	
+		"l"	3	-442	-430	440	
 
 		"face"	
-		"l"	3	-436	-425	-437	
+		"l"	3	-445	-441	-447	
 
 		"face"	
-		"l"	3	202	435	-435	
+		"l"	3	441	444	445	
 
 		"face"	
-		"l"	3	437	436	438	
+		"l"	3	444	446	440	
 
 		"face"	
-		"l"	3	439	-439	-423	
+		"l"	3	-444	-441	447	
 
 		"face"	
-		"l"	3	-435	422	-437	
+		"l"	3	-367	-448	-447	
 
 		"face"	
-		"l"	3	-440	434	-438	
+		"l"	3	443	366	-445	
 
 		"face"	
-		"l"	3	440	441	-209	
+		"l"	3	366	446	447	
 
 		"face"	
-		"l"	3	-273	208	269	
+		"l"	3	-373	-448	438	
 
 		"face"	
-		"l"	3	442	-270	-442	
+		"l"	3	-363	-439	-447	
 
 		"face"	
-		"l"	3	272	-443	-441	
+		"l"	3	372	362	-367	
 
 		"face"	
-		"l"	3	443	441	-212	
+		"l"	3	448	428	449	
 
 		"face"	
-		"l"	3	212	211	-209	
+		"l"	3	450	-450	440	
 
 		"face"	
-		"l"	3	-441	208	-442	
+		"l"	3	-440	-441	-429	
 
 		"face"	
-		"l"	3	-213	440	-444	
+		"l"	3	-451	439	-449	
 
 		"face"	
-		"l"	3	440	444	-432	
+		"l"	3	451	452	453	
 
 		"face"	
-		"l"	3	-213	431	433	
+		"l"	3	454	-454	455	
 
 		"face"	
-		"l"	3	-444	-434	-445	
+		"l"	3	456	-456	-453	
 
 		"face"	
-		"l"	3	212	443	-441	
+		"l"	3	-455	-457	-452	
 
 		"face"	
-		"l"	3	445	444	446	
+		"l"	3	457	443	458	
 
 		"face"	
-		"l"	3	447	-447	-432	
+		"l"	3	459	-459	368	
 
 		"face"	
-		"l"	3	-441	431	-445	
+		"l"	3	-443	-369	-444	
 
 		"face"	
-		"l"	3	-448	440	-446	
+		"l"	3	-460	442	-458	
 
 		"face"	
-		"l"	3	448	449	244	
+		"l"	3	458	460	447	
 
 		"face"	
-		"l"	3	-247	-245	220	
+		"l"	3	443	-448	440	
 
 		"face"	
-		"l"	3	450	-221	-450	
+		"l"	3	457	-441	-461	
 
 		"face"	
-		"l"	3	246	-451	-449	
+		"l"	3	-444	-458	-459	
 
 		"face"	
-		"l"	3	451	449	-229	
+		"l"	3	-458	460	440	
 
 		"face"	
-		"l"	3	-296	228	244	
+		"l"	3	-451	-441	449	
 
 		"face"	
-		"l"	3	-449	-245	-450	
+		"l"	3	-457	-450	-461	
 
 		"face"	
-		"l"	3	295	448	-452	
+		"l"	3	450	456	457	
 
 		"face"	
-		"l"	3	452	449	-222	
+		"l"	3	456	460	449	
 
 		"face"	
-		"l"	3	232	221	-229	
+		"l"	3	-453	-450	461	
 
 		"face"	
-		"l"	3	-452	228	-450	
+		"l"	3	-456	-462	-461	
 
 		"face"	
-		"l"	3	-233	451	-453	
+		"l"	3	452	455	-457	
 
 		"face"	
-		"l"	3	-451	449	220	
+		"l"	3	455	460	461	
 
 		"face"	
-		"l"	3	224	-221	-222	
+		"l"	3	462	-462	447	
 
 		"face"	
-		"l"	3	-453	221	-450	
+		"l"	3	-459	-448	-461	
 
 		"face"	
-		"l"	3	-225	452	450	
+		"l"	3	-463	458	-456	
 
 		"face"	
-		"l"	3	-451	453	-419	
+		"l"	3	-433	428	431	
 
 		"face"	
-		"l"	3	-431	418	429	
+		"l"	3	463	-432	449	
 
 		"face"	
-		"l"	3	454	-430	-454	
+		"l"	3	-449	-450	-429	
 
 		"face"	
-		"l"	3	430	-455	450	
+		"l"	3	-464	448	432	
 
 		"face"	
-		"l"	3	452	453	-422	
+		"l"	3	-433	464	465	
 
 		"face"	
-		"l"	3	-225	421	-419	
+		"l"	3	466	-466	467	
 
 		"face"	
-		"l"	3	450	418	-454	
+		"l"	3	468	-468	-465	
 
 		"face"	
-		"l"	3	224	-451	-453	
+		"l"	3	-467	-469	432	
 
 		"face"	
-		"l"	3	455	456	258	
+		"l"	3	448	464	469	
 
 		"face"	
-		"l"	3	-261	-259	239	
+		"l"	3	-464	-470	465	
 
 		"face"	
-		"l"	3	457	-240	-457	
+		"l"	3	432	-466	-465	
 
 		"face"	
-		"l"	3	260	-458	-456	
+		"l"	3	463	-433	-449	
 
 		"face"	
-		"l"	3	458	456	-244	
+		"l"	3	470	464	471	
 
 		"face"	
-		"l"	3	-313	243	258	
+		"l"	3	472	-472	469	
 
 		"face"	
-		"l"	3	-456	-259	-457	
+		"l"	3	-449	-470	-465	
 
 		"face"	
-		"l"	3	312	455	-459	
+		"l"	3	-473	448	-471	
 
 		"face"	
-		"l"	3	459	456	-241	
+		"l"	3	-469	464	467	
 
 		"face"	
-		"l"	3	246	240	-244	
+		"l"	3	473	-468	471	
 
 		"face"	
-		"l"	3	-459	243	-457	
+		"l"	3	-471	-472	-465	
 
 		"face"	
-		"l"	3	-247	458	-460	
+		"l"	3	-474	470	468	
 
 		"face"	
-		"l"	3	-458	456	239	
+		"l"	3	474	475	476	
 
 		"face"	
-		"l"	3	241	-240	-241	
+		"l"	3	477	-477	478	
 
 		"face"	
-		"l"	3	-460	240	-457	
+		"l"	3	479	-479	-476	
 
 		"face"	
-		"l"	3	-242	459	457	
+		"l"	3	-478	-480	-475	
 
 		"face"	
-		"l"	3	-458	460	-423	
+		"l"	3	439	480	481	
 
 		"face"	
-		"l"	3	-440	422	438	
+		"l"	3	-451	-482	482	
 
 		"face"	
-		"l"	3	461	-439	-461	
+		"l"	3	-449	-483	-481	
 
 		"face"	
-		"l"	3	439	-462	457	
+		"l"	3	450	448	-440	
 
 		"face"	
-		"l"	3	459	460	-426	
+		"l"	3	442	483	484	
 
 		"face"	
-		"l"	3	-242	425	-423	
+		"l"	3	-460	-485	485	
 
 		"face"	
-		"l"	3	457	422	-461	
+		"l"	3	-458	-486	-484	
 
 		"face"	
-		"l"	3	241	-458	-460	
+		"l"	3	459	457	-443	
 
 		"face"	
-		"l"	3	462	460	-429	
+		"l"	3	-457	486	487	
 
 		"face"	
-		"l"	3	430	428	-426	
+		"l"	3	-455	-488	488	
 
 		"face"	
-		"l"	3	-460	425	-461	
+		"l"	3	-452	-489	-487	
 
 		"face"	
-		"l"	3	-431	459	-463	
+		"l"	3	454	451	456	
 
 		"face"	
-		"l"	3	458	463	-449	
+		"l"	3	487	489	479	
 
 		"face"	
-		"l"	3	-247	448	450	
+		"l"	3	486	-480	482	
 
 		"face"	
-		"l"	3	-460	-451	-464	
+		"l"	3	-457	-483	-490	
 
 		"face"	
-		"l"	3	246	459	-459	
+		"l"	3	-487	456	-488	
 
 		"face"	
-		"l"	3	464	463	465	
+		"l"	3	456	489	482	
 
 		"face"	
-		"l"	3	466	-466	-449	
+		"l"	3	450	-483	481	
 
 		"face"	
-		"l"	3	-459	448	-464	
+		"l"	3	457	-482	-490	
 
 		"face"	
-		"l"	3	-467	458	-465	
+		"l"	3	-451	-458	-457	
 
 		"face"	
-		"l"	3	459	463	450	
+		"l"	3	-458	489	481	
 
 		"face"	
-		"l"	3	-431	-451	454	
+		"l"	3	-484	-482	-475	
 
 		"face"	
-		"l"	3	-463	-455	-464	
+		"l"	3	-486	474	-490	
 
 		"face"	
-		"l"	3	430	462	-460	
+		"l"	3	483	485	457	
 
 		"face"	
-		"l"	3	467	468	275	
+		"l"	3	485	489	-475	
 
 		"face"	
-		"l"	3	-278	-276	253	
+		"l"	3	477	474	479	
 
 		"face"	
-		"l"	3	469	-254	-469	
+		"l"	3	-488	-480	-490	
 
 		"face"	
-		"l"	3	277	-470	-468	
+		"l"	3	-478	487	-486	
 
 		"face"	
-		"l"	3	470	468	-258	
+		"l"	3	490	475	491	
 
 		"face"	
-		"l"	3	-327	257	275	
+		"l"	3	492	-492	493	
 
 		"face"	
-		"l"	3	-468	-276	-469	
+		"l"	3	494	-494	-476	
 
 		"face"	
-		"l"	3	326	467	-471	
+		"l"	3	-493	-495	-491	
 
 		"face"	
-		"l"	3	471	468	-255	
+		"l"	3	470	480	495	
 
 		"face"	
-		"l"	3	260	254	-258	
+		"l"	3	496	-496	497	
 
 		"face"	
-		"l"	3	-471	257	-469	
+		"l"	3	498	-498	-481	
 
 		"face"	
-		"l"	3	-261	470	-472	
+		"l"	3	-497	-499	-471	
 
 		"face"	
-		"l"	3	-470	468	253	
+		"l"	3	499	500	501	
 
 		"face"	
-		"l"	3	255	-254	-255	
+		"l"	3	502	-502	503	
 
 		"face"	
-		"l"	3	-472	254	-469	
+		"l"	3	504	-504	-501	
 
 		"face"	
-		"l"	3	-256	471	469	
+		"l"	3	-503	-505	-500	
 
 		"face"	
-		"l"	3	-470	472	-432	
+		"l"	3	505	506	507	
 
 		"face"	
-		"l"	3	-448	431	446	
+		"l"	3	508	-508	509	
 
 		"face"	
-		"l"	3	473	-447	-473	
+		"l"	3	510	-510	-507	
 
 		"face"	
-		"l"	3	447	-474	469	
+		"l"	3	-509	-511	-506	
 
 		"face"	
-		"l"	3	471	472	-435	
+		"l"	3	507	511	494	
 
 		"face"	
-		"l"	3	-256	434	-432	
+		"l"	3	506	-495	497	
 
 		"face"	
-		"l"	3	469	431	-473	
+		"l"	3	505	-498	-512	
 
 		"face"	
-		"l"	3	255	-470	-472	
+		"l"	3	-507	-506	-508	
 
 		"face"	
-		"l"	3	474	472	-438	
+		"l"	3	-506	511	497	
 
 		"face"	
-		"l"	3	439	437	-435	
+		"l"	3	-497	-498	495	
 
 		"face"	
-		"l"	3	-472	434	-473	
+		"l"	3	-505	-496	-512	
 
 		"face"	
-		"l"	3	-440	471	-475	
+		"l"	3	496	504	505	
 
 		"face"	
-		"l"	3	470	475	-456	
+		"l"	3	504	511	495	
 
 		"face"	
-		"l"	3	-261	455	457	
+		"l"	3	-501	-496	-491	
 
 		"face"	
-		"l"	3	-472	-458	-476	
+		"l"	3	-504	490	-512	
 
 		"face"	
-		"l"	3	260	471	-471	
+		"l"	3	500	503	-505	
 
 		"face"	
-		"l"	3	476	475	477	
+		"l"	3	503	511	-491	
 
 		"face"	
-		"l"	3	478	-478	-456	
+		"l"	3	492	490	494	
 
 		"face"	
-		"l"	3	-471	455	-476	
+		"l"	3	-508	-495	-512	
 
 		"face"	
-		"l"	3	-479	470	-477	
+		"l"	3	-493	507	-504	
 
 		"face"	
-		"l"	3	474	475	461	
+		"l"	3	-480	475	478	
 
 		"face"	
-		"l"	3	479	-462	477	
+		"l"	3	512	-479	491	
 
 		"face"	
-		"l"	3	-477	-478	-476	
+		"l"	3	-491	-492	-476	
 
 		"face"	
-		"l"	3	-480	476	-475	
+		"l"	3	-513	490	479	
 
 		"face"	
-		"l"	3	471	475	457	
+		"l"	3	448	480	482	
 
 		"face"	
-		"l"	3	-440	-458	461	
+		"l"	3	-473	-483	495	
 
 		"face"	
-		"l"	3	-475	-462	-476	
+		"l"	3	-471	-496	-481	
 
 		"face"	
-		"l"	3	439	474	-472	
+		"l"	3	472	470	-449	
 
 		"face"	
-		"l"	3	480	481	282	
+		"l"	3	513	514	-491	
 
 		"face"	
-		"l"	3	-286	-283	270	
+		"l"	3	500	490	495	
 
 		"face"	
-		"l"	3	482	-271	-482	
+		"l"	3	515	-496	-515	
 
 		"face"	
-		"l"	3	285	-483	-481	
+		"l"	3	-501	-516	-514	
 
 		"face"	
-		"l"	3	483	481	-275	
+		"l"	3	-516	514	495	
 
 		"face"	
-		"l"	3	-342	274	282	
+		"l"	3	472	-496	482	
 
 		"face"	
-		"l"	3	-481	-283	-482	
+		"l"	3	516	-483	-515	
 
 		"face"	
-		"l"	3	341	480	-484	
+		"l"	3	-473	-517	515	
 
 		"face"	
-		"l"	3	484	481	-272	
+		"l"	3	-517	514	482	
 
 		"face"	
-		"l"	3	277	271	-275	
+		"l"	3	-487	-483	479	
 
 		"face"	
-		"l"	3	-484	274	-482	
+		"l"	3	517	-480	-515	
 
 		"face"	
-		"l"	3	-278	483	-485	
+		"l"	3	486	-518	516	
 
 		"face"	
-		"l"	3	-483	481	270	
+		"l"	3	-518	514	479	
 
 		"face"	
-		"l"	3	272	-271	-272	
+		"l"	3	512	-480	-491	
 
 		"face"	
-		"l"	3	-485	271	-482	
+		"l"	3	-514	490	-515	
 
 		"face"	
-		"l"	3	-273	484	482	
+		"l"	3	-513	513	517	
 
 		"face"	
-		"l"	3	484	485	-441	
+		"l"	3	518	519	-338	
 
 		"face"	
-		"l"	3	-273	440	442	
+		"l"	3	-379	337	377	
 
 		"face"	
-		"l"	3	482	-443	-486	
+		"l"	3	520	-378	-520	
 
 		"face"	
-		"l"	3	272	-483	-485	
+		"l"	3	378	-521	-519	
 
 		"face"	
-		"l"	3	486	485	-446	
+		"l"	3	521	519	-344	
 
 		"face"	
-		"l"	3	447	445	-441	
+		"l"	3	345	343	-338	
 
 		"face"	
-		"l"	3	-485	440	-486	
+		"l"	3	-519	337	-520	
 
 		"face"	
-		"l"	3	-448	484	-487	
+		"l"	3	-346	518	-522	
 
 		"face"	
-		"l"	3	483	487	-468	
+		"l"	3	522	523	-428	
 
 		"face"	
-		"l"	3	-278	467	469	
+		"l"	3	430	427	432	
 
 		"face"	
-		"l"	3	-485	-470	-488	
+		"l"	3	524	-433	-524	
 
 		"face"	
-		"l"	3	277	484	-484	
+		"l"	3	-431	-525	-523	
 
 		"face"	
-		"l"	3	488	487	489	
+		"l"	3	518	525	-434	
 
 		"face"	
-		"l"	3	490	-490	-468	
+		"l"	3	-346	433	435	
 
 		"face"	
-		"l"	3	-484	467	-488	
+		"l"	3	-522	-436	-526	
 
 		"face"	
-		"l"	3	-491	483	-489	
+		"l"	3	345	521	-519	
 
 		"face"	
-		"l"	3	484	487	469	
+		"l"	3	-522	526	527	
 
 		"face"	
-		"l"	3	-448	-470	473	
+		"l"	3	-526	-528	-523	
 
 		"face"	
-		"l"	3	-487	-474	-488	
+		"l"	3	-436	522	-527	
 
 		"face"	
-		"l"	3	447	486	-485	
+		"l"	3	525	435	521	
 
 		"face"	
-		"l"	3	491	492	315	
+		"l"	3	435	526	-523	
 
 		"face"	
-		"l"	3	-318	-316	293	
+		"l"	3	430	522	524	
 
 		"face"	
-		"l"	3	493	-294	-493	
+		"l"	3	-437	-525	-527	
 
 		"face"	
-		"l"	3	317	-494	-492	
+		"l"	3	-431	436	-436	
 
 		"face"	
-		"l"	3	494	492	-300	
+		"l"	3	528	523	529	
 
 		"face"	
-		"l"	3	-363	299	315	
+		"l"	3	530	-530	-428	
 
 		"face"	
-		"l"	3	-492	-316	-493	
+		"l"	3	-523	427	-524	
 
 		"face"	
-		"l"	3	362	491	-495	
+		"l"	3	-531	522	-529	
 
 		"face"	
-		"l"	3	495	492	-295	
+		"l"	3	531	532	533	
 
 		"face"	
-		"l"	3	303	294	-300	
+		"l"	3	534	-534	535	
 
 		"face"	
-		"l"	3	-495	299	-493	
+		"l"	3	536	-536	-533	
 
 		"face"	
-		"l"	3	-304	494	-496	
+		"l"	3	-535	-537	-532	
 
 		"face"	
-		"l"	3	-494	492	293	
+		"l"	3	537	525	538	
 
 		"face"	
-		"l"	3	295	-294	-295	
+		"l"	3	539	-539	-434	
 
 		"face"	
-		"l"	3	-496	294	-493	
+		"l"	3	-519	433	-526	
 
 		"face"	
-		"l"	3	-296	495	493	
+		"l"	3	-540	518	-538	
 
 		"face"	
-		"l"	3	-494	496	-449	
+		"l"	3	538	540	-523	
 
 		"face"	
-		"l"	3	-467	448	465	
+		"l"	3	525	522	527	
 
 		"face"	
-		"l"	3	497	-466	-497	
+		"l"	3	537	-528	-541	
 
 		"face"	
-		"l"	3	466	-498	493	
+		"l"	3	-526	-538	-539	
 
 		"face"	
-		"l"	3	495	496	-452	
+		"l"	3	-538	540	527	
 
 		"face"	
-		"l"	3	-296	451	-449	
+		"l"	3	541	-528	542	
 
 		"face"	
-		"l"	3	493	448	-497	
+		"l"	3	-537	-543	-541	
 
 		"face"	
-		"l"	3	295	-494	-496	
+		"l"	3	-542	536	537	
 
 		"face"	
-		"l"	3	498	499	329	
+		"l"	3	536	540	542	
 
 		"face"	
-		"l"	3	-332	-330	310	
+		"l"	3	-533	-543	-529	
 
 		"face"	
-		"l"	3	500	-311	-500	
+		"l"	3	-536	528	-541	
 
 		"face"	
-		"l"	3	331	-501	-499	
+		"l"	3	532	535	-537	
 
 		"face"	
-		"l"	3	501	499	-315	
+		"l"	3	535	540	-529	
 
 		"face"	
-		"l"	3	-373	314	329	
+		"l"	3	530	528	-523	
 
 		"face"	
-		"l"	3	-499	-330	-500	
+		"l"	3	-539	522	-541	
 
 		"face"	
-		"l"	3	372	498	-502	
+		"l"	3	-531	538	-536	
 
 		"face"	
-		"l"	3	502	499	-312	
+		"l"	3	543	523	468	
 
 		"face"	
-		"l"	3	317	311	-315	
+		"l"	3	544	-469	529	
 
 		"face"	
-		"l"	3	-502	314	-500	
+		"l"	3	-529	-530	-524	
 
 		"face"	
-		"l"	3	-318	501	-503	
+		"l"	3	-545	528	-544	
 
 		"face"	
-		"l"	3	-501	499	310	
+		"l"	3	545	532	546	
 
 		"face"	
-		"l"	3	312	-311	-312	
+		"l"	3	547	-547	533	
 
 		"face"	
-		"l"	3	-503	311	-500	
+		"l"	3	-532	-534	-533	
 
 		"face"	
-		"l"	3	-313	502	500	
+		"l"	3	-548	531	-546	
 
 		"face"	
-		"l"	3	-501	503	-456	
+		"l"	3	546	548	-529	
 
 		"face"	
-		"l"	3	-479	455	477	
+		"l"	3	532	528	542	
 
 		"face"	
-		"l"	3	504	-478	-504	
+		"l"	3	545	-543	-549	
 
 		"face"	
-		"l"	3	478	-505	500	
+		"l"	3	-533	-546	-547	
 
 		"face"	
-		"l"	3	502	503	-459	
+		"l"	3	549	548	-544	
 
 		"face"	
-		"l"	3	-313	458	-456	
+		"l"	3	544	543	-529	
 
 		"face"	
-		"l"	3	500	455	-504	
+		"l"	3	-547	528	-549	
 
 		"face"	
-		"l"	3	312	-501	-503	
+		"l"	3	-545	546	-550	
 
 		"face"	
-		"l"	3	505	503	-465	
+		"l"	3	-525	523	432	
 
 		"face"	
-		"l"	3	466	464	-459	
+		"l"	3	466	-433	468	
 
 		"face"	
-		"l"	3	-503	458	-504	
+		"l"	3	-544	-469	-524	
 
 		"face"	
-		"l"	3	-467	502	-506	
+		"l"	3	-467	543	524	
 
 		"face"	
-		"l"	3	-505	503	477	
+		"l"	3	550	551	552	
 
 		"face"	
-		"l"	3	506	-478	-465	
+		"l"	3	553	-553	554	
 
 		"face"	
-		"l"	3	-506	464	-504	
+		"l"	3	555	-555	-552	
 
 		"face"	
-		"l"	3	-507	505	504	
+		"l"	3	-554	-556	-551	
 
 		"face"	
-		"l"	3	501	507	-492	
+		"l"	3	556	551	557	
 
 		"face"	
-		"l"	3	-318	491	493	
+		"l"	3	558	-558	552	
 
 		"face"	
-		"l"	3	-503	-494	-508	
+		"l"	3	-551	-553	-552	
 
 		"face"	
-		"l"	3	317	502	-502	
+		"l"	3	-559	550	-557	
 
 		"face"	
-		"l"	3	508	507	509	
+		"l"	3	559	560	-386	
 
 		"face"	
-		"l"	3	510	-510	-492	
+		"l"	3	-420	385	418	
 
 		"face"	
-		"l"	3	-502	491	-508	
+		"l"	3	561	-419	-561	
 
 		"face"	
-		"l"	3	-511	501	-509	
+		"l"	3	419	-562	-560	
 
 		"face"	
-		"l"	3	502	507	493	
+		"l"	3	562	563	415	
 
 		"face"	
-		"l"	3	-467	-494	497	
+		"l"	3	-415	-416	413	
 
 		"face"	
-		"l"	3	-506	-498	-508	
+		"l"	3	564	-414	-564	
 
 		"face"	
-		"l"	3	466	505	-503	
+		"l"	3	414	-565	-563	
 
 		"face"	
-		"l"	3	511	512	344	
+		"l"	3	415	565	566	
 
 		"face"	
-		"l"	3	-347	-345	324	
+		"l"	3	563	-567	552	
 
 		"face"	
-		"l"	3	513	-325	-513	
+		"l"	3	562	-553	-566	
 
 		"face"	
-		"l"	3	346	-514	-512	
+		"l"	3	-564	-563	-416	
 
 		"face"	
-		"l"	3	514	512	-329	
+		"l"	3	-563	565	552	
 
 		"face"	
-		"l"	3	-396	328	344	
+		"l"	3	-559	-553	557	
 
 		"face"	
-		"l"	3	-512	-345	-513	
+		"l"	3	-562	-558	-566	
 
 		"face"	
-		"l"	3	395	511	-515	
+		"l"	3	558	561	562	
 
 		"face"	
-		"l"	3	515	512	-326	
+		"l"	3	561	565	557	
 
 		"face"	
-		"l"	3	331	325	-329	
+		"l"	3	-561	-558	567	
 
 		"face"	
-		"l"	3	-515	328	-513	
+		"l"	3	-419	-568	-566	
 
 		"face"	
-		"l"	3	-332	514	-516	
+		"l"	3	560	418	-562	
 
 		"face"	
-		"l"	3	-514	512	324	
+		"l"	3	418	565	567	
 
 		"face"	
-		"l"	3	326	-325	-326	
+		"l"	3	-427	-568	566	
 
 		"face"	
-		"l"	3	-516	325	-513	
+		"l"	3	-416	-567	-566	
 
 		"face"	
-		"l"	3	-327	515	513	
+		"l"	3	426	415	-419	
 
 		"face"	
-		"l"	3	-514	516	-468	
+		"l"	3	568	551	569	
 
 		"face"	
-		"l"	3	-491	467	489	
+		"l"	3	570	-570	557	
 
 		"face"	
-		"l"	3	517	-490	-517	
+		"l"	3	-557	-558	-552	
 
 		"face"	
-		"l"	3	490	-518	513	
+		"l"	3	-571	556	-569	
 
 		"face"	
-		"l"	3	515	516	-471	
+		"l"	3	571	572	-374	
 
 		"face"	
-		"l"	3	-327	470	-468	
+		"l"	3	397	373	399	
 
 		"face"	
-		"l"	3	513	467	-517	
+		"l"	3	573	-400	-573	
 
 		"face"	
-		"l"	3	326	-514	-516	
+		"l"	3	-398	-574	-572	
 
 		"face"	
-		"l"	3	518	516	-477	
+		"l"	3	574	560	-401	
 
 		"face"	
-		"l"	3	478	476	-471	
+		"l"	3	402	400	-386	
 
 		"face"	
-		"l"	3	-516	470	-517	
+		"l"	3	-560	385	-561	
 
 		"face"	
-		"l"	3	-479	515	-519	
+		"l"	3	-403	559	-575	
 
 		"face"	
-		"l"	3	-518	516	489	
+		"l"	3	-401	575	567	
 
 		"face"	
-		"l"	3	519	-490	-477	
+		"l"	3	560	-568	557	
 
 		"face"	
-		"l"	3	-519	476	-517	
+		"l"	3	574	-558	-576	
 
 		"face"	
-		"l"	3	-520	518	517	
+		"l"	3	-561	-575	400	
 
 		"face"	
-		"l"	3	514	520	-499	
+		"l"	3	-575	575	557	
 
 		"face"	
-		"l"	3	-332	498	500	
+		"l"	3	-571	-558	569	
 
 		"face"	
-		"l"	3	-516	-501	-521	
+		"l"	3	-574	-570	-576	
 
 		"face"	
-		"l"	3	331	515	-515	
+		"l"	3	570	573	574	
 
 		"face"	
-		"l"	3	521	520	522	
+		"l"	3	573	575	569	
 
 		"face"	
-		"l"	3	523	-523	-499	
+		"l"	3	-573	-570	576	
 
 		"face"	
-		"l"	3	-515	498	-521	
+		"l"	3	-400	-577	-576	
 
 		"face"	
-		"l"	3	-524	514	-522	
+		"l"	3	572	399	-574	
 
 		"face"	
-		"l"	3	518	520	504	
+		"l"	3	399	575	576	
 
 		"face"	
-		"l"	3	524	-505	522	
+		"l"	3	-405	-577	567	
 
 		"face"	
-		"l"	3	-522	-523	-521	
+		"l"	3	400	-568	-576	
 
 		"face"	
-		"l"	3	-525	521	-519	
+		"l"	3	404	-401	-400	
 
 		"face"	
-		"l"	3	515	520	500	
+		"l"	3	-556	551	554	
 
 		"face"	
-		"l"	3	-479	-501	504	
+		"l"	3	577	-555	569	
 
 		"face"	
-		"l"	3	-519	-505	-521	
+		"l"	3	-569	-570	-552	
 
 		"face"	
-		"l"	3	478	518	-516	
+		"l"	3	-578	568	555	
 
 		"face"	
-		"l"	3	525	526	351	
+		"l"	3	578	572	-377	
 
 		"face"	
-		"l"	3	-355	-352	339	
+		"l"	3	378	376	-374	
 
 		"face"	
-		"l"	3	527	-340	-527	
+		"l"	3	-572	373	-573	
 
 		"face"	
-		"l"	3	354	-528	-526	
+		"l"	3	-379	571	-579	
 
 		"face"	
-		"l"	3	528	526	-344	
+		"l"	3	-377	579	576	
 
 		"face"	
-		"l"	3	-415	343	351	
+		"l"	3	572	-577	569	
 
 		"face"	
-		"l"	3	-526	-352	-527	
+		"l"	3	578	-570	-580	
 
 		"face"	
-		"l"	3	414	525	-529	
+		"l"	3	-573	-579	376	
 
 		"face"	
-		"l"	3	529	526	-341	
+		"l"	3	-579	579	569	
 
 		"face"	
-		"l"	3	346	340	-344	
+		"l"	3	-578	-570	554	
 
 		"face"	
-		"l"	3	-529	343	-527	
+		"l"	3	580	-555	-580	
 
 		"face"	
-		"l"	3	-347	528	-530	
+		"l"	3	577	-581	578	
 
 		"face"	
-		"l"	3	-528	526	339	
+		"l"	3	-556	581	582	
 
 		"face"	
-		"l"	3	341	-340	-341	
+		"l"	3	583	-583	584	
 
 		"face"	
-		"l"	3	-530	340	-527	
+		"l"	3	585	-585	-582	
 
 		"face"	
-		"l"	3	-342	529	527	
+		"l"	3	-584	-586	555	
 
 		"face"	
-		"l"	3	529	530	-484	
+		"l"	3	568	581	586	
 
 		"face"	
-		"l"	3	-342	483	-481	
+		"l"	3	-578	-587	582	
 
 		"face"	
-		"l"	3	527	480	-531	
+		"l"	3	555	-583	-582	
 
 		"face"	
-		"l"	3	341	-528	-530	
+		"l"	3	577	-556	-569	
 
 		"face"	
-		"l"	3	531	530	-489	
+		"l"	3	571	587	-519	
 
 		"face"	
-		"l"	3	490	488	-484	
+		"l"	3	-379	518	520	
 
 		"face"	
-		"l"	3	-530	483	-531	
+		"l"	3	-579	-521	-588	
 
 		"face"	
-		"l"	3	-491	529	-532	
+		"l"	3	378	578	-572	
 
 		"face"	
-		"l"	3	528	532	-512	
+		"l"	3	-581	588	582	
 
 		"face"	
-		"l"	3	-347	511	513	
+		"l"	3	577	-583	586	
 
 		"face"	
-		"l"	3	-530	-514	-533	
+		"l"	3	578	-587	-589	
 
 		"face"	
-		"l"	3	346	529	-529	
+		"l"	3	-578	-579	580	
 
 		"face"	
-		"l"	3	533	532	534	
+		"l"	3	-579	588	586	
 
 		"face"	
-		"l"	3	535	-535	-512	
+		"l"	3	-588	-587	589	
 
 		"face"	
-		"l"	3	-529	511	-533	
+		"l"	3	-521	-590	-589	
 
 		"face"	
-		"l"	3	-536	528	-534	
+		"l"	3	587	520	578	
 
 		"face"	
-		"l"	3	529	532	513	
+		"l"	3	590	581	591	
 
 		"face"	
-		"l"	3	-491	-514	517	
+		"l"	3	592	-592	586	
 
 		"face"	
-		"l"	3	-532	-518	-533	
+		"l"	3	-569	-587	-582	
 
 		"face"	
-		"l"	3	490	531	-530	
+		"l"	3	-593	568	-591	
 
 		"face"	
-		"l"	3	536	537	384	
+		"l"	3	593	594	-532	
 
 		"face"	
-		"l"	3	-386	-385	360	
+		"l"	3	534	531	536	
 
 		"face"	
-		"l"	3	538	-361	-538	
+		"l"	3	595	-537	-595	
 
 		"face"	
-		"l"	3	385	-539	-537	
+		"l"	3	-535	-596	-594	
 
 		"face"	
-		"l"	3	-539	537	360	
+		"l"	3	596	587	-538	
 
 		"face"	
-		"l"	3	362	-361	-362	
+		"l"	3	539	537	-519	
 
 		"face"	
-		"l"	3	539	361	-538	
+		"l"	3	-572	518	-588	
 
 		"face"	
-		"l"	3	-363	-540	538	
+		"l"	3	-540	571	-597	
 
 		"face"	
-		"l"	3	-539	540	-492	
+		"l"	3	-538	597	589	
 
 		"face"	
-		"l"	3	-511	491	509	
+		"l"	3	587	-590	586	
 
 		"face"	
-		"l"	3	541	-510	-541	
+		"l"	3	596	-587	-598	
 
 		"face"	
-		"l"	3	510	-542	538	
+		"l"	3	-588	-597	537	
 
 		"face"	
-		"l"	3	-540	540	-495	
+		"l"	3	-597	597	586	
 
 		"face"	
-		"l"	3	-363	494	-492	
+		"l"	3	-593	-587	591	
 
 		"face"	
-		"l"	3	538	491	-541	
+		"l"	3	-596	-592	-598	
 
 		"face"	
-		"l"	3	362	-539	539	
+		"l"	3	592	595	596	
 
 		"face"	
-		"l"	3	542	543	376	
+		"l"	3	595	597	591	
 
 		"face"	
-		"l"	3	-407	-377	370	
+		"l"	3	-595	-592	598	
 
 		"face"	
-		"l"	3	544	-371	-544	
+		"l"	3	-537	-599	-598	
 
 		"face"	
-		"l"	3	406	-545	-543	
+		"l"	3	594	536	-596	
 
 		"face"	
-		"l"	3	545	543	380	
+		"l"	3	536	597	598	
 
 		"face"	
-		"l"	3	-383	-381	376	
+		"l"	3	-542	-599	589	
 
 		"face"	
-		"l"	3	-543	-377	-544	
+		"l"	3	537	-590	-598	
 
 		"face"	
-		"l"	3	382	542	-546	
+		"l"	3	541	-538	-537	
 
 		"face"	
-		"l"	3	546	543	-372	
+		"l"	3	-586	581	584	
 
 		"face"	
-		"l"	3	385	371	380	
+		"l"	3	599	-585	591	
 
 		"face"	
-		"l"	3	-546	-381	-544	
+		"l"	3	-591	-592	-582	
 
 		"face"	
-		"l"	3	-386	545	-547	
+		"l"	3	-600	590	585	
 
 		"face"	
-		"l"	3	-545	543	370	
+		"l"	3	600	594	601	
 
 		"face"	
-		"l"	3	372	-371	-372	
+		"l"	3	602	-602	-532	
 
 		"face"	
-		"l"	3	-547	371	-544	
+		"l"	3	-594	531	-595	
 
 		"face"	
-		"l"	3	-373	546	544	
+		"l"	3	-603	593	-601	
 
 		"face"	
-		"l"	3	-545	547	-499	
+		"l"	3	601	603	598	
 
 		"face"	
-		"l"	3	-524	498	522	
+		"l"	3	594	-599	591	
 
 		"face"	
-		"l"	3	548	-523	-548	
+		"l"	3	600	-592	-604	
 
 		"face"	
-		"l"	3	523	-549	544	
+		"l"	3	-595	-601	-602	
 
 		"face"	
-		"l"	3	546	547	-502	
+		"l"	3	-601	603	591	
 
 		"face"	
-		"l"	3	-373	501	-499	
+		"l"	3	-600	-592	584	
 
 		"face"	
-		"l"	3	544	498	-548	
+		"l"	3	604	-585	-604	
 
 		"face"	
-		"l"	3	372	-545	-547	
+		"l"	3	599	-605	600	
 
 		"face"	
-		"l"	3	549	547	-509	
+		"l"	3	605	606	-551	
 
 		"face"	
-		"l"	3	510	508	-502	
+		"l"	3	553	550	555	
 
 		"face"	
-		"l"	3	-547	501	-548	
+		"l"	3	607	-556	-607	
 
 		"face"	
-		"l"	3	-511	546	-550	
+		"l"	3	-554	-608	-606	
 
 		"face"	
-		"l"	3	545	550	-537	
+		"l"	3	608	606	609	
 
 		"face"	
-		"l"	3	-386	536	538	
+		"l"	3	610	-610	-551	
 
 		"face"	
-		"l"	3	-547	-539	-551	
+		"l"	3	-606	550	-607	
 
 		"face"	
-		"l"	3	385	546	-546	
+		"l"	3	-611	605	-609	
 
 		"face"	
-		"l"	3	546	550	538	
+		"l"	3	611	606	585	
 
 		"face"	
-		"l"	3	-511	-539	541	
+		"l"	3	612	-586	609	
 
 		"face"	
-		"l"	3	-550	-542	-551	
+		"l"	3	-609	-610	-607	
 
 		"face"	
-		"l"	3	510	549	-547	
+		"l"	3	-613	608	-612	
 
 		"face"	
-		"l"	3	551	552	399	
+		"l"	3	-608	606	555	
 
 		"face"	
-		"l"	3	-418	-400	393	
+		"l"	3	583	-556	585	
 
 		"face"	
-		"l"	3	553	-394	-553	
+		"l"	3	-612	-586	-607	
 
 		"face"	
-		"l"	3	417	-554	-552	
+		"l"	3	-584	611	607	
 
 		"face"	
-		"l"	3	554	552	403	
+		"l"	3	613	614	615	
 
 		"face"	
-		"l"	3	-405	-404	399	
+		"l"	3	616	-616	617	
 
 		"face"	
-		"l"	3	-552	-400	-553	
+		"l"	3	618	-618	-615	
 
 		"face"	
-		"l"	3	404	551	-555	
+		"l"	3	-617	-619	-614	
 
 		"face"	
-		"l"	3	555	552	-395	
+		"l"	3	619	614	620	
 
 		"face"	
-		"l"	3	406	394	403	
+		"l"	3	621	-621	615	
 
 		"face"	
-		"l"	3	-555	-404	-553	
+		"l"	3	-614	-616	-615	
 
 		"face"	
-		"l"	3	-407	554	-556	
+		"l"	3	-622	613	-620	
 
 		"face"	
-		"l"	3	-554	552	393	
+		"l"	3	622	623	624	
 
 		"face"	
-		"l"	3	395	-394	-395	
+		"l"	3	625	-625	626	
 
 		"face"	
-		"l"	3	-556	394	-553	
+		"l"	3	627	-627	-624	
 
 		"face"	
-		"l"	3	-396	555	553	
+		"l"	3	-626	-628	-623	
 
 		"face"	
-		"l"	3	-554	556	-512	
+		"l"	3	628	629	615	
 
 		"face"	
-		"l"	3	-536	511	534	
+		"l"	3	-622	-616	620	
 
 		"face"	
-		"l"	3	557	-535	-557	
+		"l"	3	-628	-621	-630	
 
 		"face"	
-		"l"	3	535	-558	553	
+		"l"	3	621	627	-629	
 
 		"face"	
-		"l"	3	555	556	-515	
+		"l"	3	627	629	620	
 
 		"face"	
-		"l"	3	-396	514	-512	
+		"l"	3	-624	-621	630	
 
 		"face"	
-		"l"	3	553	511	-557	
+		"l"	3	-627	-631	-630	
 
 		"face"	
-		"l"	3	395	-554	-556	
+		"l"	3	623	626	-628	
 
 		"face"	
-		"l"	3	558	556	-522	
+		"l"	3	631	614	632	
 
 		"face"	
-		"l"	3	523	521	-515	
+		"l"	3	633	-633	620	
 
 		"face"	
-		"l"	3	-556	514	-557	
+		"l"	3	-620	-621	-615	
 
 		"face"	
-		"l"	3	-524	555	-559	
+		"l"	3	-634	619	-632	
 
 		"face"	
-		"l"	3	554	559	-543	
+		"l"	3	634	635	-409	
 
 		"face"	
-		"l"	3	-407	542	544	
+		"l"	3	636	408	637	
 
 		"face"	
-		"l"	3	-556	-545	-560	
+		"l"	3	638	-638	-636	
 
 		"face"	
-		"l"	3	406	555	-555	
+		"l"	3	-637	-639	-635	
 
 		"face"	
-		"l"	3	555	559	544	
+		"l"	3	639	623	640	
 
 		"face"	
-		"l"	3	-524	-545	548	
+		"l"	3	641	-641	624	
 
 		"face"	
-		"l"	3	-559	-549	-560	
+		"l"	3	-623	-625	-624	
 
 		"face"	
-		"l"	3	523	558	-556	
+		"l"	3	-642	622	-640	
 
 		"face"	
-		"l"	3	560	561	-414	
+		"l"	3	640	642	630	
 
 		"face"	
-		"l"	3	417	413	-417	
+		"l"	3	623	-631	620	
 
 		"face"	
-		"l"	3	562	416	-562	
+		"l"	3	639	-621	-643	
 
 		"face"	
-		"l"	3	-418	-563	-561	
+		"l"	3	-624	-640	-641	
 
 		"face"	
-		"l"	3	563	561	412	
+		"l"	3	-640	642	620	
 
 		"face"	
-		"l"	3	414	-413	-414	
+		"l"	3	-634	-621	632	
 
 		"face"	
-		"l"	3	-561	413	-562	
+		"l"	3	-639	-633	-643	
 
 		"face"	
-		"l"	3	-415	560	-564	
+		"l"	3	633	638	639	
 
 		"face"	
-		"l"	3	560	564	-529	
+		"l"	3	638	642	632	
 
 		"face"	
-		"l"	3	-415	528	-526	
+		"l"	3	-636	-633	643	
 
 		"face"	
-		"l"	3	-564	525	-565	
+		"l"	3	-638	-644	-643	
 
 		"face"	
-		"l"	3	414	563	-561	
+		"l"	3	635	637	-639	
 
 		"face"	
-		"l"	3	565	564	-534	
+		"l"	3	637	642	643	
 
 		"face"	
-		"l"	3	535	533	-529	
+		"l"	3	644	-644	630	
 
 		"face"	
-		"l"	3	-561	528	-565	
+		"l"	3	-641	-631	-643	
 
 		"face"	
-		"l"	3	-536	560	-566	
+		"l"	3	-645	640	-638	
 
 		"face"	
-		"l"	3	-563	566	-552	
+		"l"	3	-619	614	617	
 
 		"face"	
-		"l"	3	-418	551	553	
+		"l"	3	645	-618	632	
 
 		"face"	
-		"l"	3	-561	-554	-567	
+		"l"	3	-632	-633	-615	
 
 		"face"	
-		"l"	3	417	560	562	
+		"l"	3	-646	631	618	
 
 		"face"	
-		"l"	3	560	566	553	
+		"l"	3	646	647	-412	
 
 		"face"	
-		"l"	3	-536	-554	557	
+		"l"	3	414	411	416	
 
 		"face"	
-		"l"	3	-566	-558	-567	
+		"l"	3	648	-417	-648	
 
 		"face"	
-		"l"	3	535	565	-561	;
+		"l"	3	-415	-649	-647	
+
+		"face"	
+		"l"	3	649	635	-418	
+
+		"face"	
+		"l"	3	419	417	-409	
+
+		"face"	
+		"l"	3	-635	408	-636	
+
+		"face"	
+		"l"	3	-420	634	-650	
+
+		"face"	
+		"l"	3	-418	650	643	
+
+		"face"	
+		"l"	3	635	-644	632	
+
+		"face"	
+		"l"	3	649	-633	-651	
+
+		"face"	
+		"l"	3	-636	-650	417	
+
+		"face"	
+		"l"	3	-650	650	632	
+
+		"face"	
+		"l"	3	-646	-633	617	
+
+		"face"	
+		"l"	3	-649	-618	-651	
+
+		"face"	
+		"l"	3	645	648	649	
+
+		"face"	
+		"l"	3	648	650	617	
+
+		"face"	
+		"l"	3	-648	-618	651	
+
+		"face"	
+		"l"	3	-417	-652	-651	
+
+		"face"	
+		"l"	3	647	416	-649	
+
+		"face"	
+		"l"	3	416	650	651	
+
+		"face"	
+		"l"	3	-424	-652	643	
+
+		"face"	
+		"l"	3	417	-644	-651	
+
+		"face"	
+		"l"	3	423	-418	-417	
+
+		"face"	
+		"l"	3	652	653	-551	
+
+		"face"	
+		"l"	3	-611	550	609	
+
+		"face"	
+		"l"	3	654	-610	-654	
+
+		"face"	
+		"l"	3	610	-655	-653	
+
+		"face"	
+		"l"	3	-619	655	656	
+
+		"face"	
+		"l"	3	657	-657	658	
+
+		"face"	
+		"l"	3	659	-659	-656	
+
+		"face"	
+		"l"	3	-658	-660	618	
+
+		"face"	
+		"l"	3	660	661	654	
+
+		"face"	
+		"l"	3	662	-655	658	
+
+		"face"	
+		"l"	3	663	-659	-662	
+
+		"face"	
+		"l"	3	-663	-664	-661	
+
+		"face"	
+		"l"	3	-664	661	658	
+
+		"face"	
+		"l"	3	-658	-659	656	
+
+		"face"	
+		"l"	3	664	-657	-662	
+
+		"face"	
+		"l"	3	657	-665	663	
+
+		"face"	
+		"l"	3	-665	661	656	
+
+		"face"	
+		"l"	3	665	-657	-653	
+
+		"face"	
+		"l"	3	666	652	-662	
+
+		"face"	
+		"l"	3	-666	-667	664	
+
+		"face"	
+		"l"	3	-667	661	-653	
+
+		"face"	
+		"l"	3	-611	652	654	
+
+		"face"	
+		"l"	3	-661	-655	-662	
+
+		"face"	
+		"l"	3	610	660	666	
+
+		"face"	
+		"l"	3	667	653	-557	
+
+		"face"	
+		"l"	3	558	556	-551	
+
+		"face"	
+		"l"	3	-653	550	-654	
+
+		"face"	
+		"l"	3	-559	652	-668	
+
+		"face"	
+		"l"	3	631	655	668	
+
+		"face"	
+		"l"	3	-646	-669	656	
+
+		"face"	
+		"l"	3	618	-657	-656	
+
+		"face"	
+		"l"	3	645	-619	-632	
+
+		"face"	
+		"l"	3	634	669	-560	
+
+		"face"	
+		"l"	3	-420	559	561	
+
+		"face"	
+		"l"	3	-650	-562	-670	
+
+		"face"	
+		"l"	3	419	649	-635	
+
+		"face"	
+		"l"	3	-649	-666	-563	
+
+		"face"	
+		"l"	3	-415	562	564	
+
+		"face"	
+		"l"	3	-647	-565	665	
+
+		"face"	
+		"l"	3	414	646	648	
+
+		"face"	
+		"l"	3	-563	670	-653	
+
+		"face"	
+		"l"	3	-666	652	656	
+
+		"face"	
+		"l"	3	-649	-657	-671	
+
+		"face"	
+		"l"	3	665	648	562	
+
+		"face"	
+		"l"	3	648	670	656	
+
+		"face"	
+		"l"	3	645	-657	668	
+
+		"face"	
+		"l"	3	649	-669	-671	
+
+		"face"	
+		"l"	3	-646	-650	-649	
+
+		"face"	
+		"l"	3	-650	670	668	
+
+		"face"	
+		"l"	3	-670	-669	-668	
+
+		"face"	
+		"l"	3	-562	667	-671	
+
+		"face"	
+		"l"	3	669	561	649	
+
+		"face"	
+		"l"	3	561	670	-668	
+
+		"face"	
+		"l"	3	558	667	-653	
+
+		"face"	
+		"l"	3	562	652	-671	
+
+		"face"	
+		"l"	3	-559	-563	-562	
+
+		"face"	
+		"l"	3	-655	653	609	
+
+		"face"	
+		"l"	3	671	-610	672	
+
+		"face"	
+		"l"	3	673	-673	-654	
+
+		"face"	
+		"l"	3	-672	-674	654	
+
+		"face"	
+		"l"	3	-660	655	658	
+
+		"face"	
+		"l"	3	674	-659	675	
+
+		"face"	
+		"l"	3	676	-676	-656	
+
+		"face"	
+		"l"	3	-675	-677	659	
+
+		"face"	
+		"l"	3	677	662	678	
+
+		"face"	
+		"l"	3	679	-679	680	
+
+		"face"	
+		"l"	3	681	-681	-663	
+
+		"face"	
+		"l"	3	-680	-682	-678	
+
+		"face"	
+		"l"	3	682	683	684	
+
+		"face"	
+		"l"	3	685	-685	686	
+
+		"face"	
+		"l"	3	687	-687	-684	
+
+		"face"	
+		"l"	3	-686	-688	-683	
+
+		"face"	
+		"l"	3	684	688	673	
+
+		"face"	
+		"l"	3	683	-674	675	
+
+		"face"	
+		"l"	3	682	-676	-689	
+
+		"face"	
+		"l"	3	-684	-683	-685	
+
+		"face"	
+		"l"	3	-683	688	675	
+
+		"face"	
+		"l"	3	-675	-676	658	
+
+		"face"	
+		"l"	3	-682	-659	-689	
+
+		"face"	
+		"l"	3	674	681	682	
+
+		"face"	
+		"l"	3	681	688	658	
+
+		"face"	
+		"l"	3	-663	-659	654	
+
+		"face"	
+		"l"	3	-681	-655	-689	
+
+		"face"	
+		"l"	3	662	680	-682	
+
+		"face"	
+		"l"	3	680	688	654	
+
+		"face"	
+		"l"	3	671	-655	673	
+
+		"face"	
+		"l"	3	-685	-674	-689	
+
+		"face"	
+		"l"	3	-672	684	-681	
+
+		"face"	
+		"l"	3	689	690	-614	
+
+		"face"	
+		"l"	3	616	613	618	
+
+		"face"	
+		"l"	3	691	-619	-691	
+
+		"face"	
+		"l"	3	-617	-692	-690	
+
+		"face"	
+		"l"	3	692	690	693	
+
+		"face"	
+		"l"	3	694	-694	-614	
+
+		"face"	
+		"l"	3	-690	613	-691	
+
+		"face"	
+		"l"	3	-695	689	-693	
+
+		"face"	
+		"l"	3	695	690	659	
+
+		"face"	
+		"l"	3	696	-660	693	
+
+		"face"	
+		"l"	3	-693	-694	-691	
+
+		"face"	
+		"l"	3	-697	692	-696	
+
+		"face"	
+		"l"	3	-692	690	618	
+
+		"face"	
+		"l"	3	657	-619	659	
+
+		"face"	
+		"l"	3	-696	-660	-691	
+
+		"face"	
+		"l"	3	-658	695	691	
+
+		"face"	
+		"l"	3	697	698	-614	
+
+		"face"	
+		"l"	3	-695	613	693	
+
+		"face"	
+		"l"	3	699	-694	-699	
+
+		"face"	
+		"l"	3	694	-700	-698	
+
+		"face"	
+		"l"	3	700	698	-620	
+
+		"face"	
+		"l"	3	621	619	-614	
+
+		"face"	
+		"l"	3	-698	613	-699	
+
+		"face"	
+		"l"	3	-622	697	-701	
+
+		"face"	
+		"l"	3	701	702	-623	
+
+		"face"	
+		"l"	3	625	622	627	
+
+		"face"	
+		"l"	3	703	-628	-703	
+
+		"face"	
+		"l"	3	-626	-704	-702	
+
+		"face"	
+		"l"	3	703	704	705	
+
+		"face"	
+		"l"	3	-703	-706	-701	
+
+		"face"	
+		"l"	3	-628	700	-705	
+
+		"face"	
+		"l"	3	702	627	-704	
+
+		"face"	
+		"l"	3	627	704	-701	
+
+		"face"	
+		"l"	3	621	700	-698	
+
+		"face"	
+		"l"	3	-629	697	-705	
+
+		"face"	
+		"l"	3	-622	628	-628	
+
+		"face"	
+		"l"	3	706	698	707	
+
+		"face"	
+		"l"	3	708	-708	-620	
+
+		"face"	
+		"l"	3	-701	619	-699	
+
+		"face"	
+		"l"	3	-709	700	-707	
+
+		"face"	
+		"l"	3	709	710	711	
+
+		"face"	
+		"l"	3	712	-712	713	
+
+		"face"	
+		"l"	3	714	-714	-711	
+
+		"face"	
+		"l"	3	-713	-715	-710	
+
+		"face"	
+		"l"	3	715	702	716	
+
+		"face"	
+		"l"	3	717	-717	-623	
+
+		"face"	
+		"l"	3	-702	622	-703	
+
+		"face"	
+		"l"	3	-718	701	-716	
+
+		"face"	
+		"l"	3	716	718	-701	
+
+		"face"	
+		"l"	3	702	700	705	
+
+		"face"	
+		"l"	3	715	-706	-719	
+
+		"face"	
+		"l"	3	-703	-716	-717	
+
+		"face"	
+		"l"	3	-716	718	705	
+
+		"face"	
+		"l"	3	719	-706	720	
+
+		"face"	
+		"l"	3	-715	-721	-719	
+
+		"face"	
+		"l"	3	-720	714	715	
+
+		"face"	
+		"l"	3	714	718	720	
+
+		"face"	
+		"l"	3	-711	-721	-707	
+
+		"face"	
+		"l"	3	-714	706	-719	
+
+		"face"	
+		"l"	3	710	713	-715	
+
+		"face"	
+		"l"	3	713	718	-707	
+
+		"face"	
+		"l"	3	708	706	-701	
+
+		"face"	
+		"l"	3	-717	700	-719	
+
+		"face"	
+		"l"	3	-709	716	-714	
+
+		"face"	
+		"l"	3	-700	698	693	
+
+		"face"	
+		"l"	3	721	-694	707	
+
+		"face"	
+		"l"	3	-707	-708	-699	
+
+		"face"	
+		"l"	3	-722	706	699	
+
+		"face"	
+		"l"	3	722	710	723	
+
+		"face"	
+		"l"	3	724	-724	711	
+
+		"face"	
+		"l"	3	-710	-712	-711	
+
+		"face"	
+		"l"	3	-725	709	-723	
+
+		"face"	
+		"l"	3	723	725	-707	
+
+		"face"	
+		"l"	3	710	706	720	
+
+		"face"	
+		"l"	3	722	-721	-726	
+
+		"face"	
+		"l"	3	-711	-723	-724	
+
+		"face"	
+		"l"	3	726	725	699	
+
+		"face"	
+		"l"	3	721	-700	-707	
+
+		"face"	
+		"l"	3	-724	706	-726	
+
+		"face"	
+		"l"	3	-722	723	-727	
+
+		"face"	
+		"l"	3	727	728	493	
+
+		"face"	
+		"l"	3	-493	-494	491	
+
+		"face"	
+		"l"	3	729	-492	-729	
+
+		"face"	
+		"l"	3	492	-730	-728	
+
+		"face"	
+		"l"	3	730	731	509	
+
+		"face"	
+		"l"	3	-509	-510	507	
+
+		"face"	
+		"l"	3	732	-508	-732	
+
+		"face"	
+		"l"	3	508	-733	-731	
+
+		"face"	
+		"l"	3	733	734	503	
+
+		"face"	
+		"l"	3	-503	-504	501	
+
+		"face"	
+		"l"	3	735	-502	-735	
+
+		"face"	
+		"l"	3	502	-736	-734	
+
+		"face"	
+		"l"	3	503	736	729	
+
+		"face"	
+		"l"	3	734	-730	737	
+
+		"face"	
+		"l"	3	733	-738	-737	
+
+		"face"	
+		"l"	3	-735	-734	-504	
+
+		"face"	
+		"l"	3	-734	736	737	
+
+		"face"	
+		"l"	3	738	-738	739	
+
+		"face"	
+		"l"	3	-733	-740	-737	
+
+		"face"	
+		"l"	3	-739	732	733	
+
+		"face"	
+		"l"	3	732	736	739	
+
+		"face"	
+		"l"	3	-732	-740	-728	
+
+		"face"	
+		"l"	3	-508	727	-737	
+
+		"face"	
+		"l"	3	731	507	-733	
+
+		"face"	
+		"l"	3	507	736	-728	
+
+		"face"	
+		"l"	3	-493	727	729	
+
+		"face"	
+		"l"	3	-504	-730	-737	
+
+		"face"	
+		"l"	3	492	503	-508	
+
+		"face"	
+		"l"	3	740	741	529	
+
+		"face"	
+		"l"	3	-545	-530	468	
+
+		"face"	
+		"l"	3	742	-469	-742	
+
+		"face"	
+		"l"	3	544	-743	-741	
+
+		"face"	
+		"l"	3	743	744	533	
+
+		"face"	
+		"l"	3	-548	-534	546	
+
+		"face"	
+		"l"	3	745	-547	-745	
+
+		"face"	
+		"l"	3	547	-746	-744	
+
+		"face"	
+		"l"	3	745	746	747	
+
+		"face"	
+		"l"	3	-745	-748	-741	
+
+		"face"	
+		"l"	3	-547	740	-747	
+
+		"face"	
+		"l"	3	744	546	-746	
+
+		"face"	
+		"l"	3	546	746	-741	
+
+		"face"	
+		"l"	3	-545	740	742	
+
+		"face"	
+		"l"	3	-550	-743	-747	
+
+		"face"	
+		"l"	3	544	549	-547	
+
+		"face"	
+		"l"	3	748	741	498	
+
+		"face"	
+		"l"	3	749	-499	529	
+
+		"face"	
+		"l"	3	-741	-530	-742	
+
+		"face"	
+		"l"	3	-750	740	-749	
+
+		"face"	
+		"l"	3	750	751	510	
+
+		"face"	
+		"l"	3	752	-511	753	
+
+		"face"	
+		"l"	3	754	-754	-752	
+
+		"face"	
+		"l"	3	-753	-755	-751	
+
+		"face"	
+		"l"	3	755	744	756	
+
+		"face"	
+		"l"	3	757	-757	533	
+
+		"face"	
+		"l"	3	-744	-534	-745	
+
+		"face"	
+		"l"	3	-758	743	-756	
+
+		"face"	
+		"l"	3	756	758	-741	
+
+		"face"	
+		"l"	3	744	740	747	
+
+		"face"	
+		"l"	3	755	-748	-759	
+
+		"face"	
+		"l"	3	-745	-756	-757	
+
+		"face"	
+		"l"	3	-756	758	747	
+
+		"face"	
+		"l"	3	759	-748	760	
+
+		"face"	
+		"l"	3	-755	-761	-759	
+
+		"face"	
+		"l"	3	-760	754	755	
+
+		"face"	
+		"l"	3	754	758	760	
+
+		"face"	
+		"l"	3	-752	-761	-749	
+
+		"face"	
+		"l"	3	-754	748	-759	
+
+		"face"	
+		"l"	3	751	753	-755	
+
+		"face"	
+		"l"	3	753	758	-749	
+
+		"face"	
+		"l"	3	749	748	-741	
+
+		"face"	
+		"l"	3	-757	740	-759	
+
+		"face"	
+		"l"	3	-750	756	-754	
+
+		"face"	
+		"l"	3	761	741	-471	
+
+		"face"	
+		"l"	3	496	470	498	
+
+		"face"	
+		"l"	3	-749	-499	-742	
+
+		"face"	
+		"l"	3	-497	748	-762	
+
+		"face"	
+		"l"	3	762	763	-500	
+
+		"face"	
+		"l"	3	502	499	504	
+
+		"face"	
+		"l"	3	764	-505	-764	
+
+		"face"	
+		"l"	3	-503	-765	-763	
+
+		"face"	
+		"l"	3	765	751	-506	
+
+		"face"	
+		"l"	3	508	505	510	
+
+		"face"	
+		"l"	3	-751	-511	-752	
+
+		"face"	
+		"l"	3	-509	750	-766	
+
+		"face"	
+		"l"	3	-506	766	-749	
+
+		"face"	
+		"l"	3	751	748	760	
+
+		"face"	
+		"l"	3	765	-761	-767	
+
+		"face"	
+		"l"	3	-752	-766	505	
+
+		"face"	
+		"l"	3	-766	766	760	
+
+		"face"	
+		"l"	3	767	-761	768	
+
+		"face"	
+		"l"	3	-765	-769	-767	
+
+		"face"	
+		"l"	3	-768	764	765	
+
+		"face"	
+		"l"	3	764	766	768	
+
+		"face"	
+		"l"	3	-764	-769	-762	
+
+		"face"	
+		"l"	3	-505	761	-767	
+
+		"face"	
+		"l"	3	763	504	-765	
+
+		"face"	
+		"l"	3	504	766	-762	
+
+		"face"	
+		"l"	3	496	761	-749	
+
+		"face"	
+		"l"	3	505	748	-767	
+
+		"face"	
+		"l"	3	-497	-506	-505	
+
+		"face"	
+		"l"	3	-743	741	468	
+
+		"face"	
+		"l"	3	473	-469	-471	
+
+		"face"	
+		"l"	3	-762	470	-742	
+
+		"face"	
+		"l"	3	-474	761	742	
+
+		"face"	
+		"l"	3	750	769	-731	
+
+		"face"	
+		"l"	3	-509	730	732	
+
+		"face"	
+		"l"	3	-766	-733	-770	
+
+		"face"	
+		"l"	3	508	765	-751	
+
+		"face"	
+		"l"	3	-765	770	-734	
+
+		"face"	
+		"l"	3	-503	733	735	
+
+		"face"	
+		"l"	3	-763	-736	-771	
+
+		"face"	
+		"l"	3	502	762	764	
+
+		"face"	
+		"l"	3	-734	771	772	
+
+		"face"	
+		"l"	3	770	-773	773	
+
+		"face"	
+		"l"	3	-765	-774	-772	
+
+		"face"	
+		"l"	3	-771	764	733	
+
+		"face"	
+		"l"	3	764	771	773	
+
+		"face"	
+		"l"	3	-768	-774	774	
+
+		"face"	
+		"l"	3	765	-775	-772	
+
+		"face"	
+		"l"	3	767	-766	-765	
+
+		"face"	
+		"l"	3	-766	771	774	
+
+		"face"	
+		"l"	3	-770	-775	775	
+
+		"face"	
+		"l"	3	-733	-776	-772	
+
+		"face"	
+		"l"	3	769	732	765	
+
+		"face"	
+		"l"	3	732	771	775	
+
+		"face"	
+		"l"	3	-739	-776	772	
+
+		"face"	
+		"l"	3	733	-773	-772	
+
+		"face"	
+		"l"	3	738	-734	-733	
+
+		"face"	
+		"l"	3	776	769	777	
+
+		"face"	
+		"l"	3	778	-778	-731	
+
+		"face"	
+		"l"	3	-751	730	-770	
+
+		"face"	
+		"l"	3	-779	750	-777	
+
+		"face"	
+		"l"	3	779	780	-532	
+
+		"face"	
+		"l"	3	-603	531	601	
+
+		"face"	
+		"l"	3	781	-602	-781	
+
+		"face"	
+		"l"	3	602	-782	-780	
+
+		"face"	
+		"l"	3	782	780	-546	
+
+		"face"	
+		"l"	3	547	545	-532	
+
+		"face"	
+		"l"	3	-780	531	-781	
+
+		"face"	
+		"l"	3	-548	779	-783	
+
+		"face"	
+		"l"	3	779	783	-744	
+
+		"face"	
+		"l"	3	-548	743	745	
+
+		"face"	
+		"l"	3	-783	-746	-784	
+
+		"face"	
+		"l"	3	547	782	-780	
+
+		"face"	
+		"l"	3	784	783	785	
+
+		"face"	
+		"l"	3	786	-786	-744	
+
+		"face"	
+		"l"	3	-780	743	-784	
+
+		"face"	
+		"l"	3	-787	779	-785	
+
+		"face"	
+		"l"	3	787	788	789	
+
+		"face"	
+		"l"	3	790	-790	791	
+
+		"face"	
+		"l"	3	792	-792	-789	
+
+		"face"	
+		"l"	3	-791	-793	-788	
+
+		"face"	
+		"l"	3	793	794	795	
+
+		"face"	
+		"l"	3	796	-796	797	
+
+		"face"	
+		"l"	3	798	-798	-795	
+
+		"face"	
+		"l"	3	-797	-799	-794	
+
+		"face"	
+		"l"	3	799	800	801	
+
+		"face"	
+		"l"	3	802	-802	803	
+
+		"face"	
+		"l"	3	804	-804	-801	
+
+		"face"	
+		"l"	3	-803	-805	-800	
+
+		"face"	
+		"l"	3	805	806	807	
+
+		"face"	
+		"l"	3	808	-808	809	
+
+		"face"	
+		"l"	3	810	-810	-807	
+
+		"face"	
+		"l"	3	-809	-811	-806	
+
+		"face"	
+		"l"	3	807	811	792	
+
+		"face"	
+		"l"	3	806	-793	797	
+
+		"face"	
+		"l"	3	805	-798	-812	
+
+		"face"	
+		"l"	3	-807	-806	-808	
+
+		"face"	
+		"l"	3	-806	811	797	
+
+		"face"	
+		"l"	3	-797	-798	795	
+
+		"face"	
+		"l"	3	-805	-796	-812	
+
+		"face"	
+		"l"	3	796	804	805	
+
+		"face"	
+		"l"	3	804	811	795	
+
+		"face"	
+		"l"	3	-801	-796	-788	
+
+		"face"	
+		"l"	3	-804	787	-812	
+
+		"face"	
+		"l"	3	800	803	-805	
+
+		"face"	
+		"l"	3	803	811	-788	
+
+		"face"	
+		"l"	3	790	787	792	
+
+		"face"	
+		"l"	3	-808	-793	-812	
+
+		"face"	
+		"l"	3	-791	807	-804	
+
+		"face"	
+		"l"	3	812	788	813	
+
+		"face"	
+		"l"	3	814	-814	789	
+
+		"face"	
+		"l"	3	-788	-790	-789	
+
+		"face"	
+		"l"	3	-815	787	-813	
+
+		"face"	
+		"l"	3	815	794	816	
+
+		"face"	
+		"l"	3	817	-817	795	
+
+		"face"	
+		"l"	3	-794	-796	-795	
+
+		"face"	
+		"l"	3	-818	793	-816	
+
+		"face"	
+		"l"	3	818	819	820	
+
+		"face"	
+		"l"	3	821	-821	822	
+
+		"face"	
+		"l"	3	823	-823	-820	
+
+		"face"	
+		"l"	3	-822	-824	-819	
+
+		"face"	
+		"l"	3	824	800	825	
+
+		"face"	
+		"l"	3	826	-826	801	
+
+		"face"	
+		"l"	3	-800	-802	-801	
+
+		"face"	
+		"l"	3	-827	799	-825	
+
+		"face"	
+		"l"	3	825	827	-788	
+
+		"face"	
+		"l"	3	800	787	795	
+
+		"face"	
+		"l"	3	824	-796	-828	
+
+		"face"	
+		"l"	3	-801	-825	-826	
+
+		"face"	
+		"l"	3	-825	827	795	
+
+		"face"	
+		"l"	3	-818	-796	816	
+
+		"face"	
+		"l"	3	-824	-817	-828	
+
+		"face"	
+		"l"	3	817	823	824	
+
+		"face"	
+		"l"	3	823	827	816	
+
+		"face"	
+		"l"	3	-820	-817	-813	
+
+		"face"	
+		"l"	3	-823	812	-828	
+
+		"face"	
+		"l"	3	819	822	-824	
+
+		"face"	
+		"l"	3	822	827	-813	
+
+		"face"	
+		"l"	3	814	812	-788	
+
+		"face"	
+		"l"	3	-826	787	-828	
+
+		"face"	
+		"l"	3	-815	825	-823	
+
+		"face"	
+		"l"	3	828	788	829	
+
+		"face"	
+		"l"	3	830	-830	813	
+
+		"face"	
+		"l"	3	-813	-814	-789	
+
+		"face"	
+		"l"	3	-831	812	-829	
+
+		"face"	
+		"l"	3	831	794	832	
+
+		"face"	
+		"l"	3	833	-833	816	
+
+		"face"	
+		"l"	3	-816	-817	-795	
+
+		"face"	
+		"l"	3	-834	815	-832	
+
+		"face"	
+		"l"	3	834	835	836	
+
+		"face"	
+		"l"	3	837	-837	838	
+
+		"face"	
+		"l"	3	839	-839	-836	
+
+		"face"	
+		"l"	3	-838	-840	-835	
+
+		"face"	
+		"l"	3	840	819	841	
+
+		"face"	
+		"l"	3	842	-842	820	
+
+		"face"	
+		"l"	3	-819	-821	-820	
+
+		"face"	
+		"l"	3	-843	818	-841	
+
+		"face"	
+		"l"	3	841	843	-813	
+
+		"face"	
+		"l"	3	819	812	816	
+
+		"face"	
+		"l"	3	840	-817	-844	
+
+		"face"	
+		"l"	3	-820	-841	-842	
+
+		"face"	
+		"l"	3	-841	843	816	
+
+		"face"	
+		"l"	3	-834	-817	832	
+
+		"face"	
+		"l"	3	-840	-833	-844	
+
+		"face"	
+		"l"	3	833	839	840	
+
+		"face"	
+		"l"	3	839	843	832	
+
+		"face"	
+		"l"	3	-836	-833	-829	
+
+		"face"	
+		"l"	3	-839	828	-844	
+
+		"face"	
+		"l"	3	835	838	-840	
+
+		"face"	
+		"l"	3	838	843	-829	
+
+		"face"	
+		"l"	3	830	828	-813	
+
+		"face"	
+		"l"	3	-842	812	-844	
+
+		"face"	
+		"l"	3	-831	841	-839	
+
+		"face"	
+		"l"	3	-793	788	791	
+
+		"face"	
+		"l"	3	844	-792	829	
+
+		"face"	
+		"l"	3	-829	-830	-789	
+
+		"face"	
+		"l"	3	-845	828	792	
+
+		"face"	
+		"l"	3	-799	794	797	
+
+		"face"	
+		"l"	3	845	-798	832	
+
+		"face"	
+		"l"	3	-832	-833	-795	
+
+		"face"	
+		"l"	3	-846	831	798	
+
+		"face"	
+		"l"	3	-811	806	809	
+
+		"face"	
+		"l"	3	-758	-810	846	
+
+		"face"	
+		"l"	3	847	-847	-807	
+
+		"face"	
+		"l"	3	757	-848	810	
+
+		"face"	
+		"l"	3	848	835	849	
+
+		"face"	
+		"l"	3	-753	-850	836	
+
+		"face"	
+		"l"	3	-835	-837	-836	
+
+		"face"	
+		"l"	3	752	834	-849	
+
+		"face"	
+		"l"	3	849	850	-829	
+
+		"face"	
+		"l"	3	835	828	832	
+
+		"face"	
+		"l"	3	848	-833	-851	
+
+		"face"	
+		"l"	3	-836	-849	-850	
+
+		"face"	
+		"l"	3	-849	850	832	
+
+		"face"	
+		"l"	3	-846	-833	797	
+
+		"face"	
+		"l"	3	-848	-798	-851	
+
+		"face"	
+		"l"	3	845	847	848	
+
+		"face"	
+		"l"	3	847	850	797	
+
+		"face"	
+		"l"	3	-807	-798	792	
+
+		"face"	
+		"l"	3	-847	-793	-851	
+
+		"face"	
+		"l"	3	806	846	-848	
+
+		"face"	
+		"l"	3	846	850	792	
+
+		"face"	
+		"l"	3	844	-793	-829	
+
+		"face"	
+		"l"	3	-850	828	-851	
+
+		"face"	
+		"l"	3	-845	849	-847	
+
+		"face"	
+		"l"	3	-799	851	852	
+
+		"face"	
+		"l"	3	853	-853	854	
+
+		"face"	
+		"l"	3	855	-855	-852	
+
+		"face"	
+		"l"	3	-854	-856	798	
+
+		"face"	
+		"l"	3	-811	856	-744	
+
+		"face"	
+		"l"	3	-787	743	785	
+
+		"face"	
+		"l"	3	857	-786	-857	
+
+		"face"	
+		"l"	3	786	-858	810	
+
+		"face"	
+		"l"	3	858	859	854	
+
+		"face"	
+		"l"	3	-854	-855	852	
+
+		"face"	
+		"l"	3	-858	-853	-860	
+
+		"face"	
+		"l"	3	853	857	-859	
+
+		"face"	
+		"l"	3	857	859	852	
+
+		"face"	
+		"l"	3	-857	-853	860	
+
+		"face"	
+		"l"	3	-786	-861	-860	
+
+		"face"	
+		"l"	3	856	785	-858	
+
+		"face"	
+		"l"	3	831	851	861	
+
+		"face"	
+		"l"	3	-846	-862	852	
+
+		"face"	
+		"l"	3	798	-853	-852	
+
+		"face"	
+		"l"	3	845	-799	-832	
+
+		"face"	
+		"l"	3	834	862	-751	
+
+		"face"	
+		"l"	3	752	750	754	
+
+		"face"	
+		"l"	3	-849	-755	-863	
+
+		"face"	
+		"l"	3	-753	848	-835	
+
+		"face"	
+		"l"	3	-848	856	-756	
+
+		"face"	
+		"l"	3	757	755	-744	
+
+		"face"	
+		"l"	3	810	743	-857	
+
+		"face"	
+		"l"	3	-758	-811	847	
+
+		"face"	
+		"l"	3	-756	863	860	
+
+		"face"	
+		"l"	3	856	-861	852	
+
+		"face"	
+		"l"	3	-848	-853	-864	
+
+		"face"	
+		"l"	3	-857	847	755	
+
+		"face"	
+		"l"	3	847	863	852	
+
+		"face"	
+		"l"	3	845	-853	861	
+
+		"face"	
+		"l"	3	848	-862	-864	
+
+		"face"	
+		"l"	3	-846	-849	-848	
+
+		"face"	
+		"l"	3	-849	863	861	
+
+		"face"	
+		"l"	3	-863	-862	864	
+
+		"face"	
+		"l"	3	-755	-865	-864	
+
+		"face"	
+		"l"	3	862	754	848	
+
+		"face"	
+		"l"	3	754	863	864	
+
+		"face"	
+		"l"	3	-760	-865	860	
+
+		"face"	
+		"l"	3	755	-861	-864	
+
+		"face"	
+		"l"	3	759	-756	-755	
+
+		"face"	
+		"l"	3	865	851	866	
+
+		"face"	
+		"l"	3	867	-867	861	
+
+		"face"	
+		"l"	3	-832	-862	-852	
+
+		"face"	
+		"l"	3	-868	831	-866	
+
+		"face"	
+		"l"	3	868	862	-777	
+
+		"face"	
+		"l"	3	778	776	-751	
+
+		"face"	
+		"l"	3	-835	750	-863	
+
+		"face"	
+		"l"	3	-779	834	-869	
+
+		"face"	
+		"l"	3	-777	869	864	
+
+		"face"	
+		"l"	3	862	-865	861	
+
+		"face"	
+		"l"	3	868	-862	-870	
+
+		"face"	
+		"l"	3	-863	-869	776	
+
+		"face"	
+		"l"	3	-869	869	861	
+
+		"face"	
+		"l"	3	-868	-862	866	
+
+		"face"	
+		"l"	3	870	-867	-870	
+
+		"face"	
+		"l"	3	867	-871	868	
+
+		"face"	
+		"l"	3	871	872	873	
+
+		"face"	
+		"l"	3	874	-874	875	
+
+		"face"	
+		"l"	3	876	-876	-873	
+
+		"face"	
+		"l"	3	-875	-877	-872	
+
+		"face"	
+		"l"	3	815	877	878	
+
+		"face"	
+		"l"	3	-834	-879	879	
+
+		"face"	
+		"l"	3	-832	-880	-878	
+
+		"face"	
+		"l"	3	833	831	-816	
+
+		"face"	
+		"l"	3	818	880	881	
+
+		"face"	
+		"l"	3	-843	-882	882	
+
+		"face"	
+		"l"	3	-841	-883	-881	
+
+		"face"	
+		"l"	3	842	840	-819	
+
+		"face"	
+		"l"	3	-840	883	884	
+
+		"face"	
+		"l"	3	-838	-885	885	
+
+		"face"	
+		"l"	3	-835	-886	-884	
+
+		"face"	
+		"l"	3	837	834	839	
+
+		"face"	
+		"l"	3	884	886	876	
+
+		"face"	
+		"l"	3	883	-877	879	
+
+		"face"	
+		"l"	3	-840	-880	-887	
+
+		"face"	
+		"l"	3	-884	839	-885	
+
+		"face"	
+		"l"	3	839	886	879	
+
+		"face"	
+		"l"	3	833	-880	878	
+
+		"face"	
+		"l"	3	840	-879	-887	
+
+		"face"	
+		"l"	3	-834	-841	-840	
+
+		"face"	
+		"l"	3	-841	886	878	
+
+		"face"	
+		"l"	3	-881	-879	-872	
+
+		"face"	
+		"l"	3	-883	871	-887	
+
+		"face"	
+		"l"	3	880	882	840	
+
+		"face"	
+		"l"	3	882	886	-872	
+
+		"face"	
+		"l"	3	874	871	876	
+
+		"face"	
+		"l"	3	-885	-877	-887	
+
+		"face"	
+		"l"	3	-875	884	-883	
+
+		"face"	
+		"l"	3	887	872	888	
+
+		"face"	
+		"l"	3	889	-889	873	
+
+		"face"	
+		"l"	3	-872	-874	-873	
+
+		"face"	
+		"l"	3	-890	871	-888	
+
+		"face"	
+		"l"	3	890	877	891	
+
+		"face"	
+		"l"	3	892	-892	878	
+
+		"face"	
+		"l"	3	-816	-879	-878	
+
+		"face"	
+		"l"	3	-893	815	-891	
+
+		"face"	
+		"l"	3	893	894	895	
+
+		"face"	
+		"l"	3	896	-896	897	
+
+		"face"	
+		"l"	3	898	-898	-895	
+
+		"face"	
+		"l"	3	-897	-899	-894	
+
+		"face"	
+		"l"	3	899	880	900	
+
+		"face"	
+		"l"	3	901	-901	881	
+
+		"face"	
+		"l"	3	-819	-882	-881	
+
+		"face"	
+		"l"	3	-902	818	-900	
+
+		"face"	
+		"l"	3	900	902	-872	
+
+		"face"	
+		"l"	3	880	871	878	
+
+		"face"	
+		"l"	3	899	-879	-903	
+
+		"face"	
+		"l"	3	-881	-900	-901	
+
+		"face"	
+		"l"	3	-900	902	878	
+
+		"face"	
+		"l"	3	-893	-879	891	
+
+		"face"	
+		"l"	3	-899	-892	-903	
+
+		"face"	
+		"l"	3	892	898	899	
+
+		"face"	
+		"l"	3	898	902	891	
+
+		"face"	
+		"l"	3	-895	-892	-888	
+
+		"face"	
+		"l"	3	-898	887	-903	
+
+		"face"	
+		"l"	3	894	897	-899	
+
+		"face"	
+		"l"	3	897	902	-888	
+
+		"face"	
+		"l"	3	889	887	-872	
+
+		"face"	
+		"l"	3	-901	871	-903	
+
+		"face"	
+		"l"	3	-890	900	-898	
+
+		"face"	
+		"l"	3	-877	872	875	
+
+		"face"	
+		"l"	3	903	-876	904	
+
+		"face"	
+		"l"	3	905	-905	-873	
+
+		"face"	
+		"l"	3	-904	-906	876	
+
+		"face"	
+		"l"	3	831	877	879	
+
+		"face"	
+		"l"	3	-868	-880	906	
+
+		"face"	
+		"l"	3	-866	-907	-878	
+
+		"face"	
+		"l"	3	867	865	-832	
+
+		"face"	
+		"l"	3	834	883	885	
+
+		"face"	
+		"l"	3	-779	-886	907	
+
+		"face"	
+		"l"	3	-869	-908	-884	
+
+		"face"	
+		"l"	3	778	868	-835	
+
+		"face"	
+		"l"	3	908	909	905	
+
+		"face"	
+		"l"	3	910	-906	906	
+
+		"face"	
+		"l"	3	870	-907	-910	
+
+		"face"	
+		"l"	3	-911	-871	-909	
+
+		"face"	
+		"l"	3	-871	909	906	
+
+		"face"	
+		"l"	3	867	-907	879	
+
+		"face"	
+		"l"	3	868	-880	-910	
+
+		"face"	
+		"l"	3	-868	-869	870	
+
+		"face"	
+		"l"	3	-869	909	879	
+
+		"face"	
+		"l"	3	-884	-880	876	
+
+		"face"	
+		"l"	3	-908	-877	-910	
+
+		"face"	
+		"l"	3	883	907	868	
+
+		"face"	
+		"l"	3	907	909	876	
+
+		"face"	
+		"l"	3	903	-877	905	
+
+		"face"	
+		"l"	3	-909	-906	-910	
+
+		"face"	
+		"l"	3	-904	908	-908	
+
+		"face"	
+		"l"	3	911	912	609	
+
+		"face"	
+		"l"	3	-613	-610	585	
+
+		"face"	
+		"l"	3	913	-586	-913	
+
+		"face"	
+		"l"	3	612	-914	-912	
+
+		"face"	
+		"l"	3	914	912	672	
+
+		"face"	
+		"l"	3	-672	-673	609	
+
+		"face"	
+		"l"	3	-912	-610	-913	
+
+		"face"	
+		"l"	3	671	911	-915	
+
+		"face"	
+		"l"	3	915	916	686	
+
+		"face"	
+		"l"	3	-686	-687	684	
+
+		"face"	
+		"l"	3	917	-685	-917	
+
+		"face"	
+		"l"	3	685	-918	-916	
+
+		"face"	
+		"l"	3	918	919	680	
+
+		"face"	
+		"l"	3	-680	-681	678	
+
+		"face"	
+		"l"	3	920	-679	-920	
+
+		"face"	
+		"l"	3	679	-921	-919	
+
+		"face"	
+		"l"	3	680	921	-912	
+
+		"face"	
+		"l"	3	919	911	922	
+
+		"face"	
+		"l"	3	918	-923	-922	
+
+		"face"	
+		"l"	3	-920	-919	-681	
+
+		"face"	
+		"l"	3	-919	921	922	
+
+		"face"	
+		"l"	3	923	-923	924	
+
+		"face"	
+		"l"	3	-918	-925	-922	
+
+		"face"	
+		"l"	3	-924	917	918	
+
+		"face"	
+		"l"	3	917	921	924	
+
+		"face"	
+		"l"	3	-917	-925	-915	
+
+		"face"	
+		"l"	3	-685	914	-922	
+
+		"face"	
+		"l"	3	916	684	-918	
+
+		"face"	
+		"l"	3	684	921	-915	
+
+		"face"	
+		"l"	3	-672	914	-912	
+
+		"face"	
+		"l"	3	-681	911	-922	
+
+		"face"	
+		"l"	3	671	680	-685	
+
+		"face"	
+		"l"	3	925	912	-591	
+
+		"face"	
+		"l"	3	926	590	672	
+
+		"face"	
+		"l"	3	-915	-673	-913	
+
+		"face"	
+		"l"	3	-927	914	-926	
+
+		"face"	
+		"l"	3	927	928	-594	
+
+		"face"	
+		"l"	3	-809	593	929	
+
+		"face"	
+		"l"	3	930	-930	-929	
+
+		"face"	
+		"l"	3	808	-931	-928	
+
+		"face"	
+		"l"	3	931	916	932	
+
+		"face"	
+		"l"	3	-803	-933	686	
+
+		"face"	
+		"l"	3	-916	-687	-917	
+
+		"face"	
+		"l"	3	802	915	-932	
+
+		"face"	
+		"l"	3	932	933	-915	
+
+		"face"	
+		"l"	3	916	914	924	
+
+		"face"	
+		"l"	3	931	-925	-934	
+
+		"face"	
+		"l"	3	-917	-932	-933	
+
+		"face"	
+		"l"	3	-932	933	924	
+
+		"face"	
+		"l"	3	934	-925	935	
+
+		"face"	
+		"l"	3	-931	-936	-934	
+
+		"face"	
+		"l"	3	-935	930	931	
+
+		"face"	
+		"l"	3	930	933	935	
+
+		"face"	
+		"l"	3	-929	-936	-926	
+
+		"face"	
+		"l"	3	-930	925	-934	
+
+		"face"	
+		"l"	3	928	929	-931	
+
+		"face"	
+		"l"	3	929	933	-926	
+
+		"face"	
+		"l"	3	926	925	-915	
+
+		"face"	
+		"l"	3	-933	914	-934	
+
+		"face"	
+		"l"	3	-927	932	-930	
+
+		"face"	
+		"l"	3	-914	912	585	
+
+		"face"	
+		"l"	3	599	-586	-591	
+
+		"face"	
+		"l"	3	-926	590	-913	
+
+		"face"	
+		"l"	3	-600	925	913	
+
+		"face"	
+		"l"	3	936	928	-601	
+
+		"face"	
+		"l"	3	602	600	-594	
+
+		"face"	
+		"l"	3	-928	593	-929	
+
+		"face"	
+		"l"	3	-603	927	-937	
+
+		"face"	
+		"l"	3	-601	937	-926	
+
+		"face"	
+		"l"	3	928	925	935	
+
+		"face"	
+		"l"	3	936	-936	-938	
+
+		"face"	
+		"l"	3	-929	-937	600	
+
+		"face"	
+		"l"	3	-605	937	913	
+
+		"face"	
+		"l"	3	599	-914	-926	
+
+		"face"	
+		"l"	3	600	925	-938	
+
+		"face"	
+		"l"	3	-600	-601	604	
+
+		"face"	
+		"l"	3	927	938	-780	
+
+		"face"	
+		"l"	3	-603	779	781	
+
+		"face"	
+		"l"	3	-937	-782	-939	
+
+		"face"	
+		"l"	3	602	936	-928	
+
+		"face"	
+		"l"	3	939	938	-785	
+
+		"face"	
+		"l"	3	786	784	-780	
+
+		"face"	
+		"l"	3	-928	779	-939	
+
+		"face"	
+		"l"	3	-787	927	-940	
+
+		"face"	
+		"l"	3	940	941	-794	
+
+		"face"	
+		"l"	3	796	793	798	
+
+		"face"	
+		"l"	3	942	-799	-942	
+
+		"face"	
+		"l"	3	-797	-943	-941	
+
+		"face"	
+		"l"	3	915	943	-800	
+
+		"face"	
+		"l"	3	802	799	804	
+
+		"face"	
+		"l"	3	-932	-805	-944	
+
+		"face"	
+		"l"	3	-803	931	-916	
+
+		"face"	
+		"l"	3	-931	944	-806	
+
+		"face"	
+		"l"	3	808	805	810	
+
+		"face"	
+		"l"	3	-928	-811	-945	
+
+		"face"	
+		"l"	3	-809	927	930	
+
+		"face"	
+		"l"	3	-806	945	942	
+
+		"face"	
+		"l"	3	944	-943	946	
+
+		"face"	
+		"l"	3	-931	-947	-946	
+
+		"face"	
+		"l"	3	-945	930	805	
+
+		"face"	
+		"l"	3	930	945	946	
+
+		"face"	
+		"l"	3	-935	-947	947	
+
+		"face"	
+		"l"	3	931	-948	-946	
+
+		"face"	
+		"l"	3	934	-932	-931	
+
+		"face"	
+		"l"	3	-932	945	947	
+
+		"face"	
+		"l"	3	-944	-948	-941	
+
+		"face"	
+		"l"	3	-805	940	-946	
+
+		"face"	
+		"l"	3	943	804	931	
+
+		"face"	
+		"l"	3	804	945	-941	
+
+		"face"	
+		"l"	3	796	940	942	
+
+		"face"	
+		"l"	3	805	-943	-946	
+
+		"face"	
+		"l"	3	-797	-806	-805	
+
+		"face"	
+		"l"	3	948	941	949	
+
+		"face"	
+		"l"	3	950	-950	-794	
+
+		"face"	
+		"l"	3	-941	793	-942	
+
+		"face"	
+		"l"	3	-951	940	-949	
+
+		"face"	
+		"l"	3	951	943	952	
+
+		"face"	
+		"l"	3	953	-953	-800	
+
+		"face"	
+		"l"	3	-916	799	-944	
+
+		"face"	
+		"l"	3	-954	915	-952	
+
+		"face"	
+		"l"	3	952	954	-941	
+
+		"face"	
+		"l"	3	943	940	947	
+
+		"face"	
+		"l"	3	951	-948	-955	
+
+		"face"	
+		"l"	3	-944	-952	-953	
+
+		"face"	
+		"l"	3	955	954	-949	
+
+		"face"	
+		"l"	3	950	948	-941	
+
+		"face"	
+		"l"	3	-953	940	-955	
+
+		"face"	
+		"l"	3	-951	952	-956	
+
+		"face"	
+		"l"	3	-943	941	798	
+
+		"face"	
+		"l"	3	853	-799	855	
+
+		"face"	
+		"l"	3	956	-856	-942	
+
+		"face"	
+		"l"	3	-854	-957	942	
+
+		"face"	
+		"l"	3	927	944	810	
+
+		"face"	
+		"l"	3	-787	-811	857	
+
+		"face"	
+		"l"	3	-940	-858	-945	
+
+		"face"	
+		"l"	3	786	939	-928	
+
+		"face"	
+		"l"	3	-940	957	946	
+
+		"face"	
+		"l"	3	-945	-947	942	
+
+		"face"	
+		"l"	3	-858	-943	-958	
+
+		"face"	
+		"l"	3	944	857	939	
+
+		"face"	
+		"l"	3	857	957	942	
+
+		"face"	
+		"l"	3	853	-943	956	
+
+		"face"	
+		"l"	3	-859	-957	-958	
+
+		"face"	
+		"l"	3	-854	858	-858	
+
+		"face"	
+		"l"	3	958	959	-794	
+
+		"face"	
+		"l"	3	-951	793	949	
+
+		"face"	
+		"l"	3	960	-950	-960	
+
+		"face"	
+		"l"	3	950	-961	-959	
+
+		"face"	
+		"l"	3	961	962	963	
+
+		"face"	
+		"l"	3	964	-964	965	
+
+		"face"	
+		"l"	3	966	-966	-963	
+
+		"face"	
+		"l"	3	-965	-967	-962	
+
+		"face"	
+		"l"	3	967	968	-800	
+
+		"face"	
+		"l"	3	-954	799	952	
+
+		"face"	
+		"l"	3	969	-953	-969	
+
+		"face"	
+		"l"	3	953	-970	-968	
+
+		"face"	
+		"l"	3	955	970	960	
+
+		"face"	
+		"l"	3	971	-961	965	
+
+		"face"	
+		"l"	3	972	-966	-971	
+
+		"face"	
+		"l"	3	-972	-973	-956	
+
+		"face"	
+		"l"	3	-973	970	965	
+
+		"face"	
+		"l"	3	-965	-966	963	
+
+		"face"	
+		"l"	3	-970	-964	-971	
+
+		"face"	
+		"l"	3	964	969	972	
+
+		"face"	
+		"l"	3	969	970	963	
+
+		"face"	
+		"l"	3	-969	-964	-959	
+
+		"face"	
+		"l"	3	-953	958	-971	
+
+		"face"	
+		"l"	3	968	952	-970	
+
+		"face"	
+		"l"	3	952	970	-959	
+
+		"face"	
+		"l"	3	-951	958	960	
+
+		"face"	
+		"l"	3	-956	-961	-971	
+
+		"face"	
+		"l"	3	950	955	-953	
+
+		"face"	
+		"l"	3	973	959	-816	
+
+		"face"	
+		"l"	3	817	815	-794	
+
+		"face"	
+		"l"	3	-959	793	-960	
+
+		"face"	
+		"l"	3	-818	958	-974	
+
+		"face"	
+		"l"	3	974	962	975	
+
+		"face"	
+		"l"	3	976	-976	963	
+
+		"face"	
+		"l"	3	-962	-964	-963	
+
+		"face"	
+		"l"	3	-977	961	-975	
+
+		"face"	
+		"l"	3	977	978	-819	
+
+		"face"	
+		"l"	3	821	818	823	
+
+		"face"	
+		"l"	3	979	-824	-979	
+
+		"face"	
+		"l"	3	-822	-980	-978	
+
+		"face"	
+		"l"	3	980	968	-825	
+
+		"face"	
+		"l"	3	826	824	-800	
+
+		"face"	
+		"l"	3	-968	799	-969	
+
+		"face"	
+		"l"	3	-827	967	-981	
+
+		"face"	
+		"l"	3	-825	981	-959	
+
+		"face"	
+		"l"	3	968	958	963	
+
+		"face"	
+		"l"	3	980	-964	-982	
+
+		"face"	
+		"l"	3	-969	-981	824	
+
+		"face"	
+		"l"	3	-981	981	963	
+
+		"face"	
+		"l"	3	-977	-964	975	
+
+		"face"	
+		"l"	3	-980	-976	-982	
+
+		"face"	
+		"l"	3	976	979	980	
+
+		"face"	
+		"l"	3	979	981	975	
+
+		"face"	
+		"l"	3	-979	-976	-974	
+
+		"face"	
+		"l"	3	-824	973	-982	
+
+		"face"	
+		"l"	3	978	823	-980	
+
+		"face"	
+		"l"	3	823	981	-974	
+
+		"face"	
+		"l"	3	817	973	-959	
+
+		"face"	
+		"l"	3	824	958	-982	
+
+		"face"	
+		"l"	3	-818	-825	-824	
+
+		"face"	
+		"l"	3	982	959	-891	
+
+		"face"	
+		"l"	3	892	890	-816	
+
+		"face"	
+		"l"	3	-974	815	-960	
+
+		"face"	
+		"l"	3	-893	973	-983	
+
+		"face"	
+		"l"	3	983	962	984	
+
+		"face"	
+		"l"	3	985	-985	975	
+
+		"face"	
+		"l"	3	-975	-976	-963	
+
+		"face"	
+		"l"	3	-986	974	-984	
+
+		"face"	
+		"l"	3	986	987	-894	
+
+		"face"	
+		"l"	3	896	893	898	
+
+		"face"	
+		"l"	3	988	-899	-988	
+
+		"face"	
+		"l"	3	-897	-989	-987	
+
+		"face"	
+		"l"	3	989	978	-900	
+
+		"face"	
+		"l"	3	901	899	-819	
+
+		"face"	
+		"l"	3	-978	818	-979	
+
+		"face"	
+		"l"	3	-902	977	-990	
+
+		"face"	
+		"l"	3	-900	990	-974	
+
+		"face"	
+		"l"	3	978	973	975	
+
+		"face"	
+		"l"	3	989	-976	-991	
+
+		"face"	
+		"l"	3	-979	-990	899	
+
+		"face"	
+		"l"	3	-990	990	975	
+
+		"face"	
+		"l"	3	-986	-976	984	
+
+		"face"	
+		"l"	3	-989	-985	-991	
+
+		"face"	
+		"l"	3	985	988	989	
+
+		"face"	
+		"l"	3	988	990	984	
+
+		"face"	
+		"l"	3	-988	-985	-983	
+
+		"face"	
+		"l"	3	-899	982	-991	
+
+		"face"	
+		"l"	3	987	898	-989	
+
+		"face"	
+		"l"	3	898	990	-983	
+
+		"face"	
+		"l"	3	892	982	-974	
+
+		"face"	
+		"l"	3	899	973	-991	
+
+		"face"	
+		"l"	3	-893	-900	-899	
+
+		"face"	
+		"l"	3	-961	959	949	
+
+		"face"	
+		"l"	3	991	-950	-891	
+
+		"face"	
+		"l"	3	-983	890	-960	
+
+		"face"	
+		"l"	3	-992	982	960	
+
+		"face"	
+		"l"	3	-967	962	965	
+
+		"face"	
+		"l"	3	992	-966	984	
+
+		"face"	
+		"l"	3	-984	-985	-963	
+
+		"face"	
+		"l"	3	-993	983	966	
+
+		"face"	
+		"l"	3	993	994	-983	
+
+		"face"	
+		"l"	3	987	982	984	
+
+		"face"	
+		"l"	3	995	-985	-995	
+
+		"face"	
+		"l"	3	-988	-996	-994	
+
+		"face"	
+		"l"	3	-996	994	984	
+
+		"face"	
+		"l"	3	-993	-985	965	
+
+		"face"	
+		"l"	3	996	-966	-995	
+
+		"face"	
+		"l"	3	992	-997	995	
+
+		"face"	
+		"l"	3	-997	994	965	
+
+		"face"	
+		"l"	3	-972	-966	960	
+
+		"face"	
+		"l"	3	997	-961	-995	
+
+		"face"	
+		"l"	3	971	-998	996	
+
+		"face"	
+		"l"	3	-998	994	960	
+
+		"face"	
+		"l"	3	991	-961	-983	
+
+		"face"	
+		"l"	3	-994	982	-995	
+
+		"face"	
+		"l"	3	-992	993	997	
+
+		"face"	
+		"l"	3	998	999	693	
+
+		"face"	
+		"l"	3	-697	-694	659	
+
+		"face"	
+		"l"	3	1000	-660	-1000	
+
+		"face"	
+		"l"	3	696	-1001	-999	
+
+		"face"	
+		"l"	3	1001	999	707	
+
+		"face"	
+		"l"	3	-722	-708	693	
+
+		"face"	
+		"l"	3	-999	-694	-1000	
+
+		"face"	
+		"l"	3	721	998	-1002	
+
+		"face"	
+		"l"	3	1002	1003	711	
+
+		"face"	
+		"l"	3	-725	-712	723	
+
+		"face"	
+		"l"	3	1004	-724	-1004	
+
+		"face"	
+		"l"	3	724	-1005	-1003	
+
+		"face"	
+		"l"	3	1004	1005	1006	
+
+		"face"	
+		"l"	3	-1004	-1007	-1002	
+
+		"face"	
+		"l"	3	-724	1001	-1006	
+
+		"face"	
+		"l"	3	1003	723	-1005	
+
+		"face"	
+		"l"	3	723	1005	-1002	
+
+		"face"	
+		"l"	3	-722	1001	-999	
+
+		"face"	
+		"l"	3	-727	998	-1006	
+
+		"face"	
+		"l"	3	721	726	-724	
+
+		"face"	
+		"l"	3	1007	999	676	
+
+		"face"	
+		"l"	3	1008	-677	707	
+
+		"face"	
+		"l"	3	-1002	-708	-1000	
+
+		"face"	
+		"l"	3	-1009	1001	-1008	
+
+		"face"	
+		"l"	3	1009	1010	687	
+
+		"face"	
+		"l"	3	1011	-688	1012	
+
+		"face"	
+		"l"	3	1013	-1013	-1011	
+
+		"face"	
+		"l"	3	-1012	-1014	-1010	
+
+		"face"	
+		"l"	3	1014	1003	1015	
+
+		"face"	
+		"l"	3	1016	-1016	711	
+
+		"face"	
+		"l"	3	-1003	-712	-1004	
+
+		"face"	
+		"l"	3	-1017	1002	-1015	
+
+		"face"	
+		"l"	3	1015	1017	-1002	
+
+		"face"	
+		"l"	3	1003	1001	1006	
+
+		"face"	
+		"l"	3	1014	-1007	-1018	
+
+		"face"	
+		"l"	3	-1004	-1015	-1016	
+
+		"face"	
+		"l"	3	-1015	1017	1006	
+
+		"face"	
+		"l"	3	1018	-1007	1019	
+
+		"face"	
+		"l"	3	-1014	-1020	-1018	
+
+		"face"	
+		"l"	3	-1019	1013	1014	
+
+		"face"	
+		"l"	3	1013	1017	1019	
+
+		"face"	
+		"l"	3	-1011	-1020	-1008	
+
+		"face"	
+		"l"	3	-1013	1007	-1018	
+
+		"face"	
+		"l"	3	1010	1012	-1014	
+
+		"face"	
+		"l"	3	1012	1017	-1008	
+
+		"face"	
+		"l"	3	1008	1007	-1002	
+
+		"face"	
+		"l"	3	-1016	1001	-1018	
+
+		"face"	
+		"l"	3	-1009	1015	-1013	
+
+		"face"	
+		"l"	3	-1001	999	659	
+
+		"face"	
+		"l"	3	674	-660	676	
+
+		"face"	
+		"l"	3	-1008	-677	-1000	
+
+		"face"	
+		"l"	3	-675	1007	1000	
+
+		"face"	
+		"l"	3	1020	1021	-678	
+
+		"face"	
+		"l"	3	679	677	681	
+
+		"face"	
+		"l"	3	1022	-682	-1022	
+
+		"face"	
+		"l"	3	-680	-1023	-1021	
+
+		"face"	
+		"l"	3	1023	1010	-683	
+
+		"face"	
+		"l"	3	685	682	687	
+
+		"face"	
+		"l"	3	-1010	-688	-1011	
+
+		"face"	
+		"l"	3	-686	1009	-1024	
+
+		"face"	
+		"l"	3	-683	1024	-1008	
+
+		"face"	
+		"l"	3	1010	1007	1019	
+
+		"face"	
+		"l"	3	1023	-1020	-1025	
+
+		"face"	
+		"l"	3	-1011	-1024	682	
+
+		"face"	
+		"l"	3	-1024	1024	1019	
+
+		"face"	
+		"l"	3	1025	-1020	1026	
+
+		"face"	
+		"l"	3	-1023	-1027	-1025	
+
+		"face"	
+		"l"	3	-1026	1022	1023	
+
+		"face"	
+		"l"	3	1022	1024	1026	
+
+		"face"	
+		"l"	3	-1022	-1027	1000	
+
+		"face"	
+		"l"	3	-682	-1001	-1025	
+
+		"face"	
+		"l"	3	1021	681	-1023	
+
+		"face"	
+		"l"	3	681	1024	1000	
+
+		"face"	
+		"l"	3	674	-1001	-1008	
+
+		"face"	
+		"l"	3	682	1007	-1025	
+
+		"face"	
+		"l"	3	-675	-683	-682	
+
+		"face"	
+		"l"	3	1009	1027	-916	
+
+		"face"	
+		"l"	3	-686	915	917	
+
+		"face"	
+		"l"	3	-1024	-918	-1028	
+
+		"face"	
+		"l"	3	685	1023	-1010	
+
+		"face"	
+		"l"	3	-1023	1028	-919	
+
+		"face"	
+		"l"	3	-680	918	920	
+
+		"face"	
+		"l"	3	-1021	-921	-1029	
+
+		"face"	
+		"l"	3	679	1020	1022	
+
+		"face"	
+		"l"	3	-919	1029	1030	
+
+		"face"	
+		"l"	3	1028	-1031	1031	
+
+		"face"	
+		"l"	3	-1023	-1032	-1030	
+
+		"face"	
+		"l"	3	-1029	1022	918	
+
+		"face"	
+		"l"	3	1022	1029	1031	
+
+		"face"	
+		"l"	3	-1026	-1032	1032	
+
+		"face"	
+		"l"	3	1023	-1033	-1030	
+
+		"face"	
+		"l"	3	1025	-1024	-1023	
+
+		"face"	
+		"l"	3	-1024	1029	1032	
+
+		"face"	
+		"l"	3	-1028	-1033	1033	
+
+		"face"	
+		"l"	3	-918	-1034	-1030	
+
+		"face"	
+		"l"	3	1027	917	1023	
+
+		"face"	
+		"l"	3	917	1029	1033	
+
+		"face"	
+		"l"	3	-924	-1034	1030	
+
+		"face"	
+		"l"	3	918	-1031	-1030	
+
+		"face"	
+		"l"	3	923	-919	-918	
+
+		"face"	
+		"l"	3	1034	1027	-952	
+
+		"face"	
+		"l"	3	953	951	-916	
+
+		"face"	
+		"l"	3	-1010	915	-1028	
+
+		"face"	
+		"l"	3	-954	1009	-1035	
+
+		"face"	
+		"l"	3	1035	1036	1037	
+
+		"face"	
+		"l"	3	1038	-1038	-962	
+
+		"face"	
+		"l"	3	1039	961	-1037	
+
+		"face"	
+		"l"	3	-1039	-1040	-1036	
+
+		"face"	
+		"l"	3	1002	1040	1041	
+
+		"face"	
+		"l"	3	-1017	-1042	1042	
+
+		"face"	
+		"l"	3	-1015	-1043	-1041	
+
+		"face"	
+		"l"	3	1016	1014	-1003	
+
+		"face"	
+		"l"	3	-1014	1043	1044	
+
+		"face"	
+		"l"	3	-1012	-1045	-968	
+
+		"face"	
+		"l"	3	-1010	967	-1044	
+
+		"face"	
+		"l"	3	1011	1009	1013	
+
+		"face"	
+		"l"	3	1044	1045	1039	
+
+		"face"	
+		"l"	3	1043	-1040	1046	
+
+		"face"	
+		"l"	3	-1014	-1047	-1046	
+
+		"face"	
+		"l"	3	-1044	1013	-1045	
+
+		"face"	
+		"l"	3	1013	1045	1046	
+
+		"face"	
+		"l"	3	-1019	-1047	1047	
+
+		"face"	
+		"l"	3	1014	-1048	-1046	
+
+		"face"	
+		"l"	3	1018	-1015	-1014	
+
+		"face"	
+		"l"	3	-1015	1045	1047	
+
+		"face"	
+		"l"	3	-1041	-1048	-1036	
+
+		"face"	
+		"l"	3	-1043	1035	-1046	
+
+		"face"	
+		"l"	3	1040	1042	1014	
+
+		"face"	
+		"l"	3	1042	1045	-1036	
+
+		"face"	
+		"l"	3	1038	1035	1039	
+
+		"face"	
+		"l"	3	-1045	-1040	-1046	
+
+		"face"	
+		"l"	3	-1039	1044	-1043	
+
+		"face"	
+		"l"	3	-1040	1036	-962	
+
+		"face"	
+		"l"	3	964	961	966	
+
+		"face"	
+		"l"	3	1048	-967	-1037	
+
+		"face"	
+		"l"	3	-965	-1049	1039	
+
+		"face"	
+		"l"	3	1009	1043	-968	
+
+		"face"	
+		"l"	3	-954	967	969	
+
+		"face"	
+		"l"	3	-1035	-970	-1044	
+
+		"face"	
+		"l"	3	953	1034	-1010	
+
+		"face"	
+		"l"	3	-1035	1049	1046	
+
+		"face"	
+		"l"	3	-1044	-1047	1039	
+
+		"face"	
+		"l"	3	-970	-1040	-1050	
+
+		"face"	
+		"l"	3	1043	969	1034	
+
+		"face"	
+		"l"	3	969	1049	1039	
+
+		"face"	
+		"l"	3	964	-1040	1048	
+
+		"face"	
+		"l"	3	972	-1049	-1050	
+
+		"face"	
+		"l"	3	-965	-973	-970	
+
+		"face"	
+		"l"	3	-383	-384	381	
+
+		"face"	
+		"l"	3	1050	-382	-61	
+
+		"face"	
+		"l"	3	1051	60	383	
+
+		"face"	
+		"l"	3	-1051	-1052	382	
+
+		"face"	
+		"l"	3	-389	-390	387	
+
+		"face"	
+		"l"	3	195	-388	-1051	
+
+		"face"	
+		"l"	3	1052	1050	389	
+
+		"face"	
+		"l"	3	-196	-1053	388	
+
+		"face"	
+		"l"	3	389	393	382	
+
+		"face"	
+		"l"	3	1050	-383	1051	
+
+		"face"	
+		"l"	3	1052	-1052	-394	
+
+		"face"	
+		"l"	3	-1051	-1053	-390	
+
+		"face"	
+		"l"	3	-1052	-384	-61	
+
+		"face"	
+		"l"	3	-62	60	-32	
+
+		"face"	
+		"l"	3	1053	31	383	
+
+		"face"	
+		"l"	3	61	-1054	1051	
+
+		"face"	
+		"l"	3	-361	347	359	
+
+		"face"	
+		"l"	3	1054	-360	1055	
+
+		"face"	
+		"l"	3	35	-1056	-348	
+
+		"face"	
+		"l"	3	-1055	-36	360	
+
+		"face"	
+		"l"	3	-370	365	368	
+
+		"face"	
+		"l"	3	-19	-369	1056	
+
+		"face"	
+		"l"	3	-1055	-1057	-366	
+
+		"face"	
+		"l"	3	18	1054	369	
+
+		"face"	
+		"l"	3	-366	-360	371	
+
+		"face"	
+		"l"	3	-1057	-372	1055	
+
+		"face"	
+		"l"	3	-1055	-1056	359	
+
+		"face"	
+		"l"	3	1056	1054	365	
+
+		"face"	
+		"l"	3	1057	1058	381	
+
+		"face"	
+		"l"	3	-396	-382	351	
+
+		"face"	
+		"l"	3	1059	-352	-1059	
+
+		"face"	
+		"l"	3	395	-1060	-1058	
+
+		"face"	
+		"l"	3	1060	1061	1062	
+
+		"face"	
+		"l"	3	1063	-1063	1064	
+
+		"face"	
+		"l"	3	1065	-1065	-1062	
+
+		"face"	
+		"l"	3	-1064	-1066	-1061	
+
+		"face"	
+		"l"	3	1066	1067	387	
+
+		"face"	
+		"l"	3	-403	-388	401	
+
+		"face"	
+		"l"	3	1068	-402	-1068	
+
+		"face"	
+		"l"	3	402	-1069	-1067	
+
+		"face"	
+		"l"	3	1069	1070	398	
+
+		"face"	
+		"l"	3	-398	-399	354	
+
+		"face"	
+		"l"	3	1071	-355	-1071	
+
+		"face"	
+		"l"	3	397	-1072	-1070	
+
+		"face"	
+		"l"	3	398	1072	1059	
+
+		"face"	
+		"l"	3	1070	-1060	1064	
+
+		"face"	
+		"l"	3	1069	-1065	-1073	
+
+		"face"	
+		"l"	3	-1071	-1070	-399	
+
+		"face"	
+		"l"	3	-1070	1072	1064	
+
+		"face"	
+		"l"	3	-1064	-1065	1062	
+
+		"face"	
+		"l"	3	-1069	-1063	-1073	
+
+		"face"	
+		"l"	3	1063	1068	1069	
+
+		"face"	
+		"l"	3	1068	1072	1062	
+
+		"face"	
+		"l"	3	-1068	-1063	-1058	
+
+		"face"	
+		"l"	3	-402	1057	-1073	
+
+		"face"	
+		"l"	3	1067	401	-1069	
+
+		"face"	
+		"l"	3	401	1072	-1058	
+
+		"face"	
+		"l"	3	-396	1057	1059	
+
+		"face"	
+		"l"	3	-399	-1060	-1073	
+
+		"face"	
+		"l"	3	395	398	-402	
+
+		"face"	
+		"l"	3	-1060	1058	351	
+
+		"face"	
+		"l"	3	358	-352	360	
+
+		"face"	
+		"l"	3	1073	-361	-1059	
+
+		"face"	
+		"l"	3	-359	-1074	1059	
+
+		"face"	
+		"l"	3	-1066	1061	1064	
+
+		"face"	
+		"l"	3	1074	-1065	1075	
+
+		"face"	
+		"l"	3	1076	-1076	-1062	
+
+		"face"	
+		"l"	3	-1075	-1077	1065	
+
+		"face"	
+		"l"	3	-1072	1070	354	
+
+		"face"	
+		"l"	3	361	-355	363	
+
+		"face"	
+		"l"	3	1077	-364	-1071	
+
+		"face"	
+		"l"	3	-362	-1078	1071	
+
+		"face"	
+		"l"	3	1078	1079	-365	
+
+		"face"	
+		"l"	3	367	364	369	
+
+		"face"	
+		"l"	3	1080	-370	-1080	
+
+		"face"	
+		"l"	3	-368	-1081	-1079	
+
+		"face"	
+		"l"	3	-365	1081	1073	
+
+		"face"	
+		"l"	3	1079	-1074	1075	
+
+		"face"	
+		"l"	3	1078	-1076	-1082	
+
+		"face"	
+		"l"	3	-1080	-1079	364	
+
+		"face"	
+		"l"	3	-1079	1081	1075	
+
+		"face"	
+		"l"	3	-1075	-1076	1064	
+
+		"face"	
+		"l"	3	-1078	-1065	-1082	
+
+		"face"	
+		"l"	3	1074	1077	1078	
+
+		"face"	
+		"l"	3	1077	1081	1064	
+
+		"face"	
+		"l"	3	-1071	-1065	1059	
+
+		"face"	
+		"l"	3	-364	-1060	-1082	
+
+		"face"	
+		"l"	3	1070	363	-1078	
+
+		"face"	
+		"l"	3	363	1081	1059	
+
+		"face"	
+		"l"	3	358	-1060	1073	
+
+		"face"	
+		"l"	3	364	-1074	-1082	
+
+		"face"	
+		"l"	3	-359	-365	-364	
+
+		"face"	
+		"l"	3	19	-369	1082	
+
+		"face"	
+		"l"	3	-18	-1083	1056	
+
+		"face"	
+		"l"	3	18	-1057	368	
+
+		"face"	
+		"l"	3	17	-19	-20	
+
+		"face"	
+		"l"	3	458	-460	-369	
+
+		"face"	
+		"l"	3	-1083	368	-20	
+
+		"face"	
+		"l"	3	1083	19	459	
+
+		"face"	
+		"l"	3	1082	-1084	-459	
+
+		"face"	
+		"l"	3	453	-455	-456	
+
+		"face"	
+		"l"	3	1084	455	1083	
+
+		"face"	
+		"l"	3	1085	-1084	454	
+
+		"face"	
+		"l"	3	-1085	-1086	-454	
+
+		"face"	
+		"l"	3	462	455	-459	
+
+		"face"	
+		"l"	3	-1083	458	1083	
+
+		"face"	
+		"l"	3	-1085	-1084	-456	
+
+		"face"	
+		"l"	3	1082	1084	-463	
+
+		"face"	
+		"l"	3	1086	-361	32	
+
+		"face"	
+		"l"	3	-38	-33	-37	
+
+		"face"	
+		"l"	3	1087	36	360	
+
+		"face"	
+		"l"	3	37	-1088	-1087	
+
+		"face"	
+		"l"	3	20	-370	-1087	
+
+		"face"	
+		"l"	3	-38	1086	1087	
+
+		"face"	
+		"l"	3	145	-1088	369	
+
+		"face"	
+		"l"	3	37	-146	-21	
+
+		"face"	
+		"l"	3	1054	-361	35	
+
+		"face"	
+		"l"	3	-16	-36	32	
+
+		"face"	
+		"l"	3	-1087	-33	360	
+
+		"face"	
+		"l"	3	15	1086	-1055	
+
+		"face"	
+		"l"	3	-19	-370	-1055	
+
+		"face"	
+		"l"	3	-16	1054	-1087	
+
+		"face"	
+		"l"	3	-21	1086	369	
+
+		"face"	
+		"l"	3	15	20	18	
+
+		"face"	
+		"l"	3	-1074	1058	360	
+
+		"face"	
+		"l"	3	-1088	-361	-37	
+
+		"face"	
+		"l"	3	1088	36	-1059	
+
+		"face"	
+		"l"	3	1087	-1089	1073	
+
+		"face"	
+		"l"	3	-1077	1061	1075	
+
+		"face"	
+		"l"	3	1089	-1076	1088	
+
+		"face"	
+		"l"	3	1090	-1089	-1062	
+
+		"face"	
+		"l"	3	-1090	-1091	1076	
+
+		"face"	
+		"l"	3	-1081	1079	369	
+
+		"face"	
+		"l"	3	-146	-370	1087	
+
+		"face"	
+		"l"	3	-1090	-1088	-1080	
+
+		"face"	
+		"l"	3	145	1089	1080	
+
+		"face"	
+		"l"	3	-1080	-1076	1073	
+
+		"face"	
+		"l"	3	-1088	-1074	1088	
+
+		"face"	
+		"l"	3	-1090	-1089	1075	
+
+		"face"	
+		"l"	3	1087	1089	1079	
+
+		"face"	
+		"l"	3	1091	1092	-440	
+
+		"face"	
+		"l"	3	441	439	-428	
+
+		"face"	
+		"l"	3	1093	427	-1093	
+
+		"face"	
+		"l"	3	-442	-1094	-1092	
+
+		"face"	
+		"l"	3	-1077	1094	1095	
+
+		"face"	
+		"l"	3	-1075	-1096	1096	
+
+		"face"	
+		"l"	3	1065	-1097	-1095	
+
+		"face"	
+		"l"	3	1074	-1066	1076	
+
+		"face"	
+		"l"	3	-1081	1097	-443	
+
+		"face"	
+		"l"	3	-368	442	444	
+
+		"face"	
+		"l"	3	-1079	-445	-1098	
+
+		"face"	
+		"l"	3	367	1078	1080	
+
+		"face"	
+		"l"	3	-1078	1098	-446	
+
+		"face"	
+		"l"	3	-362	445	-434	
+
+		"face"	
+		"l"	3	1071	433	-1099	
+
+		"face"	
+		"l"	3	361	-1072	1077	
+
+		"face"	
+		"l"	3	-446	1099	1093	
+
+		"face"	
+		"l"	3	1098	-1094	1096	
+
+		"face"	
+		"l"	3	-1078	-1097	-1100	
+
+		"face"	
+		"l"	3	-1099	1077	445	
+
+		"face"	
+		"l"	3	1077	1099	1096	
+
+		"face"	
+		"l"	3	1074	-1097	1095	
+
+		"face"	
+		"l"	3	1078	-1096	-1100	
+
+		"face"	
+		"l"	3	-1075	-1079	-1078	
+
+		"face"	
+		"l"	3	-1079	1099	1095	
+
+		"face"	
+		"l"	3	-1098	-1096	-1092	
+
+		"face"	
+		"l"	3	-445	1091	-1100	
+
+		"face"	
+		"l"	3	1097	444	1078	
+
+		"face"	
+		"l"	3	444	1099	-1092	
+
+		"face"	
+		"l"	3	441	1091	1093	
+
+		"face"	
+		"l"	3	445	-1094	-1100	
+
+		"face"	
+		"l"	3	-442	-446	-445	
+
+		"face"	
+		"l"	3	1100	-382	-37	
+
+		"face"	
+		"l"	3	-60	36	-61	
+
+		"face"	
+		"l"	3	-1051	60	381	
+
+		"face"	
+		"l"	3	59	1050	-1101	
+
+		"face"	
+		"l"	3	196	-388	-1101	
+
+		"face"	
+		"l"	3	-60	1100	-1051	
+
+		"face"	
+		"l"	3	-196	1050	387	
+
+		"face"	
+		"l"	3	59	195	-197	
+
+		"face"	
+		"l"	3	-1058	-382	-1059	
+
+		"face"	
+		"l"	3	-1089	1058	-37	
+
+		"face"	
+		"l"	3	-1101	36	381	
+
+		"face"	
+		"l"	3	1088	1100	1057	
+
+		"face"	
+		"l"	3	-1067	-388	-1068	
+
+		"face"	
+		"l"	3	1101	1067	-1101	
+
+		"face"	
+		"l"	3	-197	1100	387	
+
+		"face"	
+		"l"	3	-1102	196	1066	
+
+		"face"	
+		"l"	3	-1061	-1063	-1062	
+
+		"face"	
+		"l"	3	-1091	1061	1088	
+
+		"face"	
+		"l"	3	-1102	-1089	1062	
+
+		"face"	
+		"l"	3	1090	1101	1060	
+
+		"face"	
+		"l"	3	1062	1067	1057	
+
+		"face"	
+		"l"	3	-1089	-1058	-1101	
+
+		"face"	
+		"l"	3	-1102	1100	-1068	
+
+		"face"	
+		"l"	3	1088	1101	-1063	
+
+		"face"	
+		"l"	3	410	388	408	
+
+		"face"	
+		"l"	3	1102	-409	-196	
+
+		"face"	
+		"l"	3	1052	195	-389	
+
+		"face"	
+		"l"	3	-1103	-1053	-411	
+
+		"face"	
+		"l"	3	1103	1104	1105	
+
+		"face"	
+		"l"	3	1106	-1106	-1103	
+
+		"face"	
+		"l"	3	1107	1102	-1105	
+
+		"face"	
+		"l"	3	-1107	-1108	-1104	
+
+		"face"	
+		"l"	3	-1105	1108	-411	
+
+		"face"	
+		"l"	3	1102	410	1052	
+
+		"face"	
+		"l"	3	1107	-1053	-1109	
+
+		"face"	
+		"l"	3	-1103	-1108	1104	
+
+		"face"	
+		"l"	3	1109	1110	-1061	
+
+		"face"	
+		"l"	3	1063	1060	1065	
+
+		"face"	
+		"l"	3	1111	-1066	-1111	
+
+		"face"	
+		"l"	3	-1064	-1112	-1110	
+
+		"face"	
+		"l"	3	556	1112	1113	
+
+		"face"	
+		"l"	3	-571	-1114	1114	
+
+		"face"	
+		"l"	3	-569	-1115	-1113	
+
+		"face"	
+		"l"	3	570	568	-557	
+
+		"face"	
+		"l"	3	559	1115	-1067	
+
+		"face"	
+		"l"	3	-403	1066	1068	
+
+		"face"	
+		"l"	3	-575	-1069	-1116	
+
+		"face"	
+		"l"	3	402	574	-560	
+
+		"face"	
+		"l"	3	-574	1116	-1070	
+
+		"face"	
+		"l"	3	-398	1069	1071	
+
+		"face"	
+		"l"	3	-572	-1072	-1117	
+
+		"face"	
+		"l"	3	397	571	573	
+
+		"face"	
+		"l"	3	-1070	1117	1111	
+
+		"face"	
+		"l"	3	1116	-1112	1114	
+
+		"face"	
+		"l"	3	-574	-1115	-1118	
+
+		"face"	
+		"l"	3	-1117	573	1069	
+
+		"face"	
+		"l"	3	573	1117	1114	
+
+		"face"	
+		"l"	3	570	-1115	1113	
+
+		"face"	
+		"l"	3	574	-1114	-1118	
+
+		"face"	
+		"l"	3	-571	-575	-574	
+
+		"face"	
+		"l"	3	-575	1117	1113	
+
+		"face"	
+		"l"	3	-1116	-1114	-1110	
+
+		"face"	
+		"l"	3	-1069	1109	-1118	
+
+		"face"	
+		"l"	3	1115	1068	574	
+
+		"face"	
+		"l"	3	1068	1117	-1110	
+
+		"face"	
+		"l"	3	1063	1109	1111	
+
+		"face"	
+		"l"	3	1069	-1112	-1118	
+
+		"face"	
+		"l"	3	-1064	-1070	-1069	
+
+		"face"	
+		"l"	3	640	-642	-625	
+
+		"face"	
+		"l"	3	1118	624	-91	
+
+		"face"	
+		"l"	3	1119	90	641	
+
+		"face"	
+		"l"	3	-1119	-1120	-641	
+
+		"face"	
+		"l"	3	-409	-637	-638	
+
+		"face"	
+		"l"	3	1102	637	1119	
+
+		"face"	
+		"l"	3	-196	-1120	636	
+
+		"face"	
+		"l"	3	-1103	195	408	
+
+		"face"	
+		"l"	3	-1106	-645	1120	
+
+		"face"	
+		"l"	3	1106	-1121	-1119	
+
+		"face"	
+		"l"	3	-1103	1118	644	
+
+		"face"	
+		"l"	3	-1107	1102	1105	
+
+		"face"	
+		"l"	3	644	637	-641	
+
+		"face"	
+		"l"	3	1118	640	1119	
+
+		"face"	
+		"l"	3	-1103	-1120	-638	
+
+		"face"	
+		"l"	3	-1119	1102	-645	
+
+		"face"	
+		"l"	3	-1120	-642	-91	
+
+		"face"	
+		"l"	3	191	90	-193	
+
+		"face"	
+		"l"	3	1121	192	641	
+
+		"face"	
+		"l"	3	-192	-1122	1119	
+
+		"face"	
+		"l"	3	195	-637	1119	
+
+		"face"	
+		"l"	3	191	-1120	1121	
+
+		"face"	
+		"l"	3	194	-1122	636	
+
+		"face"	
+		"l"	3	-192	-195	-196	
+
+		"face"	
+		"l"	3	90	-625	-1119	
+
+		"face"	
+		"l"	3	-89	1118	1122	
+
+		"face"	
+		"l"	3	89	-1123	624	
+
+		"face"	
+		"l"	3	88	-90	-91	
+
+		"face"	
+		"l"	3	-90	-625	1122	
+
+		"face"	
+		"l"	3	-105	-1123	1123	
+
+		"face"	
+		"l"	3	99	-1124	624	
+
+		"face"	
+		"l"	3	104	-100	89	
+
+		"face"	
+		"l"	3	-626	-627	624	
+
+		"face"	
+		"l"	3	-100	-625	1123	
+
+		"face"	
+		"l"	3	1124	-1124	626	
+
+		"face"	
+		"l"	3	99	-1125	625	
+
+		"face"	
+		"l"	3	638	636	634	
+
+		"face"	
+		"l"	3	1125	-635	194	
+
+		"face"	
+		"l"	3	1121	-195	-637	
+
+		"face"	
+		"l"	3	-1126	-1122	-639	
+
+		"face"	
+		"l"	3	-623	641	639	
+
+		"face"	
+		"l"	3	1126	-640	1121	
+
+		"face"	
+		"l"	3	-193	-1122	-642	
+
+		"face"	
+		"l"	3	-1127	192	622	
+
+		"face"	
+		"l"	3	-620	633	631	
+
+		"face"	
+		"l"	3	1127	-632	-1126	
+
+		"face"	
+		"l"	3	-1127	1125	-634	
+
+		"face"	
+		"l"	3	-1128	1126	619	
+
+		"face"	
+		"l"	3	-634	-640	-639	
+
+		"face"	
+		"l"	3	1125	638	1121	
+
+		"face"	
+		"l"	3	-1127	-1122	639	
+
+		"face"	
+		"l"	3	-1126	1126	633	
+
+		"face"	
+		"l"	3	-100	701	1128	
+
+		"face"	
+		"l"	3	-104	-1129	1129	
+
+		"face"	
+		"l"	3	-102	-1130	-702	
+
+		"face"	
+		"l"	3	103	101	99	
+
+		"face"	
+		"l"	3	703	625	701	
+
+		"face"	
+		"l"	3	-1129	-702	99	
+
+		"face"	
+		"l"	3	1124	-100	-626	
+
+		"face"	
+		"l"	3	1128	-1125	-704	
+
+		"face"	
+		"l"	3	-1094	1092	-428	
+
+		"face"	
+		"l"	3	-531	427	529	
+
+		"face"	
+		"l"	3	1130	-530	-1093	
+
+		"face"	
+		"l"	3	530	-1131	1093	
+
+		"face"	
+		"l"	3	-1066	1094	1096	
+
+		"face"	
+		"l"	3	1131	-1097	1132	
+
+		"face"	
+		"l"	3	791	-1133	-1095	
+
+		"face"	
+		"l"	3	-1132	-792	1065	
+
+		"face"	
+		"l"	3	-1072	1098	-434	
+
+		"face"	
+		"l"	3	-540	433	538	
+
+		"face"	
+		"l"	3	1133	-539	-1099	
+
+		"face"	
+		"l"	3	539	-1134	1071	
+
+		"face"	
+		"l"	3	1134	1135	535	
+
+		"face"	
+		"l"	3	-535	-536	533	
+
+		"face"	
+		"l"	3	809	-534	-1136	
+
+		"face"	
+		"l"	3	534	-810	-1135	
+
+		"face"	
+		"l"	3	535	1136	1130	
+
+		"face"	
+		"l"	3	1135	-1131	1132	
+
+		"face"	
+		"l"	3	1134	-1133	-1137	
+
+		"face"	
+		"l"	3	-1136	-1135	-536	
+
+		"face"	
+		"l"	3	-1135	1136	1132	
+
+		"face"	
+		"l"	3	-1132	-1133	1096	
+
+		"face"	
+		"l"	3	-1134	-1097	-1137	
+
+		"face"	
+		"l"	3	1131	1133	1134	
+
+		"face"	
+		"l"	3	1133	1136	1096	
+
+		"face"	
+		"l"	3	-1099	-1097	1093	
+
+		"face"	
+		"l"	3	-539	-1094	-1137	
+
+		"face"	
+		"l"	3	1098	538	-1134	
+
+		"face"	
+		"l"	3	538	1136	1093	
+
+		"face"	
+		"l"	3	-531	-1094	1130	
+
+		"face"	
+		"l"	3	-536	-1131	-1137	
+
+		"face"	
+		"l"	3	530	535	-539	
+
+		"face"	
+		"l"	3	-495	475	493	
+
+		"face"	
+		"l"	3	1137	-494	476	
+
+		"face"	
+		"l"	3	-475	-477	-476	
+
+		"face"	
+		"l"	3	-1138	474	494	
+
+		"face"	
+		"l"	3	-499	480	497	
+
+		"face"	
+		"l"	3	1138	-498	481	
+
+		"face"	
+		"l"	3	-440	-482	-481	
+
+		"face"	
+		"l"	3	-1139	439	498	
+
+		"face"	
+		"l"	3	-511	506	509	
+
+		"face"	
+		"l"	3	1139	-510	1140	
+
+		"face"	
+		"l"	3	1141	-1141	-507	
+
+		"face"	
+		"l"	3	-1140	-1142	510	
+
+		"face"	
+		"l"	3	1142	483	1143	
+
+		"face"	
+		"l"	3	1144	-1144	484	
+
+		"face"	
+		"l"	3	-443	-485	-484	
+
+		"face"	
+		"l"	3	-1145	442	-1143	
+
+		"face"	
+		"l"	3	1143	1145	-475	
+
+		"face"	
+		"l"	3	483	474	481	
+
+		"face"	
+		"l"	3	1142	-482	-1146	
+
+		"face"	
+		"l"	3	-484	-1143	-1144	
+
+		"face"	
+		"l"	3	-1143	1145	481	
+
+		"face"	
+		"l"	3	-1139	-482	497	
+
+		"face"	
+		"l"	3	-1142	-498	-1146	
+
+		"face"	
+		"l"	3	1138	1141	1142	
+
+		"face"	
+		"l"	3	1141	1145	497	
+
+		"face"	
+		"l"	3	-507	-498	494	
+
+		"face"	
+		"l"	3	-1141	-495	-1146	
+
+		"face"	
+		"l"	3	506	1140	-1142	
+
+		"face"	
+		"l"	3	1140	1145	494	
+
+		"face"	
+		"l"	3	1137	-495	-475	
+
+		"face"	
+		"l"	3	-1144	474	-1146	
+
+		"face"	
+		"l"	3	-1138	1143	-1141	
+
+		"face"	
+		"l"	3	487	454	-489	
+
+		"face"	
+		"l"	3	1146	488	1085	
+
+		"face"	
+		"l"	3	1083	-1086	-455	
+
+		"face"	
+		"l"	3	-1147	-1084	-488	
+
+		"face"	
+		"l"	3	484	459	-486	
+
+		"face"	
+		"l"	3	1147	485	1083	
+
+		"face"	
+		"l"	3	-20	-1084	-460	
+
+		"face"	
+		"l"	3	-1148	19	-485	
+
+		"face"	
+		"l"	3	476	-478	-479	
+
+		"face"	
+		"l"	3	-111	478	-1147	
+
+		"face"	
+		"l"	3	-1148	1146	477	
+
+		"face"	
+		"l"	3	110	1147	-477	
+
+		"face"	
+		"l"	3	477	485	-488	
+
+		"face"	
+		"l"	3	1146	487	1083	
+
+		"face"	
+		"l"	3	-1148	-1084	-486	
+
+		"face"	
+		"l"	3	-1147	1147	-478	
+
+		"face"	
+		"l"	3	1148	-477	111	
+
+		"face"	
+		"l"	3	-1	-112	110	
+
+		"face"	
+		"l"	3	-1148	-111	476	
+
+		"face"	
+		"l"	3	0	1147	-1149	
+
+		"face"	
+		"l"	3	23	-485	-1149	
+
+		"face"	
+		"l"	3	-1	1148	-1148	
+
+		"face"	
+		"l"	3	-20	1147	484	
+
+		"face"	
+		"l"	3	0	19	-24	
+
+		"face"	
+		"l"	3	-1138	-477	493	
+
+		"face"	
+		"l"	3	1149	-494	-151	
+
+		"face"	
+		"l"	3	1150	150	476	
+
+		"face"	
+		"l"	3	-1150	-1151	1137	
+
+		"face"	
+		"l"	3	-1145	-485	1143	
+
+		"face"	
+		"l"	3	1151	-1144	1150	
+
+		"face"	
+		"l"	3	-147	-1151	484	
+
+		"face"	
+		"l"	3	-1152	146	1144	
+
+		"face"	
+		"l"	3	-1140	-1141	509	
+
+		"face"	
+		"l"	3	1152	-510	-1150	
+
+		"face"	
+		"l"	3	-1152	1149	1140	
+
+		"face"	
+		"l"	3	-1153	1151	1139	
+
+		"face"	
+		"l"	3	1140	-1144	1137	
+
+		"face"	
+		"l"	3	1149	-1138	1150	
+
+		"face"	
+		"l"	3	-1152	-1151	1143	
+
+		"face"	
+		"l"	3	-1150	1151	-1141	
+
+		"face"	
+		"l"	3	-1151	-477	-151	
+
+		"face"	
+		"l"	3	148	150	111	
+
+		"face"	
+		"l"	3	-1149	-112	476	
+
+		"face"	
+		"l"	3	-149	1148	1150	
+
+		"face"	
+		"l"	3	146	-485	1150	
+
+		"face"	
+		"l"	3	148	-1151	-1149	
+
+		"face"	
+		"l"	3	-24	1148	484	
+
+		"face"	
+		"l"	3	-149	23	-147	
+
+		"face"	
+		"l"	3	1153	-494	-119	
+
+		"face"	
+		"l"	3	-150	118	-151	
+
+		"face"	
+		"l"	3	-1150	150	493	
+
+		"face"	
+		"l"	3	149	1149	-1154	
+
+		"face"	
+		"l"	3	1154	-510	-1154	
+
+		"face"	
+		"l"	3	-150	1153	-1150	
+
+		"face"	
+		"l"	3	-1153	1149	509	
+
+		"face"	
+		"l"	3	149	1152	-1155	
+
+		"face"	
+		"l"	3	1155	1092	498	
+
+		"face"	
+		"l"	3	1138	-499	-440	
+
+		"face"	
+		"l"	3	-1092	439	-1093	
+
+		"face"	
+		"l"	3	-1139	1091	-1156	
+
+		"face"	
+		"l"	3	-830	1094	1156	
+
+		"face"	
+		"l"	3	1157	-1157	1095	
+
+		"face"	
+		"l"	3	1076	-1096	-1095	
+
+		"face"	
+		"l"	3	-1158	-1077	829	
+
+		"face"	
+		"l"	3	-837	1158	510	
+
+		"face"	
+		"l"	3	1139	-511	1141	
+
+		"face"	
+		"l"	3	1159	-1142	-1159	
+
+		"face"	
+		"l"	3	-1140	-1160	836	
+
+		"face"	
+		"l"	3	1160	1097	-1143	
+
+		"face"	
+		"l"	3	1144	1142	-443	
+
+		"face"	
+		"l"	3	1080	442	-1098	
+
+		"face"	
+		"l"	3	-1145	-1081	-1161	
+
+		"face"	
+		"l"	3	-1143	1161	-1092	
+
+		"face"	
+		"l"	3	1097	1091	1095	
+
+		"face"	
+		"l"	3	1160	-1096	-1162	
+
+		"face"	
+		"l"	3	-1098	-1161	1142	
+
+		"face"	
+		"l"	3	-1161	1161	1095	
+
+		"face"	
+		"l"	3	-1158	-1096	1156	
+
+		"face"	
+		"l"	3	-1160	-1157	-1162	
+
+		"face"	
+		"l"	3	1157	1159	1160	
+
+		"face"	
+		"l"	3	1159	1161	1156	
+
+		"face"	
+		"l"	3	-1159	-1157	-1156	
+
+		"face"	
+		"l"	3	-1142	1155	-1162	
+
+		"face"	
+		"l"	3	1158	1141	-1160	
+
+		"face"	
+		"l"	3	1141	1161	-1156	
+
+		"face"	
+		"l"	3	1138	1155	-1092	
+
+		"face"	
+		"l"	3	1142	1091	-1162	
+
+		"face"	
+		"l"	3	-1139	-1143	-1142	
+
+		"face"	
+		"l"	3	-1131	1092	529	
+
+		"face"	
+		"l"	3	-750	-530	498	
+
+		"face"	
+		"l"	3	-1156	-499	-1093	
+
+		"face"	
+		"l"	3	749	1155	1130	
+
+		"face"	
+		"l"	3	-792	1094	1132	
+
+		"face"	
+		"l"	3	844	-1133	1156	
+
+		"face"	
+		"l"	3	829	-1157	-1095	
+
+		"face"	
+		"l"	3	-845	-830	791	
+
+		"face"	
+		"l"	3	-810	1135	533	
+
+		"face"	
+		"l"	3	-758	-534	756	
+
+		"face"	
+		"l"	3	846	-757	-1136	
+
+		"face"	
+		"l"	3	757	-847	809	
+
+		"face"	
+		"l"	3	-850	1158	753	
+
+		"face"	
+		"l"	3	-753	-754	510	
+
+		"face"	
+		"l"	3	836	-511	-1159	
+
+		"face"	
+		"l"	3	752	-837	849	
+
+		"face"	
+		"l"	3	753	1162	-1156	
+
+		"face"	
+		"l"	3	1158	1155	1156	
+
+		"face"	
+		"l"	3	-850	-1157	-1163	
+
+		"face"	
+		"l"	3	-1159	849	-754	
+
+		"face"	
+		"l"	3	849	1162	1156	
+
+		"face"	
+		"l"	3	-845	-1157	1132	
+
+		"face"	
+		"l"	3	-847	-1133	-1163	
+
+		"face"	
+		"l"	3	844	846	-850	
+
+		"face"	
+		"l"	3	846	1162	1132	
+
+		"face"	
+		"l"	3	-1136	-1133	1130	
+
+		"face"	
+		"l"	3	-757	-1131	-1163	
+
+		"face"	
+		"l"	3	1135	756	-847	
+
+		"face"	
+		"l"	3	756	1162	1130	
+
+		"face"	
+		"l"	3	-750	-1131	-1156	
+
+		"face"	
+		"l"	3	-754	1155	-1163	
+
+		"face"	
+		"l"	3	749	753	-757	
+
+		"face"	
+		"l"	3	841	-843	-821	
+
+		"face"	
+		"l"	3	1163	820	-182	
+
+		"face"	
+		"l"	3	1164	181	842	
+
+		"face"	
+		"l"	3	-1164	-1165	-842	
+
+		"face"	
+		"l"	3	836	-838	-839	
+
+		"face"	
+		"l"	3	1165	838	1164	
+
+		"face"	
+		"l"	3	-1153	-1165	837	
+
+		"face"	
+		"l"	3	-1166	1152	-837	
+
+		"face"	
+		"l"	3	829	-831	-814	
+
+		"face"	
+		"l"	3	1166	813	-1164	
+
+		"face"	
+		"l"	3	-1166	1163	830	
+
+		"face"	
+		"l"	3	-1167	1165	-830	
+
+		"face"	
+		"l"	3	830	838	-842	
+
+		"face"	
+		"l"	3	1163	841	1164	
+
+		"face"	
+		"l"	3	-1166	-1165	-839	
+
+		"face"	
+		"l"	3	-1164	1165	-831	
+
+		"face"	
+		"l"	3	1159	1139	-837	
+
+		"face"	
+		"l"	3	1165	836	-1153	
+
+		"face"	
+		"l"	3	-1152	1152	-1140	
+
+		"face"	
+		"l"	3	-1166	1151	-1160	
+
+		"face"	
+		"l"	3	1080	1144	1160	
+
+		"face"	
+		"l"	3	1167	-1161	-1152	
+
+		"face"	
+		"l"	3	-147	1151	-1145	
+
+		"face"	
+		"l"	3	-1168	146	-1081	
+
+		"face"	
+		"l"	3	1076	1157	-830	
+
+		"face"	
+		"l"	3	1166	829	-1166	
+
+		"face"	
+		"l"	3	-1168	1165	-1158	
+
+		"face"	
+		"l"	3	-1167	1167	-1077	
+
+		"face"	
+		"l"	3	-1158	-1161	-1160	
+
+		"face"	
+		"l"	3	1165	1159	-1152	
+
+		"face"	
+		"l"	3	-1168	1151	1160	
+
+		"face"	
+		"l"	3	-1166	1167	1157	
+
+		"face"	
+		"l"	3	1168	1110	791	
+
+		"face"	
+		"l"	3	-791	-792	789	
+
+		"face"	
+		"l"	3	1169	-790	-1111	
+
+		"face"	
+		"l"	3	790	-1170	-1169	
+
+		"face"	
+		"l"	3	590	1112	1170	
+
+		"face"	
+		"l"	3	926	-1171	1171	
+
+		"face"	
+		"l"	3	672	-1172	-1113	
+
+		"face"	
+		"l"	3	-927	-673	-591	
+
+		"face"	
+		"l"	3	593	1172	809	
+
+		"face"	
+		"l"	3	-809	-810	807	
+
+		"face"	
+		"l"	3	929	-808	-1173	
+
+		"face"	
+		"l"	3	808	-930	-594	
+
+		"face"	
+		"l"	3	-933	1173	803	
+
+		"face"	
+		"l"	3	-803	-804	801	
+
+		"face"	
+		"l"	3	686	-802	-1174	
+
+		"face"	
+		"l"	3	802	-687	932	
+
+		"face"	
+		"l"	3	803	1174	1169	
+
+		"face"	
+		"l"	3	1173	-1170	1171	
+
+		"face"	
+		"l"	3	-933	-1172	-1175	
+
+		"face"	
+		"l"	3	-1174	932	-804	
+
+		"face"	
+		"l"	3	932	1174	1171	
+
+		"face"	
+		"l"	3	-927	-1172	1170	
+
+		"face"	
+		"l"	3	-930	-1171	-1175	
+
+		"face"	
+		"l"	3	926	929	-933	
+
+		"face"	
+		"l"	3	929	1174	1170	
+
+		"face"	
+		"l"	3	-1173	-1171	-1169	
+
+		"face"	
+		"l"	3	-808	1168	-1175	
+
+		"face"	
+		"l"	3	1172	807	-930	
+
+		"face"	
+		"l"	3	807	1174	-1169	
+
+		"face"	
+		"l"	3	-791	1168	1169	
+
+		"face"	
+		"l"	3	-804	-1170	-1175	
+
+		"face"	
+		"l"	3	790	803	-808	
+
+		"face"	
+		"l"	3	-1170	1110	789	
+
+		"face"	
+		"l"	3	1175	-790	-1061	
+
+		"face"	
+		"l"	3	-1110	1060	-1111	
+
+		"face"	
+		"l"	3	-1176	1109	1169	
+
+		"face"	
+		"l"	3	-673	1112	1171	
+
+		"face"	
+		"l"	3	1176	-1172	1113	
+
+		"face"	
+		"l"	3	-557	-1114	-1113	
+
+		"face"	
+		"l"	3	-1177	556	672	
+
+		"face"	
+		"l"	3	-687	1173	801	
+
+		"face"	
+		"l"	3	1177	-802	1178	
+
+		"face"	
+		"l"	3	1179	-1179	-1174	
+
+		"face"	
+		"l"	3	-1178	-1180	686	
+
+		"face"	
+		"l"	3	1180	1115	1181	
+
+		"face"	
+		"l"	3	1182	-1182	-1067	
+
+		"face"	
+		"l"	3	-560	1066	-1116	
+
+		"face"	
+		"l"	3	-1183	559	-1181	
+
+		"face"	
+		"l"	3	1181	1183	-1110	
+
+		"face"	
+		"l"	3	1115	1109	1113	
+
+		"face"	
+		"l"	3	1180	-1114	-1184	
+
+		"face"	
+		"l"	3	-1116	-1181	-1182	
+
+		"face"	
+		"l"	3	-1181	1183	1113	
+
+		"face"	
+		"l"	3	-1177	-1114	1171	
+
+		"face"	
+		"l"	3	-1180	-1172	-1184	
+
+		"face"	
+		"l"	3	1176	1179	1180	
+
+		"face"	
+		"l"	3	1179	1183	1171	
+
+		"face"	
+		"l"	3	-1174	-1172	1169	
+
+		"face"	
+		"l"	3	-1179	-1170	-1184	
+
+		"face"	
+		"l"	3	1173	1178	-1180	
+
+		"face"	
+		"l"	3	1178	1183	1169	
+
+		"face"	
+		"l"	3	1175	-1170	-1110	
+
+		"face"	
+		"l"	3	-1182	1109	-1184	
+
+		"face"	
+		"l"	3	-1176	1181	-1179	
+
+		"face"	
+		"l"	3	-1112	1110	1065	
+
+		"face"	
+		"l"	3	1131	-1066	791	
+
+		"face"	
+		"l"	3	-1169	-792	-1111	
+
+		"face"	
+		"l"	3	-1132	1168	1111	
+
+		"face"	
+		"l"	3	568	1112	1114	
+
+		"face"	
+		"l"	3	-593	-1115	1170	
+
+		"face"	
+		"l"	3	-591	-1171	-1113	
+
+		"face"	
+		"l"	3	592	590	-569	
+
+		"face"	
+		"l"	3	571	1116	1071	
+
+		"face"	
+		"l"	3	-540	-1072	1133	
+
+		"face"	
+		"l"	3	-597	-1134	-1117	
+
+		"face"	
+		"l"	3	539	596	-572	
+
+		"face"	
+		"l"	3	-596	1172	-1135	
+
+		"face"	
+		"l"	3	-535	1134	809	
+
+		"face"	
+		"l"	3	-594	-810	-1173	
+
+		"face"	
+		"l"	3	534	593	595	
+
+		"face"	
+		"l"	3	-1135	1184	-1169	
+
+		"face"	
+		"l"	3	1172	1168	1170	
+
+		"face"	
+		"l"	3	-596	-1171	-1185	
+
+		"face"	
+		"l"	3	-1173	595	1134	
+
+		"face"	
+		"l"	3	595	1184	1170	
+
+		"face"	
+		"l"	3	592	-1171	1114	
+
+		"face"	
+		"l"	3	596	-1115	-1185	
+
+		"face"	
+		"l"	3	-593	-597	-596	
+
+		"face"	
+		"l"	3	-597	1184	1114	
+
+		"face"	
+		"l"	3	-1117	-1115	1111	
+
+		"face"	
+		"l"	3	-1134	-1112	-1185	
+
+		"face"	
+		"l"	3	1116	1133	596	
+
+		"face"	
+		"l"	3	1133	1184	1111	
+
+		"face"	
+		"l"	3	1131	-1112	-1169	
+
+		"face"	
+		"l"	3	1134	1168	-1185	
+
+		"face"	
+		"l"	3	-1132	-1135	-1134	
+
+		"face"	
+		"l"	3	-1176	1060	789	
+
+		"face"	
+		"l"	3	1185	-790	1186	
+
+		"face"	
+		"l"	3	1187	-1187	-1061	
+
+		"face"	
+		"l"	3	-1186	-1188	1175	
+
+		"face"	
+		"l"	3	-1183	1066	1181	
+
+		"face"	
+		"l"	3	1188	-1182	1187	
+
+		"face"	
+		"l"	3	194	-1188	-1067	
+
+		"face"	
+		"l"	3	-1189	-195	1182	
+
+		"face"	
+		"l"	3	-1178	-1179	801	
+
+		"face"	
+		"l"	3	1189	-802	-1186	
+
+		"face"	
+		"l"	3	-1189	1185	1178	
+
+		"face"	
+		"l"	3	-1190	1188	1177	
+
+		"face"	
+		"l"	3	1178	-1182	1175	
+
+		"face"	
+		"l"	3	1185	-1176	1187	
+
+		"face"	
+		"l"	3	-1189	-1188	1181	
+
+		"face"	
+		"l"	3	-1186	1188	-1179	
+
+		"face"	
+		"l"	3	-1188	1060	1186	
+
+		"face"	
+		"l"	3	193	-1187	1090	
+
+		"face"	
+		"l"	3	-1102	-1091	-1061	
+
+		"face"	
+		"l"	3	-194	1101	1187	
+
+		"face"	
+		"l"	3	-195	1066	1187	
+
+		"face"	
+		"l"	3	193	-1188	-1102	
+
+		"face"	
+		"l"	3	-197	1101	-1067	
+
+		"face"	
+		"l"	3	-194	196	194	
+
+		"face"	
+		"l"	3	-815	-790	813	
+
+		"face"	
+		"l"	3	1190	-814	1186	
+
+		"face"	
+		"l"	3	-1186	-1187	789	
+
+		"face"	
+		"l"	3	-1191	1185	814	
+
+		"face"	
+		"l"	3	-827	-802	825	
+
+		"face"	
+		"l"	3	1191	-826	-1186	
+
+		"face"	
+		"l"	3	-1190	1185	801	
+
+		"face"	
+		"l"	3	-1192	1189	826	
+
+		"face"	
+		"l"	3	-822	-823	820	
+
+		"face"	
+		"l"	3	-202	-821	-1191	
+
+		"face"	
+		"l"	3	-1192	1190	822	
+
+		"face"	
+		"l"	3	201	1191	821	
+
+		"face"	
+		"l"	3	822	-826	814	
+
+		"face"	
+		"l"	3	1190	-815	-1186	
+
+		"face"	
+		"l"	3	-1192	1185	825	
+
+		"face"	
+		"l"	3	-1191	1191	-823	
+
+		"face"	
+		"l"	3	-674	653	672	
+
+		"face"	
+		"l"	3	1176	-673	-557	
+
+		"face"	
+		"l"	3	-668	556	-654	
+
+		"face"	
+		"l"	3	-1177	667	673	
+
+		"face"	
+		"l"	3	-677	655	675	
+
+		"face"	
+		"l"	3	1192	-676	668	
+
+		"face"	
+		"l"	3	-632	-669	-656	
+
+		"face"	
+		"l"	3	-1193	631	676	
+
+		"face"	
+		"l"	3	-688	683	686	
+
+		"face"	
+		"l"	3	1177	-687	1179	
+
+		"face"	
+		"l"	3	1193	-1180	-684	
+
+		"face"	
+		"l"	3	-1178	-1194	687	
+
+		"face"	
+		"l"	3	1194	669	-1181	
+
+		"face"	
+		"l"	3	1182	1180	-560	
+
+		"face"	
+		"l"	3	-635	559	-670	
+
+		"face"	
+		"l"	3	-1183	634	-1195	
+
+		"face"	
+		"l"	3	-1181	1195	-668	
+
+		"face"	
+		"l"	3	669	667	668	
+
+		"face"	
+		"l"	3	1194	-669	-1196	
+
+		"face"	
+		"l"	3	-670	-1195	1180	
+
+		"face"	
+		"l"	3	-1195	1195	668	
+
+		"face"	
+		"l"	3	-1193	-669	675	
+
+		"face"	
+		"l"	3	-1194	-676	-1196	
+
+		"face"	
+		"l"	3	1192	1193	1194	
+
+		"face"	
+		"l"	3	1193	1195	675	
+
+		"face"	
+		"l"	3	-684	-676	673	
+
+		"face"	
+		"l"	3	-1180	-674	-1196	
+
+		"face"	
+		"l"	3	683	1179	-1194	
+
+		"face"	
+		"l"	3	1179	1195	673	
+
+		"face"	
+		"l"	3	1176	-674	-668	
+
+		"face"	
+		"l"	3	1180	667	-1196	
+
+		"face"	
+		"l"	3	-1177	-1181	-1180	
+
+		"face"	
+		"l"	3	1015	-1017	-712	
+
+		"face"	
+		"l"	3	1196	711	-244	
+
+		"face"	
+		"l"	3	1197	243	1016	
+
+		"face"	
+		"l"	3	-1197	-1198	-1016	
+
+		"face"	
+		"l"	3	687	-1012	-1013	
+
+		"face"	
+		"l"	3	1198	1012	1197	
+
+		"face"	
+		"l"	3	-1190	-1198	1011	
+
+		"face"	
+		"l"	3	-1199	1189	-688	
+
+		"face"	
+		"l"	3	676	-1009	-708	
+
+		"face"	
+		"l"	3	1127	707	-1197	
+
+		"face"	
+		"l"	3	-1199	1196	1008	
+
+		"face"	
+		"l"	3	-1128	1198	-677	
+
+		"face"	
+		"l"	3	1008	1012	-1016	
+
+		"face"	
+		"l"	3	1196	1015	1197	
+
+		"face"	
+		"l"	3	-1199	-1198	-1013	
+
+		"face"	
+		"l"	3	-1197	1198	-1009	
+
+		"face"	
+		"l"	3	1193	1177	-688	
+
+		"face"	
+		"l"	3	1198	687	-1190	
+
+		"face"	
+		"l"	3	-1189	1189	-1178	
+
+		"face"	
+		"l"	3	-1199	1188	-1194	
+
+		"face"	
+		"l"	3	-635	1182	1194	
+
+		"face"	
+		"l"	3	1125	-1195	-1189	
+
+		"face"	
+		"l"	3	194	1188	-1183	
+
+		"face"	
+		"l"	3	-1126	-195	634	
+
+		"face"	
+		"l"	3	-632	1192	-677	
+
+		"face"	
+		"l"	3	1127	676	-1199	
+
+		"face"	
+		"l"	3	-1126	1198	-1193	
+
+		"face"	
+		"l"	3	-1128	1125	631	
+
+		"face"	
+		"l"	3	-1193	-1195	-1194	
+
+		"face"	
+		"l"	3	1198	1193	-1189	
+
+		"face"	
+		"l"	3	-1126	1188	1194	
+
+		"face"	
+		"l"	3	-1199	1125	1192	
+
+		"face"	
+		"l"	3	1089	-1077	1090	
+
+		"face"	
+		"l"	3	-144	-1091	-1167	
+
+		"face"	
+		"l"	3	-1168	1166	1076	
+
+		"face"	
+		"l"	3	143	1167	-1090	
+
+		"face"	
+		"l"	3	-146	-1081	-1090	
+
+		"face"	
+		"l"	3	-144	1089	-1168	
+
+		"face"	
+		"l"	3	-147	1167	1080	
+
+		"face"	
+		"l"	3	143	146	145	
+
+		"face"	
+		"l"	3	-728	-494	-729	
+
+		"face"	
+		"l"	3	1199	728	-119	
+
+		"face"	
+		"l"	3	-1154	118	493	
+
+		"face"	
+		"l"	3	-1200	1153	727	
+
+		"face"	
+		"l"	3	-731	-510	-732	
+
+		"face"	
+		"l"	3	1200	731	-1154	
+
+		"face"	
+		"l"	3	-1155	1153	509	
+
+		"face"	
+		"l"	3	-1201	1154	730	
+
+		"face"	
+		"l"	3	1201	-740	1202	
+
+		"face"	
+		"l"	3	263	-1203	-1200	
+
+		"face"	
+		"l"	3	-1201	1199	739	
+
+		"face"	
+		"l"	3	-264	1200	-1202	
+
+		"face"	
+		"l"	3	739	731	727	
+
+		"face"	
+		"l"	3	1199	-728	-1154	
+
+		"face"	
+		"l"	3	-1201	1153	-732	
+
+		"face"	
+		"l"	3	-1200	1200	-740	
+
+		"face"	
+		"l"	3	1163	-814	-1167	
+
+		"face"	
+		"l"	3	143	1166	1090	
+
+		"face"	
+		"l"	3	1203	-1091	813	
+
+		"face"	
+		"l"	3	-144	-1204	-1164	
+
+		"face"	
+		"l"	3	181	-821	-1164	
+
+		"face"	
+		"l"	3	143	1163	1203	
+
+		"face"	
+		"l"	3	180	-1204	820	
+
+		"face"	
+		"l"	3	-144	-181	-182	
+
+		"face"	
+		"l"	3	-1204	-814	1090	
+
+		"face"	
+		"l"	3	-194	-1091	1186	
+
+		"face"	
+		"l"	3	-1191	-1187	813	
+
+		"face"	
+		"l"	3	193	1190	1203	
+
+		"face"	
+		"l"	3	-181	-821	1203	
+
+		"face"	
+		"l"	3	-194	-1204	-1191	
+
+		"face"	
+		"l"	3	201	1190	820	
+
+		"face"	
+		"l"	3	193	-202	180	
+
+		"face"	
+		"l"	3	478	-513	-492	
+
+		"face"	
+		"l"	3	-114	491	1204	
+
+		"face"	
+		"l"	3	1205	-1205	512	
+
+		"face"	
+		"l"	3	113	-1206	-479	
+
+		"face"	
+		"l"	3	1146	-479	110	
+
+		"face"	
+		"l"	3	6	-111	-110	
+
+		"face"	
+		"l"	3	1206	109	478	
+
+		"face"	
+		"l"	3	-7	-1207	-1147	
+
+		"face"	
+		"l"	3	-1207	-479	-110	
+
+		"face"	
+		"l"	3	116	109	113	
+
+		"face"	
+		"l"	3	1205	-114	478	
+
+		"face"	
+		"l"	3	-117	-1206	1206	
+
+		"face"	
+		"l"	3	-1205	-492	113	
+
+		"face"	
+		"l"	3	-115	-114	-113	
+
+		"face"	
+		"l"	3	1207	112	491	
+
+		"face"	
+		"l"	3	114	-1208	1204	
+
+		"face"	
+		"l"	3	-730	728	491	
+
+		"face"	
+		"l"	3	-1208	-492	-113	
+
+		"face"	
+		"l"	3	1208	112	-729	
+
+		"face"	
+		"l"	3	1207	-1209	729	
+
+		"face"	
+		"l"	3	716	-718	622	
+
+		"face"	
+		"l"	3	1126	-623	-193	
+
+		"face"	
+		"l"	3	1209	192	717	
+
+		"face"	
+		"l"	3	-1127	-1210	-717	
+
+		"face"	
+		"l"	3	711	-713	-714	
+
+		"face"	
+		"l"	3	1196	713	1209	
+
+		"face"	
+		"l"	3	-244	-1210	712	
+
+		"face"	
+		"l"	3	-1197	243	-712	
+
+		"face"	
+		"l"	3	707	-709	619	
+
+		"face"	
+		"l"	3	1127	-620	-1127	
+
+		"face"	
+		"l"	3	-1197	1126	708	
+
+		"face"	
+		"l"	3	-1128	1196	-708	
+
+		"face"	
+		"l"	3	708	713	-717	
+
+		"face"	
+		"l"	3	1126	716	1209	
+
+		"face"	
+		"l"	3	-1197	-1210	-714	
+
+		"face"	
+		"l"	3	-1127	1196	-709	
+
+		"face"	
+		"l"	3	-1210	-718	-193	
+
+		"face"	
+		"l"	3	240	192	-237	
+
+		"face"	
+		"l"	3	1210	236	717	
+
+		"face"	
+		"l"	3	-241	-1211	1209	
+
+		"face"	
+		"l"	3	243	-713	1209	
+
+		"face"	
+		"l"	3	240	-1210	1210	
+
+		"face"	
+		"l"	3	242	-1211	712	
+
+		"face"	
+		"l"	3	-241	-243	-244	
+
+		"face"	
+		"l"	3	-1130	1211	258	
+
+		"face"	
+		"l"	3	-235	-259	257	
+
+		"face"	
+		"l"	3	1212	-258	-1212	
+
+		"face"	
+		"l"	3	234	-1213	1129	
+
+		"face"	
+		"l"	3	101	701	1129	
+
+		"face"	
+		"l"	3	-235	-1130	1212	
+
+		"face"	
+		"l"	3	-237	-1213	-702	
+
+		"face"	
+		"l"	3	234	236	-102	
+
+		"face"	
+		"l"	3	714	712	709	
+
+		"face"	
+		"l"	3	1213	-710	242	
+
+		"face"	
+		"l"	3	1210	-243	-713	
+
+		"face"	
+		"l"	3	-1214	-1211	-715	
+
+		"face"	
+		"l"	3	-702	717	715	
+
+		"face"	
+		"l"	3	-1213	-716	1210	
+
+		"face"	
+		"l"	3	-237	-1211	-718	
+
+		"face"	
+		"l"	3	1212	236	701	
+
+		"face"	
+		"l"	3	-1212	-720	1214	
+
+		"face"	
+		"l"	3	-258	-1215	-1214	
+
+		"face"	
+		"l"	3	1212	1213	719	
+
+		"face"	
+		"l"	3	257	-1213	1211	
+
+		"face"	
+		"l"	3	719	-716	-715	
+
+		"face"	
+		"l"	3	1213	714	1210	
+
+		"face"	
+		"l"	3	1212	-1211	715	
+
+		"face"	
+		"l"	3	-1214	-1213	-720	
+
+		"face"	
+		"l"	3	724	722	-710	
+
+		"face"	
+		"l"	3	333	709	1215	
+
+		"face"	
+		"l"	3	1216	-1216	-723	
+
+		"face"	
+		"l"	3	-334	-1217	-725	
+
+		"face"	
+		"l"	3	1213	1214	257	
+
+		"face"	
+		"l"	3	-249	-258	-257	
+
+		"face"	
+		"l"	3	1217	256	-1215	
+
+		"face"	
+		"l"	3	248	-1218	-1214	
+
+		"face"	
+		"l"	3	-243	709	-1214	
+
+		"face"	
+		"l"	3	-249	1213	1217	
+
+		"face"	
+		"l"	3	324	-1218	-710	
+
+		"face"	
+		"l"	3	248	-325	242	
+
+		"face"	
+		"l"	3	-325	709	1217	
+
+		"face"	
+		"l"	3	-332	-1218	1215	
+
+		"face"	
+		"l"	3	-334	-1216	-710	
+
+		"face"	
+		"l"	3	331	333	324	
+
+		"face"	
+		"l"	3	-725	1002	1004	
+
+		"face"	
+		"l"	3	-1217	-1005	1218	
+
+		"face"	
+		"l"	3	-334	-1219	-1003	
+
+		"face"	
+		"l"	3	1216	333	724	
+
+		"face"	
+		"l"	3	-1209	728	-113	
+
+		"face"	
+		"l"	3	122	112	-119	
+
+		"face"	
+		"l"	3	-1200	118	-729	
+
+		"face"	
+		"l"	3	-123	1199	1208	
+
+		"face"	
+		"l"	3	-266	-1203	1208	
+
+		"face"	
+		"l"	3	122	-1209	-1200	
+
+		"face"	
+		"l"	3	-264	1199	1202	
+
+		"face"	
+		"l"	3	-123	263	265	
+
+		"face"	
+		"l"	3	-876	1219	1220	
+
+		"face"	
+		"l"	3	903	-1221	1221	
+
+		"face"	
+		"l"	3	904	-1222	-1220	
+
+		"face"	
+		"l"	3	-904	-905	875	
+
+		"face"	
+		"l"	3	-886	1222	-731	
+
+		"face"	
+		"l"	3	-779	730	777	
+
+		"face"	
+		"l"	3	907	-778	-1223	
+
+		"face"	
+		"l"	3	778	-908	885	
+
+		"face"	
+		"l"	3	908	1223	1221	
+
+		"face"	
+		"l"	3	-904	-1222	1220	
+
+		"face"	
+		"l"	3	-908	-1221	-1224	
+
+		"face"	
+		"l"	3	903	907	-909	
+
+		"face"	
+		"l"	3	907	1223	1220	
+
+		"face"	
+		"l"	3	-1223	-1221	1224	
+
+		"face"	
+		"l"	3	-778	-1225	-1224	
+
+		"face"	
+		"l"	3	1222	777	-908	
+
+		"face"	
+		"l"	3	884	837	-886	
+
+		"face"	
+		"l"	3	1225	885	-1153	
+
+		"face"	
+		"l"	3	1164	1152	-838	
+
+		"face"	
+		"l"	3	-1226	-1165	-885	
+
+		"face"	
+		"l"	3	881	842	-883	
+
+		"face"	
+		"l"	3	1226	882	1164	
+
+		"face"	
+		"l"	3	-182	-1165	-843	
+
+		"face"	
+		"l"	3	-1227	181	-882	
+
+		"face"	
+		"l"	3	873	-875	-876	
+
+		"face"	
+		"l"	3	-278	875	-1226	
+
+		"face"	
+		"l"	3	-1227	1225	874	
+
+		"face"	
+		"l"	3	277	1226	-874	
+
+		"face"	
+		"l"	3	874	882	-885	
+
+		"face"	
+		"l"	3	1225	884	1164	
+
+		"face"	
+		"l"	3	-1227	-1165	-883	
+
+		"face"	
+		"l"	3	-1226	1226	-875	
+
+		"face"	
+		"l"	3	1225	-876	277	
+
+		"face"	
+		"l"	3	149	-278	-277	
+
+		"face"	
+		"l"	3	1227	276	875	
+
+		"face"	
+		"l"	3	-150	-1228	-1226	
+
+		"face"	
+		"l"	3	1152	-886	-1226	
+
+		"face"	
+		"l"	3	149	1225	1227	
+
+		"face"	
+		"l"	3	-1155	-1228	885	
+
+		"face"	
+		"l"	3	-150	1154	-1153	
+
+		"face"	
+		"l"	3	-906	872	904	
+
+		"face"	
+		"l"	3	1228	-905	888	
+
+		"face"	
+		"l"	3	-888	-889	-873	
+
+		"face"	
+		"l"	3	-1229	887	905	
+
+		"face"	
+		"l"	3	865	877	906	
+
+		"face"	
+		"l"	3	1229	-907	891	
+
+		"face"	
+		"l"	3	-891	-892	-878	
+
+		"face"	
+		"l"	3	-1230	890	-866	
+
+		"face"	
+		"l"	3	1230	1231	-888	
+
+		"face"	
+		"l"	3	894	887	891	
+
+		"face"	
+		"l"	3	1232	-892	-1232	
+
+		"face"	
+		"l"	3	-895	-1233	-1231	
+
+		"face"	
+		"l"	3	-1233	1231	891	
+
+		"face"	
+		"l"	3	-1230	-892	906	
+
+		"face"	
+		"l"	3	1233	-907	-1232	
+
+		"face"	
+		"l"	3	1229	-1234	1232	
+
+		"face"	
+		"l"	3	-1234	1231	906	
+
+		"face"	
+		"l"	3	-911	-907	905	
+
+		"face"	
+		"l"	3	1234	-906	-1232	
+
+		"face"	
+		"l"	3	910	-1235	1233	
+
+		"face"	
+		"l"	3	-1235	1231	905	
+
+		"face"	
+		"l"	3	1228	-906	-888	
+
+		"face"	
+		"l"	3	-1231	887	-1232	
+
+		"face"	
+		"l"	3	-1229	1230	1234	
+
+		"face"	
+		"l"	3	-890	-874	888	
+
+		"face"	
+		"l"	3	1235	-889	-298	
+
+		"face"	
+		"l"	3	1236	297	873	
+
+		"face"	
+		"l"	3	-1236	-1237	889	
+
+		"face"	
+		"l"	3	-902	-882	900	
+
+		"face"	
+		"l"	3	1237	-901	1236	
+
+		"face"	
+		"l"	3	-294	-1237	881	
+
+		"face"	
+		"l"	3	-1238	293	901	
+
+		"face"	
+		"l"	3	-897	-898	895	
+
+		"face"	
+		"l"	3	1238	-896	-1236	
+
+		"face"	
+		"l"	3	-1238	1235	897	
+
+		"face"	
+		"l"	3	-1239	1237	896	
+
+		"face"	
+		"l"	3	897	-901	889	
+
+		"face"	
+		"l"	3	1235	-890	1236	
+
+		"face"	
+		"l"	3	-1238	-1237	900	
+
+		"face"	
+		"l"	3	-1236	1237	-898	
+
+		"face"	
+		"l"	3	1239	-889	-281	
+
+		"face"	
+		"l"	3	-297	280	-298	
+
+		"face"	
+		"l"	3	-1236	297	888	
+
+		"face"	
+		"l"	3	296	1235	-1240	
+
+		"face"	
+		"l"	3	1224	-1202	1240	
+
+		"face"	
+		"l"	3	1241	-1241	-264	
+
+		"face"	
+		"l"	3	-1201	263	1201	
+
+		"face"	
+		"l"	3	-1242	1200	-1225	
+
+		"face"	
+		"l"	3	885	730	-1223	
+
+		"face"	
+		"l"	3	-1228	1222	-1201	
+
+		"face"	
+		"l"	3	-1155	1200	-731	
+
+		"face"	
+		"l"	3	1227	1154	-886	
+
+		"face"	
+		"l"	3	875	-1221	-1220	
+
+		"face"	
+		"l"	3	276	1219	-1242	
+
+		"face"	
+		"l"	3	1227	1241	1220	
+
+		"face"	
+		"l"	3	-277	-1228	-876	
+
+		"face"	
+		"l"	3	1220	1222	-1225	
+
+		"face"	
+		"l"	3	1241	1224	-1201	
+
+		"face"	
+		"l"	3	1227	1200	-1223	
+
+		"face"	
+		"l"	3	-1242	-1228	-1221	
+
+		"face"	
+		"l"	3	1242	-1241	-267	
+
+		"face"	
+		"l"	3	268	266	-264	
+
+		"face"	
+		"l"	3	-1242	263	1240	
+
+		"face"	
+		"l"	3	-269	1241	-1243	
+
+		"face"	
+		"l"	3	-284	1219	-1243	
+
+		"face"	
+		"l"	3	268	1242	-1242	
+
+		"face"	
+		"l"	3	-277	1241	-1220	
+
+		"face"	
+		"l"	3	-269	276	283	
+
+		"face"	
+		"l"	3	1243	-874	278	
+
+		"face"	
+		"l"	3	-153	-279	277	
+
+		"face"	
+		"l"	3	-1227	-278	873	
+
+		"face"	
+		"l"	3	152	1226	-1244	
+
+		"face"	
+		"l"	3	184	-882	-1244	
+
+		"face"	
+		"l"	3	-153	1243	-1227	
+
+		"face"	
+		"l"	3	-182	1226	881	
+
+		"face"	
+		"l"	3	152	181	-185	
+
+		"face"	
+		"l"	3	-1237	-874	-298	
+
+		"face"	
+		"l"	3	295	297	278	
+
+		"face"	
+		"l"	3	-1244	-279	873	
+
+		"face"	
+		"l"	3	-296	1243	1236	
+
+		"face"	
+		"l"	3	293	-882	1236	
+
+		"face"	
+		"l"	3	295	-1237	-1244	
+
+		"face"	
+		"l"	3	-185	1243	881	
+
+		"face"	
+		"l"	3	-296	184	-294	
+
+		"face"	
+		"l"	3	979	821	977	
+
+		"face"	
+		"l"	3	1244	-978	201	
+
+		"face"	
+		"l"	3	-1192	-202	-822	
+
+		"face"	
+		"l"	3	-1245	1191	-980	
+
+		"face"	
+		"l"	3	-968	826	980	
+
+		"face"	
+		"l"	3	1245	-981	-1192	
+
+		"face"	
+		"l"	3	-1190	1191	-827	
+
+		"face"	
+		"l"	3	-1246	1189	967	
+
+		"face"	
+		"l"	3	-962	976	974	
+
+		"face"	
+		"l"	3	1246	-975	-1245	
+
+		"face"	
+		"l"	3	-1246	1244	-977	
+
+		"face"	
+		"l"	3	-1247	1245	961	
+
+		"face"	
+		"l"	3	-977	-981	-980	
+
+		"face"	
+		"l"	3	1244	979	-1192	
+
+		"face"	
+		"l"	3	-1246	1191	980	
+
+		"face"	
+		"l"	3	-1245	1245	976	
+
+		"face"	
+		"l"	3	988	896	986	
+
+		"face"	
+		"l"	3	1247	-987	-1239	
+
+		"face"	
+		"l"	3	-1238	1238	-897	
+
+		"face"	
+		"l"	3	-1248	1237	-989	
+
+		"face"	
+		"l"	3	-978	901	989	
+
+		"face"	
+		"l"	3	1248	-990	-1238	
+
+		"face"	
+		"l"	3	-294	1237	-902	
+
+		"face"	
+		"l"	3	-1249	293	977	
+
+		"face"	
+		"l"	3	-975	985	983	
+
+		"face"	
+		"l"	3	-304	-984	-1248	
+
+		"face"	
+		"l"	3	-1249	1247	-986	
+
+		"face"	
+		"l"	3	303	1248	974	
+
+		"face"	
+		"l"	3	-986	-990	-989	
+
+		"face"	
+		"l"	3	1247	988	-1238	
+
+		"face"	
+		"l"	3	-1249	1237	989	
+
+		"face"	
+		"l"	3	-1248	1248	985	
+
+		"face"	
+		"l"	3	1249	974	306	
+
+		"face"	
+		"l"	3	-292	-307	303	
+
+		"face"	
+		"l"	3	-1249	-304	-975	
+
+		"face"	
+		"l"	3	291	1248	-1250	
+
+		"face"	
+		"l"	3	202	977	-1250	
+
+		"face"	
+		"l"	3	-292	1249	-1249	
+
+		"face"	
+		"l"	3	-294	1248	-978	
+
+		"face"	
+		"l"	3	291	293	-203	
+
+		"face"	
+		"l"	3	1247	983	303	
+
+		"face"	
+		"l"	3	-305	-304	-303	
+
+		"face"	
+		"l"	3	1250	302	-984	
+
+		"face"	
+		"l"	3	304	-1251	-1248	
+
+		"face"	
+		"l"	3	1044	1011	967	
+
+		"face"	
+		"l"	3	1245	-968	-1190	
+
+		"face"	
+		"l"	3	1197	1189	-1012	
+
+		"face"	
+		"l"	3	-1246	-1198	-1045	
+
+		"face"	
+		"l"	3	1041	1016	-1043	
+
+		"face"	
+		"l"	3	1251	1042	1197	
+
+		"face"	
+		"l"	3	-244	-1198	-1017	
+
+		"face"	
+		"l"	3	-1252	243	-1042	
+
+		"face"	
+		"l"	3	1037	-1039	961	
+
+		"face"	
+		"l"	3	1246	-962	-1246	
+
+		"face"	
+		"l"	3	-1252	1245	1038	
+
+		"face"	
+		"l"	3	-1247	1251	-1038	
+
+		"face"	
+		"l"	3	1038	1042	-1045	
+
+		"face"	
+		"l"	3	1245	1044	1197	
+
+		"face"	
+		"l"	3	-1252	-1198	-1043	
+
+		"face"	
+		"l"	3	-1246	1251	-1039	
+
+		"face"	
+		"l"	3	1252	-1038	306	
+
+		"face"	
+		"l"	3	-199	-307	-1247	
+
+		"face"	
+		"l"	3	-1252	1246	1037	
+
+		"face"	
+		"l"	3	198	1251	-1253	
+
+		"face"	
+		"l"	3	244	-1042	-1253	
+
+		"face"	
+		"l"	3	-199	1252	-1252	
+
+		"face"	
+		"l"	3	-244	1251	1041	
+
+		"face"	
+		"l"	3	198	243	-245	
+
+		"face"	
+		"l"	3	1244	974	-1247	
+
+		"face"	
+		"l"	3	198	1246	306	
+
+		"face"	
+		"l"	3	-1250	-307	-975	
+
+		"face"	
+		"l"	3	-199	1249	-1245	
+
+		"face"	
+		"l"	3	-202	977	-1245	
+
+		"face"	
+		"l"	3	198	1244	-1250	
+
+		"face"	
+		"l"	3	-203	1249	-978	
+
+		"face"	
+		"l"	3	-199	202	201	
+
+		"face"	
+		"l"	3	1253	-1038	-330	
+
+		"face"	
+		"l"	3	327	329	306	
+
+		"face"	
+		"l"	3	-1253	-307	1037	
+
+		"face"	
+		"l"	3	-328	1252	-1254	
+
+		"face"	
+		"l"	3	325	-1042	-1254	
+
+		"face"	
+		"l"	3	327	1253	-1253	
+
+		"face"	
+		"l"	3	-245	1252	1041	
+
+		"face"	
+		"l"	3	-328	244	-326	
+
+		"face"	
+		"l"	3	-1036	-1038	-1037	
+
+		"face"	
+		"l"	3	1254	1036	1255	
+
+		"face"	
+		"l"	3	1256	-1256	1037	
+
+		"face"	
+		"l"	3	-1255	-1257	1035	
+
+		"face"	
+		"l"	3	-1003	-1042	-1041	
+
+		"face"	
+		"l"	3	1257	1040	1256	
+
+		"face"	
+		"l"	3	-335	-1257	1041	
+
+		"face"	
+		"l"	3	-1258	334	1002	
+
+		"face"	
+		"l"	3	1047	1040	1035	
+
+		"face"	
+		"l"	3	1254	-1036	1256	
+
+		"face"	
+		"l"	3	-1258	-1257	-1041	
+
+		"face"	
+		"l"	3	-1255	1257	-1048	
+
+		"face"	
+		"l"	3	333	1002	1218	
+
+		"face"	
+		"l"	3	-337	-1219	-1258	
+
+		"face"	
+		"l"	3	-335	1257	-1003	
+
+		"face"	
+		"l"	3	336	334	-334	
+
+		"face"	
+		"l"	3	-1257	-1038	1255	
+
+		"face"	
+		"l"	3	335	-1256	-330	
+
+		"face"	
+		"l"	3	-1254	329	1037	
+
+		"face"	
+		"l"	3	-336	1253	1256	
+
+		"face"	
+		"l"	3	334	-1042	1256	
+
+		"face"	
+		"l"	3	335	-1257	-1254	
+
+		"face"	
+		"l"	3	-326	1253	1041	
+
+		"face"	
+		"l"	3	-336	325	-335	;
 createNode tweak -n "tweak1";
-	rename -uid "5898427A-4336-69CC-2AED-30ADBC8E78CC";
+	rename -uid "57BC5D36-4712-076F-A7E1-5AB449F26F9B";
 createNode objectSet -n "set1";
-	rename -uid "9506F2AF-4D58-96A8-C384-C2AF4CAD736B";
+	rename -uid "BBBC94CE-4030-08F8-A55E-F6A1B983010F";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId1";
-	rename -uid "3DAD11BB-4BE8-53E1-67CB-BE9EEC07EF4F";
+	rename -uid "D72B4D88-4BC7-828D-8E58-1E8AC901298A";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts1";
-	rename -uid "B48667D2-4B9F-510F-26F3-AA92B410E945";
+	rename -uid "3126B729-44D1-89F8-84A8-2291C098268E";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "tweakSet1";
-	rename -uid "C4F01502-47DC-A4C7-8D0F-51B6F4F5CD95";
+	rename -uid "15BE4553-457A-1335-210D-1A93BDF878C6";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId2";
-	rename -uid "24EB6909-4EFF-2A25-763D-C38F891666EB";
+	rename -uid "56F5F680-4C69-D8A0-1390-328A6E02F7B3";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts2";
-	rename -uid "DE492C98-423F-D408-43A0-D8B274B5DCB5";
+	rename -uid "D295F878-47B0-E008-1020-E692AC928426";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial1";
-	rename -uid "38ABF839-4CB8-3A76-31A7-C48F92B8BC0C";
+	rename -uid "6C093496-4492-91F5-AC4A-0B82D0598F13";
 	setAttr -l on -k off -cb on ".en";
 	setAttr -l on ".wl";
 	setAttr -cb off ".tSt";
@@ -17291,31 +24120,31 @@ createNode zMaterial -n "zMaterial1";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set2";
-	rename -uid "64D716F8-48E5-0062-B57B-75876D41EB82";
+	rename -uid "3CB3E22E-488A-5786-9972-F4BCFAF3A263";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId3";
-	rename -uid "1936F06B-429B-02DB-FFC3-7DBC8628FDAB";
+	rename -uid "CE940275-4F53-748A-B791-57953EC34715";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts3";
-	rename -uid "8D6BEEF0-4896-D549-0710-3EAC9B674A3F";
+	rename -uid "75666723-4433-89D9-864A-DB9FEDF3C577";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "set3";
-	rename -uid "E0EF72DF-4A6D-3FC8-0BAF-72B16589EDC6";
+	rename -uid "C1077F1E-4ACD-D074-5550-D79C0940F0FF";
 	setAttr ".ihi" 0;
 	setAttr -s 2 ".dsm";
 	setAttr ".vo" yes;
 	setAttr -s 2 ".gn";
 createNode groupId -n "groupId4";
-	rename -uid "46606300-476A-7FBB-5170-CF99A3080494";
+	rename -uid "D48491A1-4D03-5A89-06A9-FBB4F0A1E3ED";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts4";
-	rename -uid "12F16C67-49D2-99C8-99DF-3EAEF7C6E746";
+	rename -uid "2DDEA208-49AA-79FC-9A06-C8A4EB6EA1D6";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zGeo -n "zGeo4";
-	rename -uid "3A46E5AF-4965-8413-82D2-9BAAFF139D7F";
+	rename -uid "812E9191-457C-B432-5D8D-5BA2521747DB";
 	setAttr ".ihi" 0;
 	setAttr ".iNMh" -type "mesh" 
 
@@ -20528,11 +27357,11 @@ createNode zGeo -n "zGeo4";
 		"lt"	3	397	398	438	;
 	setAttr ".IDL" 4;
 createNode zTissue -n "zTissue2";
-	rename -uid "7B3496D3-43C3-EA51-A7B1-47A215311EA1";
+	rename -uid "3BE9643A-4D99-E5EF-30E2-9282C6FA039A";
 	setAttr -cb off ".taf";
-	setAttr ".SzC" -type "zSerializedBinaryData" ("eNqrZxRkZGRgYGBkZAxhYOAwv/RgmafigmwO8Q9rhMOyejqZCkCyAwBY/uy1sETm/7XisyOgpWTnNjuW2mAZOxZ9MyE7lmtzr9uxMN4vtGfJ8IyzZ0mekmjP8uRWuj3LtHV2dixJx3JsWY7t47BjecZ/DmoyS/EbOVsGlksO3PYs8zqO2LH8yOa3Zynli7DHY+uWcgM7lrsum2xZ9BOu2rCIqnbb0jho2sq67Fgspj23Zfl15a8tS8PZnXbkmgUALco5OQ==") ;
+	setAttr ".SzC" -type "zSerializedBinaryData" ("eNqrZxRkZGRgYGBkZAxhYODo23DWdX7lTn4O8Q9rhMOyejqZUpkZKAcsf/ZaWKIJlezcZsdSGyxjx6JvJmTHcm3udTsWxvuF9iwZnnH2LMlTEu1ZntxKt2eZts7OjiXpWI4ty7F9HHYsz/jP2YG0X3LgtmeZ13HEjuVHNr89SylfhD2S4VvKDexY7rpssmXRT7hqwyKq2m1LknvbyrrsWCymPbdl+XXlry1Lw9mddgyjYBTQDbDIz19vx8BiX/XLlvqGAwCwHDm6") ;
 createNode zTet -n "zTet2";
-	rename -uid "77087707-4B53-0D0B-DE86-1DB1786F39DF";
+	rename -uid "0F4055D1-4E5B-4FB9-145F-4FA390D8869F";
 	setAttr -l on -k off ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -25921,31 +32750,31 @@ createNode zTet -n "zTet2";
 		"face"	
 		"l"	3	568	589	-585	;
 createNode tweak -n "tweak2";
-	rename -uid "61AC044D-450A-DEB9-05D0-6F82614DD13E";
+	rename -uid "EB8D721C-4CE8-4479-54AC-78AC01C5F772";
 createNode objectSet -n "set4";
-	rename -uid "01766D6D-4B38-A54F-1AD9-409B3DCEE355";
+	rename -uid "1C0CB174-4200-D1A9-3DED-C195194A3D3A";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId5";
-	rename -uid "FB315C9C-4C67-A4B4-5899-24A9CBC2BC0C";
+	rename -uid "BDADAE8F-4F20-A41A-F397-AE967BC16570";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts5";
-	rename -uid "A6FB9475-4624-B0CE-EA69-1F95615F113F";
+	rename -uid "1EB87837-4327-22BA-9EAA-B6940CBC0D1F";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "tweakSet2";
-	rename -uid "8807DAE3-4D30-0340-6BAE-3F8389206F61";
+	rename -uid "71E48A2E-4F33-837D-7D95-FA89FA77AB91";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId6";
-	rename -uid "49C6F532-4B99-CEEC-739D-B8909F500D0E";
+	rename -uid "F1418BF2-4A6D-35D0-4750-A0AD9CC6F144";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts6";
-	rename -uid "F36EE454-45C7-A06F-E73D-CC8198010953";
+	rename -uid "98E6A348-4F82-527B-A2C0-84B6308FF385";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial2";
-	rename -uid "039B9ADF-4ED5-F011-5A96-898C98C3872F";
+	rename -uid "BFA10D50-4060-9E9B-D453-998802EF8D3A";
 	setAttr -l on -k off -cb on ".en";
 	setAttr -l on ".wl";
 	setAttr -cb off ".tSt";
@@ -25956,47 +32785,47 @@ createNode zMaterial -n "zMaterial2";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set5";
-	rename -uid "AAE47C50-4674-A424-AA7C-0EB24A379447";
+	rename -uid "DA5E471B-4281-1703-9F3E-DDBCAF4DA132";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId7";
-	rename -uid "EE41C077-4EBB-27DE-8CE9-D1B754F0A24E";
+	rename -uid "F68F71C1-4640-02A5-6BF0-26BEDCC3A24B";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts7";
-	rename -uid "3435E26C-4F8A-8A16-227C-4782DEEC8CCB";
+	rename -uid "7E91739A-453E-BCAA-3E31-1C959015770C";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode groupId -n "groupId8";
-	rename -uid "18321722-4F2A-0512-3FBA-3F83B5D341F1";
+	rename -uid "78B4B533-4125-A0C0-BA85-F88456895013";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts8";
-	rename -uid "5D5E17A6-4939-3A14-1FA3-46958E38CF44";
+	rename -uid "45361D4E-4DF9-1563-C0EC-69A770DDA358";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode script -n "sceneConfigurationScriptNode";
-	rename -uid "56B3BE8F-4F9D-6201-CCB0-0D9854085A12";
+	rename -uid "8474D611-4974-8C9A-F4F1-319CF018CD37";
 	setAttr ".b" -type "string" "playbackOptions -min 1 -max 120 -ast 1 -aet 200 ";
 	setAttr ".st" 6;
 createNode polySphere -n "polySphere3";
-	rename -uid "E11116A2-4197-FF19-536F-70B086CAB59E";
+	rename -uid "806F1CE1-48C1-E6B0-A24F-B18FA8372EED";
 createNode transformGeometry -n "transformGeometry5";
-	rename -uid "FD710E7B-493B-DE2E-FBA6-229F8ACBE271";
+	rename -uid "842D6248-4048-5F01-DFD3-D0866CDD42A1";
 	setAttr ".txf" -type "matrix" 0.51555736753835568 0 0 0 0 0.68211824821882827 0 0
 		 0 0 0.28901105353000844 0 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 1;
 createNode zRestShape -n "zRestShape1";
-	rename -uid "B587A5B5-45D4-0C36-F361-0B8A1947E5B1";
+	rename -uid "64F0773D-460E-FD1A-0D28-569BD316C712";
 	addAttr -ci true -h true -sn "aal" -ln "attributeAliasList" -dt "attributeAlias";
 	setAttr ".wgt[0]"  1;
 	setAttr ".aal" -type "attributeAlias" {"l_armA_restShape","targetWeight[0]"} ;
 createNode objectSet -n "set6";
-	rename -uid "3749BB44-4E3A-F145-DD88-18AA5429589C";
+	rename -uid "4DF85579-4AB6-8B9C-5E25-0FBA42D3DD4C";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId9";
-	rename -uid "B2391442-4086-80DD-8A57-DCB4C9ACAEB5";
+	rename -uid "96743F9E-456C-164D-CF57-57A6716DFA52";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts9";
-	rename -uid "922C644D-4828-7A32-1E8C-81BE11AD2D4C";
+	rename -uid "32485685-44C8-5DE4-2207-44AE940A8136";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 select -ne :time1;
@@ -26026,8 +32855,6 @@ select -ne :defaultResolution;
 select -ne :hardwareRenderGlobals;
 	setAttr ".ctrs" 256;
 	setAttr ".btrs" 512;
-select -ne :ikSystem;
-	setAttr -s 4 ".sol";
 connectAttr "groupId1.id" "l_armA_muscle_geoShape.iog.og[0].gid";
 connectAttr "set1.mwc" "l_armA_muscle_geoShape.iog.og[0].gco";
 connectAttr "groupId2.id" "l_armA_muscle_geoShape.iog.og[1].gid";
