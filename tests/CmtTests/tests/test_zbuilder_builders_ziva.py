@@ -206,25 +206,27 @@ class ZivaBuildTestCase(VfxTestCase):
 class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
     def test_order_retrieved(self):
         desired_type_order = zva.ZNODES
-
-        test_utils.load_scene()
+        test_utils.load_scene(scene_name="generic_tissue.ma")
         builder = zva.Ziva()
         builder.retrieve_connections()
-
-        retrieved = builder.get_scene_items()
+        retrieved = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
         retrieved_type_order = [x.type for x in retrieved]
-
-        # remove duplicates
+        # remove duplicates from retrieved_type_order.
         seen = set()
         seen_add = seen.add
         retrieved_type_order = [
             str(x) for x in retrieved_type_order if not (x in seen or seen_add(x))
         ]
-
+        # remove items from desired that are not represented in retrieved_by_type
+        new_desired_type_order = []
+        for item in desired_type_order:
+            if item in retrieved_type_order:
+                new_desired_type_order.append(item)
         # the retrieved_type_order is going to have a few extra node types at end of list.
         # the items NOT in ZNODES needs to be at the end, this is up for refactor
         # when this ticket is done then this can do a complete equal
-        self.assertEqual(desired_type_order, retrieved_type_order[0:len(desired_type_order)])
+        self.assertEqual(new_desired_type_order,
+                         retrieved_type_order[0:len(new_desired_type_order)])
 
 
 class ZivaSolverDisableTestCase(VfxTestCase):
