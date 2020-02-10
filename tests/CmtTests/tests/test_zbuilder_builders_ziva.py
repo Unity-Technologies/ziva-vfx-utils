@@ -207,7 +207,7 @@ class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
     def test_order_retrieved(self):
         desired_type_order = zva.ZNODES
 
-        test_utils.build_generic_scene()
+        test_utils.load_scene()
         builder = zva.Ziva()
         builder.retrieve_connections()
 
