@@ -24,7 +24,6 @@ class DGNode(Base):
         attrs (dict): A place for the maya attributes dictionary.
 
     """
-    
     """ Types of maya nodes this parameter is aware of.  Only needed 
         if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
@@ -63,8 +62,14 @@ class DGNode(Base):
 
     def __deepcopy__(self, memo):
         # Some attributes cannot be deepcopied so define a listy of attributes
-        # to ignore.
-        non_copyable_attrs = ('depends_on')
+        # to ignore.  These items are zBuilder scene items.  We need to not copy these
+        # attributes and apply them to copy afterwards.
+        non_copyable_attrs = ['depends_on', '_children', '_parent']
+        non_copyable_attrs.extend(Base.SCENE_ITEM_ATTRIBUTES)
+
+        non_copyable_items = {}
+        for attr in non_copyable_attrs:
+            non_copyable_items[attr] = self.__dict__.get(attr, None)
 
         result = type(self)()
 
@@ -72,6 +77,11 @@ class DGNode(Base):
             # skip over attributes defined as non-copyable in non_copyable_attrs
             if k not in non_copyable_attrs:
                 setattr(result, k, copy.deepcopy(v, memo))
+
+        # Add non-copyable attrs back into scene item manually after it's copied.
+        for item in non_copyable_items:
+            if item in result.__dict__:
+                result.__dict__[item] = non_copyable_items[item]
 
         return result
 
