@@ -123,7 +123,7 @@ class Ziva(Builder):
                     # for proper parenting.
 
                     parent_tissue_scene_item = self.get_scene_items(name_filter=item.parent_tissue)
-                    parent_tissue_mesh = parent_tissue_scene_item[0].long_association[0]
+                    parent_tissue_mesh = item.parent_tissue.long_association[0]
                     parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
                     parent_node = solver.get(item.solver.name, self.root_node)
