@@ -157,17 +157,12 @@ def get_tissue_children(ztissue):
         (str) Children mesh of zTissue, or None if none found.
     """
     tmp = []
-    if cmds.objectType(ztissue) == 'zTissue':
-        child_attr = '{}.oChildTissue'.format(ztissue)
-        if cmds.objExists(child_attr):
-            children = cmds.listConnections(child_attr)
 
-            if children:
-                # sel = cmds.ls(sl=True)
-                # cmds.select(children)
-                # tmp.extend(mel.eval('zQuery -t zTissue -m -l'))
-                # cmds.select(sel)
-                return children
+    child_attr = '{}.oChildTissue'.format(ztissue)
+    children = cmds.listConnections(child_attr)
+
+    if children:
+        return children
     return None
 
 
@@ -179,11 +174,8 @@ def get_tissue_parent(ztissue):
     Returns:
         (str) Parent mesh of zTissue, or None if none found
     """
-    if cmds.objectType(ztissue) == 'zTissue':
-        parent_attr = '{}.iParentTissue'.format(ztissue)
-        if cmds.objExists(parent_attr):
-            parent = cmds.listConnections(parent_attr)
-            if parent:
-                # parent = mel.eval('zQuery -t zTissue -m -l')
-                return parent[0]
+    parent_attr = '{}.iParentTissue'.format(ztissue)
+    parent = cmds.listConnections(parent_attr)
+    if parent:
+        return parent[0]
     return None
