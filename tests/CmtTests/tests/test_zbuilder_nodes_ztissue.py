@@ -180,37 +180,4 @@ class ZivaTissueMirrorTestCase(VfxTestCase):
         }
 
         for key, value in parents.iteritems():
-            # print value
-            # print cmds.listConnections(key + '.iParentTissue')
             self.assertEqual(value, cmds.listConnections(key + '.iParentTissue')[0])
-            #print 'FURESDR', value, cmds.listConnections(key + '.iParentTissue')
-        # print parents
-        # print dca
-        # parents = [x.parent_tissue.name for x in self.scene_items_retrieved if x.parent_tissue]
-
-
-# class ZivaMirrorSelectedTestCase(VfxTestCase):
-#     def setUp(self):
-#         super(ZivaMirrorSelectedTestCase, self).setUp()
-#         test_utils.load_scene(scene_name='mirror_example.ma')
-
-#     def test_mirror_selection(self):
-#         cmds.select('l_arm_muscles')
-
-#         builder = zva.Ziva()
-#         builder.retrieve_from_scene_selection()
-#         # before we build we want to mirror just the center geo
-#         for item in builder.get_scene_items(name_filter='c_chest_bone'):
-#             item.mirror()
-
-#         # and we want to interpolate any map associated with the center geo
-#         for item in builder.get_scene_items(type_filter='map'):
-#             if 'c_chest_bone' in item._mesh:
-#                 item.interpolate()
-
-#         # now a simple string replace
-#         builder.string_replace('^l_', 'r_')
-
-#         builder.build()
-
-#         self.assertSceneHasNodes(['zAttachment2', 'zMaterial3', 'zMaterial4'])
