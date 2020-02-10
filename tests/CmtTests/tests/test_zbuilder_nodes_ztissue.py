@@ -103,6 +103,14 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
 
 class ZivaTissueMirrorTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
     def setUp(self):
         super(ZivaTissueMirrorTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -110,8 +118,11 @@ class ZivaTissueMirrorTestCase(VfxTestCase):
         self.builder.retrieve_from_scene()
 
         # gather info
-        self.tissue_items = self.builder.get_scene_items(type_filter='zTissue')
-        self.l_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('l_')]
+        self.type_ = 'zTissue'
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
 
     def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
         """Args:
@@ -123,26 +134,27 @@ class ZivaTissueMirrorTestCase(VfxTestCase):
                                    Test fails if zBuilder is missing any of the keys
                                    or has any keys with different values.
         """
-        tissue_names = [x.name for x in self.tissue_items]
-        self.check_retrieve_looks_good(builder, expected_plugs, tissue_names, "zTissue")
+        item_names = [x.name for x in self.scene_items_retrieved]
+        self.check_retrieve_looks_good(builder, expected_plugs, item_names, self.type_)
 
     def test_builder_change_with_string_replace(self):
         ## VERIFY
 
         # find left and right tissue items regardless of name, by looking at mesh they
         # are tied to
-        r_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('r_')]
-        self.assertNotEqual(len(self.l_tissue_geo), 0)
-        self.assertEqual(r_tissue_geo, [])
+        r_item_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('r_')]
+        self.assertNotEqual(len(self.l_item_geo), 0)  # Left geo should have been all renamerd to r_
+        self.assertEqual(r_item_geo, [])  # Make sure no r_ geo is in original scene
 
         ## ACT
         self.builder.string_replace("^l_", "r_")
 
         ## VERIFY
-        new_left_geo = [x for x in self.tissue_items if x.association[0].startswith('l_')]
-        r_tissue_geo = [x for x in self.tissue_items if x.association[0].startswith('r_')]
-        self.assertEqual(len(self.l_tissue_geo), len(r_tissue_geo))
-        self.assertEqual(new_left_geo, [])
+        new_left_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('l_')]
+        r_item_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('r_')]
+        self.assertEqual(len(self.l_item_geo),
+                         len(r_item_geo))  # number of right geos equal original left
+        self.assertEqual(new_left_geo, [])  # after replace left geo should have been renamed
 
     def test_builder_build_with_string_replace(self):
         # ACT
@@ -150,14 +162,31 @@ class ZivaTissueMirrorTestCase(VfxTestCase):
         self.builder.build()
 
         # VERIFY
-        tissue_names_in_builder = [x.name for x in self.tissue_items]
-        self.assertSceneHasNodes(tissue_names_in_builder)
+        item_names_in_builder = [x.name for x in self.scene_items_retrieved]
+        # Original Ziva nodes should still be in scene
+        self.assertSceneHasNodes(item_names_in_builder)
 
-        for item in self.tissue_items:
-            scene_name = item.name
-            for attr in item.attrs.keys():
+        # comparing attribute values between builder and scene
+        for scene_item in self.scene_items_retrieved:
+            scene_name = scene_item.name
+            for attr in scene_item.attrs.keys():
                 scene_value = cmds.getAttr('{}.{}'.format(scene_name, attr))
-                self.assertTrue(scene_value == item.attrs[attr]['value'])
+                self.assertTrue(scene_value == scene_item.attrs[attr]['value'])
+
+        # Tissue specific sub-tissue check
+        parents = {
+            x.name: x.parent_tissue.name
+            for x in self.scene_items_retrieved if x.parent_tissue
+        }
+
+        for key, value in parents.iteritems():
+            # print value
+            # print cmds.listConnections(key + '.iParentTissue')
+            self.assertEqual(value, cmds.listConnections(key + '.iParentTissue')[0])
+            #print 'FURESDR', value, cmds.listConnections(key + '.iParentTissue')
+        # print parents
+        # print dca
+        # parents = [x.parent_tissue.name for x in self.scene_items_retrieved if x.parent_tissue]
 
 
 # class ZivaMirrorSelectedTestCase(VfxTestCase):
