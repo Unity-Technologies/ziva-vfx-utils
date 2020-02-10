@@ -27,8 +27,10 @@ class TissueNode(Ziva):
         super(TissueNode, self).populate(maya_node=maya_node)
 
         scene_name = self.get_scene_name()
-        self.children_tissues = get_tissue_children(scene_name)
-        self.parent_tissue = get_tissue_parent(scene_name)
+        parent_name = get_tissue_parent(scene_name)
+
+        if parent_name:
+            self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
@@ -129,20 +131,18 @@ def build_multiple(tissue_items,
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()
 
-            if ztissue.children_tissues:
-                """ If there are children lets check if there are parameters for
-                them.  If there are none, then lets check scene.
-                """
-                children_parms = ztissue.builder.get_scene_items(
-                    name_filter=ztissue.children_tissues)
-                if children_parms:
-                    children = [x.association[0] for x in children_parms]
-                else:
-                    cmds.select(ztissue.children_tissues, r=True)
-                    children = mel.eval('zQuery -type zTissue -m ')
+            if ztissue.parent_tissue:
+                parent_name = ztissue.parent_tissue.name
+                parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
 
-                cmds.select(ztissue.association)
-                cmds.select(children, add=True)
+                if parent_scene_item:
+                    parent = [x.association[0] for x in parent_scene_item]
+                else:
+                    cmds.select(ztissue.parent_tissue.name, r=True)
+                    parent = mel.eval('zQuery -type zTissue -m ')
+
+                cmds.select(parent)
+                cmds.select(ztissue.association, add=True)
                 mel.eval('ziva -ast')
 
     cmds.select(sel)
