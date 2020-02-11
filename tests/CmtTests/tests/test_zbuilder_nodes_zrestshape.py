@@ -249,7 +249,7 @@ class ZivaRestShapeMirrorTestCase(VfxTestCase):
                 scene_value = cmds.getAttr('{}.{}'.format(scene_name, attr))
                 self.assertTrue(scene_value == scene_item.attrs[attr]['value'])
 
-        # checking the actual restshape got hooked up in maya
+        # checking the actual restshapes got hooked up in maya
         for item in self.builder.get_scene_items(type_filter='zRestShape'):
             connections = cmds.listConnections('{}.target'.format(item.name))
             connections_long_name = cmds.ls(connections, long=True)
