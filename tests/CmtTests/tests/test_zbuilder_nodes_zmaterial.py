@@ -3,7 +3,7 @@ import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
-from zBuilder.parameters.maps import get_weights
+
 from maya import cmds
 
 from vfx_test_case import VfxTestCase
@@ -223,6 +223,8 @@ class ZivaMaterialMirrorTestCase(VfxTestCase):
         self.assertEqual(new_left_geo, [])  # after replace left geo should have been renamed
 
     def test_builder_build_with_string_replace(self):
+        from zBuilder.parameters.maps import get_weights
+
         # ACT
         self.builder.string_replace("^l_", "r_")
         self.builder.build()
