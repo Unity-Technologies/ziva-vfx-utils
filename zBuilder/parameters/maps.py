@@ -141,15 +141,12 @@ class Map(Base):
     def apply_weights(self):
         """This applies the weight from this node to the maya scene.
         """
-        if cmds.objExists('%s[0]' % self.name):
-            if not cmds.getAttr('%s[0]' % self.name, l=True):
-                val = ' '.join([str(w) for w in self.values])
-                cmd = "setAttr {}[0:{}] {}".format(self.name, len(self.values) - 1, val)
-                mel.eval(cmd)
-        else:
-            # applying doubleArray maps
-            if cmds.objExists(self.name):
-                cmds.setAttr(self.name, self.values, type='doubleArray')
+        from utility.paintable_maps import set_paintable_map
+        node_name = self.name.split('.')[0]
+        attr_name = self.name.split('.', 1)[1]
+        new_weights = self.values
+
+        set_paintable_map(node_name, attr_name, new_weights)
 
     def copy_values_from(self, map_parameter):
         self.values = map_parameter.values
