@@ -285,7 +285,8 @@ class MyDockingUI(QtWidgets.QWidget):
             'zTissue': self.open_tissue_menu,
             'zBone': self.open_bone_menu,
             'zLineOfAction': self.open_line_of_action_menu,
-            'zRestShape': self.open_rest_shape_menu
+            'zRestShape': self.open_rest_shape_menu,
+            'zSolverTransform': self.open_solver_menu
         }
 
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
@@ -417,6 +418,39 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def open_rest_shape_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
+
+    def open_solver_menu(self, menu, node):
+        solver_transform = node
+        solver = node.children[0]
+
+        self.add_zsolver_menu_action(menu, solver_transform, 'Enable', 'enable')
+        self.add_zsolver_menu_action(menu, solver, 'Collision Detection', 'collisionDetection')
+        self.add_zsolver_menu_action(menu, solver, 'Show Bones', 'showBones')
+        self.add_zsolver_menu_action(menu, solver, 'Show Tet Meshes', 'showTetMeshes')
+        self.add_zsolver_menu_action(menu, solver, 'Show Muscle Fibers', 'showMuscleFibers')
+        self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
+        self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
+        self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
+
+    def add_zsolver_menu_action(self, menu, node, text, attr):
+        action = QtWidgets.QAction(self)
+        action.setText(text)
+        action.setCheckable(True)
+        action.setChecked(node.attrs[attr]['value'])
+        action.changed.connect(partial(self.toggle_attribute, node, attr))
+        menu.addAction(action)
+
+    def toggle_attribute(self, node, attr):
+        value = node.attrs[attr]['value']
+        if isinstance(value, bool):
+            value = not value
+        elif isinstance(value, int):
+            value = 1 - value
+        else:
+            cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
+            return
+        node.attrs[attr]['value'] = value
+        cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
