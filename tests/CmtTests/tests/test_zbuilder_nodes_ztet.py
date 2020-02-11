@@ -169,6 +169,7 @@ class ZivaTetMirrorTestCase(VfxTestCase):
         self.assertEqual(new_left_geo, [])  # after replace left geo should have been renamed
 
     def test_builder_build_with_string_replace(self):
+        from zBuilder.parameters.maps import get_weights
         # ACT
         self.builder.string_replace("^l_", "r_")
         self.builder.build()
