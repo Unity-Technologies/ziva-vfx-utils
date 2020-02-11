@@ -1,15 +1,16 @@
 //Maya ASCII 2018ff09 scene
 //Name: mirror_example.ma
-//Last modified: Tue, Feb 11, 2020 10:59:44 AM
+//Last modified: Tue, Feb 11, 2020 12:36:38 PM
 //Codeset: 1252
 requires maya "2018ff09";
 requires "stereoCamera" "10.0";
 requires -nodeType "zGeo" -nodeType "zTissue" -nodeType "zBone" -nodeType "zTet"
-		 -nodeType "zEmbedder" -nodeType "zMaterial" -nodeType "zFiber" -nodeType "zRestShape"
-		 -nodeType "zSolverTransform" -nodeType "zSolver" -dataType "zSolverParamsData" -dataType "zCacheParamsData"
-		 -dataType "zGeoData" -dataType "zSubTissueData" -dataType "zAttachmentData" -dataType "zSolverOutputData"
-		 -dataType "zMuscleData" -dataType "zSerializedBinaryData" -dataType "zLineOfActionData"
-		 -dataType "zFieldData" -dataType "zWarpData" "ziva" "1.8";
+		 -nodeType "zEmbedder" -nodeType "zAttachment" -nodeType "zMaterial" -nodeType "zFiber"
+		 -nodeType "zRestShape" -nodeType "zSolverTransform" -nodeType "zSolver" -dataType "zSolverParamsData"
+		 -dataType "zCacheParamsData" -dataType "zGeoData" -dataType "zSubTissueData" -dataType "zAttachmentData"
+		 -dataType "zSolverOutputData" -dataType "zMuscleData" -dataType "zSerializedBinaryData"
+		 -dataType "zLineOfActionData" -dataType "zFieldData" -dataType "zWarpData" "ziva" "1.8";
+requires "stereoCamera" "10.0";
 currentUnit -l centimeter -a degree -t film;
 fileInfo "application" "maya";
 fileInfo "product" "Maya 2018";
@@ -17,27 +18,27 @@ fileInfo "version" "2018";
 fileInfo "cutIdentifier" "201903222215-65bada0e52";
 fileInfo "osv" "Microsoft Windows 8 Business Edition, 64-bit  (Build 9200)\n";
 createNode transform -s -n "persp";
-	rename -uid "34951E15-4A42-D57E-08E6-D89F0CD517E4";
+	rename -uid "F0FD77B5-4CC5-BF73-3501-0BB012F6453A";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" 2.3680065776644073 2.8457801372063685 5.735868728449697 ;
-	setAttr ".r" -type "double3" -12.338352729598972 368.19999999998799 -4.0167597762808521e-16 ;
+	setAttr ".t" -type "double3" 1.7518904863705815 2.4643026418535832 5.0940231876984807 ;
+	setAttr ".r" -type "double3" -10.538352729763277 -364.19999999989614 -4.9829986461407891e-17 ;
 createNode camera -s -n "perspShape" -p "persp";
-	rename -uid "74AAEC56-479E-B096-A9D8-CA8AC5FFBB6E";
+	rename -uid "A32C4F16-49E0-CF9E-3971-59A9BE6B9340";
 	setAttr -k off ".v" no;
 	setAttr ".fl" 34.999999999999993;
-	setAttr ".coi" 6.4912250498546369;
+	setAttr ".coi" 5.025262933564921;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
 	setAttr ".tp" -type "double3" 2.0340284705162048 1.8071434497833252 -1.1920928955078125e-07 ;
 	setAttr ".hc" -type "string" "viewSet -p %camera";
 createNode transform -s -n "top";
-	rename -uid "50AAF2FD-4D54-65E0-AFB5-A8812B822305";
+	rename -uid "784F56DE-4751-65BB-6DBB-E08067F7C5C9";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 0 1000.1 0 ;
 	setAttr ".r" -type "double3" -89.999999999999986 0 0 ;
 createNode camera -s -n "topShape" -p "top";
-	rename -uid "CA7BB6D1-42B4-A3FA-155F-34862317CE2D";
+	rename -uid "675A384E-4244-7134-4EF4-BE82A2645A2E";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -48,11 +49,11 @@ createNode camera -s -n "topShape" -p "top";
 	setAttr ".hc" -type "string" "viewSet -t %camera";
 	setAttr ".o" yes;
 createNode transform -s -n "front";
-	rename -uid "172ACBC6-4E4A-6AD6-183C-058E0D81248B";
+	rename -uid "C4D118DE-4839-AC0B-F52A-648948CB35F1";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 0 0 1000.1 ;
 createNode camera -s -n "frontShape" -p "front";
-	rename -uid "47EB51D6-4C99-E6D6-FC57-90B3B60D2E95";
+	rename -uid "8E2C5F80-47EF-B7E7-3C2B-CD8AF3532AF9";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -63,12 +64,12 @@ createNode camera -s -n "frontShape" -p "front";
 	setAttr ".hc" -type "string" "viewSet -f %camera";
 	setAttr ".o" yes;
 createNode transform -s -n "side";
-	rename -uid "C16346F8-46FB-B540-8A99-DA94F40E23B0";
+	rename -uid "CB814CB9-4937-8533-FFA4-6397FC4B172E";
 	setAttr ".v" no;
 	setAttr ".t" -type "double3" 1000.1 0 0 ;
 	setAttr ".r" -type "double3" 0 89.999999999999986 0 ;
 createNode camera -s -n "sideShape" -p "side";
-	rename -uid "D2BF21C9-4072-8E4D-2502-1BA5373FB819";
+	rename -uid "E964105F-4E26-8219-519B-809D85E15D17";
 	setAttr -k off ".v" no;
 	setAttr ".rnd" no;
 	setAttr ".coi" 1000.1;
@@ -79,9 +80,9 @@ createNode camera -s -n "sideShape" -p "side";
 	setAttr ".hc" -type "string" "viewSet -s %camera";
 	setAttr ".o" yes;
 createNode transform -n "l_geo";
-	rename -uid "38873A19-4CF3-AEBB-F6AE-1284E7396057";
+	rename -uid "3C0EBD42-42D1-78D5-C9F8-88B5C2BAA433";
 createNode transform -n "l_armA_muscle_geo" -p "l_geo";
-	rename -uid "70FA7678-4D62-CB8E-7B51-CF9AED08C6A6";
+	rename -uid "B3751AC9-4DFB-B06C-BE4A-EF856F30B71C";
 	setAttr -l on ".tx";
 	setAttr -l on ".ty";
 	setAttr -l on ".tz";
@@ -94,9 +95,9 @@ createNode transform -n "l_armA_muscle_geo" -p "l_geo";
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "l_armA_muscle_geoShape" -p "l_armA_muscle_geo";
-	rename -uid "59FAA43D-4963-4444-D156-5984BCB5B6D1";
+	rename -uid "B5C498CB-41F6-0CDD-5DCA-B3911D7668BE";
 	setAttr -k off ".v";
-	setAttr -s 16 ".iog[0].og";
+	setAttr -s 20 ".iog[0].og";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
 	setAttr ".uvst[0].uvsn" -type "string" "map1";
@@ -105,7 +106,7 @@ createNode mesh -n "l_armA_muscle_geoShape" -p "l_armA_muscle_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode mesh -n "l_armA_muscle_geoShapeOrig" -p "l_armA_muscle_geo";
-	rename -uid "4C75C6C2-4896-913F-4610-C2952E9D588F";
+	rename -uid "0BA8B0B3-4914-0FA6-CE3F-B49E3CD29132";
 	setAttr -k off ".v";
 	setAttr ".io" yes;
 	setAttr ".vir" yes;
@@ -116,7 +117,7 @@ createNode mesh -n "l_armA_muscle_geoShapeOrig" -p "l_armA_muscle_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "l_armA_subtissue_geo" -p "l_geo";
-	rename -uid "66EF8597-47EC-A38D-8C16-6E9E703A2A96";
+	rename -uid "14C6F1BE-414F-65C6-CE2B-DB8F9C177645";
 	setAttr -l on ".tx";
 	setAttr -l on ".ty";
 	setAttr -l on ".tz";
@@ -129,7 +130,7 @@ createNode transform -n "l_armA_subtissue_geo" -p "l_geo";
 	setAttr ".rp" -type "double3" 1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 	setAttr ".sp" -type "double3" 1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 createNode mesh -n "l_armA_subtissue_geoShape" -p "l_armA_subtissue_geo";
-	rename -uid "4DD0E89C-45FA-C527-5AEF-4CB1FF324539";
+	rename -uid "484DCF61-4B43-9CFB-5212-D48C1D78887B";
 	setAttr -k off ".v";
 	setAttr -s 12 ".iog[0].og";
 	setAttr ".vir" yes;
@@ -140,7 +141,7 @@ createNode mesh -n "l_armA_subtissue_geoShape" -p "l_armA_subtissue_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode mesh -n "l_armA_subtissue_geoShapeOrig" -p "l_armA_subtissue_geo";
-	rename -uid "A84BB371-4AC1-1576-ACCA-74989ABE2EAC";
+	rename -uid "A39556CB-449E-1FE2-C2F1-AE991EAEF86B";
 	setAttr -k off ".v";
 	setAttr ".io" yes;
 	setAttr ".vir" yes;
@@ -1417,12 +1418,24 @@ createNode mesh -n "l_armA_subtissue_geoShapeOrig" -p "l_armA_subtissue_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "l_armA_bone_geo" -p "l_geo";
-	rename -uid "0215AE54-43CD-E550-F861-BC901DF8DD71";
+	rename -uid "919C5921-4C41-30B9-411B-0EA2BACD89A8";
 	setAttr ".rp" -type "double3" 1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 	setAttr ".sp" -type "double3" 1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 createNode mesh -n "l_armA_bone_geoShape" -p "l_armA_bone_geo";
-	rename -uid "F42BF8EC-43F7-2C28-CB21-3F8BF63036FB";
+	rename -uid "4EF10FAA-4C3E-F930-23E3-1FB2EB02E428";
 	setAttr -k off ".v";
+	setAttr -s 4 ".iog[0].og";
+	setAttr ".vir" yes;
+	setAttr ".vif" yes;
+	setAttr ".uvst[0].uvsn" -type "string" "map1";
+	setAttr ".cuvs" -type "string" "map1";
+	setAttr ".dcc" -type "string" "Ambient+Diffuse";
+	setAttr ".covm[0]"  0 1 1;
+	setAttr ".cdvm[0]"  0 1 1;
+createNode mesh -n "l_armA_bone_geoShapeOrig" -p "l_armA_bone_geo";
+	rename -uid "74A45DA0-46E8-C523-D0B7-CE835709773B";
+	setAttr -k off ".v";
+	setAttr ".io" yes;
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
 	setAttr ".uvst[0].uvsn" -type "string" "map1";
@@ -1431,12 +1444,24 @@ createNode mesh -n "l_armA_bone_geoShape" -p "l_armA_bone_geo";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "l_armB_bone_geo" -p "l_geo";
-	rename -uid "7510FF62-4AAF-B27C-6590-DCB0F540D3AC";
+	rename -uid "7A71A4B4-45EB-D6EB-55D1-1AAD92DB7175";
 	setAttr ".rp" -type "double3" 1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 	setAttr ".sp" -type "double3" 1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 createNode mesh -n "l_armB_bone_geoShape" -p "l_armB_bone_geo";
-	rename -uid "7F95B4BE-4A5B-C691-A8C1-D49467893DA7";
+	rename -uid "0F69F6EA-416A-A034-1C7F-EAA895778492";
 	setAttr -k off ".v";
+	setAttr -s 4 ".iog[0].og";
+	setAttr ".vir" yes;
+	setAttr ".vif" yes;
+	setAttr ".uvst[0].uvsn" -type "string" "map1";
+	setAttr ".cuvs" -type "string" "map1";
+	setAttr ".dcc" -type "string" "Ambient+Diffuse";
+	setAttr ".covm[0]"  0 1 1;
+	setAttr ".cdvm[0]"  0 1 1;
+createNode mesh -n "l_armB_bone_geoShapeOrig" -p "l_armB_bone_geo";
+	rename -uid "054DB9CA-4067-C032-EE46-2BA774F76CCA";
+	setAttr -k off ".v";
+	setAttr ".io" yes;
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
 	setAttr ".uvst[0].uvsn" -type "string" "map1";
@@ -2709,11 +2734,11 @@ createNode mesh -n "l_armB_bone_geoShape" -p "l_armB_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "l_armA_restShape" -p "l_geo";
-	rename -uid "E91D5B82-4B71-3DE3-CDE2-10B3CAC046AE";
+	rename -uid "9C266230-48AF-FFDE-7D07-5AB34713CF37";
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "l_armA_restShapeShape" -p "l_armA_restShape";
-	rename -uid "87D37546-4254-B1A2-D1E4-C4BCE06998A1";
+	rename -uid "20744B88-4444-88CE-8838-00923D525904";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -2723,13 +2748,13 @@ createNode mesh -n "l_armA_restShapeShape" -p "l_armA_restShape";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 createNode transform -n "r_geo";
-	rename -uid "D8E04509-49B1-BA53-0212-A286958253B6";
+	rename -uid "ED44151C-4CA1-4F72-4D9C-17A977127C2D";
 createNode transform -n "r_armA_muscle_geo" -p "r_geo";
-	rename -uid "8A5A3014-4C2C-13A9-7C64-ED865EB67FFA";
+	rename -uid "D39B280D-4371-F84F-F5F4-1290DB02EE61";
 	setAttr ".rp" -type "double3" -2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".sp" -type "double3" -2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 createNode mesh -n "r_armA_muscle_geoShape" -p "r_armA_muscle_geo";
-	rename -uid "83106720-4A85-11A9-157A-0592D5F1FE73";
+	rename -uid "E6AA5399-4E50-2D41-1F80-7198DAABC22B";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -3929,11 +3954,11 @@ createNode mesh -n "r_armA_muscle_geoShape" -p "r_armA_muscle_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_subtissue_geo" -p "r_geo";
-	rename -uid "31DF3E8C-4DBC-7465-6354-7782E3ABCFDD";
+	rename -uid "F8C70C9E-4C14-65C7-F855-649A0F42AFBF";
 	setAttr ".rp" -type "double3" -1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 	setAttr ".sp" -type "double3" -1.7650112250913905 1.8071434660858978 -3.9191122016366331e-16 ;
 createNode mesh -n "r_armA_subtissue_geoShape" -p "r_armA_subtissue_geo";
-	rename -uid "E55E82E7-4B96-B0CA-24B0-998161CC4C9F";
+	rename -uid "4211F920-4AA1-C23A-F4F6-64B487CA330B";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -5209,11 +5234,11 @@ createNode mesh -n "r_armA_subtissue_geoShape" -p "r_armA_subtissue_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_bone_geo" -p "r_geo";
-	rename -uid "AAAF6A93-427B-52AA-0C00-A0A2654769DA";
+	rename -uid "C8B98EB7-4E05-640A-FD74-01AC3D47B7A6";
 	setAttr ".rp" -type "double3" -1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 	setAttr ".sp" -type "double3" -1.906998211064217 1.0282276377273223 -0.91899252633054174 ;
 createNode mesh -n "r_armA_bone_geoShape" -p "r_armA_bone_geo";
-	rename -uid "D37E35AE-4256-C598-5465-CEBD84D2A4BE";
+	rename -uid "D6446333-4C18-8DEC-0397-2D941A67F011";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -6413,11 +6438,11 @@ createNode mesh -n "r_armA_bone_geoShape" -p "r_armA_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armB_bone_geo" -p "r_geo";
-	rename -uid "139CAE92-4516-DA59-5DA1-5C82253AE57E";
+	rename -uid "63B92F43-4005-0067-33C9-35ACDF112AC5";
 	setAttr ".rp" -type "double3" -1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 	setAttr ".sp" -type "double3" -1.906998211064217 1.0038672348638551 0.77033919087847313 ;
 createNode mesh -n "r_armB_bone_geoShape" -p "r_armB_bone_geo";
-	rename -uid "5E286A1F-4BD2-4E16-7B5D-D19A450D00BA";
+	rename -uid "9EB8D2A2-48E7-43D2-7DB6-07A3AA7C8882";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -7694,7 +7719,7 @@ createNode mesh -n "r_armB_bone_geoShape" -p "r_armB_bone_geo";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "r_armA_restShape" -p "r_geo";
-	rename -uid "3CAA8CEC-44EC-6486-0993-8E84331A7C0A";
+	rename -uid "F902BC04-446A-7AF2-D107-40AD4A43EFDA";
 	setAttr ".r" -type "double3" 0 180 0 ;
 	setAttr ".s" -type "double3" 1 1 -1 ;
 	setAttr ".rp" -type "double3" 2.0340282833537242 1.8071434660858978 4.5164500658361733e-16 ;
@@ -7702,7 +7727,7 @@ createNode transform -n "r_armA_restShape" -p "r_geo";
 	setAttr ".sp" -type "double3" 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 ;
 	setAttr ".spt" -type "double3" 0 0 9.0329001316723466e-16 ;
 createNode mesh -n "r_armA_restShapeShape" -p "r_armA_restShape";
-	rename -uid "C4832576-423B-31F5-2E0D-A7B4D179A00A";
+	rename -uid "B4225EC6-4187-9D06-6713-DDADBC1D911E";
 	setAttr -k off ".v";
 	setAttr ".vir" yes;
 	setAttr ".vif" yes;
@@ -8834,13 +8859,14 @@ createNode mesh -n "r_armA_restShapeShape" -p "r_armA_restShape";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode zSolverTransform -n "zSolver1";
-	rename -uid "A6ECD185-41DB-3F9B-9B20-6D99C6B1232A";
+	rename -uid "317E854B-4999-1004-574C-FCB170C1D8A2";
 createNode zSolver -n "zSolver1Shape" -p "zSolver1";
-	rename -uid "1201349B-4A2F-763A-B3EE-9C86FD273DBA";
+	rename -uid "D638DE4F-4172-EDD2-B7D5-A88683695B20";
 	setAttr -k off ".v";
 	setAttr ".covm[0]"  0 1 1;
 	setAttr ".cdvm[0]"  0 1 1;
 	setAttr -s 4 ".iGo";
+	setAttr -s 2 ".iC";
 	setAttr -s 2 ".iM";
 	setAttr -s 2 ".acr";
 	setAttr ".acr[0].acrcv" -type "float3" 0.079000004 0 0.292 ;
@@ -8863,64 +8889,64 @@ createNode zSolver -n "zSolver1Shape" -p "zSolver1";
 	setAttr ".mcr[2].mcrp" 1;
 	setAttr ".mcr[2].mcrcv" -type "float3" 0 1 1 ;
 	setAttr ".mcr[2].mcri" 2;
-	setAttr ".unL" 4;
+	setAttr ".unL" 7;
 createNode lightLinker -s -n "lightLinker1";
-	rename -uid "EFF4CEEA-41AE-E0DC-789A-C9BDB4F83038";
+	rename -uid "6B708767-46F2-9335-2978-2796E0158FCB";
 	setAttr -s 2 ".lnk";
 	setAttr -s 2 ".slnk";
 createNode shapeEditorManager -n "shapeEditorManager";
-	rename -uid "0DB8629E-40AB-736C-DFBD-4C898A3F1AE6";
+	rename -uid "0C305B52-42C6-1B55-0085-38863A6B1985";
 createNode poseInterpolatorManager -n "poseInterpolatorManager";
-	rename -uid "33CF5FA2-4632-A74B-D81F-11AD8A5A86F3";
+	rename -uid "B4076BEE-4FB5-85DF-86E0-358F15608D44";
 createNode displayLayerManager -n "layerManager";
-	rename -uid "79FBACC5-4B72-AD79-7424-EDB4D156A8A9";
+	rename -uid "E342B70F-433B-D70E-D5DB-738E935DECE1";
 createNode displayLayer -n "defaultLayer";
-	rename -uid "40505950-48F7-53D6-EACA-C1AEC5DB7EC0";
+	rename -uid "98B62235-4B1A-093A-CFCC-50BB6A57DE82";
 createNode renderLayerManager -n "renderLayerManager";
-	rename -uid "21E34495-4AD3-D018-EEC9-B7B1B8547D95";
+	rename -uid "718F39CC-48EF-AF63-EA6B-C3BCD88AB905";
 createNode renderLayer -n "defaultRenderLayer";
-	rename -uid "F293912F-40E7-FE10-4239-AEBC9A890E86";
+	rename -uid "7FA35417-439C-48BB-0910-FAA84DA3CEF7";
 	setAttr ".g" yes;
 createNode polySphere -n "polySphere1";
-	rename -uid "95FB15B2-422B-ED48-1CC8-A1B276EADEDF";
+	rename -uid "5EDDEAC4-4FE7-260A-5580-FE82AB464109";
 createNode polySphere -n "polySphere2";
-	rename -uid "9DF88348-4ECC-E596-8B8C-FAA04A725463";
+	rename -uid "1FDD5752-446F-3F64-D724-E483E985F623";
 createNode transformGeometry -n "transformGeometry1";
-	rename -uid "B0A412F1-4329-BD53-BD0D-59B4D4B29FFC";
+	rename -uid "E0D5250F-4CEE-3122-0B3A-509C56CDC4B0";
 	setAttr ".txf" -type "matrix" 1 0 0 0 0 0.61002036162039175 0 0 0 0 1 0 0 1.8071434660858978 -2.0340282833537242 1;
 createNode transformGeometry -n "transformGeometry2";
-	rename -uid "31154B92-43EA-70B3-42CA-EDB35572A38A";
+	rename -uid "CF716A83-4900-8400-54E9-7F9B4EC42736";
 	setAttr ".txf" -type "matrix" 0.51313602644227829 0 0 0 0 0.26279409002056547 0 0
 		 0 0 0.51313602644227829 0 -0.91899252633054129 1.0282276377273223 -1.9069982110642172 1;
 createNode transformGeometry -n "transformGeometry3";
-	rename -uid "0047F7EF-40C3-BFE1-AE54-3E929D0E09D8";
+	rename -uid "7A77F500-43F0-589B-5EAC-3D8583F78627";
 	setAttr ".txf" -type "matrix" 2.2204460492503131e-16 0 1 0 0 1 0 0 -1 0 2.2204460492503131e-16 0
 		 0 0 0 1;
 createNode transformGeometry -n "transformGeometry4";
-	rename -uid "0444BCB0-493A-88AD-EFAE-A09A6F21817C";
+	rename -uid "DF6A90A2-4084-E0FC-E6B4-60A8B37C7F65";
 	setAttr ".txf" -type "matrix" 2.2204460492503131e-16 0 1 0 0 1 0 0 -1 0 2.2204460492503131e-16 0
 		 0 0 0 1;
 createNode zEmbedder -n "zEmbedder1";
-	rename -uid "86A0D586-4F4F-6DF9-AE99-68B3D154A1C0";
+	rename -uid "0BC88A87-408A-FFFF-12D8-9FA679614A3F";
 	setAttr -s 2 ".ip";
 	setAttr -s 2 ".og";
 	setAttr -s 2 ".iGo";
 createNode zGeo -n "zGeo1";
-	rename -uid "695B93C1-4C8B-1B9F-4EC5-69B434F5E179";
+	rename -uid "547DA07D-4354-0BCE-2DE8-3295D9970D06";
 	setAttr ".ihi" 0;
 	setAttr ".mDe" 1;
 	setAttr ".IDL" 1;
 createNode zBone -n "zBone1";
-	rename -uid "8B0DAAFA-4E08-EFC0-6C8A-BDAE987E1BE5";
+	rename -uid "B4352A95-4AAD-B7E9-A337-AEB59E28DDEC";
 createNode zGeo -n "zGeo2";
-	rename -uid "8BEB7395-4C2B-04BD-6BF6-C3B385272618";
+	rename -uid "05CAA71B-4D6F-F405-6E89-9F95F8B8D9DE";
 	setAttr ".ihi" 0;
 	setAttr ".mDe" 1;
 	setAttr ".IDL" 2;
 createNode zBone -n "zBone2";
-	rename -uid "5CC1D738-4744-FF71-C687-4AB595FF1C85";
+	rename -uid "0422A7C3-4D84-FADA-BE36-D79DEFBC94C9";
 createNode zGeo -n "zGeo3";
-	rename -uid "297666D4-4456-0DD9-6097-52B46F9502AD";
+	rename -uid "BB0C8930-486E-ABF5-1D5A-A0B99B27E7EE";
 	setAttr ".ihi" 0;
 	setAttr ".iNMh" -type "mesh" 
 
@@ -12133,12 +12159,12 @@ createNode zGeo -n "zGeo3";
 		"lt"	3	397	398	438	;
 	setAttr ".IDL" 3;
 createNode zTissue -n "zTissue1";
-	rename -uid "EBCE293B-49B4-A8D5-3010-7ABD76ED3E3B";
+	rename -uid "F4D44C33-4951-3E9F-7515-B2A95916A61C";
 	setAttr -cb off ".taf";
 	setAttr ".SzC" -type "zSerializedBinaryData" ("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") ;
 createNode zTet -n "zTet1";
-	rename -uid "B1199CD6-4B97-FC47-1C5C-168950522EC3";
+	rename -uid "E7909245-4A2D-A021-2E72-A48D8726712C";
 	setAttr -l on -k off ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -24087,31 +24113,31 @@ createNode zTet -n "zTet1";
 		"face"	
 		"l"	3	-336	325	-335	;
 createNode tweak -n "tweak1";
-	rename -uid "C1D44244-4DEE-F596-BC95-C6AC658C7184";
+	rename -uid "DB83DFCE-481B-1AFE-2794-E9951300C333";
 createNode objectSet -n "set1";
-	rename -uid "D7CAB1C8-4856-8483-5FBE-E98E13B6E30F";
+	rename -uid "05315D59-4753-4344-3BB4-81A5BB8D5B45";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId1";
-	rename -uid "D97C2050-47CB-3A70-612E-158B02D96870";
+	rename -uid "7FAEA93B-4198-B7A2-6C23-0EA7411146F1";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts1";
-	rename -uid "939B11FC-4421-6246-3407-4D958A916EEB";
+	rename -uid "A8893B7A-4C23-8120-475E-DEA93BDB1ED7";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "tweakSet1";
-	rename -uid "B1865AC6-4751-129B-3055-0E96405AA2E3";
+	rename -uid "4BD1AE8E-4D2A-F3BA-66E0-6DBCFD64FA81";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId2";
-	rename -uid "A7922F22-440C-D86F-B908-989B7240D98A";
+	rename -uid "DA59B75E-47B4-E76B-7A26-9AAD2B007E64";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts2";
-	rename -uid "9DC00D57-4C78-54E0-3E79-C6B1877D03CB";
+	rename -uid "E44E780C-412C-894D-0226-11AD50FC7758";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial1";
-	rename -uid "C635ED1F-4671-A7C8-E289-FDA98FE26AF0";
+	rename -uid "51CC348B-4492-701A-6ED7-EDBA8B156490";
 	setAttr -l on -k off -cb on ".en";
 	setAttr -l on ".wl";
 	setAttr ".yM" 10;
@@ -24123,31 +24149,31 @@ createNode zMaterial -n "zMaterial1";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set2";
-	rename -uid "8341144A-424D-BDD1-5E9C-3EB03142FC53";
+	rename -uid "9B43CCDC-4ED0-D47A-9112-5F80EAE24967";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId3";
-	rename -uid "20F010E9-4536-1BD7-B74B-A69C58D814B7";
+	rename -uid "3C60901C-422A-685C-6B37-F090224E3426";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts3";
-	rename -uid "66362EE8-4667-0171-A698-E6AD53275AD2";
+	rename -uid "A93CDFD1-4493-58E7-F76D-B695742E5227";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "set3";
-	rename -uid "F1A32C90-4319-502F-4746-20B690E59F2F";
+	rename -uid "9B4FFBC0-47D7-65E3-86AA-8395553BA2A6";
 	setAttr ".ihi" 0;
 	setAttr -s 2 ".dsm";
 	setAttr ".vo" yes;
 	setAttr -s 2 ".gn";
 createNode groupId -n "groupId4";
-	rename -uid "29F053FB-4C3A-006E-F76E-E893D23A52BB";
+	rename -uid "C5473746-442A-FF19-3177-9AA5201D829A";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts4";
-	rename -uid "CDC84C9B-4E78-F932-0D70-E4BB5A5E031A";
+	rename -uid "367A491C-41B4-8FBE-50E0-1DBF5508E8B3";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zGeo -n "zGeo4";
-	rename -uid "8CE88352-43D4-2A0F-C378-46BE4B411DB9";
+	rename -uid "5BBE092F-4ED2-2F89-8ACF-DDADEF2024E8";
 	setAttr ".ihi" 0;
 	setAttr ".iNMh" -type "mesh" 
 
@@ -27360,11 +27386,11 @@ createNode zGeo -n "zGeo4";
 		"lt"	3	397	398	438	;
 	setAttr ".IDL" 4;
 createNode zTissue -n "zTissue2";
-	rename -uid "53283AED-46C4-98EB-D195-488C099046B0";
+	rename -uid "CA7ABDA7-4384-73EC-F149-AB93858F1CA9";
 	setAttr -cb off ".taf";
 	setAttr ".SzC" -type "zSerializedBinaryData" ("eNqrZxRkZGRgYGBkZAxhYOBgmukeaGfQrskh/mGNcFhWTydTKjMD5YDlz14LSzShkp3b7Fhqg2XsWPTNhOxYrs29bsfCeL/QniXDM86eJXlKoj3Lk1vp9izT1tnZsSQdy7FlObaPw47lGf85O5D2Sw7c9izzOo7YsfzI5rdnKeWLsEcyfEu5gR3LXZdNtiz6CVdtWERVu21Jcm9bWZcdi8W057Ysv678tWVpOLvTjmEUjAK6ARb5+evtGFjsq37ZUt9wAGi/N9s=") ;
 createNode zTet -n "zTet2";
-	rename -uid "0909B93A-44A9-CBAA-FEEE-39BD2CAA9CF6";
+	rename -uid "53115CB0-4F95-5F5F-0D27-8FBF0DD3592A";
 	setAttr -l on -k off ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 		 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -32753,31 +32779,31 @@ createNode zTet -n "zTet2";
 		"face"	
 		"l"	3	568	589	-585	;
 createNode tweak -n "tweak2";
-	rename -uid "18A633A0-4A63-E381-BF3C-E6B32773484B";
+	rename -uid "38F373AA-4049-E2C2-C5E5-32B996DFE6CB";
 createNode objectSet -n "set4";
-	rename -uid "97A38FAC-4CCD-E7E7-DAE8-70971A615CE5";
+	rename -uid "F9AC9710-4DC1-0532-7853-3C83FAD2D4D3";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId5";
-	rename -uid "FD22EC7F-41B7-6A98-70DF-AD9D9346895D";
+	rename -uid "44F3AD84-4E92-6D76-BD68-C8B456F30604";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts5";
-	rename -uid "2CE5D37B-400F-CCEE-87BE-6E83A1B79C92";
+	rename -uid "A87E2EAE-4549-6919-BB3D-159622F2B4B4";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode objectSet -n "tweakSet2";
-	rename -uid "A1F98E6C-45A8-8401-B5B3-DCB0DDE47F48";
+	rename -uid "98BDEE7B-4352-43AA-1BBF-A2AC33C9E596";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId6";
-	rename -uid "308262B6-4607-DC4E-CBC9-2F98F34C0460";
+	rename -uid "52FD6C26-4673-DE89-117D-698E60FAE225";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts6";
-	rename -uid "9C0CBD6D-4014-F19B-001B-31AFD6DE8D0C";
+	rename -uid "878A23B8-47CF-7F21-77DF-48BBE0DCD86A";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial2";
-	rename -uid "9677FAC3-41EE-9E0B-019D-D2AC2377EBA0";
+	rename -uid "429463AB-4947-D8DA-7A16-C3939D6003D2";
 	setAttr -l on -k off -cb on ".en";
 	setAttr -l on ".wl";
 	setAttr ".yM" 2;
@@ -32790,51 +32816,51 @@ createNode zMaterial -n "zMaterial2";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set5";
-	rename -uid "EDD62F29-4737-49B6-5186-399883A18B53";
+	rename -uid "CB4C3A45-450C-3CBA-B1B5-958AAF6F214B";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId7";
-	rename -uid "42CDDC98-4377-AEAF-0AF9-C68227876F8A";
+	rename -uid "B415FD0F-4BB5-4907-936C-22992ADE78D3";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts7";
-	rename -uid "B3123445-408C-7C6E-FFE5-4A8826B269A7";
+	rename -uid "252586AE-4DD3-406D-8057-D4ADCBEC94AC";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode groupId -n "groupId8";
-	rename -uid "5866CF63-4682-3BE7-5E37-D8912B86690C";
+	rename -uid "2A670EB5-414C-65A0-C0C5-6B88A93047BB";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts8";
-	rename -uid "F87FEC48-4510-B594-039E-7EAE530BC9B6";
+	rename -uid "16703B7B-4A91-B2A6-01D6-699E7F10A867";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode script -n "sceneConfigurationScriptNode";
-	rename -uid "385062E2-4523-7396-8F48-A78712A7E168";
+	rename -uid "569E9F57-453B-1E23-6FAF-C6AE9D2BABDE";
 	setAttr ".b" -type "string" "playbackOptions -min 1 -max 120 -ast 1 -aet 200 ";
 	setAttr ".st" 6;
 createNode polySphere -n "polySphere3";
-	rename -uid "EE6E089F-403E-AC0A-DB9C-4DB40D97A464";
+	rename -uid "CE4DAF9C-4295-D53D-3991-D0AAF0889632";
 createNode transformGeometry -n "transformGeometry5";
-	rename -uid "2AA2431C-4055-C033-7385-139D9EFFC6AE";
+	rename -uid "901AAF0E-4055-0F45-F548-F7BAB801BAE1";
 	setAttr ".txf" -type "matrix" 0.51555736753835568 0 0 0 0 0.68211824821882827 0 0
 		 0 0 0.28901105353000844 0 2.0340282833537242 1.8071434660858978 -4.5164500658361733e-16 1;
 createNode zRestShape -n "zRestShape1";
-	rename -uid "C7781D04-477B-A213-7739-BB9A533A7246";
+	rename -uid "63847DD8-40F7-3602-9D58-4DA9EF667B99";
 	addAttr -ci true -h true -sn "aal" -ln "attributeAliasList" -dt "attributeAlias";
 	setAttr ".wgt[0]"  1;
 	setAttr ".aal" -type "attributeAlias" {"l_armA_restShape","targetWeight[0]"} ;
 createNode objectSet -n "set6";
-	rename -uid "45287EE7-4E85-FE02-0846-0B8BDDC1E9CF";
+	rename -uid "90214468-4DFB-5EA0-CFBC-288A9CDFB12B";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId9";
-	rename -uid "4018901F-47BC-5BD5-CB4F-B184A31FB31E";
+	rename -uid "49AA78C8-4C44-1DF9-CCA1-3184993425EC";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts9";
-	rename -uid "EBB5B2D0-4E26-888D-D9C9-4C94941536E9";
+	rename -uid "E51C9000-487B-ADB5-F3F0-C5A549801E9F";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial3";
-	rename -uid "C3287E9A-4DC4-0B54-007D-8C9A35A957AA";
+	rename -uid "29E14A39-442F-E1B4-C968-059CB05DD85F";
 	setAttr -k off -cb on ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
@@ -32867,18 +32893,18 @@ createNode zMaterial -n "zMaterial3";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set7";
-	rename -uid "4DA4BEA8-4D2E-F841-E248-388DCC823CC6";
+	rename -uid "1DE88B01-40C2-DD1A-B098-7F87196021D8";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId10";
-	rename -uid "AB83530D-4798-995A-3C45-03B72B6C9D1D";
+	rename -uid "2EE98E6C-4DF7-7497-E33C-BDBBB4B162DF";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts10";
-	rename -uid "8DB52716-4476-C41F-1E4D-9B9BEA2B72AD";
+	rename -uid "FDFEF08B-48BF-8C85-0899-8B9F204C4492";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial4";
-	rename -uid "7D34308A-40FD-1A67-09AB-7583EFF0FE44";
+	rename -uid "AED64AE4-423C-1560-755F-49A3A375083C";
 	setAttr -k off -cb on ".en";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0.87260002 0.87260002 0.87260002
 		 0.87260002 0.87260002 0.87260002 0.87260002 0.87260002 0.87260002 0.87260002 0.87260002
@@ -32940,18 +32966,18 @@ createNode zMaterial -n "zMaterial4";
 	setAttr ".pW" 1;
 	setAttr ".sT" 1;
 createNode objectSet -n "set8";
-	rename -uid "C5C87618-47AE-7B2B-77EE-D99CCB1F3D08";
+	rename -uid "61F92EAC-455A-3808-65AA-2BB60EFB52D2";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId11";
-	rename -uid "C4951950-46E9-DE85-866C-02909CBEC049";
+	rename -uid "99E79F5B-41AF-9F23-2B52-5B965424FD6C";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts11";
-	rename -uid "B2E84171-46DE-F97C-18A4-D9B342BB7E97";
+	rename -uid "4AC84BCA-4099-AFA0-9E27-51922F7C22E3";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zMaterial -n "zMaterial5";
-	rename -uid "DB532DA4-4E36-8615-50C9-4DB6848CEAB9";
+	rename -uid "97DF50F8-473D-EB0A-D8B7-FCA431D4B65E";
 	setAttr -k off -cb on ".en";
 	setAttr -s 76 ".wl[0].w";
 	setAttr ".wl[0].w[61]" 0;
@@ -33039,18 +33065,18 @@ createNode zMaterial -n "zMaterial5";
 	setAttr -cb off ".bSe";
 	setAttr -cb off ".cmD";
 createNode objectSet -n "set9";
-	rename -uid "5EDD29C6-47D7-7A8D-A776-6B8AC27AB25A";
+	rename -uid "82F9F4C1-490A-89D8-EF1F-1E92E88FBFE4";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId12";
-	rename -uid "226A967F-43ED-A538-ABA7-779340803D9C";
+	rename -uid "44DF2FFF-4595-BF23-0097-64A1FBD684BF";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts12";
-	rename -uid "44B434CC-44D9-865A-92AA-AD992F5C3735";
+	rename -uid "47B787C8-4813-F54C-3E78-EAA7E0AAA2A9";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zFiber -n "zFiber1";
-	rename -uid "C6E9714F-47DF-3544-6839-2CA59C4ED771";
+	rename -uid "DC366BA2-4CF1-B9B3-4252-728F5942AA99";
 	setAttr ".epts" -type "doubleArray" 382 0.8726000189781189 0.8726000189781189
 		 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189
 		 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189
@@ -33129,18 +33155,18 @@ createNode zFiber -n "zFiber1";
 		 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189 0.8726000189781189
 		 0.8726000189781189 0.8726000189781189 0.8726000189781189 ;
 createNode objectSet -n "set10";
-	rename -uid "0B7286B1-4D6B-AFE1-D49B-17BAA35D6929";
+	rename -uid "1581684E-47B0-7028-F794-7CAAE39D3C09";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId13";
-	rename -uid "354D4333-48E3-772F-8512-32B7EEC9604D";
+	rename -uid "660BFAAD-496A-3179-2046-88A97EDC6E0D";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts13";
-	rename -uid "242718E0-4FA6-8B88-76C1-9A8F278CCC8F";
+	rename -uid "36A94E36-4D23-A327-C726-7F967512D1E6";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 createNode zFiber -n "zFiber2";
-	rename -uid "E92F0FF1-4E5C-50A7-F165-2C9451B79D05";
+	rename -uid "F7A46460-4A51-1B28-D125-88B3866E62D2";
 	setAttr -s 382 -k off ".wl[0].w[0:381]"  0.97287595 0.98460126 0.99384236
 		 0.99765474 0.99884415 0.99885643 0.99885643 0.99885643 0.99885643 0.99885643 0.99885643
 		 0.99885643 0.99885643 0.99885643 0.99796045 0.99455565 0.98567241 0.97358924 0.96390015
@@ -33209,14 +33235,378 @@ createNode zFiber -n "zFiber2";
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
 		 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ;
 createNode objectSet -n "set11";
-	rename -uid "BA7AB1EB-4FC0-31DE-C169-6388ACCBE28B";
+	rename -uid "533DDBE2-491D-462C-8EE1-E487EC81E328";
 	setAttr ".ihi" 0;
 	setAttr ".vo" yes;
 createNode groupId -n "groupId14";
-	rename -uid "CA7716AE-4164-3CA4-D25A-1089A16B1219";
+	rename -uid "F06DB155-412F-598F-F15D-698E9E9F6DE4";
 	setAttr ".ihi" 0;
 createNode groupParts -n "groupParts14";
-	rename -uid "3A92F8CA-4E90-86D6-537A-368A53526854";
+	rename -uid "431BE6A4-4FDD-A3BB-1F2E-E99287E2FB5A";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode zAttachment -n "zAttachment1";
+	rename -uid "BCF2D932-4D5A-34CF-BD34-9698D0F96001";
+	setAttr -s 2 ".ip";
+	setAttr -s 2 ".og";
+	setAttr -s 184 ".wl[0].w";
+	setAttr ".wl[0].w[0]" 0;
+	setAttr ".wl[0].w[1]" 0;
+	setAttr ".wl[0].w[2]" 0;
+	setAttr ".wl[0].w[3]" 0;
+	setAttr ".wl[0].w[4]" 0;
+	setAttr ".wl[0].w[5]" 0;
+	setAttr ".wl[0].w[6]" 0;
+	setAttr ".wl[0].w[7]" 0;
+	setAttr ".wl[0].w[8]" 0;
+	setAttr ".wl[0].w[9]" 0;
+	setAttr ".wl[0].w[10]" 0;
+	setAttr ".wl[0].w[11]" 0;
+	setAttr ".wl[0].w[12]" 0;
+	setAttr ".wl[0].w[13]" 0;
+	setAttr ".wl[0].w[14]" 0;
+	setAttr ".wl[0].w[15]" 0;
+	setAttr ".wl[0].w[16]" 0;
+	setAttr ".wl[0].w[17]" 0;
+	setAttr ".wl[0].w[18]" 0;
+	setAttr ".wl[0].w[19]" 0;
+	setAttr ".wl[0].w[20]" 0;
+	setAttr ".wl[0].w[21]" 0;
+	setAttr ".wl[0].w[22]" 0;
+	setAttr ".wl[0].w[23]" 0;
+	setAttr ".wl[0].w[24]" 0;
+	setAttr ".wl[0].w[25]" 0;
+	setAttr ".wl[0].w[26]" 0;
+	setAttr ".wl[0].w[27]" 0;
+	setAttr ".wl[0].w[28]" 0;
+	setAttr ".wl[0].w[29]" 0;
+	setAttr ".wl[0].w[30]" 0;
+	setAttr ".wl[0].w[31]" 0;
+	setAttr ".wl[0].w[32]" 0;
+	setAttr ".wl[0].w[33]" 0;
+	setAttr ".wl[0].w[34]" 0;
+	setAttr ".wl[0].w[35]" 0;
+	setAttr ".wl[0].w[36]" 0;
+	setAttr ".wl[0].w[37]" 0;
+	setAttr ".wl[0].w[38]" 0;
+	setAttr ".wl[0].w[39]" 0;
+	setAttr ".wl[0].w[40]" 0;
+	setAttr ".wl[0].w[41]" 0;
+	setAttr ".wl[0].w[42]" 0;
+	setAttr ".wl[0].w[43]" 0;
+	setAttr ".wl[0].w[44]" 0;
+	setAttr ".wl[0].w[45]" 0;
+	setAttr ".wl[0].w[46]" 0;
+	setAttr ".wl[0].w[47]" 0;
+	setAttr ".wl[0].w[48]" 0;
+	setAttr ".wl[0].w[49]" 0;
+	setAttr ".wl[0].w[50]" 0;
+	setAttr ".wl[0].w[51]" 0;
+	setAttr ".wl[0].w[52]" 0;
+	setAttr ".wl[0].w[53]" 0;
+	setAttr ".wl[0].w[54]" 0;
+	setAttr ".wl[0].w[55]" 0;
+	setAttr ".wl[0].w[56]" 0;
+	setAttr ".wl[0].w[57]" 0;
+	setAttr ".wl[0].w[58]" 0;
+	setAttr ".wl[0].w[59]" 0;
+	setAttr ".wl[0].w[60]" 0;
+	setAttr ".wl[0].w[61]" 0;
+	setAttr ".wl[0].w[62]" 0;
+	setAttr ".wl[0].w[63]" 0;
+	setAttr ".wl[0].w[64]" 0;
+	setAttr ".wl[0].w[65]" 0;
+	setAttr ".wl[0].w[66]" 0;
+	setAttr ".wl[0].w[67]" 0;
+	setAttr ".wl[0].w[68]" 0;
+	setAttr ".wl[0].w[69]" 0;
+	setAttr ".wl[0].w[70]" 0;
+	setAttr ".wl[0].w[71]" 0;
+	setAttr ".wl[0].w[72]" 0;
+	setAttr ".wl[0].w[73]" 0;
+	setAttr ".wl[0].w[74]" 0;
+	setAttr ".wl[0].w[75]" 0;
+	setAttr ".wl[0].w[76]" 0;
+	setAttr ".wl[0].w[77]" 0;
+	setAttr ".wl[0].w[78]" 0;
+	setAttr ".wl[0].w[79]" 0;
+	setAttr ".wl[0].w[80]" 0;
+	setAttr ".wl[0].w[81]" 0;
+	setAttr ".wl[0].w[82]" 0;
+	setAttr ".wl[0].w[83]" 0;
+	setAttr ".wl[0].w[84]" 0;
+	setAttr ".wl[0].w[85]" 0;
+	setAttr ".wl[0].w[86]" 0;
+	setAttr ".wl[0].w[87]" 0;
+	setAttr ".wl[0].w[88]" 0;
+	setAttr ".wl[0].w[89]" 0;
+	setAttr ".wl[0].w[90]" 0;
+	setAttr ".wl[0].w[91]" 0;
+	setAttr ".wl[0].w[92]" 0;
+	setAttr ".wl[0].w[93]" 0;
+	setAttr ".wl[0].w[94]" 0;
+	setAttr ".wl[0].w[95]" 0;
+	setAttr ".wl[0].w[96]" 0;
+	setAttr ".wl[0].w[97]" 0;
+	setAttr ".wl[0].w[98]" 0;
+	setAttr ".wl[0].w[99]" 0;
+	setAttr ".wl[0].w[100]" 0;
+	setAttr ".wl[0].w[101]" 0;
+	setAttr ".wl[0].w[102]" 0;
+	setAttr ".wl[0].w[103]" 0;
+	setAttr ".wl[0].w[104]" 0;
+	setAttr ".wl[0].w[105]" 0;
+	setAttr ".wl[0].w[106]" 0;
+	setAttr ".wl[0].w[107]" 0;
+	setAttr ".wl[0].w[108]" 0;
+	setAttr ".wl[0].w[109]" 0;
+	setAttr ".wl[0].w[110]" 0;
+	setAttr ".wl[0].w[111]" 0;
+	setAttr ".wl[0].w[112]" 0;
+	setAttr ".wl[0].w[113]" 0;
+	setAttr ".wl[0].w[114]" 0;
+	setAttr ".wl[0].w[115]" 0;
+	setAttr ".wl[0].w[116]" 0;
+	setAttr ".wl[0].w[117]" 0;
+	setAttr ".wl[0].w[118]" 0;
+	setAttr ".wl[0].w[119]" 0;
+	setAttr ".wl[0].w[120]" 0;
+	setAttr ".wl[0].w[121]" 0;
+	setAttr ".wl[0].w[122]" 0;
+	setAttr ".wl[0].w[123]" 0;
+	setAttr ".wl[0].w[124]" 0;
+	setAttr ".wl[0].w[125]" 0;
+	setAttr ".wl[0].w[126]" 0;
+	setAttr ".wl[0].w[127]" 0;
+	setAttr ".wl[0].w[128]" 0;
+	setAttr ".wl[0].w[129]" 0;
+	setAttr ".wl[0].w[130]" 0;
+	setAttr ".wl[0].w[131]" 0;
+	setAttr ".wl[0].w[132]" 0;
+	setAttr ".wl[0].w[134]" 0;
+	setAttr ".wl[0].w[135]" 0;
+	setAttr ".wl[0].w[136]" 0;
+	setAttr ".wl[0].w[137]" 0;
+	setAttr ".wl[0].w[138]" 0;
+	setAttr ".wl[0].w[139]" 0;
+	setAttr ".wl[0].w[140]" 0;
+	setAttr ".wl[0].w[141]" 0;
+	setAttr ".wl[0].w[142]" 0;
+	setAttr ".wl[0].w[143]" 0;
+	setAttr ".wl[0].w[144]" 0;
+	setAttr ".wl[0].w[145]" 0;
+	setAttr ".wl[0].w[146]" 0;
+	setAttr ".wl[0].w[147]" 0;
+	setAttr ".wl[0].w[148]" 0;
+	setAttr ".wl[0].w[149]" 0;
+	setAttr ".wl[0].w[150]" 0;
+	setAttr ".wl[0].w[151]" 0.0078431367874145508;
+	setAttr ".wl[0].w[155]" 0;
+	setAttr ".wl[0].w[156]" 0;
+	setAttr ".wl[0].w[157]" 0;
+	setAttr ".wl[0].w[158]" 0;
+	setAttr ".wl[0].w[159]" 0;
+	setAttr ".wl[0].w[160]" 0;
+	setAttr ".wl[0].w[161]" 0;
+	setAttr ".wl[0].w[162]" 0.0078431367874145508;
+	setAttr ".wl[0].w[164]" 0.97254902124404907;
+	setAttr ".wl[0].w[165]" 0;
+	setAttr ".wl[0].w[166]" 0;
+	setAttr ".wl[0].w[167]" 0;
+	setAttr ".wl[0].w[168]" 0;
+	setAttr ".wl[0].w[176]" 0;
+	setAttr ".wl[0].w[177]" 0;
+	setAttr ".wl[0].w[178]" 0;
+	setAttr ".wl[0].w[179]" 0;
+	setAttr ".wl[0].w[180]" 0;
+	setAttr ".wl[0].w[186]" 0;
+	setAttr ".wl[0].w[187]" 0;
+	setAttr ".wl[0].w[188]" 0;
+	setAttr ".wl[0].w[196]" 0;
+	setAttr ".wl[0].w[197]" 0;
+	setAttr ".wl[0].w[198]" 0;
+	setAttr ".wl[0].w[199]" 0;
+	setAttr ".wl[0].w[200]" 0;
+	setAttr ".wl[0].w[217]" 0;
+	setAttr ".wl[0].w[218]" 0;
+	setAttr ".wl[0].w[219]" 0;
+	setAttr ".wl[0].w[237]" 0;
+	setAttr ".wl[0].w[238]" 0;
+	setAttr ".wl[0].w[239]" 0;
+	setAttr ".wl[0].w[380]" 0;
+	setAttr ".stE" 5;
+	setAttr -cb off ".mOff";
+	setAttr -cb off ".corr";
+	setAttr ".uID" -type "long2" 6 0 ;
+createNode tweak -n "tweak3";
+	rename -uid "6A2521DF-4D90-2357-DD60-C692B8C3DB58";
+createNode objectSet -n "set12";
+	rename -uid "2B8A212E-4F67-58AE-E0CD-5D8DF4B3B624";
+	setAttr ".ihi" 0;
+	setAttr -s 2 ".dsm";
+	setAttr ".vo" yes;
+	setAttr -s 2 ".gn";
+createNode groupId -n "groupId15";
+	rename -uid "33431AC2-4332-E693-2914-BC821826041D";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts15";
+	rename -uid "E57C0587-4AAE-6A5E-C2CD-E3BCD3F1D29A";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode objectSet -n "tweakSet3";
+	rename -uid "9350DADB-4939-1118-2F78-F18C065E9CD2";
+	setAttr ".ihi" 0;
+	setAttr ".vo" yes;
+createNode groupId -n "groupId16";
+	rename -uid "7AA14C94-461E-BE6C-EDED-94BF0DA05D3A";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts16";
+	rename -uid "B8879C64-4778-EA91-56DA-50997E104967";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode groupId -n "groupId17";
+	rename -uid "1C401AF5-4B93-AA37-1874-929E2E35FC98";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts17";
+	rename -uid "F4AAF5FF-420A-7E7A-4AA4-4F878912CA21";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode zAttachment -n "zAttachment2";
+	rename -uid "08A8A851-4461-F5D2-677C-538893AC16B5";
+	setAttr -s 2 ".ip";
+	setAttr -s 2 ".og";
+	setAttr -s 2 ".wl";
+	setAttr ".wl[0:1].w"
+		380 0 0 1 0 2 0 3 0 4 0 5 0 6 0.056384477764368057 
+		7 0.18560388684272766 8 0.27394452691078186 9 0.31969299912452698 
+		10 0.31969273090362549 11 0.2734048068523407 12 0.17455682158470154 13 
+		0.037389013916254044 14 0 15 0 16 0 17 0 18 0 19 0 20 
+		0 21 0 22 0 23 0 24 0 25 0 26 0.12167935818433762 27 
+		0.39981231093406677 28 0.62725728750228882 29 0.72332972288131714 30 
+		0.72332924604415894 31 0.59627950191497803 32 0.36560812592506409 33 
+		0.087474927306175232 34 0 35 0 36 0 37 0 38 0 39 0 40 
+		0 41 0 42 0 43 0 44 0 45 0 46 0.11756708472967148 47 
+		0.51793438196182251 48 0.81404691934585571 49 0.97859674692153931 50 
+		0.96966314315795898 51 0.78818416595458984 52 0.46976089477539063 53 
+		0.058099221438169479 54 0 55 0 56 0 57 0 58 0 59 0 60 
+		0 61 0 62 0 63 0 64 0 65 0 66 0 67 0.47665789723396301 
+		68 0.85166996717453003 71 0.81428384780883789 72 0.42099389433860779 
+		73 0 74 0 75 0 76 0 77 0 78 0 79 0 80 0 81 0 
+		82 0 83 0 84 0 85 0 86 0 87 0.34461578726768494 88 0.7569735050201416 
+		89 0.95225328207015991 90 0.9413565993309021 91 0.71469879150390625 92 
+		0.27881407737731934 93 0 94 0 95 0 96 0 97 0 98 0 99 
+		0 100 0 101 0 102 0 103 0 104 0 105 0 106 0 107 0.12506978213787079 
+		108 0.55715411901473999 109 0.76508998870849609 110 0.75265210866928101 
+		111 0.51691830158233643 112 0.061329703778028488 113 0 114 0 115 0 
+		116 0 117 0 118 0 119 0 120 0 121 0 122 0 123 0 124 0 
+		125 0 126 0 127 0 128 0.3005879819393158 129 0.51065754890441895 130 
+		0.4963277280330658 131 0.2549838125705719 132 0 133 0 134 0 135 0 
+		136 0 137 0 138 0 139 0 140 0 141 0 142 0 143 0 144 0 
+		145 0 146 0 147 0 148 0.011800598353147507 149 0.21786335110664368 
+		150 0.20279593765735626 151 0 152 0 153 0 154 0 155 0 156 0 
+		157 0 158 0 159 0 160 0 161 0 162 0 163 0 164 0 165 0 
+		166 0 167 0 168 0 169 0 170 0 171 0 172 0 173 0 174 0 
+		175 0 176 0 177 0 178 0 179 0 180 0 181 0 182 0 183 0 
+		184 0 185 0 186 0 187 0 188 0 189 0 190 0 191 0 192 0 
+		193 0 194 0 195 0 196 0 197 0 198 0 199 0 200 0 201 0 
+		202 0 203 0 204 0 205 0 206 0 207 0 208 0 209 0 210 0 
+		211 0 212 0 213 0 214 0 215 0 216 0 217 0 218 0 219 0 
+		220 0 221 0 222 0 223 0 224 0 225 0 226 0 227 0 228 0 
+		229 0 230 0 231 0 232 0 233 0 234 0 235 0 236 0 237 0 
+		238 0 239 0 240 0 241 0 242 0 243 0 244 0 245 0 246 0 
+		247 0 248 0 249 0 250 0 251 0 252 0 253 0 254 0 255 0 
+		256 0 257 0 258 0 259 0 260 0 261 0 262 0 263 0 264 0 
+		265 0 266 0 267 0 268 0 269 0 270 0 271 0 272 0 273 0 
+		274 0 275 0 276 0 277 0 278 0 279 0 280 0 281 0 282 0 
+		283 0 284 0 285 0 286 0 287 0 288 0 289 0 290 0 291 0 
+		292 0 293 0 294 0 295 0 296 0 297 0 298 0 299 0 300 0 
+		301 0 302 0 303 0 304 0 305 0 306 0 307 0 308 0 309 0 
+		310 0 311 0 312 0 313 0 314 0 315 0 316 0 317 0 318 0 
+		319 0 320 0 321 0 322 0 323 0 324 0 325 0 326 0 327 0 
+		328 0 329 0 330 0 331 0 332 0 333 0 334 0 335 0 336 0 
+		337 0 338 0 339 0 340 0 341 0 342 0 343 0 344 0 345 0 
+		346 0 347 0 348 0 349 0 350 0 351 0 352 0 353 0 354 0 
+		355 0 356 0 357 0 358 0 359 0 360 0 361 0 362 0 363 0 
+		364 0 365 0 366 0 367 0 368 0 369 0 370 0 371 0 372 0 
+		373 0 374 0 375 0 376 0 377 0 378 0 379 0 380 0 381 0
+		120 0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 
+		8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0 16 0 
+		17 0 18 0 19 0 20 0 21 0 22 0 23 0 24 0 25 0 
+		26 0 27 0 28 0 29 0 30 0 31 0 32 0 33 0 34 0 
+		35 0 36 0 37 0 38 0 39 0 40 0 41 0 42 0 43 0 
+		44 0 45 0 46 0 47 0 48 0 49 0 50 0 51 0 52 0 
+		53 0 54 0 55 0 56 0 57 0 58 0 59 0 60 0 61 0 
+		62 0 63 0 64 0 65 0 66 0 67 0 68 0 69 0 70 0 
+		71 0 72 0 73 0 74 0 75 0 76 0 77 0 78 0 79 0 
+		80 0 81 0 82 0 83 0 84 0 85 0 86 0 87 0 88 0 
+		89 0 90 0 91 0 92 0 93 0 94 0 95 0 96 0 97 0 
+		98 0 99 0 100 0 101 0 102 0 103 0 104 0 105 0 106 0 
+		107 0 108 0 109 0.023529410362243652 110 0 111 0 112 0 113 0 
+		114 0 115 0 116 0 117 0 118 0 119 0;
+	setAttr ".wl[1].w"
+		222 120 0 121 0 122 0 123 0 124 0 125 0 126 0 127 0 
+		128 0 129 0 130 0 131 0 132 0 133 0 134 0 135 0 136 0 
+		137 0 138 0 139 0 140 0 141 0 142 0 143 0 144 0 145 0 
+		146 0 147 0 148 0 149 0 150 0 151 0 152 0 153 0 154 0 
+		155 0 156 0 157 0 158 0 159 0 160 0 161 0 162 0 163 0 
+		164 0 165 0 166 0 167 0 168 0 169 0 170 0 171 0 172 0 
+		173 0 174 0 175 0 176 0 177 0 178 0 179 0 180 0 181 0 
+		182 0 183 0 184 0 185 0 186 0 187 0 188 0 189 0 190 0 
+		191 0 192 0 193 0 194 0 195 0 196 0 197 0 198 0 199 0 
+		202 0 203 0 204 0 205 0 206 0 207 0 208 0 209 0 210 0 
+		211 0 212 0 213 0 214 0 215 0 216 0 217 0 218 0 219 0 
+		223 0 224 0 225 0 226 0 227 0 228 0 229 0 230 0 231 0 
+		232 0 233 0 234 0 235 0 236 0 237 0 243 0 244 0 245 0 
+		246 0 247 0 248 0 249 0 250 0 251 0 252 0 253 0 254 0 
+		255 0 256 0 257 0 263 0 264 0 265 0 266 0 267 0 268 0 
+		269 0 270 0 271 0 272 0 273 0 274 0 275 0 276 0 283 0 
+		284 0 285 0 286 0 287 0 288 0 289 0 290 0 291 0 292 0 
+		293 0 294 0 295 0 296 0 303 0 304 0 305 0 306 0 307 0 
+		308 0 309 0 310 0 311 0 312 0 313 0 314 0 315 0 316 0 
+		323 0 324 0 325 0 326 0 327 0 328 0 329 0 330 0 331 0 
+		332 0 333 0 334 0 335 0 336 0 342 0 343 0 344 0 345 0 
+		346 0 347 0 348 0 349 0 350 0 351 0 352 0 353 0 354 0 
+		355 0 356 0 357 0 360 0 361 0 362 0 363 0 364 0 365 0 
+		366 0 367 0 368 0 369 0 370 0 371 0 372 0 373 0 374 0 
+		375 0 376 0 377 0 378 0 379 0.0077816220000386238 380 0 381 
+		0;
+	setAttr -k off ".wl[0].w";
+	setAttr ".cM" 2;
+	setAttr ".stE" 6;
+	setAttr -cb off ".mOff";
+	setAttr -cb off ".corr";
+	setAttr ".uID" -type "long2" 7 0 ;
+createNode objectSet -n "set13";
+	rename -uid "A128C6F2-4780-69C3-9392-6195E1043B6F";
+	setAttr ".ihi" 0;
+	setAttr -s 2 ".dsm";
+	setAttr ".vo" yes;
+	setAttr -s 2 ".gn";
+createNode groupId -n "groupId18";
+	rename -uid "8F32CDE4-4073-4E07-D3F5-BB822C2F842F";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts18";
+	rename -uid "19DFED06-463F-37C7-D1DC-3D9A7F0F3CD1";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode tweak -n "tweak4";
+	rename -uid "55898090-4316-2ED6-7F66-BCA32A784583";
+createNode groupId -n "groupId19";
+	rename -uid "958D3495-4584-EDC4-C9FF-25B4F4AF40EF";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts19";
+	rename -uid "27B437EB-4F47-7159-1BFE-FA968677915D";
+	setAttr ".ihi" 0;
+	setAttr ".ic" -type "componentList" 1 "vtx[*]";
+createNode objectSet -n "tweakSet4";
+	rename -uid "E339CE22-4FBE-4A88-D069-748CB9297E75";
+	setAttr ".ihi" 0;
+	setAttr ".vo" yes;
+createNode groupId -n "groupId20";
+	rename -uid "E34BC845-458C-C709-FFD5-359A82F0838C";
+	setAttr ".ihi" 0;
+createNode groupParts -n "groupParts20";
+	rename -uid "01E71176-4F45-F45B-03DC-33BC5A70DF2A";
 	setAttr ".ihi" 0;
 	setAttr ".ic" -type "componentList" 1 "vtx[*]";
 select -ne :time1;
@@ -33262,6 +33652,10 @@ connectAttr "groupId13.id" "l_armA_muscle_geoShape.iog.og[6].gid";
 connectAttr "set10.mwc" "l_armA_muscle_geoShape.iog.og[6].gco";
 connectAttr "groupId14.id" "l_armA_muscle_geoShape.iog.og[7].gid";
 connectAttr "set11.mwc" "l_armA_muscle_geoShape.iog.og[7].gco";
+connectAttr "groupId17.id" "l_armA_muscle_geoShape.iog.og[9].gid";
+connectAttr "set12.mwc" "l_armA_muscle_geoShape.iog.og[9].gco";
+connectAttr "groupId18.id" "l_armA_muscle_geoShape.iog.og[10].gid";
+connectAttr "set13.mwc" "l_armA_muscle_geoShape.iog.og[10].gco";
 connectAttr "zEmbedder1.og[0]" "l_armA_muscle_geoShape.i";
 connectAttr "tweak1.vl[0].vt[0]" "l_armA_muscle_geoShape.twl";
 connectAttr "transformGeometry3.og" "l_armA_muscle_geoShapeOrig.i";
@@ -33279,7 +33673,19 @@ connectAttr "groupId11.id" "l_armA_subtissue_geoShape.iog.og[5].gid";
 connectAttr "set8.mwc" "l_armA_subtissue_geoShape.iog.og[5].gco";
 connectAttr "zEmbedder1.og[1]" "l_armA_subtissue_geoShape.i";
 connectAttr "tweak2.vl[0].vt[0]" "l_armA_subtissue_geoShape.twl";
-connectAttr "transformGeometry4.og" "l_armA_bone_geoShape.i";
+connectAttr "zAttachment2.og[1]" "l_armA_bone_geoShape.i";
+connectAttr "groupId19.id" "l_armA_bone_geoShape.iog.og[0].gid";
+connectAttr "set13.mwc" "l_armA_bone_geoShape.iog.og[0].gco";
+connectAttr "groupId20.id" "l_armA_bone_geoShape.iog.og[1].gid";
+connectAttr "tweakSet4.mwc" "l_armA_bone_geoShape.iog.og[1].gco";
+connectAttr "tweak4.vl[0].vt[0]" "l_armA_bone_geoShape.twl";
+connectAttr "transformGeometry4.og" "l_armA_bone_geoShapeOrig.i";
+connectAttr "groupId15.id" "l_armB_bone_geoShape.iog.og[2].gid";
+connectAttr "set12.mwc" "l_armB_bone_geoShape.iog.og[2].gco";
+connectAttr "groupId16.id" "l_armB_bone_geoShape.iog.og[3].gid";
+connectAttr "tweakSet3.mwc" "l_armB_bone_geoShape.iog.og[3].gco";
+connectAttr "zAttachment1.og[0]" "l_armB_bone_geoShape.i";
+connectAttr "tweak3.vl[0].vt[0]" "l_armB_bone_geoShape.twl";
 connectAttr "transformGeometry5.og" "l_armA_restShapeShape.i";
 connectAttr ":time1.o" "zSolver1.iT";
 connectAttr "zSolver1.osp" "zSolver1Shape.isp";
@@ -33289,6 +33695,8 @@ connectAttr "zFiber2.oGo" "zSolver1Shape.iGo[2]";
 connectAttr "zMaterial4.oGo" "zSolver1Shape.iGo[3]";
 connectAttr "zFiber1.oMus" "zSolver1Shape.iM[0]";
 connectAttr "zFiber2.oMus" "zSolver1Shape.iM[1]";
+connectAttr "zAttachment1.oC" "zSolver1Shape.iC[0]";
+connectAttr "zAttachment2.oC" "zSolver1Shape.iC[1]";
 relationship "link" ":lightLinker1" ":initialShadingGroup.message" ":defaultLightSet.message";
 relationship "link" ":lightLinker1" ":initialParticleSE.message" ":defaultLightSet.message";
 relationship "shadowLink" ":lightLinker1" ":initialShadingGroup.message" ":defaultLightSet.message";
@@ -33347,7 +33755,7 @@ connectAttr "groupId8.msg" "set3.gn" -na;
 connectAttr "l_armA_muscle_geoShape.iog.og[3]" "set3.dsm" -na;
 connectAttr "l_armA_subtissue_geoShape.iog.og[3]" "set3.dsm" -na;
 connectAttr "zEmbedder1.msg" "set3.ub[0]";
-connectAttr "zFiber2.og[0]" "groupParts4.ig";
+connectAttr "zAttachment2.og[0]" "groupParts4.ig";
 connectAttr "groupId4.id" "groupParts4.gi";
 connectAttr "l_armA_subtissue_geo.wm" "zGeo4.iNMx";
 connectAttr "zSolver1.osp" "zGeo4.isp";
@@ -33428,6 +33836,50 @@ connectAttr "l_armA_muscle_geoShape.iog.og[7]" "set11.dsm" -na;
 connectAttr "zFiber2.msg" "set11.ub[0]";
 connectAttr "zFiber1.og[0]" "groupParts14.ig";
 connectAttr "groupId14.id" "groupParts14.gi";
+connectAttr "groupParts15.og" "zAttachment1.ip[0].ig";
+connectAttr "groupId15.id" "zAttachment1.ip[0].gi";
+connectAttr "groupParts17.og" "zAttachment1.ip[1].ig";
+connectAttr "groupId17.id" "zAttachment1.ip[1].gi";
+connectAttr "zGeo2.oGo" "zAttachment1.iGo1";
+connectAttr "zGeo3.oGo" "zAttachment1.iGo2";
+connectAttr "groupParts16.og" "tweak3.ip[0].ig";
+connectAttr "groupId16.id" "tweak3.ip[0].gi";
+connectAttr "groupId15.msg" "set12.gn" -na;
+connectAttr "groupId17.msg" "set12.gn" -na;
+connectAttr "l_armB_bone_geoShape.iog.og[2]" "set12.dsm" -na;
+connectAttr "l_armA_muscle_geoShape.iog.og[9]" "set12.dsm" -na;
+connectAttr "zAttachment1.msg" "set12.ub[0]";
+connectAttr "tweak3.og[0]" "groupParts15.ig";
+connectAttr "groupId15.id" "groupParts15.gi";
+connectAttr "groupId16.msg" "tweakSet3.gn" -na;
+connectAttr "l_armB_bone_geoShape.iog.og[3]" "tweakSet3.dsm" -na;
+connectAttr "tweak3.msg" "tweakSet3.ub[0]";
+connectAttr "l_armB_bone_geoShapeOrig.w" "groupParts16.ig";
+connectAttr "groupId16.id" "groupParts16.gi";
+connectAttr "zFiber2.og[0]" "groupParts17.ig";
+connectAttr "groupId17.id" "groupParts17.gi";
+connectAttr "groupParts18.og" "zAttachment2.ip[0].ig";
+connectAttr "groupId18.id" "zAttachment2.ip[0].gi";
+connectAttr "groupParts19.og" "zAttachment2.ip[1].ig";
+connectAttr "groupId19.id" "zAttachment2.ip[1].gi";
+connectAttr "zGeo3.oGo" "zAttachment2.iGo1";
+connectAttr "zGeo1.oGo" "zAttachment2.iGo2";
+connectAttr "groupId18.msg" "set13.gn" -na;
+connectAttr "groupId19.msg" "set13.gn" -na;
+connectAttr "l_armA_muscle_geoShape.iog.og[10]" "set13.dsm" -na;
+connectAttr "l_armA_bone_geoShape.iog.og[0]" "set13.dsm" -na;
+connectAttr "zAttachment2.msg" "set13.ub[0]";
+connectAttr "zAttachment1.og[1]" "groupParts18.ig";
+connectAttr "groupId18.id" "groupParts18.gi";
+connectAttr "groupParts20.og" "tweak4.ip[0].ig";
+connectAttr "groupId20.id" "tweak4.ip[0].gi";
+connectAttr "tweak4.og[0]" "groupParts19.ig";
+connectAttr "groupId19.id" "groupParts19.gi";
+connectAttr "groupId20.msg" "tweakSet4.gn" -na;
+connectAttr "l_armA_bone_geoShape.iog.og[1]" "tweakSet4.dsm" -na;
+connectAttr "tweak4.msg" "tweakSet4.ub[0]";
+connectAttr "l_armA_bone_geoShapeOrig.w" "groupParts20.ig";
+connectAttr "groupId20.id" "groupParts20.gi";
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "l_armA_muscle_geoShape.iog" ":initialShadingGroup.dsm" -na;
 connectAttr "l_armA_subtissue_geoShape.iog" ":initialShadingGroup.dsm" -na;
