@@ -188,6 +188,10 @@ class ZivaTetMirrorTestCase(VfxTestCase):
         # Checking maps in builder against ones in scene
         for item in self.scene_items_retrieved:
             for map_ in item.parameters['map']:
-                map_value = map_.values
-                scene_value = cmds.getAttr(map_.name)[0]
-                self.assertEqual(map_value, list(scene_value))
+                builder_map_value = map_.values
+
+                scene_mesh = map_.get_mesh()
+                scene_map_name = map_.name
+                scene_map_value = get_weights(scene_map_name, scene_mesh)
+
+                self.assertEqual(builder_map_value, list(scene_map_value))
