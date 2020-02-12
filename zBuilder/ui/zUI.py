@@ -489,7 +489,7 @@ class MyDockingUI(QtWidgets.QWidget):
             # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
             # is the argument that tells zBuilder to not get maps, meshes.
             self.builder = zva.Ziva()
-            self.builder.retrieve_connections(get_parameters=False)
+            self.builder.retrieve_connections()
             builder = self.builder
 
         # remember names of items to expand
