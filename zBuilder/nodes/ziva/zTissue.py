@@ -17,6 +17,11 @@ class TissueNode(Ziva):
         super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
         self.parent_tissue = None
+        """ parent_tissues and children_tissues are used to define sub-tissues.  This is storing
+        the scene_item for the respective tissue.  The parent tissue is the one that gets filled
+        and the children_tissues are unused.  The reason for this is because at time of retrieval
+        the children tissues are not processed so their are no children scene items to get.
+        """
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -31,6 +36,7 @@ class TissueNode(Ziva):
 
         if parent_name:
             self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
+            
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
