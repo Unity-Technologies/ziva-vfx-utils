@@ -218,10 +218,3 @@ class ZivaRivetToBoneMirrorTestCase(VfxTestCase):
                 scene_map_value = get_weights(scene_map_name, scene_mesh)
 
                 self.assertEqual(builder_map_value, list(scene_map_value))
-
-        # check the scene to make sure rivets got hooked up correctly
-        # (correct rivet on correct fiber, etc etc etc.)
-
-        for item in self.scene_items_retrieved:
-            print item.name
-        print ddds
