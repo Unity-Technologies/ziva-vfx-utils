@@ -656,6 +656,19 @@ class Ziva(Builder):
         # last ditch check of map validity for zAttachments and zFibers
         mz.check_map_validity(self.get_scene_items(type_filter='map'))
 
+    def retrieve(self, get_parameters=True, get_connected=True):
+        """[summary]
+        
+        Args:
+            get_parameters (bool, optional): [description]. Defaults to True.
+            get_connected (bool, optional): [description]. Defaults to True.
+        """
+        print('get_parameters = ', get_parameters)
+        print('get_connected = ', get_connected)
+        logger.info('retrieving....')
+
+        selection = cmds.ls(sl=True)
+
 
 def transform_rivet_and_LoA_into_tissue_meshes(selection):
     """ This takes a list of items from a maya scene and if it finds any 
