@@ -56,7 +56,8 @@ class MaterialNode(Ziva):
             # if there are enough existing materials use those
             # or else create a new material
             if d_index < len(existing_materials):
-                self.name = cmds.rename(existing_materials[d_index], name)
+                if existing_materials[d_index] != name:
+                    self.name = cmds.rename(existing_materials[d_index], name)
             else:
                 cmds.select(mesh, r=True)
                 results = mel.eval('ziva -m')

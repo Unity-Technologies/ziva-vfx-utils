@@ -57,7 +57,8 @@ class RestShapeNode(Ziva):
                 # If this name is elsewhere in scene (on another mesh) it will not
                 # be able to name it so we capture return and rename scene_item
                 # so setAttrs work
-                self.name = cmds.rename(results, self.name)
+                if results[0] != self.name:
+                    self.name = cmds.rename(results, self.name)
 
             else:
                 # The rest shape node exists on mesh so now lets update it.
@@ -66,8 +67,9 @@ class RestShapeNode(Ziva):
                     mel.eval('zRestShape -r {} {};'.format(self.association[0], target))
 
                 # now lets add back what is in self
-                for target in self.targets:
-                    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
+                # for target in self.targets:
+
+                #    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
 
                 # update name of node to that which is on mesh.
                 self.name = existing_restshape_node[0]

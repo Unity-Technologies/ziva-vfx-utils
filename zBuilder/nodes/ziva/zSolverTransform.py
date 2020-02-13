@@ -34,6 +34,7 @@ class SolverTransformNode(Ziva):
                 raise Exception('zSolverTransform not in scene.  please check.')
 
         else:
-            new_name = cmds.rename(solver_name, self.name)
+            if solver_name != self.name:
+                new_name = cmds.rename(solver_name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

@@ -77,7 +77,8 @@ class FiberNode(Ziva):
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    self.name = cmds.rename(existing_fibers[d_index], name)
+                    if existing_fibers[d_index] != name:
+                        self.name = cmds.rename(existing_fibers[d_index], name)
                 else:
                     cmds.select(mesh, r=True)
                     results = mel.eval('ziva -f')

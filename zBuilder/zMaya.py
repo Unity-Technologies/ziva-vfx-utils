@@ -780,7 +780,8 @@ def cull_creation_nodes(scene_items, permissive=True):
         if cmds.objExists(mesh):
             existing = mel.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
-                out = cmds.rename(existing, name)
+                if existing[0] != name:
+                    out = cmds.rename(existing, name)
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
