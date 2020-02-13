@@ -353,7 +353,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
-        weight_map = node.parameters['map'][0]  # weight map @ index 0
+        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
         weight_map_menu = menu.addMenu('Weight')
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -362,8 +362,8 @@ class MyDockingUI(QtWidgets.QWidget):
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0]  # weight map @ index 0
-        endpoints_map = node.parameters['map'][1]  # endpoints map @ index 1
+        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
+        endpoints_map = node.get_parameters(['map'])[1]  # endpoints map @ index 1
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -374,7 +374,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.parameters['map'][0]  # weight map @ index 0
+        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
 
         self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
 
@@ -383,7 +383,7 @@ class MyDockingUI(QtWidgets.QWidget):
         target_mesh_name = node.association[1]
 
         # TODO Add the ability to get map by name instead of index
-        maps = node.parameters['map']
+        maps = node.get_parameters(['map'])
         source_map = maps[0]  # source map @ index 0
         target_map = maps[1]  # target map @ index 1
 
@@ -481,13 +481,7 @@ class MyDockingUI(QtWidgets.QWidget):
         """
 
         if not builder:
-            # clean builder
-            # TODO: this line should be changed after VFXACT-388 to make more efficient
-
-            # This is using zBuilder to build the model data for the UI.  Currently the model data
-            # excludes Mpas and Meshes.  This is strictly a performance issue.  With this included
-            # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
-            # is the argument that tells zBuilder to not get maps, meshes.
+            # reset builder
             self.builder = zva.Ziva()
             self.builder.retrieve_connections()
             builder = self.builder

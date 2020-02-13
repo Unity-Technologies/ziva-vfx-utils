@@ -70,21 +70,25 @@ class Builder(object):
         if not parent:
             parent = self.root_node
 
-        zbuilder_nodes = []
+        scene_items = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
                 if type_ in obj.TYPES or type_ == obj.type:
                     obb = obj(parent=parent, builder=self)
                     obb.populate(maya_node=node)
-                    zbuilder_nodes.append(obb)
-        if not zbuilder_nodes:
+                    scene_items.append(obb)
+        if not scene_items:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
-            zbuilder_nodes.append(objct)
+            scene_items.append(objct)
 
         if get_parameters:
-            for node in zbuilder_nodes:
+            for node in scene_items:
                 if hasattr(node, 'spawn_parameters'):
+                    parameters = self.get_parameters_from_node(node)
+                    for parameter in parameters:
+                        node.add_parameter(parameter)
+                        scene_items.append(parameter)
                     # get the parameter info for a node in a dict format
                     node_parameter_info = node.spawn_parameters()
 
@@ -93,9 +97,32 @@ class Builder(object):
                             parameter = self.parameter_factory(parameter_type, parameter_arg)
 
                             node.add_parameter(parameter)
-                            zbuilder_nodes.append(parameter)
+                            scene_items.append(parameter)
 
-        return zbuilder_nodes
+        return scene_items
+
+    def get_parameters_from_node(self, node, types=[]):
+        """
+        Get parameters (e.g. maps and meshes) for the specified node.
+        Args:
+            node (zBuilder node): zBuilder scene item
+            types (list): node types to return, e.g. map, mesh. If empty return all types.
+
+        Returns:
+            list of zBuilder node parameters
+        """
+        # get the parameter info for a node in a dict format
+        node_parameter_info = node.spawn_parameters()
+        parameters = []
+        if not types:
+            types = node_parameter_info.keys()
+        for parameter_type, parameter_args in node_parameter_info.iteritems():
+            for parameter_arg in parameter_args:
+                if parameter_type in types:
+                    parameter = self.parameter_factory(parameter_type, parameter_arg)
+                    parameters.append(parameter)
+
+        return parameters
 
     def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
