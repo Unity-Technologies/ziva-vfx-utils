@@ -307,7 +307,7 @@ def rig_paste():
     # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
     # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
     solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
-        type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
+        type_filter='zSolver')[0].solver.name[:-5]  # remove 'Shape' at the end
     if not cmds.objExists(solver_in_clipboard):
         generated_solver = mel.eval('ziva -s;')[1]  # make a new solver
         cmds.rename(

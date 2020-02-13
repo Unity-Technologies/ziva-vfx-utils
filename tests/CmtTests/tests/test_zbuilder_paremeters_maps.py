@@ -43,13 +43,15 @@ class ZivaMapTestCase(VfxTestCase):
         # This is grabbing a zTet map to test against.
         sphere = cmds.polySphere()
 
-        mel.eval('ziva -t {}'.format(sphere[0]))
+        results = mel.eval('ziva -t {}'.format(sphere[0]))
+        tet_name = results[5]
 
         cmds.select(sphere[0])
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
-        tet_map = builder.get_scene_items(type_filter='map')[1]
+        tet_node = builder.get_scene_items(name_filter=tet_name)[0]
+        tet_map = tet_node.parameters['map'][0]
 
         expected_values = [.2 for x in tet_map.values]
 

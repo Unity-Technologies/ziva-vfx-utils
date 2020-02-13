@@ -189,8 +189,9 @@ class Builder(object):
             # loop through scene item attributes as defined by each scene item
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
-                    restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
-                    scene_item.__dict__[attr] = restored
+                    if scene_item.__dict__[attr]:
+                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        scene_item.__dict__[attr] = restored
 
     def retrieve_from_file(self, file_path):
         """ Reads scene items from a given file.  The items get placed in the bundle.
@@ -208,12 +209,13 @@ class Builder(object):
         # with the proper scene item.
 
         # loop through the scene items
-
         for scene_item in self.get_scene_items():
             # loop through scene item attributes as defined by each scene item
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
-                    restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                    if scene_item.__dict__[attr]:
+                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        scene_item.__dict__[attr] = restored
 
         self.bundle.stats()
         after = datetime.datetime.now()
@@ -301,6 +303,8 @@ def restore_scene_items_from_string(item, builder):
             item[parm] = builder.get_scene_items(name_filter=item[parm])
     else:
         item = builder.get_scene_items(name_filter=item)
+        if item:
+            item = item[0]
     return item
 
 
