@@ -188,14 +188,16 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-    def invert_weights(self, node, map_):
+    def invert_weights(self, node, map_index):
+        map_ = node.get_parameters(['map'])[map_index]
         map_.invert()
         map_.apply_weights()
 
-    def copy_weights(self, node, map_):
-        self.maps_clipboard = map_
+    def copy_weights(self, node, map_index):
+        self.maps_clipboard = node.get_parameters(['map'])[map_index]
 
-    def paste_weights(self, node, new_map):
+    def paste_weights(self, node, new_map_index):
+        new_map = node.get_parameters(['map'])[new_map_index]
         """Pasting the maps.  Terms used here
             orig/new.
             The map/node the items were copied from are prefixed with orig.
@@ -296,23 +298,24 @@ class MyDockingUI(QtWidgets.QWidget):
             method(menu, node)
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def add_map_actions_to_menu(self, menu, node, map_):
+    def add_map_actions_to_menu(self, menu, node, map_index):
         """Add map actions to the menu
         Args:
             menu (QMenu): menu to add option to
             node (zBuilder object): zBuilder.nodes object
-            map_ (map object): zBuilder.parameters.maps object
+            map_index (int): map index. 0 for source map 1 for target/endPoints map
         """
         paint_action = QtWidgets.QAction(self)
         paint_action.setText('Paint')
         paint_action.setObjectName("actionPaint")
-        paint_action.triggered.connect(map_.open_paint_tool)
+        paint_action.triggered.connect(
+            partial(node.get_parameters(['map'])[map_index].open_paint_tool))
         menu.addAction(paint_action)
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
         invert_action.setObjectName('actionInvertWeights')
-        invert_action.triggered.connect(partial(self.invert_weights, node, map_))
+        invert_action.triggered.connect(partial(self.invert_weights, node, map_index))
         menu.addAction(invert_action)
 
         menu.addSeparator()
@@ -320,13 +323,13 @@ class MyDockingUI(QtWidgets.QWidget):
         copy_action = QtWidgets.QAction(self)
         copy_action.setText('Copy')
         copy_action.setObjectName('actionCopyWeights')
-        copy_action.triggered.connect(partial(self.copy_weights, node, map_))
+        copy_action.triggered.connect(partial(self.copy_weights, node, map_index))
         menu.addAction(copy_action)
 
         paste_action = QtWidgets.QAction(self)
         paste_action.setText('Paste')
         paste_action.setObjectName('actionPasteWeights')
-        paste_action.triggered.connect(partial(self.paste_weights, node, map_))
+        paste_action.triggered.connect(partial(self.paste_weights, node, map_index))
         paste_action.setEnabled(bool(self.maps_clipboard))
         menu.addAction(paste_action)
 
@@ -353,39 +356,30 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
-        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
         weight_map_menu = menu.addMenu('Weight')
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
     def open_fiber_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
-        endpoints_map = node.get_parameters(['map'])[1]  # endpoints map @ index 1
 
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
         end_points_map_menu = menu.addMenu('EndPoints')
-        self.add_map_actions_to_menu(end_points_map_menu, node, endpoints_map)
+        self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
     def open_material_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = node.get_parameters(['map'])[0]  # weight map @ index 0
 
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
     def open_attachment_menu(self, menu, node):
         source_mesh_name = node.association[0]
         target_mesh_name = node.association[1]
-
-        # TODO Add the ability to get map by name instead of index
-        maps = node.get_parameters(['map'])
-        source_map = maps[0]  # source map @ index 0
-        target_map = maps[1]  # target map @ index 1
 
         self.add_attribute_actions_to_menu(menu, node)
         menu.addAction(self.actionSelectST)
@@ -395,10 +389,10 @@ class MyDockingUI(QtWidgets.QWidget):
         target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
 
         source_map_menu = menu.addMenu(source_menu_text)
-        self.add_map_actions_to_menu(source_map_menu, node, source_map)
+        self.add_map_actions_to_menu(source_map_menu, node, 0)
 
         target_map_menu = menu.addMenu(target_menu_text)
-        self.add_map_actions_to_menu(target_map_menu, node, target_map)
+        self.add_map_actions_to_menu(target_map_menu, node, 1)
 
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
