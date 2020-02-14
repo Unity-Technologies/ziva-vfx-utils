@@ -58,6 +58,7 @@ def attr_values_from_scene(plug_names):
 class VfxTestCase(TestCase):
     temp_file_path = test_utils.get_tmp_file_location()
     """Base class for unit test cases run for ZivaVFX plugin."""
+
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -79,6 +80,50 @@ class VfxTestCase(TestCase):
                 a, b, eps))
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
+
+    def compare_maps_in_builder_with_scene(self, scene_items):
+        from zBuilder.parameters.maps import get_weights
+
+        # Checking maps in builder against ones in scene
+        for item in self.scene_items_retrieved:
+            for map_ in item.parameters['map']:
+                builder_map_value = map_.values
+
+                scene_mesh = map_.get_mesh()
+                scene_map_name = map_.name
+                scene_map_value = get_weights(scene_map_name, scene_mesh)
+
+                self.assertEqual(builder_map_value, list(scene_map_value))
+
+    def check_node_association_amount_equal(self, scene_items, startswith='r_', amount=0):
+        geo = [x for x in scene_items if x.association[0].startswith(startswith)]
+        self.assertEqual(len(geo), amount)
+
+    def check_node_association_amount_not_equal(self, scene_items, startswith='r_', amount=0):
+        geo = [x for x in scene_items if x.association[0].startswith(startswith)]
+        self.assertNotEqual(len(geo), amount)
+
+    def compare_builder_nodes_with_scene_nodes(self, builder):
+        # goes every node in a builder and checks by name if they are in the scene.
+        # useful for checking after a build if everything built.
+        items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
+
+        for item in items:
+            self.assertTrue(cmds.objExists(item.name))
+
+    def compare_builder_attrs_with_scene_attrs(self, builder):
+        # goes through every attribute in builder and checks if the same nodes in scene have same
+        # value.  Useful for checking if a build worked on attribute changes.
+        items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
+
+        for item in items:
+            for attr, v in item.attrs.iteritems():
+
+                # TODO oLength is on zLineOfAction and it is not settable.  So skipping over here:
+                # We should maybe not aquire non-settable attributes OR define them as non-settable
+                # and automatically deal with them in set_maya_attrs
+                if attr != 'oLength':
+                    self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
     def check_retrieve_looks_good(self, builder, expected_plugs, node_names, node_type):
         """Args:

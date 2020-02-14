@@ -190,64 +190,32 @@ class ZivaMaterialMirrorTestCase(VfxTestCase):
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
 
-    def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
-        """Args:
-            builder (builders.ziva.Ziva()): builder object
-            expected_plugs (dict): A dict of expected attribute/value pairs.
-                                   {'zTissue1.collisions':True, ...}.
-                                   If None/empty/False, then attributes are taken from zBuilder
-                                   and values are taken from the scene.
-                                   Test fails if zBuilder is missing any of the keys
-                                   or has any keys with different values.
-        """
-        item_names = [x.name for x in self.scene_items_retrieved]
-        self.check_retrieve_looks_good(builder, expected_plugs, item_names, self.type_)
-
     def test_builder_change_with_string_replace(self):
-        ## VERIFY
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
 
-        # find left and right tissue items regardless of name, by looking at mesh they
-        # are tied to
-        r_item_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('r_')]
-        self.assertNotEqual(len(self.l_item_geo), 0)  # Left geo should have been all renamerd to r_
-        self.assertEqual(r_item_geo, [])  # Make sure no r_ geo is in original scene
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_not_equal(self.scene_items_retrieved, 'l_', 0)
 
-        ## ACT
+        # ACT
         self.builder.string_replace("^l_", "r_")
 
-        ## VERIFY
-        new_left_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('l_')]
-        r_item_geo = [x for x in self.scene_items_retrieved if x.association[0].startswith('r_')]
-        self.assertEqual(len(self.l_item_geo),
-                         len(r_item_geo))  # number of right geos equal original left
-        self.assertEqual(new_left_geo, [])  # after replace left geo should have been renamed
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
 
     def test_builder_build_with_string_replace(self):
-        from zBuilder.parameters.maps import get_weights
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # ACT
         self.builder.string_replace("^l_", "r_")
         self.builder.build()
 
         # VERIFY
-        item_names_in_builder = [x.name for x in self.scene_items_retrieved]
-        # Original Ziva nodes should still be in scene
-        self.assertSceneHasNodes(item_names_in_builder)
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
 
-        # comparing attribute values between builder and scene
-        for scene_item in self.scene_items_retrieved:
-            scene_name = scene_item.name
-            for attr in scene_item.attrs.keys():
-                scene_value = cmds.getAttr('{}.{}'.format(scene_name, attr))
-                self.assertTrue(scene_value == scene_item.attrs[attr]['value'])
-
-        # Checking maps in builder against ones in scene
-        for item in self.scene_items_retrieved:
-            for map_ in item.parameters['map']:
-                builder_map_value = map_.values
-
-                scene_mesh = map_.get_mesh()
-                scene_map_name = map_.name
-                scene_map_value = get_weights(scene_map_name, scene_mesh)
-
-                self.assertEqual(builder_map_value, list(scene_map_value))
+        self.compare_maps_in_builder_with_scene(self.scene_items_retrieved)
