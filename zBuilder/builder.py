@@ -89,15 +89,6 @@ class Builder(object):
                     for parameter in parameters:
                         node.add_parameter(parameter)
                         scene_items.append(parameter)
-                    # get the parameter info for a node in a dict format
-                    node_parameter_info = node.spawn_parameters()
-
-                    for parameter_type, parameter_args in node_parameter_info.iteritems():
-                        for parameter_arg in parameter_args:
-                            parameter = self.parameter_factory(parameter_type, parameter_arg)
-
-                            node.add_parameter(parameter)
-                            scene_items.append(parameter)
 
         return scene_items
 
