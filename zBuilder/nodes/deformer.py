@@ -20,7 +20,7 @@ class Deformer(DGNode):
         """ This takes a zBuilder parameter and adds it to the node.  This is effectively
         a pointer to original parameter for later retrieval
 
-        args: 
+        args:
             parameter: obj the parameter to add to node
         """
         self.parameters[parameter.type].append(parameter)
@@ -42,6 +42,9 @@ class Deformer(DGNode):
             for map_name, mesh_name in zip(map_names, mesh_names):
                 objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
+
+    def get_parameters(self, types=[]):
+        return self.builder.get_parameters_from_node(self, types)
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
@@ -126,9 +129,6 @@ class Deformer(DGNode):
             parent = cmds.listRelatives(mesh, p=True)
             tmp.extend(cmds.ls(parent, long=True))
         return tmp
-
-    def get_parameters(self, types=[]):
-        return self.builder.get_parameters_from_node(self, types)
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya
