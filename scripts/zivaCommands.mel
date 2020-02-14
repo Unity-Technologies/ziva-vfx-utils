@@ -133,6 +133,7 @@ global proc ZivaDeleteSelection()
         warning("selected node: " + $s + " can not be deleted in isolation");
         continue;
     }
+    
     if((nodeType($s) == "transform") || (nodeType($s) == "mesh"))
     {
       string $body[] = `zQuery -m $s`;
@@ -148,7 +149,7 @@ global proc ZivaDeleteSelection()
         }
       }
     }
-    if((nodeType($s) == "zAttachment") || (nodeType($s) == "zFiber") || (nodeType($s) == "zMaterial"))
+    else if((nodeType($s) == "zAttachment") || (nodeType($s) == "zFiber") || (nodeType($s) == "zMaterial"))
     {
       if(`objExists($s)`)
       {
