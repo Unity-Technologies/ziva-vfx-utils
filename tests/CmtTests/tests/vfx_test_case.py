@@ -81,20 +81,6 @@ class VfxTestCase(TestCase):
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
 
-    def compare_maps_in_builder_with_scene(self, scene_items):
-        from zBuilder.parameters.maps import get_weights
-
-        # Checking maps in builder against ones in scene
-        for item in scene_items:
-            for map_ in item.parameters['map']:
-                builder_map_value = map_.values
-
-                scene_mesh = map_.get_mesh()
-                scene_map_name = map_.name
-                scene_map_value = get_weights(scene_map_name, scene_mesh)
-
-                self.assertEqual(builder_map_value, list(scene_map_value))
-
     def check_node_association_amount_equal(self, scene_items, startswith='r_', amount=0):
         geo = [x for x in scene_items if x.association[0].startswith(startswith)]
         self.assertEqual(len(geo), amount)
@@ -124,6 +110,20 @@ class VfxTestCase(TestCase):
                 # and automatically deal with them in set_maya_attrs
                 if attr != 'oLength':
                     self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
+
+    def compare_builder_parameters_with_scene_parameters(self, builder):
+        from zBuilder.parameters.maps import get_weights
+
+        items = builder.get_scene_items(type_filter=['map'])
+        # Checking maps in builder against ones in scene
+        for item in items:
+            builder_map_value = item.values
+
+            scene_mesh = item.get_mesh()
+            scene_map_name = item.name
+            scene_map_value = get_weights(scene_map_name, scene_mesh)
+
+            self.assertEqual(builder_map_value, list(scene_map_value))
 
     def check_retrieve_looks_good(self, builder, expected_plugs, node_names, node_type):
         """Args:
