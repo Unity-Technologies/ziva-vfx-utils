@@ -85,7 +85,7 @@ class VfxTestCase(TestCase):
         from zBuilder.parameters.maps import get_weights
 
         # Checking maps in builder against ones in scene
-        for item in self.scene_items_retrieved:
+        for item in scene_items:
             for map_ in item.parameters['map']:
                 builder_map_value = map_.values
 
