@@ -227,6 +227,7 @@ class ZivaRestShapeMirrorTestCase(VfxTestCase):
         # VERIFY
         self.compare_builder_nodes_with_scene_nodes(self.builder)
         self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
 
         self.compare_builder_parameters_with_scene_parameters(self.builder)
 

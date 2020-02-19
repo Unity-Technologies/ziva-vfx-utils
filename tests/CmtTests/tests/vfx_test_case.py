@@ -125,6 +125,14 @@ class VfxTestCase(TestCase):
 
             self.assertEqual(builder_map_value, list(scene_map_value))
 
+    def compare_builder_restshapes_with_scene_restshapes(self, builder):
+        # checking the actual restshapes got hooked up in maya
+        for item in self.builder.get_scene_items(type_filter='zRestShape'):
+            connections = cmds.listConnections('{}.target'.format(item.name))
+            connections_long_name = cmds.ls(connections, long=True)
+
+            self.assertEqual(item.targets, connections_long_name)
+
     def check_retrieve_looks_good(self, builder, expected_plugs, node_names, node_type):
         """Args:
             builder (builders.ziva.Ziva()): builder object
