@@ -218,4 +218,4 @@ class ZivaMaterialMirrorTestCase(VfxTestCase):
         self.compare_builder_nodes_with_scene_nodes(self.builder)
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
-        self.compare_builder_parameters_with_scene_parameters(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)

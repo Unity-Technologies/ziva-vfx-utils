@@ -111,7 +111,7 @@ class VfxTestCase(TestCase):
                 if attr != 'oLength':
                     self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
-    def compare_builder_parameters_with_scene_parameters(self, builder):
+    def compare_builder_maps_with_scene_maps(self, builder):
         from zBuilder.parameters.maps import get_weights
 
         items = builder.get_scene_items(type_filter=['map'])
