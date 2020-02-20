@@ -15,10 +15,14 @@ Release Notes
 
 Functionality
 -------------
+- **Scene Panel:** Now able to rename nodes by double-clicking on them.
+- **Scene Panel:** Added right-click menu for zSolver.
+- **Scene Panel:** Updated icons.
 - **zBuilder:** Now storing a link to map and mesh in scene item.
 
 Bug Fixes
 ---------
+- **Scene Panel:** Opening Node Editor clears Scene Panel content while detached from the dock.
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.
 
 1.0.10
