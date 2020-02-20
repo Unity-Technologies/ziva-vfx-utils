@@ -229,10 +229,3 @@ class ZivaRestShapeMirrorTestCase(VfxTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
         self.compare_builder_restshapes_with_scene_restshapes(self.builder)
         self.compare_builder_maps_with_scene_maps(self.builder)
-
-        # checking the actual restshapes got hooked up in maya
-        for item in self.builder.get_scene_items(type_filter='zRestShape'):
-            connections = cmds.listConnections('{}.target'.format(item.name))
-            connections_long_name = cmds.ls(connections, long=True)
-
-            self.assertEqual(item.targets, connections_long_name)
