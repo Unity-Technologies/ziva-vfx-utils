@@ -486,12 +486,20 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
     if rtbs:
         for rtb in rtbs:
-            crv = cmds.listConnections(rtb + '.outputGeometry')
+            crv = cmds.listConnections(rtb + '.outputGeometry', shapes=True)
+            # If curve has multiple zRivetToBone nodes, need to search zRivetToBone connections
+            # until curve is found
+            while crv:
+                if cmds.nodeType(crv[0]) == 'nurbsCurve':
+                    break
+                else:
+                    crv = cmds.listConnections(crv[0] + ".outputGeometry", shapes=True)
+            crv = cmds.listRelatives(crv, p=True)
             if crv:
                 # remove namespace
                 crv = crv[0].split(":")[-1]
                 cmds.rename(rtb, crv + '_zRivetToBone1')
-                print('rename: ', rtb, '{}_{}'.format(crv, '_zRivetToBone1'))
+                print('rename: ', rtb, '{}_{}'.format(crv, 'zRivetToBone1'))
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
