@@ -19,6 +19,7 @@ Functionality
 - **Scene Panel:** Added right-click menu for zSolver.
 - **Scene Panel:** Updated icons.
 - **zBuilder:** Now storing a link to map and mesh in scene item.
+- **Shelf:** Added Ziva Shelf.
 
 Bug Fixes
 ---------
