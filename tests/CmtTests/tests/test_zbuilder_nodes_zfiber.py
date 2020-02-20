@@ -253,23 +253,8 @@ class ZivaFiberMirrorTestCase(VfxTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
-        self.check_node_association_amount_not_equal(self.scene_items_retrieved, 'l_', 0)
-
-        # ACT
-        self.builder.string_replace("^l_", "r_")
-
-        # VERIFY
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
                                                  len(self.l_item_geo))
-
-    def test_builder_change_with_string_replace(self):
-        # VERIFY
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
-        self.check_node_association_amount_not_equal(self.scene_items_retrieved, 'l_', 0)
 
         # ACT
         self.builder.string_replace("^l_", "r_")
