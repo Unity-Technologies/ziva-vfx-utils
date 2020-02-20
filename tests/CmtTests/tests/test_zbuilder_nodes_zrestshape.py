@@ -228,8 +228,7 @@ class ZivaRestShapeMirrorTestCase(VfxTestCase):
         self.compare_builder_nodes_with_scene_nodes(self.builder)
         self.compare_builder_attrs_with_scene_attrs(self.builder)
         self.compare_builder_restshapes_with_scene_restshapes(self.builder)
-
-        self.compare_builder_parameters_with_scene_parameters(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
 
         # checking the actual restshapes got hooked up in maya
         for item in self.builder.get_scene_items(type_filter='zRestShape'):
