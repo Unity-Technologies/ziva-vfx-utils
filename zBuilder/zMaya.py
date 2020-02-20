@@ -453,6 +453,8 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
                 for r in replace:
                     mesh = mesh.replace(r, '')
+                # remove namespace
+                mesh = mesh.split(":")[-1]
                 if item != '{}_{}'.format(mesh, zNode):
                     cmds.rename(item, '{}_{}tmp'.format(mesh, zNode))
 
@@ -463,6 +465,8 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
                 for r in replace:
                     mesh = mesh.replace(r, '')
+                # remove namespace
+                mesh = mesh.split(":")[-1]
                 if item != '{}_{}'.format(mesh, zNode):
                     cmds.rename(item, '{}_{}'.format(mesh, zNode))
                     print('rename: ', item, '{}_{}'.format(mesh, zNode))
@@ -473,7 +477,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         for loa in loas:
             crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
-                cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
+                # remove namespace
+                crv = crv[0].split(":")[-1]
+                cmds.rename(loa, crv.replace('_zFiber', '_zLineOfAction'))
+                print('rename: ', loa, crv.replace('_zFiber', '_zLineOfAction'))
 
     # rename zRivetToBone nodes
     rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
@@ -481,7 +488,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         for rtb in rtbs:
             crv = cmds.listConnections(rtb + '.outputGeometry')
             if crv:
-                cmds.rename(rtb, crv[0] + '_zRivetToBone1')
+                # remove namespace
+                crv = crv[0].split(":")[-1]
+                cmds.rename(rtb, crv + '_zRivetToBone1')
+                print('rename: ', rtb, '{}_{}'.format(crv, '_zRivetToBone1'))
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
@@ -489,9 +499,13 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             s = mel.eval('zQuery -as {}'.format(attachment))[0]
             for r in replace:
                 s = s.replace(r, '')
+            # remove namespace from source mesh
+            s = s.split(":")[-1]
             t = mel.eval('zQuery -at {}'.format(attachment))[0]
             for r in replace:
                 t = t.replace(r, '')
+            # remove namespace from target mesh
+            t = t.split(":")[-1]
             if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
                 cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
                 print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
