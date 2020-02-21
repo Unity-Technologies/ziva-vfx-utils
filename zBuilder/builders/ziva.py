@@ -98,7 +98,7 @@ class Ziva(Builder):
         # solvers
         collected_solver_dict = {}
         for item in self.get_scene_items(type_filter=['zSolver']):
-            for x in self.get_scene_items(type_filter='zSolverTransform'):
+            for x in self.get_scene_items(type_filter=['zSolverTransform']):
                 if x.solver == item.solver:
                     parent_node = x
                     collected_solver_dict[item.name] = x
