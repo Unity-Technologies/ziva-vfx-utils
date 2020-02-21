@@ -322,17 +322,6 @@ class ZivaMirrorTestCase(VfxTestCase):
 
     """
 
-
-class ZivaMirrorTestCase(VfxTestCase):
-    """This Class tests a specific type of "mirroring" so there are some assumptions made
-
-    - geometry has an identifiable qualifier, in this case it is l_ and r_
-    - Both sides geometry are in the scene
-    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
-    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
-
-    """
-
     def builder_change_with_string_replace(self):
         # VERIFY
         self.compare_builder_nodes_with_scene_nodes(self.builder)
