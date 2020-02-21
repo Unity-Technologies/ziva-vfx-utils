@@ -151,7 +151,7 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaRivetToBoneMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
