@@ -70,13 +70,13 @@ class ZivaFiberGenericTestCase(VfxTestCase):
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(cmds.ls("r_tissue_2_zFiber"), [])
+        self.assertEqual(cmds.ls("r_tissue_2_zFiber1"), [])
 
         ## ACT
         mz.rename_ziva_nodes()
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_2_zFiber")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_2_zFiber1")), 1)
 
     def test_string_replace(self):
         ## VERIFY
