@@ -306,8 +306,8 @@ def rig_paste():
     # We resolve this as follows: If such a solver does not exist in the scene (because, say,
     # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
     # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
-    solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(type_filter='zSolver')[0]
-    solver_in_clipboard = cmds.listRelatives(solver_in_clipboard.name, p=True)[0]
+    solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
+        type_filter='zSolverTransform')[0].name
     if not cmds.objExists(solver_in_clipboard):
         generated_solver = mel.eval('ziva -s;')[1]  # make a new solver
         cmds.rename(
@@ -419,8 +419,7 @@ def load_rig(file_name, solver_name=None):
     builder.retrieve_from_file(file_name)
     if solver_name != None:
         # replace the solver name stored in the .zBuilder file with solverName
-        solver_name_in_file = builder.get_scene_items(type_filter='zSolver')[0]
-        solver_name_in_file = cmds.listRelatives(solver_name_in_file, p=True)[0]
+        solver_name_in_file = builder.get_scene_items(type_filter='zSolverTransform')[0].name
         builder.string_replace(solver_name_in_file, solver_name)
     builder.build()
 
