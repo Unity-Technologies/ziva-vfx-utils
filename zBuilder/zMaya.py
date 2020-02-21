@@ -423,6 +423,17 @@ def get_association(zNode):
             return mesh
 
 
+def safe_rename(old_name, new_name):
+    """
+    Same as cmds.rename nut does not throw an exception if renaming failed
+    Useful if need to rename all the nodes that are not referenced
+    """
+    try:
+        return cmds.rename(old_name, new_name)
+    except RuntimeError:
+        pass
+
+
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
     """ Renames zNodes based on mesh it's connected to.
 
@@ -469,9 +480,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 if zNode in ['zMaterial', 'zFiber']:
                     new_name += '1'
                 if item != new_name:
-                    new_name = cmds.rename(item, '{}{}'.format(new_name, postfix))
-                    old_names.append(item)
-                    new_names.append(new_name)
+                    new_name = safe_rename(item, '{}{}'.format(new_name, postfix))
+                    if new_name:
+                        old_names.append(item)
+                        new_names.append(new_name)
 
         return old_names, new_names
 
@@ -492,8 +504,9 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 crv = crv[0].split(':')[-1]
                 new_name = crv.replace('_zFiber', '_zLineOfAction')
                 if loa != new_name:
-                    new_name = cmds.rename(loa, new_name)
-                    logger.info('rename: {} to {}'.format(loa, new_name))
+                    new_name = safe_rename(loa, new_name)
+                    if new_name:
+                        logger.info('rename: {} to {}'.format(loa, new_name))
 
     def rivet_to_bone_rename_helper(rtbs, postfix):
         # The same idea as for znode_rename_helper but for zRivetToBone
@@ -517,9 +530,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 crv = crv.split(':')[-1]
                 new_name = '{}_{}'.format(crv, 'zRivetToBone1')
                 if rtb != new_name:
-                    new_name = cmds.rename(rtb, '{}{}'.format(new_name, postfix))
-                    old_names.append(rtb)
-                    new_names.append(new_name)
+                    new_name = safe_rename(rtb, '{}{}'.format(new_name, postfix))
+                    if new_name:
+                        old_names.append(rtb)
+                        new_names.append(new_name)
 
         return old_names, new_names
 
@@ -547,8 +561,9 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             t = t.split(":")[-1]
             new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
             if attachment != new_name:
-                new_name = cmds.rename(attachment, new_name)
-                logger.info('rename: {} to {}'.format(attachment, new_name))
+                new_name = safe_rename(attachment, new_name)
+                if new_name:
+                    logger.info('rename: {} to {}'.format(attachment, new_name))
 
     logger.info('finished renaming.... ')
 
