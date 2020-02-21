@@ -156,7 +156,9 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
         self.builder.retrieve_from_scene()
         # gather info
         self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
-        self.l_item_geo = []
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
 
     def test_builder_change_with_string_replace(self):
         super(ZivaRivetToBoneMirrorTestCase, self).builder_change_with_string_replace()
