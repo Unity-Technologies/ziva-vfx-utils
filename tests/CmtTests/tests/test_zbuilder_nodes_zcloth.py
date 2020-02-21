@@ -6,7 +6,7 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase
 
 NODE_TYPE = 'zCloth'
 
@@ -150,7 +150,7 @@ class ZivaClothMirrorTestCase(ZivaMirrorTestCase):
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
-    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+    - Ziva nodes are named default like so: zCloth1, zCloth2, zCloth3
 
     """
 
@@ -171,3 +171,37 @@ class ZivaClothMirrorTestCase(ZivaMirrorTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaClothMirrorTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaClothMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaClothMirrorNiceNameTestCase, self).setUp()
+        # gather info
+
+        # Bring in scene
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # force NICE NAMES
+        mz.rename_ziva_nodes()
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaClothMirrorNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaClothMirrorNiceNameTestCase, self).builder_build_with_string_replace()

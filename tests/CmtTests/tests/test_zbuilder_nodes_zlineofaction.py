@@ -6,7 +6,7 @@ import zBuilder.zMaya as mz
 from maya import cmds
 from maya import mel
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase
 
 NODE_TYPE = 'zLineOfAction'
 
@@ -19,7 +19,7 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        test_utils.load_scene(scene_name="mirror_example-lineofaction_rivet.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -129,7 +129,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         cmds.setAttr('bone.translateY', 2)
         cmds.polySphere(name='tissue')
 
-        # create zTissue and zBone
+        # create zLineOfAction and zBone
         cmds.select('tissue')
         mel.eval('ziva -t')
 
@@ -210,7 +210,7 @@ class ZivaLineOfActionMirrorTestCase(ZivaMirrorTestCase):
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
-    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+    - Ziva nodes are named default like so: zLineOfAction1, zLineOfAction2, zLineOfAction3
 
     """
 
