@@ -208,12 +208,13 @@ class ZivaRestShapeMirrorTestCase(ZivaMirrorTestCase):
     def test_builder_build_with_string_replace(self):
         super(ZivaRestShapeMirrorTestCase, self).builder_build_with_string_replace()
 
+
 class ZivaRestShapeUpdateTestCase(ZivaUpdateTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
-    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Both sides have Ziva nodes
 
     """
 

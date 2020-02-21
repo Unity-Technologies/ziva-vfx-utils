@@ -148,7 +148,7 @@ class ZivaBoneUpdateTestCase(ZivaUpdateTestCase):
 
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
-    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Both sides have Ziva nodes
 
     """
 
