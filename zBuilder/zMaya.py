@@ -446,7 +446,13 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
 
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
-    for zNode in zNodes:
+    def znode_rename_helper(zNode, postfix):
+        # Helper for cases when need to rename nodes like:
+        # zMaterial1, zMaterial4, zMaterial25 to
+        # zMaterial1, zMaterial2, zMaterial3
+        # And not to rename nodes like:
+        # zMaterial1, zMaterial2, zMaterial3 to
+        # zMaterial4, zMaterial5, zMaterial6
         items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
         if items:
             for item in items:
@@ -456,20 +462,14 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 # remove namespace
                 mesh = mesh.split(":")[-1]
                 if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}tmp'.format(mesh, zNode))
+                    new_name = cmds.rename(item, '{}_{}{}'.format(mesh, zNode, postfix))
+                    if not postfix:
+                        logger.info('rename: {} to {}'.format(item, new_name))
 
+    for zNode in zNodes:
+        znode_rename_helper(zNode, '_tmp')
         # looping through this twice to get around how maya renames stuff
-        items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
-                for r in replace:
-                    mesh = mesh.replace(r, '')
-                # remove namespace
-                mesh = mesh.split(":")[-1]
-                if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}'.format(mesh, zNode))
-                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
+        znode_rename_helper(zNode, '')
 
     # rename zLineOfAction nodes
     loas = mel.eval('zQuery -loa {}'.format(solver[0]))
@@ -479,12 +479,13 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             if crv:
                 # remove namespace
                 crv = crv[0].split(":")[-1]
-                cmds.rename(loa, crv.replace('_zFiber', '_zLineOfAction'))
-                print('rename: ', loa, crv.replace('_zFiber', '_zLineOfAction'))
+                new_name = crv.replace('_zFiber', '_zLineOfAction')
+                if loa != new_name:
+                    new_name = cmds.rename(loa, new_name)
+                    logger.info('rename: {} to {}'.format(loa, new_name))
 
-    # rename zRivetToBone nodes
-    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
-    if rtbs:
+    def rivet_to_bone_rename_helper(rtbs, postfix):
+        # The same idea as for znode_rename_helper but for zRivetToBone
         for rtb in rtbs:
             crv = cmds.listConnections(rtb + '.outputGeometry', shapes=True)
             # If curve has multiple zRivetToBone nodes, need to search zRivetToBone connections
@@ -496,10 +497,21 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     crv = cmds.listConnections(crv[0] + ".outputGeometry", shapes=True)
             crv = cmds.listRelatives(crv, p=True)
             if crv:
+                for r in replace:
+                    crv = crv.replace(r, '')
                 # remove namespace
                 crv = crv[0].split(":")[-1]
-                cmds.rename(rtb, crv + '_zRivetToBone1')
-                print('rename: ', rtb, '{}_{}'.format(crv, 'zRivetToBone1'))
+                new_name = "{}_{}{}".format(crv, 'zRivetToBone', postfix)
+                if rtb != new_name:
+                    new_name = cmds.rename(rtb, new_name)
+                    if not postfix:
+                        logger.info('rename: {} to {}'.format(rtb, new_name))
+
+    # rename zRivetToBone nodes
+    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
+    if rtbs:
+        rivet_to_bone_rename_helper(rtbs, '_tmp')
+        rivet_to_bone_rename_helper(rtbs, '')
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
@@ -514,9 +526,11 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 t = t.replace(r, '')
             # remove namespace from target mesh
             t = t.split(":")[-1]
-            if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
-                cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+            new_name = cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+            if attachment != new_name:
+                new_name = cmds.rename(attachment, new_name)
+                logger.info('rename: {} to {}'.format(attachment, new_name))
+
     logger.info('finished renaming.... ')
 
 
