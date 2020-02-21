@@ -497,10 +497,11 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                     crv = cmds.listConnections(crv[0] + ".outputGeometry", shapes=True)
             crv = cmds.listRelatives(crv, p=True)
             if crv:
+                crv = crv[0]
                 for r in replace:
                     crv = crv.replace(r, '')
                 # remove namespace
-                crv = crv[0].split(":")[-1]
+                crv = crv.split(":")[-1]
                 new_name = "{}_{}{}".format(crv, 'zRivetToBone', postfix)
                 if rtb != new_name:
                     new_name = cmds.rename(rtb, new_name)
