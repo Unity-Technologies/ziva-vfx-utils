@@ -121,7 +121,6 @@ class Ziva(Builder):
                 if item.parent_tissue:
                     # This node has a parent subTissue, so lets find the parents mesh
                     # for proper parenting.
-                    parent_tissue_scene_item = self.get_scene_items(name_filter=item.parent_tissue)
                     parent_tissue_mesh = item.parent_tissue.long_association[0]
                     parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
