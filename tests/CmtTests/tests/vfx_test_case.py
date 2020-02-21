@@ -104,12 +104,7 @@ class VfxTestCase(TestCase):
 
         for item in items:
             for attr, v in item.attrs.iteritems():
-
-                # TODO oLength is on zLineOfAction and it is not settable.  So skipping over here:
-                # We should maybe not aquire non-settable attributes OR define them as non-settable
-                # and automatically deal with them in set_maya_attrs
-                if attr != 'oLength':
-                    self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
+                self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
     def compare_builder_maps_with_scene_maps(self, builder):
         from zBuilder.parameters.maps import get_weights
