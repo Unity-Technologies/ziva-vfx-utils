@@ -425,7 +425,7 @@ def get_association(zNode):
 
 def safe_rename(old_name, new_name):
     """
-    Same as cmds.rename nut does not throw an exception if renaming failed
+    Same as cmds.rename but does not throw an exception if renaming failed
     Useful if need to rename all the nodes that are not referenced
     """
     try:
