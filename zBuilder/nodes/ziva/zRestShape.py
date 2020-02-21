@@ -15,7 +15,7 @@ class RestShapeNode(Ziva):
 
     def __init__(self, parent=None, builder=None):
         super(RestShapeNode, self).__init__(parent=parent, builder=builder)
-        self.targets = []s
+        self.targets = []
         self.tissue_item = None
 
     def populate(self, maya_node=None):

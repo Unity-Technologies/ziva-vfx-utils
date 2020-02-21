@@ -81,8 +81,24 @@ class VfxTestCase(TestCase):
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
 
+    def check_tissue_node_subtissue_builder_and_scene(self, scene_items):
+
+        # Tissue specific sub-tissue check
+        parents = {
+            x.name: x.parent_tissue.name
+            for x in scene_items if x.type == 'zTissue' and x.parent_tissue
+        }
+
+        if parents:
+            for key, value in parents.iteritems():
+                self.assertEqual(value, cmds.listConnections(key + '.iParentTissue')[0])
+
     def check_node_association_amount_equal(self, scene_items, startswith='r_', amount=0):
-        geo = [x for x in scene_items if x.association[0].startswith(startswith)]
+        geo = []
+        for scene_item in scene_items:
+            if scene_item.association:
+                if scene_item.association[0].startswith(startswith):
+                    geo.append(scene_item)
         self.assertEqual(len(geo), amount)
 
     def check_node_association_amount_not_equal(self, scene_items, startswith='r_', amount=0):
@@ -294,3 +310,57 @@ class VfxTestCase(TestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
+
+
+class ZivaMirrorTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+
+    """
+
+
+class ZivaMirrorTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+
+    """
+
+    def builder_change_with_string_replace(self):
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
+
+    def builder_build_with_string_replace(self):
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
+        self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)

@@ -9,7 +9,9 @@ import zBuilder.zMaya as mz
 
 from maya import OpenMaya as om
 
-from vfx_test_case import VfxTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase
+
+NODE_TYPE = 'zSolver'
 
 
 class ZivaSolverGenericTestCase(VfxTestCase):
@@ -255,80 +257,28 @@ class ZivaSolverTestCase(VfxTestCase):
         self.assertSceneHasNodes([solver_node.name])
 
 
-class ZivaSolverMirrorTestCase(VfxTestCase):
+class ZivaSolverMirrorTestCase(ZivaMirrorTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
 
     """
 
     def setUp(self):
         super(ZivaSolverMirrorTestCase, self).setUp()
+
         test_utils.load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-
         # gather info
-        self.type_ = 'zSolver'
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
-        self.l_item_geo = []
-
-    def check_retrieve_ztissue_looks_good(self, builder, expected_plugs):
-        """Args:
-            builder (builders.ziva.Ziva()): builder object
-            expected_plugs (dict): A dict of expected attribute/value pairs.
-                                   {'zTissue1.collisions':True, ...}.
-                                   If None/empty/False, then attributes are taken from zBuilder
-                                   and values are taken from the scene.
-                                   Test fails if zBuilder is missing any of the keys
-                                   or has any keys with different values.
-        """
-        item_names = [x.name for x in self.scene_items_retrieved]
-        self.check_retrieve_looks_good(builder, expected_plugs, item_names, self.type_)
-
-    def test_builder_build_with_string_replace(self):
-        # ACT
-        self.builder.string_replace("^l_", "r_")
-        self.builder.build()
-
-        # VERIFY
-        item_names_in_builder = [x.name for x in self.scene_items_retrieved]
-        # Original Ziva nodes should still be in scene
-        self.assertSceneHasNodes(item_names_in_builder)
-
-        # comparing attribute values between builder and scene
-        for scene_item in self.scene_items_retrieved:
-            scene_name = scene_item.name
-            for attr in scene_item.attrs.keys():
-                scene_value = cmds.getAttr('{}.{}'.format(scene_name, attr))
-                self.assertTrue(scene_value == scene_item.attrs[attr]['value'])
-
-
-class ZivaSolverTransformMirrorTestCase(VfxTestCase):
-    """This Class tests a specific type of "mirroring" so there are some assumptions made
-
-    - geometry has an identifiable qualifier, in this case it is l_ and r_
-    - Both sides geometry are in the scene
-    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
-
-    """
-
-    def setUp(self):
-        super(ZivaSolverTransformMirrorTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
-        self.builder = zva.Ziva()
-        self.builder.retrieve_from_scene()
-
-        # gather info
-        self.type_ = 'zSolverTransform'
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
-        # VERIFY
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        super(ZivaSolverMirrorTestCase, self).builder_change_with_string_replace()
 
-
+    def test_builder_build_with_string_replace(self):
+        super(ZivaSolverMirrorTestCase, self).builder_build_with_string_replace()

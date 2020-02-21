@@ -6,7 +6,9 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 
-from vfx_test_case import VfxTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase
+
+NODE_TYPE = 'zCloth'
 
 
 class ZivaClothTestCase(VfxTestCase):
@@ -142,55 +144,28 @@ class ZivaClothTestCase(VfxTestCase):
         self.assertSceneHasNodes(['zCloth1', 'zCloth2'])
 
 
-class ZivaClothMirrorTestCase(VfxTestCase):
+class ZivaClothMirrorTestCase(ZivaMirrorTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
 
     """
 
     def setUp(self):
         super(ZivaClothMirrorTestCase, self).setUp()
+
         test_utils.load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-
         # gather info
-        self.type_ = 'zCloth'
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
-        self.l_item_geo = [
-            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
-        ]
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
-        # VERIFY
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
-                                                 len(self.l_item_geo))
-
-        # ACT
-        self.builder.string_replace("^l_", "r_")
-
-        # VERIFY
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
-        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
-                                                 len(self.l_item_geo))
+        super(ZivaClothMirrorTestCase, self).builder_change_with_string_replace()
 
     def test_builder_build_with_string_replace(self):
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
-        # ACT
-        self.builder.string_replace("^l_", "r_")
-        self.builder.build()
-
-        # VERIFY
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
-        self.compare_builder_maps_with_scene_maps(self.builder)
+        super(ZivaClothMirrorTestCase, self).builder_build_with_string_replace()
