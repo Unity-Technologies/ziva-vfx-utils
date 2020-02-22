@@ -89,7 +89,7 @@ class DGNode(Base):
         # selection = mz.parse_maya_node_for_selection(maya_node)
         maya_node = mz.check_maya_node(maya_node)
         self.name = maya_node
-        self.type = cmds.objectType(maya_node)
+        self.type = cmds.objectType(self.long_name)
         self.get_maya_attrs()
 
     def build(self, *args, **kwargs):
@@ -122,7 +122,7 @@ class DGNode(Base):
         Returns:
             prints out items that are different.
         """
-        name = self.name
+        name = self.long_name
 
         attr_list = self.attrs.keys()
         if cmds.objExists(name):
@@ -155,12 +155,12 @@ class DGNode(Base):
         """
 
         # build the attribute list to aquire from scene
-        attr_list = mz.build_attr_list(self.name)
+        attr_list = mz.build_attr_list(self.long_name)
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
 
         # with attribute list, get values in dictionary format and update node.
-        self.attrs = mz.build_attr_key_values(self.name, attr_list)
+        self.attrs = mz.build_attr_key_values(self.long_name, attr_list)
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya

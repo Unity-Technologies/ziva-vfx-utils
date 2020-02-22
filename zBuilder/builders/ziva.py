@@ -371,9 +371,9 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         solver = None
         if args:
-            solver = mel.eval('zQuery -t "zSolver" {}'.format(args[0]))
+            solver = mel.eval('zQuery -t "zSolver" -l {}'.format(args[0]))
         else:
-            solver = mel.eval('zQuery -t "zSolver"')
+            solver = mel.eval('zQuery -t "zSolver" -l')
 
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
@@ -695,7 +695,7 @@ def zQuery(types, solver):
     types_in_znodes = list(set(ZNODES) & set(types))
 
     for node_type in types_in_znodes:
-        tmp = mel.eval('zQuery -t "{}" {}'.format(node_type, solver))
+        tmp = mel.eval('zQuery -t "{}" -l {}'.format(node_type, solver))
         if tmp:
             nodes.extend(tmp)
 
