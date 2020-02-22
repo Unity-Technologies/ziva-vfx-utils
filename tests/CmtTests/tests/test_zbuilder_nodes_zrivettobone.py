@@ -191,7 +191,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         builder.build()
 
         # gather info
-        cmds.select('l_armA_muscle_geo', 'l_armA_subtissue_geo')
+        cmds.select('l_armA_muscle_geo')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
