@@ -245,7 +245,7 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
 
         # NICE NAMES
         mz.rename_ziva_nodes()
