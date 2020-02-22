@@ -1,6 +1,7 @@
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
+from maya import cmds
 
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateNiceNameTestCase
 
