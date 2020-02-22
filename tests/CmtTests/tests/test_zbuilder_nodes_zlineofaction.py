@@ -19,7 +19,7 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="mirror_example-lineofaction_rivet.ma")
+        test_utils.load_scene(scene_name="generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
