@@ -81,9 +81,9 @@ def delete_rivet_from_solver(solvers):
     """
     history = cmds.listHistory(solvers, allConnections=True, future=True)
     if history:
-        locators = cmds.ls(history, type='zRivetToBoneLocator')
-        rivets = cmds.ls(history, type='zRivetToBone')
-        locator_parent = cmds.listRelatives(locators, parent=True)
+        locators = cmds.ls(history, type='zRivetToBoneLocator', l=True)
+        rivets = cmds.ls(history, type='zRivetToBone', l=True)
+        locator_parent = cmds.listRelatives(locators, parent=True, fullPath=True)
         if rivets and locator_parent:
             cmds.delete(rivets + locator_parent)
 
