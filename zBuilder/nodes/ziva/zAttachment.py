@@ -32,7 +32,7 @@ class AttachmentNode(Ziva):
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
 
-        name = self.name
+        name = self.get_scene_name()
         source_mesh = self.association[0]
         target_mesh = self.association[1]
 
@@ -62,17 +62,17 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    cmds.rename(existing[d_index], name)
+                    self.name = cmds.rename(existing[d_index], name)
                 else:
                     cmds.select(source_mesh, r=True)
                     cmds.select(target_mesh, add=True)
                     new_att = mel.eval('ziva -a')
-                    cmds.rename(new_att[0], name)
+                    self.name = cmds.rename(new_att[0], name)
             else:
                 cmds.select(source_mesh, r=True)
                 cmds.select(target_mesh, add=True)
                 new_att = mel.eval('ziva -a')
-                cmds.rename(new_att[0], name)
+                self.name = cmds.rename(new_att[0], name)
 
             # set the attributes
             self.set_maya_attrs(attr_filter=attr_filter)

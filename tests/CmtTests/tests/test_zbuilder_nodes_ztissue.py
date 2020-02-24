@@ -5,7 +5,9 @@ import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
 
-from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
+
+NODE_TYPE = 'zTissue'
 
 
 class ZivaTissueGenericTestCase(VfxTestCase):
@@ -81,19 +83,6 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
 
-    def test_string_replace(self):
-        ## VERIFY
-        # check if an item exists before string_replace
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
-        self.assertGreaterEqual(len(r_tissue), 1)
-
-        ## ACT
-        self.builder.string_replace("^r_", "l_")
-
-        ## VERIFY
-        r_tissue = self.builder.get_scene_items(name_filter="r_tissue_2_zTissue")
-        self.assertEqual(r_tissue, [])
-
     def test_cut_paste(self):
         builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zTissue")
         self.check_retrieve_ztissue_looks_good(builder, {})
@@ -113,3 +102,32 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
+
+
+class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+
+    """
+
+    def setUp(self):
+        super(ZivaTissueMirrorTestCase, self).setUp()
+
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaTissueMirrorTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaTissueMirrorTestCase, self).builder_build_with_string_replace()

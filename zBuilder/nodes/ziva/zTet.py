@@ -50,7 +50,9 @@ class TetNode(Ziva):
         if self.get_user_tet_mesh():
             name = self.get_scene_name()
             try:
-                cmds.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh', name + '.iTet', f=True)
+                cmds.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
+                                 name + '.iTet',
+                                 f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
@@ -79,13 +81,13 @@ class TetNode(Ziva):
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.name
-        if not cmds.objExists(name):
-            mesh = self.association[0]
-            if cmds.objExists(mesh):
-                if permissive:
-                    name = mel.eval('zQuery -t zTet ' + mesh)[0]
-                else:
-                    raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
+        mesh = self.association[0]
+        if not cmds.objExists(name) and cmds.objExists(mesh):
+            # this occurs when the zTet node does NOT exist and the mesh does.
+            if permissive:
+                name = mel.eval('zQuery -t zTet ' + mesh)[0]
+            else:
+                raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
 
         if name:
             if not cmds.objExists(name):
@@ -94,7 +96,7 @@ class TetNode(Ziva):
                         '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
                         format(mesh))
             else:
-                new_name = cmds.rename(name, self.name)
+                self.name = cmds.rename(name, self.name)
 
         self.apply_user_tet_mesh()
         self.set_maya_attrs(attr_filter=attr_filter)

@@ -19,12 +19,22 @@ class Base(object):
     type = None
     """ type of scene item """
 
-    COMPARE_EXCLUDE = ['info', '_class', '_children', 'builder', '_parent']
+    COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on', '_children', '_parent']
     """ A list of attribute names in __dict__ to exclude from
             any comparisons.  Anything using __eq__. """
 
-    SCENE_ITEM_ATTRIBUTES = ['parameters', '_children', '_parent']
-    """ The attributes that contain a scene item """
+    SCENE_ITEM_ATTRIBUTES = [
+        'parameters',
+        'fiber_item',
+        'tissue_item',
+        'solver',
+        'parent_tissue',  # for sub-tissues
+        'children_tissues',  # for sub-tissues
+    ]
+    """ The attributes that contain a scene item used as a pointer to the scene item in the bundle.
+            This will convert scene items to a string before serialization and resetup the pointer
+            upon deserilization,  Note that this attributes values gets added to COMPARE_EXCLUDE for 
+            excluding purposes, else there is a cycle."""
 
     def __init__(self, *args, **kwargs):
         self._name = None
@@ -52,8 +62,8 @@ class Base(object):
         to exclude a few keys as they may or may not be equal and that doesn't matter.  For example .info
         has a timestamp, username, maya version, os.  None of those are relevant in this case.
         """
-        return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__,
-                                                         self.COMPARE_EXCLUDE)
+        ignore_list = self.COMPARE_EXCLUDE + self.SCENE_ITEM_ATTRIBUTES
+        return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__, ignore_list)
 
     def __ne__(self, other):
         """ Define a non-equality test
@@ -279,4 +289,9 @@ def equal_dicts(dict_1, dict_2, ignore_keys):
     """
     keys_1 = set(dict_1).difference(ignore_keys)
     keys_2 = set(dict_2).difference(ignore_keys)
-    return keys_1 == keys_2 and all(dict_1[k] == dict_2[k] for k in keys_1)
+
+    if keys_1 == keys_2:
+        return_results = all(dict_1[k] == dict_2[k] for k in keys_1)
+        return return_results
+    else:
+        return False
