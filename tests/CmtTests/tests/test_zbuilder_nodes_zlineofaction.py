@@ -6,7 +6,7 @@ import zBuilder.zMaya as mz
 from maya import cmds
 from maya import mel
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase
 
 NODE_TYPE = 'zLineOfAction'
 
@@ -129,7 +129,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         cmds.setAttr('bone.translateY', 2)
         cmds.polySphere(name='tissue')
 
-        # create zTissue and zBone
+        # create zLineOfAction and zBone
         cmds.select('tissue')
         mel.eval('ziva -t')
 
