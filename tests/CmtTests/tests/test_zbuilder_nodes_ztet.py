@@ -144,6 +144,7 @@ class ZivaTetMirrorTestCase(ZivaMirrorTestCase):
     def test_builder_build_with_string_replace(self):
         super(ZivaTetMirrorTestCase, self).builder_build_with_string_replace()
 
+
 class ZivaTetUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
@@ -176,9 +177,6 @@ class ZivaTetUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
-
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
 
     def test_builder_change_with_string_replace(self):
         super(ZivaTetUpdateNiceNameTestCase, self).builder_change_with_string_replace()

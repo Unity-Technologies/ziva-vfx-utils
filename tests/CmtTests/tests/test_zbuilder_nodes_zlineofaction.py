@@ -266,9 +266,6 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
 
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
     def test_builder_change_with_string_replace(self):
         super(ZivaLineOfActionUpdateNiceNameTestCase, self).builder_change_with_string_replace()
 

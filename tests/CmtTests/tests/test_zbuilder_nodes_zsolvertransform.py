@@ -66,9 +66,6 @@ class ZivaSolverTransformUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
         self.l_item_geo = []
 
-        self.compare_builder_nodes_with_scene_nodes(self.builder)
-        self.compare_builder_attrs_with_scene_attrs(self.builder)
-
     def test_builder_change_with_string_replace(self):
         super(ZivaSolverTransformUpdateNiceNameTestCase, self).builder_change_with_string_replace()
 
