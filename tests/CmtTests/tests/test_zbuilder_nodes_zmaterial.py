@@ -6,7 +6,7 @@ import zBuilder.zMaya as mz
 
 from maya import cmds
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateNiceNameTestCase, ZivaUpdateTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
 
 NODE_TYPE = 'zMaterial'
 
@@ -232,12 +232,45 @@ class ZivaMaterialUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
 
-
     def test_builder_change_with_string_replace(self):
         super(ZivaMaterialUpdateNiceNameTestCase, self).builder_change_with_string_replace()
 
     def test_builder_build_with_string_replace(self):
         super(ZivaMaterialUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaMaterialMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaMaterialMirrorNiceNameTestCase, self).setUp()
+        # gather info
+
+        # Bring in scene
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # force NICE NAMES
+        mz.rename_ziva_nodes()
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaMaterialMirrorNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaMaterialMirrorNiceNameTestCase, self).builder_build_with_string_replace()
 
 
 class ZivaMaterialUpdateTestCase(ZivaUpdateTestCase):

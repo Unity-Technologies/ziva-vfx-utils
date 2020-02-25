@@ -6,7 +6,7 @@ import zBuilder.zMaya as mz
 from maya import cmds
 from maya import mel
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateNiceNameTestCase, ZivaUpdateTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
 
 NODE_TYPE = 'zLineOfAction'
 
