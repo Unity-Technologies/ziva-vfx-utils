@@ -5,7 +5,7 @@ import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase
 
 NODE_TYPE = 'zFiber'
 class ZivaFiberGenericTestCase(VfxTestCase):
@@ -231,7 +231,7 @@ class ZivaFiberMirrorTestCase(ZivaMirrorTestCase):
     - geometry has an identifiable qualifier, in this case it is l_ and r_
     - Both sides geometry are in the scene
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
-    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+    - Ziva nodes are named default like so: zFiber1, zFiber2, zFiber3
 
     """
 
@@ -252,3 +252,40 @@ class ZivaFiberMirrorTestCase(ZivaMirrorTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaFiberMirrorTestCase, self).builder_build_with_string_replace()
+
+class ZivaFiberUpdateTestCase(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaFiberUpdateTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+        cmds.select(self.l_item_geo)
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_scene()
+        new_builder.string_replace("^l_", "r_")
+        new_builder.build()
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaFiberUpdateTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaFiberUpdateTestCase, self).builder_build_with_string_replace()
