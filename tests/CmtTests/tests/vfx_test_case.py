@@ -367,7 +367,8 @@ class ZivaUpdateTestCase(VfxTestCase):
     def builder_change_with_string_replace(self):
 
         self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
-        self.check_node_association_amount_not_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
 
         # ACT
         self.builder.string_replace("^l_", "r_")

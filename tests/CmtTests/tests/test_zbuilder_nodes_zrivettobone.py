@@ -187,12 +187,13 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.type_ = 'zAttachment'
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
-        cmds.select(self.l_item_geo)
+        # select a left tissue mesh
+        tissue = self.builder.get_scene_items(type_filter='zTissue')[0]
+        cmds.select(tissue.association[0])
 
         new_builder = zva.Ziva()
         new_builder.retrieve_from_scene()

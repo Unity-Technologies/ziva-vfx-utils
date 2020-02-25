@@ -273,8 +273,7 @@ class ZivaFiberUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.type_ = 'zAttachment'
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=self.type_)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
