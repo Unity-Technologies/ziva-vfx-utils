@@ -27,13 +27,15 @@ class SolverTransformNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        solver_name = self.get_scene_name()
+        solver_name = self.get_scene_name(long_name=True)
+        if not cmds.objExists(solver_name):
+            solver_name = self.get_scene_name()
 
         if not cmds.objExists(solver_name):
             if not permissive:
                 raise Exception('zSolverTransform not in scene.  please check.')
 
         else:
-            new_name = cmds.rename(solver_name, self.name)
+            cmds.rename(solver_name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

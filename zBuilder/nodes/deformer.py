@@ -124,11 +124,8 @@ class Deformer(DGNode):
             list od strings: list of strings of mesh names.
         """
         meshes = cmds.deformer(node, query=True, g=True)
-        tmp = list()
-        for mesh in meshes:
-            parent = cmds.listRelatives(mesh, p=True)
-            tmp.extend(cmds.ls(parent, long=True))
-        return tmp
+        parent = cmds.listRelatives(meshes, p=True, fullPath=True)
+        return parent
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya

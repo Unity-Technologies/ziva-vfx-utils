@@ -45,7 +45,7 @@ class TissueNode(Ziva):
         """
         solver = None
         if args:
-            solver = mel.eval('zQuery -t zSolver {}'.format(args[0]))
+            solver = mel.eval('zQuery -t zSolver -l {}'.format(args[0]))
 
         if not solver:
             solver = self.solver
@@ -135,12 +135,15 @@ def build_multiple(tissue_items,
                 children_parms = ztissue.builder.get_scene_items(
                     name_filter=ztissue.children_tissues)
                 if children_parms:
-                    children = [x.association[0] for x in children_parms]
+                    children = [x.long_association[0] if cmds.objExists(x.long_association[0]) else x.association[0] for x in children_parms]
                 else:
                     cmds.select(ztissue.children_tissues, r=True)
                     children = mel.eval('zQuery -type zTissue -m ')
 
-                cmds.select(ztissue.association)
+                mesh = ztissue.long_association[0]
+                if not cmds.objExists(mesh):
+                    mesh = ztissue.association
+                cmds.select(mesh)
                 cmds.select(children, add=True)
                 mel.eval('ziva -ast')
 

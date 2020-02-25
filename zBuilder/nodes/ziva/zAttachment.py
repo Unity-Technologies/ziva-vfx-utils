@@ -33,9 +33,12 @@ class AttachmentNode(Ziva):
         permissive = kwargs.get('permissive', True)
 
         name = self.name
-        source_mesh = self.association[0]
-        target_mesh = self.association[1]
-
+        source_mesh = self.long_association[0]
+        if not cmds.objExists(source_mesh):
+            source_mesh = self.association[0]
+        target_mesh = self.long_association[1]
+        if not cmds.objExists(target_mesh):
+            source_mesh = self.association[1]
         # check if both meshes exist
         if mz.check_body_type([source_mesh, target_mesh]):
             # check existing attachments in scene
@@ -53,12 +56,19 @@ class AttachmentNode(Ziva):
                                                                    association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
-                data_s = data_attachment.association[0]
-                data_t = data_attachment.association[1]
+                data_s = data_attachment.long_association[0]
+                if not cmds.objExists(data_s):
+                    data_s = data_attachment.association[0]
+                data_t = data_attachment.long_association[1]
+                if not cmds.objExists(data_t):
+                    data_t = data_attachment.association[1]
                 if data_s == source_mesh and data_t == target_mesh:
                     data.append(data_attachment)
 
-            d_index = data.index(self)
+            try:
+                d_index = data.index(self)
+            except ValueError:
+                d_index = 0
 
             if existing:
                 if d_index < len(existing):

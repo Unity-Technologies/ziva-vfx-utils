@@ -99,13 +99,15 @@ class EmbedderNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
 
-        name = self.get_scene_name()
-        collision_meshes = self.get_collision_meshes()
-        embedded_meshes = self.get_embedded_meshes()
+        collision_meshes = self.get_collision_meshes(long_name=True)
+
+        embedded_meshes = self.get_embedded_meshes(long_name=True)
 
         if collision_meshes:
             for mesh in collision_meshes:
                 for item in collision_meshes[mesh]:
+                    if not cmds.objExists(item):
+                        item = item.split('|')[-1]
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
                         cmds.select(mesh, item, r=True)
@@ -114,6 +116,8 @@ class EmbedderNode(Ziva):
         if embedded_meshes:
             for mesh in embedded_meshes:
                 for item in embedded_meshes[mesh]:
+                    if not cmds.objExists(item):
+                        item = item.split('|')[-1]
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
                         cmds.select(mesh, item, r=True)

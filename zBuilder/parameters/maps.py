@@ -120,14 +120,17 @@ class Map(Base):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
 
-        if cmds.objExists(mesh_data.name):
+        mesh_name = mesh_data.long_name
+        if not cmds.objExists(mesh_name):
+            mesh_name = mesh_data.name
+        if cmds.objExists(mesh_name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
             interp_weights = self.values
             if self.interp_method == "barycentric":
-                interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values)
+                interp_weights = interpolate_values(created_mesh, mesh_name, self.values)
             elif self.interp_method == "endPoints":
-                interp_weights = interpolate_end_points_weights(created_mesh, mesh_data.name,
+                interp_weights = interpolate_end_points_weights(created_mesh, mesh_name,
                                                                 self.values)
             self.values = interp_weights
 
@@ -233,6 +236,8 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
     interpolated_weights = list()
 
+    print weight_list
+
     while not destination_mesh_m_it_mesh_vertex.isDone():
 
         closest_m_point_on_mesh = om.MPointOnMesh()
@@ -253,6 +258,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
         weights = list()
         for i in xrange(3):
             vertex_id_int = triangle_m_int_array[i]
+            print vertex_id_int
             weights.append(weight_list[vertex_id_int])
 
         bary_u = u_util.getFloat(u_util_ptr)

@@ -69,9 +69,13 @@ class RivetToBoneNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        crv = self.curve
+        crv = self.long_curve_name
+        if not cmds.objExists(crv):
+            crv = self.curve
         cv_index = self.cv_indices
-        bone = self.association[0]
+        bone = self.long_association[0]
+        if not cmds.objExists(bone):
+            bone = self.association[0]
 
         cmds.select(cl=True)
         if cmds.objExists(crv) and cmds.objExists(bone):
@@ -92,7 +96,7 @@ class RivetToBoneNode(Ziva):
 
 
 def is_cv_connected_to_rivet(crv, cv):
-    shape = cmds.listRelatives(crv, c=True)[0]
+    shape = cmds.listRelatives(crv, c=True, fullPath=True)[0]
     hist = cmds.listHistory(shape)
     rivets = cmds.ls(hist, type='zRivetToBone')
     for rivet in rivets:

@@ -27,7 +27,9 @@ class SolverNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        solver_name = self.get_scene_name()
+        solver_name = self.get_scene_name(long_name=True)
+        if not cmds.objExists(solver_name):
+            solver_name = self.get_scene_name()
 
         if not cmds.objExists(solver_name):
             results = mel.eval('ziva -s')
@@ -40,6 +42,6 @@ class SolverNode(Ziva):
             solverTransform_child = cmds.listRelatives(st.name, c=True)[0]
             cmds.rename(solverTransform_child, solver_name.split('|')[-1])
         else:
-            new_name = cmds.rename(solver_name, self.name)
+            cmds.rename(solver_name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

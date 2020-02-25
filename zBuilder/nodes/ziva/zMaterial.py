@@ -41,17 +41,22 @@ class MaterialNode(Ziva):
 
         # get mesh name and node name from data
         name = self.name
-        mesh = self.association[0]
-
-        # logger.info('creating material {}'.format(name))
+        mesh = self.long_association[0]
+        if not cmds.objExists(mesh):
+            mesh = self.association[0]
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_materials = mel.eval('zQuery -t zMaterial {}'.format(mesh))
+            if not existing_materials:
+                existing_materials = []
             data_materials = self.builder.bundle.get_scene_items(type_filter='zMaterial',
                                                                  association_filter=mesh)
 
-            d_index = data_materials.index(self)
+            try:
+                d_index = data_materials.index(self)
+            except ValueError:
+                d_index = 0
 
             # if there are enough existing materials use those
             # or else create a new material

@@ -100,7 +100,7 @@ class Ziva(Builder):
             for x in self.get_scene_items(type_filter='zSolverTransform'):
                 if x.solver == item.solver:
                     parent_node = x
-                    solver[item.name] = x
+                    solver[item.long_name] = x
 
             parent_node.add_child(item)
 
@@ -212,7 +212,7 @@ class Ziva(Builder):
 
         # query all the ziva nodes---------------------------------------------
         cmds.select(bodies)
-        nodes = mel.eval('zQuery -a')
+        nodes = mel.eval('zQuery -a -l')
 
         if nodes:
             # find zFiber---------------------------------------------
