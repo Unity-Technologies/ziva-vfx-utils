@@ -47,7 +47,7 @@ class Ziva(Deformer):
         if self.type == 'zSolver':
             self.solver = self
         else:
-            solver = mel.eval('zQuery -t zSolver {} -l'.format(self.long_name))
+            solver = mel.eval('zQuery -t zSolver {}'.format(self.long_name))
             if solver:
                 self.solver = self.builder.get_scene_items(name_filter=solver[0])[0]
 
