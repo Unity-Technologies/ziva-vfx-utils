@@ -124,9 +124,9 @@ class Ziva(Builder):
                     parent_tissue_mesh = item.parent_tissue.long_association[0]
                     parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
-                    parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
+                    parent_node = collected_solver_dict.get(item.solver.long_name, self.root_node)
             else:
-                parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
+                parent_node = collected_solver_dict.get(item.solver.long_name, self.root_node)
 
             self.geo[item.long_association[0]].parent = parent_node
             parent_node.add_child(self.geo[item.long_association[0]])
