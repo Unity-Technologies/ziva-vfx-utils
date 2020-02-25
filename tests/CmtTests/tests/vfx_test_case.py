@@ -355,6 +355,43 @@ class ZivaMirrorTestCase(VfxTestCase):
         self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)
 
 
+class ZivaUpdateTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def builder_change_with_string_replace(self):
+
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
+
+    def builder_build_with_string_replace(self):
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
+        self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)
+
+
 class ZivaMirrorNiceNameTestCase(VfxTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
