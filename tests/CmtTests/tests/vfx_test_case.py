@@ -58,6 +58,7 @@ def attr_values_from_scene(plug_names):
 class VfxTestCase(TestCase):
     temp_file_path = test_utils.get_tmp_file_location()
     """Base class for unit test cases run for ZivaVFX plugin."""
+
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -79,6 +80,69 @@ class VfxTestCase(TestCase):
                 a, b, eps))
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
+
+    def check_tissue_node_subtissue_builder_and_scene(self, scene_items):
+
+        # Tissue specific sub-tissue check
+        parents = {
+            x.name: x.parent_tissue.name
+            for x in scene_items if x.type == 'zTissue' and x.parent_tissue
+        }
+
+        if parents:
+            for key, value in parents.iteritems():
+                self.assertEqual(value, cmds.listConnections(key + '.iParentTissue')[0])
+
+    def check_node_association_amount_equal(self, scene_items, startswith='r_', amount=0):
+        geo = []
+        for scene_item in scene_items:
+            if scene_item.association:
+                if scene_item.association[0].startswith(startswith):
+                    geo.append(scene_item)
+        self.assertEqual(len(geo), amount)
+
+    def check_node_association_amount_not_equal(self, scene_items, startswith='r_', amount=0):
+        geo = [x for x in scene_items if x.association[0].startswith(startswith)]
+        self.assertNotEqual(len(geo), amount)
+
+    def compare_builder_nodes_with_scene_nodes(self, builder):
+        # goes every node in a builder and checks by name if they are in the scene.
+        # useful for checking after a build if everything built.
+        items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
+
+        for item in items:
+            self.assertTrue(cmds.objExists(item.name))
+
+    def compare_builder_attrs_with_scene_attrs(self, builder):
+        # goes through every attribute in builder and checks if the same nodes in scene have same
+        # value.  Useful for checking if a build worked on attribute changes.
+        items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
+
+        for item in items:
+            for attr, v in item.attrs.iteritems():
+                self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
+
+    def compare_builder_maps_with_scene_maps(self, builder):
+        from zBuilder.parameters.maps import get_weights
+
+        items = builder.get_scene_items(type_filter=['map'])
+        # Checking maps in builder against ones in scene
+        for item in items:
+            builder_map_value = item.values
+
+            scene_mesh = item.get_mesh()
+            scene_map_name = item.name
+            scene_map_value = get_weights(scene_map_name, scene_mesh)
+
+            self.assertEqual(builder_map_value, list(scene_map_value))
+
+    def compare_builder_restshapes_with_scene_restshapes(self, builder):
+        # checking the actual restshapes got hooked up in maya
+        for item in self.builder.get_scene_items(type_filter='zRestShape'):
+            connections = cmds.listConnections('{}.target'.format(item.name))
+            connections_long_name = cmds.ls(connections, long=True)
+
+            self.assertEqual(item.targets, connections_long_name)
 
     def check_retrieve_looks_good(self, builder, expected_plugs, node_names, node_type):
         """Args:
@@ -246,3 +310,125 @@ class VfxTestCase(TestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         return builder
+
+
+class ZivaMirrorTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
+
+    """
+
+    def builder_change_with_string_replace(self):
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
+
+    def builder_build_with_string_replace(self):
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
+        self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)
+
+
+class ZivaUpdateTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def builder_change_with_string_replace(self):
+
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
+
+    def builder_build_with_string_replace(self):
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
+        self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)
+
+
+class ZivaMirrorNiceNameTestCase(VfxTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def builder_change_with_string_replace(self):
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_',
+                                                 len(self.l_item_geo))
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+
+        # VERIFY
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'l_', 0)
+        self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_',
+                                                 len(self.l_item_geo))
+
+    def builder_build_with_string_replace(self):
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # ACT
+        self.builder.string_replace("^l_", "r_")
+        self.builder.build()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+        self.compare_builder_maps_with_scene_maps(self.builder)
+        self.compare_builder_restshapes_with_scene_restshapes(self.builder)
+        self.check_tissue_node_subtissue_builder_and_scene(self.scene_items_retrieved)
