@@ -110,6 +110,8 @@ class EmbedderNode(Ziva):
                         item = item.split('|')[-1]
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
+                        if not cmds.objExists(mesh):
+                            mesh = mesh.split('|')[-1]
                         cmds.select(mesh, item, r=True)
                         mel.eval('ziva -tcm')
 
@@ -120,6 +122,8 @@ class EmbedderNode(Ziva):
                         item = item.split('|')[-1]
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
+                        if not cmds.objExists(mesh):
+                            mesh = mesh.split('|')[-1]
                         cmds.select(mesh, item, r=True)
                         mel.eval('ziva -e')
 

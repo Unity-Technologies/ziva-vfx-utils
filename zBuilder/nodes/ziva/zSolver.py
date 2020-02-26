@@ -25,7 +25,6 @@ class SolverNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         solver_name = self.get_scene_name(long_name=True)
 

@@ -148,7 +148,10 @@ def build_multiple(tissue_items,
                     parent = mel.eval('zQuery -type zTissue -m ')
 
                 cmds.select(parent)
-                cmds.select(ztissue.long_association, add=True)
+                tissue_mesh = ztissue.long_association[0]
+                if not cmds.objExists(tissue_mesh):
+                    tissue_mesh = ztissue.association[0]
+                cmds.select(tissue_mesh, add=True)
                 mel.eval('ziva -ast')
 
     cmds.select(sel)

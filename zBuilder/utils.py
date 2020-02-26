@@ -300,21 +300,6 @@ def rig_paste():
         for i in range(0, num_object_to_paste):
             builder.string_replace(source_selection[i].split('|')[-1],
                                    target_selection[i].split('|')[-1])
-
-    # In case there are other solvers in the scene, we need to make sure that all the zBuilder commands
-    # go to the solver stored in the clipboard. Otherwise, errors could occur due to solver ambiguity.
-    # We resolve this as follows: If such a solver does not exist in the scene (because, say,
-    # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
-    # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
-    solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
-        type_filter='zSolverTransform')[0].name
-    if not cmds.objExists(solver_in_clipboard):
-        generated_solver = mel.eval('ziva -s;')[1]  # make a new solver
-        cmds.rename(
-            generated_solver,
-            solver_in_clipboard)  # rename the solver (this also auto-renames the solver shape node)
-    mel.eval('ziva -def ' + solver_in_clipboard + ';')  # make the clipboard solver default
-
     builder.build()
 
 
@@ -341,14 +326,6 @@ def rig_update(solvers=None):
         # remove existing solver
         remove_solver(solvers=[solver])
 
-        # create an empty solver
-        generated_solver = mel.eval('ziva -s;')[1]  # make the output solver
-        cmds.rename(
-            generated_solver,
-            solver_transform)  # rename the solver (this also auto-renames the solver shape node)
-
-        mel.eval('ziva -def ' + solver + ';')  # make this solver be default
-
         # re-build the solver
         builder.build()
 
@@ -366,14 +343,8 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
     # on the 'warped_*' geometry is added into the sourceSolver.
     if target_solver == "":
-        target_solver = prefix + source_solver  # default target solver
+        target_solver = prefix + source_solver.split('|')[-1]  # default target solver
 
-    if not cmds.objExists(target_solver):
-        generated_solver = mel.eval('ziva -s;')[1]  # make the output solver
-        cmds.rename(generated_solver,
-                  target_solver)  # rename the solver (this also auto-renames the transform node)
-
-    # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
     cmds.select(source_solver)
     builder = zva.Ziva()
     builder.retrieve_from_scene()
@@ -381,11 +352,9 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # rename to prefix
     builder.string_replace('^', prefix)
     builder.string_replace(
-        '^' + prefix + source_solver,
+        '^' + prefix + source_solver.split('|')[-1],
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
-    # build the transferred solver
-    mel.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
     builder.build()
 
 

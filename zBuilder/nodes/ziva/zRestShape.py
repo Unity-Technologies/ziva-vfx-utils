@@ -55,7 +55,7 @@ class RestShapeNode(Ziva):
             if not existing_restshape_node:
                 # there is not a zRestShape so we need to create one
                 cmds.select(mesh)
-                cmds.select(self.targets, add=True)
+                cmds.select(targets, add=True)
                 results = mel.eval('zRestShape -a')[0]
 
                 # Rename the zRestShape node based on the name of scene_item.
