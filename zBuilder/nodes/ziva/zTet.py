@@ -95,3 +95,4 @@ class TetNode(Ziva):
                 self.name = cmds.rename(name, self.name)
 
         self.apply_user_tet_mesh()
+        # zTet does not need to build maps and attributes here because it's done by zTissue
