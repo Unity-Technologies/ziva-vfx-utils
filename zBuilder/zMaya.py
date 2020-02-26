@@ -435,6 +435,10 @@ def safe_rename(old_name, new_name):
             pass
 
 
+def strip_namespace(node):
+    return node.split(':')[-1]
+
+
 def znode_rename_helper(zNode, postfix, solver, replace):
     """
     Helper for cases when need to rename nodes like:
@@ -462,8 +466,7 @@ def znode_rename_helper(zNode, postfix, solver, replace):
             mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
             for r in replace:
                 mesh = mesh.replace(r, '')
-            # remove namespace
-            mesh = mesh.split(':')[-1]
+            mesh = strip_namespace(mesh)
             new_name = '{}_{}'.format(mesh, zNode)
             if zNode in ['zMaterial', 'zFiber']:
                 new_name += '1'
@@ -503,8 +506,7 @@ def rivet_to_bone_rename_helper(rtbs, postfix, replace):
             crv = crv[0]
             for r in replace:
                 crv = crv.replace(r, '')
-            # remove namespace
-            crv = crv.split(':')[-1]
+            crv = strip_namespace(crv)
             new_name = '{}_{}'.format(crv, 'zRivetToBone1')
             if rtb != new_name:
                 new_name = safe_rename(rtb, '{}{}'.format(new_name, postfix))
@@ -551,8 +553,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         for loa in loas:
             crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
-                # remove namespace
-                crv = crv[0].split(':')[-1]
+                crv = strip_namespace(crv[0])
                 new_name = crv.replace('_zFiber', '_zLineOfAction')
                 new_name = safe_rename(loa, new_name)
                 if new_name:
