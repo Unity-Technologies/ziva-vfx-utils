@@ -81,13 +81,13 @@ class TetNode(Ziva):
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.name
-        if not cmds.objExists(name):
-            mesh = self.association[0]
-            if cmds.objExists(mesh):
-                if permissive:
-                    name = mel.eval('zQuery -t zTet ' + mesh)[0]
-                else:
-                    raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
+        mesh = self.association[0]
+        if not cmds.objExists(name) and cmds.objExists(mesh):
+            # this occurs when the zTet node does NOT exist and the mesh does.
+            if permissive:
+                name = mel.eval('zQuery -t zTet ' + mesh)[0]
+            else:
+                raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
 
         if name:
             if not cmds.objExists(name):

@@ -96,12 +96,12 @@ class Ziva(Builder):
             self.root_node.add_child(item)
 
         # solvers
-        solver = {}
+        collected_solver_dict = {}
         for item in self.get_scene_items(type_filter=['zSolver']):
-            for x in self.get_scene_items(type_filter='zSolverTransform'):
+            for x in self.get_scene_items(type_filter=['zSolverTransform']):
                 if x.solver == item.solver:
                     parent_node = x
-                    solver[item.name] = x
+                    collected_solver_dict[item.name] = x
                     parent_node.add_child(item)
 
         # get geometry-----------------------------------------------------------
@@ -121,14 +121,12 @@ class Ziva(Builder):
                 if item.parent_tissue:
                     # This node has a parent subTissue, so lets find the parents mesh
                     # for proper parenting.
-
-                    parent_tissue_scene_item = self.get_scene_items(name_filter=item.parent_tissue)
                     parent_tissue_mesh = item.parent_tissue.long_association[0]
                     parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
-                    parent_node = solver.get(item.solver.name, self.root_node)
+                    parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
             else:
-                parent_node = solver.get(item.solver.name, self.root_node)
+                parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
 
             self.geo[item.long_association[0]].parent = parent_node
             parent_node.add_child(self.geo[item.long_association[0]])
@@ -246,7 +244,7 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # KWARG PARSING--------------------------------------------------------
         # ---------------------------------------------------------------------
-        get_parameters = kwargs.get('get_parameters', True)
+        get_parameters = kwargs.get('get_parameters', False)
 
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------

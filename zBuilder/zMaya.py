@@ -674,11 +674,13 @@ def build_attr_key_values(selection, attr_list):
         for item in cmds.ls(obj):
             type_ = cmds.getAttr(item, type=True)
             if not type_ == 'TdataCompound':
-                attr_dict[attr] = {}
-                attr_dict[attr]['type'] = type_
-                attr_dict[attr]['value'] = cmds.getAttr(item)
-                attr_dict[attr]['locked'] = cmds.getAttr(item, lock=True)
-                attr_dict[attr]['alias'] = cmds.aliasAttr(obj, q=True)
+                # we do not want to get any attribute that is not writable as we cannot change it.
+                if cmds.attributeQuery(attr, node=selection, w=True):
+                    attr_dict[attr] = {}
+                    attr_dict[attr]['type'] = type_
+                    attr_dict[attr]['value'] = cmds.getAttr(item)
+                    attr_dict[attr]['locked'] = cmds.getAttr(item, lock=True)
+                    attr_dict[attr]['alias'] = cmds.aliasAttr(obj, q=True)
 
     return attr_dict
 
