@@ -67,9 +67,9 @@ class RestShapeNode(Ziva):
                     mel.eval('zRestShape -r {} {};'.format(self.association[0], target))
 
                 # now lets add back what is in self
-                # for target in self.targets:
+                for target in self.targets:
 
-                #    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
+                    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
 
                 # update name of node to that which is on mesh.
                 self.name = existing_restshape_node[0]
