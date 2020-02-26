@@ -141,7 +141,6 @@ class VfxTestCase(TestCase):
         for item in self.builder.get_scene_items(type_filter='zRestShape'):
             connections = cmds.listConnections('{}.target'.format(item.name))
             connections_long_name = cmds.ls(connections, long=True)
-
             self.assertEqual(item.targets, connections_long_name)
 
     def check_retrieve_looks_good(self, builder, expected_plugs, node_names, node_type):
