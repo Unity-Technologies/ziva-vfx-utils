@@ -16,7 +16,7 @@ class RestShapeNode(Ziva):
     def __init__(self, parent=None, builder=None):
         super(RestShapeNode, self).__init__(parent=parent, builder=builder)
         self.targets = []
-        self.tissue_name = None
+        self.tissue_item = None
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -25,7 +25,8 @@ class RestShapeNode(Ziva):
 
         self.targets = cmds.listConnections(self.name + '.target')
         self.targets = cmds.ls(self.targets, long=True)  # find long names
-        self.tissue_name = get_rest_shape_tissue(self.name)
+        tissue_name = get_rest_shape_tissue(self.name)
+        self.tissue_item = self.builder.get_scene_items(name_filter=tissue_name)[0]
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.
@@ -50,16 +51,13 @@ class RestShapeNode(Ziva):
                 cmds.select(mesh)
                 cmds.select(targets, add=True)
                 results = mel.eval('zRestShape -a')[0]
-                
+
                 # Rename the zRestShape node based on the name of scene_item.
                 # If this name is elsewhere in scene (on another mesh) it will not
                 # be able to name it so we capture return and rename scene_item
                 # so setAttrs work
                 self.name = cmds.rename(results, self.name)
 
-                # Update name of tissue.  If a 'string_replace' was applied to scene_items
-                # this could get out of sync so lets double check it.
-                self.tissue_name = get_rest_shape_tissue(self.name)
             else:
                 # The rest shape node exists on mesh so now lets update it.
                 # First lets remove existing targets

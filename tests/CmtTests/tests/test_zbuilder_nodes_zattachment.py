@@ -5,7 +5,9 @@ import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
 
-from vfx_test_case import VfxTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+
+NODE_TYPE = 'zAttachment'
 
 
 class ZivaAttachmentGenericTestCase(VfxTestCase):
@@ -170,3 +172,144 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
         self.check_map_interpolation(self.builder, "l_tissue_1_high__c_bone_1_zAttachment", weights,
                                      0)
+
+
+class ZivaAttachmentMirrorTestCase(ZivaMirrorTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zAttachment1, zAttachment2, zAttachment3
+
+    """
+
+    def setUp(self):
+        super(ZivaAttachmentMirrorTestCase, self).setUp()
+
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaAttachmentMirrorTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaAttachmentMirrorTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaAttachmentMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaAttachmentMirrorNiceNameTestCase, self).setUp()
+        # gather info
+
+        # Bring in scene
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # force NICE NAMES
+        mz.rename_ziva_nodes()
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaAttachmentMirrorNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaAttachmentMirrorNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaAttachmentUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva VFX nodes
+    - The Ziva Nodes have a side identifier same as geo
+
+    """
+
+    def setUp(self):
+        super(ZivaAttachmentUpdateNiceNameTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # NICE NAMES
+        mz.rename_ziva_nodes()
+
+        # make FULL setup based on left
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        builder.string_replace('^l_', 'r_')
+        builder.build()
+
+        # gather info
+        cmds.select('l_armA_muscle_geo', 'l_armA_subtissue_geo')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaAttachmentUpdateNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaAttachmentUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaAttachmentUpdateTestCase(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaAttachmentUpdateTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+        cmds.select(self.l_item_geo)
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_scene()
+        new_builder.string_replace("^l_", "r_")
+        new_builder.build()
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaAttachmentUpdateTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaAttachmentUpdateTestCase, self).builder_build_with_string_replace()

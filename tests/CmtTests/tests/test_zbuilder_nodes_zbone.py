@@ -5,15 +5,15 @@ import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
 
-from vfx_test_case import VfxTestCase, attr_values_from_scene, attr_values_from_zbuilder_nodes
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+
+NODE_TYPE = 'zBone'
 
 
 class ZivaBoneGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.bone_names = [
-            "c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"
-        ]
+        cls.bone_names = ["c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"]
         cls.bone_attrs = ["contactSliding", "contactStiffnessExp", "collisions"]
 
     def setUp(self):
@@ -112,3 +112,144 @@ class ZivaBoneGenericTestCase(VfxTestCase):
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_bone_1_zBone")), 1)
+
+
+class ZivaBoneMirrorTestCase(ZivaMirrorTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zBone1, zBone2, zBone3
+
+    """
+
+    def setUp(self):
+        super(ZivaBoneMirrorTestCase, self).setUp()
+
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaBoneMirrorTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaBoneMirrorTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaBoneUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva VFX nodes
+    - The Ziva Nodes have a side identifier same as geo
+
+    """
+
+    def setUp(self):
+        super(ZivaBoneUpdateNiceNameTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # NICE NAMES
+        mz.rename_ziva_nodes()
+
+        # make FULL setup based on left
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        builder.string_replace('^l_', 'r_')
+        builder.build()
+
+        # gather info
+        cmds.select('l_armA_muscle_geo', 'l_armA_subtissue_geo')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaBoneUpdateNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaBoneUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaBoneMirrorNiceNameTestCase, self).setUp()
+        # gather info
+
+        # Bring in scene
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # force NICE NAMES
+        mz.rename_ziva_nodes()
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaBoneMirrorNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaBoneMirrorNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaBoneUpdateTestCase(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaBoneUpdateTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+        cmds.select(self.l_item_geo)
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_scene()
+        new_builder.string_replace("^l_", "r_")
+        new_builder.build()
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaBoneUpdateTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaBoneUpdateTestCase, self).builder_build_with_string_replace()
