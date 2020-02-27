@@ -574,13 +574,12 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             s = mel.eval('zQuery -as {}'.format(attachment))[0]
             for r in replace:
                 s = s.replace(r, '')
-            # remove namespace from source mesh
-            s = s.split(":")[-1]
+            s = strip_namespace(s)
             t = mel.eval('zQuery -at {}'.format(attachment))[0]
             for r in replace:
                 t = t.replace(r, '')
             # remove namespace from target mesh
-            t = t.split(":")[-1]
+            t = strip_namespace(t)
             new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
             new_name = safe_rename(attachment, new_name)
             if new_name:
