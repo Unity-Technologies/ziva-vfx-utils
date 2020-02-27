@@ -105,7 +105,7 @@ class EmbedderNode(Ziva):
         # based on stored solver then rename it to what is in builder.
         if not cmds.objExists(name):
             found_name = mel.eval('zQuery -t zEmbedder {}'.format(self.solver.name))
-            self.name = cmds.rename(found_name[0], self.name)
+            self.name = mz.safe_rename(found_name[0], self.name)
 
         collision_meshes = self.get_collision_meshes()
         embedded_meshes = self.get_embedded_meshes()
