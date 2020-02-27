@@ -434,6 +434,8 @@ def safe_rename(old_name, new_name):
         except RuntimeError:
             pass
 
+    return old_name
+
 
 def strip_namespace(node):
     return node.split(':')[-1]
