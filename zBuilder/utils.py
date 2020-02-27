@@ -86,7 +86,7 @@ def remove(nodes):
         # We do this first as this will remove other items.
         if mz.check_body_type([node]):
             # If this is a zTissue of zTet, we need to select the mesh before we remove it:
-            cmds.select(mel.eval('zQuery -m'))
+            cmds.select(mel.eval('zQuery -m -l'))
             mel.eval('ziva -rm')
         # Check again if node exists after the body has been removed.
         if cmds.objExists(node):
@@ -200,7 +200,7 @@ def rig_cut_copy(cut=False):
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
 
-    selection = cmds.ls(sl=True)
+    selection = cmds.ls(sl=True, l=True)
     if not selection:
         mel.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
         return False
