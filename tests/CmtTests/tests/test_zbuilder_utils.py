@@ -363,4 +363,4 @@ class BuilderUtilsMirrorTestCase(VfxTestCase):
         cmds.select('r_muscle')
         utils.copy_paste_with_substitution('^r', 'l')
 
-        self.assertSceneHasNodes(['l_zMaterial', 'l_zTissue'])
+        self.assertSceneHasNodes(['l_zMaterial1', 'l_zTissue'])

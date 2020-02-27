@@ -77,13 +77,13 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(cmds.ls("r_tissue_2_zLineOfAction"), [])
+        self.assertEqual(cmds.ls("r_tissue_2_zLineOfAction1"), [])
 
         ## ACT
         mz.rename_ziva_nodes()
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_2_zLineOfAction")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_2_zLineOfAction1")), 1)
 
     def test_string_replace(self):
         ## VERIFY
