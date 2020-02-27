@@ -26,7 +26,7 @@ class SolverNode(Ziva):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
-        solver_name = self.get_scene_name(long_name=True)
+        solver_name = self.get_scene_name()
 
         if not cmds.objExists(solver_name):
             results = mel.eval('ziva -s')
@@ -39,7 +39,7 @@ class SolverNode(Ziva):
             solverTransform_child = cmds.listRelatives(st.long_name, c=True, fullPath=True)[0]
             solver_name = cmds.rename(solverTransform_child, solver_name.split('|')[-1])
         else:
-            cmds.rename(solver_name, self.name)
+            solver_name = cmds.rename(solver_name, self.name)
 
         cmds.ziva(solver_name, defaultSolver=True)
 

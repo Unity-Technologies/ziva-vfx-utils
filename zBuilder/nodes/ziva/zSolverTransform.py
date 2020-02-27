@@ -27,7 +27,7 @@ class SolverTransformNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        solver_name = self.get_scene_name(long_name=True)
+        solver_name = self.get_scene_name()
 
         if not cmds.objExists(solver_name):
             if not permissive:

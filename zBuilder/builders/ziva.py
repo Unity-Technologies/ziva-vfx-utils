@@ -610,7 +610,7 @@ class Ziva(Builder):
                                  permissive=permissive,
                                  interp_maps=interp_maps)
 
-        with SolverDisabler(solver_transform[0].long_name):
+        with SolverDisabler(solver_transform[0].name):
 
             # generate list of node types to build
             node_types_to_build = list()
