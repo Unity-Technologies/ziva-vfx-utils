@@ -62,8 +62,7 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    if existing[d_index] != name:
-                        self.name = mz.safe_rename(existing[d_index], name)
+                    self.name = mz.safe_rename(existing[d_index], name)
                 else:
                     cmds.select(source_mesh, r=True)
                     cmds.select(target_mesh, add=True)
