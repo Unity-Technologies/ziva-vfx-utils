@@ -1,3 +1,4 @@
+import unittest
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.zMaya as mz
@@ -63,6 +64,10 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         # this will have new value of tet
         self.check_builder_nodes_built_in_scene(builder)
         self.check_builder_nodes_setattr_in_scene(builder)
+
+    @unittest.expectedFailure
+    def test_clean_scene(self):
+        mz.clean_scene()
 
 
 class ZivaReferenceMirrorTestCase(VfxTestCase):
