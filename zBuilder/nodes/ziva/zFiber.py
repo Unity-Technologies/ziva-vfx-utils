@@ -64,7 +64,7 @@ class FiberNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        mesh = self.nice_association
+        mesh = self.nice_association[0]
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
