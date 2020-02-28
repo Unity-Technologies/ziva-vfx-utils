@@ -78,7 +78,7 @@ class FieldAdaptorNode(Ziva):
             # then hook it up.
             results_ = cmds.createNode('zFieldAdaptor', name=name)
             clt = cmds.ls(results_, type='zFieldAdaptor')[0]
-            cmds.rename(clt, name)
+            mz.safe_rename(clt, name)
 
         # check if field exists and if it does hook it up
         if cmds.objExists(self.input_field):
@@ -100,7 +100,7 @@ class FieldAdaptorNode(Ziva):
             #if not cmds.listConnections('{}.outField'.format(name)):
             if name not in exisiting:
                 cmds.connectAttr('{}.outField'.format(name),
-                               '{}.fields[{}]'.format(output_body, str(exisiting_size)))
+                                 '{}.fields[{}]'.format(output_body, str(exisiting_size)))
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)

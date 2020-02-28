@@ -1,6 +1,7 @@
 from maya import cmds
 from maya import mel
 
+import zBuilder.zMaya as mz
 from zBuilder.nodes import Ziva
 import logging
 
@@ -36,10 +37,10 @@ class SolverNode(Ziva):
             # rename shape after.
             solverTransform = cmds.ls(results, type='zSolverTransform')[0]
             st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
-            cmds.rename(solverTransform, st.name)
+            mz.safe_rename(solverTransform, st.name)
             solverTransform_child = cmds.listRelatives(st.name, c=True)[0]
-            cmds.rename(solverTransform_child, solver_name.split('|')[-1])
+            mz.safe_rename(solverTransform_child, solver_name.split('|')[-1])
         else:
-            new_name = cmds.rename(solver_name, self.name)
+            new_name = mz.safe_rename(solver_name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

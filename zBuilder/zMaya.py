@@ -434,6 +434,8 @@ def safe_rename(old_name, new_name):
         except RuntimeError:
             pass
 
+    return old_name
+
 
 def strip_namespace(node):
     return node.split(':')[-1]
@@ -872,7 +874,7 @@ def cull_creation_nodes(scene_items, permissive=True):
         if cmds.objExists(mesh):
             existing = mel.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
-                out = cmds.rename(existing, name)
+                out = safe_rename(existing, name)
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
