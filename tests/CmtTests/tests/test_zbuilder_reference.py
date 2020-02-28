@@ -67,7 +67,12 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
 
     @unittest.expectedFailure
     def test_clean_scene(self):
-        mz.clean_scene()
+
+        mc.clean_scene()
+        # this scene is referenced and therefore nothing will get cleaned from scene
+        # lets check
+        tissues_in_scene = cmds.ls(type='zTissue')
+        self.assertEquals(0, len(tissues_in_scene))
 
 
 class ZivaReferenceMirrorTestCase(VfxTestCase):
