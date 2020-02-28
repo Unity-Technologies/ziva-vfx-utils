@@ -34,9 +34,7 @@ class RestShapeNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
 
         # this is the mesh with zTissue that will have the zRestShape node
-        mesh = self.long_association[0]
-        if not cmds.objExists(mesh):
-            mesh = self.association[0]
+        mesh = self.nice_association[0]
 
         # Checking if the mesh is in scene
         if cmds.objExists(mesh):

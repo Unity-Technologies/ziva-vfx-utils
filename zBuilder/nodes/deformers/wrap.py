@@ -18,7 +18,7 @@ class Wrap(Deformer):
 
         name = self.get_scene_name()
         if not cmds.objExists(name):
-            cmds.select(self.long_association, r=True)
+            cmds.select(self.nice_association, r=True)
             version = 7
             operation = 1  # create
             threshold = 0

@@ -776,9 +776,7 @@ def cull_creation_nodes(scene_items, permissive=True):
     # check meshes for existing zBones or zTissue
     for i, scene_item in enumerate(scene_items):
         type_ = scene_item.type
-        mesh = scene_item.long_association[0]
-        if not cmds.objExists(mesh):
-            mesh = scene_item.association[0]
+        mesh = scene_item.nice_association[0]
         name = scene_item.name
 
         if cmds.objExists(mesh):

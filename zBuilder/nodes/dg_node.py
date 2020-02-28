@@ -95,10 +95,7 @@ class DGNode(Base):
             maya_node (str): The maya node to populate parameter with.
 
         """
-
-        # selection = mz.parse_maya_node_for_selection(maya_node)
-        maya_node = mz.check_maya_node(maya_node)
-        self.name = maya_node
+        self.name = mz.check_maya_node(maya_node)
         self.type = cmds.objectType(self.long_name)
         self.get_maya_attrs()
 
@@ -106,6 +103,18 @@ class DGNode(Base):
         """ Builds the node in maya.  meant to be overwritten.
         """
         raise NotImplementedError
+
+    @property
+    def nice_association(self):
+        """ if long name exists in the maya scene return it, else return short name
+        """
+        out = []
+        for i, item in enumerate(self._association):
+            if cmds.objExists(item):
+                out.append(item)
+            else:
+                out.append(self.association[i])
+        return out
 
     @property
     def association(self):

@@ -73,9 +73,7 @@ class RivetToBoneNode(Ziva):
         if not cmds.objExists(crv):
             crv = self.curve
         cv_index = self.cv_indices
-        bone = self.long_association[0]
-        if not cmds.objExists(bone):
-            bone = self.association[0]
+        bone = self.nice_association[0]
 
         cmds.select(cl=True)
         if cmds.objExists(crv) and cmds.objExists(bone):

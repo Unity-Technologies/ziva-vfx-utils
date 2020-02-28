@@ -236,8 +236,6 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
 
     interpolated_weights = list()
 
-    print weight_list
-
     while not destination_mesh_m_it_mesh_vertex.isDone():
 
         closest_m_point_on_mesh = om.MPointOnMesh()
@@ -258,7 +256,6 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
         weights = list()
         for i in xrange(3):
             vertex_id_int = triangle_m_int_array[i]
-            print vertex_id_int
             weights.append(weight_list[vertex_id_int])
 
         bary_u = u_util.getFloat(u_util_ptr)

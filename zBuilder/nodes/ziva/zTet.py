@@ -74,9 +74,7 @@ class TetNode(Ziva):
 
         name = self.name
         if not cmds.objExists(name):
-            mesh = self.long_association[0]
-            if not cmds.objExists(mesh):
-                mesh = self.association[0]
+            mesh = self.nice_association[0]
             if cmds.objExists(mesh):
                 if permissive:
                     name = mel.eval('zQuery -t zTet ' + mesh)

@@ -433,7 +433,7 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
     for displayed_node_type in displayed_node_types:
         for item in builder.get_scene_items(type_filter=displayed_node_type):
             # Add each mesh of this type to selection.
-            cmds.select(item.long_association, add=True)
+            cmds.select(item.nice_association, add=True)
 
 
 def next_free_plug_in_array(dst_plug):

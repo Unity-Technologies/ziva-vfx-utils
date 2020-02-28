@@ -142,15 +142,13 @@ def build_multiple(tissue_items,
                 parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
 
                 if parent_scene_item:
-                    parent = [x.long_association[0] if cmds.objExists(x.long_association[0]) else x.association[0] for x in parent_scene_item]
+                    parent = [x.nice_association[0] for x in parent_scene_item]
                 else:
                     cmds.select(ztissue.parent_tissue.long_name, r=True)
                     parent = mel.eval('zQuery -type zTissue -m ')
 
                 cmds.select(parent)
-                tissue_mesh = ztissue.long_association[0]
-                if not cmds.objExists(tissue_mesh):
-                    tissue_mesh = ztissue.association[0]
+                tissue_mesh = ztissue.nice_association[0]
                 cmds.select(tissue_mesh, add=True)
                 mel.eval('ziva -ast')
 
