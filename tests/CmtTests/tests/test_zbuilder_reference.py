@@ -10,7 +10,7 @@ from vfx_test_case import VfxTestCase
 class ZivaReferenceGenericTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaReferenceGenericTestCase, self).setUp()
-        test_utils.reference_scene(scene_name='mirror_example.ma')
+        test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -39,8 +39,8 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
             item.attrs['tetSize']['value'] = 52.5
             self.assertEquals(52.5, item.attrs['tetSize']['value'])
 
-        # reference geo only
-        test_utils.reference_scene(scene_name='mirror_example.ma')
+        # reference full ziva setup
+        test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
 
         builder.build()
 
@@ -57,8 +57,28 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
             self.assertEquals(52.5, item.attrs['tetSize']['value'])
 
         # reference geo only
-        test_utils.reference_scene(scene_name='mirror_example-geo.ma')
+        test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
 
+        builder.build()
+
+        # this will have new value of tet
+        self.check_builder_nodes_built_in_scene(builder)
+        self.check_builder_nodes_setattr_in_scene(builder)
+
+    def test_write_and_read_build_and_mirror_on_referenced_geo_only(self):
+        # half is ziva setup half is empty.  So we doing a string replace on refrerenced and
+        # building the other side.
+        builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
+
+        # Change an attribute in builder and check that came through
+        for item in builder.get_scene_items(type_filter='zTet'):
+            item.attrs['tetSize']['value'] = 52.5
+            self.assertEquals(52.5, item.attrs['tetSize']['value'])
+
+        # reference geo only
+        test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
+
+        builder.string_replace('TEMP:l_', 'TEMP:r_')
         builder.build()
 
         # this will have new value of tet
