@@ -31,7 +31,7 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
             for attr, v in item.attrs.iteritems():
                 self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
-    def test_write_and_read_build_on_full_setup(self):
+    def test_write_and_read_build_on_referenced_full_setup(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
 
         # Change an attribute in builder and check that came through
@@ -48,7 +48,7 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         self.check_builder_nodes_built_in_scene(builder)
         self.check_builder_nodes_setattr_in_scene(builder)
 
-    def test_write_and_read_build_on_geo_only(self):
+    def test_write_and_read_build_on_referenced_geo_only(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
 
         # Change an attribute in builder and check that came through
@@ -66,11 +66,10 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         self.check_builder_nodes_setattr_in_scene(builder)
 
     @unittest.expectedFailure
-    def test_clean_scene(self):
+    def test_clean_scene_on_referenced_scene(self):
 
         mc.clean_scene()
-        # this scene is referenced and therefore nothing will get cleaned from scene
-        # lets check
+
         tissues_in_scene = cmds.ls(type='zTissue')
         self.assertEquals(0, len(tissues_in_scene))
 
