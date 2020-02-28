@@ -1,5 +1,6 @@
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
+import zBuilder.zMaya as mz
 from maya import cmds
 
 from vfx_test_case import VfxTestCase
@@ -29,14 +30,37 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
             for attr, v in item.attrs.iteritems():
                 self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
-    def test_write_and_read_build(self):
+    def test_write_and_read_build_on_full_setup(self):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
+
+        # Change an attribute in builder and check that came through
+        for item in builder.get_scene_items(type_filter='zTet'):
+            item.attrs['tetSize']['value'] = 52.5
+            self.assertEquals(52.5, item.attrs['tetSize']['value'])
 
         # reference geo only
         test_utils.reference_scene(scene_name='mirror_example.ma')
 
         builder.build()
 
+        # this will have new value of tet
+        self.check_builder_nodes_built_in_scene(builder)
+        self.check_builder_nodes_setattr_in_scene(builder)
+
+    def test_write_and_read_build_on_geo_only(self):
+        builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
+
+        # Change an attribute in builder and check that came through
+        for item in builder.get_scene_items(type_filter='zTet'):
+            item.attrs['tetSize']['value'] = 52.5
+            self.assertEquals(52.5, item.attrs['tetSize']['value'])
+
+        # reference geo only
+        test_utils.reference_scene(scene_name='mirror_example-geo.ma')
+
+        builder.build()
+
+        # this will have new value of tet
         self.check_builder_nodes_built_in_scene(builder)
         self.check_builder_nodes_setattr_in_scene(builder)
 
