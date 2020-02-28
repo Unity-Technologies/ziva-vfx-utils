@@ -1,6 +1,6 @@
 //Maya ASCII 2018ff09 scene
 //Name: generic_duplicate.ma
-//Last modified: Mon, Feb 24, 2020 11:49:38 AM
+//Last modified: Fri, Feb 28, 2020 11:07:45 AM
 //Codeset: 1252
 requires maya "2018ff09";
 requires "stereoCamera" "10.0";
@@ -12,6 +12,7 @@ requires -nodeType "zGeo" -nodeType "zTissue" -nodeType "zBone" -nodeType "zClot
 		 -dataType "zAttachmentData" -dataType "zSolverOutputData" -dataType "zMuscleData"
 		 -dataType "zSerializedBinaryData" -dataType "zLineOfActionData" -dataType "zFieldData"
 		 -dataType "zWarpData" "ziva" "1.8";
+requires "stereoCamera" "10.0";
 currentUnit -l centimeter -a degree -t film;
 fileInfo "application" "maya";
 fileInfo "product" "Maya 2018";
@@ -21,13 +22,13 @@ fileInfo "osv" "Microsoft Windows 8 Business Edition, 64-bit  (Build 9200)\n";
 createNode transform -s -n "persp";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000233";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" -3.4765471700465858 1.7701857551219156 7.0888505751205733 ;
+	setAttr ".t" -type "double3" -3.9872587177778502 3.7018151455426969 17.672451330613804 ;
 	setAttr ".r" -type "double3" -11.738352729607534 -363.79999999993993 -4.9805666234315701e-17 ;
 createNode camera -s -n "perspShape" -p "persp";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000234";
 	setAttr -k off ".v" no;
 	setAttr ".fl" 34.999999999999993;
-	setAttr ".coi" 7.6274806920813782;
+	setAttr ".coi" 18.393078188234224;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
@@ -85,7 +86,7 @@ createNode transform -n "group1";
 createNode zSolverTransform -n "zSolver1" -p "group1";
 	rename -uid "A2B779C0-0000-024C-5DA6-18900000029B";
 	setAttr ".s" -type "double3" 10 10 10 ;
-createNode zSolver -n "zSolver1Shape" -p "|group1|zSolver1";
+createNode zSolver -n "zSolver1Shape" -p "zSolver1";
 	rename -uid "A2B779C0-0000-024C-5DA6-18900000029C";
 	setAttr -k off ".v";
 	setAttr ".covm[0]"  0 1 1;
@@ -10393,10 +10394,10 @@ createNode mesh -n "r_bone_1Shape" -p "|group1|r_bone_1";
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode transform -n "group2";
 	rename -uid "959F203C-41A3-1541-9C06-8C9AEE8EFE98";
-createNode zSolverTransform -n "zSolver1" -p "group2";
+createNode zSolverTransform -n "zSolver2" -p "group2";
 	rename -uid "0F490B6A-442F-6C6A-B0C3-7A83C99FF8EC";
 	setAttr ".s" -type "double3" 10 10 10 ;
-createNode zSolver -n "zSolver1Shape" -p "|group2|zSolver1";
+createNode zSolver -n "zSolver2Shape" -p "zSolver2";
 	rename -uid "7E0F98F8-4ED0-2822-2151-E6B7ECA9A727";
 	setAttr -k off ".v";
 	setAttr ".covm[0]"  0 1 1;
@@ -20703,19 +20704,19 @@ createNode mesh -n "r_bone_1Shape" -p "|group2|r_bone_1";
 	setAttr ".pd[0]" -type "dataPolyComponent" Index_Data UV 0 ;
 	setAttr ".hfd" -type "dataPolyComponent" Index_Data Face 0 ;
 createNode lightLinker -s -n "lightLinker1";
-	rename -uid "193D9453-4D4C-4A69-B6A4-758BC3C9D5C3";
+	rename -uid "54BB4CEE-43D7-7B19-7827-B495E6E4D305";
 	setAttr -s 2 ".lnk";
 	setAttr -s 2 ".slnk";
 createNode shapeEditorManager -n "shapeEditorManager";
-	rename -uid "C42F05F5-472F-6E7A-CB0F-9EB75567F8B8";
+	rename -uid "E21BF237-4EDF-8D04-FB5D-6FB14A717EF6";
 createNode poseInterpolatorManager -n "poseInterpolatorManager";
-	rename -uid "2B7DE1EC-46A1-69C5-28F7-C9A9ABF669D9";
+	rename -uid "812B1269-4405-CB9D-6EF8-2EAF63499761";
 createNode displayLayerManager -n "layerManager";
-	rename -uid "0338F0BD-4E65-203B-E8BD-CA8DA63CACE9";
+	rename -uid "DF2310DC-4875-D568-2A75-ABA8824A6D40";
 createNode displayLayer -n "defaultLayer";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000253";
 createNode renderLayerManager -n "renderLayerManager";
-	rename -uid "05AA163E-420F-CC00-4F37-FD9BAD1B0B1D";
+	rename -uid "11AE69AC-430A-7FED-0831-8C93EA994A87";
 createNode renderLayer -n "defaultRenderLayer";
 	rename -uid "A2B779C0-0000-024C-5D9F-D84F00000255";
 	setAttr ".g" yes;
@@ -51171,9 +51172,9 @@ createNode script -n "uiConfigurationScriptNode";
 		+ "\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Camera Sequencer\")) -mbv $menusOkayInPanels  $panelName;\n\n\t\t\t$editorName = sequenceEditorNameFromPanel($panelName);\n            clipEditor -e \n                -displayKeys 0\n                -displayTangents 0\n                -displayActiveKeys 0\n                -displayActiveKeyTangents 0\n                -displayInfinities 0\n                -displayValues 0\n                -autoFit 0\n                -autoFitTime 0\n                -snapTime \"none\" \n                -snapValue \"none\" \n                -initialized 0\n                -manageSequencer 1 \n                $editorName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"hyperGraphPanel\" (localizedPanelLabel(\"Hypergraph Hierarchy\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Hypergraph Hierarchy\")) -mbv $menusOkayInPanels  $panelName;\n"
 		+ "\n\t\t\t$editorName = ($panelName+\"HyperGraphEd\");\n            hyperGraph -e \n                -graphLayoutStyle \"hierarchicalLayout\" \n                -orientation \"horiz\" \n                -mergeConnections 0\n                -zoom 1\n                -animateTransition 0\n                -showRelationships 1\n                -showShapes 0\n                -showDeformers 0\n                -showExpressions 0\n                -showConstraints 0\n                -showConnectionFromSelected 0\n                -showConnectionToSelected 0\n                -showConstraintLabels 0\n                -showUnderworld 0\n                -showInvisible 0\n                -transitionFrames 1\n                -opaqueContainers 0\n                -freeform 0\n                -imagePosition 0 0 \n                -imageScale 1\n                -imageEnabled 0\n                -graphType \"DAG\" \n                -heatMapDisplay 0\n                -updateSelection 1\n                -updateNodeAdded 1\n                -useDrawOverrideColor 0\n                -limitGraphTraversal -1\n"
 		+ "                -range 0 0 \n                -iconSize \"smallIcons\" \n                -showCachedConnections 0\n                $editorName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"hyperShadePanel\" (localizedPanelLabel(\"Hypershade\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Hypershade\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"visorPanel\" (localizedPanelLabel(\"Visor\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Visor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"nodeEditorPanel\" (localizedPanelLabel(\"Node Editor\")) `;\n\tif ($nodeEditorPanelVisible || $nodeEditorWorkspaceControlOpen) {\n"
-		+ "\t\tif (\"\" == $panelName) {\n\t\t\tif ($useSceneConfig) {\n\t\t\t\t$panelName = `scriptedPanel -unParent  -type \"nodeEditorPanel\" -l (localizedPanelLabel(\"Node Editor\")) -mbv $menusOkayInPanels `;\n\n\t\t\t$editorName = ($panelName+\"NodeEditorEd\");\n            nodeEditor -e \n                -allAttributes 0\n                -allNodes 0\n                -autoSizeNodes 1\n                -consistentNameSize 1\n                -createNodeCommand \"nodeEdCreateNodeCommand\" \n                -connectNodeOnCreation 0\n                -connectOnDrop 0\n                -copyConnectionsOnPaste 0\n                -defaultPinnedState 0\n                -additiveGraphingMode 0\n                -settingsChangedCallback \"nodeEdSyncControls\" \n                -traversalDepthLimit -1\n                -keyPressCommand \"nodeEdKeyPressCommand\" \n                -nodeTitleMode \"name\" \n                -gridSnap 0\n                -gridVisibility 1\n                -crosshairOnEdgeDragging 0\n                -popupMenuScript \"nodeEdBuildPanelMenus\" \n                -showNamespace 1\n"
-		+ "                -showShapes 1\n                -showSGShapes 0\n                -showTransforms 1\n                -useAssets 1\n                -syncedSelection 1\n                -extendToShapes 1\n                -editorMode \"default\" \n                $editorName;\n\t\t\t}\n\t\t} else {\n\t\t\t$label = `panel -q -label $panelName`;\n\t\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Node Editor\")) -mbv $menusOkayInPanels  $panelName;\n\n\t\t\t$editorName = ($panelName+\"NodeEditorEd\");\n            nodeEditor -e \n                -allAttributes 0\n                -allNodes 0\n                -autoSizeNodes 1\n                -consistentNameSize 1\n                -createNodeCommand \"nodeEdCreateNodeCommand\" \n                -connectNodeOnCreation 0\n                -connectOnDrop 0\n                -copyConnectionsOnPaste 0\n                -defaultPinnedState 0\n                -additiveGraphingMode 0\n                -settingsChangedCallback \"nodeEdSyncControls\" \n                -traversalDepthLimit -1\n                -keyPressCommand \"nodeEdKeyPressCommand\" \n"
-		+ "                -nodeTitleMode \"name\" \n                -gridSnap 0\n                -gridVisibility 1\n                -crosshairOnEdgeDragging 0\n                -popupMenuScript \"nodeEdBuildPanelMenus\" \n                -showNamespace 1\n                -showShapes 1\n                -showSGShapes 0\n                -showTransforms 1\n                -useAssets 1\n                -syncedSelection 1\n                -extendToShapes 1\n                -editorMode \"default\" \n                $editorName;\n\t\t\tif (!$useSceneConfig) {\n\t\t\t\tpanel -e -l $label $panelName;\n\t\t\t}\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"createNodePanel\" (localizedPanelLabel(\"Create Node\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Create Node\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"polyTexturePlacementPanel\" (localizedPanelLabel(\"UV Editor\")) `;\n"
+		+ "\t\tif (\"\" == $panelName) {\n\t\t\tif ($useSceneConfig) {\n\t\t\t\t$panelName = `scriptedPanel -unParent  -type \"nodeEditorPanel\" -l (localizedPanelLabel(\"Node Editor\")) -mbv $menusOkayInPanels `;\n\n\t\t\t$editorName = ($panelName+\"NodeEditorEd\");\n            nodeEditor -e \n                -allAttributes 0\n                -allNodes 0\n                -autoSizeNodes 1\n                -consistentNameSize 1\n                -createNodeCommand \"nodeEdCreateNodeCommand\" \n                -connectNodeOnCreation 0\n                -connectOnDrop 0\n                -copyConnectionsOnPaste 0\n                -connectionStyle \"bezier\" \n                -defaultPinnedState 0\n                -additiveGraphingMode 0\n                -settingsChangedCallback \"nodeEdSyncControls\" \n                -traversalDepthLimit -1\n                -keyPressCommand \"nodeEdKeyPressCommand\" \n                -nodeTitleMode \"name\" \n                -gridSnap 0\n                -gridVisibility 1\n                -crosshairOnEdgeDragging 0\n                -popupMenuScript \"nodeEdBuildPanelMenus\" \n"
+		+ "                -showNamespace 1\n                -showShapes 1\n                -showSGShapes 0\n                -showTransforms 1\n                -useAssets 1\n                -syncedSelection 1\n                -extendToShapes 1\n                -editorMode \"default\" \n                $editorName;\n\t\t\t}\n\t\t} else {\n\t\t\t$label = `panel -q -label $panelName`;\n\t\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Node Editor\")) -mbv $menusOkayInPanels  $panelName;\n\n\t\t\t$editorName = ($panelName+\"NodeEditorEd\");\n            nodeEditor -e \n                -allAttributes 0\n                -allNodes 0\n                -autoSizeNodes 1\n                -consistentNameSize 1\n                -createNodeCommand \"nodeEdCreateNodeCommand\" \n                -connectNodeOnCreation 0\n                -connectOnDrop 0\n                -copyConnectionsOnPaste 0\n                -connectionStyle \"bezier\" \n                -defaultPinnedState 0\n                -additiveGraphingMode 0\n                -settingsChangedCallback \"nodeEdSyncControls\" \n                -traversalDepthLimit -1\n"
+		+ "                -keyPressCommand \"nodeEdKeyPressCommand\" \n                -nodeTitleMode \"name\" \n                -gridSnap 0\n                -gridVisibility 1\n                -crosshairOnEdgeDragging 0\n                -popupMenuScript \"nodeEdBuildPanelMenus\" \n                -showNamespace 1\n                -showShapes 1\n                -showSGShapes 0\n                -showTransforms 1\n                -useAssets 1\n                -syncedSelection 1\n                -extendToShapes 1\n                -editorMode \"default\" \n                $editorName;\n\t\t\tif (!$useSceneConfig) {\n\t\t\t\tpanel -e -l $label $panelName;\n\t\t\t}\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"createNodePanel\" (localizedPanelLabel(\"Create Node\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Create Node\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"polyTexturePlacementPanel\" (localizedPanelLabel(\"UV Editor\")) `;\n"
 		+ "\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"UV Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"renderWindowPanel\" (localizedPanelLabel(\"Render View\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Render View\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextPanel \"shapePanel\" (localizedPanelLabel(\"Shape Editor\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tshapePanel -edit -l (localizedPanelLabel(\"Shape Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextPanel \"posePanel\" (localizedPanelLabel(\"Pose Editor\")) `;\n\tif (\"\" != $panelName) {\n"
 		+ "\t\t$label = `panel -q -label $panelName`;\n\t\tposePanel -edit -l (localizedPanelLabel(\"Pose Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"dynRelEdPanel\" (localizedPanelLabel(\"Dynamic Relationships\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Dynamic Relationships\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"relationshipPanel\" (localizedPanelLabel(\"Relationship Editor\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Relationship Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"referenceEditorPanel\" (localizedPanelLabel(\"Reference Editor\")) `;\n"
 		+ "\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Reference Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"componentEditorPanel\" (localizedPanelLabel(\"Component Editor\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Component Editor\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"dynPaintScriptedPanelType\" (localizedPanelLabel(\"Paint Effects\")) `;\n\tif (\"\" != $panelName) {\n\t\t$label = `panel -q -label $panelName`;\n\t\tscriptedPanel -edit -l (localizedPanelLabel(\"Paint Effects\")) -mbv $menusOkayInPanels  $panelName;\n\t\tif (!$useSceneConfig) {\n\t\t\tpanel -e -l $label $panelName;\n\t\t}\n\t}\n\n\n\t$panelName = `sceneUIReplacement -getNextScriptedPanel \"scriptEditorPanel\" (localizedPanelLabel(\"Script Editor\")) `;\n"
@@ -165952,33 +165953,26 @@ select -ne :defaultResolution;
 select -ne :hardwareRenderGlobals;
 	setAttr ".ctrs" 256;
 	setAttr ".btrs" 512;
-connectAttr ":time1.o" "|group1|zSolver1.iT";
-connectAttr "|group1|zSolver1.osp" "|group1|zSolver1|zSolver1Shape.isp";
-connectAttr "c_bone_1_zBone.oGo" "|group1|zSolver1|zSolver1Shape.iGo[0]";
-connectAttr "r_tissue_2_zMaterial.oGo" "|group1|zSolver1|zSolver1Shape.iGo[2]";
-connectAttr "c_bone_2_zBone.oGo" "|group1|zSolver1|zSolver1Shape.iGo[3]";
-connectAttr "c_tissue_3_zMaterial.oGo" "|group1|zSolver1|zSolver1Shape.iGo[4]";
-connectAttr "c_cloth_1_zMaterial.oGo" "|group1|zSolver1|zSolver1Shape.iGo[5]";
-connectAttr "r_subtissue_1_zFiber.oGo" "|group1|zSolver1|zSolver1Shape.iGo[6]";
-connectAttr "l_tissue_1_zFiber.oGo" "|group1|zSolver1|zSolver1Shape.iGo[7]";
-connectAttr "l_bone_1_zBone.oGo" "|group1|zSolver1|zSolver1Shape.iGo[8]";
-connectAttr "l_cloth_1_zMaterial.oGo" "|group1|zSolver1|zSolver1Shape.iGo[9]";
-connectAttr "r_tissue_2__c_bone_1_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[1]"
-		;
-connectAttr "c_tissue_3__c_bone_2_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[2]"
-		;
-connectAttr "c_cloth_1__c_bone_1_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[3]"
-		;
-connectAttr "l_tissue_1__c_bone_1_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[4]"
-		;
-connectAttr "l_tissue_1__l_bone_1_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[5]"
-		;
-connectAttr "l_cloth_1__c_bone_1_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[6]"
-		;
-connectAttr "l_cloth_1__c_tissue_3_zAttachment.oC" "|group1|zSolver1|zSolver1Shape.iC[7]"
-		;
-connectAttr "r_subtissue_1_zFiber.oMus" "|group1|zSolver1|zSolver1Shape.iM[1]";
-connectAttr "l_tissue_1_zFiber.oMus" "|group1|zSolver1|zSolver1Shape.iM[2]";
+connectAttr ":time1.o" "zSolver1.iT";
+connectAttr "zSolver1.osp" "zSolver1Shape.isp";
+connectAttr "c_bone_1_zBone.oGo" "zSolver1Shape.iGo[0]";
+connectAttr "r_tissue_2_zMaterial.oGo" "zSolver1Shape.iGo[2]";
+connectAttr "c_bone_2_zBone.oGo" "zSolver1Shape.iGo[3]";
+connectAttr "c_tissue_3_zMaterial.oGo" "zSolver1Shape.iGo[4]";
+connectAttr "c_cloth_1_zMaterial.oGo" "zSolver1Shape.iGo[5]";
+connectAttr "r_subtissue_1_zFiber.oGo" "zSolver1Shape.iGo[6]";
+connectAttr "l_tissue_1_zFiber.oGo" "zSolver1Shape.iGo[7]";
+connectAttr "l_bone_1_zBone.oGo" "zSolver1Shape.iGo[8]";
+connectAttr "l_cloth_1_zMaterial.oGo" "zSolver1Shape.iGo[9]";
+connectAttr "r_tissue_2__c_bone_1_zAttachment.oC" "zSolver1Shape.iC[1]";
+connectAttr "c_tissue_3__c_bone_2_zAttachment.oC" "zSolver1Shape.iC[2]";
+connectAttr "c_cloth_1__c_bone_1_zAttachment.oC" "zSolver1Shape.iC[3]";
+connectAttr "l_tissue_1__c_bone_1_zAttachment.oC" "zSolver1Shape.iC[4]";
+connectAttr "l_tissue_1__l_bone_1_zAttachment.oC" "zSolver1Shape.iC[5]";
+connectAttr "l_cloth_1__c_bone_1_zAttachment.oC" "zSolver1Shape.iC[6]";
+connectAttr "l_cloth_1__c_tissue_3_zAttachment.oC" "zSolver1Shape.iC[7]";
+connectAttr "r_subtissue_1_zFiber.oMus" "zSolver1Shape.iM[1]";
+connectAttr "l_tissue_1_zFiber.oMus" "zSolver1Shape.iM[2]";
 connectAttr "groupId45.id" "|group1|l_tissue_1|l_tissue_Shape1.iog.og[19].gid";
 connectAttr "set25.mwc" "|group1|l_tissue_1|l_tissue_Shape1.iog.og[19].gco";
 connectAttr "groupId46.id" "|group1|l_tissue_1|l_tissue_Shape1.iog.og[20].gid";
@@ -166146,33 +166140,26 @@ connectAttr "l_tissue_1__l_bone_1_zAttachment.og[1]" "|group1|l_bone_1|l_bone_1S
 		;
 connectAttr "tweak14.vl[0].vt[0]" "|group1|l_bone_1|l_bone_1Shape.twl";
 connectAttr "polyCube3.out" "|group1|l_bone_1|l_bone_1ShapeOrig.i";
-connectAttr ":time1.o" "|group2|zSolver1.iT";
-connectAttr "|group2|zSolver1.osp" "|group2|zSolver1|zSolver1Shape.isp";
-connectAttr "c_bone_1_zBone1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[0]";
-connectAttr "r_tissue_2_zMaterial1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[2]";
-connectAttr "c_bone_2_zBone1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[3]";
-connectAttr "c_tissue_3_zMaterial1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[4]";
-connectAttr "c_cloth_1_zMaterial1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[5]";
-connectAttr "r_subtissue_1_zFiber1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[6]";
-connectAttr "l_tissue_1_zFiber1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[7]";
-connectAttr "l_bone_1_zBone1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[8]";
-connectAttr "l_cloth_1_zMaterial1.oGo" "|group2|zSolver1|zSolver1Shape.iGo[9]";
-connectAttr "r_tissue_2__c_bone_1_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[1]"
-		;
-connectAttr "c_tissue_3__c_bone_2_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[2]"
-		;
-connectAttr "c_cloth_1__c_bone_1_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[3]"
-		;
-connectAttr "l_tissue_1__c_bone_1_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[4]"
-		;
-connectAttr "l_tissue_1__l_bone_1_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[5]"
-		;
-connectAttr "l_cloth_1__c_bone_1_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[6]"
-		;
-connectAttr "l_cloth_1__c_tissue_3_zAttachment1.oC" "|group2|zSolver1|zSolver1Shape.iC[7]"
-		;
-connectAttr "r_subtissue_1_zFiber1.oMus" "|group2|zSolver1|zSolver1Shape.iM[1]";
-connectAttr "l_tissue_1_zFiber1.oMus" "|group2|zSolver1|zSolver1Shape.iM[2]";
+connectAttr ":time1.o" "zSolver2.iT";
+connectAttr "zSolver2.osp" "zSolver2Shape.isp";
+connectAttr "c_bone_1_zBone1.oGo" "zSolver2Shape.iGo[0]";
+connectAttr "r_tissue_2_zMaterial1.oGo" "zSolver2Shape.iGo[2]";
+connectAttr "c_bone_2_zBone1.oGo" "zSolver2Shape.iGo[3]";
+connectAttr "c_tissue_3_zMaterial1.oGo" "zSolver2Shape.iGo[4]";
+connectAttr "c_cloth_1_zMaterial1.oGo" "zSolver2Shape.iGo[5]";
+connectAttr "r_subtissue_1_zFiber1.oGo" "zSolver2Shape.iGo[6]";
+connectAttr "l_tissue_1_zFiber1.oGo" "zSolver2Shape.iGo[7]";
+connectAttr "l_bone_1_zBone1.oGo" "zSolver2Shape.iGo[8]";
+connectAttr "l_cloth_1_zMaterial1.oGo" "zSolver2Shape.iGo[9]";
+connectAttr "r_tissue_2__c_bone_1_zAttachment1.oC" "zSolver2Shape.iC[1]";
+connectAttr "c_tissue_3__c_bone_2_zAttachment1.oC" "zSolver2Shape.iC[2]";
+connectAttr "c_cloth_1__c_bone_1_zAttachment1.oC" "zSolver2Shape.iC[3]";
+connectAttr "l_tissue_1__c_bone_1_zAttachment1.oC" "zSolver2Shape.iC[4]";
+connectAttr "l_tissue_1__l_bone_1_zAttachment1.oC" "zSolver2Shape.iC[5]";
+connectAttr "l_cloth_1__c_bone_1_zAttachment1.oC" "zSolver2Shape.iC[6]";
+connectAttr "l_cloth_1__c_tissue_3_zAttachment1.oC" "zSolver2Shape.iC[7]";
+connectAttr "r_subtissue_1_zFiber1.oMus" "zSolver2Shape.iM[1]";
+connectAttr "l_tissue_1_zFiber1.oMus" "zSolver2Shape.iM[2]";
 connectAttr "groupId95.id" "|group2|l_tissue_1|l_tissue_Shape1.iog.og[19].gid";
 connectAttr "set49.mwc" "|group2|l_tissue_1|l_tissue_Shape1.iog.og[19].gco";
 connectAttr "groupId96.id" "|group2|l_tissue_1|l_tissue_Shape1.iog.og[20].gid";
@@ -166364,7 +166351,7 @@ connectAttr "groupParts55.og" "zEmbedder1.ip[11].ig";
 connectAttr "groupId55.id" "zEmbedder1.ip[11].gi";
 connectAttr "groupParts62.og" "zEmbedder1.ip[12].ig";
 connectAttr "groupId62.id" "zEmbedder1.ip[12].gi";
-connectAttr "|group1|zSolver1|zSolver1Shape.oSd" "zEmbedder1.solved";
+connectAttr "zSolver1Shape.oSd" "zEmbedder1.solved";
 connectAttr "zGeo3.oGo" "zEmbedder1.iGo[1]";
 connectAttr "zGeo5.oGo" "zEmbedder1.iGo[3]";
 connectAttr "zGeo6.oGo" "zEmbedder1.iGo[4]";
@@ -166375,7 +166362,7 @@ connectAttr "zGeo8.oGo" "zEmbedder1.iGo[11]";
 connectAttr "zGeo10.oGo" "zEmbedder1.iGo[12]";
 connectAttr "|group1|c_bone_1.wm" "zGeo1.iNMx";
 connectAttr "|group1|c_bone_1|c_bone_Shape1.w" "zGeo1.iNMh";
-connectAttr "|group1|zSolver1.osp" "zGeo1.isp";
+connectAttr "zSolver1.osp" "zGeo1.isp";
 connectAttr "zGeo1.oGo" "c_bone_1_zBone.iGo";
 connectAttr "|group1|c_bone_1|c_bone_Shape1.w" "c_bone_1_zBone.aM";
 connectAttr "groupId11.msg" "set3.gn" -na;
@@ -166405,7 +166392,7 @@ connectAttr "tweak2.msg" "tweakSet2.ub[0]";
 connectAttr "|group1|c_bone_1|c_bone_Shape1Orig1.w" "groupParts7.ig";
 connectAttr "groupId7.id" "groupParts7.gi";
 connectAttr "|group1|r_tissue_2.wm" "zGeo3.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo3.isp";
+connectAttr "zSolver1.osp" "zGeo3.isp";
 connectAttr "zGeo3.oGo" "r_tissue_2_zTissue.iGo";
 connectAttr "|group1|r_tissue_2_collision_mesh|r_tissue_2_collision_meshShape.msg" "r_tissue_2_zTissue.cS"
 		;
@@ -166451,11 +166438,11 @@ connectAttr "tweak2.og[0]" "groupParts13.ig";
 connectAttr "groupId13.id" "groupParts13.gi";
 connectAttr "|group1|c_bone_2.wm" "zGeo4.iNMx";
 connectAttr "|group1|c_bone_2|c_bone_Shape2.w" "zGeo4.iNMh";
-connectAttr "|group1|zSolver1.osp" "zGeo4.isp";
+connectAttr "zSolver1.osp" "zGeo4.isp";
 connectAttr "zGeo4.oGo" "c_bone_2_zBone.iGo";
 connectAttr "|group1|c_bone_2|c_bone_Shape2.w" "c_bone_2_zBone.aM";
 connectAttr "|group1|c_tissue_3.wm" "zGeo5.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo5.isp";
+connectAttr "zSolver1.osp" "zGeo5.isp";
 connectAttr "zGeo5.oGo" "c_tissue_3_zTissue.iGo";
 connectAttr "groupParts14.og" "c_tissue_3_zTet.ip[0].ig";
 connectAttr "groupId14.id" "c_tissue_3_zTet.ip[0].gi";
@@ -166505,7 +166492,7 @@ connectAttr "tweak5.msg" "tweakSet5.ub[0]";
 connectAttr "|group1|c_bone_2|c_bone_Shape3Orig2.w" "groupParts20.ig";
 connectAttr "groupId20.id" "groupParts20.gi";
 connectAttr "|group1|c_cloth_1.wm" "zGeo6.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo6.isp";
+connectAttr "zSolver1.osp" "zGeo6.isp";
 connectAttr "zGeo6.oGo" "c_cloth_1_zCloth.iGo";
 connectAttr "groupParts21.og" "c_cloth_1_zMaterial.ip[0].ig";
 connectAttr "groupId21.id" "c_cloth_1_zMaterial.ip[0].gi";
@@ -166540,7 +166527,7 @@ connectAttr "groupId24.id" "groupParts24.gi";
 connectAttr "r_tissue_2__c_bone_1_zAttachment.og[1]" "groupParts25.ig";
 connectAttr "groupId25.id" "groupParts25.gi";
 connectAttr "|group1|r_subtissue_1.wm" "zGeo7.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo7.isp";
+connectAttr "zSolver1.osp" "zGeo7.isp";
 connectAttr "zGeo7.oGo" "r_subtissue_1_zTissue.iGo";
 connectAttr "r_tissue_2_zTissue.oCT" "r_subtissue_1_zTissue.iPT";
 connectAttr "groupParts30.og" "r_subtissue_1_zTet.ip[0].ig";
@@ -166609,7 +166596,7 @@ connectAttr "|group1|l_loa_curve|l_loa_curveShape.ws" "r_subtissue_1_zLineOfActi
 		;
 connectAttr "polySphere6.out" "transformGeometry1.ig";
 connectAttr "|group1|l_tissue_1.wm" "zGeo8.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo8.isp";
+connectAttr "zSolver1.osp" "zGeo8.isp";
 connectAttr "zGeo8.oGo" "l_tissue_1_zTissue.iGo";
 connectAttr "groupParts45.og" "l_tissue_1_zTet.ip[0].ig";
 connectAttr "groupId45.id" "l_tissue_1_zTet.ip[0].gi";
@@ -166697,7 +166684,7 @@ connectAttr "|group1|l_tissue_1_embedded_cube|l_tissue_1_embedded_cubeShapeOrig.
 connectAttr "groupId56.id" "groupParts56.gi";
 connectAttr "|group1|l_bone_1.wm" "zGeo9.iNMx";
 connectAttr "|group1|l_bone_1|l_bone_1Shape.w" "zGeo9.iNMh";
-connectAttr "|group1|zSolver1.osp" "zGeo9.isp";
+connectAttr "zSolver1.osp" "zGeo9.isp";
 connectAttr "zGeo9.oGo" "l_bone_1_zBone.iGo";
 connectAttr "|group1|l_bone_1|l_bone_1Shape.w" "l_bone_1_zBone.aM";
 connectAttr "groupParts57.og" "l_tissue_1__l_bone_1_zAttachment.ip[0].ig";
@@ -166723,7 +166710,7 @@ connectAttr "tweak14.msg" "tweakSet14.ub[0]";
 connectAttr "|group1|l_bone_1|l_bone_1ShapeOrig.w" "groupParts59.ig";
 connectAttr "groupId59.id" "groupParts59.gi";
 connectAttr "|group1|l_cloth_1.wm" "zGeo10.iNMx";
-connectAttr "|group1|zSolver1.osp" "zGeo10.isp";
+connectAttr "zSolver1.osp" "zGeo10.isp";
 connectAttr "zGeo10.oGo" "l_cloth_1_zCloth.iGo";
 connectAttr "groupParts60.og" "l_cloth_1_zMaterial.ip[0].ig";
 connectAttr "groupId60.id" "l_cloth_1_zMaterial.ip[0].gi";
@@ -166796,7 +166783,7 @@ connectAttr "groupParts105.og" "zEmbedder2.ip[11].ig";
 connectAttr "groupId105.id" "zEmbedder2.ip[11].gi";
 connectAttr "groupParts112.og" "zEmbedder2.ip[12].ig";
 connectAttr "groupId112.id" "zEmbedder2.ip[12].gi";
-connectAttr "|group2|zSolver1|zSolver1Shape.oSd" "zEmbedder2.solved";
+connectAttr "zSolver2Shape.oSd" "zEmbedder2.solved";
 connectAttr "zGeo12.oGo" "zEmbedder2.iGo[1]";
 connectAttr "zGeo14.oGo" "zEmbedder2.iGo[3]";
 connectAttr "zGeo15.oGo" "zEmbedder2.iGo[4]";
@@ -166807,7 +166794,7 @@ connectAttr "zGeo17.oGo" "zEmbedder2.iGo[11]";
 connectAttr "zGeo19.oGo" "zEmbedder2.iGo[12]";
 connectAttr "|group2|c_bone_1.wm" "zGeo11.iNMx";
 connectAttr "|group2|c_bone_1|c_bone_Shape1.w" "zGeo11.iNMh";
-connectAttr "|group2|zSolver1.osp" "zGeo11.isp";
+connectAttr "zSolver2.osp" "zGeo11.isp";
 connectAttr "zGeo11.oGo" "c_bone_1_zBone1.iGo";
 connectAttr "|group2|c_bone_1|c_bone_Shape1.w" "c_bone_1_zBone1.aM";
 connectAttr "groupId72.msg" "set35.gn" -na;
@@ -166838,7 +166825,7 @@ connectAttr "tweak16.msg" "tweakSet16.ub[0]";
 connectAttr "|group2|c_bone_1|c_bone_Shape1Orig1.w" "groupParts68.ig";
 connectAttr "groupId68.id" "groupParts68.gi";
 connectAttr "|group2|r_tissue_2.wm" "zGeo12.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo12.isp";
+connectAttr "zSolver2.osp" "zGeo12.isp";
 connectAttr "zGeo12.oGo" "r_tissue_2_zTissue1.iGo";
 connectAttr "|group2|r_tissue_2_collision_mesh|r_tissue_2_collision_meshShape.msg" "r_tissue_2_zTissue1.cS"
 		;
@@ -166884,11 +166871,11 @@ connectAttr "tweak16.og[0]" "groupParts74.ig";
 connectAttr "groupId74.id" "groupParts74.gi";
 connectAttr "|group2|c_bone_2.wm" "zGeo13.iNMx";
 connectAttr "|group2|c_bone_2|c_bone_Shape2.w" "zGeo13.iNMh";
-connectAttr "|group2|zSolver1.osp" "zGeo13.isp";
+connectAttr "zSolver2.osp" "zGeo13.isp";
 connectAttr "zGeo13.oGo" "c_bone_2_zBone1.iGo";
 connectAttr "|group2|c_bone_2|c_bone_Shape2.w" "c_bone_2_zBone1.aM";
 connectAttr "|group2|c_tissue_3.wm" "zGeo14.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo14.isp";
+connectAttr "zSolver2.osp" "zGeo14.isp";
 connectAttr "zGeo14.oGo" "c_tissue_3_zTissue1.iGo";
 connectAttr "groupParts75.og" "c_tissue_3_zTet1.ip[0].ig";
 connectAttr "groupId75.id" "c_tissue_3_zTet1.ip[0].gi";
@@ -166938,7 +166925,7 @@ connectAttr "tweak19.msg" "tweakSet19.ub[0]";
 connectAttr "|group2|c_bone_2|c_bone_Shape3Orig2.w" "groupParts81.ig";
 connectAttr "groupId81.id" "groupParts81.gi";
 connectAttr "|group2|c_cloth_1.wm" "zGeo15.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo15.isp";
+connectAttr "zSolver2.osp" "zGeo15.isp";
 connectAttr "zGeo15.oGo" "c_cloth_1_zCloth1.iGo";
 connectAttr "groupParts82.og" "c_cloth_1_zMaterial1.ip[0].ig";
 connectAttr "groupId82.id" "c_cloth_1_zMaterial1.ip[0].gi";
@@ -166973,7 +166960,7 @@ connectAttr "groupId85.id" "groupParts85.gi";
 connectAttr "r_tissue_2__c_bone_1_zAttachment1.og[1]" "groupParts86.ig";
 connectAttr "groupId86.id" "groupParts86.gi";
 connectAttr "|group2|r_subtissue_1.wm" "zGeo16.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo16.isp";
+connectAttr "zSolver2.osp" "zGeo16.isp";
 connectAttr "zGeo16.oGo" "r_subtissue_1_zTissue1.iGo";
 connectAttr "r_tissue_2_zTissue1.oCT" "r_subtissue_1_zTissue1.iPT";
 connectAttr "groupParts87.og" "r_subtissue_1_zTet1.ip[0].ig";
@@ -167042,7 +167029,7 @@ connectAttr "|group2|l_loa_curve|l_loa_curveShape.ws" "r_subtissue_1_zLineOfActi
 		;
 connectAttr "polySphere14.out" "transformGeometry2.ig";
 connectAttr "|group2|l_tissue_1.wm" "zGeo17.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo17.isp";
+connectAttr "zSolver2.osp" "zGeo17.isp";
 connectAttr "zGeo17.oGo" "l_tissue_1_zTissue1.iGo";
 connectAttr "groupParts95.og" "l_tissue_1_zTet1.ip[0].ig";
 connectAttr "groupId95.id" "l_tissue_1_zTet1.ip[0].gi";
@@ -167130,7 +167117,7 @@ connectAttr "|group2|l_tissue_1_embedded_cube|l_tissue_1_embedded_cubeShapeOrig.
 connectAttr "groupId106.id" "groupParts106.gi";
 connectAttr "|group2|l_bone_1.wm" "zGeo18.iNMx";
 connectAttr "|group2|l_bone_1|l_bone_1Shape.w" "zGeo18.iNMh";
-connectAttr "|group2|zSolver1.osp" "zGeo18.isp";
+connectAttr "zSolver2.osp" "zGeo18.isp";
 connectAttr "zGeo18.oGo" "l_bone_1_zBone1.iGo";
 connectAttr "|group2|l_bone_1|l_bone_1Shape.w" "l_bone_1_zBone1.aM";
 connectAttr "groupParts107.og" "l_tissue_1__l_bone_1_zAttachment1.ip[0].ig";
@@ -167156,7 +167143,7 @@ connectAttr "tweak26.msg" "tweakSet26.ub[0]";
 connectAttr "|group2|l_bone_1|l_bone_1ShapeOrig.w" "groupParts109.ig";
 connectAttr "groupId109.id" "groupParts109.gi";
 connectAttr "|group2|l_cloth_1.wm" "zGeo19.iNMx";
-connectAttr "|group2|zSolver1.osp" "zGeo19.isp";
+connectAttr "zSolver2.osp" "zGeo19.isp";
 connectAttr "zGeo19.oGo" "l_cloth_1_zCloth1.iGo";
 connectAttr "groupParts110.og" "l_cloth_1_zMaterial1.ip[0].ig";
 connectAttr "groupId110.id" "l_cloth_1_zMaterial1.ip[0].gi";
