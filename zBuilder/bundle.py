@@ -189,7 +189,7 @@ class Bundle(object):
             if name_set and item.name not in name_set:
                 return invert
             if hasattr(item, 'association'):
-                if association_set and association_set.isdisjoint(item.long_association):
+                if association_set and association_set.isdisjoint(item.nice_association):
                     return invert
                 if association_regex and not re.search(association_regex, item.long_association):
                     return invert

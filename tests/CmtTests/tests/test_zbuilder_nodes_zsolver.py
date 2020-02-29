@@ -359,10 +359,10 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaSolverDuplicateTestCase, self).setUp()
         test_utils.load_scene(scene_name='generic_duplicate.ma')
-        cmds.select('group1|zSolver1')
+        cmds.select('zSolver1')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
-        cmds.ziva('group1|zSolver1', defaultSolver=True)
+        cmds.ziva('zSolver1', defaultSolver=True)
 
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
@@ -463,12 +463,12 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
         solver_values = []
         for attr in solver_attrs:
-            value = cmds.getAttr("{}.{}".format("group1|zSolver1|zSolver1Shape", attr))
+            value = cmds.getAttr("{}.{}".format("zSolver1|zSolver1Shape", attr))
             solver_values.append(value)
 
         solver_transform_values = []
         for attr in solver_transform_attrs:
-            value = cmds.getAttr("{}.{}".format("group1|zSolver1", attr))
+            value = cmds.getAttr("{}.{}".format("zSolver1", attr))
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
@@ -490,7 +490,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
     def test_remove_solver(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder, long=True)
-        cmds.select("group1|zSolver1")
+        cmds.select("zSolver1")
         utils.remove_solver(askForConfirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
@@ -515,15 +515,16 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
     def test_cut_paste(self):
         # Act
-        cmds.select('group1|zSolver1')
+        cmds.select("zSolver1")
         utils.rig_cut()
 
         # Verify
-        self.assertEqual(cmds.ls("group1|zSolver1"), [])
+        self.assertEqual(cmds.ls("zSolver1"), [])
 
         # Act
         utils.rig_paste()
         builder = zva.Ziva()
+        cmds.select("zSolver1")
         builder.retrieve_from_scene()
 
         # Verify
@@ -532,11 +533,11 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
     def test_copy_paste(self):
         # Act
-        cmds.select('group1|zSolver1')
+        cmds.select("zSolver1")
         utils.rig_copy()
 
         # Verify
-        self.assertSceneHasNodes(["group1|zSolver1"])
+        self.assertSceneHasNodes(["zSolver1"])
 
         # Act
         mz.clean_scene()
@@ -564,7 +565,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
         # Act
         # now do the trasnfer
-        utils.rig_transfer('group3|zSolver1', 'warped_', '')
+        utils.rig_transfer('zSolver1', 'warped_', '')
 
         # Verify
         # when done we should have some ziva nodes with a 'warped_' prefix
