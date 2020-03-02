@@ -36,7 +36,6 @@ class TissueNode(Ziva):
 
         if parent_name:
             self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
-            
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
@@ -128,11 +127,11 @@ def build_multiple(tissue_items,
         # rename zTissues and zTets-----------------------------------------
         for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
                                                 tissue_results['scene_items']):
-            node.name = cmds.rename(new_name, builder_name)
+            node.name = mz.safe_rename(new_name, builder_name)
 
         for new_name, builder_name, node in zip(outs[2::4], tet_results['names'],
                                                 tet_results['scene_items']):
-            node.name = cmds.rename(new_name, builder_name)
+            node.name = mz.safe_rename(new_name, builder_name)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()

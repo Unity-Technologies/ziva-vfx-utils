@@ -82,7 +82,7 @@ class RivetToBoneNode(Ziva):
                     cmds.select('{}.cv[{}]'.format(crv, i), add=True)
                 cmds.select(bone, add=True)
                 results = mel.eval('zRivetToBone')
-                self.name = cmds.rename(results[0], self.name)
+                self.name = mz.safe_rename(results[0], self.name)
 
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)

@@ -73,6 +73,6 @@ def build_multiple(scene_items, attr_filter=None, permissive=False):
     if results:
         results = cmds.ls(results, type='zBone')
         for new, name, scene_item in zip(results, culled['names'], culled['scene_items']):
-            scene_item.name = cmds.rename(new, name)
+            scene_item.name = mz.safe_rename(new, name)
 
     cmds.select(sel)

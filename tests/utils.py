@@ -64,6 +64,23 @@ def get_ziva_node_names_from_builder(builder, long=False):
     return node_names
 
 
+def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
+    """Loading a maya test scene based on name.  These are maya files in the repo
+    so it searches for proper file based on current directoy.
+
+    Args:
+        new_scene (bool, optional): If True forces a new scene.. Defaults to True.
+        scene_name (str, optional): Name of the file to reference. Defaults to 'generic.ma'.
+        namespace (str, optional): The namespace to use for referenced file.
+                                            ":" is equal to no namespace. Defaults to "TEMP".
+    """
+    path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
+    if new_scene:
+        cmds.file(new=True, force=True)
+
+    cmds.file(path, reference=True, namespace=namespace, ignoreVersion=True)
+
+
 def load_scene(new_scene=True, scene_name='generic.ma'):
     path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
     if new_scene:

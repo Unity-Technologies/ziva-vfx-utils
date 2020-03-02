@@ -5,10 +5,11 @@ import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase
-
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
 
 NODE_TYPE = 'zFiber'
+
+
 class ZivaFiberGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
@@ -71,13 +72,13 @@ class ZivaFiberGenericTestCase(VfxTestCase):
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(cmds.ls("r_tissue_2_zFiber"), [])
+        self.assertEqual(cmds.ls("r_tissue_2_zFiber1"), [])
 
         ## ACT
         mz.rename_ziva_nodes()
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_2_zFiber")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_2_zFiber1")), 1)
 
     def test_string_replace(self):
         ## VERIFY
@@ -253,6 +254,8 @@ class ZivaFiberMirrorTestCase(ZivaMirrorTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaFiberMirrorTestCase, self).builder_build_with_string_replace()
+
+
 class ZivaFiberMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
@@ -285,6 +288,47 @@ class ZivaFiberMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaFiberMirrorNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaFiberUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva VFX nodes
+    - The Ziva Nodes have a side identifier same as geo
+
+    """
+
+    def setUp(self):
+        super(ZivaFiberUpdateNiceNameTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example.ma')
+
+        # NICE NAMES
+        mz.rename_ziva_nodes()
+
+        # make FULL setup based on left
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        builder.string_replace('^l_', 'r_')
+        builder.build()
+
+        # gather info
+        cmds.select('l_armA_muscle_geo', 'l_armA_subtissue_geo')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaFiberUpdateNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaFiberUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
 
 class ZivaFiberUpdateTestCase(ZivaUpdateTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
