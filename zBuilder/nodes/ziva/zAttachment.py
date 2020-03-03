@@ -60,17 +60,17 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    self.name = mz.safe_rename(existing[d_index], name)
+                    self.name = mz.safe_rename(existing[d_index], self.name)
                 else:
                     cmds.select(source_mesh, r=True)
                     cmds.select(target_mesh, add=True)
                     new_att = mel.eval('ziva -a')
-                    self.name = mz.safe_rename(new_att[0], name)
+                    self.name = mz.safe_rename(new_att[0], self.name)
             else:
                 cmds.select(source_mesh, r=True)
                 cmds.select(target_mesh, add=True)
                 new_att = mel.eval('ziva -a')
-                self.name = mz.safe_rename(new_att[0], name)
+                self.name = mz.safe_rename(new_att[0], self.name)
 
             # set the attributes
             self.set_maya_attrs(attr_filter=attr_filter)
