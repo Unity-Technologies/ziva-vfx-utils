@@ -26,7 +26,6 @@ class SolverNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         solver_name = self.get_scene_name()
 
@@ -37,10 +36,13 @@ class SolverNode(Ziva):
             # rename shape after.
             solverTransform = cmds.ls(results, type='zSolverTransform')[0]
             st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
-            mz.safe_rename(solverTransform, st.name)
-            solverTransform_child = cmds.listRelatives(st.name, c=True)[0]
+            new_name = mz.safe_rename(solverTransform, st.name)
+            st.name = new_name
+            solverTransform_child = cmds.listRelatives(st.name, c=True, fullPath=True)[0]
             mz.safe_rename(solverTransform_child, solver_name.split('|')[-1])
         else:
             new_name = mz.safe_rename(solver_name, self.name)
+
+        cmds.ziva(new_name, defaultSolver=True)
 
         self.set_maya_attrs(attr_filter=attr_filter)

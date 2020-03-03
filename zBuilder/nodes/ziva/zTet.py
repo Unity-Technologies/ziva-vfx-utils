@@ -67,27 +67,21 @@ class TetNode(Ziva):
         There is only ever 1 per mesh so no need to worry about multiple tets
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
-            interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
 
-        attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
-        interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.name
-        mesh = self.association[0]
-        if not cmds.objExists(name) and cmds.objExists(mesh):
-            # this occurs when the zTet node does NOT exist and the mesh does.
-            if permissive:
-                name = mel.eval('zQuery -t zTet ' + mesh)[0]
-            else:
-                raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
+        if not cmds.objExists(name):
+            mesh = self.nice_association[0]
+            if cmds.objExists(mesh):
+                if permissive:
+                    name = mel.eval('zQuery -t zTet ' + mesh)
+                    if name:
+                        name = name[0]
+                else:
+                    raise Exception('{} does not exist in scene. Check mesh {}.'.format(name, mesh))
 
         if name:
             if not cmds.objExists(name):
@@ -99,5 +93,4 @@ class TetNode(Ziva):
                 self.name = mz.safe_rename(name, self.name)
 
         self.apply_user_tet_mesh()
-        self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=False)
+        # zTet does not need to build maps and attributes here because it's done by zTissue

@@ -101,19 +101,19 @@ class Ziva(Builder):
             for x in self.get_scene_items(type_filter=['zSolverTransform']):
                 if x.solver == item.solver:
                     parent_node = x
-                    collected_solver_dict[item.name] = x
+                    collected_solver_dict[item.long_name] = x
                     parent_node.add_child(item)
 
         # get geometry-----------------------------------------------------------
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             # proxy object to represent geometry
             grp = DGNode()
-            grp.name = item.long_association[0]
+            grp.name = item.nice_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
             # store ziva node this geometry depends on
             # to synchronize enable/envelope behaviour in the scene panel
             grp.depends_on = item
-            self.geo[item.long_association[0]] = grp
+            self.geo[item.nice_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=['zBone', 'zTissue', 'zCloth']):
             if item.type == 'zTissue':
@@ -121,29 +121,29 @@ class Ziva(Builder):
                 if item.parent_tissue:
                     # This node has a parent subTissue, so lets find the parents mesh
                     # for proper parenting.
-                    parent_tissue_mesh = item.parent_tissue.long_association[0]
+                    parent_tissue_mesh = item.parent_tissue.nice_association[0]
                     parent_node = self.geo.get(parent_tissue_mesh, self.root_node)
                 else:
-                    parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
+                    parent_node = collected_solver_dict.get(item.solver.long_name, self.root_node)
             else:
-                parent_node = collected_solver_dict.get(item.solver.name, self.root_node)
+                parent_node = collected_solver_dict.get(item.solver.long_name, self.root_node)
 
-            self.geo[item.long_association[0]].parent = parent_node
-            parent_node.add_child(self.geo[item.long_association[0]])
+            self.geo[item.nice_association[0]].parent = parent_node
+            parent_node.add_child(self.geo[item.nice_association[0]])
 
-            self.geo[item.long_association[0]].add_child(item)
+            self.geo[item.nice_association[0]].add_child(item)
 
         for item in self.get_scene_items(type_filter=['zTet']):
-            parent_node = self.geo.get(item.long_association[0], self.root_node)
+            parent_node = self.geo.get(item.nice_association[0], self.root_node)
             parent_node.add_child(item)
 
         for item in self.get_scene_items(type_filter=['zMaterial', 'zFiber', 'zAttachment']):
-            parent_node = self.geo.get(item.long_association[0], None)
+            parent_node = self.geo.get(item.nice_association[0], None)
             if parent_node:
                 parent_node.add_child(item)
 
             if item.type == 'zAttachment':
-                parent_node = self.geo.get(item.long_association[1], None)
+                parent_node = self.geo.get(item.nice_association[1], None)
                 if parent_node:
                     parent_node.add_child(item)
 
@@ -173,7 +173,7 @@ class Ziva(Builder):
         for item in self.get_scene_items(type_filter=['zLineOfAction']):
             parent_node = item.fiber_item
 
-            for crv in item.long_association:
+            for crv in item.nice_association:
                 # proxy object to represent geometry
                 # curve geometry does not need depends_on parameter
                 # because zLineOfAction does not have enable/envelope attribute
@@ -188,7 +188,7 @@ class Ziva(Builder):
                 if rivet_items:
                     for rivet in rivet_items:
                         grp.add_child(rivet)
-                self.geo[item.long_association[0]] = grp
+                self.geo[item.nice_association[0]] = grp
 
         for item in self.get_scene_items(type_filter=Field.TYPES):
             self.root_node.add_child(item)
@@ -211,7 +211,7 @@ class Ziva(Builder):
 
         # query all the ziva nodes---------------------------------------------
         cmds.select(bodies)
-        nodes = mel.eval('zQuery -a')
+        nodes = mel.eval('zQuery -a -l')
 
         if nodes:
             # find zFiber---------------------------------------------
@@ -370,9 +370,9 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         solver = None
         if args:
-            solver = mel.eval('zQuery -t "zSolver" {}'.format(args[0]))
+            solver = mel.eval('zQuery -t "zSolver" -l {}'.format(args[0]))
         else:
-            solver = mel.eval('zQuery -t "zSolver"')
+            solver = mel.eval('zQuery -t "zSolver" -l')
 
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
@@ -718,7 +718,7 @@ def zQuery(types, solver):
     # go through ordered 'types' list and fill up the return_value in a nice ordered manner
     for type_ in types:
         if type_ in types_in_znodes:
-            tmp = mel.eval('zQuery -t "{}" {}'.format(type_, solver))
+            tmp = mel.eval('zQuery -t "{}" -l {}'.format(type_, solver))
             if tmp:
                 return_value.extend(tmp)
         else:

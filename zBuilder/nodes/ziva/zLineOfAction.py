@@ -48,18 +48,28 @@ class LineOfActionNode(Ziva):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
-        if cmds.objExists(self.association[0]) and cmds.objExists(self.fiber_item.name):
+        loas = []
+        for loa in self.nice_association:
+            if cmds.objExists(loa):
+                loas.append(loa)
+            else:
+                cmds.warning(loa + ' curve does not exists in scene')
+
+        if not loas:
+            cmds.warning('No curves found, skipping line of action')
+            return
+
+        if cmds.objExists(self.fiber_item.name):
             # check if the zFiber has a lineOf Action on it, if it does that is
             # what we want to use.  If not lets create a new one
             existing = cmds.listConnections(self.fiber_item.name, type='zLineOfAction')
             if not existing:
-                cmds.select(self.fiber_item.name, self.association)
+                cmds.select(self.fiber_item.name, loas)
                 results_ = mel.eval('ziva -lineOfAction')
                 clt = cmds.ls(results_, type='zLineOfAction')[0]
                 self.name = mz.safe_rename(clt, self.name)
         else:
-            cmds.warning(self.association[0] +
-                         ' mesh does not exists in scene, skippings line of action')
+            cmds.warning(self.fiber_item.name + ' fiber does not exists in scene, skipping line of action')
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)

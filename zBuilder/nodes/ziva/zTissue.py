@@ -52,7 +52,7 @@ class TissueNode(Ziva):
         """
         solver = None
         if args:
-            solver = mel.eval('zQuery -t zSolver {}'.format(args[0]))
+            solver = mel.eval('zQuery -t zSolver -l {}'.format(args[0]))
 
         if not solver:
             solver = self.solver
@@ -141,13 +141,14 @@ def build_multiple(tissue_items,
                 parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
 
                 if parent_scene_item:
-                    parent = [x.association[0] for x in parent_scene_item]
+                    parent = [x.nice_association[0] for x in parent_scene_item]
                 else:
-                    cmds.select(ztissue.parent_tissue.name, r=True)
+                    cmds.select(ztissue.parent_tissue.long_name, r=True)
                     parent = mel.eval('zQuery -type zTissue -m ')
 
                 cmds.select(parent)
-                cmds.select(ztissue.association, add=True)
+                tissue_mesh = ztissue.nice_association[0]
+                cmds.select(tissue_mesh, add=True)
                 mel.eval('ziva -ast')
 
     cmds.select(sel)

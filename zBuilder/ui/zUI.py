@@ -264,7 +264,7 @@ class MyDockingUI(QtWidgets.QWidget):
 
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        cmds.select(node.long_association)
+        cmds.select(node.nice_association)
 
     def open_menu(self, position):
         """Generates menu for tree items

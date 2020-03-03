@@ -32,8 +32,8 @@ class Deformer(DGNode):
 
         """
         objs = {}
-        if self.long_association:
-            objs['mesh'] = self.long_association
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
@@ -76,7 +76,7 @@ class Deformer(DGNode):
         Returns:
             list: List of long mesh names.
         """
-        return self.long_association
+        return self.nice_association
 
     def get_mesh_objects(self):
         """
@@ -124,11 +124,8 @@ class Deformer(DGNode):
             list od strings: list of strings of mesh names.
         """
         meshes = cmds.deformer(node, query=True, g=True)
-        tmp = list()
-        for mesh in meshes:
-            parent = cmds.listRelatives(mesh, p=True)
-            tmp.extend(cmds.ls(parent, long=True))
-        return tmp
+        parent = cmds.listRelatives(meshes, p=True, fullPath=True)
+        return parent
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya

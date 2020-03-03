@@ -81,9 +81,9 @@ def delete_rivet_from_solver(solvers):
     """
     history = cmds.listHistory(solvers, allConnections=True, future=True)
     if history:
-        locators = cmds.ls(history, type='zRivetToBoneLocator')
-        rivets = cmds.ls(history, type='zRivetToBone')
-        locator_parent = cmds.listRelatives(locators, parent=True)
+        locators = cmds.ls(history, type='zRivetToBoneLocator', l=True)
+        rivets = cmds.ls(history, type='zRivetToBone', l=True)
+        locator_parent = cmds.listRelatives(locators, parent=True, fullPath=True)
         if rivets and locator_parent:
             cmds.delete(rivets + locator_parent)
 
@@ -396,7 +396,7 @@ def get_association(zNode):
 
     elif _type == 'zRestShape':
         tet = cmds.listConnections('{}.iGeo'.format(zNode))[0]
-        mesh = mel.eval('zQuery -type "zTissue" -m {}'.format(tet))
+        mesh = mel.eval('zQuery -type "zTissue" -l -m {}'.format(tet))
         return mesh
 
     elif _type == 'zFieldAdaptor':
@@ -868,7 +868,7 @@ def cull_creation_nodes(scene_items, permissive=True):
     # check meshes for existing zBones or zTissue
     for i, scene_item in enumerate(scene_items):
         type_ = scene_item.type
-        mesh = scene_item.association[0]
+        mesh = scene_item.nice_association[0]
         name = scene_item.name
 
         if cmds.objExists(mesh):

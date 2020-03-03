@@ -34,10 +34,7 @@ class RestShapeNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
 
         # this is the mesh with zTissue that will have the zRestShape node
-        mesh = self.association[0]
-
-        # get a list of the short names of all the targets
-        targets = [x.split('|')[-1] for x in self.targets]
+        mesh = self.nice_association[0]
 
         # Checking if the mesh is in scene
         if cmds.objExists(mesh):
@@ -45,6 +42,13 @@ class RestShapeNode(Ziva):
             # there is an existing zRestShape on it.
 
             existing_restshape_node = mel.eval('zQuery -type zRestShape {}'.format(mesh))
+
+            targets = []
+            for target in self.targets:
+                if cmds.objExists(target):
+                    targets.append(target)
+                elif cmds.objExists(target.split("|")[-1]):
+                    targets.append(target.split("|")[-1])
 
             if not existing_restshape_node:
                 # there is not a zRestShape so we need to create one
@@ -61,12 +65,12 @@ class RestShapeNode(Ziva):
             else:
                 # The rest shape node exists on mesh so now lets update it.
                 # First lets remove existing targets
-                for target in self.targets:
-                    mel.eval('zRestShape -r {} {};'.format(self.association[0], target))
+                for target in targets:
+                    mel.eval('zRestShape -r {} {};'.format(mesh, target))
 
                 for target in self.targets:
                     # now lets add back what is in self
-                    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
+                    mel.eval('zRestShape -a {} {};'.format(mesh, target))
 
                 # update name of node to that which is on mesh.
                 self.name = existing_restshape_node[0]
