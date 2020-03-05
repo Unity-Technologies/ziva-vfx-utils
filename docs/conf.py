@@ -49,8 +49,12 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
+import datetime
+
+now = datetime.datetime.now()
+
 project = u'zBuilder'
-copyright = u'2016, Ziva Dynamics'
+copyright = u'{}, Ziva Dynamics'.format(now.year)
 author = u'Ziva Dynamics'
 
 # The version info for the project you're documenting, acts as replacement for
