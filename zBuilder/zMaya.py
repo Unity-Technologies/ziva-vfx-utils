@@ -81,9 +81,9 @@ def delete_rivet_from_solver(solvers):
     """
     history = cmds.listHistory(solvers, allConnections=True, future=True)
     if history:
-        locators = cmds.ls(history, type='zRivetToBoneLocator')
-        rivets = cmds.ls(history, type='zRivetToBone')
-        locator_parent = cmds.listRelatives(locators, parent=True)
+        locators = cmds.ls(history, type='zRivetToBoneLocator', l=True)
+        rivets = cmds.ls(history, type='zRivetToBone', l=True)
+        locator_parent = cmds.listRelatives(locators, parent=True, fullPath=True)
         if rivets and locator_parent:
             cmds.delete(rivets + locator_parent)
 
@@ -396,7 +396,7 @@ def get_association(zNode):
 
     elif _type == 'zRestShape':
         tet = cmds.listConnections('{}.iGeo'.format(zNode))[0]
-        mesh = mel.eval('zQuery -type "zTissue" -m {}'.format(tet))
+        mesh = mel.eval('zQuery -type "zTissue" -l -m {}'.format(tet))
         return mesh
 
     elif _type == 'zFieldAdaptor':
@@ -423,6 +423,102 @@ def get_association(zNode):
             return mesh
 
 
+def safe_rename(old_name, new_name):
+    """
+    Same as cmds.rename but does not throw an exception if renaming failed
+    Useful if need to rename all the nodes that are not referenced
+    """
+    if old_name != new_name:
+        try:
+            return cmds.rename(old_name, new_name)
+        except RuntimeError:
+            pass
+
+    return old_name
+
+
+def strip_namespace(node):
+    return node.split(':')[-1]
+
+
+def znode_rename_helper(zNode, postfix, solver, replace):
+    """
+    Helper for cases when need to rename nodes like:
+    zMaterial1, zMaterial4, zMaterial25 to
+    zMaterial1, zMaterial2, zMaterial3
+    And not to rename nodes like:
+    zMaterial1, zMaterial2, zMaterial3 to
+    zMaterial4, zMaterial5, zMaterial6
+    Args:
+        zNode (string): node type
+        postfix (string): postfix to use for renaming
+        solver (string): solver name
+        replace (list): list of strings to remove from the new name
+
+    Returns:
+        tuple of lists: old names, new names
+    """
+
+    # store data to print results later
+    old_names = []
+    new_names = []
+    items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver))
+    if items:
+        for item in items:
+            mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+            for r in replace:
+                mesh = mesh.replace(r, '')
+            mesh = strip_namespace(mesh)
+            new_name = '{}_{}'.format(mesh, zNode)
+            if zNode in ['zMaterial', 'zFiber']:
+                new_name += '1'
+            if item != new_name:
+                new_name = safe_rename(item, '{}{}'.format(new_name, postfix))
+                if new_name:
+                    old_names.append(item)
+                    new_names.append(new_name)
+
+    return old_names, new_names
+
+
+def rivet_to_bone_rename_helper(rtbs, postfix, replace):
+    """
+    The same idea as for znode_rename_helper but for zRivetToBone
+    Args:
+        rtbs (list): list of zRivetToBone nodes to rename
+        postfix (string): postfix to use for renaming
+        replace (list): list of strings to remove from the new name
+
+    Returns:
+        tuple of lists: old names, new names
+    """
+    old_names = []
+    new_names = []
+    for rtb in rtbs:
+        crv = cmds.listConnections(rtb + '.outputGeometry', shapes=True)
+        # If curve has multiple zRivetToBone nodes, need to search zRivetToBone connections
+        # until curve is found
+        while crv:
+            if cmds.nodeType(crv[0]) == 'nurbsCurve':
+                break
+            else:
+                crv = cmds.listConnections(crv[0] + '.outputGeometry', shapes=True)
+        crv = cmds.listRelatives(crv, p=True)
+        if crv:
+            crv = crv[0]
+            for r in replace:
+                crv = crv.replace(r, '')
+            crv = strip_namespace(crv)
+            new_name = '{}_{}'.format(crv, 'zRivetToBone1')
+            if rtb != new_name:
+                new_name = safe_rename(rtb, '{}{}'.format(new_name, postfix))
+                if new_name:
+                    old_names.append(rtb)
+                    new_names.append(new_name)
+
+    return old_names, new_names
+
+
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
     """ Renames zNodes based on mesh it's connected to.
 
@@ -447,25 +543,11 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
     for zNode in zNodes:
-        items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
-                for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}tmp'.format(mesh, zNode))
-
+        old_names, _ = znode_rename_helper(zNode, '_tmp', solver[0], replace)
         # looping through this twice to get around how maya renames stuff
-        items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
-                for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    cmds.rename(item, '{}_{}'.format(mesh, zNode))
-                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
+        _, new_names = znode_rename_helper(zNode, '', solver[0], replace)
+        for i, item in enumerate(old_names):
+            logger.info('rename: {} to {}'.format(item, new_names[i]))
 
     # rename zLineOfAction nodes
     loas = mel.eval('zQuery -loa {}'.format(solver[0]))
@@ -473,15 +555,20 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         for loa in loas:
             crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
-                cmds.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
+                crv = strip_namespace(crv[0])
+                new_name = crv.replace('_zFiber', '_zLineOfAction')
+                new_name = safe_rename(loa, new_name)
+                if new_name:
+                    logger.info('rename: {} to {}'.format(loa, new_name))
 
     # rename zRivetToBone nodes
     rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
     if rtbs:
-        for rtb in rtbs:
-            crv = cmds.listConnections(rtb + '.outputGeometry')
-            if crv:
-                cmds.rename(rtb, crv[0] + '_zRivetToBone1')
+        old_names, new_names = rivet_to_bone_rename_helper(rtbs, '_tmp', replace)
+        _, new_names = rivet_to_bone_rename_helper(new_names, '', replace)
+
+        for i, item in enumerate(old_names):
+            logger.info('rename: {} to {}'.format(item, new_names[i]))
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
@@ -489,12 +576,17 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             s = mel.eval('zQuery -as {}'.format(attachment))[0]
             for r in replace:
                 s = s.replace(r, '')
+            s = strip_namespace(s)
             t = mel.eval('zQuery -at {}'.format(attachment))[0]
             for r in replace:
                 t = t.replace(r, '')
-            if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
-                cmds.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+            # remove namespace from target mesh
+            t = strip_namespace(t)
+            new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
+            new_name = safe_rename(attachment, new_name)
+            if new_name:
+                logger.info('rename: {} to {}'.format(attachment, new_name))
+
     logger.info('finished renaming.... ')
 
 
@@ -674,11 +766,13 @@ def build_attr_key_values(selection, attr_list):
         for item in cmds.ls(obj):
             type_ = cmds.getAttr(item, type=True)
             if not type_ == 'TdataCompound':
-                attr_dict[attr] = {}
-                attr_dict[attr]['type'] = type_
-                attr_dict[attr]['value'] = cmds.getAttr(item)
-                attr_dict[attr]['locked'] = cmds.getAttr(item, lock=True)
-                attr_dict[attr]['alias'] = cmds.aliasAttr(obj, q=True)
+                # we do not want to get any attribute that is not writable as we cannot change it.
+                if cmds.attributeQuery(attr, node=selection, w=True):
+                    attr_dict[attr] = {}
+                    attr_dict[attr]['type'] = type_
+                    attr_dict[attr]['value'] = cmds.getAttr(item)
+                    attr_dict[attr]['locked'] = cmds.getAttr(item, lock=True)
+                    attr_dict[attr]['alias'] = cmds.aliasAttr(obj, q=True)
 
     return attr_dict
 
@@ -774,13 +868,13 @@ def cull_creation_nodes(scene_items, permissive=True):
     # check meshes for existing zBones or zTissue
     for i, scene_item in enumerate(scene_items):
         type_ = scene_item.type
-        mesh = scene_item.association[0]
+        mesh = scene_item.nice_association[0]
         name = scene_item.name
 
         if cmds.objExists(mesh):
             existing = mel.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
-                out = cmds.rename(existing, name)
+                out = safe_rename(existing, name)
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)

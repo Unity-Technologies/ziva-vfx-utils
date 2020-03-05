@@ -15,7 +15,7 @@ class DeltaMush(Deformer):
 
         name = self.get_scene_name()
         if not cmds.objExists(name):
-            cmds.select(self.long_association, r=True)
+            cmds.select(self.nice_association, r=True)
             delta_mush = cmds.deltaMush(name=name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

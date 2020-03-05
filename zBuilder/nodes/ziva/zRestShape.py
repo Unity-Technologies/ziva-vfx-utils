@@ -16,7 +16,7 @@ class RestShapeNode(Ziva):
     def __init__(self, parent=None, builder=None):
         super(RestShapeNode, self).__init__(parent=parent, builder=builder)
         self.targets = []
-        self.tissue_name = None
+        self.tissue_item = None
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -25,7 +25,8 @@ class RestShapeNode(Ziva):
 
         self.targets = cmds.listConnections(self.name + '.target')
         self.targets = cmds.ls(self.targets, long=True)  # find long names
-        self.tissue_name = get_rest_shape_tissue(self.name)
+        tissue_name = get_rest_shape_tissue(self.name)
+        self.tissue_item = self.builder.get_scene_items(name_filter=tissue_name)[0]
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.
@@ -33,10 +34,7 @@ class RestShapeNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
 
         # this is the mesh with zTissue that will have the zRestShape node
-        mesh = self.association[0]
-
-        # get a list of the short names of all the targets
-        targets = [x.split('|')[-1] for x in self.targets]
+        mesh = self.nice_association[0]
 
         # Checking if the mesh is in scene
         if cmds.objExists(mesh):
@@ -45,30 +43,34 @@ class RestShapeNode(Ziva):
 
             existing_restshape_node = mel.eval('zQuery -type zRestShape {}'.format(mesh))
 
+            targets = []
+            for target in self.targets:
+                if cmds.objExists(target):
+                    targets.append(target)
+                elif cmds.objExists(target.split("|")[-1]):
+                    targets.append(target.split("|")[-1])
+
             if not existing_restshape_node:
                 # there is not a zRestShape so we need to create one
                 cmds.select(mesh)
                 cmds.select(targets, add=True)
                 results = mel.eval('zRestShape -a')[0]
-                
+
                 # Rename the zRestShape node based on the name of scene_item.
                 # If this name is elsewhere in scene (on another mesh) it will not
                 # be able to name it so we capture return and rename scene_item
                 # so setAttrs work
-                self.name = cmds.rename(results, self.name)
+                self.name = mz.safe_rename(results, self.name)
 
-                # Update name of tissue.  If a 'string_replace' was applied to scene_items
-                # this could get out of sync so lets double check it.
-                self.tissue_name = get_rest_shape_tissue(self.name)
             else:
                 # The rest shape node exists on mesh so now lets update it.
                 # First lets remove existing targets
-                for target in self.targets:
-                    mel.eval('zRestShape -r {} {};'.format(self.association[0], target))
+                for target in targets:
+                    mel.eval('zRestShape -r {} {};'.format(mesh, target))
 
-                # now lets add back what is in self
                 for target in self.targets:
-                    mel.eval('zRestShape -a {} {};'.format(self.association[0], target))
+                    # now lets add back what is in self
+                    mel.eval('zRestShape -a {} {};'.format(mesh, target))
 
                 # update name of node to that which is on mesh.
                 self.name = existing_restshape_node[0]

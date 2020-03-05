@@ -120,14 +120,17 @@ class Map(Base):
         """ Interpolates map against mesh in scene.  Re-sets value."""
         mesh_data = self.get_mesh_component()
 
-        if cmds.objExists(mesh_data.name):
+        mesh_name = mesh_data.long_name
+        if not cmds.objExists(mesh_name):
+            mesh_name = mesh_data.name
+        if cmds.objExists(mesh_name):
             logger.info('interpolating map:  {}'.format(self.name))
             created_mesh = mesh_data.build_mesh()
             interp_weights = self.values
             if self.interp_method == "barycentric":
-                interp_weights = interpolate_values(created_mesh, mesh_data.name, self.values)
+                interp_weights = interpolate_values(created_mesh, mesh_name, self.values)
             elif self.interp_method == "endPoints":
-                interp_weights = interpolate_end_points_weights(created_mesh, mesh_data.name,
+                interp_weights = interpolate_end_points_weights(created_mesh, mesh_name,
                                                                 self.values)
             self.values = interp_weights
 

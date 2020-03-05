@@ -24,7 +24,6 @@ class DGNode(Base):
         attrs (dict): A place for the maya attributes dictionary.
 
     """
-    
     """ Types of maya nodes this parameter is aware of.  Only needed 
         if parameter can deal with multiple types.  Else leave at None """
     MAP_LIST = []
@@ -63,8 +62,14 @@ class DGNode(Base):
 
     def __deepcopy__(self, memo):
         # Some attributes cannot be deepcopied so define a listy of attributes
-        # to ignore.
-        non_copyable_attrs = ('depends_on')
+        # to ignore.  These items are zBuilder scene items.  We need to not copy these
+        # attributes and apply them to copy afterwards.
+        non_copyable_attrs = ['depends_on']
+        non_copyable_attrs.extend(Base.SCENE_ITEM_ATTRIBUTES)
+
+        non_copyable_items = {}
+        for attr in non_copyable_attrs:
+            non_copyable_items[attr] = self.__dict__.get(attr, None)
 
         result = type(self)()
 
@@ -72,6 +77,11 @@ class DGNode(Base):
             # skip over attributes defined as non-copyable in non_copyable_attrs
             if k not in non_copyable_attrs:
                 setattr(result, k, copy.deepcopy(v, memo))
+
+        # Add non-copyable attrs back into scene item manually after it's copied.
+        for item in non_copyable_items:
+            if item in result.__dict__:
+                result.__dict__[item] = non_copyable_items[item]
 
         return result
 
@@ -85,17 +95,26 @@ class DGNode(Base):
             maya_node (str): The maya node to populate parameter with.
 
         """
-
-        # selection = mz.parse_maya_node_for_selection(maya_node)
-        maya_node = mz.check_maya_node(maya_node)
-        self.name = maya_node
-        self.type = cmds.objectType(maya_node)
+        self.name = mz.check_maya_node(maya_node)
+        self.type = cmds.objectType(self.long_name)
         self.get_maya_attrs()
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  meant to be overwritten.
         """
         raise NotImplementedError
+
+    @property
+    def nice_association(self):
+        """ if long name exists in the maya scene return it, else return short name
+        """
+        out = []
+        for i, item in enumerate(self._association):
+            if cmds.objExists(item):
+                out.append(item)
+            else:
+                out.append(self.association[i])
+        return out
 
     @property
     def association(self):
@@ -122,7 +141,7 @@ class DGNode(Base):
         Returns:
             prints out items that are different.
         """
-        name = self.name
+        name = self.long_name
 
         attr_list = self.attrs.keys()
         if cmds.objExists(name):
@@ -155,12 +174,12 @@ class DGNode(Base):
         """
 
         # build the attribute list to aquire from scene
-        attr_list = mz.build_attr_list(self.name)
+        attr_list = mz.build_attr_list(self.long_name)
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
 
         # with attribute list, get values in dictionary format and update node.
-        self.attrs = mz.build_attr_key_values(self.name, attr_list)
+        self.attrs = mz.build_attr_key_values(self.long_name, attr_list)
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya
