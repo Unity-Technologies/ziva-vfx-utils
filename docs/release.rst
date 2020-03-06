@@ -19,7 +19,11 @@ Functionality
 - **Scene Panel:** Added right-click menu for zSolver.
 - **Scene Panel:** Updated icons.
 - **Shelf:** Added Ziva Shelf.
+- **zBuilder:** Add Merge Solvers to the Ziva menu.
+- **zBuilder:** Add support for referencing.
 - **zBuilder:** Now storing a link to map and mesh in scene item.
+- **zBuilder:** Removed use of mObject inside zBuilder.
+- **zBuilder:** Unit tests added for mirroring and referencing coverage.
 - **zBuilder:** Performance improvements to zBuilder.
 
 Benchmark Runtimes (in seconds, lower is better):
@@ -55,7 +59,10 @@ Benchmark Runtimes (in seconds, lower is better):
 Bug Fixes
 ---------
 - **Scene Panel:** Opening Node Editor clears Scene Panel content while detached from the dock.
+- **Scene Panel:** Some maps in Scene Panel right click menu did not work.
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.
+- **zBuilder:** Copy and Paste from menu did not work on objects with multiple rest shapes.
+- **zBuilder:** zMaya.rename_ziva_nodes() didn't work on zRestShapes.
 
 1.0.10
 ------
