@@ -18,13 +18,51 @@ Functionality
 - **Scene Panel:** Now able to rename nodes by double-clicking on them.
 - **Scene Panel:** Added right-click menu for zSolver.
 - **Scene Panel:** Updated icons.
-- **zBuilder:** Now storing a link to map and mesh in scene item.
 - **Shelf:** Added Ziva Shelf.
+- **zBuilder:** Add Merge Solvers to the Ziva menu.
+- **zBuilder:** Add support for referencing.
+- **zBuilder:** Now storing a link to map and mesh in scene item.
+- **zBuilder:** Removed use of mObject inside zBuilder.
+- **zBuilder:** Unit tests added for mirroring and referencing coverage.
+- **zBuilder:** Performance improvements to zBuilder.
+
+Benchmark Runtimes (in seconds, lower is better):
+
++---------------------+------------------------+--------------------+-------------------+-------------------+
+|                     | Action                 | 1.0.9              | 1.0.10            | 1.0.11            |
++=====================+========================+====================+===================+===================+
+|   **Demo Arm**      | build()                | 2.80               | 1.70              | 0.93              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve()             | 0.42               | 0.37              | 0.32              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve_from_file()   | 0.07               | 0.06              | 0.06              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | write()                | 0.35               | 0.36              | 0.30              |
++---------------------+------------------------+--------------------+-------------------+-------------------+
+|   **Jellyphant**    | build()                | 9.27               | 7.05              | 3.33              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve()             | 1.11               | 0.96              | 0.53              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve_from_file()   | 0.22               | 0.18              | 0.23              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | write()                | 1.17               | 1.16              | 0.90              |
++---------------------+------------------------+--------------------+-------------------+-------------------+
+| **bob-leg-muscles** | build()                | 184.72             | 53.67             | 32.48             |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve()             | 9.5                | 6.92              | 4.80              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | retrieve_from_file()   | 2.14               | 1.06              | 1.82              |
++                     +------------------------+--------------------+-------------------+-------------------+
+|                     | write()                | 7.95               | 7.66              | 7.30              |
++---------------------+------------------------+--------------------+-------------------+-------------------+
 
 Bug Fixes
 ---------
 - **Scene Panel:** Opening Node Editor clears Scene Panel content while detached from the dock.
+- **Scene Panel:** Some maps in Scene Panel right click menu did not work.
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.
+- **zBuilder:** Copy and Paste from menu did not work on objects with multiple rest shapes.
+- **zBuilder:** zMaya.rename_ziva_nodes() didn't work on zRestShapes.
 
 1.0.10
 ------
