@@ -4,6 +4,8 @@ from maya import OpenMaya as om
 
 import zBuilder.zMaya as mz
 from zBuilder.nodes.base import Base
+from utility.paintable_maps import split_map_name, get_paintable_map, set_paintable_map
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -60,14 +62,11 @@ class Map(Base):
             mesh_name: Name of mesh to populate it with.
 
         """
-        map_type = cmds.objectType(map_name)
-        weight_value = get_weights(map_name, mesh_name)
-
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
-        self.values = weight_value
-        self.map_type = map_type
+        self.values = get_weights(map_name)
+        self.map_type = cmds.objectType(map_name)
 
         # logger.info('Retrieving Data : {}'.format(self))
 
@@ -144,12 +143,8 @@ class Map(Base):
     def apply_weights(self):
         """This applies the weight from this node to the maya scene.
         """
-        from utility.paintable_maps import set_paintable_map
-        node_name = self.name.split('.')[0]
-        attr_name = self.name.split('.', 1)[1]
-        new_weights = self.values
-
-        set_paintable_map(node_name, attr_name, new_weights)
+        node, attr = split_map_name(self.name)
+        set_paintable_map(node, attr, self.values)
 
     def copy_values_from(self, map_parameter):
         self.values = map_parameter.values
@@ -183,24 +178,15 @@ def invert_weights(weights):
     return weights
 
 
-def get_weights(map_name, mesh_name):
+def get_weights(map_name):
     """ Gets the weights for the map.
     Args:
         map_name: Map to get weights from.
-        mesh_name: Mesh to check vert count.
 
     Returns:
-        value of map
-
-    Raises:
-        ValueError: if there is a problem getting map.
+        list(float)
     """
-    vert_count = cmds.polyEvaluate(mesh_name, v=True)
-    try:
-        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
-    except ValueError:
-        value = cmds.getAttr(map_name)
-    return value
+    return get_paintable_map(*split_map_name(map_name))
 
 
 def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
