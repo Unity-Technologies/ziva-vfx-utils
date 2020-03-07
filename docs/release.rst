@@ -16,14 +16,14 @@ Release Notes
 Functionality
 -------------
 - **Scene Panel:** Now able to rename nodes by double-clicking on them.
-- **Scene Panel:** Added right-click menu for zSolver.
-- **Scene Panel:** Updated icons.
-- **Shelf:** Added Ziva Shelf.
+- **Scene Panel:** Add right-click menu for zSolver.
+- **Scene Panel:** Update icons.
+- **Shelf:** Add Ziva Shelf.
 - **zBuilder:** Add Merge Solvers to the Ziva menu.
 - **zBuilder:** Add support for referencing.
 - **zBuilder:** Now storing a link to map and mesh in scene item.
-- **zBuilder:** Removed use of mObject inside zBuilder.
-- **zBuilder:** Unit tests added for mirroring and referencing coverage.
+- **zBuilder:** Remove use of mObject inside zBuilder.
+- **zBuilder:** Add unit tests for mirroring and referencing coverage.
 - **zBuilder:** Performance improvements to zBuilder.
 
 Benchmark Runtimes (in seconds, lower is better):
