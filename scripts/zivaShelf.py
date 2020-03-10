@@ -34,8 +34,13 @@ def _shelf_dict():
 
 
 def _setup_button(desc, ctl):
+    maya_version = cmds.about(version=True)
+    icon_name = desc['image']
+    if maya_version < 2018:
+        icon_name = icon_name.replace('.png', '_shelf.png')
+
     # set the icon
-    cmds.shelfButton(ctl, edit=True, image=desc['image'])
+    cmds.shelfButton(ctl, edit=True, image=icon_name)
 
     # set the command
     command_type = desc.get('commandType', 'python')
@@ -43,8 +48,6 @@ def _setup_button(desc, ctl):
 
 
 def _add_buttons(parent, desc):
-    print 'Creating {0} shelf'.format(_SHELFNAME_)
-
     for ctl, but in desc['shelf']['buttons'].iteritems():
         cmds.setParent(parent)
 
