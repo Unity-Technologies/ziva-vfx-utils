@@ -34,7 +34,7 @@ def _shelf_dict():
 
 
 def _setup_button(desc, ctl):
-    maya_version = cmds.about(version=True)
+    maya_version = int(cmds.about(version=True)[:4])
     icon_name = desc['image']
     if maya_version < 2018:
         icon_name = icon_name.replace('.png', '_shelf.png')
