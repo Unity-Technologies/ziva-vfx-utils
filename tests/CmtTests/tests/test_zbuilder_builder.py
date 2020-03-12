@@ -7,6 +7,7 @@ import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 import tests.utils as test_utils
 from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
+import unittest
 
 
 class ZivaBuilderTestCase(VfxTestCase):
@@ -50,6 +51,36 @@ class ZivaBuilderTestCase(VfxTestCase):
 
         # Verify
         self.assertEqual(builder_orig, builder_from_deepcopy)
+
+    @unittest.expectedFailure
+    def test_deepcopy_of_builder_break_sceneitem_connection(self):
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+
+        # Helper function to check that ziva node contains same map node that
+        # stored in builder.bundle.scene_items
+        def check_ziva_node_has_same_map_node_as_sceneitems(test_case, builder, node_name,
+                                                            map_name):
+            ziva_node = builder.get_scene_items(name_filter=node_name)
+            map_in_node = ziva_node[0].parameters['map'][0]
+
+            map_in_sceneitem = builder.get_scene_items(name_filter=map_name)
+            map_in_sceneitem = map_in_sceneitem[0]
+            test_case.assertIs(map_in_node, map_in_sceneitem)
+
+        # Setup
+        builder_orig = retrieve_builder_from_scene()
+        # Verify: The original builder contains correct connection after retrieval operation
+        check_ziva_node_has_same_map_node_as_sceneitems(self, builder_orig, 'l_tissue_1_zTet',
+                                                        'l_tissue_1_zTet.weightList[0].weights')
+        # Act
+        builder_from_deepcopy = copy.deepcopy(builder_orig)
+
+        # Verify
+        # The connection should keep in new builder after deepcopy
+        check_ziva_node_has_same_map_node_as_sceneitems(self, builder_from_deepcopy,
+                                                        'l_tissue_1_zTet',
+                                                        'l_tissue_1_zTet.weightList[0].weights')
 
     def test_build_does_not_change_builder(self):
         # Setup

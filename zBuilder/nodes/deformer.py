@@ -140,7 +140,12 @@ class Deformer(DGNode):
         Returns:
             nothing.
         """
-        self.check_map_interpolation(interp_maps)
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # Update self.parameters dict is not necessary if it refers to
+        # the same map node as the ones in bundle.scene_items.
+        # We do it here because zBuilder deepcopy operation breaks this connection.
+        self.parameters['map'] = self.check_map_interpolation(interp_maps)
 
         # Cycle through the maps stored in the node.
         for item in self.parameters['map']:
@@ -158,6 +163,10 @@ class Deformer(DGNode):
 
         Args:
             interp_maps (bool): Do you want to do it?
+
+        Return:
+            list(zBuilder.parameters.maps.Map): Return the new intepolated map nodes
+            to replace the ones stored in self.parameters dict.
         """
 
         map_objects = self.get_map_objects()
@@ -169,3 +178,10 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
+
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # The return is not necessary if the self.parameters dict refer to
+        # the same map node. We do it here because zBuilder deepcopy operation
+        # breaks this connection.
+        return map_objects
