@@ -1,14 +1,13 @@
+import copy
 import logging
 import re
-import copy
 
 from maya import cmds
 from maya import mel
-
-import zBuilder.zMaya as mz
-import zBuilder.builders.ziva as zva
-import zBuilder.builders.skinClusters as skn
 from zBuilder.IO import is_sequence
+import zBuilder.builders.skinClusters as skn
+import zBuilder.builders.ziva as zva
+import zBuilder.zMaya as mz
 
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
@@ -118,14 +117,15 @@ def remove_solver(solvers=None, askForConfirmation=False):
     solver_transforms = mel.eval('zQuery -t "zSolverTransform" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
-    message += ', '.join(cmds.ls(s)[0] for s in solver_transforms)  # The transforms have nicer names.
+    message += ', '.join(cmds.ls(s)[0]
+                         for s in solver_transforms)  # The transforms have nicer names.
     message += ', including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
         response = cmds.confirmDialog(title='Remove Ziva solver(s)',
-                                    message=message,
-                                    button=['Yes', 'Cancel'],
-                                    defaultButton='Yes',
-                                    cancelButton='Cancel')
+                                      message=message,
+                                      button=['Yes', 'Cancel'],
+                                      defaultButton='Yes',
+                                      cancelButton='Cancel')
         if response != 'Yes':
             return
 
@@ -313,7 +313,7 @@ def rig_paste():
         cmds.rename(
             generated_solver,
             solver_in_clipboard)  # rename the solver (this also auto-renames the solver shape node)
-    mel.eval('ziva -def ' + solver_in_clipboard + ';')  # make the clipboard solver default
+    mel.eval('ziva -ds ' + solver_in_clipboard + ';')  # make the clipboard solver default
 
     builder.build()
 
@@ -347,7 +347,7 @@ def rig_update(solvers=None):
             generated_solver,
             solver_transform)  # rename the solver (this also auto-renames the solver shape node)
 
-        mel.eval('ziva -def ' + solver + ';')  # make this solver be default
+        mel.eval('ziva -ds ' + solver + ';')  # make this solver be default
 
         # re-build the solver
         builder.build()
@@ -371,7 +371,7 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     if not cmds.objExists(target_solver):
         generated_solver = mel.eval('ziva -s;')[1]  # make the output solver
         cmds.rename(generated_solver,
-                  target_solver)  # rename the solver (this also auto-renames the transform node)
+                    target_solver)  # rename the solver (this also auto-renames the transform node)
 
     # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
     cmds.select(source_solver)
@@ -385,7 +385,7 @@ def rig_transfer(source_solver, prefix, target_solver=""):
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
     # build the transferred solver
-    mel.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
+    mel.eval('ziva -ds ' + target_solver + ';')  # make the target solver be default
     builder.build()
 
 
@@ -501,10 +501,10 @@ def listConnectionPlugs(node, destination=True, source=True):
     assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
     assert isinstance(source, bool), 'Arguments "source" is not a bool'
     plugs = cmds.listConnections(node,
-                               plugs=True,
-                               connections=True,
-                               source=source,
-                               destination=destination)
+                                 plugs=True,
+                                 connections=True,
+                                 source=source,
+                                 destination=destination)
     plugs = plugs if plugs else []  # Convert Maya's None result to an empty list
     assert len(plugs) % 2 == 0, "List does not have an even number of elements " + str(plugs)
     return zip(plugs[0::2], plugs[1::2])
@@ -580,9 +580,9 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
         tissue_geo_plugs = mz.none_to_empty(
             cmds.listConnections('{}.iGeo'.format(embedder2),
-                               plugs=True,
-                               source=True,
-                               destination=False))
+                                 plugs=True,
+                                 source=True,
+                                 destination=False))
         meshes = mz.none_to_empty(cmds.deformer(embedder2, query=True, geometry=True))
         indices = set(mz.none_to_empty(cmds.deformer(embedder1, query=True, geometryIndices=True)))
 
@@ -590,7 +590,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
             cmds.deformer(embedder2, edit=True, remove=True, geometry=mesh)
             cmds.deformer(embedder1, edit=True, before=True,
-                        geometry=mesh)  # "-before" for referencing
+                          geometry=mesh)  # "-before" for referencing
             # TODO: how do I get the index of a mesh without this mess?
             new_indices = set(cmds.deformer(embedder1, query=True, geometryIndices=True))
             new_index = list(new_indices - indices)[0]
