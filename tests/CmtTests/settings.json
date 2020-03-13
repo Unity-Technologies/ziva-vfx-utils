@@ -2,7 +2,6 @@
     "plugin_path": {
         "win_2020": "//synology/public/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2020/ziva.mll",
         "win_2019": "//synology/public/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2019/ziva.mll",
-        "win_2019": "c:/ziva/worldtree1_2019dev/Maya/plugins/zMaya/ziva.mll",
         "win_2018": "//synology/public/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2018/ziva.mll",
         "win_2017": "//synology/public/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2017/ziva.mll",
         "win_2016.5": "//synology/public/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2016.5/ziva.mll",
