@@ -104,12 +104,9 @@ def remove_zRivetToBone_nodes(nodes):
     Return:
         None
     '''
-    existed_nodes = [node for node in nodes if cmds.objExists(node)]
+    existed_nodes = {node for node in nodes if cmds.objExists(node)}
     if not existed_nodes:
         return
-
-    existed_nodes = list(set(existed_nodes))
-    nodes_to_delete = []
 
     def set_rivet(rivet):
         if rivet:
@@ -124,6 +121,7 @@ def remove_zRivetToBone_nodes(nodes):
         nodes_to_delete.extend(cmds.listConnections(locator, type='zRivetToBone'))
         nodes_to_delete.extend(cmds.listRelatives(locator, parent=True))
 
+    nodes_to_delete = []
     for node in existed_nodes:
         # 1/4 Collect zRivetToBone node connect to zBone/mesh nodes
         set_rivet(cmds.zQuery(node, rtb=True))
@@ -142,8 +140,8 @@ def remove_zRivetToBone_nodes(nodes):
             if ('zRivetToBoneLocator' == cmds.nodeType(shape_node)):
                 set_rivet_locator(shape_node)
 
-    nodes_to_delete = list(set(nodes_to_delete))
-    cmds.delete(nodes_to_delete)
+    if nodes_to_delete:
+        cmds.delete(nodes_to_delete)
 
 
 def remove_solver(solvers=None, askForConfirmation=False):

@@ -137,7 +137,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
     def test_delete_rivet_with_selected_rivet_locator(self):
         # Setup & Action
-        deleted_nodes = self.delete_selected_node_rivet(self.bone_rivet_setup, ['zRivetToBone1'])
+        deleted_nodes = self.delete_selected_node_rivet(self.bone_rivet_setup, ['zRivet1Shape'])
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
