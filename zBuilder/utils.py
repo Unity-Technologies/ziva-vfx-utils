@@ -93,6 +93,59 @@ def remove(nodes):
                 cmds.delete(node)
 
 
+def remove_zRivetToBone_nodes(nodes):
+    '''
+    Remove zRivetToBone nodes and its connected zRivetToBoneLocator nodes
+    according to input Maya scene nodes.
+
+    Args:
+        nodes: Maya nodes in the scene
+
+    Return:
+        None
+    '''
+    existed_nodes = [node for node in nodes if cmds.objExists(node)]
+    if not existed_nodes:
+        return
+
+    existed_nodes = list(set(existed_nodes))
+    nodes_to_delete = []
+
+    def set_rivet(rivet):
+        if rivet:
+            if is_sequence(rivet):
+                nodes_to_delete.extend(rivet)
+            else:
+                nodes_to_delete.append(rivet)
+            locator_list = cmds.listConnections(rivet, type='zRivetToBoneLocator')
+            nodes_to_delete.extend(locator_list)
+
+    def set_rivet_locator(locator):
+        nodes_to_delete.extend(cmds.listConnections(locator, type='zRivetToBone'))
+        nodes_to_delete.extend(cmds.listRelatives(locator, parent=True))
+
+    for node in existed_nodes:
+        # 1/4 Collect zRivetToBone node connect to zBone/mesh nodes
+        set_rivet(cmds.zQuery(node, rtb=True))
+
+        node_type = cmds.nodeType(node)
+        if 'zRivetToBone' == node_type:
+            # 2/4 Collect zRivetToBone and its connected zRivetToBoneLocator transform node
+            set_rivet(node)
+        elif 'zRivetToBoneLocator' == node_type:
+            # 3/4 Collect zRivetToBoneLocator transform and zRivetToBone node
+            # through zRivetToBoneLocator node
+            set_rivet_locator(node)
+        elif 'transform' == node_type:
+            # 4/4 Collect zRivetToBoneLocator transform and its connected zRivetToBone node
+            shape_node = cmds.listRelatives(node)
+            if ('zRivetToBoneLocator' == cmds.nodeType(shape_node)):
+                set_rivet_locator(shape_node)
+
+    nodes_to_delete = list(set(nodes_to_delete))
+    cmds.delete(nodes_to_delete)
+
+
 def remove_solver(solvers=None, askForConfirmation=False):
     # Removes the entire Ziva rig from the solver(s).
     # If no solver is provided, it infers them from selection.
