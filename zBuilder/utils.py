@@ -141,7 +141,8 @@ def remove_zRivetToBone_nodes(nodes):
                 set_rivet_locator(shape_node)
 
     if nodes_to_delete:
-        cmds.delete(nodes_to_delete)
+        cmds.select(nodes_to_delete, r=True)
+        mel.eval('doDelete')
 
 
 def remove_solver(solvers=None, askForConfirmation=False):
