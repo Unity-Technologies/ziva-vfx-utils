@@ -1,5 +1,5 @@
 from zBuilder.builder import Builder
-import maya.cmds as mc
+from maya import cmds
 
 
 class Attributes(Builder):
@@ -8,7 +8,7 @@ class Attributes(Builder):
 
     @Builder.time_this
     def retrieve_from_scene(self):
-        selection = mc.ls(sl=True, l=True)
+        selection = cmds.ls(sl=True, l=True)
 
         for item in selection:
             scene_items = self.node_factory(item, get_parameters=False)

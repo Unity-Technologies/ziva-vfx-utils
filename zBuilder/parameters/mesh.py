@@ -1,7 +1,7 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
-import maya.OpenMaya as om
+from maya import OpenMaya as om
 from zBuilder.nodes.base import Base
 import logging
 
@@ -117,8 +117,11 @@ class Mesh(Base):
             True if topologically corresponding, else False
 
         """
-        if mc.objExists(self.name):
-            points = get_mesh_info(self.name)[2]
+        mesh = self.long_name
+        if not cmds.objExists(mesh):
+            mesh = self.name
+        if cmds.objExists(mesh):
+            points = get_mesh_info(mesh)[2]
 
             if len(points) == len(self.get_point_list()):
                 return True
@@ -132,7 +135,7 @@ def get_intermediate(dagPath):
 
     Args:
         dagPath (MFnDagPath): dag path for mesh to search for intermediate shape
-    
+
     Returns:
         mObject: mObject of intermediate shape or None if none found.
     '''
@@ -201,7 +204,7 @@ def get_mesh_vertex_positions(mesh):
         list of lists: List of vertex positions in x,y, z world positions.
     """
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
-    points = mc.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+    points = cmds.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
 
     # convert flat list of points to list containing 3 element lists.  Each 3 element list is
     # x, y, z worldspace coordinate of vert
@@ -251,8 +254,8 @@ def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
     # do housekeeping.
     returnedName = returned_mfnDependencyNode.name()
 
-    rebuiltMesh = mc.rename(returnedName, name + '_rebuilt')
+    rebuiltMesh = cmds.rename(returnedName, name + '_rebuilt')
 
-    # mc.sets( rebuiltMesh, e=True, addElement='initialShadingGroup' )
+    # cmds.sets( rebuiltMesh, e=True, addElement='initialShadingGroup' )
 
     return rebuiltMesh

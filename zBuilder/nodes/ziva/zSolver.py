@@ -1,6 +1,7 @@
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
+import zBuilder.zMaya as mz
 from zBuilder.nodes import Ziva
 import logging
 
@@ -25,25 +26,23 @@ class SolverNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         solver_name = self.get_scene_name()
 
-        if not mc.objExists(solver_name):
-            results = mm.eval('ziva -s')
+        if not cmds.objExists(solver_name):
+            results = mel.eval('ziva -s')
 
             # we need to rename the transform before the shape or maya may
             # rename shape after.
-            solverTransform = mc.ls(results, type='zSolverTransform')[0]
+            solverTransform = cmds.ls(results, type='zSolverTransform')[0]
             st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
-            mc.rename(solverTransform, st.name)
-            solverTransform_child = mc.listRelatives(st.name, c=True)[0]
-            mc.rename(solverTransform_child, solver_name.split('|')[-1])
-            self.mobject = solver_name.split('|')[-1]
-
-            st.mobject = st.name
+            new_name = mz.safe_rename(solverTransform, st.name)
+            st.name = new_name
+            solverTransform_child = cmds.listRelatives(st.name, c=True, fullPath=True)[0]
+            mz.safe_rename(solverTransform_child, solver_name.split('|')[-1])
         else:
-            new_name = mc.rename(solver_name, self.name)
-            self.mobject = new_name
+            new_name = mz.safe_rename(solver_name, self.name)
+
+        cmds.ziva(new_name, defaultSolver=True)
 
         self.set_maya_attrs(attr_filter=attr_filter)

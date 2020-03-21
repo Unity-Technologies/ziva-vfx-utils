@@ -1,14 +1,16 @@
 {
     "plugin_path": {
-        "win_2019": "//synology/public/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2019/ziva.mll",
-        "win_2018": "//synology/public/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2018/ziva.mll",
-        "win_2017": "//synology/public/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2017/ziva.mll",
-        "win_2016.5": "//synology/public/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016.5/ziva.mll",
-        "win_2016": "//synology/public/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/win2016/ziva.mll",
-        "lin_2019": "/mnt/z/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2019/ziva.so",
-        "lin_2018": "/mnt/z/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2018/ziva.so",
-        "lin_2017": "/mnt/z/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2017/ziva.so",
-        "lin_2016.5": "/mnt/z/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016.5/ziva.so",
-        "lin_2016": "/mnt/z/common/plugins/ImmutablePast/ZivaVFX-Maya-1_7/lin2016/ziva.so"
+        "win_2020": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2020/ziva.mll",
+        "win_2019": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2019/ziva.mll",
+        "win_2018": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2018/ziva.mll",
+        "win_2017": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2017/ziva.mll",
+        "win_2016.5": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2016.5/ziva.mll",
+        "win_2016": "//synology/public/common/plugins/ImmutablePast/nightly/v1.9rc/1/win2016/ziva.mll",
+        "lin_2020": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2020/ziva.so",
+        "lin_2019": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2019/ziva.so",
+        "lin_2018": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2018/ziva.so",
+        "lin_2017": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2017/ziva.so",
+        "lin_2016.5": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2016.5/ziva.so",
+        "lin_2016": "/mnt/z/common/plugins/ImmutablePast/nightly/v1.9rc/1/lin2016/ziva.so"
     }
 }

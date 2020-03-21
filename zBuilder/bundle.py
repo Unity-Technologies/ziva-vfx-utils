@@ -1,5 +1,6 @@
 import re
 import logging
+from zBuilder.IO import is_sequence
 
 logger = logging.getLogger(__name__)
 
@@ -167,15 +168,15 @@ class Bundle(object):
             return self.scene_items
 
         # put type filter in a list if it isn't
-        if not isinstance(type_filter, list):
+        if not is_sequence(type_filter):
             type_filter = [type_filter]
 
         # put association filter in a list if it isn't
-        if not isinstance(association_filter, list):
+        if not is_sequence(association_filter):
             association_filter = [association_filter]
 
         # put name filter in a list if it isn't
-        if not isinstance(name_filter, list):
+        if not is_sequence(name_filter):
             name_filter = [name_filter]
 
         type_set = set(type_filter)
@@ -188,9 +189,9 @@ class Bundle(object):
             if name_set and item.name not in name_set:
                 return invert
             if hasattr(item, 'association'):
-                if association_set and association_set.isdisjoint(item.association):
+                if association_set and association_set.isdisjoint(item.nice_association):
                     return invert
-                if association_regex and not re.search(association_regex, item.association):
+                if association_regex and not re.search(association_regex, item.long_association):
                     return invert
 
             if name_regex and not re.search(name_regex, item.name):

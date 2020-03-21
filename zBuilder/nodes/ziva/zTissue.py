@@ -1,8 +1,8 @@
 from zBuilder.nodes import Ziva
 import logging
 import zBuilder.zMaya as mz
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,11 @@ class TissueNode(Ziva):
         super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
         self.parent_tissue = None
+        """ parent_tissues and children_tissues are used to define sub-tissues.  This is storing
+        the scene_item for the respective tissue.  The parent tissue is the one that gets filled
+        and the children_tissues are unused.  The reason for this is because at time of retrieval
+        the children tissues are not processed so their are no children scene items to get.
+        """
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -27,8 +32,10 @@ class TissueNode(Ziva):
         super(TissueNode, self).populate(maya_node=maya_node)
 
         scene_name = self.get_scene_name()
-        self.children_tissues = get_tissue_children(scene_name)
-        self.parent_tissue = get_tissue_parent(scene_name)
+        parent_name = get_tissue_parent(scene_name)
+
+        if parent_name:
+            self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
@@ -45,7 +52,7 @@ class TissueNode(Ziva):
         """
         solver = None
         if args:
-            solver = mm.eval('zQuery -t zSolver {}'.format(args[0]))
+            solver = mel.eval('zQuery -t zSolver -l {}'.format(args[0]))
 
         if not solver:
             solver = self.solver
@@ -104,7 +111,7 @@ def build_multiple(tissue_items,
     Returns:
 
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
     tet_results = mz.cull_creation_nodes(tet_items, permissive=permissive)
     tissue_results = mz.cull_creation_nodes(tissue_items, permissive=permissive)
@@ -114,39 +121,37 @@ def build_multiple(tissue_items,
 
         Ziva.check_meshes(tissue_results['meshes'])
 
-        mc.select(tissue_results['meshes'], r=True)
-        outs = mm.eval('ziva -t')
+        cmds.select(tissue_results['meshes'], r=True)
+        outs = mel.eval('ziva -t')
 
         # rename zTissues and zTets-----------------------------------------
-        for new, name, node in zip(outs[1::4], tissue_results['names'],
-                                   tissue_results['scene_items']):
-            node.mobject = new
-            mc.rename(new, name)
+        for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
+                                                tissue_results['scene_items']):
+            node.name = mz.safe_rename(new_name, builder_name)
 
-        for new, name, node in zip(outs[2::4], tet_results['names'], tet_results['scene_items']):
-            node.mobject = new
-            mc.rename(new, name)
+        for new_name, builder_name, node in zip(outs[2::4], tet_results['names'],
+                                                tet_results['scene_items']):
+            node.name = mz.safe_rename(new_name, builder_name)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()
 
-            if ztissue.children_tissues:
-                """ If there are children lets check if there are parameters for
-                them.  If there are none, then lets check scene.
-                """
-                children_parms = ztissue.builder.get_scene_items(
-                    name_filter=ztissue.children_tissues)
-                if children_parms:
-                    children = [x.association[0] for x in children_parms]
+            if ztissue.parent_tissue:
+                parent_name = ztissue.parent_tissue.name
+                parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
+
+                if parent_scene_item:
+                    parent = [x.nice_association[0] for x in parent_scene_item]
                 else:
-                    mc.select(ztissue.children_tissues, r=True)
-                    children = mm.eval('zQuery -type zTissue -m ')
+                    cmds.select(ztissue.parent_tissue.long_name, r=True)
+                    parent = mel.eval('zQuery -type zTissue -m ')
 
-                mc.select(ztissue.association)
-                mc.select(children, add=True)
-                mm.eval('ziva -ast')
+                cmds.select(parent)
+                tissue_mesh = ztissue.nice_association[0]
+                cmds.select(tissue_mesh, add=True)
+                mel.eval('ziva -ast')
 
-    mc.select(sel)
+    cmds.select(sel)
 
 
 def get_tissue_children(ztissue):
@@ -158,17 +163,12 @@ def get_tissue_children(ztissue):
         (str) Children mesh of zTissue, or None if none found.
     """
     tmp = []
-    if mc.objectType(ztissue) == 'zTissue':
-        child_attr = '{}.oChildTissue'.format(ztissue)
-        if mc.objExists(child_attr):
-            children = mc.listConnections(child_attr)
 
-            if children:
-                # sel = mc.ls(sl=True)
-                # mc.select(children)
-                # tmp.extend(mm.eval('zQuery -t zTissue -m -l'))
-                # mc.select(sel)
-                return children
+    child_attr = '{}.oChildTissue'.format(ztissue)
+    children = cmds.listConnections(child_attr)
+
+    if children:
+        return children
     return None
 
 
@@ -180,11 +180,8 @@ def get_tissue_parent(ztissue):
     Returns:
         (str) Parent mesh of zTissue, or None if none found
     """
-    if mc.objectType(ztissue) == 'zTissue':
-        parent_attr = '{}.iParentTissue'.format(ztissue)
-        if mc.objExists(parent_attr):
-            parent = mc.listConnections(parent_attr)
-            if parent:
-                # parent = mm.eval('zQuery -t zTissue -m -l')
-                return parent[0]
+    parent_attr = '{}.iParentTissue'.format(ztissue)
+    parent = cmds.listConnections(parent_attr)
+    if parent:
+        return parent[0]
     return None

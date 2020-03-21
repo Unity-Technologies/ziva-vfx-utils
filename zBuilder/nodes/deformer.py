@@ -1,5 +1,7 @@
-import maya.cmds as mc
-import maya.mel as mm
+from collections import defaultdict
+
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 
 from zBuilder.nodes.dg_node import DGNode
@@ -12,6 +14,17 @@ class Deformer(DGNode):
     def __init__(self, parent=None, builder=None):
         super(Deformer, self).__init__(parent=parent, builder=builder)
 
+        self.parameters = defaultdict(list)
+
+    def add_parameter(self, parameter):
+        """ This takes a zBuilder parameter and adds it to the node.  This is effectively
+        a pointer to original parameter for later retrieval
+
+        args:
+            parameter: obj the parameter to add to node
+        """
+        self.parameters[parameter.type].append(parameter)
+
     def spawn_parameters(self):
         """
 
@@ -19,16 +32,19 @@ class Deformer(DGNode):
 
         """
         objs = {}
-        if self.long_association:
-            objs['mesh'] = self.long_association
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
-                objs['map'].append([map_name, mesh_name])
+                objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
+
+    def get_parameters(self, types=[]):
+        return self.builder.get_parameters_from_node(self, types)
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
@@ -60,7 +76,7 @@ class Deformer(DGNode):
         Returns:
             list: List of long mesh names.
         """
-        return self.long_association
+        return self.nice_association
 
     def get_mesh_objects(self):
         """
@@ -93,7 +109,7 @@ class Deformer(DGNode):
         """
         map_names = []
         for map_ in self.MAP_LIST:
-            map_names.extend(mc.ls('{}.{}'.format(self.name, map_)))
+            map_names.extend(cmds.ls('{}.{}'.format(self.name, map_)))
 
         return map_names
 
@@ -107,17 +123,13 @@ class Deformer(DGNode):
         Returns:
             list od strings: list of strings of mesh names.
         """
-        meshes = mc.deformer(node, query=True, g=True)
-        tmp = list()
-        for mesh in meshes:
-            parent = mc.listRelatives(mesh, p=True)
-            tmp.extend(mc.ls(parent, long=True))
-        return tmp
+        meshes = cmds.deformer(node, query=True, g=True)
+        parent = cmds.listRelatives(meshes, p=True, fullPath=True)
+        return parent
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya
-        scene.  It first does a mObject check to see if it has been tracked, if
-        it has it uses that instead of stored scene_name.
+        scene.
 
         Args:
             interp_maps (str): Do you want maps interpolated?
@@ -128,16 +140,20 @@ class Deformer(DGNode):
         Returns:
             nothing.
         """
-        maps = self.get_map_names()
-        scene_name = self.get_scene_name()
-        original_name = self.name
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # Update self.parameters dict is not necessary if it refers to
+        # the same map node as the ones in bundle.scene_items.
+        # We do it here because zBuilder deepcopy operation breaks this connection.
+        self.parameters['map'] = self.check_map_interpolation(interp_maps)
 
-        self.check_map_interpolation(interp_maps)
-        for map_ in maps:
-            map_data = self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_)
-            if map_data:
-                map_data[0].string_replace(original_name, scene_name)
-                map_data[0].apply_weights()
+        # Cycle through the maps stored in the node.
+        for item in self.parameters['map']:
+            # We are replacing the name in the map node (first part) with the name of
+            # the node it is coming from.
+            item.string_replace(item.name.split('.')[0], self.name)
+            # apply the weights
+            item.apply_weights()
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
@@ -147,6 +163,10 @@ class Deformer(DGNode):
 
         Args:
             interp_maps (bool): Do you want to do it?
+
+        Return:
+            list(zBuilder.parameters.maps.Map): Return the new intepolated map nodes
+            to replace the ones stored in self.parameters dict.
         """
 
         map_objects = self.get_map_objects()
@@ -158,3 +178,10 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
+
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # The return is not necessary if the self.parameters dict refer to
+        # the same map node. We do it here because zBuilder deepcopy operation
+        # breaks this connection.
+        return map_objects

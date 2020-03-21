@@ -1,8 +1,10 @@
 import re
 
-import maya.cmds as mc
-import maya.mel as mm
-import maya.OpenMaya as om
+from maya import cmds
+from maya import mel
+from maya import OpenMaya as om
+
+from zBuilder.IO import is_sequence
 
 import logging
 
@@ -27,13 +29,13 @@ def check_body_type(bodies):
     Returns:
         (bool): True if all bodies pass test, else False.
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
     for body in bodies:
-        if not mc.objExists(body):
+        if not cmds.objExists(body):
             return False
 
-    mc.select(bodies)
-    bt = mm.eval('zQuery -bt')
+    cmds.select(bodies)
+    bt = mel.eval('zQuery -bt')
 
     if len(bt) == len(bodies):
         return True
@@ -52,7 +54,7 @@ def get_type(body):
 
     """
     try:
-        return mc.objectType(body)
+        return cmds.objectType(body)
     except:
         pass
 
@@ -60,13 +62,13 @@ def get_type(body):
 def clean_scene():
     """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
     """
-    solvers = mc.ls(type='zSolver')
+    solvers = cmds.ls(type='zSolver')
     delete_rivet_from_solver(solvers)
 
     for node in ZNODES:
-        in_scene = mc.ls(type=node)
+        in_scene = cmds.ls(type=node)
         if in_scene:
-            mc.delete(in_scene)
+            cmds.delete(in_scene)
 
 
 def delete_rivet_from_solver(solvers):
@@ -77,13 +79,13 @@ def delete_rivet_from_solver(solvers):
     Args:
         solver ([list]): The solver/s that have the rivets that are to be deleted.
     """
-    history = mc.listHistory(solvers, allConnections=True, future=True)
+    history = cmds.listHistory(solvers, allConnections=True, future=True)
     if history:
-        locators = mc.ls(history, type='zRivetToBoneLocator')
-        rivets = mc.ls(history, type='zRivetToBone')
-        locator_parent = mc.listRelatives(locators, parent=True)
+        locators = cmds.ls(history, type='zRivetToBoneLocator', l=True)
+        rivets = cmds.ls(history, type='zRivetToBone', l=True)
+        locator_parent = cmds.listRelatives(locators, parent=True, fullPath=True)
         if rivets and locator_parent:
-            mc.delete(rivets + locator_parent)
+            cmds.delete(rivets + locator_parent)
 
 
 def get_zSolver(body):
@@ -94,10 +96,10 @@ def get_zSolver(body):
     Returns:
         returns long name of zSolver.
     """
-    sel = mc.ls(sl=True)
-    mc.select(body, r=True)
-    solver = mm.eval('zQuery -t "zSolver" -l')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(body, r=True)
+    solver = mel.eval('zQuery -t "zSolver" -l')
+    cmds.select(sel, r=True)
     return solver
 
 
@@ -109,10 +111,10 @@ def get_zSolverTransform(body):
     Returns:
         returns long name of zSolverTransform.
     """
-    sel = mc.ls(sl=True)
-    mc.select(body, r=True)
-    solver = mm.eval('zQuery -t "zSolverTransform" -l')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(body, r=True)
+    solver = mel.eval('zQuery -t "zSolverTransform" -l')
+    cmds.select(sel, r=True)
     return solver
 
 
@@ -124,10 +126,10 @@ def get_zAttachments(bodies):
     Returns:
         string of name of zAttachments.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    attachments = mm.eval('zQuery -t zAttachment')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    attachments = mel.eval('zQuery -t zAttachment')
+    cmds.select(sel, r=True)
     if attachments:
         return list(set(attachments))
     else:
@@ -144,7 +146,7 @@ def isSolver(selection):
     """
     isSolver = False
     for s in selection:
-        if mc.objectType(s) == 'zSolver' or mc.objectType(s) == 'zSolverTransform':
+        if cmds.objectType(s) == 'zSolver' or cmds.objectType(s) == 'zSolverTransform':
             isSolver = True
             continue
     return isSolver
@@ -158,16 +160,16 @@ def get_zBones(bodies):
     Returns:
         string of name of zBones.
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
 
     if isSolver(sel):
-        bones = mm.eval('zQuery -t zBone')
+        bones = mel.eval('zQuery -t zBone')
         if bones:
             return bones
         else:
             return []
     else:
-        bones = mm.eval('zQuery -t zBone')
+        bones = mel.eval('zQuery -t zBone')
         if not bones:
             bones = list()
 
@@ -175,15 +177,15 @@ def get_zBones(bodies):
 
         if attachments:
             for attachment in attachments:
-                mesh1 = mm.eval('zQuery -as -l "' + attachment + '"')
-                mesh2 = mm.eval('zQuery -at -l "' + attachment + '"')
-                mc.select(mesh1, mesh2, r=True)
-                tmp = mm.eval('zQuery -t "zBone"')
+                mesh1 = mel.eval('zQuery -as -l "' + attachment + '"')
+                mesh2 = mel.eval('zQuery -at -l "' + attachment + '"')
+                cmds.select(mesh1, mesh2, r=True)
+                tmp = mel.eval('zQuery -t "zBone"')
                 if tmp:
 
                     bones.extend(tmp)
 
-        mc.select(sel, r=True)
+        cmds.select(sel, r=True)
         if len(bones) > 0:
             return list(set(bones))
         else:
@@ -198,10 +200,10 @@ def get_zTets(bodies):
     Returns:
         string of name of zTets.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    zTets = mm.eval('zQuery -t "zTet"')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    zTets = mel.eval('zQuery -t "zTet"')
+    cmds.select(sel, r=True)
     if zTets:
         return zTets
     else:
@@ -216,10 +218,10 @@ def get_zTissues(bodies):
     Returns:
         string of name of zTissues.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    zTissues = mm.eval('zQuery -t "zTissue"')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    zTissues = mel.eval('zQuery -t "zTissue"')
+    cmds.select(sel, r=True)
     if zTissues:
         return zTissues
     else:
@@ -234,10 +236,10 @@ def get_zMaterials(bodies):
     Returns:
         string of name of zmaterials.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    zMaterial = mm.eval('zQuery -t "zMaterial"')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    zMaterial = mel.eval('zQuery -t "zMaterial"')
+    cmds.select(sel, r=True)
     if zMaterial:
         return zMaterial
     else:
@@ -252,10 +254,10 @@ def get_zFibers(bodies):
     Returns:
         string of name of zFibers.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    zFibers = mm.eval('zQuery -t "zFiber"')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    zFibers = mel.eval('zQuery -t "zFiber"')
+    cmds.select(sel, r=True)
     if zFibers:
         return zFibers
     else:
@@ -270,10 +272,10 @@ def get_zCloth(bodies):
     Returns:
         string of name of zCloth.
     """
-    sel = mc.ls(sl=True)
-    mc.select(bodies, r=True)
-    zCloth = mm.eval('zQuery -t "zCloth"')
-    mc.select(sel, r=True)
+    sel = cmds.ls(sl=True)
+    cmds.select(bodies, r=True)
+    zCloth = mel.eval('zQuery -t "zCloth"')
+    cmds.select(sel, r=True)
     if zCloth:
         return zCloth
     else:
@@ -300,7 +302,7 @@ def get_zFieldAdaptors(bodies):
     """
     field_adapters = []
     for body in bodies:
-        fields = mc.listConnections(body + '.fields')
+        fields = cmds.listConnections(body + '.fields')
         fields = none_to_empty(fields)
         field_adapters.extend(fields)
     return field_adapters
@@ -316,7 +318,7 @@ def get_fields_on_zFieldAdaptors(adaptors):
     """
     fields = []
     for adaptor in adaptors:
-        fields.extend(mc.listConnections(adaptor + '.field'))
+        fields.extend(cmds.listConnections(adaptor + '.field'))
     return fields
 
 
@@ -329,10 +331,10 @@ def get_zTet_user_mesh(zTet):
     Returns:
         str: User tet mesh.
     """
-    if mc.objExists(zTet + '.iTet'):
-        mesh = mc.listConnections(zTet + '.iTet')
+    if cmds.objExists(zTet + '.iTet'):
+        mesh = cmds.listConnections(zTet + '.iTet')
         if mesh:
-            return mc.ls(mesh[0], l=True)[0]
+            return cmds.ls(mesh[0], l=True)[0]
         else:
             return mesh
     return None
@@ -347,8 +349,8 @@ def get_fiber_lineofaction(zFiber):
     Returns:
         str: zLineOfAction
     """
-    if mc.objExists(zFiber + '.iLineOfActionData'):
-        conn = mc.listConnections(zFiber + '.iLineOfActionData')
+    if cmds.objExists(zFiber + '.iLineOfActionData'):
+        conn = cmds.listConnections(zFiber + '.iLineOfActionData')
         if conn:
             return conn[0]
         else:
@@ -366,8 +368,8 @@ def get_lineOfAction_fiber(zlineofaction):
     Returns:
         str: Name of zFiber hooked up to lineOfAction
     """
-    if mc.objExists(zlineofaction + '.oLineOfActionData'):
-        conn = mc.listConnections(zlineofaction + '.oLineOfActionData')
+    if cmds.objExists(zlineofaction + '.oLineOfActionData'):
+        conn = cmds.listConnections(zlineofaction + '.oLineOfActionData')
         if conn:
             return conn[0]
         else:
@@ -382,26 +384,26 @@ def get_association(zNode):
     args:
         zNode (string): the zNode to find association of.
     """
-    _type = mc.objectType(zNode)
+    _type = cmds.objectType(zNode)
 
     if _type == 'zAttachment':
         tmp = []
-        tmp.extend(mm.eval('zQuery -as -l "' + zNode + '"'))
-        tmp.extend(mm.eval('zQuery -at -l "' + zNode + '"'))
-        # mc.select(sel,r=True)
+        tmp.extend(mel.eval('zQuery -as -l "' + zNode + '"'))
+        tmp.extend(mel.eval('zQuery -at -l "' + zNode + '"'))
+        # cmds.select(sel,r=True)
 
         return tmp
 
     elif _type == 'zRestShape':
-        tet = mc.listConnections('{}.iGeo'.format(zNode))[0]
-        mesh = mm.eval('zQuery -type "zTissue" -m {}'.format(tet))
+        tet = cmds.listConnections('{}.iGeo'.format(zNode))[0]
+        mesh = mel.eval('zQuery -type "zTissue" -l -m {}'.format(tet))
         return mesh
 
     elif _type == 'zFieldAdaptor':
         return []
 
     elif _type == 'zLineOfAction':
-        tmp = mc.listConnections(zNode + '.curves')
+        tmp = cmds.listConnections(zNode + '.curves')
         return tmp
 
     elif _type == 'zEmbedder':
@@ -409,7 +411,7 @@ def get_association(zNode):
         return list()
 
     elif _type == 'zRivetToBone':
-        tmp = mc.listConnections(zNode + '.rivetMesh')
+        tmp = cmds.listConnections(zNode + '.rivetMesh')
         return tmp
     else:
         cmd = 'zQuery -t "%s" -l -m "%s"' % (_type, zNode)
@@ -417,8 +419,104 @@ def get_association(zNode):
         if _type in ['zSolverTransform', 'zSolver']:
             return []
         else:
-            mesh = mm.eval(cmd)
+            mesh = mel.eval(cmd)
             return mesh
+
+
+def safe_rename(old_name, new_name):
+    """
+    Same as cmds.rename but does not throw an exception if renaming failed
+    Useful if need to rename all the nodes that are not referenced
+    """
+    if old_name != new_name:
+        try:
+            return cmds.rename(old_name, new_name)
+        except RuntimeError:
+            pass
+
+    return old_name
+
+
+def strip_namespace(node):
+    return node.split(':')[-1]
+
+
+def znode_rename_helper(zNode, postfix, solver, replace):
+    """
+    Helper for cases when need to rename nodes like:
+    zMaterial1, zMaterial4, zMaterial25 to
+    zMaterial1, zMaterial2, zMaterial3
+    And not to rename nodes like:
+    zMaterial1, zMaterial2, zMaterial3 to
+    zMaterial4, zMaterial5, zMaterial6
+    Args:
+        zNode (string): node type
+        postfix (string): postfix to use for renaming
+        solver (string): solver name
+        replace (list): list of strings to remove from the new name
+
+    Returns:
+        tuple of lists: old names, new names
+    """
+
+    # store data to print results later
+    old_names = []
+    new_names = []
+    items = mel.eval('zQuery -t "{}" {}'.format(zNode, solver))
+    if items:
+        for item in items:
+            mesh = mel.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
+            for r in replace:
+                mesh = mesh.replace(r, '')
+            mesh = strip_namespace(mesh)
+            new_name = '{}_{}'.format(mesh, zNode)
+            if zNode in ['zMaterial', 'zFiber']:
+                new_name += '1'
+            if item != new_name:
+                new_name = safe_rename(item, '{}{}'.format(new_name, postfix))
+                if new_name:
+                    old_names.append(item)
+                    new_names.append(new_name)
+
+    return old_names, new_names
+
+
+def rivet_to_bone_rename_helper(rtbs, postfix, replace):
+    """
+    The same idea as for znode_rename_helper but for zRivetToBone
+    Args:
+        rtbs (list): list of zRivetToBone nodes to rename
+        postfix (string): postfix to use for renaming
+        replace (list): list of strings to remove from the new name
+
+    Returns:
+        tuple of lists: old names, new names
+    """
+    old_names = []
+    new_names = []
+    for rtb in rtbs:
+        crv = cmds.listConnections(rtb + '.outputGeometry', shapes=True)
+        # If curve has multiple zRivetToBone nodes, need to search zRivetToBone connections
+        # until curve is found
+        while crv:
+            if cmds.nodeType(crv[0]) == 'nurbsCurve':
+                break
+            else:
+                crv = cmds.listConnections(crv[0] + '.outputGeometry', shapes=True)
+        crv = cmds.listRelatives(crv, p=True)
+        if crv:
+            crv = crv[0]
+            for r in replace:
+                crv = crv.replace(r, '')
+            crv = strip_namespace(crv)
+            new_name = '{}_{}'.format(crv, 'zRivetToBone1')
+            if rtb != new_name:
+                new_name = safe_rename(rtb, '{}{}'.format(new_name, postfix))
+                if new_name:
+                    old_names.append(rtb)
+                    new_names.append(new_name)
+
+    return old_names, new_names
 
 
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
@@ -433,54 +531,61 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     * zTissue: <meshName>_zTissue
     * zBone: <meshName>_zBone
     * zCloth: <meshName>_zCloth
+    * zRestShape: <meshName>_zRestShape
     * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     """
-    sel = mc.ls(sl=True)
-    solver = mm.eval('zQuery -t "zSolver"')
+    solver = mel.eval('zQuery -t "zSolver"')
 
-    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth']
+    if not solver:
+        logger.error("No solver found for current selection !")
+        return
+
+    zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
 
     for zNode in zNodes:
-        items = mm.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
-                for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    mc.rename(item, '{}_{}tmp'.format(mesh, zNode))
-
+        old_names, _ = znode_rename_helper(zNode, '_tmp', solver[0], replace)
         # looping through this twice to get around how maya renames stuff
-        items = mm.eval('zQuery -t "{}" {}'.format(zNode, solver[0]))
-        if items:
-            for item in items:
-                mesh = mm.eval('zQuery -t "{}" -m "{}"'.format(zNode, item))[0]
-                for r in replace:
-                    mesh = mesh.replace(r, '')
-                if item != '{}_{}'.format(mesh, zNode):
-                    mc.rename(item, '{}_{}'.format(mesh, zNode))
-                    print('rename: ', item, '{}_{}'.format(mesh, zNode))
+        _, new_names = znode_rename_helper(zNode, '', solver[0], replace)
+        for i, item in enumerate(old_names):
+            logger.info('rename: {} to {}'.format(item, new_names[i]))
 
-    # for now doing an ls type for lineOfActions until with have zQuery support
-    loas = mc.ls(type='zLineOfAction')
+    # rename zLineOfAction nodes
+    loas = mel.eval('zQuery -loa {}'.format(solver[0]))
     if loas:
         for loa in loas:
-            crv = mc.listConnections(loa + '.oLineOfActionData')
+            crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
-                mc.rename(loa, crv[0].replace('_zFiber', '_zLineOfAction'))
+                crv = strip_namespace(crv[0])
+                new_name = crv.replace('_zFiber', '_zLineOfAction')
+                new_name = safe_rename(loa, new_name)
+                if new_name:
+                    logger.info('rename: {} to {}'.format(loa, new_name))
 
-    attachments = mm.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
+    # rename zRivetToBone nodes
+    rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
+    if rtbs:
+        old_names, new_names = rivet_to_bone_rename_helper(rtbs, '_tmp', replace)
+        _, new_names = rivet_to_bone_rename_helper(new_names, '', replace)
+
+        for i, item in enumerate(old_names):
+            logger.info('rename: {} to {}'.format(item, new_names[i]))
+
+    attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
         for attachment in attachments:
-            s = mm.eval('zQuery -as {}'.format(attachment))[0]
+            s = mel.eval('zQuery -as {}'.format(attachment))[0]
             for r in replace:
                 s = s.replace(r, '')
-            t = mm.eval('zQuery -at {}'.format(attachment))[0]
+            s = strip_namespace(s)
+            t = mel.eval('zQuery -at {}'.format(attachment))[0]
             for r in replace:
                 t = t.replace(r, '')
-            if attachment != '{}__{}_{}'.format(s, t, 'zAttachment'):
-                mc.rename(attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
-                print('rename: ', attachment, '{}__{}_{}'.format(s, t, 'zAttachment'))
+            # remove namespace from target mesh
+            t = strip_namespace(t)
+            new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
+            new_name = safe_rename(attachment, new_name)
+            if new_name:
+                logger.info('rename: {} to {}'.format(attachment, new_name))
 
     logger.info('finished renaming.... ')
 
@@ -488,9 +593,9 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
 def select_tissue_meshes():
     """ Selects all zTissues in scene
     """
-    mc.select(cl=True)
-    meshes = mm.eval('zQuery -t "zTissue" -m')
-    mc.select(meshes)
+    cmds.select(cl=True)
+    meshes = mel.eval('zQuery -t "zTissue" -m')
+    cmds.select(meshes)
 
 
 def get_mdagpath_from_mesh(mesh_name):
@@ -541,17 +646,17 @@ def check_mesh_quality(meshes):
 
     tmp = []
     for s in meshes:
-        mc.select(s, r=True)
-        mm.eval('ziva -mq')
-        sel2 = mc.ls(sl=True)
+        cmds.select(s, r=True)
+        mel.eval('ziva -mq')
+        sel2 = cmds.ls(sl=True)
         if sel2[0] != s:
             tmp.extend(sel2)
 
     if tmp:
-        mc.select(tmp)
+        cmds.select(tmp)
         raise Exception('check meshes!')
     else:
-        mc.select(meshes)
+        cmds.select(meshes)
 
 
 def check_maya_node(maya_node):
@@ -563,7 +668,7 @@ def check_maya_node(maya_node):
     Returns:
 
     """
-    if isinstance(maya_node, list):
+    if is_sequence(maya_node):
         return maya_node[0]
     else:
         return maya_node
@@ -586,7 +691,7 @@ def parse_maya_node_for_selection(args):
     """
     selection = None
     if len(args) > 0:
-        if isinstance(args[0], (list, tuple)):
+        if is_sequence(args[0]):
             selection = args[0]
         else:
             selection = [args[0]]
@@ -594,8 +699,8 @@ def parse_maya_node_for_selection(args):
         tmp = []
         # check if it exists and get long name----------------------------------
         for sel in selection:
-            if mc.objExists(sel):
-                tmp.extend(mc.ls(sel, l=True))
+            if cmds.objExists(sel):
+                tmp.extend(cmds.ls(sel, l=True))
             else:
                 raise Exception('{} does not exist in scene, stopping!'.format(sel))
         selection = tmp
@@ -603,11 +708,10 @@ def parse_maya_node_for_selection(args):
     # if nothing valid has been passed then we check out active selection in
     # maya.
     if not selection:
-        selection = mc.ls(sl=True, l=True)
+        selection = cmds.ls(sl=True, l=True)
         # if still nothing is selected then we raise an error
         if not selection:
-            raise Exception(
-                'Nothing selected or passed, please select something and try again.')
+            raise Exception('Nothing selected or passed, please select something and try again.')
     return selection
 
 
@@ -624,8 +728,8 @@ def build_attr_list(selection, attr_filter=None):
         list: list of attributes names
     """
     attributes = []
-    keyable = mc.listAttr(selection, k=True)
-    channel_box = mc.listAttr(selection, cb=True)
+    keyable = cmds.listAttr(selection, k=True)
+    channel_box = cmds.listAttr(selection, cb=True)
     if channel_box:
         attributes.extend(channel_box)
     if keyable:
@@ -634,8 +738,8 @@ def build_attr_list(selection, attr_filter=None):
     attribute_names = []
     for attr in attributes:
         obj = '{}.{}'.format(selection, attr)
-        if mc.objExists(obj):
-            type_ = mc.getAttr(obj, type=True)
+        if cmds.objExists(obj):
+            type_ = cmds.getAttr(obj, type=True)
             if not type_ == 'TdataCompound':
                 attribute_names.append(attr)
 
@@ -659,14 +763,16 @@ def build_attr_key_values(selection, attr_list):
     attr_dict = {}
     for attr in attr_list:
         obj = '{}.{}'.format(selection, attr)
-        for item in mc.ls(obj):
-            type_ = mc.getAttr(item, type=True)
+        for item in cmds.ls(obj):
+            type_ = cmds.getAttr(item, type=True)
             if not type_ == 'TdataCompound':
-                attr_dict[attr] = {}
-                attr_dict[attr]['type'] = type_
-                attr_dict[attr]['value'] = mc.getAttr(item)
-                attr_dict[attr]['locked'] = mc.getAttr(item, lock=True)
-                attr_dict[attr]['alias'] = mc.aliasAttr(obj, q=True)
+                # we do not want to get any attribute that is not writable as we cannot change it.
+                if cmds.attributeQuery(attr, node=selection, w=True):
+                    attr_dict[attr] = {}
+                    attr_dict[attr]['type'] = type_
+                    attr_dict[attr]['value'] = cmds.getAttr(item)
+                    attr_dict[attr]['locked'] = cmds.getAttr(item, lock=True)
+                    attr_dict[attr]['alias'] = cmds.aliasAttr(obj, q=True)
 
     return attr_dict
 
@@ -702,8 +808,8 @@ def replace_long_name(search, replace, long_name):
                         # yeilds this replace string: "l_"
                         # as it found an "_" at end of string.
                         # then it performs a match replace on original string
-                        with_this = item[match.span(1)[0]:match.span(1)
-                                         [1]] + replace + item[match.span(2)[0]:match.span(2)[1]]
+                        with_this = item[match.span(1)[0]:match.span(1)[1]] + replace + item[
+                            match.span(2)[0]:match.span(2)[1]]
                         item = item[:match.start()] + with_this + item[match.end():]
                     else:
                         item = re.sub(search, replace, item)
@@ -762,14 +868,13 @@ def cull_creation_nodes(scene_items, permissive=True):
     # check meshes for existing zBones or zTissue
     for i, scene_item in enumerate(scene_items):
         type_ = scene_item.type
-        mesh = scene_item.association[0]
+        mesh = scene_item.nice_association[0]
         name = scene_item.name
 
-        if mc.objExists(mesh):
-            existing = mm.eval('zQuery -t "{}" {}'.format(type_, mesh))
+        if cmds.objExists(mesh):
+            existing = mel.eval('zQuery -t "{}" {}'.format(type_, mesh))
             if existing:
-                out = mc.rename(existing, name)
-                scene_item.mobject = out
+                out = safe_rename(existing, name)
             else:
                 results['meshes'].append(mesh)
                 results['names'].append(name)
@@ -797,19 +902,19 @@ def check_map_validity(map_parameters):
     Returns:
         list of offending maps
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
 
     report = []
     for parameter in map_parameters:
-        if mc.objExists(parameter.name):
-            map_type = mc.objectType(parameter.name)
+        if cmds.objExists(parameter.name):
+            map_type = cmds.objectType(parameter.name)
             if map_type == 'zAttachment':
                 values = parameter.values
                 if all(v == 0 for v in values):
                     report.append(parameter.name)
                     dg_node = parameter.name.split('.')[0]
-                    tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
-                    mc.setAttr('{}.enable'.format(tissue[0]), 0)
+                    tissue = mel.eval('zQuery -type zTissue {}'.format(dg_node))
+                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
 
             if map_type == 'zFiber' and 'endPoints' in parameter.name:
                 values = parameter.values
@@ -824,12 +929,12 @@ def check_map_validity(map_parameters):
                 if not upper or not lower:
                     report.append(parameter.name)
                     dg_node = parameter.name.split('.')[0]
-                    tissue = mm.eval('zQuery -type zTissue {}'.format(dg_node))
-                    mc.setAttr('{}.enable'.format(tissue[0]), 0)
+                    tissue = mel.eval('zQuery -type zTissue {}'.format(dg_node))
+                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
 
     if report:
         logger.info('Check these maps: {}'.format(report))
-    mc.select(sel)
+    cmds.select(sel)
     return report
 
 

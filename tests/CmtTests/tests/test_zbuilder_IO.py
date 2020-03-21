@@ -1,5 +1,5 @@
-import maya.cmds as mc
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 import os
 import logging
 import sys
@@ -13,17 +13,13 @@ from vfx_test_case import VfxTestCase
 
 
 class IOTestCase(VfxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         super(IOTestCase, self).setUp()
         # Build a basic setup
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
 
-        mc.select(cl=True)
+        cmds.select(cl=True)
 
         # use builder to retrieve from scene
         self.z = zva.Ziva()
@@ -32,12 +28,11 @@ class IOTestCase(VfxTestCase):
         self.temp_files = []
 
     def tearDown(self):
-        super(IOTestCase, self).tearDown()
-
         # delete temp files
         for temp_file in self.temp_files:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
+        super(IOTestCase, self).tearDown()
 
     def test_builder_write(self):
         # find a temp file location
@@ -72,10 +67,10 @@ class IOTestCase(VfxTestCase):
         # find a temp file location
         temp = tempfile.TemporaryFile()
 
-        mc.file(new=True, f=True)
+        cmds.file(new=True, f=True)
         test_utils.build_anatomical_arm_with_no_popup()
 
-        mc.select('zSolver1')
+        cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
         # build it on live scene

@@ -1,9 +1,8 @@
 import weakref
 from functools import partial
-import copy
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 try:
     from shiboken2 import wrapInstance
 except ImportError:
@@ -17,7 +16,6 @@ import view
 import icons
 import os
 import zBuilder.builders.ziva as zva
-import zBuilder.parameters.maps as mp
 from zBuilder.nodes.base import Base
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
@@ -26,9 +24,8 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 # Show window with docking ability
 def run():
     builder = zva.Ziva()
-    builder.retrieve_connections()
 
-    dock_window(MyDockingUI, builder=builder)
+    return dock_window(MyDockingUI, builder=builder)
 
 
 class MenuLineEdit(QtWidgets.QLineEdit):
@@ -68,7 +65,6 @@ class ProximityWidget(QtWidgets.QWidget):
     """
     Widget in right-click menu to change map weights for attachments
     """
-
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
         h_layout = QtWidgets.QHBoxLayout(self)
@@ -104,8 +100,8 @@ class ProximityWidget(QtWidgets.QWidget):
         to_value = float(self.to_edit.text())
         if to_value < from_value:
             self.to_edit.setText(str(from_value))
-        mm.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(self.from_edit.text(),
-                                                                      self.to_edit.text()))
+        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(
+            self.from_edit.text(), self.to_edit.text()))
 
 
 class MyDockingUI(QtWidgets.QWidget):
@@ -127,16 +123,15 @@ class MyDockingUI(QtWidgets.QWidget):
         self.main_layout = parent.layout()
         self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.builder = builder or zva.Ziva()
+        self.builder.retrieve_connections()
 
         # clipboard for copied attributes
         self.attrs_clipboard = {}
         # clipboard for the maps.  This is either a zBuilder Map object or None.
         self.maps_clipboard = None
 
-        root_node = builder.root_node
-
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self._model = model.SceneGraphModel(root_node, self._proxy_model)
+        self._model = model.SceneGraphModel(self.builder, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -146,10 +141,11 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
+        self.treeView.setItemDelegate(model.TreeItemDelegate())
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
-        self.set_root_node(root_node=root_node)
+        self.set_builder(self.builder)
 
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -185,23 +181,25 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self.set_root_node)
+        self.actionRefresh.triggered.connect(self.set_builder)
 
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText('Select Source and Target')
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
-    def invert_weights(self, node, map_):
+    def invert_weights(self, node, map_index):
+        map_ = node.get_parameters(['map'])[map_index]
         map_.invert()
         map_.apply_weights()
 
-    def copy_weights(self, node, map_):
-        self.maps_clipboard = map_
+    def copy_weights(self, node, map_index):
+        self.maps_clipboard = node.get_parameters(['map'])[map_index]
 
-    def paste_weights(self, node, new_map):
+    def paste_weights(self, node, new_map_index):
+        new_map = node.get_parameters(['map'])[new_map_index]
         """Pasting the maps.  Terms used here
-            orig/new.  
+            orig/new.
             The map/node the items were copied from are prefixed with orig.
             The map/node the items are going to be pasted onto are prefixed with new
 
@@ -260,19 +258,19 @@ class MyDockingUI(QtWidgets.QWidget):
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def select_source_and_target(self):
-        """Selects the source and target mesh of an attachment. This is a menu 
+        """Selects the source and target mesh of an attachment. This is a menu
         command.
         """
 
         indexes = self.treeView.selectedIndexes()[0]
         node = indexes.data(model.SceneGraphModel.nodeRole)
-        mc.select(node.long_association)
+        cmds.select(node.nice_association)
 
     def open_menu(self, position):
         """Generates menu for tree items
 
         We are getting the zBuilder node in the tree item and checking type.
-        With that we can build a custom menu per type.  If there are more then 
+        With that we can build a custom menu per type.  If there are more then
         one object selected in UI a menu does not appear as items in menu work
         on a single selection.
         """
@@ -289,7 +287,8 @@ class MyDockingUI(QtWidgets.QWidget):
             'zTissue': self.open_tissue_menu,
             'zBone': self.open_bone_menu,
             'zLineOfAction': self.open_line_of_action_menu,
-            'zRestShape': self.open_rest_shape_menu
+            'zRestShape': self.open_rest_shape_menu,
+            'zSolverTransform': self.open_solver_menu
         }
 
         node = indexes[0].data(model.SceneGraphModel.nodeRole)
@@ -299,36 +298,24 @@ class MyDockingUI(QtWidgets.QWidget):
             method(menu, node)
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    # TODO: Implement this functionality in zBuilder core
-    def get_maps_from_node(self, node):
-        maps = []
-        # get node parameters
-        param_dict = node.spawn_parameters()
-        param_dict.pop('mesh', None)
-        for key, values in param_dict.iteritems():
-            for value in values:
-                obj = self.builder.parameter_factory(key, value)
-                maps.append(obj)
-
-        return maps
-
-    def add_map_actions_to_menu(self, menu, node, map_):
+    def add_map_actions_to_menu(self, menu, node, map_index):
         """Add map actions to the menu
         Args:
             menu (QMenu): menu to add option to
             node (zBuilder object): zBuilder.nodes object
-            map_ (map object): zBuilder.parameters.maps object
+            map_index (int): map index. 0 for source map 1 for target/endPoints map
         """
         paint_action = QtWidgets.QAction(self)
         paint_action.setText('Paint')
         paint_action.setObjectName("actionPaint")
-        paint_action.triggered.connect(map_.open_paint_tool)
+        paint_action.triggered.connect(
+            partial(node.get_parameters(['map'])[map_index].open_paint_tool))
         menu.addAction(paint_action)
 
         invert_action = QtWidgets.QAction(self)
         invert_action.setText('Invert')
         invert_action.setObjectName('actionInvertWeights')
-        invert_action.triggered.connect(partial(self.invert_weights, node, map_))
+        invert_action.triggered.connect(partial(self.invert_weights, node, map_index))
         menu.addAction(invert_action)
 
         menu.addSeparator()
@@ -336,13 +323,13 @@ class MyDockingUI(QtWidgets.QWidget):
         copy_action = QtWidgets.QAction(self)
         copy_action.setText('Copy')
         copy_action.setObjectName('actionCopyWeights')
-        copy_action.triggered.connect(partial(self.copy_weights, node, map_))
+        copy_action.triggered.connect(partial(self.copy_weights, node, map_index))
         menu.addAction(copy_action)
 
         paste_action = QtWidgets.QAction(self)
         paste_action.setText('Paste')
         paste_action.setObjectName('actionPasteWeights')
-        paste_action.triggered.connect(partial(self.paste_weights, node, map_))
+        paste_action.triggered.connect(partial(self.paste_weights, node, map_index))
         paste_action.setEnabled(bool(self.maps_clipboard))
         menu.addAction(paste_action)
 
@@ -369,39 +356,30 @@ class MyDockingUI(QtWidgets.QWidget):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
         weight_map_menu = menu.addMenu('Weight')
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
     def open_fiber_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
 
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
-        endpoints_map = self.get_maps_from_node(node)[1]  # endpoints map @ index 1
 
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
         end_points_map_menu = menu.addMenu('EndPoints')
-        self.add_map_actions_to_menu(end_points_map_menu, node, endpoints_map)
+        self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
     def open_material_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
         menu.addSection('Maps')
         weight_map_menu = menu.addMenu('Weight')
-        weight_map = self.get_maps_from_node(node)[0]  # weight map @ index 0
 
-        self.add_map_actions_to_menu(weight_map_menu, node, weight_map)
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
     def open_attachment_menu(self, menu, node):
         source_mesh_name = node.association[0]
         target_mesh_name = node.association[1]
-
-        # TODO Add the ability to get map by name instead of index
-        maps = self.get_maps_from_node(node)
-        source_map = maps[0]  # source map @ index 0
-        target_map = maps[1]  # target map @ index 1
 
         self.add_attribute_actions_to_menu(menu, node)
         menu.addAction(self.actionSelectST)
@@ -411,10 +389,10 @@ class MyDockingUI(QtWidgets.QWidget):
         target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
 
         source_map_menu = menu.addMenu(source_menu_text)
-        self.add_map_actions_to_menu(source_map_menu, node, source_map)
+        self.add_map_actions_to_menu(source_map_menu, node, 0)
 
         target_map_menu = menu.addMenu(target_menu_text)
-        self.add_map_actions_to_menu(target_map_menu, node, target_map)
+        self.add_map_actions_to_menu(target_map_menu, node, 1)
 
         menu.addSection('')
         proximity_menu = menu.addMenu('Paint By Proximity')
@@ -435,6 +413,39 @@ class MyDockingUI(QtWidgets.QWidget):
     def open_rest_shape_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
 
+    def open_solver_menu(self, menu, node):
+        solver_transform = node
+        solver = node.children[0]
+
+        self.add_zsolver_menu_action(menu, solver_transform, 'Enable', 'enable')
+        self.add_zsolver_menu_action(menu, solver, 'Collision Detection', 'collisionDetection')
+        self.add_zsolver_menu_action(menu, solver, 'Show Bones', 'showBones')
+        self.add_zsolver_menu_action(menu, solver, 'Show Tet Meshes', 'showTetMeshes')
+        self.add_zsolver_menu_action(menu, solver, 'Show Muscle Fibers', 'showMuscleFibers')
+        self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
+        self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
+        self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
+
+    def add_zsolver_menu_action(self, menu, node, text, attr):
+        action = QtWidgets.QAction(self)
+        action.setText(text)
+        action.setCheckable(True)
+        action.setChecked(node.attrs[attr]['value'])
+        action.changed.connect(partial(self.toggle_attribute, node, attr))
+        menu.addAction(action)
+
+    def toggle_attribute(self, node, attr):
+        value = node.attrs[attr]['value']
+        if isinstance(value, bool):
+            value = not value
+        elif isinstance(value, int):
+            value = 1 - value
+        else:
+            cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
+            return
+        node.attrs[attr]['value'] = value
+        cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
+
     def tree_changed(self):
         """When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
@@ -442,37 +453,38 @@ class MyDockingUI(QtWidgets.QWidget):
         indexes = self.treeView.selectedIndexes()
         if indexes:
             nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
-            mc.select(nodes)
+            # find nodes that exist in the scene
+            scene_nodes = cmds.ls(nodes, l=True)
+            if scene_nodes:
+                cmds.select(scene_nodes)
+            not_found_nodes = [node for node in nodes if node not in scene_nodes]
+            if not_found_nodes:
+                cmds.warning(
+                    "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
-    def set_root_node(self, root_node=None):
-        """This builds and/or resets the tree given a root_node.  The root_node
+    def set_builder(self, builder=None):
+        """This builds and/or resets the tree given a builder.  The builder
         is a zBuilder object that the tree is built from.  If None is passed
-        it uses the scene selection to build a new root_node.
+        it uses the scene selection to build a new builder.
 
         This forces a complete redraw of the ui tree.
 
         Args:
-            root_node (:obj:`obj`, optional): The zBuilder root_node to build
+            builder (:obj:`obj`, optional): The zBuilder builder to build
                 tree from.  Defaults to None.
         """
 
-        if not root_node:
-            # clean builder
-            # TODO: this line should be changed after VFXACT-388 to make more efficient
-
-            # This is using zBuilder to build the model data for the UI.  Currently the model data
-            # excludes Mpas and Meshes.  This is strictly a performance issue.  With this included
-            # the UI takes a lot longer to load on a larger scene.  The get_parameters=False
-            # is the argument that tells zBuilder to not get maps, meshes.
+        if not builder:
+            # reset builder
             self.builder = zva.Ziva()
-            self.builder.retrieve_connections(get_parameters=False)
-            root_node = self.builder.root_node
+            self.builder.retrieve_connections()
+            builder = self.builder
 
         # remember names of items to expand
         names_to_expand = self.get_expanded()
 
         self._model.beginResetModel()
-        self._model.root_node = root_node
+        self._model.builder = builder
         self._model.endResetModel()
 
         # restore previous expansion in treeView or expand all zSolverTransform items
@@ -485,7 +497,7 @@ class MyDockingUI(QtWidgets.QWidget):
             for index in indexes:
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True, long=True)
+        sel = cmds.ls(sl=True, long=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
@@ -543,6 +555,3 @@ class MyDockingUI(QtWidgets.QWidget):
 
             MyDockingUI.instances.remove(ins)
             del ins
-
-    def run(self):
-        return self

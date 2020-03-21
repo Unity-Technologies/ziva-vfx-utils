@@ -1,7 +1,7 @@
 from vfx_test_case import VfxTestCase
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 import zBuilder.parameters.maps as maps
 import zBuilder.builders.ziva as zva
@@ -21,11 +21,11 @@ class ZivaMapTestCase(VfxTestCase):
         # this tests the zBuilder interface for inverting maps
         # This is grabbing a zTet map to test against.
 
-        sphere = mc.polySphere()
+        sphere = cmds.polySphere()
 
-        mm.eval('ziva -t {}'.format(sphere[0]))
+        mel.eval('ziva -t {}'.format(sphere[0]))
 
-        mc.select(sphere[0])
+        cmds.select(sphere[0])
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
@@ -41,15 +41,17 @@ class ZivaMapTestCase(VfxTestCase):
     def test_apply_map(self):
         # this tests the zBuilder interface for applying a map to maya scene
         # This is grabbing a zTet map to test against.
-        sphere = mc.polySphere()
+        sphere = cmds.polySphere()
 
-        mm.eval('ziva -t {}'.format(sphere[0]))
+        results = mel.eval('ziva -t {}'.format(sphere[0]))
+        tet_name = results[5]
 
-        mc.select(sphere[0])
+        cmds.select(sphere[0])
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
-        tet_map = builder.get_scene_items(type_filter='map')[1]
+        tet_node = builder.get_scene_items(name_filter=tet_name)[0]
+        tet_map = tet_node.parameters['map'][0]
 
         expected_values = [.2 for x in tet_map.values]
 
@@ -58,5 +60,5 @@ class ZivaMapTestCase(VfxTestCase):
         tet_map.apply_weights()
 
         # get from scene and compare
-        scene_weights = mc.getAttr('{}[0:{}]'.format(tet_map.name, len(tet_map.values) - 1))
+        scene_weights = cmds.getAttr('{}[0:{}]'.format(tet_map.name, len(tet_map.values) - 1))
         self.assertAllApproxEqual(scene_weights, expected_values)

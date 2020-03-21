@@ -1,7 +1,7 @@
 import weakref
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
 
@@ -68,7 +68,7 @@ class MyDockingUI(QtWidgets.QWidget):
             if node.type == 'zSolverTransform':
                 self.treeView.expand(index)
 
-        sel = mc.ls(sl=True)
+        sel = cmds.ls(sl=True)
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:

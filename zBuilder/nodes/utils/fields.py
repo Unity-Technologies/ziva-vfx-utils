@@ -1,5 +1,5 @@
 from zBuilder.nodes.dg_node import DGNode
-import maya.cmds as mc
+from maya import cmds
 
 
 class Field(DGNode):
@@ -27,26 +27,24 @@ class Field(DGNode):
         permissive = kwargs.get('permissive', True)
 
         name = self.get_scene_name()
-        if not mc.objExists(name):
+        if not cmds.objExists(name):
             # clearing the selection before we create anything as the
             # selection is used to assign it to something.
-            mc.select(cl=True)
+            cmds.select(cl=True)
             factory = {
-                'airField': mc.air,
-                'dragField': mc.drag,
-                'gravityField': mc.gravity,
-                'newtonField': mc.newton,
-                'radialField': mc.radial,
-                'turbulenceField': mc.turbulence,
-                'uniformField': mc.uniform,
-                'vortexField': mc.vortex
+                'airField': cmds.air,
+                'dragField': cmds.drag,
+                'gravityField': cmds.gravity,
+                'newtonField': cmds.newton,
+                'radialField': cmds.radial,
+                'turbulenceField': cmds.turbulence,
+                'uniformField': cmds.uniform,
+                'vortexField': cmds.vortex
             }
             results = factory[self.type](n=name)
-            self.mobject = name
 
         else:
-            new_name = mc.rename(name, self.name)
-            self.mobject = new_name
+            new_name = cmds.rename(name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

@@ -1,6 +1,6 @@
 from zBuilder.nodes import Ziva
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import zBuilder.zMaya as mz
 import logging
 
@@ -15,6 +15,27 @@ class FiberNode(Ziva):
     MAP_LIST = ['weightList[0].weights', 'endPoints']
     """ List of maps to store. """
 
+    def spawn_parameters(self):
+        """
+
+        Returns:
+
+        """
+        objs = {}
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
+
+        mesh_names = self.get_map_meshes()
+        map_names = self.get_map_names()
+        if map_names and mesh_names:
+            objs['map'] = []
+            for map_name, mesh_name in zip(map_names, mesh_names):
+                if '.endPoints' in map_name:
+                    objs['map'].append([map_name, mesh_name, "endPoints"])
+                else:
+                    objs['map'].append([map_name, mesh_name, "barycentric"])
+        return objs
+
     def get_map_meshes(self):
         """
         This is the mesh associated with each map in obj.MAP_LIST.  Typically
@@ -25,7 +46,7 @@ class FiberNode(Ziva):
         Returns:
             list(): of long mesh names.
         """
-        return [self.long_association[0], self.long_association[0]]
+        return [self.nice_association[0], self.nice_association[0]]
 
     def build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.
@@ -43,31 +64,30 @@ class FiberNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        name = self.name
-        mesh = self.association[0]
+        mesh = self.nice_association[0]
 
-        if mc.objExists(mesh):
+        if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_fibers = mm.eval('zQuery -t zFiber {}'.format(mesh))
+            existing_fibers = mel.eval('zQuery -t zFiber {}'.format(mesh))
             data_fibers = self.builder.bundle.get_scene_items(type_filter='zFiber',
                                                               association_filter=mesh)
 
-            d_index = data_fibers.index(self)
+            try:
+                d_index = data_fibers.index(self)
+            except ValueError:
+                d_index = 0
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    self.mobject = existing_fibers[d_index]
-                    mc.rename(existing_fibers[d_index], name)
+                    self.name = mz.safe_rename(existing_fibers[d_index], self.name)
                 else:
-                    mc.select(mesh, r=True)
-                    results = mm.eval('ziva -f')
-                    self.mobject = results[0]
-                    mc.rename(results[0], name)
+                    cmds.select(mesh, r=True)
+                    results = mel.eval('ziva -f')
+                    self.name = mz.safe_rename(results[0], self.name)
             else:
-                mc.select(mesh, r=True)
-                results = mm.eval('ziva -f')
-                self.mobject = results[0]
-                mc.rename(results[0], name)
+                cmds.select(mesh, r=True)
+                results = mel.eval('ziva -f')
+                self.name = mz.safe_rename(results[0], self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 

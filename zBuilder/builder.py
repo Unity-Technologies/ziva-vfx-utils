@@ -19,10 +19,11 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
+
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
-        import maya.cmds as mc
+        from maya import cmds
         from zBuilder.nodes.base import Base
 
         self.root_node = Base()
@@ -31,8 +32,8 @@ class Builder(object):
         self.info = dict()
         self.info['version'] = zBuilder.__version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = mc.about(v=True)
-        self.info['operating_system'] = mc.about(os=True)
+        self.info['maya_version'] = cmds.about(v=True)
+        self.info['operating_system'] = cmds.about(os=True)
 
     def __eq__(self, other):
         """ Compares the builders.
@@ -69,38 +70,52 @@ class Builder(object):
         if not parent:
             parent = self.root_node
 
-        item_list = []
+        scene_items = []
         for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj):
-                if obj.TYPES:
-                    if type_ in obj.TYPES:
-                        obb = obj(parent=parent, builder=self)
-                        obb.populate(maya_node=node)
-                        item_list.append(obb)
-                if type_ == obj.type:
-
-                    objct = obj(parent=parent, builder=self)
-                    objct.populate(maya_node=node)
-
-                    item_list.append(objct)
-        if not item_list:
+                if type_ in obj.TYPES or type_ == obj.type:
+                    obb = obj(parent=parent, builder=self)
+                    obb.populate(maya_node=node)
+                    scene_items.append(obb)
+        if not scene_items:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
-            item_list.append(objct)
+            scene_items.append(objct)
 
         if get_parameters:
-            for obj__ in item_list:
-                if hasattr(obj__, 'spawn_parameters'):
-                    others = obj__.spawn_parameters()
-                    for k, values in others.iteritems():
-                        for v in values:
-                            obj = self.parameter_factory(k, v)
-                            if obj:
-                                item_list.append(obj)
+            for node in scene_items:
+                if hasattr(node, 'spawn_parameters'):
+                    parameters = self.get_parameters_from_node(node)
+                    for parameter in parameters:
+                        node.add_parameter(parameter)
+                        scene_items.append(parameter)
 
-        return item_list
+        return scene_items
 
-    def parameter_factory(self, parameter_type, parameter_names):
+    def get_parameters_from_node(self, node, types=[]):
+        """
+        Get parameters (e.g. maps and meshes) for the specified node.
+        Args:
+            node (zBuilder node): zBuilder scene item
+            types (list): node types to return, e.g. map, mesh. If empty return all types.
+
+        Returns:
+            list of zBuilder node parameters
+        """
+        # get the parameter info for a node in a dict format
+        node_parameter_info = node.spawn_parameters()
+        parameters = []
+        if not types:
+            types = node_parameter_info.keys()
+        for parameter_type, parameter_args in node_parameter_info.iteritems():
+            for parameter_arg in parameter_args:
+                if parameter_type in types:
+                    parameter = self.parameter_factory(parameter_type, parameter_arg)
+                    parameters.append(parameter)
+
+        return parameters
+
+    def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
         desired one based on arguments.
         
@@ -114,25 +129,36 @@ class Builder(object):
                 whereas the first is the name.
         
         Returns:
-            object: zBuilder parameter object
+            object: zBuilder parameter object, either one created or an existing one that has 
+            already been created.
         '''
         # put association filter in a list if it isn't
-        if not isinstance(parameter_names, list):
-            parameter_names = [parameter_names]
+        if not io.is_sequence(parameter_args):
+            parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
-            if inspect.isclass(obj):
-                if parameter_type == obj.type:
-                    scene_items = self.bundle.get_scene_items(type_filter=parameter_type)
-                    scene_items = [x.long_name for x in scene_items]
-                    if any(x not in scene_items for x in parameter_names):
-                        return obj(*parameter_names, builder=self)
+            if inspect.isclass(obj) and parameter_type == obj.type:
+                scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
+                scene_item_names = [y.long_name for y in scene_item_nodes]
+
+                # the first element in parameter_args is the name.
+                parameter_name = parameter_args[0]
+                try:
+                    # There is an existing scene item for this item so lets just
+                    # return that.
+                    index = scene_item_names.index(parameter_name)
+                    return scene_item_nodes[index]
+                except ValueError:
+                    # When valueerror there is no exisitng scene item with that name
+                    # so lets create one and return that.
+                    return obj(*parameter_args, builder=self)
 
     @staticmethod
     def time_this(original_function):
         """
         A decorator to time functions.
         """
+
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -176,6 +202,15 @@ class Builder(object):
             self.bundle.stats()
             logger.info('Wrote File: %s' % file_path)
 
+        # loop through the scene items
+        for scene_item in self.get_scene_items():
+            # loop through scene item attributes as defined by each scene item
+            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+                if attr in scene_item.__dict__:
+                    if scene_item.__dict__[attr]:
+                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        scene_item.__dict__[attr] = restored
+
     def retrieve_from_file(self, file_path):
         """ Reads scene items from a given file.  The items get placed in the bundle.
 
@@ -186,6 +221,20 @@ class Builder(object):
         before = datetime.datetime.now()
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
+
+        # The json data is now loaded.  We need to go through the defined scene item attributes
+        # (The attributes that hold un-serializable scene items) and replace the string name
+        # with the proper scene item.
+
+        # loop through the scene items
+        for scene_item in self.get_scene_items():
+            # loop through scene item attributes as defined by each scene item
+            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+                if attr in scene_item.__dict__:
+                    if scene_item.__dict__[attr]:
+                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        scene_item.__dict__[attr] = restored
+
         self.bundle.stats()
         after = datetime.datetime.now()
         logger.info('Read File: {} in {}'.format(file_path, after - before))
@@ -262,12 +311,19 @@ class Builder(object):
                                            association_regex=association_regex,
                                            invert_match=invert_match)
 
-    def break_connection_to_scene(self):
-        """Sets the mObject for all scene items to None.  This is useful if you want to break the 
-        connection between the node and what is in the scene.
-        """
-        for item in self.get_scene_items(type_filter=['map', 'mesh'], invert_match=True):
-            item.break_connection_to_scene()
+
+def restore_scene_items_from_string(item, builder):
+    if io.is_sequence(item):
+        if item:
+            item = builder.get_scene_items(name_filter=item)
+    elif isinstance(item, dict):
+        for parm in item:
+            item[parm] = builder.get_scene_items(name_filter=item[parm])
+    else:
+        item = builder.get_scene_items(name_filter=item)
+        if item:
+            item = item[0]
+    return item
 
 
 def builder_factory(class_name):

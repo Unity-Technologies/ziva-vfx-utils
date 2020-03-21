@@ -1,0 +1,125 @@
+{
+    "shelf": {
+        "shelfID": "standard",
+        "buttons": {
+            "openScenePanel": {
+                "help": "Open Scene Panel",
+                "image": "scene_panel.png",
+                "commandType": "python",
+                "command": "from zBuilder.ui import zUI;zivaUI = zUI.run();"
+            },
+            "shelfSep_1": {
+                "separator": true,
+                "width": 25
+            },
+            "createSolver": {
+                "help": "Create zSolver",
+                "image": "zSolver.png",
+                "commandType": "mel",
+                "command": "ziva -s;"
+            },
+            "createTissue": {
+                "help": "Create zTissue",
+                "image": "zTissue.png",
+                "commandType": "mel",
+                "command": "ziva -t;"
+            },
+            "createBone": {
+                "help": "Create zBone",
+                "image": "zBone.png",
+                "commandType": "mel",
+                "command": "ziva -b;"
+            },
+            "createCloth": {
+                "help": "Create zCloth",
+                "image": "zCloth.png",
+                "commandType": "mel",
+                "command": "ziva -c;"
+            },
+            "shelfSep_2": {
+                "separator": true,
+                "width": 25
+            },
+            "addAttachment": {
+                "help": "Add zAttachment: select source vertices and target object",
+                "image": "zAttachment.png",
+                "commandType": "mel",
+                "command": "ziva -a;"
+            },
+            "addMaterial": {
+                "help": "Add zMaterial: select tissue geometry",
+                "image": "zMaterial.png",
+                "commandType": "mel",
+                "command": "ziva -m;"
+            },
+            "addFiber": {
+                "help": "Add zFiber: select tissue geometry",
+                "image": "zFiber.png",
+                "commandType": "mel",
+                "command": "ziva -f;"
+            },
+            "addSubtissue": {
+                "help": "Add Subtissue: select parent and then child tissue mesh",
+                "image": "subtissue.png",
+                "commandType": "mel",
+                "command": "ziva -ast;"
+            },
+            "addRestShape": {
+                "help": "Add zRestShape: select tissue mesh and then restShape mesh",
+                "image": "zRestShape.png",
+                "commandType": "mel",
+                "command": "zRestShape -a;"
+            },
+            "addLOA": {
+                "help": "Add zLineOfAction: select zFiber and curve",
+                "image": "zLineOfAction.png",
+                "commandType": "mel",
+                "command": "ziva -loa;"
+            },
+            "addFiberCurve": {
+                "help": "Add Fiber Curve: select zFiber",
+                "image": "curve.png",
+                "commandType": "mel",
+                "command": "zLineOfActionUtil;"
+            },
+            "addRivetToBone": {
+                "help": "Add zRivetToBone: select target curve vertex and bone mesh",
+                "image": "zRivetToBone.png",
+                "commandType": "mel",
+                "command": "zRivetToBone;"
+            },
+            "addCache": {
+                "help": "Add zCache",
+                "image": "zCache.png",
+                "commandType": "mel",
+                "command": "ziva -acn;"
+            },
+            "shelfSep_3": {
+                "separator": true,
+                "width": 25
+            },
+            "removeBody": {
+                "help": "Remove zTissue/zBone/zCloth from selected mesh",
+                "image": "remove_body.png",
+                "commandType": "mel",
+                "command": "ziva -rm;"
+            },
+            "clearCache": {
+                "help": "Clear zCache",
+                "image": "clear_zCache.png",
+                "commandType": "mel",
+                "command": "zCache -c;"
+            },
+            "shelfSep_4": {
+                "separator": true,
+                "width": 25
+            },
+            "intPlayback": {
+                "help": "Interactive Playback",
+                "image": "interactive_playback.png",
+                "commandType": "mel",
+                "command": "play -record;"
+            }
+        }
+    }
+}

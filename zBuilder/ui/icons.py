@@ -1,4 +1,5 @@
 import os
+from maya import cmds
 
 
 def get_icon_path_from_node(node):
@@ -22,5 +23,14 @@ def get_icon_path_from_name(name):
     Returns:
         str: The path to the matching icon.
     """
-    dirname = os.path.dirname(__file__)
-    return os.path.join(dirname, 'icons', '{name}.png'.format(name=name))
+    # look for repo icons first
+    icons_folder = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                                 '../..'))
+    # if repo does not exist try to use Ziva module folder else ignore it
+    if "icons" not in os.listdir(icons_folder):
+        try:
+            icons_folder = cmds.moduleInfo(moduleName='ZivaVFX', path=True)
+        except RuntimeError:
+            return ''
+
+    return os.path.join(icons_folder, 'icons', '{name}.png'.format(name=name))

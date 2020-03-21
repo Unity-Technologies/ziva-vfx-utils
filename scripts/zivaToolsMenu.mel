@@ -5,7 +5,7 @@ setParent $gMainWindow;
 menu -label "Ziva Tools" -tearOff true zivaToolMenu;
 setParent -menu zivaToolMenu;
 
-menuItem -label "Interactive Playback" -ec true -ecr true -c "play -record" -ann "Starts interactive playback mode. In this mode, you can manipulate the bones using standard Maya tools (move, rotate, etc.), and see an interactive response.";
+menuItem -label "Interactive Playback" -ec true -ecr true -c "play -record" -ann "Starts interactive playback mode. In this mode, you can manipulate the bones using standard Maya tools (move, rotate, etc.), and see an interactive response." -i "interactive_playback.png";
 menuItem -divider true;
 menuItem -label "Toggle Enabled Bodies" -ec true -ecr true -c "ZivaToggleEnabled" -ann "Toggles the active state of the selected Ziva objects.";
 
@@ -41,19 +41,19 @@ menuItem -label "Find Intersections" -ec true -ecr true -c "ZivaSelectIntersecti
 menuItem -label "Find Self Intersections" -ec true -ecr true -c "ZivaSelectSelfIntersections" -ann "Find self-intersections (self-collisions) on a Maya mesh.";
 
 menuItem -label "Select Connected" -divider true;
-menuItem -label "zTissues" -ec true -ecr true -c "select -r `zQuery -t zTissue`" -ann "Selects zTissue nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zCloth" -ec true -ecr true -c "select -r `zQuery -t zCloth`" -ann "Selects zCloth nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zBones" -ec true -ecr true -c "select -r `zQuery -t zBone`" -ann "Selects zBone nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zRestShape" -ec true -ecr true -c "select -r `zQuery -t zRestShape`" -ann "Selects zRestShape nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zTet" -ec true -ecr true -c "select -r `zQuery -t zTet`" -ann "Selects zTet nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zAttachments" -ec true -ecr true -c "select -r `zQuery -t zAttachment`" -ann "Selects zAttachment nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zMaterials" -ec true -ecr true - c "select -r `zQuery -t zMaterial`" -ann "Selects zMaterial nodes that are connected to the currently selected mesh(es).";
-menuItem -label "zFibers" -ec true -ecr true -c "select -r `zQuery -t zFiber`" -ann "Selects zFiber nodes that are connected to the currently selected mesh(es).";
+menuItem -label "zTissues" -ec true -ecr true -c "select -r `zQuery -t zTissue`" -ann "Selects zTissue nodes that are connected to the currently selected mesh(es)." -i "out_zTissue.png";
+menuItem -label "zCloth" -ec true -ecr true -c "select -r `zQuery -t zCloth`" -ann "Selects zCloth nodes that are connected to the currently selected mesh(es)." -i "out_zCloth.png";
+menuItem -label "zBones" -ec true -ecr true -c "select -r `zQuery -t zBone`" -ann "Selects zBone nodes that are connected to the currently selected mesh(es)." -i "out_zBone.png";
+menuItem -label "zRestShape" -ec true -ecr true -c "select -r `zQuery -t zRestShape`" -ann "Selects zRestShape nodes that are connected to the currently selected mesh(es)." -i "out_zRestShape.png";
+menuItem -label "zTet" -ec true -ecr true -c "select -r `zQuery -t zTet`" -ann "Selects zTet nodes that are connected to the currently selected mesh(es)." -i "out_zTet.png";
+menuItem -label "zAttachments" -ec true -ecr true -c "select -r `zQuery -t zAttachment`" -ann "Selects zAttachment nodes that are connected to the currently selected mesh(es)." -i "out_zAttachment.png";
+menuItem -label "zMaterials" -ec true -ecr true - c "select -r `zQuery -t zMaterial`" -ann "Selects zMaterial nodes that are connected to the currently selected mesh(es)." -i "out_zMaterial.png";
+menuItem -label "zFibers" -ec true -ecr true -c "select -r `zQuery -t zFiber`" -ann "Selects zFiber nodes that are connected to the currently selected mesh(es)." -i "out_zFiber.png";
 
 menuItem -label "Select in Hierarchy" -divider true;
-menuItem -label "Tissues" -ec true -ecr true -c "ZivaSelectInHierarchy zTissue" -ann "Selects tissue meshes in the currently selected hierarchy.";
-menuItem -label "Cloth" -ec true -ecr true -c "ZivaSelectInHierarchy zCloth" -ann "Selects cloth meshes in the currently selected hierarchy.";
-menuItem -label "Bones" -ec true -ecr true -c "ZivaSelectInHierarchy zBone" -ann "Selects bone meshes in the currently selected hierarchy.";
+menuItem -label "Tissues" -ec true -ecr true -c "ZivaSelectInHierarchy zTissue" -ann "Selects tissue meshes in the currently selected hierarchy." -i "out_zTissue.png";
+menuItem -label "Cloth" -ec true -ecr true -c "ZivaSelectInHierarchy zCloth" -ann "Selects cloth meshes in the currently selected hierarchy." -i "out_zCloth.png";
+menuItem -label "Bones" -ec true -ecr true -c "ZivaSelectInHierarchy zBone" -ann "Selects bone meshes in the currently selected hierarchy." -i "out_zBone.png";
 
 menuItem -label "Proximity Tools" -divider true;
 menuItem -label "Select Vertices" -aob true -ec true -ecr true -c "zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat" -ann "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.";

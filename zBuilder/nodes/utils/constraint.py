@@ -1,5 +1,5 @@
 from zBuilder.nodes.dg_node import DGNode
-import maya.cmds as mc
+from maya import cmds
 
 
 class Constraint(DGNode):
@@ -29,25 +29,23 @@ class Constraint(DGNode):
         permissive = kwargs.get('permissive', True)
 
         name = self.get_scene_name()
-        if not mc.objExists(name):
+        if not cmds.objExists(name):
 
-            mc.select(self.association)
+            cmds.select(self.association)
             constraint = None
             if self.type == 'parentConstraint':
-                results = mc.parentConstraint(mo=True)
-                constraint = mc.ls(results, type='parentConstraint')[0]
+                results = cmds.parentConstraint(mo=True)
+                constraint = cmds.ls(results, type='parentConstraint')[0]
             if self.type == 'pointConstraint':
-                results = mc.pointConstraint(mo=True)
-                constraint = mc.ls(results, type='pointConstraint')[0]
+                results = cmds.pointConstraint(mo=True)
+                constraint = cmds.ls(results, type='pointConstraint')[0]
             if self.type == 'orientConstraint':
-                results = mc.orientConstraint(mo=True)
-                constraint = mc.ls(results, type='orientConstraint')[0]
+                results = cmds.orientConstraint(mo=True)
+                constraint = cmds.ls(results, type='orientConstraint')[0]
 
-            mc.rename(constraint, name)
-            self.mobject = name
+            cmds.rename(constraint, name)
         else:
-            new_name = mc.rename(self.name, self.name)
-            self.mobject = new_name
+            new_name = cmds.rename(self.name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
 
@@ -91,10 +89,10 @@ class Constraint(DGNode):
 def get_targets(constraint_name):
     i = 0
     targets = list()
-    while not mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name,
+    while not cmds.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name,
                                                                            i)) == None:
         targets.extend(
-            mc.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)))
+            cmds.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)))
         i += 1
     return targets
 
@@ -106,8 +104,8 @@ def get_constrained(constraint_name):
     ]
 
     constrained = [
-        mc.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con
-        if mc.objExists('{}.{}'.format(constraint_name, c))
+        cmds.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con
+        if cmds.objExists('{}.{}'.format(constraint_name, c))
     ]
     constrained = list(set(constrained))
     return constrained
@@ -118,19 +116,19 @@ def get_constrained(constraint_name):
 #     constraintData_dict = dict()
 #
 #     # Get generic stuff
-#     constraintData_dict['type'] = mc.objectType(constraintName)
+#     constraintData_dict['type'] = cmds.objectType(constraintName)
 #     targetObjects_list = list()
 #     i = 0
-#     while not mc.listConnections('%s.target[%i].targetParentMatrix' % (
+#     while not cmds.listConnections('%s.target[%i].targetParentMatrix' % (
 #     constraintName, i)) == None:
-#         targetObjects_list.append(mc.listConnections(
+#         targetObjects_list.append(cmds.listConnections(
 #             '%s.target[%i].targetParentMatrix' % (constraintName, i))[0])
 #         i += 1
 #     constraintData_dict['targets'] = targetObjects_list
 #
 #     if constraintData_dict['type'] == 'aimConstraint':
 #         # up object
-#         worldUpObj = mc.listConnections(constraintName + '.worldUpMatrix')
+#         worldUpObj = cmds.listConnections(constraintName + '.worldUpMatrix')
 #         if not worldUpObj == None:
 #             constraintData_dict['upObject'] = worldUpObj[0]
 #         else:
@@ -138,25 +136,25 @@ def get_constrained(constraint_name):
 #
 #         # constrained object
 #         constraintData_dict['constrained'] = \
-#         mc.listConnections(constraintName + '.constraintRotateOrder')[0]
+#         cmds.listConnections(constraintName + '.constraintRotateOrder')[0]
 #
 #     if constraintData_dict['type'] == 'parentConstraint':
 #
 #         # if there's no connections to rotations we check translations.
 #         # TO DO this should probably support skipping axes
 #         print 'working on populating data for %s' % constraintName
-#         constrainedObject = mc.listConnections(
+#         constrainedObject = cmds.listConnections(
 #             constraintName + '.constraintRotate.constraintRotateX')
 #         if constrainedObject != None:
 #             constraintData_dict['constrained'] = constrainedObject[0]
 #         else:
-#             constraintData_dict['constrained'] = mc.listConnections(
+#             constraintData_dict['constrained'] = cmds.listConnections(
 #                 constraintName + '.constraintTranslate.constraintTranslateX')[0]
 #
 #     if constraintData_dict['type'] == 'poleVectorConstraint':
 #         print 'working on populating data for %s' % constraintName
 #         constraintData_dict['constrained'] = \
-#         mc.listConnections(constraintName + '.constraintParentInverseMatrix')[0]
+#         cmds.listConnections(constraintName + '.constraintParentInverseMatrix')[0]
 #
 #     return constraintData_dict
 #
@@ -164,16 +162,16 @@ def get_constrained(constraint_name):
 # def build_constraint(constraintName, constraintType, targetObjects,
 #                      constrainedObject, upObject):
 #     if constraintType == 'aimConstraint':
-#         py_cmd = 'mc.aimConstraint( %s, \'%s\', worldUpObject=\'%s\', name=\'%s\', mo=True )' % (
+#         py_cmd = 'cmds.aimConstraint( %s, \'%s\', worldUpObject=\'%s\', name=\'%s\', mo=True )' % (
 #         targetObjects, constrainedObject, upObject, constraintName)
 #         exec (py_cmd)
 #
 #     if constraintType == 'parentConstraint':
-#         py_cmd = 'mc.parentConstraint( %s, \'%s\', name=\'%s\' )' % (
+#         py_cmd = 'cmds.parentConstraint( %s, \'%s\', name=\'%s\' )' % (
 #         targetObjects, constrainedObject, constraintName)
 #         exec (py_cmd)
 #
 #     if constraintType == 'poleVectorConstraint':
-#         py_cmd = 'mc.poleVectorConstraint( %s, \'%s\', name=\'%s\' )' % (
+#         py_cmd = 'cmds.poleVectorConstraint( %s, \'%s\', name=\'%s\' )' % (
 #         targetObjects, constrainedObject, constraintName)
 #         exec (py_cmd)

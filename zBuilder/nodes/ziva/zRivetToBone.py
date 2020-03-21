@@ -1,8 +1,8 @@
 from zBuilder.nodes import Ziva
 import logging
 import zBuilder.zMaya as mz
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +12,7 @@ class RivetToBoneNode(Ziva):
     """
     type = 'zRivetToBone'
     """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(RivetToBoneNode, self).__init__(parent=parent, builder=builder)
         self.cv_indices = []
@@ -24,9 +25,9 @@ class RivetToBoneNode(Ziva):
         """
         super(RivetToBoneNode, self).populate(maya_node=maya_node)
         scene_name = self.get_scene_name()
-        curve_shape = mc.deformer(scene_name, q=True, g=True)[0]
-        self.curve = mc.listRelatives(curve_shape, p=True, f=True)[0]
-        self.cv_indices = mc.getAttr(scene_name + '.cvIndices')
+        curve_shape = cmds.deformer(scene_name, q=True, g=True)[0]
+        self.curve = cmds.listRelatives(curve_shape, p=True, f=True)[0]
+        self.cv_indices = cmds.getAttr(scene_name + '.cvIndices')
 
     @property
     def long_curve_name(self):
@@ -48,8 +49,8 @@ class RivetToBoneNode(Ziva):
 
     @curve.setter
     def curve(self, curve_name):
-        if mc.ls(curve_name, long=True):
-            self._curve = mc.ls(curve_name, long=True)[0]
+        if cmds.ls(curve_name, long=True):
+            self._curve = cmds.ls(curve_name, long=True)[0]
         else:
             self._curve = curve_name
 
@@ -68,19 +69,21 @@ class RivetToBoneNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        crv = self.curve
+        crv = self.long_curve_name
+        if not cmds.objExists(crv):
+            crv = self.curve
         cv_index = self.cv_indices
-        bone = self.association[0]
+        bone = self.nice_association[0]
 
-        mc.select(cl=True)
-        if mc.objExists(crv) and mc.objExists(bone):
+        cmds.select(cl=True)
+        if cmds.objExists(crv) and cmds.objExists(bone):
             if not is_cv_connected_to_rivet(crv, cv_index):
                 for i in cv_index:
-                    mc.select('{}.cv[{}]'.format(crv, i), add=True)
-                mc.select(bone, add=True)
-                results = mm.eval('zRivetToBone')
-                self.mobject = results[0]
-                mc.rename(results[0], self.name)
+                    cmds.select('{}.cv[{}]'.format(crv, i), add=True)
+                cmds.select(bone, add=True)
+                results = mel.eval('zRivetToBone')
+                self.name = mz.safe_rename(results[0], self.name)
+
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
             if permissive:
@@ -92,10 +95,10 @@ class RivetToBoneNode(Ziva):
 
 
 def is_cv_connected_to_rivet(crv, cv):
-    shape = mc.listRelatives(crv, c=True)[0]
-    hist = mc.listHistory(shape)
-    rivets = mc.ls(hist, type='zRivetToBone')
+    shape = cmds.listRelatives(crv, c=True, fullPath=True)[0]
+    hist = cmds.listHistory(shape)
+    rivets = cmds.ls(hist, type='zRivetToBone')
     for rivet in rivets:
-        if mc.getAttr(rivet + '.cvIndices') == cv:
+        if cmds.getAttr(rivet + '.cvIndices') == cv:
             return True
     return False

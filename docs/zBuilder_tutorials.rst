@@ -90,8 +90,8 @@ This comes in handy if you want to mirror the setup, for example.
 
 .. code-block:: python
 
-    import maya.cmds as mc
-    mc.select('r_bicep_muscle')
+    from maya import cmds
+    cmds.select('r_bicep_muscle')
     import zBuilder.builders.ziva as zva
     z = zva.Ziva()
     z.retrieve_from_scene_selection()
@@ -347,7 +347,7 @@ To represent a model name change let's clean the scene and change the name of on
     import zBuilder.zMaya as mz
     mz.clean_scene()
 
-    mc.rename('r_bicep_muscle', 'r_biceps_muscle')
+    cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
 
 Now the information in the builder is out of sync with the geometry in the scene.
 We can update it by doing the following:
@@ -444,7 +444,6 @@ Here we're using the name filter to search for the specific item we're intereste
     = zSolver1 <zBuilder.nodes.ziva.zSolverTransform SolverTransformNode> ==================================
         _builder_type - zBuilder.nodes
         solver - zSolver1Shape
-        _DGNode__mobject - <maya.OpenMaya.MObject; proxy of <Swig Object of type 'MObject *' at 0x000001E90F8E9690> >
         _name - |zSolver1
         _association - []
         attrs - {u'enable': {'locked': False, 'type': u'bool', 'value': True, 'alias': None}, u'translateX': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'translateY': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'translateZ': {'locked': False, 'type': u'doubleLinear', 'value': 0.0, 'alias': None}, u'scaleX': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'scaleY': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'visibility': {'locked': False, 'type': u'bool', 'value': True, 'alias': None}, u'rotateX': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'rotateY': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'rotateZ': {'locked': False, 'type': u'doubleAngle', 'value': 0.0, 'alias': None}, u'scaleZ': {'locked': False, 'type': u'double', 'value': 100.0, 'alias': None}, u'startFrame': {'locked': False, 'type': u'double', 'value': 1.0, 'alias': None}}

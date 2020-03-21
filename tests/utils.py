@@ -1,6 +1,6 @@
 import tempfile
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 import os
 import zBuilder.builders.ziva as zva
 '''
@@ -30,46 +30,63 @@ def build_mirror_sample_geo():
     """ Builds 2 sphere and a cube to test some basic mirroring stuff.
     """
 
-    sph = mc.polySphere(name='r_muscle')[0]
-    mc.setAttr(sph + '.t', -10, 5, 0)
-    sph = mc.polySphere(name='l_muscle')[0]
-    mc.setAttr(sph + '.t', 10, 5, 0)
-    mc.setAttr(sph + '.s', -1, 1, 1)
-    cub = mc.polyCube(name='bone')[0]
-    mc.setAttr(cub + '.s', 15, 15, 3)
-    mc.polyNormal('l_muscle', normalMode=0, userNormalMode=0, ch=0)
-    mc.delete('r_muscle', 'l_muscle', 'bone', ch=True)
-    mc.makeIdentity('r_muscle', 'l_muscle', 'bone', apply=True)
+    sph = cmds.polySphere(name='r_muscle')[0]
+    cmds.setAttr(sph + '.t', -10, 5, 0)
+    sph = cmds.polySphere(name='l_muscle')[0]
+    cmds.setAttr(sph + '.t', 10, 5, 0)
+    cmds.setAttr(sph + '.s', -1, 1, 1)
+    cub = cmds.polyCube(name='bone')[0]
+    cmds.setAttr(cub + '.s', 15, 15, 3)
+    cmds.polyNormal('l_muscle', normalMode=0, userNormalMode=0, ch=0)
+    cmds.delete('r_muscle', 'l_muscle', 'bone', ch=True)
+    cmds.makeIdentity('r_muscle', 'l_muscle', 'bone', apply=True)
 
 
 def ziva_mirror_sample_geo():
     """ sets up a bone and a tissue with constraint on the mirror geo sample
     """
-    mc.select('bone')
-    mm.eval('ziva -b')
-    mc.select('r_muscle')
-    mm.eval('ziva -t')
+    cmds.select('bone')
+    mel.eval('ziva -b')
+    cmds.select('r_muscle')
+    mel.eval('ziva -t')
 
-    mm.eval(
+    mel.eval(
         'select -r r_muscle.vtx[60] r_muscle.vtx[78:81] r_muscle.vtx[97:101] r_muscle.vtx[117:122] r_muscle.vtx[137:142] r_muscle.vtx[157:162] r_muscle.vtx[177:179] r_muscle.vtx[197:199]'
     )
-    mc.select('bone', add=True)
-    mm.eval('ziva -a')
+    cmds.select('bone', add=True)
+    mel.eval('ziva -a')
 
 
-def get_ziva_node_names_from_builder(builder):
+def get_ziva_node_names_from_builder(builder, long=False):
     # get items that has z + Capital case letter and don't have dots ( to exclude maps )
     # this will list all Ziva nodes excluding meshes and maps
-    node_names = [obj.name for obj in builder.get_scene_items(name_regex="z[A-Z][^\.]*$")]
+    node_names = [obj.name if not long else obj.long_name for obj in builder.get_scene_items(name_regex="z[A-Z][^\.]*$")]
     return node_names
 
 
-def build_generic_scene(new_scene=True, scene_name='generic.ma'):
+def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
+    """Loading a maya test scene based on name.  These are maya files in the repo
+    so it searches for proper file based on current directoy.
+
+    Args:
+        new_scene (bool, optional): If True forces a new scene.. Defaults to True.
+        scene_name (str, optional): Name of the file to reference. Defaults to 'generic.ma'.
+        namespace (str, optional): The namespace to use for referenced file.
+                                            ":" is equal to no namespace. Defaults to "TEMP".
+    """
     path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
     if new_scene:
-        mc.file(new=True, force=True)
+        cmds.file(new=True, force=True)
+
+    cmds.file(path, reference=True, namespace=namespace, ignoreVersion=True)
+
+
+def load_scene(new_scene=True, scene_name='generic.ma'):
+    path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
+    if new_scene:
+        cmds.file(new=True, force=True)
     # import with no namespace
-    mc.file(path, i=True, ns=":", ignoreVersion=True)
+    cmds.file(path, i=True, ns=":", ignoreVersion=True)
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
@@ -83,31 +100,31 @@ def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
         nothing
     """
     if new_scene:
-        mc.file(new=True, force=True)
+        cmds.file(new=True, force=True)
 
-    mm.eval('ziva_loadArmGeometry_anatomicalArmDemo();')
+    mel.eval('ziva_loadArmGeometry_anatomicalArmDemo();')
 
     if ziva_setup:
-        mm.eval('ziva -s;')
+        mel.eval('ziva -s;')
 
-        mm.eval('ziva_makeBones_anatomicalArmDemo();')
-        mm.eval('ziva_makeTissues_anatomicalArmDemo(1);')
-        mm.eval('ziva_makeAttachments_anatomicalArmDemo();')
-        mm.eval('ziva_makeMuscleFibers_anatomicalArmDemo();')
-        mm.eval('ziva_setupMuscleFibersActivation();')
+        mel.eval('ziva_makeBones_anatomicalArmDemo();')
+        mel.eval('ziva_makeTissues_anatomicalArmDemo(1);')
+        mel.eval('ziva_makeAttachments_anatomicalArmDemo();')
+        mel.eval('ziva_makeMuscleFibers_anatomicalArmDemo();')
+        mel.eval('ziva_setupMuscleFibersActivation();')
 
-        mc.setAttr('zSolver1.collisionDetection', 1)
-        mc.setAttr('zSolver1.substeps', 1)
-        mc.setAttr('zSolver1.maxNewtonIterations', 2)
+        cmds.setAttr('zSolver1.collisionDetection', 1)
+        cmds.setAttr('zSolver1.substeps', 1)
+        cmds.setAttr('zSolver1.maxNewtonIterations', 2)
 
 
 def retrieve_builder_from_scene():
     """ Get a new zBuilder.builders.ziva.Ziva() with everything retrieved from scene."""
-    original_selection = mc.ls(selection=True)
-    mc.select(clear=True)
+    original_selection = cmds.ls(selection=True)
+    cmds.select(clear=True)
     builder = zva.Ziva()
     builder.retrieve_from_scene()
-    mc.select(original_selection, replace=True)
+    cmds.select(original_selection, replace=True)
     return builder
 
 

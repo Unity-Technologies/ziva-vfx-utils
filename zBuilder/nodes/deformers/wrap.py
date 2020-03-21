@@ -1,6 +1,6 @@
 import logging
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 from zBuilder.nodes.deformer import Deformer
 
@@ -17,8 +17,8 @@ class Wrap(Deformer):
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.get_scene_name()
-        if not mc.objExists(name):
-            mc.select(self.long_association, r=True)
+        if not cmds.objExists(name):
+            cmds.select(self.nice_association, r=True)
             version = 7
             operation = 1  # create
             threshold = 0
@@ -33,12 +33,8 @@ class Wrap(Deformer):
                 version, '{', operation, threshold, maxDist, inflType, exclusiveBind,
                 autoWeightThreshold, renderInfl, fallOffMode, '}')
 
-            results = mm.eval(cmd)
-            mc.rename(results[0], self.name)
-            # print cmd
-            #self.mobject = delta_mush
-        else:
-            self.mobject = name
+            results = mel.eval(cmd)
+            cmds.rename(results[0], self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         # self.set_maya_weights(interp_maps=interp_maps)
@@ -53,9 +49,9 @@ class Wrap(Deformer):
         Returns:
             list od strings: list of strings of mesh names.
         """
-        driver_points = mc.listConnections('{}.driverPoints'.format(node))
-        output_geometry = mc.listConnections('{}.geomMatrix'.format(node))
-        #output_geometry = mc.listConnections('{}.outputGeometry'.format(node))
+        driver_points = cmds.listConnections('{}.driverPoints'.format(node))
+        output_geometry = cmds.listConnections('{}.geomMatrix'.format(node))
+        #output_geometry = cmds.listConnections('{}.outputGeometry'.format(node))
 
         out = list()
         out.extend(output_geometry)

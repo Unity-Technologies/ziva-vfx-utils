@@ -2,12 +2,13 @@ import logging
 import re
 import copy
 
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
 import zBuilder.builders.skinClusters as skn
+from zBuilder.IO import is_sequence
 
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
@@ -20,13 +21,13 @@ def copy_paste(*args, **kwargs):
     '''
     A utility wrapper for copying and pasting a tissue
     '''
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
 
     selection = None
     if args:
-        selection = mc.ls(args[0], l=True)
+        selection = cmds.ls(args[0], l=True)
     else:
-        selection = mc.ls(sl=True, l=True)
+        selection = cmds.ls(sl=True, l=True)
 
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection(selection[0])
@@ -34,7 +35,7 @@ def copy_paste(*args, **kwargs):
     builder.stats()
     builder.build(**kwargs)
 
-    mc.select(sel)
+    cmds.select(sel)
 
 
 def check_map_validity():
@@ -48,17 +49,17 @@ def check_map_validity():
     Returns:
         list of offending maps
     """
-    sel = mc.ls(sl=True)
+    sel = cmds.ls(sl=True)
 
     # we are going to check fibers and attachments
-    mc.select(mc.ls(type=['zAttachment', 'zFiber']), r=True)
+    cmds.select(cmds.ls(type=['zAttachment', 'zFiber']), r=True)
 
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection(connections=False)
 
     mz.check_map_validity(builder.get_scene_items(type_filter='map'))
 
-    mc.select(sel, r=True)
+    cmds.select(sel, r=True)
 
 
 def remove(nodes):
@@ -70,7 +71,7 @@ def remove(nodes):
 
     for node in nodes:
         # Check if node still exists.
-        if not mc.objExists(node):
+        if not cmds.objExists(node):
             continue
 
         # Check if node is a solver, and if so, remove it first.
@@ -78,19 +79,19 @@ def remove(nodes):
             remove_solver(solvers=[node])
 
         # Check if node still exists.
-        if not mc.objExists(node):
+        if not cmds.objExists(node):
             continue
 
         # Check if node is a body, and if so, remove it.
         # We do this first as this will remove other items.
         if mz.check_body_type([node]):
             # If this is a zTissue of zTet, we need to select the mesh before we remove it:
-            mc.select(mm.eval('zQuery -m'))
-            mm.eval('ziva -rm')
+            cmds.select(mel.eval('zQuery -m -l'))
+            mel.eval('ziva -rm')
         # Check again if node exists after the body has been removed.
-        if mc.objExists(node):
-            if mc.objectType(node) in safe_to_delete:
-                mc.delete(node)
+        if cmds.objExists(node):
+            if cmds.objectType(node) in safe_to_delete:
+                cmds.delete(node)
 
 
 def remove_solver(solvers=None, askForConfirmation=False):
@@ -102,26 +103,25 @@ def remove_solver(solvers=None, askForConfirmation=False):
     # The command also deletes the solver nodes themselves.
     if solvers is None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
-        num_selected_objects = len(mc.ls(selection=True))
+        num_selected_objects = len(cmds.ls(selection=True))
         if num_selected_objects > 0:
-            solvers = mm.eval('zQuery -t "zSolver" -l')
+            solvers = mel.eval('zQuery -t "zSolver" -l')
         else:
-            mm.eval('error -n "Nothing is selected"')
+            mel.eval('error -n "Nothing is selected"')
             return
     if solvers is None:
-        mm.eval('error -n "No solver selected"')
+        mel.eval('error -n "No solver selected"')
         return
 
     # Convert any solver transform nodes to solver shape nodes.
-    solvers = mm.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
+    solvers = mel.eval('zQuery -t "zSolver" -l ' + ' '.join(solvers))
+    solver_transforms = mel.eval('zQuery -t "zSolverTransform" -l ' + ' '.join(solvers))
 
     message = 'This command will remove the solver(s): '
-    for solver in solvers:
-        short_solver_name = mc.ls(solver)[0][:-5]  # remove 'Shape' at the end
-        message += short_solver_name + ', '
-    message += 'including all Ziva rigs in them. Proceed?'
+    message += ', '.join(cmds.ls(s)[0] for s in solver_transforms)  # The transforms have nicer names.
+    message += ', including all Ziva rigs in them. Proceed?'
     if askForConfirmation:
-        response = mc.confirmDialog(title='Remove Ziva solver(s)',
+        response = cmds.confirmDialog(title='Remove Ziva solver(s)',
                                     message=message,
                                     button=['Yes', 'Cancel'],
                                     defaultButton='Yes',
@@ -130,25 +130,36 @@ def remove_solver(solvers=None, askForConfirmation=False):
             return
 
     to_erase = []
+    meshes_to_unlock = []
     for node in mz.ZNODES:
-        nodes_in_scene = mc.ls(type=node)
+        nodes_in_scene = cmds.ls(type=node)
         for item in nodes_in_scene:
             solver_of_this_item = mz.get_zSolver(item)
             if solver_of_this_item:
                 solver_of_this_item = solver_of_this_item[0]
             if solver_of_this_item in solvers:
                 to_erase.append(item)
-            # unlock the transform attributes
-            if (node == 'zTissue') or (node == 'zCloth'):
-                maya_mesh = mm.eval('zQuery -m ' + item)[0]
-                attrs = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-                for attr in attrs:
-                    mm.eval('setAttr -lock 0 ' + maya_mesh + '.' + attr)
+                # unlock the transform attributes
+                if (node == 'zTissue') or (node == 'zCloth'):
+                    maya_mesh = mel.eval('zQuery -m ' + item)[0]
+                    meshes_to_unlock.append(maya_mesh)
+
+    # If anything is referenced, we won't be able to delete it.
+    # So, don't start making any changes to the scene if we know it's going to fail.
+    has_referenced = any(cmds.referenceQuery(node, isNodeReferenced=True) for node in to_erase)
+    if has_referenced:
+        mel.eval('error -n "Cannot delete solvers with referenced nodes"')
+        return
+
+    for maya_mesh in meshes_to_unlock:
+        for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']:
+            # unlock can fail on referenced transforms, so 'catchQuiet' to ignore that
+            mel.eval('catchQuiet(`setAttr -lock 0 ' + maya_mesh + '.' + attr + '`)')
 
     mz.delete_rivet_from_solver(solvers)
-    mm.eval('select -cl;')  # needed to avoid Maya error messages
+    mel.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
-        mc.delete(to_erase)
+        cmds.delete(to_erase)
 
 
 def remove_all_solvers(confirmation=False):
@@ -156,7 +167,7 @@ def remove_all_solvers(confirmation=False):
     # All Ziva nodes are removed from the Maya scene.
     # The command also deletes the solvers themselves.
     if confirmation:
-        response = mc.confirmDialog(
+        response = cmds.confirmDialog(
             title='Remove all Ziva solvers',
             message=
             'This command will erase all Ziva nodes from the Maya scene. All Ziva nodes, including all solvers, will be erased. Proceed?',
@@ -189,18 +200,18 @@ def rig_cut_copy(cut=False):
     global ZIVA_CLIPBOARD_SELECTION
     global ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE
 
-    selection = mc.ls(sl=True)
+    selection = cmds.ls(sl=True, l=True)
     if not selection:
-        mm.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
+        mel.eval('error -n "Selection is empty. Cut/copy needs a selection to operate on."')
         return False
 
     # Enforce that the selected objects come from exactly one solver.
-    selected_solvers = mm.eval('zQuery -t "zSolver" -l')
+    selected_solvers = mel.eval('zQuery -t "zSolver" -l')
     if selected_solvers is None:
-        mm.eval('error -n "Selected objects are not connected to a solver."')
+        mel.eval('error -n "Selected objects are not connected to a solver."')
         return False
     if len(selected_solvers) >= 2:
-        mm.eval(
+        mel.eval(
             'error -n "Selected objects come from two or more solvers. Inputs to cut/copy must come from only one solver."'
         )
         return False
@@ -217,7 +228,7 @@ def rig_cut_copy(cut=False):
     elif num_solver_nodes == 1:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = True
     else:
-        mm.eval('error -n "Selection contains more than one solver node. "')
+        mel.eval('error -n "Selection contains more than one solver node. "')
         return False
 
     ZIVA_CLIPBOARD_ZBUILDER = zva.Ziva()
@@ -266,7 +277,7 @@ def rig_paste():
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
     if ZIVA_CLIPBOARD_ZBUILDER is None:
-        mm.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
+        mel.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
         return
 
     # We need to do a deepcopy of ziva_clipboard_zbuilder because we want to manipulate
@@ -277,7 +288,7 @@ def rig_paste():
     builder = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
 
     source_selection = ZIVA_CLIPBOARD_SELECTION
-    target_selection = mc.ls(sl=True, l=True)
+    target_selection = cmds.ls(sl=True, l=True)
     num_object_to_paste = min([len(source_selection), len(target_selection)])
 
     # If nothing is selected when we paste, or the clipboard contains a solver node,
@@ -289,21 +300,6 @@ def rig_paste():
         for i in range(0, num_object_to_paste):
             builder.string_replace(source_selection[i].split('|')[-1],
                                    target_selection[i].split('|')[-1])
-
-    # In case there are other solvers in the scene, we need to make sure that all the zBuilder commands
-    # go to the solver stored in the clipboard. Otherwise, errors could occur due to solver ambiguity.
-    # We resolve this as follows: If such a solver does not exist in the scene (because, say,
-    # it has been cut), we first create a solver and name it the same as the solver on the clipboard.
-    # Then, we make the solver stored on the clipboard be the default solver. So, all zBuilder commands go to it.
-    solver_in_clipboard = ZIVA_CLIPBOARD_ZBUILDER.get_scene_items(
-        type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
-    if not mc.objExists(solver_in_clipboard):
-        generated_solver = mm.eval('ziva -s;')[1]  # make a new solver
-        mc.rename(
-            generated_solver,
-            solver_in_clipboard)  # rename the solver (this also auto-renames the solver shape node)
-    mm.eval('ziva -def ' + solver_in_clipboard + ';')  # make the clipboard solver default
-
     builder.build()
 
 
@@ -313,7 +309,7 @@ def rig_update(solvers=None):
     # built Ziva rig on the modified geometry.
     # If no "solvers" are provided, they are inferred from selection.
     if solvers is None:
-        solvers = mm.eval('zQuery -t "zSolver" -l')
+        solvers = mel.eval('zQuery -t "zSolver" -l')
 
     # zQuery gives an error if no solvers though it does not stop script
     # this is to stop script
@@ -321,22 +317,14 @@ def rig_update(solvers=None):
         raise Exception("No solver in scene.")
 
     for solver in solvers:
-        solver_transform = mc.listRelatives(solver, p=True, f=True)[0][1:]
+        solver_transform = cmds.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
-        mc.select(solver)
+        cmds.select(solver)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
         # remove existing solver
         remove_solver(solvers=[solver])
-
-        # create an empty solver
-        generated_solver = mm.eval('ziva -s;')[1]  # make the output solver
-        mc.rename(
-            generated_solver,
-            solver_transform)  # rename the solver (this also auto-renames the solver shape node)
-
-        mm.eval('ziva -def ' + solver + ';')  # make this solver be default
 
         # re-build the solver
         builder.build()
@@ -355,30 +343,18 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
     # on the 'warped_*' geometry is added into the sourceSolver.
     if target_solver == "":
-        target_solver = prefix + source_solver  # default target solver
+        target_solver = prefix + source_solver.split('|')[-1]  # default target solver
 
-    if not mc.objExists(target_solver):
-        generated_solver = mm.eval('ziva -s;')[1]  # make the output solver
-        mc.rename(generated_solver,
-                  target_solver)  # rename the solver (this also auto-renames the transform node)
-
-    # select the sourceSolver, and read the ziva setup from sourceSolver into the zBuilder object
-    mc.select(source_solver)
+    cmds.select(source_solver)
     builder = zva.Ziva()
     builder.retrieve_from_scene()
 
     # rename to prefix
     builder.string_replace('^', prefix)
     builder.string_replace(
-        '^' + prefix + source_solver,
+        '^' + prefix + source_solver.split('|')[-1],
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
-    # we need to clear the stored mobjects.  Without doing this it keeps a pointer to original object
-    # and uses that instead of creating a new object.  This makes sure it is a new setup with new nodes.
-    builder.break_connection_to_scene()
-
-    # build the transferred solver
-    mm.eval('ziva -def ' + target_solver + ';')  # make the target solver be default
     builder.build()
 
 
@@ -390,12 +366,12 @@ def skincluster_transfer(prefix=""):
     # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
     # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the
     # quotes).
-    selected_nodes = mc.ls(sl=True)
+    selected_nodes = cmds.ls(sl=True)
     if len(selected_nodes) == 0:
-        mc.error("Must select at least one mesh.\n")
+        cmds.error("Must select at least one mesh.\n")
 
     if prefix == "":
-        mc.error('Must specify a prefix.')
+        cmds.error('Must specify a prefix.')
 
     builder = skn.SkinCluster()
     builder.retrieve_from_scene()
@@ -412,8 +388,7 @@ def load_rig(file_name, solver_name=None):
     builder.retrieve_from_file(file_name)
     if solver_name != None:
         # replace the solver name stored in the .zBuilder file with solverName
-        solver_name_in_file = builder.get_scene_items(
-            type_filter='zSolver')[0].solver[:-5]  # remove 'Shape' at the end
+        solver_name_in_file = builder.get_scene_items(type_filter='zSolverTransform')[0].name
         builder.string_replace(solver_name_in_file, solver_name)
     builder.build()
 
@@ -454,11 +429,11 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
     # types:
     displayed_node_types = ['zTissue', 'zBone', 'zCloth']
     # clear selection
-    mc.select(cl=True)
+    cmds.select(cl=True)
     for displayed_node_type in displayed_node_types:
         for item in builder.get_scene_items(type_filter=displayed_node_type):
             # Add each mesh of this type to selection.
-            mc.select(item.long_association, add=True)
+            cmds.select(item.nice_association, add=True)
 
 
 def next_free_plug_in_array(dst_plug):
@@ -478,7 +453,7 @@ def next_free_plug_in_array(dst_plug):
     array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
     if array_match:
         plug = array_match.group(1)
-        indices = mc.getAttr(plug, multiIndices=True)
+        indices = cmds.getAttr(plug, multiIndices=True)
         new_index = indices[-1] + 1 if indices else 0  # [-1] assumes indices are sorted
         new_dst = '{}[{}]'.format(plug, new_index)
         return new_dst
@@ -493,7 +468,7 @@ def listConnectionPlugs(node, destination=True, source=True):
     assert isinstance(node, basestring), 'Arguments #1 is not a string'
     assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
     assert isinstance(source, bool), 'Arguments "source" is not a bool'
-    plugs = mc.listConnections(node,
+    plugs = cmds.listConnections(node,
                                plugs=True,
                                connections=True,
                                source=source,
@@ -516,16 +491,16 @@ def merge_two_solvers(solver_transform1, solver_transform2):
     # Checking inputs
     assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
     assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
-    assert mc.nodeType(
+    assert cmds.nodeType(
         solver_transform1) == 'zSolverTransform', 'Argument #1 is not a zSolverTransform'
-    assert mc.nodeType(
+    assert cmds.nodeType(
         solver_transform2) == 'zSolverTransform', 'Argument #2 is not a zSolverTransform'
     assert solver_transform1 != solver_transform2, 'The two solvers are not different'
 
-    solver1 = mm.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
-    solver2 = mm.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
-    embedder1 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
-    embedder2 = mm.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
+    solver1 = mel.eval('zQuery -t zSolver {}'.format(solver_transform1))[0]
+    solver2 = mel.eval('zQuery -t zSolver {}'.format(solver_transform2))[0]
+    embedder1 = mel.eval('zQuery -t zEmbedder {}'.format(solver_transform1))[0]
+    embedder2 = mel.eval('zQuery -t zEmbedder {}'.format(solver_transform2))[0]
 
     ####################################################################
     # For speed and to reduce noise, try to disable the solvers
@@ -538,21 +513,21 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         ####################################################################
         # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
         for src, dst in listConnectionPlugs(solver2, source=False):
-            mc.disconnectAttr(src, dst)
+            cmds.disconnectAttr(src, dst)
             new_src = src.replace(solver2, solver1, 1)
             try:
-                mc.connectAttr(new_src, dst)
+                cmds.connectAttr(new_src, dst)
             except:
                 logger.info('Skipped new connection {} {}'.format(src, dst))
 
         ####################################################################
         # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
         for dst, src in listConnectionPlugs(solver2, destination=False):
-            mc.disconnectAttr(src, dst)
+            cmds.disconnectAttr(src, dst)
             new_dst = dst.replace(solver2, solver1, 1)
             new_dst = next_free_plug_in_array(new_dst)
             try:
-                mc.connectAttr(src, new_dst)
+                cmds.connectAttr(src, new_dst)
             except:
                 if not new_dst.endswith('iSolverParams'):  # We _expect_ this plug to fail.
                     logger.info('Skipped new connection {} {}'.format(src, new_dst))
@@ -560,10 +535,10 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         ####################################################################
         # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
         for src, dst in listConnectionPlugs(solver_transform2, source=False):
-            mc.disconnectAttr(src, dst)
+            cmds.disconnectAttr(src, dst)
             new_src = src.replace(solver_transform2, solver_transform1, 1)
             try:
-                mc.connectAttr(new_src, dst)
+                cmds.connectAttr(new_src, dst)
             except:
                 logger.info('Skipped new connection {} {}'.format(src, dst))
 
@@ -572,31 +547,31 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 
         # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
         tissue_geo_plugs = mz.none_to_empty(
-            mc.listConnections('{}.iGeo'.format(embedder2),
+            cmds.listConnections('{}.iGeo'.format(embedder2),
                                plugs=True,
                                source=True,
                                destination=False))
-        meshes = mz.none_to_empty(mc.deformer(embedder2, query=True, geometry=True))
-        indices = set(mz.none_to_empty(mc.deformer(embedder1, query=True, geometryIndices=True)))
+        meshes = mz.none_to_empty(cmds.deformer(embedder2, query=True, geometry=True))
+        indices = set(mz.none_to_empty(cmds.deformer(embedder1, query=True, geometryIndices=True)))
 
         # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
         for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
-            mc.deformer(embedder2, edit=True, remove=True, geometry=mesh)
-            mc.deformer(embedder1, edit=True, before=True,
+            cmds.deformer(embedder2, edit=True, remove=True, geometry=mesh)
+            cmds.deformer(embedder1, edit=True, before=True,
                         geometry=mesh)  # "-before" for referencing
             # TODO: how do I get the index of a mesh without this mess?
-            new_indices = set(mc.deformer(embedder1, query=True, geometryIndices=True))
+            new_indices = set(cmds.deformer(embedder1, query=True, geometryIndices=True))
             new_index = list(new_indices - indices)[0]
             indices = new_indices
-            mc.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
+            cmds.connectAttr(geo_plug, '{}.iGeo[{}]'.format(embedder1, new_index))
 
         ####################################################################
         # logger.info('Trying to delete stale solver {}'.format(solver_transform2))
 
         for node in [solver2, solver_transform2, embedder2]:
             # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
-            if not mc.ls(node, readOnly=True):
-                mc.delete(node)
+            if not cmds.ls(node, readOnly=True):
+                cmds.delete(node)
 
 
 def merge_solvers(solver_transforms):
@@ -618,7 +593,7 @@ def merge_solvers(solver_transforms):
 
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
-    assert isinstance(solver_transforms, list), 'Arguments #1 is not a list'
+    assert is_sequence(solver_transforms), 'Arguments #1 is not a list'
 
     if len(solver_transforms) < 2:
         return

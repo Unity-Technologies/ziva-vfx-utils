@@ -1,8 +1,8 @@
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
 import logging
-import maya.cmds as mc
-import maya.mel as mm
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,7 @@ class TetNode(Ziva):
 
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
+
     def __init__(self, parent=None, builder=None):
         super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
@@ -49,7 +50,9 @@ class TetNode(Ziva):
         if self.get_user_tet_mesh():
             name = self.get_scene_name()
             try:
-                mc.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh', name + '.iTet', f=True)
+                cmds.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
+                                 name + '.iTet',
+                                 f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
@@ -60,42 +63,34 @@ class TetNode(Ziva):
 
         These get built after the tissues so it is assumed they are in scene.
         This just checks what tet is associated with mesh and uses that one,
-        renames it and stores mObject then changes attributes.
+        renames it and then changes attributes.
         There is only ever 1 per mesh so no need to worry about multiple tets
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
-            interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
 
-        attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
-        interp_maps = kwargs.get('interp_maps', 'auto')
 
         name = self.name
-        if not mc.objExists(name):
-            mesh = self.association[0]
-            if mc.objExists(mesh):
+        if not cmds.objExists(name):
+            mesh = self.nice_association[0]
+            if cmds.objExists(mesh):
                 if permissive:
-                    name = mm.eval('zQuery -t zTet ' + mesh)[0]
+                    name = mel.eval('zQuery -t zTet ' + mesh)
+                    if name:
+                        name = name[0]
                 else:
-                    raise Exception('{} does not exist in scene.  Check meshes.'.format(mesh))
+                    raise Exception('{} does not exist in scene. Check mesh {}.'.format(name, mesh))
 
         if name:
-            if not mc.objExists(name):
+            if not cmds.objExists(name):
                 if permissive:
                     logger.info(
                         '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
                         format(mesh))
             else:
-                new_name = mc.rename(name, self.name)
-                self.mobject = new_name
+                self.name = mz.safe_rename(name, self.name)
 
         self.apply_user_tet_mesh()
-        self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=False)
+        # zTet does not need to build maps and attributes here because it's done by zTissue

@@ -73,10 +73,10 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
             os.removedirs(cls.module_path)
 
     def tearDown(self):
-        super(TestLicenseRegister, self).tearDown()
         # delete these files as their content changes between test cases
         delete_file(self.floating_license_file_path)
         delete_file(self.new_license_file_in_module_path)
+        super(TestLicenseRegister, self).tearDown()
 
     # --------------------------------------------------------------------------------
 
@@ -113,7 +113,8 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
             generated_content = lic_file.read()
             self.assertEqual(self.new_node_locked_license_content1, generated_content)
 
-    def test_overriding_existing_node_locked_license(self):
+
+    def test_overriding_existing_node_based_license(self):
         '''
         Test overriding existing node locked license file.
         This should not happen as each node locked license file name is unique.
