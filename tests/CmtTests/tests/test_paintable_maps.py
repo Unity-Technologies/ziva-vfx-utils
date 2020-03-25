@@ -1,20 +1,12 @@
 from maya import cmds
 from maya import mel
-from utility.paintable_maps import set_paintable_map
+from utility.paintable_maps import get_paintable_map, set_paintable_map
 import vfx_test_case
 
 
 def make_weights(num_weights, shift):
     """ Make some interesting non-trivial weights to test with. """
     return [x % 10 + shift for x in xrange(num_weights)]
-
-
-def get_weights(map_name, vert_count):
-    try:
-        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
-    except ValueError:
-        value = cmds.getAttr(map_name)
-    return value
 
 
 class SetWeightsTestCase(vfx_test_case.VfxTestCase):
@@ -26,7 +18,8 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         cmds.polyCube(name='Tissue2')  # Many tissues, so we have a long array
         cmds.polyCube(name='Tissue3')  # of weights on the embedder node.
         cmds.polyCube(name='Tissue4')  # Letting us test that we handle those arrays well --
-        cmds.polyCube(name='Tissue5')  # the code in set_paintable_map_by_MFnWeight... is kinda scary.
+        cmds.polyCube(
+            name='Tissue5')  # the code in set_paintable_map_by_MFnWeight... is kinda scary.
         cmds.polyPlane(name='Bone')
         mel.eval('ziva -s')  # makes zSolver1
         cmds.setAttr('zSolver1.enable', False)  # Go faster. We don't need to do sims.
@@ -70,5 +63,7 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         for node, attr, weights in test_cases:
             print('node, attr = {}, {}'.format(node, attr))  # so we can tell what failed
             set_paintable_map(node, attr, weights)
-            observed_weights = get_weights(node + '.' + attr, len(weights))  ## ACT ###############
-            self.assertAllApproxEqual(weights, observed_weights)  ## VERIFY #######################
+            ## ACT ###############
+            observed_weights = get_paintable_map(node, attr)
+            ## VERIFY #######################
+            self.assertAllApproxEqual(weights, observed_weights)

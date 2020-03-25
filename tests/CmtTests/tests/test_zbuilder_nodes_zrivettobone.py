@@ -4,17 +4,16 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
-from maya import mel
 
-from vfx_test_case import VfxTestCase
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+
+NODE_TYPE = 'zRivetToBone'
 
 
 class ZivaRivetToBoneGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.rivet_to_bone_names = [
-            "l_loa_curve_zRivetToBone1", "l_loa_curve_zRivetToBone2"
-        ]
+        cls.rivet_to_bone_names = ["l_loa_curve_zRivetToBone1", "l_loa_curve_zRivetToBone2"]
         cls.rivet_to_bone_attrs = ["envelope"]
 
     def setUp(self):
@@ -38,7 +37,8 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
                                    Test fails if zBuilder is missing any of the keys
                                    or has any keys with different values.
         """
-        self.check_retrieve_looks_good(builder, expected_plugs, self.rivet_to_bone_names, "zRivetToBone")
+        self.check_retrieve_looks_good(builder, expected_plugs, self.rivet_to_bone_names,
+                                       "zRivetToBone")
 
     def test_retrieve(self):
         self.check_retrieve_rivet_to_bone_looks_good(self.builder, {})
@@ -49,7 +49,8 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         self.check_retrieve_rivet_to_bone_looks_good(builder, {})
 
     def test_build_restores_attr_values(self):
-        self.check_build_restores_attr_values(self.builder, self.rivet_to_bone_names, self.rivet_to_bone_attrs)
+        self.check_build_restores_attr_values(self.builder, self.rivet_to_bone_names,
+                                              self.rivet_to_bone_attrs)
 
     def test_remove(self):
         ## ACT
@@ -134,3 +135,146 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_loa_curve_zRivetToBone1")), 1)
+
+
+class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+    - Ziva nodes are named default like so: zRivetToBone1, zRivetToBone2, zRivetToBone3
+
+    """
+
+    def setUp(self):
+        super(ZivaRivetToBoneMirrorTestCase, self).setUp()
+
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaRivetToBoneMirrorTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaRivetToBoneMirrorTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva VFX nodes
+    - The Ziva Nodes have a side identifier same as geo
+
+    """
+
+    def setUp(self):
+        super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+
+        # NICE NAMES
+        mz.rename_ziva_nodes()
+
+        # make FULL setup based on left
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        builder.string_replace('^l_', 'r_')
+        builder.build()
+
+        # gather info
+        cmds.select('l_armA_muscle_geo')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaTissueUpdateNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaTissueUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaRivetToBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaRivetToBoneMirrorNiceNameTestCase, self).setUp()
+        # gather info
+
+        # Bring in scene
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+
+        # force NICE NAMES
+        mz.rename_ziva_nodes()
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaRivetToBoneMirrorNiceNameTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaRivetToBoneMirrorNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+
+    def setUp(self):
+        super(ZivaRivetToBoneUpdateTestCase, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+        # select a left tissue mesh
+        tissue = self.builder.get_scene_items(type_filter='zTissue')[0]
+        cmds.select(tissue.association[0])
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_scene()
+        new_builder.string_replace("^l_", "r_")
+        new_builder.build()
+
+    def test_builder_change_with_string_replace(self):
+        super(ZivaRivetToBoneUpdateTestCase, self).builder_change_with_string_replace()
+
+    def test_builder_build_with_string_replace(self):
+        super(ZivaRivetToBoneUpdateTestCase, self).builder_build_with_string_replace()

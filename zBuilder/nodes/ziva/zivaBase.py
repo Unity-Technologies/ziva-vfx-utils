@@ -44,9 +44,12 @@ class Ziva(Deformer):
         mesh = mz.get_association(maya_node)
         self.association = mesh
 
-        solver = mel.eval('zQuery -t zSolver {}'.format(self.name))
-        if solver:
-            self.solver = solver[0]
+        if self.type == 'zSolver':
+            self.solver = self
+        else:
+            solver = mel.eval('zQuery -t zSolver {}'.format(self.long_name))
+            if solver:
+                self.solver = self.builder.get_scene_items(name_filter=solver[0])[0]
 
     @staticmethod
     def check_meshes(meshes):

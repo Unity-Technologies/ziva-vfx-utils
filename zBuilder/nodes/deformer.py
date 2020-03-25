@@ -32,8 +32,8 @@ class Deformer(DGNode):
 
         """
         objs = {}
-        if self.long_association:
-            objs['mesh'] = self.long_association
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
@@ -76,7 +76,7 @@ class Deformer(DGNode):
         Returns:
             list: List of long mesh names.
         """
-        return self.long_association
+        return self.nice_association
 
     def get_mesh_objects(self):
         """
@@ -124,11 +124,8 @@ class Deformer(DGNode):
             list od strings: list of strings of mesh names.
         """
         meshes = cmds.deformer(node, query=True, g=True)
-        tmp = list()
-        for mesh in meshes:
-            parent = cmds.listRelatives(mesh, p=True)
-            tmp.extend(cmds.ls(parent, long=True))
-        return tmp
+        parent = cmds.listRelatives(meshes, p=True, fullPath=True)
+        return parent
 
     def set_maya_weights(self, interp_maps=False):
         """ Given a Builder node this set the map values of the object in the maya
@@ -143,16 +140,20 @@ class Deformer(DGNode):
         Returns:
             nothing.
         """
-        maps = self.get_map_names()
-        scene_name = self.get_scene_name()
-        original_name = self.name
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # Update self.parameters dict is not necessary if it refers to
+        # the same map node as the ones in bundle.scene_items.
+        # We do it here because zBuilder deepcopy operation breaks this connection.
+        self.parameters['map'] = self.check_map_interpolation(interp_maps)
 
-        self.check_map_interpolation(interp_maps)
-        for map_ in maps:
-            map_data = self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_)
-            if map_data:
-                map_data[0].string_replace(original_name, scene_name)
-                map_data[0].apply_weights()
+        # Cycle through the maps stored in the node.
+        for item in self.parameters['map']:
+            # We are replacing the name in the map node (first part) with the name of
+            # the node it is coming from.
+            item.string_replace(item.name.split('.')[0], self.name)
+            # apply the weights
+            item.apply_weights()
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
@@ -162,6 +163,10 @@ class Deformer(DGNode):
 
         Args:
             interp_maps (bool): Do you want to do it?
+
+        Return:
+            list(zBuilder.parameters.maps.Map): Return the new intepolated map nodes
+            to replace the ones stored in self.parameters dict.
         """
 
         map_objects = self.get_map_objects()
@@ -173,3 +178,10 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
+
+        # TODO: deepcopy breaks connection.
+        # Search "deepcopy breaks connection" and fix all of them.
+        # The return is not necessary if the self.parameters dict refer to
+        # the same map node. We do it here because zBuilder deepcopy operation
+        # breaks this connection.
+        return map_objects

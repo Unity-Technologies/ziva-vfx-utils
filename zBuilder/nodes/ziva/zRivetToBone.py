@@ -69,9 +69,11 @@ class RivetToBoneNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        crv = self.curve
+        crv = self.long_curve_name
+        if not cmds.objExists(crv):
+            crv = self.curve
         cv_index = self.cv_indices
-        bone = self.association[0]
+        bone = self.nice_association[0]
 
         cmds.select(cl=True)
         if cmds.objExists(crv) and cmds.objExists(bone):
@@ -80,7 +82,8 @@ class RivetToBoneNode(Ziva):
                     cmds.select('{}.cv[{}]'.format(crv, i), add=True)
                 cmds.select(bone, add=True)
                 results = mel.eval('zRivetToBone')
-                cmds.rename(results[0], self.name)
+                self.name = mz.safe_rename(results[0], self.name)
+
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
             if permissive:
@@ -92,7 +95,7 @@ class RivetToBoneNode(Ziva):
 
 
 def is_cv_connected_to_rivet(crv, cv):
-    shape = cmds.listRelatives(crv, c=True)[0]
+    shape = cmds.listRelatives(crv, c=True, fullPath=True)[0]
     hist = cmds.listHistory(shape)
     rivets = cmds.ls(hist, type='zRivetToBone')
     for rivet in rivets:

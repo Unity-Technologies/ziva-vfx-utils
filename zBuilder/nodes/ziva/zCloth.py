@@ -72,7 +72,7 @@ def build_multiple(scene_items, attr_filter=None):
     # rename zCloth------------------------------------------------------------
     if results:
         results = cmds.ls(results, type='zCloth')
-        for new, name, item in zip(results, culled['names'], culled['scene_items']):
-            cmds.rename(new, name)
+        for new_name, builder_name, item in zip(results, culled['names'], culled['scene_items']):
+            item.name = mz.safe_rename(new_name, builder_name)
 
     cmds.select(sel)

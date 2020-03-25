@@ -22,8 +22,8 @@ class FiberNode(Ziva):
 
         """
         objs = {}
-        if self.long_association:
-            objs['mesh'] = self.long_association
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
         map_names = self.get_map_names()
@@ -46,7 +46,7 @@ class FiberNode(Ziva):
         Returns:
             list(): of long mesh names.
         """
-        return [self.long_association[0], self.long_association[0]]
+        return [self.nice_association[0], self.nice_association[0]]
 
     def build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.
@@ -64,8 +64,7 @@ class FiberNode(Ziva):
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        name = self.name
-        mesh = self.association[0]
+        mesh = self.nice_association[0]
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
@@ -73,19 +72,22 @@ class FiberNode(Ziva):
             data_fibers = self.builder.bundle.get_scene_items(type_filter='zFiber',
                                                               association_filter=mesh)
 
-            d_index = data_fibers.index(self)
+            try:
+                d_index = data_fibers.index(self)
+            except ValueError:
+                d_index = 0
 
             if existing_fibers:
                 if d_index < len(existing_fibers):
-                    cmds.rename(existing_fibers[d_index], name)
+                    self.name = mz.safe_rename(existing_fibers[d_index], self.name)
                 else:
                     cmds.select(mesh, r=True)
                     results = mel.eval('ziva -f')
-                    cmds.rename(results[0], name)
+                    self.name = mz.safe_rename(results[0], self.name)
             else:
                 cmds.select(mesh, r=True)
                 results = mel.eval('ziva -f')
-                cmds.rename(results[0], name)
+                self.name = mz.safe_rename(results[0], self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 

@@ -117,8 +117,11 @@ class Mesh(Base):
             True if topologically corresponding, else False
 
         """
-        if cmds.objExists(self.name):
-            points = get_mesh_info(self.name)[2]
+        mesh = self.long_name
+        if not cmds.objExists(mesh):
+            mesh = self.name
+        if cmds.objExists(mesh):
+            points = get_mesh_info(mesh)[2]
 
             if len(points) == len(self.get_point_list()):
                 return True
