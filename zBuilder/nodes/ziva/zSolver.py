@@ -1,9 +1,10 @@
+import logging
+
 from maya import cmds
 from maya import mel
-
-import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes import Ziva
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,6 @@ class SolverNode(Ziva):
     """
     type = 'zSolver'
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 
@@ -39,7 +39,7 @@ class SolverNode(Ziva):
             new_name = mz.safe_rename(solverTransform, st.name)
             st.name = new_name
             solverTransform_child = cmds.listRelatives(st.name, c=True, fullPath=True)[0]
-            mz.safe_rename(solverTransform_child, solver_name.split('|')[-1])
+            mz.safe_rename(solverTransform_child, get_short_name(solver_name))
         else:
             new_name = mz.safe_rename(solver_name, self.name)
 

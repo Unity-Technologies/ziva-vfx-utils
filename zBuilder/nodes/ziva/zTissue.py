@@ -1,8 +1,9 @@
-from zBuilder.nodes import Ziva
 import logging
-import zBuilder.zMaya as mz
+
 from maya import cmds
 from maya import mel
+from zBuilder.nodes import Ziva
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,6 @@ class TissueNode(Ziva):
     """
     type = 'zTissue'
     """ The type of node. """
-
     def __init__(self, parent=None, builder=None):
         super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
@@ -22,7 +22,6 @@ class TissueNode(Ziva):
         and the children_tissues are unused.  The reason for this is because at time of retrieval
         the children tissues are not processed so their are no children scene items to get.
         """
-
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
 

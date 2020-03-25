@@ -1,8 +1,10 @@
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
 import logging
+
 from maya import cmds
 from maya import mel
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.nodes import Ziva
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +17,6 @@ class TetNode(Ziva):
 
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
-
     def __init__(self, parent=None, builder=None):
         super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
@@ -40,9 +41,8 @@ class TetNode(Ziva):
             if long_name:
                 return self._user_tet_mesh
             else:
-                return self._user_tet_mesh.split('|')[-1]
-        else:
-            return None
+                return get_short_name(self._user_tet_mesh)
+        return None
 
     def apply_user_tet_mesh(self):
         """ Applies the user tet mesh if any.
@@ -88,7 +88,7 @@ class TetNode(Ziva):
                 if permissive:
                     logger.info(
                         '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
-                        format(mesh))
+                        format(name))
             else:
                 self.name = mz.safe_rename(name, self.name)
 

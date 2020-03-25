@@ -1,14 +1,10 @@
-import logging
-import inspect
 import copy
+import logging
 
-from maya import OpenMaya as om
 from maya import cmds
-from maya import mel
-
-import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes.base import Base
-from zBuilder.nodes.base import serialize_object
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +30,6 @@ class DGNode(Base):
     EXTEND_ATTR_LIST = list()
     """ List of maya node attribute names to add
             to the auto generated attribute list to include."""
-
     def __init__(self, parent=None, builder=None):
         super(DGNode, self).__init__(parent=parent, builder=builder)
 
@@ -122,7 +117,7 @@ class DGNode(Base):
         """
         tmp = []
         for item in self._association:
-            tmp.append(item.split('|')[-1])
+            tmp.append(get_short_name(item))
         return tmp
 
     @association.setter
@@ -165,7 +160,7 @@ class DGNode(Base):
         name = self.long_name
 
         if not long_name:
-            name = name.split('|')[-1]
+            name = get_short_name(name)
 
         return name
 

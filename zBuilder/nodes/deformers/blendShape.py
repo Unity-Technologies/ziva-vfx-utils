@@ -1,8 +1,9 @@
 import logging
-from maya import cmds
-import zBuilder.zMaya as mz
 
+from maya import cmds
+from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes.deformer import Deformer
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class BlendShape(Deformer):
             cmds.select(self.target, r=True)
             cmds.select(self.association, add=True)
 
-            results = cmds.blendShape(name=self.name)
+            cmds.blendShape(name=self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
@@ -59,7 +60,7 @@ class BlendShape(Deformer):
 
     @property
     def target(self):
-        return self._target.split('|')[-1]
+        return get_short_name(self._target)
 
     @target.setter
     def target(self, target_mesh):

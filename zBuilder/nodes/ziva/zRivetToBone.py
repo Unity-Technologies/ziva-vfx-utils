@@ -1,8 +1,10 @@
-from zBuilder.nodes import Ziva
 import logging
-import zBuilder.zMaya as mz
+
 from maya import cmds
 from maya import mel
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.nodes import Ziva
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +14,6 @@ class RivetToBoneNode(Ziva):
     """
     type = 'zRivetToBone'
     """ The type of node. """
-
     def __init__(self, parent=None, builder=None):
         super(RivetToBoneNode, self).__init__(parent=parent, builder=builder)
         self.cv_indices = []
@@ -43,9 +44,8 @@ class RivetToBoneNode(Ziva):
         returns short name, self.long_name returns the stored long name.
         """
         if self._curve:
-            return self._curve.split('|')[-1]
-        else:
-            return None
+            return get_short_name(self._curve)
+        return None
 
     @curve.setter
     def curve(self, curve_name):

@@ -1,13 +1,12 @@
+import json
 import logging
-
-import zBuilder
-import zBuilder.IO as io
-import zBuilder.zMaya as mz
+import time
 
 from maya import cmds
-
-import time
-import json
+import zBuilder
+import zBuilder.IO as io
+from zBuilder.mayaUtils import get_short_name
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +34,6 @@ class Base(object):
             This will convert scene items to a string before serialization and resetup the pointer
             upon deserilization,  Note that this attributes values gets added to COMPARE_EXCLUDE for 
             excluding purposes, else there is a cycle."""
-
     def __init__(self, *args, **kwargs):
         self._name = None
         self._class = (self.__class__.__module__, self.__class__.__name__)
@@ -107,8 +105,7 @@ class Base(object):
         output = ""
         tab_level += 1
 
-        for i in range(tab_level):
-            output += "\t"
+        output += "\t" * tab_level
         output += "|-----" + self._name + "\n"
 
         print(self.children)
@@ -135,9 +132,8 @@ class Base(object):
         returns short name, self.long_name returns the stored long name.
         """
         if self._name:
-            return self._name.split('|')[-1]
-        else:
-            return None
+            return get_short_name(self._name)
+        return None
 
     @name.setter
     def name(self, name):

@@ -7,8 +7,8 @@ from maya import mel
 from zBuilder.IO import is_sequence
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
+from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
-
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
 ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
@@ -30,7 +30,7 @@ def copy_paste(*args, **kwargs):
 
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection(selection[0])
-    builder.string_replace(selection[0].split('|')[-1], selection[1].split('|')[-1])
+    builder.string_replace(get_short_name(selection[0]), get_short_name(selection[1]))
     builder.stats()
     builder.build(**kwargs)
 
@@ -350,8 +350,8 @@ def rig_paste():
     #     source selection 2 is pasted onto target selection 2; and so on.
     if not (target_selection == [] or ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE):
         for i in range(0, num_object_to_paste):
-            builder.string_replace(source_selection[i].split('|')[-1],
-                                   target_selection[i].split('|')[-1])
+            builder.string_replace(get_short_name(source_selection[i]),
+                                   get_short_name(target_selection[i]))
     builder.build()
 
 
@@ -395,7 +395,7 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # Note that the targetSolver may be the same as the sourceSolver, in which case the rig
     # on the 'warped_*' geometry is added into the sourceSolver.
     if target_solver == "":
-        target_solver = prefix + source_solver.split('|')[-1]  # default target solver
+        target_solver = prefix + get_short_name(source_solver)  # default target solver
 
     cmds.select(source_solver)
     builder = zva.Ziva()
@@ -404,7 +404,7 @@ def rig_transfer(source_solver, prefix, target_solver=""):
     # rename to prefix
     builder.string_replace('^', prefix)
     builder.string_replace(
-        '^' + prefix + source_solver.split('|')[-1],
+        '^' + prefix + get_short_name(source_solver),
         target_solver)  # rename the solver stored in the zBuilder to targetSolver
 
     builder.build()

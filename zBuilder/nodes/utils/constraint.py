@@ -1,5 +1,6 @@
-from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.nodes.dg_node import DGNode
 
 
 class Constraint(DGNode):
@@ -13,7 +14,6 @@ class Constraint(DGNode):
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
-
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
@@ -26,7 +26,6 @@ class Constraint(DGNode):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         name = self.get_scene_name()
         if not cmds.objExists(name):
@@ -51,12 +50,12 @@ class Constraint(DGNode):
 
     @property
     def targets(self):
-        short = [x.split('|')[-1] for x in self.association]
+        short = [get_short_name(x) for x in self.association]
         return short[:-1]
 
     @property
     def constrained(self):
-        short = [x.split('|')[-1] for x in self.association]
+        short = [get_short_name(x) for x in self.association]
         return short[-1]
 
     def populate(self, maya_node=None):
@@ -90,7 +89,7 @@ def get_targets(constraint_name):
     i = 0
     targets = list()
     while not cmds.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name,
-                                                                           i)) == None:
+                                                                             i)) == None:
         targets.extend(
             cmds.listConnections('{}.target[{}].targetParentMatrix'.format(constraint_name, i)))
         i += 1

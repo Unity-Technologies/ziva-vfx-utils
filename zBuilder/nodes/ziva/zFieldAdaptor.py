@@ -1,9 +1,9 @@
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+import logging
 
 from maya import cmds
-from maya import mel
-import logging
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.nodes import Ziva
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,6 @@ class FieldAdaptorNode(Ziva):
     """
     type = 'zFieldAdaptor'
     """ The type of node. """
-
     def __init__(self, parent=None, builder=None):
         super(FieldAdaptorNode, self).__init__(parent=parent, builder=builder)
         self.output_bodies = []
@@ -36,9 +35,8 @@ class FieldAdaptorNode(Ziva):
         returns short name, self.long_field_name returns the stored long name.
         """
         if self._input_field:
-            return self._input_field.split('|')[-1]
-        else:
-            return None
+            return get_short_name(self._input_field)
+        return None
 
     @input_field.setter
     def input_field(self, name):
@@ -69,8 +67,6 @@ class FieldAdaptorNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
-
         name = self.name
 
         if not cmds.objExists(name):

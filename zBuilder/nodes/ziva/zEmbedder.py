@@ -1,8 +1,10 @@
-from zBuilder.nodes import Ziva
+import logging
+
 from maya import cmds
 from maya import mel
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +14,6 @@ class EmbedderNode(Ziva):
     """
     type = 'zEmbedder'
     """ The type of node. """
-
     def __init__(self, parent=None, builder=None):
         super(EmbedderNode, self).__init__(parent=parent, builder=builder)
         self.__embedded_meshes = None
@@ -64,8 +65,8 @@ class EmbedderNode(Ziva):
             msh = []
             for name in self.__collision_meshes:
                 for item in self.__collision_meshes[name]:
-                    msh.append(item.split('|')[-1])
-                tmp[name.split('|')[-1]] = msh
+                    msh.append(get_short_name(item))
+                tmp[get_short_name(name)] = msh
             return tmp
 
     def get_embedded_meshes(self, long_name=False):
@@ -83,8 +84,8 @@ class EmbedderNode(Ziva):
             msh = []
             for name in self.__embedded_meshes:
                 for item in self.__embedded_meshes[name]:
-                    msh.append(item.split('|')[-1])
-                tmp[name.split('|')[-1]] = msh
+                    msh.append(get_short_name(item))
+                tmp[get_short_name(name)] = msh
             return tmp
 
     def build(self, *args, **kwargs):
@@ -114,11 +115,11 @@ class EmbedderNode(Ziva):
             for mesh in collision_meshes:
                 for item in collision_meshes[mesh]:
                     if not cmds.objExists(item):
-                        item = item.split('|')[-1]
+                        item = get_short_name(item)
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
                         if not cmds.objExists(mesh):
-                            mesh = mesh.split('|')[-1]
+                            mesh = get_short_name(mesh)
                         cmds.select(mesh, item, r=True)
                         mel.eval('ziva -tcm')
 
@@ -126,11 +127,11 @@ class EmbedderNode(Ziva):
             for mesh in embedded_meshes:
                 for item in embedded_meshes[mesh]:
                     if not cmds.objExists(item):
-                        item = item.split('|')[-1]
+                        item = get_short_name(item)
                     history = cmds.listHistory(item)
                     if not cmds.ls(history, type='zEmbedder'):
                         if not cmds.objExists(mesh):
-                            mesh = mesh.split('|')[-1]
+                            mesh = get_short_name(mesh)
                         cmds.select(mesh, item, r=True)
                         mel.eval('ziva -e')
 

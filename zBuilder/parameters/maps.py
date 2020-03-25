@@ -1,12 +1,12 @@
+import logging
+
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
-
-import zBuilder.zMaya as mz
+from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
+from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes.base import Base
-from utility.paintable_maps import split_map_name, get_paintable_map, set_paintable_map
-
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -91,10 +91,8 @@ class Map(Base):
         if self._mesh:
             if long_name:
                 return self._mesh
-            else:
-                return self._mesh.split('|')[-1]
-        else:
-            return None
+            return get_short_name(self._mesh)
+        return None
 
     def get_mesh_component(self):
         """ Gets the mesh data object.
