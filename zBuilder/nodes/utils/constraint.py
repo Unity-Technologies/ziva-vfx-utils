@@ -27,8 +27,7 @@ class Constraint(DGNode):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
-        name = self.get_scene_name()
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
 
             cmds.select(self.association)
             constraint = None
@@ -59,9 +58,8 @@ class Constraint(DGNode):
     def populate(self, maya_node=None):
         super(Constraint, self).populate(maya_node=maya_node)
 
-        name = self.get_scene_name()
-        targets = get_targets(name)
-        constrained = get_constrained(name)
+        targets = get_targets(self.name)
+        constrained = get_constrained(self.name)
 
         association = targets
         association.extend(constrained)

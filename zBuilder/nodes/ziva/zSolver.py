@@ -27,7 +27,7 @@ class SolverNode(Ziva):
         """
         attr_filter = kwargs.get('attr_filter', list())
 
-        solver_name = self.get_scene_name()
+        solver_name = self.name
 
         if not cmds.objExists(solver_name):
             results = mel.eval('ziva -s')

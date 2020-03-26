@@ -25,10 +25,9 @@ class RivetToBoneNode(Ziva):
             maya_node: Maya node to populate with.
         """
         super(RivetToBoneNode, self).populate(maya_node=maya_node)
-        scene_name = self.get_scene_name()
-        curve_shape = cmds.deformer(scene_name, q=True, g=True)[0]
+        curve_shape = cmds.deformer(self.name, q=True, g=True)[0]
         self.curve = cmds.listRelatives(curve_shape, p=True, f=True)[0]
-        self.cv_indices = cmds.getAttr(scene_name + '.cvIndices')
+        self.cv_indices = cmds.getAttr(self.name + '.cvIndices')
 
     @property
     def long_curve_name(self):

@@ -30,9 +30,7 @@ class TissueNode(Ziva):
         """
         super(TissueNode, self).populate(maya_node=maya_node)
 
-        scene_name = self.get_scene_name()
-        parent_name = get_tissue_parent(scene_name)
-
+        parent_name = get_tissue_parent(self.name)
         if parent_name:
             self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
 
@@ -161,7 +159,6 @@ def get_tissue_children(ztissue):
     Returns:
         (str) Children mesh of zTissue, or None if none found.
     """
-    tmp = []
 
     child_attr = '{}.oChildTissue'.format(ztissue)
     children = cmds.listConnections(child_attr)

@@ -1,9 +1,9 @@
 import logging
+
 from maya import cmds
 from maya import mel
-
-import zBuilder.zMaya as mz
 from zBuilder.nodes.deformer import Deformer
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,7 @@ class ZRelaxerNode(Deformer):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_scene_name()
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
             cmds.select(self.association, r=True)
             results = mel.eval('zRelaxer')
             mz.safe_rename(results[0], self.name)

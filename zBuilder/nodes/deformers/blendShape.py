@@ -36,9 +36,7 @@ class BlendShape(Deformer):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_scene_name()
-
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
             cmds.select(self.target, r=True)
             cmds.select(self.association, add=True)
 
@@ -51,11 +49,9 @@ class BlendShape(Deformer):
         super(BlendShape, self).populate(maya_node=maya_node)
         self.target = get_target(self.name)
 
-        name = self.get_scene_name()
-
-        num_weights = cmds.blendShape(name, q=True, wc=True)
+        num_weights = cmds.blendShape(self.name, q=True, wc=True)
         attr_list = ['weight[' + str(i) + ']' for i in range(0, num_weights)]
-        attrs = mz.build_attr_key_values(name, attr_list)
+        attrs = mz.build_attr_key_values(self.name, attr_list)
         self.attrs.update(attrs)
 
     @property

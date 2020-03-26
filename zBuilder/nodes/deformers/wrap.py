@@ -1,7 +1,7 @@
 import logging
+
 from maya import cmds
 from maya import mel
-
 from zBuilder.nodes.deformer import Deformer
 
 logger = logging.getLogger(__name__)
@@ -16,8 +16,7 @@ class Wrap(Deformer):
         # interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_scene_name()
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
             cmds.select(self.nice_association, r=True)
             version = 7
             operation = 1  # create
@@ -37,7 +36,6 @@ class Wrap(Deformer):
             cmds.rename(results[0], self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
-        # self.set_maya_weights(interp_maps=interp_maps)
 
     @staticmethod
     def get_meshes(node):
@@ -51,7 +49,6 @@ class Wrap(Deformer):
         """
         driver_points = cmds.listConnections('{}.driverPoints'.format(node))
         output_geometry = cmds.listConnections('{}.geomMatrix'.format(node))
-        #output_geometry = cmds.listConnections('{}.outputGeometry'.format(node))
 
         out = list()
         out.extend(output_geometry)

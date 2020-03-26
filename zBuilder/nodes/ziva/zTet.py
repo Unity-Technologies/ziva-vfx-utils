@@ -48,15 +48,14 @@ class TetNode(Ziva):
         """ Applies the user tet mesh if any.
         """
         if self.get_user_tet_mesh():
-            name = self.get_scene_name()
             try:
                 cmds.connectAttr(str(self.get_user_tet_mesh()) + '.worldMesh',
-                                 name + '.iTet',
+                                 self.name + '.iTet',
                                  f=True)
             except:
                 user_mesh = str(self.get_user_tet_mesh())
                 # TODO permissive check
-                print('could not connect {}.worldMesh to {}.iTet'.format(user_mesh, name))
+                print('could not connect {}.worldMesh to {}.iTet'.format(user_mesh, self.name))
 
     def build(self, *args, **kwargs):
         """ Builds the zTets in maya scene.

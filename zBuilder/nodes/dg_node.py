@@ -148,22 +148,6 @@ class DGNode(Base):
                         print('DIFF:', name + '.' + attr, '\tobject value:', obj_val,
                               '\tscene value:', scene_val)
 
-    def get_scene_name(self, long_name=False):
-        """This returns either long name or short name.
-
-        Args:
-            long_name (bool): Return the fullpath or not. Defaults to False.
-
-        Returns:
-            (str) Name of maya object.
-        """
-        name = self.long_name
-
-        if not long_name:
-            name = get_short_name(name)
-
-        return name
-
     def get_maya_attrs(self):
         """ Get attribute values from maya and update self.
         """
@@ -190,7 +174,7 @@ class DGNode(Base):
         Returns:
             nothing.
         """
-        scene_name = self.get_scene_name()
+        scene_name = self.name
 
         type_ = self.type
         node_attrs = self.attrs.keys()

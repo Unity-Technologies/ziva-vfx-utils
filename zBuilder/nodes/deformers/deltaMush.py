@@ -1,4 +1,5 @@
 import logging
+
 from maya import cmds
 from zBuilder.nodes.deformer import Deformer
 
@@ -13,10 +14,9 @@ class DeltaMush(Deformer):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.get_scene_name()
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
             cmds.select(self.nice_association, r=True)
-            delta_mush = cmds.deltaMush(name=name)
+            cmds.deltaMush(name=self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)

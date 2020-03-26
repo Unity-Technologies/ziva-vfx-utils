@@ -1,5 +1,6 @@
-from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
+from zBuilder.nodes.dg_node import DGNode
+import zBuilder.zMaya as mz
 
 
 class Field(DGNode):
@@ -11,7 +12,6 @@ class Field(DGNode):
         'uniformField', 'vortexField'
     ]
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
@@ -24,10 +24,8 @@ class Field(DGNode):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
 
-        name = self.get_scene_name()
-        if not cmds.objExists(name):
+        if not cmds.objExists(self.name):
             # clearing the selection before we create anything as the
             # selection is used to assign it to something.
             cmds.select(cl=True)
@@ -41,10 +39,10 @@ class Field(DGNode):
                 'uniformField': cmds.uniform,
                 'vortexField': cmds.vortex
             }
-            results = factory[self.type](n=name)
+            factory[self.type](n=self.name)
 
         else:
-            new_name = cmds.rename(name, self.name)
+            mz.safe_rename(self.name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
 

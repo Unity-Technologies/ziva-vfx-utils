@@ -24,9 +24,8 @@ class FieldAdaptorNode(Ziva):
             maya_node: Maya node to populate with.
         """
         super(FieldAdaptorNode, self).populate(maya_node=maya_node)
-        scene_name = self.get_scene_name()
-        self.input_field = get_field(scene_name)
-        self.output_bodies = get_bodies(scene_name)
+        self.input_field = get_field(self.name)
+        self.output_bodies = get_bodies(self.name)
 
     @property
     def input_field(self):
