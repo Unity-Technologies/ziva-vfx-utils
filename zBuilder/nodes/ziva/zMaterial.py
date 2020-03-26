@@ -1,9 +1,9 @@
+import logging
+
 from maya import cmds
 from maya import mel
-import zBuilder.zMaya as mz
-
 from zBuilder.nodes import Ziva
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,6 @@ class MaterialNode(Ziva):
 
     MAP_LIST = ['weightList[0].weights']
     """ List of maps to store. """
-
     def build(self, *args, **kwargs):
         """ Builds the zMaterial in maya scene.
 
@@ -47,8 +46,8 @@ class MaterialNode(Ziva):
             existing_materials = mel.eval('zQuery -t zMaterial {}'.format(mesh))
             if not existing_materials:
                 existing_materials = []
-            data_materials = self.builder.bundle.get_scene_items(type_filter='zMaterial',
-                                                                 association_filter=mesh)
+            data_materials = self.builder.get_scene_items(type_filter='zMaterial',
+                                                          association_filter=mesh)
 
             try:
                 d_index = data_materials.index(self)

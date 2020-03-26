@@ -27,7 +27,7 @@ class EmbedderNode(Ziva):
         """
         super(EmbedderNode, self).populate(maya_node=maya_node)
 
-        tissues = self.builder.bundle.get_scene_items(type_filter='zTissue')
+        tissues = self.builder.get_scene_items(type_filter='zTissue')
         tissue_meshes = [x.nice_association[0] for x in tissues]
         embedded_meshes = get_embedded_meshes(tissue_meshes)
 

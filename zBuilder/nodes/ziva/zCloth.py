@@ -1,9 +1,9 @@
+import logging
+
 from maya import cmds
 from maya import mel
-import zBuilder.zMaya as mz
-
 from zBuilder.nodes import Ziva
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,6 @@ class ClothNode(Ziva):
     """
     type = 'zCloth'
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
@@ -29,8 +28,7 @@ class ClothNode(Ziva):
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
 
-        scene_items = self.builder.bundle.get_scene_items(type_filter='zCloth',
-                                                          name_filter=name_filter)
+        scene_items = self.builder.get_scene_items(type_filter='zCloth', name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zCloth and build them together for speed reasons.

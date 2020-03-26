@@ -1,8 +1,9 @@
-from zBuilder.nodes import Ziva
+import logging
+
 from maya import cmds
 from maya import mel
+from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,6 @@ class FiberNode(Ziva):
     """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'endPoints']
     """ List of maps to store. """
-
     def spawn_parameters(self):
         """
 
@@ -69,8 +69,8 @@ class FiberNode(Ziva):
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
             existing_fibers = mel.eval('zQuery -t zFiber {}'.format(mesh))
-            data_fibers = self.builder.bundle.get_scene_items(type_filter='zFiber',
-                                                              association_filter=mesh)
+            data_fibers = self.builder.get_scene_items(type_filter='zFiber',
+                                                       association_filter=mesh)
 
             try:
                 d_index = data_fibers.index(self)

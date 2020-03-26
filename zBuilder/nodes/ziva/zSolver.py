@@ -35,7 +35,7 @@ class SolverNode(Ziva):
             # we need to rename the transform before the shape or maya may
             # rename shape after.
             solverTransform = cmds.ls(results, type='zSolverTransform')[0]
-            st = self.builder.bundle.get_scene_items(type_filter='zSolverTransform')[0]
+            st = self.builder.get_scene_items(type_filter='zSolverTransform')[0]
             new_name = mz.safe_rename(solverTransform, st.name)
             st.name = new_name
             solverTransform_child = cmds.listRelatives(st.name, c=True, fullPath=True)[0]

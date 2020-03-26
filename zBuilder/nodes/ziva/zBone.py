@@ -1,9 +1,9 @@
+import logging
+
 from maya import cmds
 from maya import mel
-import zBuilder.zMaya as mz
-
 from zBuilder.nodes import Ziva
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,6 @@ class BoneNode(Ziva):
     """
     type = 'zBone'
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 
@@ -30,8 +29,7 @@ class BoneNode(Ziva):
         name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
 
-        scene_items = self.builder.bundle.get_scene_items(type_filter='zBone',
-                                                          name_filter=name_filter)
+        scene_items = self.builder.get_scene_items(type_filter='zBone', name_filter=name_filter)
 
         # checking if the node is the first one in list.  If it is I get
         # all the zBones and build them together for speed reasons.

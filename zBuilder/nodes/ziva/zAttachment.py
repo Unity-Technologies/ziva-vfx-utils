@@ -1,9 +1,9 @@
+import logging
+
 from maya import cmds
 from maya import mel
-import zBuilder.zMaya as mz
-
 from zBuilder.nodes import Ziva
-import logging
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,6 @@ class AttachmentNode(Ziva):
     """ The type of node. """
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
     """ List of maps to store. """
-
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 
@@ -47,8 +46,8 @@ class AttachmentNode(Ziva):
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self.builder.bundle.get_scene_items(type_filter='zAttachment',
-                                                                   association_filter=source_mesh)
+            data_attachments = self.builder.get_scene_items(type_filter='zAttachment',
+                                                            association_filter=source_mesh)
             data = []
             for data_attachment in data_attachments:
                 data_s = data_attachment.nice_association[0]

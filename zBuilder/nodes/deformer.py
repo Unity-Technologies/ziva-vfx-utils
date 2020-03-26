@@ -1,8 +1,6 @@
 from collections import defaultdict
 
 from maya import cmds
-from maya import mel
-import zBuilder.zMaya as mz
 
 from zBuilder.nodes.dg_node import DGNode
 import logging
@@ -97,8 +95,7 @@ class Deformer(DGNode):
         """
         maps_ = list()
         for map_name in self.get_map_names():
-            maps_.extend(
-                self.builder.bundle.get_scene_items(type_filter='map', name_filter=map_name))
+            maps_.extend(self.builder.get_scene_items(type_filter='map', name_filter=map_name))
         return maps_
 
     def get_map_names(self):
