@@ -29,7 +29,5 @@ class SolverTransformNode(Ziva):
         if not cmds.objExists(self.name):
             if not permissive:
                 raise Exception('zSolverTransform not in scene.  please check.')
-        else:
-            mz.safe_rename(self.name, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)

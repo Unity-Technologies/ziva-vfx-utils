@@ -41,9 +41,6 @@ class Field(DGNode):
             }
             factory[self.type](n=self.name)
 
-        else:
-            mz.safe_rename(self.name, self.name)
-
         self.set_maya_attrs(attr_filter=attr_filter)
 
     def populate(self, maya_node=None):
