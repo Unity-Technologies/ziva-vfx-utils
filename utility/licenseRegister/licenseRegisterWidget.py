@@ -34,6 +34,11 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
     MSG_INVALID_SERVER_PORT = 'Invalid server port. Should be a number between 0 ~ 65535.'
     MSG_SUCCEED_REGISTER_NODE_LOCKED_LIC = 'Success: license file copied to {}.'
     MSG_SUCCEED_REGISTER_FLOATING_LIC = 'Success: license server info added to {}.'
+    MSG_RESTART_MAYA = '\n\nPlease restart Maya to make the license take effect.'
+    MSG_NEED_ADMIN_PRIVILEGE = '''\n\nNeed administrator privilege to access destination path.
+Try launching Maya as administrator, and retry.'''
+
+    ACCESS_DENY_KEYWORD = 'Permission denied'
 
     def __init__(self, *args, **kwargs):
         super(LicenseRegisterWidget, self).__init__(*args, **kwargs)
@@ -132,18 +137,21 @@ class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
                 else:
                     register_floating_license(self.modulePath, self.srvAddr, 'ANY', self.srvPort)
             except Exception as e:
-                self.lblStatus.setText(str(e))
+                errorMsg = str(e)
+                if self.ACCESS_DENY_KEYWORD in errorMsg:
+                    errorMsg += self.MSG_NEED_ADMIN_PRIVILEGE
+                self.lblStatus.setText(errorMsg)
                 return
 
             if isNodeLockedMode:
                 fileName = path.basename(self.licFilePath)
                 self.lblStatus.setText(
                     self.MSG_SUCCEED_REGISTER_NODE_LOCKED_LIC.format(
-                        path.join(self.modulePath, fileName)))
+                        path.join(self.modulePath, fileName)) + self.MSG_RESTART_MAYA)
             else:
                 self.lblStatus.setText(
                     self.MSG_SUCCEED_REGISTER_FLOATING_LIC.format(
-                        path.join(self.modulePath, LICENSE_FILE_NAME)))
+                        path.join(self.modulePath, LICENSE_FILE_NAME)) + self.MSG_RESTART_MAYA)
 
     def onLicenseTypeChange(self):
         isNodeLockedMode = self.rdoNodeLockedLic.isChecked()
