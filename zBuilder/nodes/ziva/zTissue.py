@@ -22,14 +22,11 @@ class TissueNode(Ziva):
         and the children_tissues are unused.  The reason for this is because at time of retrieval
         the children tissues are not processed so their are no children scene items to get.
         """
-    def populate(self, maya_node=None):
-        """ This populates the node given a selection.
 
-        Args:
-            maya_node: Maya node to populate with.
+    def make_node_connections(self):
+        """Adding connections for zTissue.  This is assiging any parent_tissues to this scene item.
+        parent_tissues are its parent sub-tissue.
         """
-        super(TissueNode, self).populate(maya_node=maya_node)
-
         parent_name = get_tissue_parent(self.name)
         if parent_name:
             self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
