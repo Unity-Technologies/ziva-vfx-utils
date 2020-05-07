@@ -64,7 +64,6 @@ class SolverDisabler:
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
-
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -332,6 +331,8 @@ class Ziva(Builder):
 
         cmds.select(scene_selection)
         self.stats()
+
+        self.make_node_connections()
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):

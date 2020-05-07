@@ -19,7 +19,6 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
-
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -158,7 +157,6 @@ class Builder(object):
         """
         A decorator to time functions.
         """
-
         @wraps(original_function)
         def new_function(*args, **kwargs):
             before = datetime.datetime.now()
@@ -168,6 +166,13 @@ class Builder(object):
             return x
 
         return new_function
+
+    def make_node_connections(self):
+        """This makes connections between this node and any other node in scene_items.  The expectations
+        is that this gets run after anytime the scene items get populated.
+        """
+        for item in self.get_scene_items():
+            item.make_node_connections()
 
     def build(self, *args, **kwargs):
         logger.info('Building....')
