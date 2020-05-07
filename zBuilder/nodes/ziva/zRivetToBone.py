@@ -28,6 +28,7 @@ class RivetToBoneNode(Ziva):
         curve_shape = cmds.deformer(self.name, q=True, g=True)[0]
         self.curve = cmds.listRelatives(curve_shape, p=True, f=True)[0]
         self.cv_indices = cmds.getAttr(self.name + '.cvIndices')
+        self.rivet_to_bone_locator = get_rivet_to_bone_locator(self.name)
 
     @property
     def long_curve_name(self):
@@ -82,6 +83,7 @@ class RivetToBoneNode(Ziva):
                 cmds.select(bone, add=True)
                 results = mel.eval('zRivetToBone')
                 self.name = mz.safe_rename(results[0], self.name)
+                self.rivet_to_bone_locator = mz.safe_rename(results[1], self.rivet_to_bone_locator)
 
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
@@ -91,6 +93,19 @@ class RivetToBoneNode(Ziva):
                 raise Exception(message)
 
         self.set_maya_attrs(attr_filter=attr_filter)
+
+
+def get_rivet_to_bone_locator(rivet_to_bone):
+    """queries a rivet to bone and returns the locators transform
+
+    Args:
+        rivet_to_bone (string): the rivet to bone node to query
+
+    Returns:
+        string: transform of the rivet to bone locator
+    """
+    locator_shape = cmds.listConnections('{}.segments'.format(rivet_to_bone))
+    return locator_shape[0]
 
 
 def is_cv_connected_to_rivet(crv, cv):
