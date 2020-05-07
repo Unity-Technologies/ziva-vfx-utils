@@ -409,6 +409,7 @@ class Ziva(Builder):
             self.setup_tree_hierarchy()
 
         self.stats()
+        self.make_node_connections()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -524,6 +525,7 @@ class Ziva(Builder):
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
         self.stats()
+        self.make_node_connections()
 
     def _populate_nodes(self, nodes, get_parameters=True):
         """
