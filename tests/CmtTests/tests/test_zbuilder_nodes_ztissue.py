@@ -48,9 +48,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
             # check node name in zBuilder and in scene check if it has a parent sub-tissue
             if cmds.objExists(item.name):
                 parent_attr = '{}.iParentTissue'.format(item.name)
-                parent_tissue = cmds.listConnections(parent_attr)[0]
+                parent_tissue = cmds.listConnections(parent_attr)
                 if parent_tissue:
-                    self.assertEqual(parent_tissue, item.parent_tissue.name)
+                    self.assertEqual(parent_tissue[0], item.parent_tissue.name)
 
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
