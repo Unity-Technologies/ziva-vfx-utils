@@ -40,6 +40,11 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         self.check_retrieve_looks_good(builder, expected_plugs, self.rivet_to_bone_names,
                                        "zRivetToBone")
 
+        # adding rivet name and rivet transform parent
+        for item in builder.get_scene_items(type_filter='zRivetToBone'):
+            self.assertEqual([item.name], cmds.ls(item.name))
+            self.assertEqual(item.rivet_locator_parent, cmds.listRelatives(item.name, p=True))
+
     def test_retrieve(self):
         self.check_retrieve_rivet_to_bone_looks_good(self.builder, {})
 
@@ -137,6 +142,27 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         self.assertEqual(len(cmds.ls("r_loa_curve_zRivetToBone1")), 1)
 
 
+class ZivaRivetToBoneRenameGroupTestCase(VfxTestCase):
+    def setUp(self):
+        super(ZivaRivetToBoneGenericTestCase, self).setUp()
+        test_utils.load_scene(scene_name="generic_tissue.ma")
+
+        # rename rivets to test
+        cmds.rename('zRivet1', 'zRivet1-NEW')
+        cmds.rename('zRivet2', 'zRivet2-NEW')
+        # add to a group
+        grp = cmds.group(em=True, n='loc_gr')
+        cmds.parent('zRivet1-NEW', 'zRivet2-NEW', grp)
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+    def test_name_group(self):
+        # adding rivet name and rivet transform parent
+        for item in self.builder.get_scene_items(type_filter='zRivetToBone'):
+            self.assertEqual([item.name], cmds.ls(item.name))
+            self.assertEqual(item.rivet_locator_parent, cmds.listRelatives(item.name, p=True))
+
+
 class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
@@ -146,7 +172,6 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zRivetToBone1, zRivetToBone2, zRivetToBone3
 
     """
-
     def setUp(self):
         super(ZivaRivetToBoneMirrorTestCase, self).setUp()
 
@@ -175,7 +200,6 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
@@ -214,7 +238,6 @@ class ZivaRivetToBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaRivetToBoneMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -248,7 +271,6 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaRivetToBoneUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
