@@ -29,7 +29,9 @@ class TissueNode(Ziva):
         """
         parent_name = get_tissue_parent(self.name)
         if parent_name:
-            self.parent_tissue = self.builder.get_scene_items(name_filter=parent_name)[0]
+            temp = self.builder.get_scene_items(name_filter=parent_name)
+            if temp:
+                self.parent_tissue = temp[0]
 
     def build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
