@@ -30,19 +30,7 @@ class Ziva(Deformer):
         Args:
             maya_node: Maya node to populate with.
         """
-
-        maya_node = mz.check_maya_node(maya_node)
-
-        self.name = maya_node
-        self.type = cmds.objectType(maya_node)
-        attr_list = mz.build_attr_list(maya_node)
-        if self.EXTEND_ATTR_LIST:
-            attr_list.extend(self.EXTEND_ATTR_LIST)
-        attrs = mz.build_attr_key_values(maya_node, attr_list)
-        self.attrs = attrs
-
-        mesh = mz.get_association(maya_node)
-        self.association = mesh
+        super(Ziva, self).populate(maya_node=maya_node)
 
         if self.type == 'zSolver':
             self.solver = self
