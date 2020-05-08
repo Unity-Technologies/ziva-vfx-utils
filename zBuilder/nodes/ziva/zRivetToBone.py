@@ -86,9 +86,11 @@ class RivetToBoneNode(Ziva):
                 self.name = mz.safe_rename(results[0], self.name)
                 # restore name of rivet locator
                 self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
+
                 # parent locator to group if group node already exists
-                if cmds.objExists(self.rivet_locator_parent):
-                    cmds.parent(self.rivet_locator, self.rivet_locator_parent)
+                if self.rivet_locator_parent:
+                    if cmds.objExists(self.rivet_locator_parent):
+                        cmds.parent(self.rivet_locator, self.rivet_locator_parent)
 
         else:
             message = 'Missing items from scene: check for existance of {} and {}'.format(crv, bone)
