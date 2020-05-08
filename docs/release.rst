@@ -10,6 +10,14 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
+1.0.12
+------
+
+Bug Fixes
+---------
+- **zBuilder:** zRivet locator names now stored and re-applied
+- **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
+
 1.0.11
 ------
 
