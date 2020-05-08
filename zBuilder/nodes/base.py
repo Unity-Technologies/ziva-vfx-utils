@@ -164,6 +164,9 @@ class Base(object):
         """
         self.__dict__ = dictionary
 
+    def make_node_connections(self):
+        pass
+
     def string_replace(self, search, replace):
         """ Search and replaces items in the node.  Uses regular expressions.
         Uses SEARCH_EXCLUDE to define attributes to exclude from this process.

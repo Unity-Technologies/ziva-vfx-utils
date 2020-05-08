@@ -42,10 +42,27 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         """
         self.check_retrieve_looks_good(builder, expected_plugs, self.tissue_names, "zTissue")
 
+        # check sub-tissues got stored properly in scene item
+        for item in builder.get_scene_items(type_filter='zTissue'):
+
+            # check node name in zBuilder and in scene check if it has a parent sub-tissue
+            if cmds.objExists(item.name):
+                parent_attr = '{}.iParentTissue'.format(item.name)
+                parent_tissue = cmds.listConnections(parent_attr)
+                if parent_tissue:
+                    self.assertEqual(parent_tissue[0], item.parent_tissue.name)
+
     def test_retrieve(self):
         self.check_retrieve_ztissue_looks_good(self.builder, {})
 
     def test_retrieve_connections(self):
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        self.check_retrieve_ztissue_looks_good(builder, {})
+
+    def test_retrieve_connections(self):
+        # this was failing, fix for this in VFXACT-645
+        cmds.select('r_subtissue_1')
         builder = zva.Ziva()
         builder.retrieve_connections()
         self.check_retrieve_ztissue_looks_good(builder, {})
@@ -113,7 +130,6 @@ class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
 
     """
-
     def setUp(self):
         super(ZivaTissueMirrorTestCase, self).setUp()
 
@@ -142,7 +158,6 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -181,7 +196,6 @@ class ZivaTissueMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaTissueMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -215,7 +229,6 @@ class ZivaTissueUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaTissueUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')

@@ -64,7 +64,6 @@ class SolverDisabler:
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
-
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -333,6 +332,8 @@ class Ziva(Builder):
         cmds.select(scene_selection)
         self.stats()
 
+        self.make_node_connections()
+
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
@@ -408,6 +409,7 @@ class Ziva(Builder):
             self.setup_tree_hierarchy()
 
         self.stats()
+        self.make_node_connections()
 
     @Builder.time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -523,6 +525,7 @@ class Ziva(Builder):
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
         self.stats()
+        self.make_node_connections()
 
     def _populate_nodes(self, nodes, get_parameters=True):
         """
