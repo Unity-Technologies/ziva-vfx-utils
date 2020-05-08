@@ -65,7 +65,9 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         cmds.select('r_subtissue_1')
         builder = zva.Ziva()
         builder.retrieve_connections()
-        self.check_retrieve_ztissue_looks_good(builder, {})
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(builder)
+        self.compare_builder_attrs_with_scene_attrs(builder)
 
     def test_build_restores_attr_values(self):
         self.check_build_restores_attr_values(self.builder, self.tissue_names, self.tissue_attrs)
