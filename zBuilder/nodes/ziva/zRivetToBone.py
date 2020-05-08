@@ -104,15 +104,15 @@ def get_rivet_locator_parent(rivet_to_bone_locator):
     """queries a rivet to bone and returns the locators transform
 
     Args:
-        rivet_to_bone (string): the rivet to bone node to query
+        rivet_to_bone_locator (string): the rivet to bone node to query
 
     Returns:
-        string: transform of the rivet to bone locator
+        string: Parent node of rivet locator or empty list if None
     """
     parent = cmds.listRelatives(rivet_to_bone_locator, p=True)
     if parent:
         return parent[0]
-    return None
+    return []
 
 
 def get_rivet_locator(rivet_to_bone):
