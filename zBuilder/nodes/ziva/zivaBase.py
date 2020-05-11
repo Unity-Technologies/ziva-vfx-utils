@@ -30,7 +30,25 @@ class Ziva(Deformer):
         Args:
             maya_node: Maya node to populate with.
         """
-        super(Ziva, self).populate(maya_node=maya_node)
+        # TODO:
+        # this populate is actually duplicating functionality from it's superclass Deformer.populate()
+        # It is currently in here because removing it and calling super populate()
+        # was causing errors that made no sense.
+        # The plan is to revert this like so and re-visit it with this ticket:
+        # https://zivadynamics.atlassian.net/browse/VFXACT-689
+
+        maya_node = mz.check_maya_node(maya_node)
+
+        self.name = maya_node
+        self.type = cmds.objectType(maya_node)
+        attr_list = mz.build_attr_list(maya_node)
+        if self.EXTEND_ATTR_LIST:
+            attr_list.extend(self.EXTEND_ATTR_LIST)
+        attrs = mz.build_attr_key_values(maya_node, attr_list)
+        self.attrs = attrs
+
+        mesh = mz.get_association(maya_node)
+        self.association = mesh
 
         if self.type == 'zSolver':
             self.solver = self
