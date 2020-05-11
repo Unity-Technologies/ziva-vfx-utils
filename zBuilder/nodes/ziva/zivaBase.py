@@ -30,6 +30,12 @@ class Ziva(Deformer):
         Args:
             maya_node: Maya node to populate with.
         """
+        # TODO:
+        # this populate is actually duplicating functionality from it's superclass Deformer.populate()
+        # It is currently in here because removing it and calling super populate()
+        # was causing errors that made no sense.
+        # The plan is to revert this like so and re-visit it with this ticket:
+        # https://zivadynamics.atlassian.net/browse/VFXACT-689
 
         maya_node = mz.check_maya_node(maya_node)
 

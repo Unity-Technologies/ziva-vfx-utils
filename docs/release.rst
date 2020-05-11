@@ -17,6 +17,7 @@ Bug Fixes
 ---------
 - **zBuilder:** zRivet locator names now stored and re-applied
 - **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
+- **zBuilder:** Scene Panel and Copy Paste did not work in some cases with sub-tissues.
 
 1.0.11
 ------
