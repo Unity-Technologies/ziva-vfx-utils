@@ -3,10 +3,6 @@ from functools import partial
 
 from maya import cmds
 from maya import mel
-try:
-    from shiboken2 import wrapInstance
-except ImportError:
-    raise Exception("Ziva Scene Panel supported on Maya 2017+")
 
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window

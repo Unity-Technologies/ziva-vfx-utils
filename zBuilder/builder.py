@@ -4,7 +4,6 @@ import zBuilder.nodes
 import zBuilder.parameters
 import zBuilder.IO as io
 
-import copy
 from functools import wraps
 import datetime
 import sys
@@ -48,11 +47,7 @@ class Builder(object):
         self.root_node.log()
 
     def view(self):
-        try:
-            import zBuilder.ui.reader as reader
-        except ImportError:
-            raise Exception("Ziva Scene Panel supported on Maya 2017+")
-
+        import zBuilder.ui.reader as reader
         reader.view(root_node=self.root_node)
 
     def node_factory(self, node, parent=None, get_parameters=True):
