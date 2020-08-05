@@ -35,9 +35,9 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
 
         # Change an attribute in builder and check that came through
-        for item in builder.get_scene_items(type_filter='zTet'):
-            item.attrs['tetSize']['value'] = 52.5
-            self.assertEquals(52.5, item.attrs['tetSize']['value'])
+        for item in builder.get_scene_items(type_filter='zTissue'):
+            item.attrs['surfaceTensionEnvelope']['value'] = 0.52
+            self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference full ziva setup
         test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
@@ -52,9 +52,9 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
 
         # Change an attribute in builder and check that came through
-        for item in builder.get_scene_items(type_filter='zTet'):
-            item.attrs['tetSize']['value'] = 52.5
-            self.assertEquals(52.5, item.attrs['tetSize']['value'])
+        for item in builder.get_scene_items(type_filter='zTissue'):
+            item.attrs['surfaceTensionEnvelope']['value'] = 0.52
+            self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference geo only
         test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
@@ -71,9 +71,9 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         builder = self.get_builder_after_writing_and_reading_from_disk(self.builder)
 
         # Change an attribute in builder and check that came through
-        for item in builder.get_scene_items(type_filter='zTet'):
-            item.attrs['tetSize']['value'] = 52.5
-            self.assertEquals(52.5, item.attrs['tetSize']['value'])
+        for item in builder.get_scene_items(type_filter='zTissue'):
+            item.attrs['surfaceTensionEnvelope']['value'] = 0.52
+            self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference geo only
         test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
@@ -102,7 +102,6 @@ class ZivaReferenceMirrorTestCase(VfxTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaReferenceMirrorTestCase, self).setUp()
         test_utils.reference_scene(scene_name='mirror_example.ma')
