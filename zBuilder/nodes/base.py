@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
     TYPES = []
     type = None
     """ type of scene item """
