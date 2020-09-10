@@ -91,6 +91,8 @@ class FiberNode(Ziva):
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')
 
+        self.check_parameter_name()
+
         # set the attributes
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)

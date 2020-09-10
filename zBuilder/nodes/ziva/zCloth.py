@@ -30,6 +30,8 @@ class ClothNode(Ziva):
 
         scene_items = self.builder.get_scene_items(type_filter='zCloth', name_filter=name_filter)
 
+        self.check_parameter_name()
+
         # checking if the node is the first one in list.  If it is I get
         # all the zCloth and build them together for speed reasons.
         # This feels kinda sloppy to me.
