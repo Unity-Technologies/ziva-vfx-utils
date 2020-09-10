@@ -92,3 +92,17 @@ class Ziva(Deformer):
                 raise Exception(error_message)
         else:
             return None
+
+    def check_parameter_name(self):
+        # This is to prevent a specific case that causes string_replace
+        # to not function.  When you use string_replace to mirror and the ziva 
+        # elements in the scene do not have a side deliminator.  
+
+        # This checks name of node (self.name) against the name of the node 
+        # stored in the .parameters map .name.  If they are not the same it
+        # updates the map name with correct name.
+        
+        for item in self.parameters['map']:
+            parameter_name = item.name.split('.')[0]
+            if parameter_name != self.name:
+                item.string_replace(parameter_name, self.name)
