@@ -30,7 +30,7 @@ class BlendShape(Deformer):
         Returns:
             list(): of long mesh names.
         """
-        return [self.association[0] for i in range(len(self.get_map_names()))]
+        return [self.association[0] for i in range(len(self.construct_map_names()))]
 
     def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')

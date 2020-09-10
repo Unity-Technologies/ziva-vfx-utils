@@ -26,7 +26,7 @@ class FiberNode(Ziva):
             objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
-        map_names = self.get_map_names()
+        map_names = self.construct_map_names()
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):

@@ -34,7 +34,7 @@ class Deformer(DGNode):
             objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
-        map_names = self.get_map_names()
+        map_names = self.construct_map_names()
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
@@ -94,11 +94,11 @@ class Deformer(DGNode):
 
         """
         maps_ = list()
-        for map_name in self.get_map_names():
+        for map_name in self.construct_map_names():
             maps_.extend(self.builder.get_scene_items(type_filter='map', name_filter=map_name))
         return maps_
 
-    def get_map_names(self):
+    def construct_map_names(self):
         """ This builds the map names.  maps from MAP_LIST with the object name
         in front
 
