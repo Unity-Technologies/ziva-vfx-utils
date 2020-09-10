@@ -125,8 +125,8 @@ class Deformer(DGNode):
         return parent
 
     def set_maya_weights(self, interp_maps=False):
-        """ Given a Builder node this set the map values of the object in the maya
-        scene.
+        """ This loops through and internal map on a node stored in 
+        self.parameters['map'] then applies weight.
 
         Args:
             interp_maps (str): Do you want maps interpolated?
@@ -134,13 +134,10 @@ class Deformer(DGNode):
                 False cancels it.
                 auto checks if it needs to.  Default = "auto"
 
-        Returns:
-            nothing.
         """
         self.check_map_interpolation(interp_maps)
         for map_ in self.parameters['map']:
             map_.apply_weights()
-
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
@@ -151,9 +148,6 @@ class Deformer(DGNode):
         Args:
             interp_maps (bool): Do you want to do it?
 
-        Return:
-            list(zBuilder.parameters.maps.Map): Return the new intepolated map nodes
-            to replace the ones stored in self.parameters dict.
         """
 
         map_objects = self.get_map_objects()
