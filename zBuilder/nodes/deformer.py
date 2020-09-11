@@ -41,9 +41,6 @@ class Deformer(DGNode):
                 objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
 
-    def get_parameters(self, types=[]):
-        return self.builder.get_parameters_from_node(self, types)
-
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
         """
@@ -75,28 +72,6 @@ class Deformer(DGNode):
             list: List of long mesh names.
         """
         return self.nice_association
-
-    def get_mesh_objects(self):
-        """
-
-        Returns:
-
-        """
-        meshes = list()
-        for mesh_name in self.get_map_meshes():
-            meshes.extend(self.builder.get_scene_items(type_filter='mesh', name_filter=mesh_name))
-        return meshes
-
-    def get_map_objects(self):
-        """
-
-        Returns:
-
-        """
-        maps_ = list()
-        for map_name in self.construct_map_names():
-            maps_.extend(self.builder.get_scene_items(type_filter='map', name_filter=map_name))
-        return maps_
 
     def construct_map_names(self):
         """ This builds the map names.  maps from MAP_LIST with the object name
@@ -150,7 +125,7 @@ class Deformer(DGNode):
 
         """
 
-        map_objects = self.get_map_objects()
+        map_objects = self.parameters['map']
         if interp_maps == 'auto':
             for map_object in map_objects:
                 if not map_object.is_topologically_corresponding():
