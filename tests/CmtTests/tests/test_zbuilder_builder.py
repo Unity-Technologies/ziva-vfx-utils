@@ -52,7 +52,6 @@ class ZivaBuilderTestCase(VfxTestCase):
         # Verify
         self.assertEqual(builder_orig, builder_from_deepcopy)
 
-    @unittest.expectedFailure
     def test_deepcopy_of_builder_break_sceneitem_connection(self):
         # TODO: deepcopy breaks connection.
         # Search "deepcopy breaks connection" and fix all of them.
