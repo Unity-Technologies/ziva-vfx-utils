@@ -53,9 +53,6 @@ class ZivaBuilderTestCase(VfxTestCase):
         self.assertEqual(builder_orig, builder_from_deepcopy)
 
     def test_deepcopy_of_builder_break_sceneitem_connection(self):
-        # TODO: deepcopy breaks connection.
-        # Search "deepcopy breaks connection" and fix all of them.
-
         # Helper function to check that ziva node contains same map node that
         # stored in builder.bundle.scene_items
         def check_ziva_node_has_same_map_node_as_sceneitems(test_case, builder, node_name,
