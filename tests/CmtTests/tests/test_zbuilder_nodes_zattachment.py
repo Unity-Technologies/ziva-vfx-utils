@@ -4,6 +4,7 @@ import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
 from maya import cmds
+from maya import mel
 
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
 
@@ -349,3 +350,120 @@ class ZivaAttachmentMirrorTestCaseB(ZivaUpdateTestCase):
     def test_check_attachment_map(self):
         self.assertEqual(cmds.getAttr('zAttachment1.weightList[0].weights'),
                          cmds.getAttr('zAttachment2.weightList[0].weights'))
+
+
+class ZivaAttachmentMirrorMenuCase(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+    def setUp(self):
+        super(ZivaAttachmentMirrorMenuCase, self).setUp()
+        test_utils.load_scene(scene_name='copy_paste_bug2.ma')
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        cmds.select('pSphere2')
+        utils.rig_cut()
+
+        self.stored_buffer = utils.return_copy_buffer()
+
+        cmds.select('pSphere1')
+        utils.rig_paste()
+
+    def test_menu_paste(self):
+
+        att_map = self.builder.get_scene_items(type_filter='map',
+                                               name_filter='zAttachment1.weightList[0].weights')[0]
+
+        self.builder_new = zva.Ziva()
+        self.builder_new.retrieve_from_scene()
+
+        new_att_map = self.builder_new.get_scene_items(
+            type_filter='map', name_filter='zAttachment1.weightList[0].weights')[0]
+
+        # the New map has been interpolated on a larger mesh so size of map should
+        # be different
+        self.assertNotEqual(len(att_map.values), len(new_att_map.values))
+
+        # it has been interpolated and source map just has 1's and 0's.  Being
+        # interpolated lets check for values that are not 1 or 0
+        non_binary_values = [x for x in new_att_map.values if x != 0.0 and x != 1.0]
+        self.assertTrue(non_binary_values)
+
+        # test post paste
+        # stiffness on attachment should equal 20
+        self.assertEquals(cmds.getAttr("zAttachment1.stiffness"), 20)
+
+        # the map is on a new node now lets check what happens when we change a value
+        # on pasted item the paste again.
+        mel.eval('setAttr "zAttachment1.stiffness" 10;')
+
+        cmds.select('pSphere3')
+
+        utils.rig_paste()
+        # New attachment gets named zAttachment2, this stiffness should equal 20
+        self.assertEquals(cmds.getAttr("zAttachment2.stiffness"), 20)
+        # make sure att1 is still 20 as well.
+        self.assertEquals(cmds.getAttr("zAttachment1.stiffness"), 10)
+
+    def test_copy_buffer(self):
+        # it has been pasted in setup.  Now the buffer should remain unchanged
+        # get buffer again and compare
+
+        build = zva.Ziva()
+        build.retrieve_from_scene()
+
+        # this gets interpolate so scene builder should be different then buffer
+        self.assertNotEquals(self.stored_buffer, build)
+
+        current_buffer = utils.return_copy_buffer()
+
+        # these should be same
+        self.assertEquals(self.stored_buffer, current_buffer)
+
+
+class ZivaAttachmentCopyBuffer(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+
+    """
+    def setUp(self):
+        super(ZivaAttachmentCopyBuffer, self).setUp()
+        test_utils.load_scene(scene_name='copy_paste_bug2.ma')
+
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+        cmds.select('pSphere2')
+        utils.rig_cut()
+
+        self.stored_buffer = utils.return_copy_buffer()
+
+        cmds.select('pSphere3')
+        utils.rig_paste()
+
+    def test_copy_buffer(self):
+        # it has been pasted in setup.  Now the buffer should remain unchanged
+        # get buffer again and compare
+
+        current_buffer = utils.return_copy_buffer()
+
+        # these should be same
+        self.assertEquals(self.stored_buffer, current_buffer)
+
+        # lets make some changes to scene to make sure it is a deep copy(buffer should not change)
+        cmds.setAttr('zAttachment1.weightList[0].weights[0]', 22)
+        cmds.setAttr('zAttachment1.stiffness', 10)
+
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # not equal to scene
+        self.assertNotEquals(self.stored_buffer, builder)
+        # equal to existing buffer
+        self.assertEquals(self.stored_buffer, utils.return_copy_buffer())
