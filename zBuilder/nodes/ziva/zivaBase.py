@@ -102,6 +102,9 @@ class Ziva(Deformer):
         # stored in the .parameters map .name.  If they are not the same it
         # updates the map name with correct name.
 
+        # It also fixes the linkage between newly created scene items after
+        # deepcopy builder operation.
+
         for item in self.parameters['map']:
             parameter_name = item.name.split('.')[0]
             if parameter_name != self.name:
