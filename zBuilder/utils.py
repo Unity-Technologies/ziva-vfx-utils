@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 def return_copy_buffer():
-    """This returns the copy buffer contents simply for inspection for testing.
+    """This returns a deep copy of the buffer contents simply for comparisons.
     """
-    return ZIVA_CLIPBOARD_ZBUILDER
+    deep = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
+    return deep
 
 
 def copy_paste(*args, **kwargs):
