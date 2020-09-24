@@ -183,7 +183,6 @@ class ZivaAttachmentMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zAttachment1, zAttachment2, zAttachment3
 
     """
-
     def setUp(self):
         super(ZivaAttachmentMirrorTestCase, self).setUp()
 
@@ -211,7 +210,6 @@ class ZivaAttachmentMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaAttachmentMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -246,7 +244,6 @@ class ZivaAttachmentUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaAttachmentUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -285,7 +282,6 @@ class ZivaAttachmentUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaAttachmentUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -313,3 +309,44 @@ class ZivaAttachmentUpdateTestCase(ZivaUpdateTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaAttachmentUpdateTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaAttachmentMirrorTestCaseB(ZivaUpdateTestCase):
+    """This Class tests a specific type of "mirroring" so there are some assumptions made
+
+    - geometry has an identifiable qualifier, in this case it is l_ and r_
+    - Both sides geometry are in the scene
+    - Both sides have Ziva nodes
+
+    """
+    def setUp(self):
+        super(ZivaAttachmentMirrorTestCaseB, self).setUp()
+        test_utils.load_scene(scene_name='mirror_example-B.ma')
+        self.builder = zva.Ziva()
+        cmds.select('l_Mus', 'l_bone')
+
+        self.builder.retrieve_from_scene_selection()
+
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+        # gather info
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.l_item_geo = [
+            x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
+        ]
+        cmds.select(self.l_item_geo)
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_scene()
+        new_builder.string_replace("^l_", "r_")
+        new_builder.build()
+
+    def test_check_bone(self):
+        self.assertEqual(cmds.getAttr('zBone2.collisions'), cmds.getAttr('zBone3.collisions'))
+
+    def test_check_attachment_map(self):
+        self.assertEqual(cmds.getAttr('zAttachment1.weightList[0].weights'),
+                         cmds.getAttr('zAttachment2.weightList[0].weights'))
+

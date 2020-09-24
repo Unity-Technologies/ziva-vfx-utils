@@ -79,14 +79,14 @@ class Builder(object):
         if get_parameters:
             for node in scene_items:
                 if hasattr(node, 'spawn_parameters'):
-                    parameters = self.get_parameters_from_node(node)
+                    parameters = self.get_node_parameters(node)
                     for parameter in parameters:
                         node.add_parameter(parameter)
                         scene_items.append(parameter)
 
         return scene_items
 
-    def get_parameters_from_node(self, node, types=[]):
+    def get_node_parameters(self, node, types=[]):
         """
         Get parameters (e.g. maps and meshes) for the specified node.
         Args:

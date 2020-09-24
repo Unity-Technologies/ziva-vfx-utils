@@ -34,15 +34,12 @@ class Deformer(DGNode):
             objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
-        map_names = self.get_map_names()
+        map_names = self.construct_map_names()
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
                 objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
-
-    def get_parameters(self, types=[]):
-        return self.builder.get_parameters_from_node(self, types)
 
     def build(self, *args, **kwargs):
         """ Builds the node in maya.  mean to be overwritten.
@@ -76,29 +73,7 @@ class Deformer(DGNode):
         """
         return self.nice_association
 
-    def get_mesh_objects(self):
-        """
-
-        Returns:
-
-        """
-        meshes = list()
-        for mesh_name in self.get_map_meshes():
-            meshes.extend(self.builder.get_scene_items(type_filter='mesh', name_filter=mesh_name))
-        return meshes
-
-    def get_map_objects(self):
-        """
-
-        Returns:
-
-        """
-        maps_ = list()
-        for map_name in self.get_map_names():
-            maps_.extend(self.builder.get_scene_items(type_filter='map', name_filter=map_name))
-        return maps_
-
-    def get_map_names(self):
+    def construct_map_names(self):
         """ This builds the map names.  maps from MAP_LIST with the object name
         in front
 
@@ -125,8 +100,8 @@ class Deformer(DGNode):
         return parent
 
     def set_maya_weights(self, interp_maps=False):
-        """ Given a Builder node this set the map values of the object in the maya
-        scene.
+        """ This loops through and internal map on a node stored in 
+        self.parameters['map'] then applies weight.
 
         Args:
             interp_maps (str): Do you want maps interpolated?
@@ -134,23 +109,10 @@ class Deformer(DGNode):
                 False cancels it.
                 auto checks if it needs to.  Default = "auto"
 
-        Returns:
-            nothing.
         """
-        # TODO: deepcopy breaks connection.
-        # Search "deepcopy breaks connection" and fix all of them.
-        # Update self.parameters dict is not necessary if it refers to
-        # the same map node as the ones in bundle.scene_items.
-        # We do it here because zBuilder deepcopy operation breaks this connection.
-        self.parameters['map'] = self.check_map_interpolation(interp_maps)
-
-        # Cycle through the maps stored in the node.
-        for item in self.parameters['map']:
-            # We are replacing the name in the map node (first part) with the name of
-            # the node it is coming from.
-            item.string_replace(item.name.split('.')[0], self.name)
-            # apply the weights
-            item.apply_weights()
+        self.check_map_interpolation(interp_maps)
+        for map_ in self.parameters['map']:
+            map_.apply_weights()
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
@@ -161,12 +123,9 @@ class Deformer(DGNode):
         Args:
             interp_maps (bool): Do you want to do it?
 
-        Return:
-            list(zBuilder.parameters.maps.Map): Return the new intepolated map nodes
-            to replace the ones stored in self.parameters dict.
         """
 
-        map_objects = self.get_map_objects()
+        map_objects = self.parameters['map']
         if interp_maps == 'auto':
             for map_object in map_objects:
                 if not map_object.is_topologically_corresponding():
@@ -175,10 +134,3 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
-
-        # TODO: deepcopy breaks connection.
-        # Search "deepcopy breaks connection" and fix all of them.
-        # The return is not necessary if the self.parameters dict refer to
-        # the same map node. We do it here because zBuilder deepcopy operation
-        # breaks this connection.
-        return map_objects

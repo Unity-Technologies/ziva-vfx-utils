@@ -16,6 +16,13 @@ ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
 logger = logging.getLogger(__name__)
 
 
+def return_copy_buffer():
+    """This returns a deep copy of the buffer contents simply for comparisons.
+    """
+    deep = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
+    return deep
+
+
 def copy_paste(*args, **kwargs):
     '''
     A utility wrapper for copying and pasting a tissue
