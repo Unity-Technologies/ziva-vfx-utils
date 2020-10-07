@@ -90,7 +90,7 @@ def runWindowsTestStage() {
     }
 
     dir('ziva-vfx-utils') {
-        bat "aws s3 cp s3://ziva-ci/ImmutablePast/test-develop/win${mayaVersion}/ziva.mil c:/plugins/ImmutablePast/test-develop/win${mayaVersion}"
+        bat "aws s3 cp s3://ziva-ci/ImmutablePast/test-develop/win${mayaVersion}/ziva.mll c:/plugins/ImmutablePast/test-develop/win${mayaVersion}/ziva.mll"
         bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
     }
 }
