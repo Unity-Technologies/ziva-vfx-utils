@@ -26,7 +26,7 @@ pipeline {
             failFast true
             parallel {
                 stage('windows') {
-                    agent { label 'windows && vfx && maya2019' }
+                    agent { label 'windows && vfx' }
                     environment {
                         mayaVersion = "2018" // variations: 2017, 2018, 2019, 2020
                     }
@@ -39,44 +39,44 @@ pipeline {
                     post { cleanup { cleanWs() } }
                 }
 
-                stage('centos7') {
-                    agent { label 'linux && centos7 && maya2019' }
-                    environment {
-                        mayaVersion = "2019"
-                    }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            runLinuxTestStage()
-                        }
-                    }
-                    post { cleanup { cleanWs() } }
-                }
+                // stage('centos7') {
+                //     agent { label 'centos7 && vfx' }
+                //     environment {
+                //         mayaVersion = "2019"
+                //     }
+                //     steps {
+                //         timeout(time: 15, unit: 'MINUTES') {
+                //             unstash 'main'
+                //             runLinuxTestStage()
+                //         }
+                //     }
+                //     post { cleanup { cleanWs() } }
+                // }
 
-                stage('centos6') {
-                    agent { label 'centos6 && vfx' }
-                    environment {
-                        mayaVersion = "2017"
-                    }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            runLinuxTestStage()
-                        }
-                    }
-                    post { cleanup { cleanWs() } }
-                }
+                // stage('centos6') {
+                //     agent { label 'centos6 && vfx' }
+                //     environment {
+                //         mayaVersion = "2017"
+                //     }
+                //     steps {
+                //         timeout(time: 15, unit: 'MINUTES') {
+                //             unstash 'main'
+                //             runLinuxTestStage()
+                //         }
+                //     }
+                //     post { cleanup { cleanWs() } }
+                // }
 
-                stage('doc generation') {
-                    agent { label 'linux && sphinx' }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            sh "ziva-vfx-utils/docs/build_the_docs.sh"
-                        }
-                    }
-                    post { cleanup { cleanWs() } }
-                }
+                // stage('doc generation') {
+                //     agent { label 'centos7 && vfx' }
+                //     steps {
+                //         timeout(time: 15, unit: 'MINUTES') {
+                //             unstash 'main'
+                //             sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                //         }
+                //     }
+                //     post { cleanup { cleanWs() } }
+                // }
             }
         }
     }
@@ -90,6 +90,7 @@ def runWindowsTestStage() {
     }
 
     dir('ziva-vfx-utils') {
+
         bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
     }
 }
