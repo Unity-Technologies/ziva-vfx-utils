@@ -25,7 +25,7 @@ pargs = parser.parse_args()
 # cmd.extend(["--path", "{0}/tests".format(current_directory_path)])
 # cmd.extend(["--maya-script-path", "{0}/scripts".format(MAYA_SCRIPT_PATH)])
 
-cmd = ["aws s3 cp"]
+cmd = ['aws s3 cp']
 
 with open('{0}/settings.json'.format(current_directory_path)) as json_file:
     data = json.load(json_file)
@@ -47,8 +47,7 @@ else:
     raise Exception('Plugin {0} is not listed. Please change settings.json.'.format(maya_plugin_version))
 
 print(cmd)
-cmd = ["aws --version"]
 
-exit_code = subprocess.check_call(cmd)
+exit_code = subprocess.check_call(' '.join(cmd), shell=True)
 
 sys.exit(exit_code)
