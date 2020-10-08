@@ -34,7 +34,7 @@ if sys.platform.startswith('linux'):
     maya_plugin_version = 'lin_' + pargs.maya
 elif sys.platform.startswith('win32'):
     maya_plugin_version = 'win_' + pargs.maya
-    maya_plugin_s3_path = 's3://ziva-ci/{0}'.format(data['plugin_path'][maya_plugin_version][14:])
+    maya_plugin_s3_path = 's3://ziva-ci/{0}'.format(data['plugin_path'][maya_plugin_version][3:])
 else:
     raise Exception('OS {0} is not supported.'.format(sys.platform))
 

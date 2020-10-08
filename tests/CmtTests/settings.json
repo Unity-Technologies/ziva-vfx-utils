@@ -2,7 +2,7 @@
     "plugin_path": {
         "win_2020": "%SystemDrive%/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2020/ziva.mll",
         "win_2019": "%SystemDrive%/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2019/ziva.mll",
-        "win_2018": "%SystemDrive%/ImmutablePast/test-develop/win2018/ziva.mll",
+        "win_2018": "c:/ImmutablePast/test-develop/win2018/ziva.mll",
         "win_2017": "%SystemDrive%/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/win2017/ziva.mll",
         "lin_2020": "/mnt/z/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/lin2020/ziva.so",
         "lin_2019": "/mnt/z/common/plugins/ImmutablePast/20200312-e11a65452-dev-win2019-bugfix-VFXACT-623-ziva--def-flag-does-not-work/lin2019/ziva.so",
