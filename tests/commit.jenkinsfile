@@ -39,19 +39,19 @@ pipeline {
                     post { cleanup { cleanWs() } }
                 }
 
-                // stage('centos7') {
-                //     agent { label 'centos7 && vfx' }
-                //     environment {
-                //         mayaVersion = "2019"
-                //     }
-                //     steps {
-                //         timeout(time: 15, unit: 'MINUTES') {
-                //             unstash 'main'
-                //             runLinuxTestStage()
-                //         }
-                //     }
-                //     post { cleanup { cleanWs() } }
-                // }
+                stage('centos7') {
+                    agent { label 'centos7 && vfx' }
+                    environment {
+                        mayaVersion = "2019"
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
 
                 // stage('centos6') {
                 //     agent { label 'centos6 && vfx' }
@@ -91,7 +91,7 @@ def runWindowsTestStage() {
 
     dir('ziva-vfx-utils') {
         // bat "aws s3 cp s3://ziva-ci/ImmutablePast/test-develop/win${mayaVersion}/ziva.mll c:/plugins/ImmutablePast/test-develop/win${mayaVersion}/ziva.mll"
-        bat "python tests/CmtTests/prepare_zbuilder_tests.py --maya ${mayaVersion}"
+        bat "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
         bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
     }
 }
@@ -103,6 +103,7 @@ def runLinuxTestStage() {
         withEnv([
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
+            sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
             sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
         }
     }
