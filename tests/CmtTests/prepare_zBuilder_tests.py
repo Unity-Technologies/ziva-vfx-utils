@@ -47,6 +47,7 @@ else:
     raise Exception('Plugin {0} is not listed. Please change settings.json.'.format(maya_plugin_version))
 
 print(cmd)
+cmd = ["aws --version"]
 
 exit_code = subprocess.check_call(cmd)
 
