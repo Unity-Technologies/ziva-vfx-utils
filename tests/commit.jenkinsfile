@@ -53,30 +53,30 @@ pipeline {
                     post { cleanup { cleanWs() } }
                 }
 
-                // stage('centos6') {
-                //     agent { label 'centos6 && vfx' }
-                //     environment {
-                //         mayaVersion = "2017"
-                //     }
-                //     steps {
-                //         timeout(time: 15, unit: 'MINUTES') {
-                //             unstash 'main'
-                //             runLinuxTestStage()
-                //         }
-                //     }
-                //     post { cleanup { cleanWs() } }
-                // }
+                stage('centos6') {
+                    agent { label 'centos6 && vfx' }
+                    environment {
+                        mayaVersion = "2017"
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage()
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
 
-                // stage('doc generation') {
-                //     agent { label 'centos7 && vfx' }
-                //     steps {
-                //         timeout(time: 15, unit: 'MINUTES') {
-                //             unstash 'main'
-                //             sh "ziva-vfx-utils/docs/build_the_docs.sh"
-                //         }
-                //     }
-                //     post { cleanup { cleanWs() } }
-                // }
+                stage('doc generation') {
+                    agent { label 'centos7 && vfx' }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
             }
         }
     }
