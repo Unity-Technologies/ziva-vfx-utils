@@ -1,6 +1,6 @@
-# Runs zBuilder tests
+# Copy plugin for zBuilder tests
 # with specified maya version as a first argument ( default is 2018 )
-# Usage: python run_zbuilder_test.py --maya 2018
+# Usage: python  tests/CmtTests/copy_plugin_zBuilder_tests.py --maya 2018
 
 import os
 import sys
@@ -24,7 +24,7 @@ with open('{0}/settings.json'.format(current_directory_path)) as json_file:
 
 if sys.platform.startswith('linux'):
     maya_plugin_version = 'lin_' + pargs.maya
-    maya_plugin_s3_path = 's3://ziva-ci/{0}'.format(data['plugin_path'][maya_plugin_version][2:])
+    maya_plugin_s3_path = 's3://ziva-ci/{0}'.format(data['plugin_path'][maya_plugin_version][13:])
 elif sys.platform.startswith('win32'):
     maya_plugin_version = 'win_' + pargs.maya
     maya_plugin_s3_path = 's3://ziva-ci/{0}'.format(data['plugin_path'][maya_plugin_version][3:])
@@ -37,6 +37,6 @@ if maya_plugin_version in data['plugin_path']:
 else:
     raise Exception('Plugin {0} is not listed. Please change settings.json.'.format(maya_plugin_version))
 
-exit_code = subprocess.check_call(' '.join(cmd), shell=True)
+exit_code = subprocess.check_call(' '.join(cmd) + ' --quiet', shell=True)
 
 sys.exit(exit_code)
