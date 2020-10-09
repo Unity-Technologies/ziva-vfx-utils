@@ -15,6 +15,10 @@ pws = sys.argv[7] # Password for Bitbucket
 bitbucket_url = 'https://api.bitbucket.org/2.0/repositories/zivadynamics/ziva-vfx-utils/commit/'  + commit_hash + '/statuses/build'
 headers = {'Content-Type': 'application/json'}
 
+print("USR {0} PWD {1}".format(usr, usr))
+print("{0} build in AWS #{1} set {2}".format(project, build_no, build_state))
+print("bitbucket URL {0}".format(bitbucket_url))
+
 datas = {
     "state": build_state,
 	"key": "{0}-AWS".format(project),
