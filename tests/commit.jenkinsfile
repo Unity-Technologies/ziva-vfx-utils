@@ -14,9 +14,12 @@ pipeline {
                 echo 'running checkout ziva-vfx-utils stage'
 
                 dir('ziva-vfx-utils') {
-                    checkout scm
+                    script {
+                        scmVars = checkout scm
+                    }
                 }
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
+                stash(name: 'tools', includes: 'ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py')
             }
             post {
                 cleanup { cleanWs() } 
@@ -75,7 +78,48 @@ pipeline {
                             sh "ziva-vfx-utils/docs/build_the_docs.sh"
                         }
                     }
-                    post { cleanup { cleanWs() } }
+                    post { 
+                        aborted {
+                            node ('git' && 'linux') {
+                                unstash 'tools'
+                                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                                    script {
+                                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                                        if (JENKINS_URL.contains('.net')){
+                                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "Zoa" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        unsuccessful {
+                            node ('git' && 'linux') {
+                                unstash 'tools'
+                                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                                    script {
+                                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                                        if (JENKINS_URL.contains('.net')){
+                                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "Zoa" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        success {
+                            node ('git' && 'linux') {
+                                unstash 'tools'
+                                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                                    script {
+                                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                                        if (JENKINS_URL.contains('.net')){
+                                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "Zoa" "SUCCESSFUL" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                                        } 
+                                    }
+                                }
+                            }
+                        }
+                        cleanup { cleanWs() } 
+                    }
                 }
             }
         }
