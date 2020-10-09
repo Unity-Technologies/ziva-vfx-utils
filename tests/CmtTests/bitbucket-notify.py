@@ -12,7 +12,7 @@ build_url = sys.argv[5]
 usr = sys.argv[6] # User for Bitbucket
 pws = sys.argv[7] # Password for Bitbucket
 
-bitbucket_url = 'https://api.bitbucket.org/2.0/repositories/zivadynamics/ziva-vfx-utils/commits/'  + commit_hash + '/statuses/build'
+bitbucket_url = 'https://api.bitbucket.org/2.0/repositories/zivadynamics/ziva-vfx-utils/commit/'  + commit_hash + '/statuses/build'
 headers = {'Content-Type': 'application/json'}
 
 datas = {
