@@ -304,7 +304,6 @@ class MyDockingUI(QtWidgets.QWidget):
         paint_action = QtWidgets.QAction(self)
         paint_action.setText('Paint')
         paint_action.setObjectName("actionPaint")
-        paint_action.triggered.connect(partial(node.paramters['map'][map_index].open_paint_tool))
         paint_action.triggered.connect(partial(node.parameters['map'][map_index].open_paint_tool))
         menu.addAction(paint_action)
 
