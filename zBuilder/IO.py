@@ -160,3 +160,25 @@ def is_sequence(var):
     False otherwise.
     """
     return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
+
+def update_builder_pre_1_9(builder):
+
+    for item in builder.get_scene_items(type_filter=['zMaterial', 'zTet', 'zFiber', 'zAttachment']):
+        item.parameters = defaultdict(list)
+
+        # add the mesh to parameters
+        for mesh_name in item.get_map_meshes():
+            mesh_name = mesh_name.split('|')[-1]
+
+            mesh = builder.get_scene_items(name_filter=mesh_name)[0]
+            item.add_parameter(mesh)
+
+        # add the maps, first we need to construct the map names for the node
+        for map_ in item.construct_map_names():
+            item.add_parameter(builder.get_scene_items(name_filter=map_)[0])
+
+    for item in builder.get_scene_items(type_filter=['zLineOfAction']):
+        # pre 1.9 the attribute was called fiber.
+        # As of 1.9 it is called fiber_item
+        setattr(item, 'fiber_item', getattr(item, 'fiber'))
+        delattr(item, 'fiber')
