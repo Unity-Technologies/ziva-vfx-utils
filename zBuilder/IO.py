@@ -188,7 +188,7 @@ def check_disk_version(builder):
 
 def update_builder_pre_1_0_11(builder):
     """This updates any zBuilder file saved before 1.0.11.  It adds a reference for the 
-    parameters and changes an attribute name.
+    parameters and changes an attribute name.  This change happened during 1.9 of Ziva VFX.
 
     Args:
         builder (obj): Builder object in need of an update.
