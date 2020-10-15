@@ -56,6 +56,8 @@ def unpack_zbuilder_contents(builder, json_data):
         if item:
             item.builder = builder
 
+    # we have the full zBuilder file ready to go at this point.  Lets check
+    # if we need to update it.
     check_disk_version(builder)
 
 
@@ -165,7 +167,13 @@ def is_sequence(var):
 
 
 def check_disk_version(builder):
-    # pre 1.0.9 we need to modify the
+    """This checks the library version of the passed builder object to check if 
+    it needs to be updated.
+
+    Args:
+        builder (obj): The builder object to check version.
+    """
+    # pre 1.0.11 we need to parameter reference to each node
     one_nine = '1.0.9'.split('.')
     one_nine = [int(v) for v in one_nine]
 
