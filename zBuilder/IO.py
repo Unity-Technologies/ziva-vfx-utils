@@ -56,6 +56,8 @@ def unpack_zbuilder_contents(builder, json_data):
         if item:
             item.builder = builder
 
+    check_disk_version(builder)
+
 
 def dump_json(file_path, json_data):
     """ Saves a json file to disk given a file path and data.
@@ -160,6 +162,21 @@ def is_sequence(var):
     False otherwise.
     """
     return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
+
+
+def check_disk_version(builder):
+    # pre 1.0.9 we need to modify the
+    one_nine = '1.0.9'.split('.')
+    one_nine = [int(v) for v in one_nine]
+
+    json_version = builder.info['version'].split('.')
+    json_version = [int(v) for v in json_version]
+
+    for nine, json_ in zip(one_nine, json_version):
+        if nine > json_:
+            update_builder_pre_1_9(builder)
+            break
+
 
 def update_builder_pre_1_9(builder):
 
