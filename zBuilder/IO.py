@@ -174,14 +174,14 @@ def check_disk_version(builder):
         builder (obj): The builder object to check version.
     """
     # pre 1.0.11 we need to parameter reference to each node
-    one_nine = '1.0.10'.split('.')
-    one_nine = [int(v) for v in one_nine]
+    one_ten = '1.0.10'.split('.')
+    one_ten = [int(v) for v in one_ten]
 
     json_version = builder.info['version'].split('.')
     json_version = [int(v) for v in json_version]
 
-    for nine, json_ in zip(one_nine, json_version):
-        if nine >= json_:
+    for ten, json_ in zip(one_ten, json_version):
+        if ten >= json_:
             update_builder_pre_1_0_11(builder)
             break
 
