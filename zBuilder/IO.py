@@ -181,7 +181,7 @@ def check_disk_version(builder):
     json_version = [int(v) for v in json_version]
 
     for ten, json_ in zip(one_ten, json_version):
-        if ten >= json_:
+        if ten > json_:
             update_builder_pre_1_0_11(builder)
             break
 
