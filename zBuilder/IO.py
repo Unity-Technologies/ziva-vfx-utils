@@ -174,36 +174,42 @@ def check_disk_version(builder):
         builder (obj): The builder object to check version.
     """
     # pre 1.0.11 we need to parameter reference to each node
-    one_nine = '1.0.9'.split('.')
+    one_nine = '1.0.10'.split('.')
     one_nine = [int(v) for v in one_nine]
 
     json_version = builder.info['version'].split('.')
     json_version = [int(v) for v in json_version]
 
     for nine, json_ in zip(one_nine, json_version):
-        if nine > json_:
-            update_builder_pre_1_9(builder)
+        if nine >= json_:
+            update_builder_pre_1_0_11(builder)
             break
 
 
-def update_builder_pre_1_9(builder):
+def update_builder_pre_1_0_11(builder):
+    """This updates any zBuilder file saved before 1.0.11.  It adds a reference for the 
+    parameters and changes an attribute name.
+
+    Args:
+        builder (obj): Builder object in need of an update.
+    """
 
     for item in builder.get_scene_items(type_filter=['zMaterial', 'zTet', 'zFiber', 'zAttachment']):
         item.parameters = defaultdict(list)
 
-        # add the mesh to parameters
+        # add the mesh object to parameters
         for mesh_name in item.get_map_meshes():
             mesh_name = mesh_name.split('|')[-1]
 
             mesh = builder.get_scene_items(name_filter=mesh_name)[0]
             item.add_parameter(mesh)
 
-        # add the maps, first we need to construct the map names for the node
+        # add the map objects, first we need to construct the map names for the node
         for map_ in item.construct_map_names():
             item.add_parameter(builder.get_scene_items(name_filter=map_)[0])
 
+    # pre 1.0.11 the attribute was called fiber on a zLineOfAction.
+    # As of 1.0.11 it is called fiber_item
     for item in builder.get_scene_items(type_filter=['zLineOfAction']):
-        # pre 1.9 the attribute was called fiber.
-        # As of 1.9 it is called fiber_item
         setattr(item, 'fiber_item', getattr(item, 'fiber'))
         delattr(item, 'fiber')
