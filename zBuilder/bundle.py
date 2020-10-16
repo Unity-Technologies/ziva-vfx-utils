@@ -53,9 +53,9 @@ class Bundle(object):
         """
 
         for scene_item in self.get_scene_items(type_filter=type_filter, name_filter=name_filter):
-            print(scene_item)
+            logger.debug(scene_item)
 
-        print('----------------------------------------------------------------')
+        logger.debug('----------------------------------------------------------------')
 
     def compare(self, type_filter=list(), name_filter=list()):
         """
