@@ -14,9 +14,12 @@ pipeline {
                 echo 'running checkout ziva-vfx-utils stage'
 
                 dir('ziva-vfx-utils') {
-                    checkout scm
+                    script {
+                        scmVars = checkout scm
+                    }
                 }
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
+                stash(name: 'tools', includes: 'ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py')
             }
             post {
                 cleanup { cleanWs() } 
@@ -26,7 +29,7 @@ pipeline {
             failFast true
             parallel {
                 stage('windows') {
-                    agent { label 'windows && vfx && maya2019' }
+                    agent { label 'windows && vfx' }
                     environment {
                         mayaVersion = "2018" // variations: 2017, 2018, 2019, 2020
                     }
@@ -40,7 +43,7 @@ pipeline {
                 }
 
                 stage('centos7') {
-                    agent { label 'linux && centos7 && maya2019' }
+                    agent { label 'centos7 && vfx' }
                     environment {
                         mayaVersion = "2019"
                     }
@@ -68,7 +71,7 @@ pipeline {
                 }
 
                 stage('doc generation') {
-                    agent { label 'linux && sphinx' }
+                    agent { label 'centos7 && vfx' }
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
                             unstash 'main'
@@ -76,6 +79,47 @@ pipeline {
                         }
                     }
                     post { cleanup { cleanWs() } }
+                }
+            }
+        }
+    }
+    post{
+        aborted {
+            node ('git' && 'linux') {
+                unstash 'tools'
+                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                    script {
+                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                        if (JENKINS_URL.contains('.net')){
+                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                        }
+                    }
+                }
+            }
+        }
+        unsuccessful {
+            node ('git' && 'linux') {
+                unstash 'tools'
+                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                    script {
+                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                        if (JENKINS_URL.contains('.net')){
+                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                        }
+                    }
+                }
+            }
+        }
+        success {
+            node ('git' && 'linux') {
+                unstash 'tools'
+                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+                    script {
+                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
+                        if (JENKINS_URL.contains('.net')){
+                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "SUCCESSFUL" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
+                        } 
+                    }
                 }
             }
         }
@@ -90,6 +134,7 @@ def runWindowsTestStage() {
     }
 
     dir('ziva-vfx-utils') {
+        bat "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
         bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
     }
 }
@@ -101,6 +146,7 @@ def runLinuxTestStage() {
         withEnv([
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
+            sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
             sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
         }
     }
