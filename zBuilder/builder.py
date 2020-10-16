@@ -198,6 +198,11 @@ class Builder(object):
         json_data = io.pack_zbuilder_contents(self,
                                               type_filter=type_filter,
                                               invert_match=invert_match)
+
+        # Print all data to investigate json circular reference issue.
+        # Remove it once fixed.
+        self.print_()
+
         if io.dump_json(file_path, json_data):
             self.bundle.stats()
             logger.info('Wrote File: %s' % file_path)
