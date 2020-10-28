@@ -26,6 +26,7 @@ global proc AEzSolverTemplate( string $nodeName )
   AEaddRampControl( $nodeName + ".attachmentColorRamp" );
   AEaddRampControl( $nodeName + ".collisionColorRamp" );
   AEaddRampControl( $nodeName + ".materialColorRamp" );
+  AEaddRampControl( $nodeName + ".muscleFiberColorRamp" );
 
   // suppress attributes attribute
   editorTemplate -suppress "localPosition";

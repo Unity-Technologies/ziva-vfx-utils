@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 class Deformers(Builder):
     """Test setup to play with deformers and how they are ordered on a mesh.
     """
-
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args-----------------------------------------------------------
@@ -19,7 +18,7 @@ class Deformers(Builder):
 
         # kwargs---------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_map_names', True)
+        get_maps = kwargs.get('construct_map_names', True)
 
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
         tmp = list()

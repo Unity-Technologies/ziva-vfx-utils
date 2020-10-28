@@ -80,6 +80,8 @@ class TissueNode(Ziva):
             # we only want to execute this if tissue_items is empty or self is the first tissue.
             # set the attributes in maya
             for ztet, ztissue in zip(tet_items, tissue_items):
+                ztet.check_parameter_name()
+
                 ztet.set_maya_attrs(attr_filter=attr_filter)
                 ztissue.set_maya_attrs(attr_filter=attr_filter)
                 ztet.set_maya_weights(interp_maps=interp_maps)

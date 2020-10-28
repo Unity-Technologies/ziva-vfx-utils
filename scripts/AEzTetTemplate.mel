@@ -8,7 +8,7 @@ global proc AEzTetTemplate( string $nodeName )
   editorTemplate -addControl "refinementPropagation";
 
   editorTemplate -addControl "fillInterior";
-  editorTemplate -addControl "tetsUpperBound";
+  editorTemplate -addControl "maxResolution";
 
   // suppress attributes attribute
   editorTemplate -suppress "caching";

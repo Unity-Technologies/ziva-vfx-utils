@@ -18,7 +18,7 @@ class DeltaMush(Builder):
 
         # kwargs----------------------------------------------------------------
         get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('get_map_names', True)
+        get_maps = kwargs.get('construct_map_names', True)
 
         hist = cmds.listHistory(selection)
         delta_mushes = cmds.ls(hist, type='deltaMush')[::-1]

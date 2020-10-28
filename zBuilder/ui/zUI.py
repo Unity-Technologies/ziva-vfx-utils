@@ -185,15 +185,15 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
     def invert_weights(self, node, map_index):
-        map_ = node.get_parameters(['map'])[map_index]
+        map_ = node.parameters['map'][map_index]
         map_.invert()
         map_.apply_weights()
 
     def copy_weights(self, node, map_index):
-        self.maps_clipboard = node.get_parameters(['map'])[map_index]
+        self.maps_clipboard = node.parameters['map'][map_index]
 
     def paste_weights(self, node, new_map_index):
-        new_map = node.get_parameters(['map'])[new_map_index]
+        new_map = node.parameters['map'][new_map_index]
         """Pasting the maps.  Terms used here
             orig/new.
             The map/node the items were copied from are prefixed with orig.
@@ -304,8 +304,7 @@ class MyDockingUI(QtWidgets.QWidget):
         paint_action = QtWidgets.QAction(self)
         paint_action.setText('Paint')
         paint_action.setObjectName("actionPaint")
-        paint_action.triggered.connect(
-            partial(node.get_parameters(['map'])[map_index].open_paint_tool))
+        paint_action.triggered.connect(partial(node.parameters['map'][map_index].open_paint_tool))
         menu.addAction(paint_action)
 
         invert_action = QtWidgets.QAction(self)

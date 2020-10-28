@@ -55,31 +55,6 @@ class DGNode(Base):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
 
-    def __deepcopy__(self, memo):
-        # Some attributes cannot be deepcopied so define a listy of attributes
-        # to ignore.  These items are zBuilder scene items.  We need to not copy these
-        # attributes and apply them to copy afterwards.
-        non_copyable_attrs = ['depends_on']
-        non_copyable_attrs.extend(Base.SCENE_ITEM_ATTRIBUTES)
-
-        non_copyable_items = {}
-        for attr in non_copyable_attrs:
-            non_copyable_items[attr] = self.__dict__.get(attr, None)
-
-        result = type(self)()
-
-        for k, v in self.__dict__.items():
-            # skip over attributes defined as non-copyable in non_copyable_attrs
-            if k not in non_copyable_attrs:
-                setattr(result, k, copy.deepcopy(v, memo))
-
-        # Add non-copyable attrs back into scene item manually after it's copied.
-        for item in non_copyable_items:
-            if item in result.__dict__:
-                result.__dict__[item] = non_copyable_items[item]
-
-        return result
-
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 

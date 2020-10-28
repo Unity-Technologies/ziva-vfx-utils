@@ -238,12 +238,12 @@ class Ziva(Builder):
         check scene for loading into a ui.
 
         Args:
-            get_parameters (bool): To get parameters or not. Default False
+            get_parameters (bool): To get parameters or not. Default True
         """
         # ---------------------------------------------------------------------
         # KWARG PARSING--------------------------------------------------------
         # ---------------------------------------------------------------------
-        get_parameters = kwargs.get('get_parameters', False)
+        get_parameters = kwargs.get('get_parameters', True)
 
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------

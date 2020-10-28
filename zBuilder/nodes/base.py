@@ -13,7 +13,13 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
+    """ SEARCH_EXCLUDE is a list of attribute names that get excluded during a string_replace()
+    The reason these are excluded is because we do not want these to be user changable.  If someone 
+    does a string_replace() and it happens to change the value of one of those attributes 
+    unexpected results will happen.
+    """
+
     TYPES = []
     type = None
     """ type of scene item """

@@ -21,5 +21,7 @@ class ZRelaxerNode(Deformer):
             results = mel.eval('zRelaxer')
             mz.safe_rename(results[0], self.name)
 
+        self.check_parameter_name()
+
         self.set_maya_attrs(attr_filter=attr_filter)
         self.set_maya_weights(interp_maps=interp_maps)
