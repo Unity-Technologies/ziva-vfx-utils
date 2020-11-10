@@ -10,13 +10,28 @@ logger = logging.getLogger(__name__)
 
 class BaseNodeEncoder(json.JSONEncoder):
     def default(self, obj):
+        # Print all data to investigate "json circular reference" issue.
+        # Remove it once fixed.
+        logger.debug('obj: {}'.format(obj))
+
         if hasattr(obj, '_class'):
+            logger.debug('obj has _class attr')
             if hasattr(obj, 'serialize'):
-                return obj.serialize()
+                serVal = obj.serialize()
+                logger.debug('obj serialize attrs')
+                for k, v in serVal.iteritems():
+                    logger.debug('key: {}, value: {}'.format(k, v))
+                logger.debug('\n')
+                return serVal
             else:
+                logger.debug('obj has no serialize attr')
+                logger.debug('obj.__dict__: {}'.format(obj.__dict__))
                 return obj.__dict__
         else:
-            return super(BaseNodeEncoder, self).default(obj)
+            logger.debug('obj has no _class attr, fallback to default handler.')
+            defaultVal = super(BaseNodeEncoder, self).default(obj)
+            logger.debug('obj default encode attr: {}'.format(defaultVal))
+            return defaultVal
 
 
 def pack_zbuilder_contents(builder, type_filter=[], invert_match=False):
