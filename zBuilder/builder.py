@@ -324,26 +324,3 @@ def restore_scene_items_from_string(item, builder):
         if item:
             item = item[0]
     return item
-
-
-def builder_factory(class_name):
-    """A factory node to return the correct Builder given class name.
-
-    If it cannot find a class it uses the base Builder class.
-
-    Args:
-        type_ ([:obj:`str`]):  The class name to search for.
-
-    Returns:
-        [:obj:`obj`]: Builder object.
-
-    Raises:
-        [Error]: if class_name cannot be found.
-    """
-
-    for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
-        if inspect.isclass(obj):
-            if class_name == obj.__name__:
-                return obj()
-
-    raise Exception('Cannot find class in zBuilder.builders')
