@@ -1,6 +1,6 @@
 import re
 import logging
-from zBuilder.IO import is_sequence
+import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
 
@@ -168,15 +168,15 @@ class Bundle(object):
             return self.scene_items
 
         # put type filter in a list if it isn't
-        if not is_sequence(type_filter):
+        if not mz.is_sequence(type_filter):
             type_filter = [type_filter]
 
         # put association filter in a list if it isn't
-        if not is_sequence(association_filter):
+        if not mz.is_sequence(association_filter):
             association_filter = [association_filter]
 
         # put name filter in a list if it isn't
-        if not is_sequence(name_filter):
+        if not mz.is_sequence(name_filter):
             name_filter = [name_filter]
 
         type_set = set(type_filter)

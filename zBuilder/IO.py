@@ -3,7 +3,7 @@ import inspect
 import sys
 import logging
 
-from collections import defaultdict
+import zBuilder.builder
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +125,8 @@ def load_base_node(json_object):
         type_ = json_object.get('type', 'Base')
 
         builder_type = json_object['_builder_type']
-        obj = find_class(builder_type, type_)
+
+        obj = zBuilder.builder.find_class(builder_type, type_)
 
         # this catches the scene items for ui that slip in.
         try:
@@ -138,78 +139,3 @@ def load_base_node(json_object):
 
     else:
         return json_object
-
-
-# TODO builder and this use same method
-def find_class(module_, type_):
-    """ Given a module and a type returns class object.
-
-    Args:
-        module_ (:obj:`str`): The module to look for.
-        type_ (:obj:`str`): The type to look for.
-
-    Returns:
-        obj: class object.
-    """
-    for name, obj in inspect.getmembers(sys.modules[module_]):
-        if inspect.isclass(obj):
-            if type_ in obj.TYPES or type_ == obj.type:
-                return obj
-
-
-def is_sequence(var):
-    """
-    Returns:
-    True if input is a sequence data type, i.e., list or tuple, but not string type.
-    False otherwise.
-    """
-    return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
-
-
-def check_disk_version(builder):
-    """This checks the library version of the passed builder object to check if 
-    it needs to be updated.
-
-    Args:
-        builder (obj): The builder object to check version.
-    """
-    # pre 1.0.11 we need to parameter reference to each node
-    one_ten = '1.0.10'.split('.')
-    one_ten = [int(v) for v in one_ten]
-
-    json_version = builder.info['version'].split('.')
-    json_version = [int(v) for v in json_version]
-
-    for ten, json_ in zip(one_ten, json_version):
-        if ten > json_:
-            update_builder_pre_1_0_11(builder)
-            break
-
-
-def update_builder_pre_1_0_11(builder):
-    """This updates any zBuilder file saved before 1.0.11.  It adds a reference for the 
-    parameters and changes an attribute name.  This change happened during 1.9 of Ziva VFX.
-
-    Args:
-        builder (obj): Builder object in need of an update.
-    """
-
-    for item in builder.get_scene_items(type_filter=['zMaterial', 'zTet', 'zFiber', 'zAttachment']):
-        item.parameters = defaultdict(list)
-
-        # add the mesh object to parameters
-        for mesh_name in item.get_map_meshes():
-            mesh_name = mesh_name.split('|')[-1]
-
-            mesh = builder.get_scene_items(name_filter=mesh_name)[0]
-            item.add_parameter(mesh)
-
-        # add the map objects, first we need to construct the map names for the node
-        for map_ in item.construct_map_names():
-            item.add_parameter(builder.get_scene_items(name_filter=map_)[0])
-
-    # pre 1.0.11 the attribute was called fiber on a zLineOfAction.
-    # As of 1.0.11 it is called fiber_item
-    for item in builder.get_scene_items(type_filter=['zLineOfAction']):
-        setattr(item, 'fiber_item', getattr(item, 'fiber'))
-        delattr(item, 'fiber')

@@ -22,7 +22,12 @@ pipeline {
                 stash(name: 'tools', includes: 'ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py')
             }
             post {
-                cleanup { cleanWs() } 
+                success {
+                    script {
+                        notifyBitbucket('INPROGRESS')
+                    }
+                }
+                cleanup { cleanWs() }
             }
         }
         stage('run tests for ziva-vfx-utils') {
@@ -84,42 +89,19 @@ pipeline {
         }
     }
     post{
-        aborted {
-            node ('git' && 'linux') {
-                unstash 'tools'
-                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
-                    script {
-                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
-                        if (JENKINS_URL.contains('.net')){
-                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
-                        }
-                    }
-                }
-            }
-        }
         unsuccessful {
             node ('git' && 'linux') {
                 unstash 'tools'
-                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
-                    script {
-                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
-                        if (JENKINS_URL.contains('.net')){
-                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "FAILED" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
-                        }
-                    }
+                script {
+                    notifyBitbucket('FAILED')
                 }
             }
         }
         success {
             node ('git' && 'linux') {
                 unstash 'tools'
-                withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
-                    script {
-                        // Add and change build status need only for builds in AWS (Domain Name: zivadev.net).
-                        if (JENKINS_URL.contains('.net')){
-                            sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" "SUCCESSFUL" ' + scmVars.GIT_COMMIT + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
-                        } 
-                    }
+                script {
+                    notifyBitbucket('SUCCESSFUL')
                 }
             }
         }
@@ -149,5 +131,18 @@ def runLinuxTestStage() {
             sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
             sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
         }
+    }
+}
+
+// Call our Bitbucket notification script to tell Bitbucket to update the status of the branch being built.
+// status should be "SUCCESSFUL", "INPROGRESS", or "FAILED"
+def notifyBitbucket(String status) {
+    withCredentials([usernamePassword( credentialsId: 'ziva-jenkins', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
+        // String interpoloation in Jenkins-Groovy is garbage. Single-quotes do NOT interpolate $-strings
+        // so we use them for variables that shouldn't be expanded until shell execution-time.
+        // Double-quotes DO interpolate $-strings, so we use them for variables we want to eagerly
+        // expand right now during Jenkins script evaluation. Then we concatenate together the
+        // single-quote and double-quote strings to build the final shell command we want executed.
+        sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" ' + "\"${status}\" \"${scmVars.GIT_COMMIT}\"" + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
     }
 }

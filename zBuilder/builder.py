@@ -65,12 +65,11 @@ class Builder(object):
             parent = self.root_node
 
         scene_items = []
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
-            if inspect.isclass(obj):
-                if type_ in obj.TYPES or type_ == obj.type:
-                    obb = obj(parent=parent, builder=self)
-                    obb.populate(maya_node=node)
-                    scene_items.append(obb)
+        obj = find_class('zBuilder.nodes', type_)
+        obb = obj(parent=parent, builder=self)
+        obb.populate(maya_node=node)
+        scene_items.append(obb)
+
         if not scene_items:
             objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
             objct.populate(maya_node=node)
@@ -127,7 +126,7 @@ class Builder(object):
             already been created.
         '''
         # put association filter in a list if it isn't
-        if not io.is_sequence(parameter_args):
+        if not mz.is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
         for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
@@ -312,8 +311,24 @@ class Builder(object):
                                            invert_match=invert_match)
 
 
+def find_class(module_, type_):
+    """ Given a module and a type returns class object.
+
+    Args:
+        module_ (:obj:`str`): The module to look for.
+        type_ (:obj:`str`): The type to look for.
+
+    Returns:
+        obj: class object.
+    """
+    for name, obj in inspect.getmembers(sys.modules[module_]):
+        if inspect.isclass(obj):
+            if type_ in obj.TYPES or type_ == obj.type:
+                return obj
+
+
 def restore_scene_items_from_string(item, builder):
-    if io.is_sequence(item):
+    if mz.is_sequence(item):
         if item:
             item = builder.get_scene_items(name_filter=item)
     elif isinstance(item, dict):
@@ -324,26 +339,3 @@ def restore_scene_items_from_string(item, builder):
         if item:
             item = item[0]
     return item
-
-
-def builder_factory(class_name):
-    """A factory node to return the correct Builder given class name.
-
-    If it cannot find a class it uses the base Builder class.
-
-    Args:
-        type_ ([:obj:`str`]):  The class name to search for.
-
-    Returns:
-        [:obj:`obj`]: Builder object.
-
-    Raises:
-        [Error]: if class_name cannot be found.
-    """
-
-    for name, obj in inspect.getmembers(sys.modules['zBuilder.builders']):
-        if inspect.isclass(obj):
-            if class_name == obj.__name__:
-                return obj()
-
-    raise Exception('Cannot find class in zBuilder.builders')
