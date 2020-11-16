@@ -3,6 +3,8 @@ import inspect
 import sys
 import logging
 
+import zBuilder.builder
+
 logger = logging.getLogger(__name__)
 
 
@@ -119,7 +121,8 @@ def load_base_node(json_object):
         type_ = json_object.get('type', 'Base')
 
         builder_type = json_object['_builder_type']
-        obj = find_class(builder_type, type_)
+
+        obj = zBuilder.builder.find_class(builder_type, type_)
 
         # this catches the scene items for ui that slip in.
         try:
@@ -132,20 +135,3 @@ def load_base_node(json_object):
 
     else:
         return json_object
-
-
-# TODO builder and this use same method
-def find_class(module_, type_):
-    """ Given a module and a type returns class object.
-
-    Args:
-        module_ (:obj:`str`): The module to look for.
-        type_ (:obj:`str`): The type to look for.
-
-    Returns:
-        obj: class object.
-    """
-    for name, obj in inspect.getmembers(sys.modules[module_]):
-        if inspect.isclass(obj):
-            if type_ in obj.TYPES or type_ == obj.type:
-                return obj
