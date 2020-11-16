@@ -56,9 +56,9 @@ def unpack_zbuilder_contents(builder, json_data):
         if item:
             item.builder = builder
 
-    # we have the full zBuilder file ready to go at this point.  Lets check
-    # if we need to update it.
-    check_disk_version(builder)
+    # # we have the full zBuilder file ready to go at this point.  Lets check
+    # # if we need to update it.
+    # check_disk_version(builder)
 
 
 def dump_json(file_path, json_data):
@@ -128,6 +128,8 @@ def load_base_node(json_object):
 
         obj = zBuilder.builder.find_class(builder_type, type_)
 
+        check_disk_version(json_object)
+
         # this catches the scene items for ui that slip in.
         try:
             scene_item = obj()
@@ -139,3 +141,49 @@ def load_base_node(json_object):
 
     else:
         return json_object
+
+
+# TODO builder and this use same method
+def find_class(module_, type_):
+    """ Given a module and a type returns class object.
+
+    Args:
+        module_ (:obj:`str`): The module to look for.
+        type_ (:obj:`str`): The type to look for.
+
+    Returns:
+        obj: class object.
+    """
+    for name, obj in inspect.getmembers(sys.modules[module_]):
+        if inspect.isclass(obj):
+            if type_ in obj.TYPES or type_ == obj.type:
+                return obj
+
+
+def is_sequence(var):
+    """
+    Returns:
+    True if input is a sequence data type, i.e., list or tuple, but not string type.
+    False otherwise.
+    """
+    return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
+
+
+def check_disk_version(json_object):
+    """This checks the library version of the passed builder object to check if 
+    it needs to be updated.
+
+    Args:
+        builder (obj): The builder object to check version.
+    """
+    # pre 1.0.11 we need to parameter reference to each node
+    one_ten = '1.0.10'.split('.')
+    one_ten = [int(v) for v in one_ten]
+
+    json_version = json_object['info']['version'].split('.')
+    json_version = [int(v) for v in json_version]
+
+    for ten, json_ in zip(one_ten, json_version):
+        if ten > json_:
+            updates.update_json_pre_1_0_11(json_object)
+            break

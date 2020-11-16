@@ -28,7 +28,8 @@ class RivetToBoneNode(Ziva):
         curve_shape = cmds.deformer(self.name, q=True, g=True)[0]
         self.curve = cmds.listRelatives(curve_shape, p=True, f=True)[0]
         self.cv_indices = cmds.getAttr(self.name + '.cvIndices')
-        self.rivet_locator = get_rivet_locator(self.name)
+        # # self.rivet_locator = get_rivet_locator(self.name)
+        self.rivet_locator = None
         self.rivet_locator_parent = get_rivet_locator_parent(self.rivet_locator)
 
     @property
@@ -85,7 +86,8 @@ class RivetToBoneNode(Ziva):
                 results = mel.eval('zRivetToBone')
                 self.name = mz.safe_rename(results[0], self.name)
                 # restore name of rivet locator
-                self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
+                if self.rivet_locator:
+                    self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
 
                 # parent locator to group if group node already exists
                 if self.rivet_locator_parent:
