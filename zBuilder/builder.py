@@ -70,11 +70,6 @@ class Builder(object):
         obb.populate(maya_node=node)
         scene_items.append(obb)
 
-        if not scene_items:
-            objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
-            objct.populate(maya_node=node)
-            scene_items.append(objct)
-
         if get_parameters:
             for node in scene_items:
                 if hasattr(node, 'spawn_parameters'):
