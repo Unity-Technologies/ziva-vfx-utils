@@ -307,7 +307,8 @@ class Builder(object):
 
 
 def find_class(module_, type_):
-    """ Given a module and a type returns class object.
+    """ Given a module and a type returns class object.  If no class objects are
+    found it returns a DGNode class object.
 
     Args:
         module_ (:obj:`str`): The module to look for.
