@@ -144,32 +144,6 @@ def load_base_node(json_object):
         return json_object
 
 
-# TODO builder and this use same method
-def find_class(module_, type_):
-    """ Given a module and a type returns class object.
-
-    Args:
-        module_ (:obj:`str`): The module to look for.
-        type_ (:obj:`str`): The type to look for.
-
-    Returns:
-        obj: class object.
-    """
-    for name, obj in inspect.getmembers(sys.modules[module_]):
-        if inspect.isclass(obj):
-            if type_ in obj.TYPES or type_ == obj.type:
-                return obj
-
-
-def is_sequence(var):
-    """
-    Returns:
-    True if input is a sequence data type, i.e., list or tuple, but not string type.
-    False otherwise.
-    """
-    return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
-
-
 def check_disk_version(json_object):
     """This checks the library version of the passed builder object to check if 
     it needs to be updated.
