@@ -326,6 +326,9 @@ def find_class(module_, type_):
             if type_ in obj.TYPES or type_ == obj.type:
                 return obj
 
+    # if class object is not found lets return a DG node object
+    return zBuilder.nodes.DGNode
+
 
 def restore_scene_items_from_string(item, builder):
     if mz.is_sequence(item):
