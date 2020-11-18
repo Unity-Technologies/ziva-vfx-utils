@@ -28,8 +28,7 @@ class RivetToBoneNode(Ziva):
         curve_shape = cmds.deformer(self.name, q=True, g=True)[0]
         self.curve = cmds.listRelatives(curve_shape, p=True, f=True)[0]
         self.cv_indices = cmds.getAttr(self.name + '.cvIndices')
-        # # self.rivet_locator = get_rivet_locator(self.name)
-        self.rivet_locator = None
+        self.rivet_locator = get_rivet_locator(self.name)
         self.rivet_locator_parent = get_rivet_locator_parent(self.rivet_locator)
 
     @property
