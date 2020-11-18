@@ -111,7 +111,6 @@ class VfxTestCase(TestCase):
         items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
 
         for item in items:
-            print item.name
             self.assertTrue(cmds.objExists(item.name))
 
     def compare_builder_attrs_with_scene_attrs(self, builder):
