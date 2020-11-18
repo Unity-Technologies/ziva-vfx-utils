@@ -4,7 +4,7 @@ import time
 
 from maya import cmds
 import zBuilder
-import zBuilder.IO as io
+
 from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
 
@@ -234,6 +234,8 @@ class Base(object):
         info['data'] = self.builder.info
 
         json_data = [node_data, info]
+
+        import zBuilder.IO as io
 
         if io.dump_json(file_path, json_data):
             logger.info('Wrote File: %s' % file_path)

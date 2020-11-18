@@ -2,8 +2,6 @@ from zBuilder.bundle import Bundle
 import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
-import zBuilder.IO as io
-
 from functools import wraps
 import datetime
 import sys
@@ -69,11 +67,6 @@ class Builder(object):
         obb = obj(parent=parent, builder=self)
         obb.populate(maya_node=node)
         scene_items.append(obb)
-
-        if not scene_items:
-            objct = zBuilder.nodes.DGNode(parent=parent, builder=self)
-            objct.populate(maya_node=node)
-            scene_items.append(objct)
 
         if get_parameters:
             for node in scene_items:
@@ -194,6 +187,7 @@ class Builder(object):
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
         """
+        import zBuilder.IO as io
         json_data = io.pack_zbuilder_contents(self,
                                               type_filter=type_filter,
                                               invert_match=invert_match)
@@ -217,6 +211,7 @@ class Builder(object):
             file_path (:obj:`str`): The file path to read from disk.
 
         """
+        import zBuilder.IO as io
         before = datetime.datetime.now()
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
@@ -312,7 +307,8 @@ class Builder(object):
 
 
 def find_class(module_, type_):
-    """ Given a module and a type returns class object.
+    """ Given a module and a type returns class object.  If no class objects are
+    found it returns a DGNode class object.
 
     Args:
         module_ (:obj:`str`): The module to look for.
@@ -325,6 +321,9 @@ def find_class(module_, type_):
         if inspect.isclass(obj):
             if type_ in obj.TYPES or type_ == obj.type:
                 return obj
+
+    # if class object is not found lets return a DG node object
+    return zBuilder.nodes.DGNode
 
 
 def restore_scene_items_from_string(item, builder):
