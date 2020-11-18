@@ -97,6 +97,12 @@ def load_scene(new_scene=True, scene_name='generic.ma'):
 
 
 def get_1_7_builder_files():
+    """Part of the test assets includes zBuilder files saved in 1_7.  This is to test 
+    backwards compatibility.  Building with these should still work after 1_9.
+
+    Returns:
+        list of str: list of paths to 1_7 zBuilder files. 
+    """
     directory = "{}/assets".format(CURRENT_DIRECTORY_PATH)
     builders = glob.glob(directory + '/*.zBuilder')
     return builders
