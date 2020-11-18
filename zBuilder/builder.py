@@ -2,8 +2,6 @@ from zBuilder.bundle import Bundle
 import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
-import zBuilder.IO as io
-
 from functools import wraps
 import datetime
 import sys
@@ -189,6 +187,7 @@ class Builder(object):
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
         """
+        import zBuilder.IO as io
         json_data = io.pack_zbuilder_contents(self,
                                               type_filter=type_filter,
                                               invert_match=invert_match)
@@ -212,6 +211,7 @@ class Builder(object):
             file_path (:obj:`str`): The file path to read from disk.
 
         """
+        import zBuilder.IO as io
         before = datetime.datetime.now()
         json_data = io.load_json(file_path)
         io.unpack_zbuilder_contents(self, json_data)
