@@ -57,10 +57,6 @@ def unpack_zbuilder_contents(builder, json_data):
         if item:
             item.builder = builder
 
-    # # we have the full zBuilder file ready to go at this point.  Lets check
-    # # if we need to update it.
-    # check_disk_version(builder)
-
 
 def dump_json(file_path, json_data):
     """ Saves a json file to disk given a file path and data.
