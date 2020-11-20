@@ -33,7 +33,6 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
 
             builder.build()
 
-            # print cmds.file(q=True, sn=True)
             self.compare_builder_nodes_with_scene_nodes(builder)
-            # self.compare_builder_attrs_with_scene_attrs(builder)
-            # self.compare_builder_maps_with_scene_maps(builder)
+            self.compare_builder_attrs_with_scene_attrs(builder)
+            self.compare_builder_maps_with_scene_maps(builder)
