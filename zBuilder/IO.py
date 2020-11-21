@@ -3,7 +3,7 @@ import inspect
 import sys
 import logging
 
-from collections import defaultdict
+import zBuilder
 
 logger = logging.getLogger(__name__)
 
