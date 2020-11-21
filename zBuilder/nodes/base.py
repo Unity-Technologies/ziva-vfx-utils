@@ -219,27 +219,6 @@ class Base(object):
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
 
-    def write(self, file_path):
-        """ Writes out the scene item to a json file given a file path.
-
-        Args:
-            file_path (str): The file path to write to disk.
-        """
-        node_data = dict()
-        node_data['d_type'] = 'node_data'
-        node_data['data'] = self
-
-        info = dict()
-        info['d_type'] = 'info'
-        info['data'] = self.builder.info
-
-        json_data = [node_data, info]
-
-        import zBuilder.IO as io
-
-        if io.dump_json(file_path, json_data):
-            logger.info('Wrote File: %s' % file_path)
-
 
 def replace_scene_items_with_string(item):
     # This takes a scene item, and replaces each instance with an embedded scene item
