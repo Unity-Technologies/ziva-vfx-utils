@@ -192,13 +192,6 @@ class Builder(object):
                                               type_filter=type_filter,
                                               invert_match=invert_match)
 
-        # Print all data to investigate "json circular reference" issue.
-        # Remove it once fixed.
-        self.print_()
-        logger.debug('\n\n')
-        logger.debug('{:-^80}'.format('dump json_data'))
-        logger.debug(json_data)
-        logger.debug('{:-^80}'.format('End of dump json_data'))
 
         if io.dump_json(file_path, json_data):
             self.bundle.stats()
