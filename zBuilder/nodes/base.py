@@ -4,7 +4,7 @@ import time
 
 from maya import cmds
 import zBuilder
-import zBuilder.IO as io
+
 from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
 
@@ -193,7 +193,7 @@ class Base(object):
         """
         searchable = [x for x in self.__dict__ if x not in self.SEARCH_EXCLUDE]
         for item in searchable:
-            if io.is_sequence(self.__dict__[item]):
+            if mz.is_sequence(self.__dict__[item]):
                 new_names = []
                 for name in self.__dict__[item]:
                     if isinstance(name, basestring):
@@ -211,7 +211,7 @@ class Base(object):
                         new_name = mz.replace_long_name(search, replace, v)
                         new_names.append(new_name)
                         self.__dict__[item][key] = new_names
-                    if io.is_sequence(v):
+                    if mz.is_sequence(v):
                         new_names = []
                         for name in self.__dict__[item][key]:
                             if isinstance(item, basestring):
@@ -235,6 +235,8 @@ class Base(object):
 
         json_data = [node_data, info]
 
+        import zBuilder.IO as io
+
         if io.dump_json(file_path, json_data):
             logger.info('Wrote File: %s' % file_path)
 
@@ -243,7 +245,7 @@ def replace_scene_items_with_string(item):
     # This takes a scene item, and replaces each instance with an embedded scene item
     # with the scene items name. The reason for this is scene items are not serializable
     # by themselves.  This enables is to "re-apply" them after it is loaded from disk
-    if io.is_sequence(item):
+    if mz.is_sequence(item):
         item = [x.name for x in item]
     elif isinstance(item, dict):
         for key in item:

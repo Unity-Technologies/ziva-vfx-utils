@@ -4,7 +4,6 @@ import re
 
 from maya import cmds
 from maya import mel
-from zBuilder.IO import is_sequence
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
 from zBuilder.mayaUtils import get_short_name
@@ -117,7 +116,7 @@ def remove_zRivetToBone_nodes(nodes):
 
     def set_rivet(rivet):
         if rivet:
-            if is_sequence(rivet):
+            if mz.is_sequence(rivet):
                 nodes_to_delete.extend(rivet)
             else:
                 nodes_to_delete.append(rivet)
@@ -652,7 +651,7 @@ def merge_solvers(solver_transforms):
 
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
-    assert is_sequence(solver_transforms), 'Arguments #1 is not a list'
+    assert mz.is_sequence(solver_transforms), 'Arguments #1 is not a list'
 
     if len(solver_transforms) < 2:
         return

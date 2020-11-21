@@ -290,10 +290,6 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
 
 class BuilderUtilsTestCase(VfxTestCase):
-    def test_builder_factory_throws_when_class_is_not_found(self):
-        with self.assertRaises(Exception):
-            bld.builder_factory('class_not_found_error')
-
     def test_remove_all_solvers(self):
         mel.eval('ziva -s')
         mel.eval('ziva -s')
