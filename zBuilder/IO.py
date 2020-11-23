@@ -3,6 +3,7 @@ import inspect
 import sys
 import logging
 
+import zBuilder
 import zBuilder.builder
 import updates
 
