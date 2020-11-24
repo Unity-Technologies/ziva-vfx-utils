@@ -46,20 +46,6 @@ class IOTestCase(VfxTestCase):
         # simply check if file exists, if it does it passes
         self.assertTrue(os.path.exists(temp.name))
 
-    def test_scene_item_write(self):
-        # loop through each scene item and write individually to see if they
-        # write
-        bools = []  # to store if the files exist
-        for item in self.z.get_scene_items():
-            # for each scene item find a temp file
-            temp = tempfile.TemporaryFile()
-            item.write(temp.name)
-            bools.append(os.path.exists(temp.name))
-            self.temp_files.append(temp.name)
-
-        # check to see if all files exist in one go
-        self.assertTrue(all(bools))
-
     def test_builder_write_build(self):
         # tests a case where you write out a zBuilder file then immediatly build
         # this could potentially screw up during the build.
