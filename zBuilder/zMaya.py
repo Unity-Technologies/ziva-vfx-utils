@@ -722,13 +722,12 @@ def parse_maya_node_for_selection(args):
     return selection
 
 
-def build_attr_list(selection, attr_filter=None):
+def build_attr_list(selection):
     """
     Builds a list of attributes to store values for.  It is looking at keyable
     attributes and if they are in channelBox.
 
     Args:
-        attr_filter:
         selection (str): maya object to find attributes
 
     returns:
@@ -749,9 +748,6 @@ def build_attr_list(selection, attr_filter=None):
             type_ = cmds.getAttr(obj, type=True)
             if not type_ == 'TdataCompound':
                 attribute_names.append(attr)
-
-    if attr_filter:
-        attrs = attr_filter
 
     return attribute_names
 
