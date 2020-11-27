@@ -46,6 +46,14 @@ zBuilder.mayaUtils module
    :undoc-members:
    :show-inheritance:
 
+zBuilder.updates module
+-----------------------
+
+.. automodule:: zBuilder.updates
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 zBuilder.utils module
 ---------------------
 
