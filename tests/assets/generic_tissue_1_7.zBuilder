@@ -124,7 +124,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -158,12 +158,6 @@
                         "type": "float",
                         "value": 1.0
                     },
-                    "oLength": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 2.0
-                    },
                     "posSensitivity": {
                         "alias": null,
                         "locked": false,
@@ -185,7 +179,7 @@
                 },
                 "fiber": "r_subtissue_1_zFiber",
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -219,7 +213,7 @@
                     1
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -313,7 +307,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -346,7 +340,7 @@
                     0
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -388,7 +382,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -4286,7 +4280,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -4319,12 +4313,6 @@
                         "type": "float",
                         "value": 1.0
                     },
-                    "oLength": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 2.0
-                    },
                     "posSensitivity": {
                         "alias": null,
                         "locked": false,
@@ -4346,7 +4334,7 @@
                 },
                 "fiber": "l_tissue_1_zFiber",
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -4457,7 +4445,7 @@
                     "r_subtissue_1_zTissue"
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -8352,7 +8340,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -8460,7 +8448,7 @@
                 },
                 "children_tissues": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -12355,7 +12343,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -12463,7 +12451,7 @@
                 },
                 "children_tissues": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -16358,7 +16346,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -16466,7 +16454,7 @@
                 },
                 "children_tissues": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -16528,7 +16516,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -16547,7 +16535,7 @@
                 "_name": "r_tissue_2__c_bone_1_zAttachment.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -16950,7 +16938,7 @@
                 "_name": "r_tissue_2__c_bone_1_zAttachment.weightList[1].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -17033,7 +17021,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -17052,7 +17040,7 @@
                 "_name": "c_tissue_3__c_bone_2_zAttachment.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -17455,7 +17443,7 @@
                 "_name": "c_tissue_3__c_bone_2_zAttachment.weightList[1].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -21733,7 +21721,7 @@
                     ]
                 ],
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -21805,7 +21793,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -21824,7 +21812,7 @@
                 "_name": "l_tissue_1__c_bone_1_zAttachment.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -22227,7 +22215,7 @@
                 "_name": "l_tissue_1__c_bone_1_zAttachment.weightList[1].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -22321,7 +22309,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -22340,7 +22328,7 @@
                 "_name": "r_tissue_2_zMaterial.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -22808,7 +22796,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -22827,7 +22815,7 @@
                 "_name": "c_tissue_3_zMaterial.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -23295,7 +23283,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -23314,7 +23302,7 @@
                 "_name": "r_subtissue_1_zMaterial.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -23782,7 +23770,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -23801,7 +23789,7 @@
                 "_name": "l_tissue_1_zMaterial.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24269,7 +24257,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24288,7 +24276,7 @@
                 "_name": "l_tissue_1_zMaterial1.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24710,7 +24698,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24776,7 +24764,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24842,7 +24830,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24864,40 +24852,9 @@
                 "_name": "r_tissue_2_zTet",
                 "_parent": null,
                 "_user_tet_mesh": null,
-                "attrs": {
-                    "fillInterior": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "enum",
-                        "value": 1
-                    },
-                    "maxResolution": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "long",
-                        "value": 150
-                    },
-                    "refinementPropagation": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.0
-                    },
-                    "surfaceRefinement": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 1.0
-                    },
-                    "tetSize": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.5714287161827087
-                    }
-                },
+                "attrs": {},
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -24916,7 +24873,7 @@
                 "_name": "r_tissue_2_zTet.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -25322,40 +25279,9 @@
                 "_name": "c_tissue_3_zTet",
                 "_parent": null,
                 "_user_tet_mesh": null,
-                "attrs": {
-                    "fillInterior": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "enum",
-                        "value": 1
-                    },
-                    "maxResolution": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "long",
-                        "value": 150
-                    },
-                    "refinementPropagation": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.0
-                    },
-                    "surfaceRefinement": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 1.0
-                    },
-                    "tetSize": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.5714287161827087
-                    }
-                },
+                "attrs": {},
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -25374,7 +25300,7 @@
                 "_name": "c_tissue_3_zTet.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -25780,40 +25706,9 @@
                 "_name": "r_subtissue_1_zTet",
                 "_parent": null,
                 "_user_tet_mesh": null,
-                "attrs": {
-                    "fillInterior": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "enum",
-                        "value": 1
-                    },
-                    "maxResolution": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "long",
-                        "value": 150
-                    },
-                    "refinementPropagation": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.0
-                    },
-                    "surfaceRefinement": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 1.0
-                    },
-                    "tetSize": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.28571435809135437
-                    }
-                },
+                "attrs": {},
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -25832,7 +25727,7 @@
                 "_name": "r_subtissue_1_zTet.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -26238,40 +26133,9 @@
                 "_name": "l_tissue_1_zTet",
                 "_parent": null,
                 "_user_tet_mesh": null,
-                "attrs": {
-                    "fillInterior": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "enum",
-                        "value": 1
-                    },
-                    "maxResolution": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "long",
-                        "value": 150
-                    },
-                    "refinementPropagation": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.0
-                    },
-                    "surfaceRefinement": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 1.0
-                    },
-                    "tetSize": {
-                        "alias": null,
-                        "locked": false,
-                        "type": "float",
-                        "value": 0.5714287161827087
-                    }
-                },
+                "attrs": {},
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -26290,7 +26154,7 @@
                 "_name": "l_tissue_1_zTet.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -26768,7 +26632,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -26840,7 +26704,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -26859,7 +26723,7 @@
                 "_name": "r_subtissue_1_zFiber.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -27262,7 +27126,7 @@
                 "_name": "r_subtissue_1_zFiber.endPoints",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -27718,7 +27582,7 @@
                     }
                 },
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -27737,7 +27601,7 @@
                 "_name": "l_tissue_1_zFiber.weightList[0].weights",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -28140,7 +28004,7 @@
                 "_name": "l_tissue_1_zFiber.endPoints",
                 "_parent": null,
                 "info": {
-                    "current_time": "16/11/2020  09:41:22",
+                    "current_time": "27/11/2020  14:40:52",
                     "maya_version": "2020",
                     "operating_system": "win64",
                     "version": "1.0.9"
@@ -28537,7 +28401,7 @@
     {
         "d_type": "info",
         "data": {
-            "current_time": "16/11/2020  09:41:22",
+            "current_time": "27/11/2020  14:40:52",
             "maya_version": "2020",
             "operating_system": "win64",
             "plugin_name": "D:/lonnie/work/ziva-vfx/plug-ins/win2020/ziva.mll",
