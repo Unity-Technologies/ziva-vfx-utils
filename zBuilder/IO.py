@@ -5,7 +5,7 @@ import logging
 
 import zBuilder
 import zBuilder.builder
-import zBuilder.updates
+import zBuilder.updates as updates
 
 logger = logging.getLogger(__name__)
 
