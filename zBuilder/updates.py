@@ -29,9 +29,9 @@ def update_json_pre_1_0_11(json_object):
     if type_ == 'zLineOfAction':
         json_object['fiber_item'] = json_object['fiber']
         json_object.pop('fiber', None)
-    if type_ == 'zRivetToBone':
+    elif type_ == 'zRivetToBone':
         json_object['rivet_locator'] = []
         json_object['rivet_locator_parent'] = []
-    if type_ == 'zRestShape':
+    elif type_ == 'zRestShape':
         json_object['tissue_item'] = json_object['tissue_name']
         json_object.pop('tissue_name', None)
