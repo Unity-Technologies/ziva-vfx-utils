@@ -3,7 +3,7 @@ import zBuilder.builder
 
 from zBuilder.nodes.deformer import construct_map_names
 from zBuilder.builder import get_node_types_with_maps
-import zBuilder.zMaya as mz
+import zBuilder.mayaUtils as mu
 
 
 def update_json_pre_1_0_11(json_object):
@@ -21,7 +21,7 @@ def update_json_pre_1_0_11(json_object):
         # this means that a mesh is only stored for a node if it has a map.
 
         # first we need to use short name for mesh
-        meshes = [x.split('|')[-1] for x in json_object['_association']]
+        meshes = [mu.get_short_name(x) for x in json_object['_association']]
         json_object['parameters']['mesh'] = meshes
 
     # pre 1.0.11 the attribute was called fiber on a zLineOfAction.
