@@ -30,7 +30,7 @@ global proc zLoadRigExecute()
         $solver = $solverParts[1];
       }
 
-      ziva -def $solver;
+      ziva -ds $solver;
       string $pythonCommand = "import zBuilder.utils as utility; utility.load_rig('" + $result[0] + "', '" + $solver + "')";
       python($pythonCommand);
       select -cl;
