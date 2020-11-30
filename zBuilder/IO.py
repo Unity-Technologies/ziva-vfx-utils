@@ -4,6 +4,8 @@ import sys
 import logging
 
 import zBuilder
+import zBuilder.builder
+import zBuilder.updates as updates
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +126,8 @@ def load_base_node(json_object):
 
         obj = zBuilder.builder.find_class(builder_type, type_)
 
+        check_disk_version(json_object)
+
         # this catches the scene items for ui that slip in.
         try:
             scene_item = obj()
@@ -135,3 +139,23 @@ def load_base_node(json_object):
 
     else:
         return json_object
+
+
+def check_disk_version(json_object):
+    """This checks the library version of the passed builder object to check if 
+    it needs to be updated.
+
+    Args:
+        builder (obj): The builder object to check version.
+    """
+    # pre 1.0.11 we need to parameter reference to each node
+    one_ten = '1.0.10'.split('.')
+    one_ten = [int(v) for v in one_ten]
+
+    json_version = json_object['info']['version'].split('.')
+    json_version = [int(v) for v in json_version]
+
+    for ten, json_ in zip(one_ten, json_version):
+        if ten > json_:
+            updates.update_json_pre_1_0_11(json_object)
+            break

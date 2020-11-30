@@ -328,6 +328,19 @@ def find_class(module_, type_):
     return zBuilder.nodes.DGNode
 
 
+def get_node_types_with_maps():
+    """This searches through the modules for existing node type objects and returns 
+    the ones that have maps associated with it.  Useful for performing actions on 
+    node types with maps.  MAP_LIST is a class attr so it is not being instantiated here.
+    """
+    returns = []
+    for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
+        if inspect.isclass(obj):
+            if obj.MAP_LIST:
+                returns.append(obj.type)
+    return returns
+
+
 def restore_scene_items_from_string(item, builder):
     if mz.is_sequence(item):
         if item:

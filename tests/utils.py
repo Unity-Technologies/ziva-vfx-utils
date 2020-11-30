@@ -1,7 +1,10 @@
 import tempfile
+import glob
+import os
+
 from maya import cmds
 from maya import mel
-import os
+
 import zBuilder.builders.ziva as zva
 '''
 These are small utilities to help with testing zBuilder.  Probably no real value
@@ -60,7 +63,10 @@ def ziva_mirror_sample_geo():
 def get_ziva_node_names_from_builder(builder, long=False):
     # get items that has z + Capital case letter and don't have dots ( to exclude maps )
     # this will list all Ziva nodes excluding meshes and maps
-    node_names = [obj.name if not long else obj.long_name for obj in builder.get_scene_items(name_regex="z[A-Z][^\.]*$")]
+    node_names = [
+        obj.name if not long else obj.long_name
+        for obj in builder.get_scene_items(name_regex="z[A-Z][^\.]*$")
+    ]
     return node_names
 
 
@@ -85,8 +91,21 @@ def load_scene(new_scene=True, scene_name='generic.ma'):
     path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
     if new_scene:
         cmds.file(new=True, force=True)
+
     # import with no namespace
     cmds.file(path, i=True, ns=":", ignoreVersion=True)
+
+
+def get_1_7_builder_files():
+    """Part of the test assets includes zBuilder files saved in 1_7.  This is to test 
+    backwards compatibility.  Building with these should still work after 1_9.
+
+    Returns:
+        list of str: list of paths to 1_7 zBuilder files. 
+    """
+    directory = "{}/assets".format(CURRENT_DIRECTORY_PATH)
+    builders = glob.glob(directory + '/*.zBuilder')
+    return builders
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):

@@ -63,7 +63,7 @@ class Deformer(DGNode):
         self.association = self.get_meshes(maya_node)
 
     def get_map_meshes(self):
-        """ This is the mesh associated with each map in obj.MAP_LIST.  Typically
+        """ This is the mesh associated with each map in obj.map_list.  Typically
         it seems to coincide with mesh store in get_association.  Sometimes
         it deviates, so you can override this method to define your own
         list of meshes against the map list.
@@ -74,16 +74,12 @@ class Deformer(DGNode):
         return self.nice_association
 
     def construct_map_names(self):
-        """ This builds the map names.  maps from MAP_LIST with the object name
+        """ This builds the map names.  maps from map_list with the object name
         in front
 
         For this we want to get the .name and not scene name.
         """
-        map_names = []
-        for map_ in self.MAP_LIST:
-            map_names.extend(cmds.ls('{}.{}'.format(self.name, map_)))
-
-        return map_names
+        return construct_map_names(self.name, self.MAP_LIST)
 
     @staticmethod
     def get_meshes(node):
@@ -134,3 +130,16 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
+
+
+def construct_map_names(name, map_list):
+    """ This builds the map names.  maps from map_list with the object name
+    in front
+
+    For this we want to get the .name and not scene name.
+    """
+    map_names = []
+    for map_ in map_list:
+        map_names.append('{}.{}'.format(name, map_))
+
+    return map_names

@@ -85,7 +85,8 @@ class RivetToBoneNode(Ziva):
                 results = mel.eval('zRivetToBone')
                 self.name = mz.safe_rename(results[0], self.name)
                 # restore name of rivet locator
-                self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
+                if self.rivet_locator:
+                    self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
 
                 # parent locator to group if group node already exists
                 if self.rivet_locator_parent:
