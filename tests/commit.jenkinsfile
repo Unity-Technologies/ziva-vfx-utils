@@ -34,7 +34,7 @@ pipeline {
             failFast true
             parallel {
                 stage('windows') {
-                    agent { label 'windows && vfx' }
+                    agent { label 'win && vfx && nogpu' }
                     environment {
                         mayaVersion = "2018" // variations: 2017, 2018, 2019, 2020
                     }
@@ -48,7 +48,7 @@ pipeline {
                 }
 
                 stage('centos7') {
-                    agent { label 'centos7 && vfx' }
+                    agent { label 'cent7 && vfx && nogpu' }
                     environment {
                         mayaVersion = "2019"
                     }
@@ -62,7 +62,7 @@ pipeline {
                 }
 
                 stage('centos6') {
-                    agent { label 'centos6 && vfx' }
+                    agent { label 'cent6 && vfx && nogpu' }
                     environment {
                         mayaVersion = "2017"
                     }
@@ -76,7 +76,7 @@ pipeline {
                 }
 
                 stage('doc generation') {
-                    agent { label 'centos7 && vfx' }
+                    agent { label 'cent7 && vfx && nogpu' }
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
                             unstash 'main'
