@@ -238,7 +238,7 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
         closest_m_point_on_mesh.getBarycentricCoords(u_util_ptr, v_util_ptr)
 
         weights = list()
-        for i in xrange(3):
+        for i in range(3):
             vertex_id_int = triangle_m_int_array[i]
             weights.append(weight_list[vertex_id_int])
 
@@ -313,7 +313,7 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
             distance_array = [distance_sum]
             # iterate through vertices on the polygon and get sum distance and distance to
             # each vertex
-            for i in xrange(1, closest_polygon_point_array.length()):
+            for i in range(1, closest_polygon_point_array.length()):
                 distance = pos.distanceTo(closest_polygon_point_array[i])
                 distance_sum += distance
                 distance_array.append(distance)
@@ -323,7 +323,7 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
             # if distance from projected point to face vertex is less or equal then average
             # distance, then set corresponding weight value
             found = False
-            for i in xrange(closest_polygon_point_array.length()):
+            for i in range(closest_polygon_point_array.length()):
                 if distance_array[i] <= average_distance:
                     interpolated_weights[closest_polygon_vtx_id_array[i]] = current_weight
                     found = True

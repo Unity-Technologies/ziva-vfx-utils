@@ -293,7 +293,7 @@ def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
         current_size = builder.elementCount()
         builder.growArray(max(0, len(new_weights) - current_size))
 
-        for i in xrange(len(new_weights)):
+        for i in range(len(new_weights)):
             dataHandle_i = builder.addElement(i)
             set_value(dataHandle_i, new_weights[i])
 

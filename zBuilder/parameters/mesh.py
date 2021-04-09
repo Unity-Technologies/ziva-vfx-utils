@@ -211,7 +211,7 @@ def get_mesh_vertex_positions(mesh):
     if len(points) % 3 != 0:
         raise Exception('List not divisible by 3.')
 
-    points = [points[x:x + 3] for x in xrange(0, len(points), 3)]
+    points = [points[x:x + 3] for x in range(0, len(points), 3)]
 
     return points
 

@@ -1,15 +1,13 @@
 import tempfile
 import os
-
 from maya import cmds
 from maya import mel
-
-import zBuilder.zMaya as mz
 import tests.utils as test_utils
+from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
+import zBuilder.zMaya as mz
 import zBuilder.utils as utils
 import zBuilder.builder as bld
 import zBuilder.builders.ziva as zva
-from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
 
 
 class BuilderMayaTestCase(VfxTestCase):

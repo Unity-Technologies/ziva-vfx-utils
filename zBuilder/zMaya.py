@@ -1,10 +1,10 @@
 import re
-
+import logging
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
+from zBuilder.commonUtils import is_string
 
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def is_sequence(var):
     True if input is a sequence data type, i.e., list or tuple, but not string type.
     False otherwise.
     """
-    return isinstance(var, (list, tuple)) and not isinstance(var, basestring)
+    return isinstance(var, (list, tuple)) and not is_string(var)
 
 
 def check_body_type(bodies):

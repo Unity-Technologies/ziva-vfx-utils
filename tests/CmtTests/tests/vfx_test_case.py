@@ -5,7 +5,7 @@ from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
-
+from zBuilder.zMaya import is_sequence
 from utility.paintable_maps import split_map_name, get_paintable_map
 
 
@@ -81,6 +81,18 @@ class VfxTestCase(TestCase):
         for ai, bi in zip(a, b):
             self.assertApproxEqual(ai, bi, eps)
 
+    def assertCountsEqual(self, a, b):
+        """
+        TODO: Remove this function after Python2 retires.
+        This is an adapter to meet the coexistense of Python2 and Python3.
+        """
+        import sys
+        if sys.version_info[0] < 3:
+            self.assertItemsEqual(a, b)
+        else:
+            self.assertCountEqual(a, b)
+
+
     def check_tissue_node_subtissue_builder_and_scene(self, scene_items):
 
         # Tissue specific sub-tissue check
@@ -90,7 +102,7 @@ class VfxTestCase(TestCase):
         }
 
         if parents:
-            for key, value in parents.iteritems():
+            for key, value in parents.items():
                 self.assertEqual(value, cmds.listConnections(key + '.iParentTissue')[0])
 
     def check_node_association_amount_equal(self, scene_items, startswith='r_', amount=0):
@@ -119,7 +131,7 @@ class VfxTestCase(TestCase):
         items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
 
         for item in items:
-            for attr, v in item.attrs.iteritems():
+            for attr, v in item.attrs.items():
                 self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
     def compare_builder_maps_with_scene_maps(self, builder):
@@ -148,19 +160,19 @@ class VfxTestCase(TestCase):
             node_names (list): A list of expected node names like zTissue1, zBone1, ...
             node_type (string/list): Node type to check: zTissue, zBone, ...
         """
-        if not mz.is_sequence(node_type):
+        if not is_sequence(node_type):
             node_type = [node_type]
 
         nodes = builder.get_scene_items(type_filter=node_type)
 
-        self.assertItemsEqual(node_names, [x.name for x in nodes])
+        self.assertCountsEqual(node_names, [x.name for x in nodes])
 
         for node in nodes:
             self.assertIn(node.type, node_type)
 
         zbuilder_plugs = attr_values_from_zbuilder_nodes(nodes)
         expected_plugs = expected_plugs or attr_values_from_scene(zbuilder_plugs.keys())
-        self.assertGreaterEqual(zbuilder_plugs, expected_plugs)
+        self.assertTrue(set(zbuilder_plugs).issuperset(set(expected_plugs)))
 
     def check_build_restores_attr_values(self, builder, node_names, node_attrs):
         plug_names = {'{}.{}'.format(geo, attr) for geo in node_names for attr in node_attrs}

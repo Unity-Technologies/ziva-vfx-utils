@@ -1,8 +1,9 @@
 import os
-import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-from vfx_test_case import VfxTestCase
 from maya import cmds
+from vfx_test_case import VfxTestCase
+import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
+from zBuilder.commonUtils import is_string
 
 try:
     from PySide2 import QtCore
@@ -31,7 +32,7 @@ class ZivaScenePanelTestCase(VfxTestCase):
 
     def check_model_data_returns_right_types(self, index):
         name = self.model.data(index, QtCore.Qt.DisplayRole)
-        self.assertIn(type(name), [unicode, str])
+        self.assertTrue(is_string(name))
 
         node_type = self.model.data(index, self.model.sortRole)
         self.assertIn(type(node_type), [unicode, str])

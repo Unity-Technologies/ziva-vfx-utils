@@ -37,7 +37,7 @@ class ZivaGeoTestCase(VfxTestCase):
             if node.type != 'ui_curve_body':
                 self.assertTrue(hasattr(node, 'depends_on'))
             self.assertIsInstance(node, DGNode)
-        self.assertItemsEqual(self.geo_names, [x.name for x in nodes.values()])
+        self.assertCountsEqual(self.geo_names, [x.name for x in nodes.values()])
 
     def test_retrieve(self):
         self.check_retrieve_geo_looks_good(self.builder)

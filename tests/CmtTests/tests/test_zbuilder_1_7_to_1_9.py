@@ -19,7 +19,6 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
     def test_build_1_7(self):
         # Act
         for item in self.builders_1_7:
-            print item
             # find corresponding maya file
             basename = os.path.basename(item)
             maya_file = basename.replace('_1_7.zBuilder', '.ma')

@@ -43,7 +43,6 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         # adding rivet name and rivet transform parent
         for item in builder.get_scene_items(type_filter='zRivetToBone'):
             scene_name = cmds.ls(item.name)[0]
-            print item.name, scene_name
             self.assertEqual(item.name, scene_name)
             # self.assertEqual(item.rivet_locator_parent, cmds.listRelatives(item.name, p=True))
 

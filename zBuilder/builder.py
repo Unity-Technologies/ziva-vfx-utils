@@ -93,7 +93,7 @@ class Builder(object):
         parameters = []
         if not types:
             types = node_parameter_info.keys()
-        for parameter_type, parameter_args in node_parameter_info.iteritems():
+        for parameter_type, parameter_args in node_parameter_info.items():
             for parameter_arg in parameter_args:
                 if parameter_type in types:
                     parameter = self.parameter_factory(parameter_type, parameter_arg)

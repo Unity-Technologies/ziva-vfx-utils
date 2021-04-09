@@ -6,6 +6,7 @@ from maya import cmds
 from maya import mel
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
+from zBuilder.commonUtils import is_string
 from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
 ZIVA_CLIPBOARD_ZBUILDER = None
@@ -523,7 +524,7 @@ def listConnectionPlugs(node, destination=True, source=True):
     """ Get all of the connections with 'node' as a list of pairs of plugs.
     The first plug in each pair is a plug on 'node'. The second plug in each
     pair is a plug the first is connected to. """
-    assert isinstance(node, basestring), 'Arguments #1 is not a string'
+    assert is_string(node), 'Arguments #1 is not a string'
     assert isinstance(destination, bool), 'Arguments "destination" is not a bool'
     assert isinstance(source, bool), 'Arguments "source" is not a bool'
     plugs = cmds.listConnections(node,
@@ -547,8 +548,8 @@ def merge_two_solvers(solver_transform1, solver_transform2):
     """
     ####################################################################
     # Checking inputs
-    assert isinstance(solver_transform1, basestring), 'Arguments #1 is not a string'
-    assert isinstance(solver_transform2, basestring), 'Arguments #2 is not a string'
+    assert is_string(solver_transform1), 'Arguments #1 is not a string'
+    assert is_string(solver_transform2), 'Arguments #2 is not a string'
     assert cmds.nodeType(
         solver_transform1) == 'zSolverTransform', 'Argument #1 is not a zSolverTransform'
     assert cmds.nodeType(

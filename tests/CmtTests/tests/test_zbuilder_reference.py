@@ -28,7 +28,7 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         items = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
 
         for item in items:
-            for attr, v in item.attrs.iteritems():
+            for attr, v in item.attrs.items():
                 self.assertEquals(v['value'], cmds.getAttr('{}.{}'.format(item.name, attr)))
 
     def test_write_and_read_build_on_referenced_full_setup(self):

@@ -4,9 +4,9 @@ import time
 
 from maya import cmds
 import zBuilder
-
-from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import get_short_name
+from zBuilder.commonUtils import is_string
 
 logger = logging.getLogger(__name__)
 
@@ -196,25 +196,25 @@ class Base(object):
             if mz.is_sequence(self.__dict__[item]):
                 new_names = []
                 for name in self.__dict__[item]:
-                    if isinstance(name, basestring):
+                    if is_string(name):
                         new_name = mz.replace_long_name(search, replace, name)
                         new_names.append(new_name)
                         self.__dict__[item] = new_names
-            elif isinstance(self.__dict__[item], basestring):
+            elif is_string(self.__dict__[item]):
                 self.__dict__[item] = mz.replace_long_name(search, replace, self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
                 new_names = []
                 self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
 
-                for key, v in self.__dict__[item].iteritems():
-                    if isinstance(v, basestring):
+                for key, v in self.__dict__[item].items():
+                    if is_string(v):
                         new_name = mz.replace_long_name(search, replace, v)
                         new_names.append(new_name)
                         self.__dict__[item][key] = new_names
                     if mz.is_sequence(v):
                         new_names = []
                         for name in self.__dict__[item][key]:
-                            if isinstance(item, basestring):
+                            if is_string(item):
                                 new_name = mz.replace_long_name(search, replace, name)
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names

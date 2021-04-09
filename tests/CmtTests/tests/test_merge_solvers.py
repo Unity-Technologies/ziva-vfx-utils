@@ -155,7 +155,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
         # Verify
         self.assertIn(solvers[0], cmds.ls(type='zSolverTransform'))
         new_meshes = cmds.ls(dag=True, type='mesh', noIntermediate=True)
-        self.assertItemsEqual(old_meshes, new_meshes)
+        self.assertCountsEqual(old_meshes, new_meshes)
         # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
 
     def test_merge_referenced_and_typical_solver(self):
@@ -176,7 +176,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
             # Verify
             self.assertIn(solver_to_keep, cmds.ls(type='zSolverTransform'))
             new_meshes = cmds.ls(dag=True, type='mesh', noIntermediate=True)
-            self.assertItemsEqual(old_meshes, new_meshes)
+            self.assertCountsEqual(old_meshes, new_meshes)
             # Referenced nodes cannot be renamed or deleted, so we should not check for their deletion.
 
     def test_merge_solvers_can_handle_connection_to_enabled(self):
@@ -209,7 +209,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
         # Verify
         new_meshes = cmds.ls(dag=True, type='mesh', noIntermediate=True)
-        self.assertItemsEqual(old_meshes, new_meshes)
+        self.assertCountsEqual(old_meshes, new_meshes)
         self.assertIn(solvers[0], cmds.ls(type='zSolverTransform'))
         self.assertEqual(1, len(cmds.ls(type='zSolverTransform')))
         self.assertEqual(1, len(cmds.ls(type='zEmbedder')))

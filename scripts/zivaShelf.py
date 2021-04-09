@@ -44,7 +44,7 @@ def _setup_button(desc, ctl):
 
 
 def _add_buttons(parent, desc):
-    for ctl, but in desc['shelf']['buttons'].iteritems():
+    for ctl, but in desc['shelf']['buttons'].items():
         cmds.setParent(parent)
 
         width = but.get('width', 35)

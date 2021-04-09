@@ -5,8 +5,8 @@ from maya import mel
 from shiboken2 import wrapInstance
 from PySide2 import QtGui, QtWidgets, QtCore
 
-import model
-import icons
+from . import model
+from . import icons
 from zBuilder.ui.utils import dock_window
 
 

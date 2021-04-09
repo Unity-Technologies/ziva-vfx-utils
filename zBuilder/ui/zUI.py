@@ -7,9 +7,9 @@ from maya import mel
 from PySide2 import QtGui, QtWidgets, QtCore
 from zBuilder.ui.utils import dock_window
 
-import model
-import view
-import icons
+from . import model
+from . import view
+from . import icons
 import os
 import zBuilder.builders.ziva as zva
 from zBuilder.nodes.base import Base

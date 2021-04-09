@@ -109,7 +109,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_rivet_with_selected_bone(self):
         # Setup & Action
@@ -117,7 +117,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_rivet_with_selected_rivet(self):
         # Setup & Action
@@ -125,7 +125,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_rivet_with_selected_rivet_locator_transform(self):
         # Setup & Action
@@ -133,7 +133,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_rivet_with_selected_rivet_locator(self):
         # Setup & Action
@@ -141,7 +141,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_selected_zbone_all_rivets(self):
         # Setup & Action
@@ -151,7 +151,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
         expected_deleted_nodes = set(
             get_rivet_name_triplet(1) + get_rivet_name_triplet(2) + get_rivet_name_triplet(3) +
             get_rivet_name_triplet(4))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
 
     def test_delete_rivet_with_share_curve_rivets(self):
         # Setup & Action
@@ -159,7 +159,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
         expected_remained_nodes = set(get_rivet_name_triplet(2))
         self.assertTrue(expected_remained_nodes.isdisjoint(deleted_nodes))
 
@@ -170,7 +170,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1) + get_rivet_name_triplet(3))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
         expected_remained_nodes = set(get_rivet_name_triplet(2) + get_rivet_name_triplet(4))
         self.assertTrue(expected_remained_nodes.isdisjoint(deleted_nodes))
 
@@ -181,7 +181,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
 
         # Verify
         expected_deleted_nodes = set(get_rivet_name_triplet(1) + get_rivet_name_triplet(3))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))
         expected_remained_nodes = set(get_rivet_name_triplet(2) + get_rivet_name_triplet(4))
         self.assertTrue(expected_remained_nodes.isdisjoint(deleted_nodes))
 
@@ -194,4 +194,4 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
         expected_deleted_nodes = set(
             get_rivet_name_triplet(1) + get_rivet_name_triplet(2) + get_rivet_name_triplet(3) +
             get_rivet_name_triplet(4))
-        self.assertLess(expected_deleted_nodes, deleted_nodes)
+        self.assertTrue(expected_deleted_nodes.issubset(deleted_nodes))

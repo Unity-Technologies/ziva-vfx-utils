@@ -1,5 +1,5 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-import icons
+from . import icons
 
 
 class SceneTreeView(QtWidgets.QTreeView):
@@ -17,12 +17,12 @@ class SceneTreeView(QtWidgets.QTreeView):
         image_child = QtGui.QImage(icons.get_icon_path_from_name('branch-child'))
         image_end = QtGui.QImage(icons.get_icon_path_from_name('branch-end'))
 
-        column_count = rect.width() / self.indentation()
+        column_count = rect.width() // self.indentation()
         model_index = self.model().mapToSource(index)
         node = model_index.internalPointer()
         row_count = self.model().rowCount(index.parent())
 
-        for column in xrange(column_count):
+        for column in range(column_count):
             # padding from the left side of widget
             pos_x = column * self.indentation()
             pos_y = rect.top()

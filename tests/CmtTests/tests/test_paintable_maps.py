@@ -6,7 +6,7 @@ import vfx_test_case
 
 def make_weights(num_weights, shift):
     """ Make some interesting non-trivial weights to test with. """
-    return [x % 10 + shift for x in xrange(num_weights)]
+    return [x % 10 + shift for x in range(num_weights)]
 
 
 class SetWeightsTestCase(vfx_test_case.VfxTestCase):
