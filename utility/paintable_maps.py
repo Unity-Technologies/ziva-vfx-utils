@@ -1,8 +1,23 @@
 from maya import cmds
+from maya import mel
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
 import re
 
+
+# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+def get_paintable_map_fallback_impl(mesh_name, map_name, vert_num=None):
+    """
+    Fallback implementation of get paintable map.
+    This is a work around to the Maya 2022 Python API regression.
+    """
+    vert_count = vert_num if vert_num else cmds.polyEvaluate(mesh_name, v=True)
+    try:
+        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
+    except ValueError:
+        value = cmds.getAttr(map_name)
+    return value
+# End of TODO
 
 def split_map_name(map_name):
     ''' Split map_name to node and attr, e.g.,
@@ -165,6 +180,26 @@ def get_paintable_map_by_getAttr_numericArray(node_name, attr_name):
             node_dot_attr, datatype))
     return cmds.getAttr(node_dot_attr)
 
+# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+def set_paintable_map_fallback_impl(map_name, map_value):
+    """
+    Fallback implementation of set paintable map.
+    This is a work around to the Maya 2022 Python API regression.
+    """
+    weight_map = '{}[0]'.format(map_name)
+    if cmds.objExists(weight_map):
+        if not cmds.getAttr(weight_map, l=True):
+            tmp = []
+            for w in map_value:
+                tmp.append(str(w))
+            val = ' '.join(tmp)
+            cmd = "setAttr {}[0:{}] {}".format(map_name, len(map_value) - 1, val)
+            mel.eval(cmd)
+    else:
+        # applying doubleArray maps
+        if cmds.objExists(map_name):
+            cmds.setAttr(map_name, map_value, type='doubleArray')
+# End of TODO
 
 def set_paintable_map(node_name, attr_name, new_weights):
     # type: (str, str, List[float]) -> None
@@ -192,6 +227,18 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
+    # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+    maya_version = int(cmds.about(version=True)[:4])
+    use_fallback_impl = False
+    if maya_version == 2022:
+        minor_version = int(cmds.about(minorVersion=True))
+        use_fallback_impl = (minor_version == 0)
+
+    if use_fallback_impl:
+        node_dot_attr = '{}.{}'.format(node_name, attr_name)
+        set_paintable_map_fallback_impl(node_dot_attr, new_weights)
+        return
+    # End of TODO
 
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray

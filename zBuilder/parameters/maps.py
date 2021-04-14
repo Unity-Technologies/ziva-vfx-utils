@@ -1,4 +1,5 @@
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
+from utility.paintable_maps import get_paintable_map_fallback_impl
 from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh
 from zBuilder.nodes.base import Base
 from maya import cmds
@@ -7,7 +8,6 @@ from maya import OpenMaya as om
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class Map(Base):
     type = 'map'
@@ -63,10 +63,20 @@ class Map(Base):
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
-        self.values = get_weights(map_name)
-        self.map_type = cmds.objectType(map_name)
 
-        # logger.info('Retrieving Data : {}'.format(self))
+        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+        maya_version = int(cmds.about(version=True)[:4])
+        use_fallback_impl = False
+        if maya_version == 2022:
+            minor_version = int(cmds.about(minorVersion=True))
+            use_fallback_impl = (minor_version == 0)
+
+        if use_fallback_impl:
+            self.values = get_paintable_map_fallback_impl(mesh_name, map_name)
+        else:
+            self.values = get_weights(map_name)
+
+        self.map_type = cmds.objectType(map_name)
 
     def set_mesh(self, mesh):
         """ Stores the mesh name.

@@ -1,8 +1,8 @@
+from utility.paintable_maps import get_paintable_map, set_paintable_map
+from utility.paintable_maps import get_paintable_map_fallback_impl
+import vfx_test_case
 from maya import cmds
 from maya import mel
-from utility.paintable_maps import get_paintable_map, set_paintable_map
-import vfx_test_case
-
 
 def make_weights(num_weights, shift):
     """ Make some interesting non-trivial weights to test with. """
@@ -32,18 +32,20 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         ## SETUP TEST DATA ########################################################################
 
         tissue_weights = make_weights(cmds.polyEvaluate('Tissue', vertex=True), 0.125)
-        bone_weights = make_weights(cmds.polyEvaluate('Bone', vertex=True), 0.25)
+        tissue_test_cases = []
+        tissue_test_cases.append(('zTet1', 'weightList[0].weights', tissue_weights))
+        tissue_test_cases.append(('zAttachment1', 'weightList[0].weights', tissue_weights))
+        tissue_test_cases.append(('zFiber1', 'endPoints', tissue_weights))
+        tissue_test_cases.append(('zEmbedder1', 'weightList[3].weights', tissue_weights))
 
-        test_cases = []
-        test_cases.append(('zTet1', 'weightList[0].weights', tissue_weights))
-        test_cases.append(('zAttachment1', 'weightList[0].weights', tissue_weights))
-        test_cases.append(('zAttachment1', 'weightList[1].weights', bone_weights))
-        test_cases.append(('zFiber1', 'endPoints', tissue_weights))
-        test_cases.append(('zEmbedder1', 'weightList[3].weights', tissue_weights))
+        bone_weights = make_weights(cmds.polyEvaluate('Bone', vertex=True), 0.25)
+        bone_test_cases = []
+        bone_test_cases.append(('zAttachment1', 'weightList[1].weights', bone_weights))
 
         ## ACT & VERIFY ###########################################################################
 
-        self.check_set_paintable_map(test_cases)
+        self.check_set_paintable_map(tissue_test_cases, 'Tissue')
+        self.check_set_paintable_map(bone_test_cases, 'Bone')
 
     def test_set_paintable_map_bonewarp(self):
         # We need to test zBoneWarp.landmarkList.landmarks because it's an array attribute,
@@ -56,14 +58,29 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         warp_weights = make_weights(cmds.polyEvaluate('BoneWarpThing', vertex=True), 0.5)
 
         test_cases = [('zBoneWarp1', 'landmarkList[0].landmarks', warp_weights)]
-        self.check_set_paintable_map(test_cases)
+        self.check_set_paintable_map(test_cases, None)
 
-    def check_set_paintable_map(self, test_cases):
-        ## SETUP was done by caller.
+    def check_set_paintable_map(self, test_cases, mesh_name):
+        # SETUP was done by caller.
+        
+        # TODO: Delete mesh_name parameter once Maya 2022 retires or fixes the regression
+        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+        maya_version = int(cmds.about(version=True)[:4])
+        use_fallback_impl = False
+        if maya_version == 2022:
+            minor_version = int(cmds.about(minorVersion=True))
+            use_fallback_impl = (minor_version == 0)
+
         for node, attr, weights in test_cases:
             print('node, attr = {}, {}'.format(node, attr))  # so we can tell what failed
             set_paintable_map(node, attr, weights)
             ## ACT ###############
-            observed_weights = get_paintable_map(node, attr)
+            observed_weights = None
+            if use_fallback_impl and mesh_name:
+                node_dot_attr = '{}.{}'.format(node, attr)
+                observed_weights = get_paintable_map_fallback_impl(mesh_name, node_dot_attr)
+            else:
+                observed_weights = get_paintable_map(node, attr)
+
             ## VERIFY #######################
             self.assertAllApproxEqual(weights, observed_weights)
