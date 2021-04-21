@@ -1,11 +1,10 @@
 import logging
 from collections import defaultdict
-
 from maya import cmds
 from maya import mel
-
 import zBuilder.zMaya as mz
 from zBuilder.builder import Builder
+from zBuilder.commonUtils import none_to_empty
 from zBuilder.nodes.utils.fields import Field
 
 logger = logging.getLogger(__name__)
@@ -81,7 +80,6 @@ class Ziva(Builder):
         """Sets up hierarchy for a tree view.  This will look at items and assign the proper 
         children, parent for QT.
         """
-        from zBuilder.nodes.base import Base
         from zBuilder.nodes.dg_node import DGNode
 
         # reset stuff............
@@ -276,7 +274,7 @@ class Ziva(Builder):
 
         children = []
         for tissue in tissue_names:
-            children.extend(mz.none_to_empty(cmds.listConnections(tissue + '.oChildTissue')))
+            children.extend(none_to_empty(cmds.listConnections(tissue + '.oChildTissue')))
 
         if children:
             nodes.extend(self.__add_bodies(children))

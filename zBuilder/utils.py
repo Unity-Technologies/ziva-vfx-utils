@@ -1,19 +1,19 @@
 import copy
 import logging
 import re
-
 from maya import cmds
 from maya import mel
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
-from zBuilder.commonUtils import is_string
+from zBuilder.commonUtils import is_string,  none_to_empty
 from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
+
+logger = logging.getLogger(__name__)
+
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
 ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
-
-logger = logging.getLogger(__name__)
 
 
 def return_copy_buffer():
@@ -376,7 +376,6 @@ def rig_update(solvers=None):
         raise Exception("No solver in scene.")
 
     for solver in solvers:
-        solver_transform = cmds.listRelatives(solver, p=True, f=True)[0][1:]
         # select the solver, and read the ziva setup from solver into the zBuilder object
         cmds.select(solver)
         builder = zva.Ziva()
@@ -605,13 +604,13 @@ def merge_two_solvers(solver_transform1, solver_transform2):
         # logger.info('Adding shapes from {} to {}'.format(embedder2, embedder1))
 
         # From embedder2, find all of the embedded meshes and which zGeoNode they're deformed by.
-        tissue_geo_plugs = mz.none_to_empty(
+        tissue_geo_plugs = none_to_empty(
             cmds.listConnections('{}.iGeo'.format(embedder2),
                                  plugs=True,
                                  source=True,
                                  destination=False))
-        meshes = mz.none_to_empty(cmds.deformer(embedder2, query=True, geometry=True))
-        indices = set(mz.none_to_empty(cmds.deformer(embedder1, query=True, geometryIndices=True)))
+        meshes = none_to_empty(cmds.deformer(embedder2, query=True, geometry=True))
+        indices = set(none_to_empty(cmds.deformer(embedder1, query=True, geometryIndices=True)))
 
         # Add all of the meshes from embedder2 onto embedder1, and connect up the iGeo to go with it.
         for mesh, geo_plug in zip(meshes, tissue_geo_plugs):
