@@ -657,21 +657,6 @@ def check_mesh_quality(meshes):
         cmds.select(meshes)
 
 
-def check_maya_node(maya_node):
-    """
-
-    Args:
-        maya_node:
-
-    Returns:
-
-    """
-    if is_sequence(maya_node):
-        return maya_node[0]
-    else:
-        return maya_node
-
-
 def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid

@@ -42,3 +42,5 @@ def is_sequence(var):
     """
     return isinstance(var, (list, tuple)) and not is_string(var)
 
+def get_first_element(maya_node):
+    return maya_node[0] if is_sequence(maya_node) else maya_node

@@ -1,10 +1,9 @@
-import copy
-import logging
-
 from maya import cmds
+from zBuilder.commonUtils import get_first_element
 from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes.base import Base
 import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ class DGNode(Base):
             maya_node (str): The maya node to populate parameter with.
 
         """
-        self.name = mz.check_maya_node(maya_node)
+        self.name = get_first_element(maya_node)
         self.type = cmds.objectType(self.long_name)
         self.get_maya_attrs()
 

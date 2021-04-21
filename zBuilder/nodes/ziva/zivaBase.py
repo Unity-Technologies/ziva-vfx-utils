@@ -1,11 +1,8 @@
-import zBuilder.zMaya as mz
 from maya import cmds
 from maya import mel
-
+from zBuilder.commonUtils import get_first_element
 from zBuilder.nodes.deformer import Deformer
-import logging
-
-logger = logging.getLogger(__name__)
+import zBuilder.zMaya as mz
 
 
 class Ziva(Deformer):
@@ -37,7 +34,7 @@ class Ziva(Deformer):
         # The plan is to revert this like so and re-visit it with this ticket:
         # https://zivadynamics.atlassian.net/browse/VFXACT-689
 
-        maya_node = mz.check_maya_node(maya_node)
+        maya_node = get_first_element(maya_node)
 
         self.name = maya_node
         self.type = cmds.objectType(maya_node)
