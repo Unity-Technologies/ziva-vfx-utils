@@ -1,9 +1,9 @@
-import logging
-
-from maya import cmds
-from maya import mel
+from zBuilder.mayaUtils import safe_rename
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
+from maya import cmds
+from maya import mel
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -70,12 +70,7 @@ class TissueNode(Ziva):
             assert (len(tissue_items) == len(tet_items)
                     ), 'zTet and zTissue have a different amount.  Not building.'
 
-            build_multiple(tissue_items,
-                           tet_items,
-                           attr_filter=attr_filter,
-                           permissive=permissive,
-                           solver=solver,
-                           interp_maps=interp_maps)
+            build_multiple(tissue_items, tet_items, permissive=permissive)
 
             # we only want to execute this if tissue_items is empty or self is the first tissue.
             # set the attributes in maya
@@ -87,27 +82,19 @@ class TissueNode(Ziva):
                 ztet.set_maya_weights(interp_maps=interp_maps)
 
 
-def build_multiple(tissue_items,
-                   tet_items,
-                   interp_maps='auto',
-                   attr_filter=None,
-                   permissive=True,
-                   solver=None):
+def build_multiple(tissue_items, tet_items, permissive=True):
     """
-    Each node can deal with it's own building.  Though, with zBones it is much
+    Each node can deal with it's own building. Though, with zTissues it is much
     faster to build them all at once with one command instead of looping
-    through them.  This function builds all the zBones at once.
+    through them.  This function builds all the zTissue at once.
 
     Args:
-        permissive (bool):
         tissue_items:
         tet_items:
-        attr_filter (obj):
-        solver:
-        interp_maps:
+        permissive (bool):
 
     Returns:
-
+        None
     """
     sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
@@ -125,11 +112,11 @@ def build_multiple(tissue_items,
         # rename zTissues and zTets-----------------------------------------
         for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
                                                 tissue_results['scene_items']):
-            node.name = mz.safe_rename(new_name, builder_name)
+            node.name = safe_rename(new_name, builder_name)
 
         for new_name, builder_name, node in zip(outs[2::4], tet_results['names'],
                                                 tet_results['scene_items']):
-            node.name = mz.safe_rename(new_name, builder_name)
+            node.name = safe_rename(new_name, builder_name)
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()

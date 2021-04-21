@@ -1,9 +1,9 @@
-import logging
-
 from maya import cmds
 from maya import mel
 from zBuilder.nodes import Ziva
+from zBuilder.mayaUtils import safe_rename
 import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class BoneNode(Ziva):
         # all the zBones and build them together for speed reasons.
         # This feels kinda sloppy to me.
         if self is scene_items[0]:
-            build_multiple(scene_items, attr_filter=attr_filter, permissive=permissive)
+            build_multiple(scene_items)
 
             # set the attributes.  This needs to run even if there are no zBone to build. This case happens during a copy paste.
             # any time you 'build' when the zBone is in scene.
@@ -43,18 +43,16 @@ class BoneNode(Ziva):
                 scene_item.set_maya_attrs(attr_filter=attr_filter)
 
 
-def build_multiple(scene_items, attr_filter=None, permissive=False):
+def build_multiple(scene_items):
     """ Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zBones at once.
 
     Args:
-        permissive (bool):
-        parameters:
-        attr_filter (obj):
+        scene_items:
 
     Returns:
-
+        None
     """
     sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
@@ -71,6 +69,6 @@ def build_multiple(scene_items, attr_filter=None, permissive=False):
     if results:
         results = cmds.ls(results, type='zBone')
         for new, name, scene_item in zip(results, culled['names'], culled['scene_items']):
-            scene_item.name = mz.safe_rename(new, name)
+            scene_item.name = safe_rename(new, name)
 
     cmds.select(sel)

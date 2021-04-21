@@ -1,9 +1,9 @@
 import logging
-
 from maya import cmds
 from maya import mel
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import safe_rename
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class ClothNode(Ziva):
         # This feels kinda sloppy to me.
 
         if self is scene_items[0]:
-            build_multiple(scene_items, attr_filter=attr_filter)
+            build_multiple(scene_items)
 
             # set the attributes.  This needs to run even if there are no zCloth to build. This case happens during a copy paste.
             # any time you 'build' when the zCloth is in scene.
@@ -43,7 +43,7 @@ class ClothNode(Ziva):
                 item.set_maya_attrs(attr_filter=attr_filter)
 
 
-def build_multiple(scene_items, attr_filter=None):
+def build_multiple(scene_items):
     """ Each node can deal with it's own building.  Though, with zCLoth it is much
     faster to build them all at once with one command instead of looping
     through them.  This function builds all the zCloth at once.
@@ -71,6 +71,6 @@ def build_multiple(scene_items, attr_filter=None):
     if results:
         results = cmds.ls(results, type='zCloth')
         for new_name, builder_name, item in zip(results, culled['names'], culled['scene_items']):
-            item.name = mz.safe_rename(new_name, builder_name)
+            item.name = safe_rename(new_name, builder_name)
 
     cmds.select(sel)

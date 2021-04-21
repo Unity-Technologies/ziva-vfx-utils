@@ -1,10 +1,8 @@
-import logging
-
+from zBuilder.mayaUtils import get_short_name, safe_rename
+from zBuilder.nodes import Ziva
 from maya import cmds
 from maya import mel
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +81,10 @@ class RivetToBoneNode(Ziva):
                     cmds.select('{}.cv[{}]'.format(crv, i), add=True)
                 cmds.select(bone, add=True)
                 results = mel.eval('zRivetToBone')
-                self.name = mz.safe_rename(results[0], self.name)
+                self.name = safe_rename(results[0], self.name)
                 # restore name of rivet locator
                 if self.rivet_locator:
-                    self.rivet_locator = mz.safe_rename(results[1], self.rivet_locator)
+                    self.rivet_locator = safe_rename(results[1], self.rivet_locator)
 
                 # parent locator to group if group node already exists
                 if self.rivet_locator_parent:

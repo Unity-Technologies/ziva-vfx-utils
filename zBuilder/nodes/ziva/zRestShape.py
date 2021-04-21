@@ -1,7 +1,7 @@
+from zBuilder.mayaUtils import safe_rename
 from zBuilder.nodes import Ziva
 from maya import cmds
 from maya import mel
-import zBuilder.zMaya as mz
 import logging
 
 logger = logging.getLogger(__name__)
@@ -60,7 +60,7 @@ class RestShapeNode(Ziva):
                 # If this name is elsewhere in scene (on another mesh) it will not
                 # be able to name it so we capture return and rename scene_item
                 # so setAttrs work
-                self.name = mz.safe_rename(results, self.name)
+                self.name = safe_rename(results, self.name)
 
             else:
                 # The rest shape node exists on mesh so now lets update it.

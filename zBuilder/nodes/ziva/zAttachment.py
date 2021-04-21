@@ -4,9 +4,9 @@ from maya import cmds
 from maya import mel
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import safe_rename
 
 logger = logging.getLogger(__name__)
-
 
 class AttachmentNode(Ziva):
     """ This node for storing information related to zAttachments.
@@ -59,17 +59,17 @@ class AttachmentNode(Ziva):
 
             if existing:
                 if d_index < len(existing):
-                    self.name = mz.safe_rename(existing[d_index], self.name)
+                    self.name = safe_rename(existing[d_index], self.name)
                 else:
                     cmds.select(source_mesh, r=True)
                     cmds.select(target_mesh, add=True)
                     new_att = mel.eval('ziva -a')
-                    self.name = mz.safe_rename(new_att[0], self.name)
+                    self.name = safe_rename(new_att[0], self.name)
             else:
                 cmds.select(source_mesh, r=True)
                 cmds.select(target_mesh, add=True)
                 new_att = mel.eval('ziva -a')
-                self.name = mz.safe_rename(new_att[0], self.name)
+                self.name = safe_rename(new_att[0], self.name)
 
             self.check_parameter_name()
 

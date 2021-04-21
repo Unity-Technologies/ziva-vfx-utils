@@ -1,9 +1,10 @@
-import logging
 
-from maya import cmds
-from maya import mel
+from zBuilder.mayaUtils import safe_rename
 from zBuilder.nodes import Ziva
 import zBuilder.zMaya as mz
+from maya import cmds
+from maya import mel
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ class LineOfActionNode(Ziva):
                 cmds.select(self.fiber_item.name, loas)
                 results_ = mel.eval('ziva -lineOfAction')
                 clt = cmds.ls(results_, type='zLineOfAction')[0]
-                self.name = mz.safe_rename(clt, self.name)
+                self.name = safe_rename(clt, self.name)
         else:
             cmds.warning(self.fiber_item.name +
                          ' fiber does not exists in scene, skipping line of action')

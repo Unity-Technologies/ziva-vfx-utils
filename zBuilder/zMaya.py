@@ -4,7 +4,7 @@ from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
 from zBuilder.commonUtils import is_sequence, none_to_empty
-
+from zBuilder.mayaUtils import safe_rename
 
 logger = logging.getLogger(__name__)
 
@@ -419,20 +419,6 @@ def get_association(zNode):
         else:
             mesh = mel.eval(cmd)
             return mesh
-
-
-def safe_rename(old_name, new_name):
-    """
-    Same as cmds.rename but does not throw an exception if renaming failed
-    Useful if need to rename all the nodes that are not referenced
-    """
-    if old_name != new_name:
-        try:
-            return cmds.rename(old_name, new_name)
-        except RuntimeError:
-            pass
-
-    return old_name
 
 
 def strip_namespace(node):

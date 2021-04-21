@@ -1,10 +1,8 @@
-import logging
-
+from zBuilder.mayaUtils import get_short_name, safe_rename
+from zBuilder.nodes import Ziva
 from maya import cmds
 from maya import mel
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +88,7 @@ class TetNode(Ziva):
                         '{} doesnt exist in scene.  Permissive set to True, skipping tet creation'.
                         format(name))
             else:
-                self.name = mz.safe_rename(name, self.name)
+                self.name = safe_rename(name, self.name)
 
         self.apply_user_tet_mesh()
         # zTet does not need to build maps and attributes here because it's done by zTissue

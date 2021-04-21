@@ -1,9 +1,8 @@
-import logging
-
+from zBuilder.nodes import Ziva
+from zBuilder.mayaUtils import safe_rename
 from maya import cmds
 from maya import mel
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -57,11 +56,11 @@ class MaterialNode(Ziva):
             # if there are enough existing materials use those
             # or else create a new material
             if d_index < len(existing_materials):
-                self.name = mz.safe_rename(existing_materials[d_index], self.name)
+                self.name = safe_rename(existing_materials[d_index], self.name)
             else:
                 cmds.select(mesh, r=True)
                 results = mel.eval('ziva -m')
-                self.name = mz.safe_rename(results[0], self.name)
+                self.name = safe_rename(results[0], self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zMaterial creation')
 

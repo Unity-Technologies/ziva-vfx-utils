@@ -1,10 +1,8 @@
-import logging
-
 from maya import cmds
 from maya import mel
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.mayaUtils import get_short_name, safe_rename
 from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +102,7 @@ class EmbedderNode(Ziva):
         # based on stored solver then rename it to what is in builder.
         if not cmds.objExists(self.name):
             found_name = mel.eval('zQuery -t zEmbedder {}'.format(self.solver.name))
-            self.name = mz.safe_rename(found_name[0], self.name)
+            self.name = safe_rename(found_name[0], self.name)
 
         collision_meshes = self.get_collision_meshes(long_name=True)
         embedded_meshes = self.get_embedded_meshes(long_name=True)

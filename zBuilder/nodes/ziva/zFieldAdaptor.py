@@ -1,9 +1,7 @@
-import logging
-
-from maya import cmds
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.mayaUtils import get_short_name, safe_rename
 from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+from maya import cmds
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +71,7 @@ class FieldAdaptorNode(Ziva):
             # then hook it up.
             results_ = cmds.createNode('zFieldAdaptor', name=name)
             clt = cmds.ls(results_, type='zFieldAdaptor')[0]
-            mz.safe_rename(clt, name)
+            safe_rename(clt, name)
 
         # check if field exists and if it does hook it up
         if cmds.objExists(self.input_field):
