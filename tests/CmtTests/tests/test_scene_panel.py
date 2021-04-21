@@ -35,13 +35,13 @@ class ZivaScenePanelTestCase(VfxTestCase):
         self.assertTrue(is_string(name))
 
         node_type = self.model.data(index, self.model.sortRole)
-        self.assertIn(type(node_type), [unicode, str])
+        self.assertTrue(is_string(node_type))
 
         node = self.model.data(index, self.model.nodeRole)
         self.assertIsInstance(node, DGNode)
 
         long_name = self.model.data(index, self.model.longNameRole)
-        self.assertIn(type(long_name), [unicode, str])
+        self.assertTrue(is_string(long_name))
 
         enable = self.model.data(index, self.model.enableRole)
         self.assertIn(enable, [True, False, 0, 1])
