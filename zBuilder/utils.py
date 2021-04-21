@@ -3,10 +3,10 @@ import logging
 import re
 from maya import cmds
 from maya import mel
+from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
+from zBuilder.mayaUtils import get_short_name
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
-from zBuilder.commonUtils import is_string,  none_to_empty
-from zBuilder.mayaUtils import get_short_name
 import zBuilder.zMaya as mz
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ def remove_zRivetToBone_nodes(nodes):
 
     def set_rivet(rivet):
         if rivet:
-            if mz.is_sequence(rivet):
+            if is_sequence(rivet):
                 nodes_to_delete.extend(rivet)
             else:
                 nodes_to_delete.append(rivet)
@@ -651,7 +651,7 @@ def merge_solvers(solver_transforms):
 
     e.g. merge_solvers(['zSolver1', 'zSolver2', 'zSolver2'])
     """
-    assert mz.is_sequence(solver_transforms), 'Arguments #1 is not a list'
+    assert is_sequence(solver_transforms), 'Arguments #1 is not a list'
 
     if len(solver_transforms) < 2:
         return

@@ -3,7 +3,7 @@ import logging
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
-from zBuilder.commonUtils import is_string, none_to_empty
+from zBuilder.commonUtils import is_sequence, none_to_empty
 
 
 logger = logging.getLogger(__name__)
@@ -14,15 +14,6 @@ ZNODES = [
     'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
 ]
 """ All available ziva nodes to be able to cleanup. """
-
-
-def is_sequence(var):
-    """
-    Returns:
-    True if input is a sequence data type, i.e., list or tuple, but not string type.
-    False otherwise.
-    """
-    return isinstance(var, (list, tuple)) and not is_string(var)
 
 
 def check_body_type(bodies):

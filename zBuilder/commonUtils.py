@@ -32,3 +32,13 @@ def is_string(var):
     if sys.version_info[0] < 3:
         return isinstance(var, basestring)
     return isinstance(var, str)
+
+
+def is_sequence(var):
+    """
+    Returns:
+    True if input is a sequence data type, i.e., list or tuple, but not string type.
+    False otherwise.
+    """
+    return isinstance(var, (list, tuple)) and not is_string(var)
+

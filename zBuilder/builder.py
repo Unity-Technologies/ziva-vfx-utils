@@ -1,4 +1,5 @@
 from zBuilder.bundle import Bundle
+from zBuilder.commonUtils import is_string, is_sequence
 import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
@@ -119,10 +120,10 @@ class Builder(object):
             already been created.
         '''
         # put association filter in a list if it isn't
-        if not mz.is_sequence(parameter_args):
+        if not is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
-        for name, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
+        for _, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj) and parameter_type == obj.type:
                 scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
@@ -334,7 +335,7 @@ def get_node_types_with_maps():
     node types with maps.  MAP_LIST is a class attr so it is not being instantiated here.
     """
     returns = []
-    for name, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
+    for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
         if inspect.isclass(obj):
             if obj.MAP_LIST:
                 returns.append(obj.type)

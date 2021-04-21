@@ -5,7 +5,7 @@ from maya import cmds
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
-from zBuilder.zMaya import is_sequence
+from zBuilder.commonUtils import is_sequence
 from utility.paintable_maps import split_map_name, get_paintable_map
 
 
