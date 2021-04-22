@@ -1,15 +1,8 @@
-import os
-
-from maya import cmds
-from maya import mel
-
-import zBuilder.zMaya as mz
-import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.builder as bld
 import zBuilder.builders.ziva as zva
+from zBuilder.utils import clean_scene
+import tests.utils as test_utils
 from vfx_test_case import VfxTestCase
-
+import os
 
 class Builder1_7_to_1_9TestCase(VfxTestCase):
     def setUp(self):
@@ -25,7 +18,7 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
 
             # open it and clean scene so we have just geo
             test_utils.load_scene(scene_name=maya_file)
-            mz.clean_scene()
+            clean_scene()
 
             builder = zva.Ziva()
             builder.retrieve_from_file(item)

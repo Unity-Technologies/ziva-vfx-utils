@@ -1,16 +1,9 @@
+import zBuilder.builders.ziva as zva
+from zBuilder.utils import clean_scene, remove_solver
+import tests.utils as test_utils
+from vfx_test_case import VfxTestCase
 from maya import cmds
 from maya import mel
-import os
-import logging
-import sys
-
-import zBuilder.zMaya as mz
-import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-import zBuilder.utils as utils
-
-from vfx_test_case import VfxTestCase
-
 
 class ZivaRivetTestCase(VfxTestCase):
     def setUp(self):
@@ -65,7 +58,7 @@ class ZivaRivetTestCase(VfxTestCase):
         z = zva.Ziva()
         z.retrieve_from_scene()
 
-        mz.clean_scene()
+        clean_scene()
 
         z.build()
 
@@ -103,7 +96,7 @@ class ZivaRivetTestCase(VfxTestCase):
         z = zva.Ziva()
         z.retrieve_from_scene()
 
-        mz.clean_scene()
+        clean_scene()
 
         z.build()
 
@@ -133,6 +126,6 @@ class ZivaRivetTestCase(VfxTestCase):
 
     def test_delete_solver_with_rivet(self):
         cmds.select('zSolver1')
-        utils.remove_solver()
+        remove_solver()
 
         self.assertEquals(cmds.ls(type=['zSolver', 'zRivetToBone', 'zRivetToBoneLocator']), [])

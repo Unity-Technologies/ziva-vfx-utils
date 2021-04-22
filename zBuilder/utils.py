@@ -1,19 +1,26 @@
-import copy
-import logging
-import re
-from maya import cmds
-from maya import mel
 from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
 from zBuilder.mayaUtils import get_short_name
 import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
+from maya import cmds
+from maya import mel
+import copy
+import logging
+import re
 
 logger = logging.getLogger(__name__)
 
 ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
 ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
+
+ALL_ZIVA_NODES = [
+    'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
+    'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
+    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
+]
+""" All available ziva nodes to be able to cleanup. """
 
 
 def return_copy_buffer():
@@ -190,7 +197,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
 
     to_erase = []
     meshes_to_unlock = []
-    for node in mz.ZNODES:
+    for node in ALL_ZIVA_NODES:
         nodes_in_scene = cmds.ls(type=node)
         for item in nodes_in_scene:
             solver_of_this_item = mz.get_zSolver(item)
@@ -236,7 +243,7 @@ def remove_all_solvers(confirmation=False):
         if response != 'Yes':
             return
 
-    mz.clean_scene()
+    clean_scene()
 
 
 def rig_cut_copy(cut=False):
@@ -660,3 +667,17 @@ def merge_solvers(solver_transforms):
     with zva.SolverDisabler(solver1):
         for solver2 in solver_transforms[1:]:
             merge_two_solvers(solver1, solver2)
+
+
+def clean_scene():
+    """
+    Deletes all ziva nodes in scene.  Effectively cleaning it up.
+    """
+    solvers = cmds.ls(type='zSolver')
+    mz.delete_rivet_from_solver(solvers)
+
+    for node in ALL_ZIVA_NODES:
+        in_scene = cmds.ls(type=node)
+        if in_scene:
+            cmds.delete(in_scene)
+

@@ -148,7 +148,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         cmds.select('zSolver1')
         utils.rig_copy()
 
-        mz.clean_scene()
+        utils.clean_scene()
 
         utils.rig_paste()
         self.assertSceneHasNodes(['zSolver1'])
@@ -235,7 +235,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         utils.save_rig(file_name)
 
         # clean scene so we just have geo
-        mz.clean_scene()
+        utils.clean_scene()
 
         utils.load_rig(file_name)
         self.assertSceneHasNodes(['zSolver1'])

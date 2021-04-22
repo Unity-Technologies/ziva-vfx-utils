@@ -1,19 +1,10 @@
+import zBuilder.builders.ziva as zva
+from zBuilder.builders.ziva import SolverDisabler
+from zBuilder.utils import clean_scene
+import tests.utils as test_utils
+from vfx_test_case import VfxTestCase
 from maya import cmds
 from maya import mel
-import os
-import logging
-import sys
-
-import zBuilder.zMaya as mz
-import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-import zBuilder.utils as utils
-
-from vfx_test_case import VfxTestCase
-from zBuilder.builders.ziva import SolverDisabler
-
-from maya import cmds
-
 
 class ZivaMirrorTestCase(VfxTestCase):
     def setUp(self):
@@ -75,7 +66,7 @@ class ZivaBuildTestCase(VfxTestCase):
     def test_retrieve_from_scene(self):
         zAttachments = cmds.ls(type='zAttachment')
         # remove ziva nodes from scene so all we have left is geo
-        mz.clean_scene()
+        clean_scene()
 
         # build
         self.builder.build()
@@ -83,7 +74,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
     def test_string_replace(self):
         # remove ziva nodes from scene so all we have left is geo
-        mz.clean_scene()
+        clean_scene()
 
         cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
         self.builder.string_replace('r_bicep_muscle', 'r_biceps_muscle')
@@ -96,7 +87,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
     def test_build_permissive_false(self):
         # remove ziva nodes from scene so all we have left is geo
-        mz.clean_scene()
+        clean_scene()
 
         # now lets delete bicep to see how build handles it
         cmds.delete('r_bicep_muscle')
@@ -106,7 +97,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
     def test_bad_mesh_error(self):
         # make sure we get an error if mesh fails a check
-        mz.clean_scene()
+        clean_scene()
 
         # now lets scale muscle to make it invalid
         cmds.setAttr('r_bicep_muscle.scaleX', l=False)

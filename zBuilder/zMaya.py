@@ -1,18 +1,10 @@
-import logging
-from maya import cmds
-from maya import mel
 from zBuilder.commonUtils import none_to_empty
 from zBuilder.mayaUtils import safe_rename
+from maya import cmds
+from maya import mel
+import logging
 
 logger = logging.getLogger(__name__)
-
-ZNODES = [
-    'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
-    'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
-    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
-]
-""" All available ziva nodes to be able to cleanup. """
-
 
 def check_body_type(bodies):
     """ Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
@@ -37,18 +29,6 @@ def check_body_type(bodies):
         return True
     else:
         return False
-
-
-def clean_scene():
-    """ Deletes all ziva nodes in scene.  Effectively cleaning it up.
-    """
-    solvers = cmds.ls(type='zSolver')
-    delete_rivet_from_solver(solvers)
-
-    for node in ZNODES:
-        in_scene = cmds.ls(type=node)
-        if in_scene:
-            cmds.delete(in_scene)
 
 
 def delete_rivet_from_solver(solvers):

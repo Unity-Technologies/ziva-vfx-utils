@@ -1,12 +1,11 @@
-import os
-from cmt.test import TestCase
-import zBuilder.zMaya as mz
-from maya import cmds
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
 import zBuilder.utils as utils
 from zBuilder.commonUtils import is_sequence
 from utility.paintable_maps import split_map_name, get_paintable_map
+import tests.utils as test_utils
+from cmt.test import TestCase
+from maya import cmds
+import os
 
 
 def isApprox(a, b, eps=1e-6):
@@ -179,7 +178,7 @@ class VfxTestCase(TestCase):
         attrs_before = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
-        mz.clean_scene()
+        utils.clean_scene()
         builder.build()
 
         attrs_after = attr_values_from_scene(plug_names)
@@ -241,7 +240,7 @@ class VfxTestCase(TestCase):
 
     def get_builder_after_clean_and_build(self, builder):
         ## SETUP
-        mz.clean_scene()
+        utils.clean_scene()
 
         ## ACT
         builder.build()
@@ -254,7 +253,7 @@ class VfxTestCase(TestCase):
         ## SETUP
         builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
-        mz.clean_scene()
+        utils.clean_scene()
 
         ## ACT
         builder = zva.Ziva()

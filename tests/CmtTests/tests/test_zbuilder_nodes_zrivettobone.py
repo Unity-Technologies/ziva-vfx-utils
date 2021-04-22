@@ -1,11 +1,10 @@
-import os
 import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
-from maya import cmds
-
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from maya import cmds
+import os
 
 NODE_TYPE = 'zRivetToBone'
 
@@ -60,7 +59,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
     def test_remove(self):
         ## ACT
-        mz.clean_scene()
+        utils.clean_scene()
 
         ## VERIFY
         rivet_to_bone = cmds.zQuery(rtb=True)
@@ -120,7 +119,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         self.assertEqual(len(cmds.ls("l_loa_curve_zRivetToBone1")), 1)
 
         ## SETUP
-        mz.clean_scene()
+        utils.clean_scene()
 
         ## ACT
         cmds.select("l_tissue_1")

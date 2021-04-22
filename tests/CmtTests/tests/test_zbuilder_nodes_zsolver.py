@@ -1,13 +1,11 @@
-from maya import cmds
-from maya import mel
-
-import os
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
-
+import tests.utils as test_utils
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from maya import cmds
+from maya import mel
+import os
 
 NODE_TYPE = 'zSolver'
 
@@ -131,7 +129,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
-        mz.clean_scene()
+        utils.clean_scene()
         self.builder.build()
 
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
@@ -143,7 +141,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        mz.clean_scene()
+        utils.clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
@@ -163,7 +161,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
         self.assertEqual(len(solver_nodes), 1)
 
-        mz.clean_scene()
+        utils.clean_scene()
         self.builder.build()
         self.builder.retrieve_from_scene()
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
@@ -198,7 +196,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertSceneHasNodes(["zSolver1"])
 
         # Act
-        mz.clean_scene()
+        utils.clean_scene()
         utils.rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -217,7 +215,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         for item in meshes_transforms:
             cmds.rename(item, 'warped_{}'.format(item))
 
-        mz.clean_scene()
+        utils.clean_scene()
 
         test_utils.load_scene(new_scene=False)
 
@@ -508,7 +506,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
-        mz.clean_scene()
+        utils.clean_scene()
         self.builder.build()
 
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
@@ -520,7 +518,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        mz.clean_scene()
+        utils.clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
@@ -540,7 +538,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
         self.assertEqual(len(solver_nodes), 1)
 
-        mz.clean_scene()
+        utils.clean_scene()
         self.builder.build()
         self.builder.retrieve_from_scene()
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
@@ -576,7 +574,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         self.assertSceneHasNodes(["zSolver1"])
 
         # Act
-        mz.clean_scene()
+        utils.clean_scene()
         utils.rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -595,7 +593,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         for item in meshes_transforms:
             cmds.rename('group1|' + item, 'warped_{}'.format(item))
 
-        mz.clean_scene()
+        utils.clean_scene()
 
         test_utils.load_scene(scene_name='generic_duplicate.ma', new_scene=False)
 

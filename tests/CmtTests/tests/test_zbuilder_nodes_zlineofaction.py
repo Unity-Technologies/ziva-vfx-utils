@@ -1,12 +1,12 @@
-import os
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
 import zBuilder.utils as utils
 import zBuilder.zMaya as mz
+from zBuilder.utils import clean_scene
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+import tests.utils as test_utils
 from maya import cmds
 from maya import mel
-
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+import os
 
 NODE_TYPE = 'zLineOfAction'
 
@@ -167,7 +167,7 @@ class ZivaMultiCurveLoaTestCase(VfxTestCase):
         self.assertEqual(len(loa.association), 2)
 
     def test_build(self):
-        mz.clean_scene()
+        clean_scene()
 
         self.builder.build()
 

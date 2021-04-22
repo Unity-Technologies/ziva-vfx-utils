@@ -1,10 +1,9 @@
-import unittest
 import zBuilder.builders.ziva as zva
+from zBuilder.utils import clean_scene
 import tests.utils as test_utils
-import zBuilder.zMaya as mz
-from maya import cmds
-
 from vfx_test_case import VfxTestCase
+from maya import cmds
+import unittest
 
 
 class ZivaReferenceGenericTestCase(VfxTestCase):
@@ -88,7 +87,7 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
     @unittest.expectedFailure
     def test_clean_scene_on_referenced_scene(self):
 
-        mc.clean_scene()
+        clean_scene()
 
         tissues_in_scene = cmds.ls(type='zTissue')
         self.assertEquals(0, len(tissues_in_scene))

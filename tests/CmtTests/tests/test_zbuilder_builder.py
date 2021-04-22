@@ -1,13 +1,11 @@
-import copy
-import os
-from maya import cmds
-import zBuilder.zMaya
-import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
+from zBuilder.utils import clean_scene
 from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 import tests.utils as test_utils
 from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
-import unittest
+from maya import cmds
+import copy
+import os
 
 
 class ZivaBuilderTestCase(VfxTestCase):
@@ -84,7 +82,7 @@ class ZivaBuilderTestCase(VfxTestCase):
         builder_orig = copy.deepcopy(builder)
 
         # Act
-        zBuilder.zMaya.clean_scene()
+        clean_scene()
         builder.build()
 
         # Verify
@@ -115,7 +113,7 @@ class ZivaBuilderTestCase(VfxTestCase):
         old_names = [item.name for item in builder.get_scene_items()]
 
         # Act
-        mz.clean_scene()
+        clean_scene()
         builder.build()  # Make the same scene, but with all new Ziva nodes
         builder.retrieve_from_scene()
         new_names = [item.name for item in builder.get_scene_items()]

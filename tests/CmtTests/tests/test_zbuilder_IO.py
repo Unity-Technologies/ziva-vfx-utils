@@ -1,16 +1,10 @@
-from maya import cmds
-from maya import mel
-import os
-import logging
-import sys
-import tempfile
-
-import zBuilder.zMaya as mz
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-
+from zBuilder.utils import clean_scene
 from vfx_test_case import VfxTestCase
-
+import tests.utils as test_utils
+from maya import cmds
+import os
+import tempfile
 
 class IOTestCase(VfxTestCase):
     def setUp(self):
@@ -62,7 +56,7 @@ class IOTestCase(VfxTestCase):
         # build it on live scene
         z.write(temp.name)
 
-        mz.clean_scene()
+        clean_scene()
 
         z.build()
 
