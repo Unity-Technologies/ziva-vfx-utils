@@ -582,42 +582,6 @@ def select_tissue_meshes():
     cmds.select(meshes)
 
 
-def get_mdagpath_from_mesh(mesh_name):
-    """ Maya stuff, getting the dagpath from a mesh name
-
-    Args:
-        mesh_name: The mesh to get dagpath from.
-    """
-    mesh_m_dag_path = om.MDagPath()
-    sel_list = om.MSelectionList()
-    sel_list.add(mesh_name)
-    sel_list.getDagPath(0, mesh_m_dag_path)
-
-    return mesh_m_dag_path
-
-
-def get_name_from_m_object(m_object, long_name=True):
-    """ Gets maya scene name from given mObject.
-    Args:
-        m_object: The m_object to get name from.
-        long_name: Returns long name. Default = ``True``
-
-    Returns:
-        str: Maya object name.
-
-    """
-    if m_object.hasFn(om.MFn.kDagNode):
-        dagpath = om.MDagPath()
-        om.MFnDagNode(m_object).getPath(dagpath)
-        if long_name:
-            name = dagpath.fullPathName()
-        else:
-            name = dagpath.partialPathName()
-    else:
-        name = om.MFnDependencyNode(m_object).name()
-    return name
-
-
 def check_mesh_quality(meshes):
     """ Light wrapper around checking mesh quality.
 

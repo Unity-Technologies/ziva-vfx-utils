@@ -1,8 +1,7 @@
-from maya import cmds
-from maya import mel
-import zBuilder.zMaya as mz
-from maya import OpenMaya as om
+from zBuilder.mayaUtils import get_mdagpath_from_mesh, get_name_from_m_object
 from zBuilder.nodes.base import Base
+from maya import cmds
+from maya import OpenMaya as om
 import logging
 
 logger = logging.getLogger(__name__)
@@ -49,7 +48,6 @@ class Mesh(Base):
         self.set_polygon_connects(polygon_connects)
         self.set_point_list(points)
 
-        # logger.info('Retrieving Data : {}'.format(self))
 
     def set_polygon_counts(self, pCountList):
         """ Stores the polygon counts.
@@ -161,7 +159,7 @@ def get_mesh_info(mesh_name):
         tuple: tuple of polygonCounts, polygonConnects, and points.
     """
     space = om.MSpace.kWorld
-    mesh_to_rebuild_m_dag_path = mz.get_mdagpath_from_mesh(mesh_name)
+    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
     intermediate_shape = get_intermediate(mesh_to_rebuild_m_dag_path)
     if intermediate_shape:
         om.MDagPath.getAPathTo(intermediate_shape, mesh_to_rebuild_m_dag_path)
@@ -175,7 +173,7 @@ def get_mesh_info(mesh_name):
     polygon_counts_list = list()
     polygon_connects_list = list()
 
-    point_list = get_mesh_vertex_positions(mz.get_name_from_m_object(mesh_to_rebuild_m_dag_path))
+    point_list = get_mesh_vertex_positions(get_name_from_m_object(mesh_to_rebuild_m_dag_path))
 
     while not mesh_to_rebuild_poly_iter.isDone():
         num_polygons += 1

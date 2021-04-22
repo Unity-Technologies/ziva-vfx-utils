@@ -1,12 +1,10 @@
-import logging
-
+from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
+from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh
+from zBuilder.nodes.base import Base
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
-from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes.base import Base
-import zBuilder.zMaya as mz
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -199,8 +197,8 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     Returns:
 
     """
-    source_mesh_m_dag_path = mz.get_mdagpath_from_mesh(source_mesh)
-    destination_mesh_m_dag_path = mz.get_mdagpath_from_mesh(destination_mesh)
+    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
+    destination_mesh_m_dag_path = get_mdagpath_from_mesh(destination_mesh)
     source_mesh_shape_m_dag_path = om.MDagPath(source_mesh_m_dag_path)
     source_mesh_shape_m_dag_path.extendToShape()
 
@@ -269,8 +267,8 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
     Returns:
         list of interpolated weights
     """
-    target_mesh_m_dag_path = mz.get_mdagpath_from_mesh(target_mesh)
-    source_mesh_m_dag_path = mz.get_mdagpath_from_mesh(source_mesh)
+    target_mesh_m_dag_path = get_mdagpath_from_mesh(target_mesh)
+    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
     target_mesh_shape_m_dag_path = om.MDagPath(target_mesh_m_dag_path)
     target_mesh_shape_m_dag_path.extendToShape()
 
