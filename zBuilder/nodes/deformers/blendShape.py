@@ -1,12 +1,9 @@
+from maya import cmds
+from zBuilder.mayaUtils import get_short_name, build_attr_key_values
+from zBuilder.nodes.deformer import Deformer
 import logging
 
-from maya import cmds
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes.deformer import Deformer
-import zBuilder.zMaya as mz
-
 logger = logging.getLogger(__name__)
-
 
 class BlendShape(Deformer):
     type = 'blendShape'
@@ -51,7 +48,7 @@ class BlendShape(Deformer):
 
         num_weights = cmds.blendShape(self.name, q=True, wc=True)
         attr_list = ['weight[' + str(i) + ']' for i in range(0, num_weights)]
-        attrs = mz.build_attr_key_values(self.name, attr_list)
+        attrs = build_attr_key_values(self.name, attr_list)
         self.attrs.update(attrs)
 
     @property

@@ -1,8 +1,7 @@
-from maya import cmds
 from zBuilder.commonUtils import get_first_element
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.mayaUtils import get_short_name, build_attr_list, build_attr_key_values
 from zBuilder.nodes.base import Base
-import zBuilder.zMaya as mz
+from maya import cmds
 import logging
 
 logger = logging.getLogger(__name__)
@@ -127,12 +126,12 @@ class DGNode(Base):
         """
 
         # build the attribute list to aquire from scene
-        attr_list = mz.build_attr_list(self.long_name)
+        attr_list = build_attr_list(self.long_name)
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)
 
         # with attribute list, get values in dictionary format and update node.
-        self.attrs = mz.build_attr_key_values(self.long_name, attr_list)
+        self.attrs = build_attr_key_values(self.long_name, attr_list)
 
     def set_maya_attrs(self, attr_filter=None):
         """Given a Builder node this set the attributes of the object in the maya

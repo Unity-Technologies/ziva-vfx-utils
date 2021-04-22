@@ -3,8 +3,7 @@ import logging
 import time
 from maya import cmds
 import zBuilder
-import zBuilder.zMaya as mz
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.mayaUtils import get_short_name, replace_long_name, replace_dict_keys
 from zBuilder.commonUtils import is_string, is_sequence
 
 logger = logging.getLogger(__name__)
@@ -196,25 +195,25 @@ class Base(object):
                 new_names = []
                 for name in self.__dict__[item]:
                     if is_string(name):
-                        new_name = mz.replace_long_name(search, replace, name)
+                        new_name = replace_long_name(search, replace, name)
                         new_names.append(new_name)
                         self.__dict__[item] = new_names
             elif is_string(self.__dict__[item]):
-                self.__dict__[item] = mz.replace_long_name(search, replace, self.__dict__[item])
+                self.__dict__[item] = replace_long_name(search, replace, self.__dict__[item])
             elif isinstance(self.__dict__[item], dict):
                 new_names = []
-                self.__dict__[item] = mz.replace_dict_keys(search, replace, self.__dict__[item])
+                self.__dict__[item] = replace_dict_keys(search, replace, self.__dict__[item])
 
                 for key, v in self.__dict__[item].items():
                     if is_string(v):
-                        new_name = mz.replace_long_name(search, replace, v)
+                        new_name = replace_long_name(search, replace, v)
                         new_names.append(new_name)
                         self.__dict__[item][key] = new_names
                     if is_sequence(v):
                         new_names = []
                         for name in self.__dict__[item][key]:
                             if is_string(item):
-                                new_name = mz.replace_long_name(search, replace, name)
+                                new_name = replace_long_name(search, replace, name)
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
 

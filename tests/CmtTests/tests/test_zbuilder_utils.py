@@ -1,14 +1,13 @@
-import tempfile
-import os
-from maya import cmds
-from maya import mel
 import tests.utils as test_utils
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
 import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import replace_long_name
 import zBuilder.utils as utils
-import zBuilder.builder as bld
 import zBuilder.builders.ziva as zva
-
+from maya import cmds
+from maya import mel
+import tempfile
+import os
 
 class BuilderMayaTestCase(VfxTestCase):
     def test_replace_long_name_usecase1(self):
@@ -27,7 +26,7 @@ class BuilderMayaTestCase(VfxTestCase):
         results = list()
 
         for case in strings:
-            results.append(mz.replace_long_name('^r_', 'l_', case))
+            results.append(replace_long_name('^r_', 'l_', case))
 
         self.assertEqual(results, outputs)
 
@@ -45,7 +44,7 @@ class BuilderMayaTestCase(VfxTestCase):
         results = list()
 
         for case in strings:
-            results.append(mz.replace_long_name('_r_', '_l_', case))
+            results.append(replace_long_name('_r_', '_l_', case))
 
         self.assertEqual(results, outputs)
 
@@ -63,7 +62,7 @@ class BuilderMayaTestCase(VfxTestCase):
             ' '                 : ' ',
         }
         # yapf: enable
-        observed = {k: mz.replace_long_name('^', 'prefix_', k) for k in expected.keys()}
+        observed = {k: replace_long_name('^', 'prefix_', k) for k in expected.keys()}
 
         self.assertDictEqual(expected, observed)
 
@@ -81,7 +80,7 @@ class BuilderMayaTestCase(VfxTestCase):
             ' '                 : ' ',
         }
         # yapf: enable
-        observed = {k: mz.replace_long_name('$', '_postfix', k) for k in expected.keys()}
+        observed = {k: replace_long_name('$', '_postfix', k) for k in expected.keys()}
 
         self.assertDictEqual(expected, observed)
 
@@ -100,7 +99,7 @@ class BuilderMayaTestCase(VfxTestCase):
             ' '                             : ' ',
         }
         # yapf: enable
-        observed = {k: mz.replace_long_name('(^|_)r($|_)', 'l', k) for k in expected.keys()}
+        observed = {k: replace_long_name('(^|_)r($|_)', 'l', k) for k in expected.keys()}
 
         self.assertDictEqual(expected, observed)
 
@@ -114,7 +113,6 @@ class BuilderMayaTestCase(VfxTestCase):
 
         # testing command
         cmds.select('bone_grp', hi=True)
-        import zBuilder.zMaya as mz
         bones = mz.get_zBones(cmds.ls(sl=True))
 
         self.assertEqual(len(bones), 5)
@@ -124,7 +122,6 @@ class BuilderMayaTestCase(VfxTestCase):
 
         # testing command
         cmds.select('r_humerus_bone', 'r_radius_bone', 'hand_bone')
-        import zBuilder.zMaya as mz
         bones = mz.get_zBones(cmds.ls(sl=True))
 
         # we should have 2 as the hand bone is not a zBone in this case
@@ -436,9 +433,8 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
 
 
 class ZivaCopyBuffer(ZivaUpdateTestCase):
-    """This Class tests a specific type of "mirroring" so there are some assumptions made
-
-
+    """
+    This Class tests a specific type of "mirroring" so there are some assumptions made
     """
     def setUp(self):
         super(ZivaCopyBuffer, self).setUp()

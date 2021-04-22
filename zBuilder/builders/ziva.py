@@ -324,7 +324,7 @@ class Ziva(Builder):
 
         if nodes:
             nodes = reorder_items_from_retrieve_connnections(nodes)
-            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self._populate_nodes(nodes, get_parameters)
             self.setup_tree_hierarchy()
 
         cmds.select(scene_selection)
@@ -403,7 +403,7 @@ class Ziva(Builder):
         node_types.extend(Field.TYPES)
         nodes = zQuery(node_types, solver)
         if nodes:
-            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self._populate_nodes(nodes, get_parameters)
             self.setup_tree_hierarchy()
 
         self.stats()
@@ -518,22 +518,16 @@ class Ziva(Builder):
             nodes = selection
 
         if nodes:
-            self._populate_nodes(nodes, get_parameters=get_parameters)
+            self._populate_nodes(nodes, get_parameters)
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
         self.stats()
         self.make_node_connections()
 
-    def _populate_nodes(self, nodes, get_parameters=True):
+    def _populate_nodes(self, nodes, get_parameters):
         """
         This instantiates a builder node and populates it with given maya node.
-
-        Args:
-            nodes:
-
-        Returns:
-
         """
 
         for node in nodes:

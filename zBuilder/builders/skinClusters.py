@@ -1,12 +1,9 @@
 from zBuilder.builder import Builder
-import zBuilder.zMaya as mz
-
+from zBuilder.mayaUtils import parse_maya_node_for_selection
 from maya import cmds
-
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class SkinCluster(Builder):
     """Capturing Maya skinClusters
@@ -14,7 +11,7 @@ class SkinCluster(Builder):
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
-        selection = mz.parse_maya_node_for_selection(args)
+        selection = parse_maya_node_for_selection(args)
 
         history = cmds.listHistory(selection)
         skin_clusters = cmds.ls(history, type='skinCluster')[::-1]

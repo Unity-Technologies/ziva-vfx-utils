@@ -1,7 +1,6 @@
 from zBuilder.builder import Builder
+from zBuilder.mayaUtils import parse_maya_node_for_selection
 from maya import cmds
-import zBuilder.zMaya as mz
-
 
 class Fields(Builder):
     """Storing maya fields.
@@ -12,7 +11,7 @@ class Fields(Builder):
 
     @Builder.time_this
     def retrieve_from_scene(self, *args, **kwargs):
-        selection = mz.parse_maya_node_for_selection(args)
+        selection = parse_maya_node_for_selection(args)
 
         history = cmds.listHistory(selection)
         fields = cmds.ls(history, type=self.MAYA_FIELD_TYPE)

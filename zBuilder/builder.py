@@ -1,13 +1,14 @@
 from zBuilder.bundle import Bundle
-from zBuilder.commonUtils import is_string, is_sequence
+from zBuilder.commonUtils import is_sequence
+from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
 import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
 from functools import wraps
 import datetime
-import sys
 import inspect
 import logging
+import sys
 import time
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ class Builder(object):
         Returns:
             obj: zBuilder node populated.
         """
-        type_ = mz.get_type(node)
+        type_ = get_type(node)
         if not parent:
             parent = self.root_node
 
@@ -172,7 +173,7 @@ class Builder(object):
         """
         must create a method to inherit this class
         """
-        selection = mz.parse_maya_node_for_selection(args)
+        selection = parse_maya_node_for_selection(args)
         for item in selection:
             b_solver = self.node_factory(item)
             self.bundle.extend_scene_items(b_solver)
@@ -330,7 +331,8 @@ def find_class(module_, type_):
 
 
 def get_node_types_with_maps():
-    """This searches through the modules for existing node type objects and returns 
+    """
+    This searches through the modules for existing node type objects and returns 
     the ones that have maps associated with it.  Useful for performing actions on 
     node types with maps.  MAP_LIST is a class attr so it is not being instantiated here.
     """
@@ -343,7 +345,7 @@ def get_node_types_with_maps():
 
 
 def restore_scene_items_from_string(item, builder):
-    if mz.is_sequence(item):
+    if is_sequence(item):
         if item:
             item = builder.get_scene_items(name_filter=item)
     elif isinstance(item, dict):
