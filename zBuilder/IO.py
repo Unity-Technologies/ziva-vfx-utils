@@ -68,22 +68,17 @@ def dump_json(file_path, json_data):
 
     Returns:
         file path if successful.
-
-    Raises:
-        IOError: If not able to write file.
     """
-    try:
-        with open(file_path, 'w') as outfile:
-            json.dump(json_data,
-                      outfile,
-                      cls=BaseNodeEncoder,
-                      sort_keys=True,
-                      indent=4,
-                      separators=(',', ': '))
-    except IOError:
-        logger.error("Error: can\'t find file or write data")
-    else:
-        return file_path
+
+    with open(file_path, 'w') as outfile:
+        json.dump(json_data,
+                  outfile,
+                  cls=BaseNodeEncoder,
+                  sort_keys=True,
+                  indent=4,
+                  separators=(',', ': '))
+
+    return file_path
 
 
 def load_json(file_path):

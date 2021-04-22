@@ -29,35 +29,36 @@ class IOTestCase(VfxTestCase):
         super(IOTestCase, self).tearDown()
 
     def test_builder_write(self):
-        # find a temp file location
-        temp = tempfile.TemporaryFile()
 
-        # build it on live scene
-        self.z.write(temp.name)
+        # Action
+        file_name = test_utils.get_tmp_file_location()
+        self.z.write(file_name)
+        self.temp_files.append(file_name)
 
-        self.temp_files.append(temp.name)
-
+        # Verify
         # simply check if file exists, if it does it passes
-        self.assertTrue(os.path.exists(temp.name))
+        self.assertTrue(os.path.exists(file_name))
 
     def test_builder_write_build(self):
-        # tests a case where you write out a zBuilder file then immediatly build
-        # this could potentially screw up during the build.
+        '''
+        Write out a zBuilder file then immediatly build.
+        This could potentially screw up during the build.
+        '''
 
-        # find a temp file location
-        temp = tempfile.TemporaryFile()
-
+        # Setup
         cmds.file(new=True, f=True)
         test_utils.build_anatomical_arm_with_no_popup()
-
         cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
-        # build it on live scene
-        z.write(temp.name)
+        
+        # Action
+        file_name = test_utils.get_tmp_file_location()
+        z.write(file_name)
+        self.temp_files.append(file_name)
 
         clean_scene()
-
         z.build()
 
+        # Verify
         self.assertSceneHasNodes(['r_bicep_muscle_zTissue'])
