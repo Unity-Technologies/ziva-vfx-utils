@@ -3,10 +3,7 @@
         "win_2020": "c:/ImmutablePast/test-develop/win2020/ziva.mll",
         "win_2019": "c:/ImmutablePast/test-develop/win2019/ziva.mll",
         "win_2018": "c:/ImmutablePast/test-develop/win2018/ziva.mll",
-        "win_2017": "c:/ImmutablePast/test-develop/win2017/ziva.mll",
         "lin_2020": "/home/centos/ImmutablePast/test-develop/lin2020/ziva.so",
-        "lin_2019": "/home/centos/ImmutablePast/test-develop/lin2019/ziva.so",
-        "lin_2018": "/home/centos/ImmutablePast/test-develop/lin2018/ziva.so",
-        "lin_2017": "/home/centos/ImmutablePast/test-develop/lin2017/ziva.so"
+        "lin_2019": "/home/centos/ImmutablePast/test-develop/lin2019/ziva.so"
     }
 }
