@@ -1,5 +1,6 @@
 from zBuilder.builder import Builder
 from zBuilder.mayaUtils import parse_maya_node_for_selection
+from zBuilder.commonUtils import time_this
 from maya import cmds
 import logging
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 class DeltaMush(Builder):
     """To capture a deltaMush
     """
-    @Builder.time_this
+    @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
@@ -28,7 +29,7 @@ class DeltaMush(Builder):
             self.bundle.add_parameter(parameter)
         self.stats()
 
-    @Builder.time_this
+    @time_this
     def build(self, *args, **kwargs):
         logger.info('Applying deltaMush....')
         attr_filter = kwargs.get('attr_filter', None)

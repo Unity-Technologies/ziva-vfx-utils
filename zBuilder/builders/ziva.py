@@ -1,18 +1,13 @@
-import logging
-from collections import defaultdict
-from maya import cmds
-from maya import mel
 import zBuilder.zMaya as mz
 from zBuilder.builder import Builder
-from zBuilder.commonUtils import none_to_empty
+from zBuilder.commonUtils import none_to_empty, time_this
 from zBuilder.nodes.utils.fields import Field
+from maya import cmds
+from maya import mel
+from collections import defaultdict
+import logging
 
 logger = logging.getLogger(__name__)
-
-try:
-    cmds.loadPlugin('ziva', qt=True)
-except RuntimeError:
-    pass
 
 ZNODES = [
     'zSolver',
@@ -332,7 +327,7 @@ class Ziva(Builder):
 
         self.make_node_connections()
 
-    @Builder.time_this
+    @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
         This gets the scene items from the scene for further manipulation or saving.
@@ -409,7 +404,7 @@ class Ziva(Builder):
         self.stats()
         self.make_node_connections()
 
-    @Builder.time_this
+    @time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
         """
         Gets scene items based on selection.
@@ -534,7 +529,7 @@ class Ziva(Builder):
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
 
-    @Builder.time_this
+    @time_this
     def build(self,
               association_filter=list(),
               attr_filter=None,

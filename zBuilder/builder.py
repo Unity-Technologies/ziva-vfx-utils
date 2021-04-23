@@ -1,10 +1,8 @@
 from zBuilder.bundle import Bundle
-from zBuilder.commonUtils import is_sequence
+from zBuilder.commonUtils import is_sequence, time_this
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
 import zBuilder.nodes
 import zBuilder.parameters
-from functools import wraps
-import datetime
 import inspect
 import json
 import logging
@@ -141,21 +139,6 @@ class Builder(object):
                     # so lets create one and return that.
                     return obj(*parameter_args, builder=self)
 
-    @staticmethod
-    def time_this(original_function):
-        """
-        A decorator to time functions.
-        """
-        @wraps(original_function)
-        def new_function(*args, **kwargs):
-            before = datetime.datetime.now()
-            x = original_function(*args, **kwargs)
-            after = datetime.datetime.now()
-            logger.info("Finished: ---Elapsed Time = {0}".format(after - before))
-            return x
-
-        return new_function
-
     def make_node_connections(self):
         """This makes connections between this node and any other node in scene_items.  The expectations
         is that this gets run after anytime the scene items get populated.
@@ -180,6 +163,7 @@ class Builder(object):
 
         self.bundle.stats()
 
+    @time_this
     def write(self, file_path, type_filter=[], invert_match=False):
         """ Writes out the scene items to a json file given a file path.
 
@@ -207,6 +191,7 @@ class Builder(object):
                         restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
                         scene_item.__dict__[attr] = restored
 
+    @time_this
     def retrieve_from_file(self, file_path):
         """ Reads scene items from a given file.  The items get placed in the bundle.
 
@@ -214,8 +199,8 @@ class Builder(object):
             file_path (:obj:`str`): The file path to read from disk.
 
         """
+
         from zBuilder.IO import load_base_node, unpack_zbuilder_contents
-        before = datetime.datetime.now()
         with open(file_path, 'rb') as handle:
             json_data = json.load(handle, object_hook=load_base_node)
             unpack_zbuilder_contents(self, json_data)
@@ -234,8 +219,7 @@ class Builder(object):
                         scene_item.__dict__[attr] = restored
 
         self.bundle.stats()
-        after = datetime.datetime.now()
-        logger.info('Read File: {} in {}'.format(file_path, after - before))
+
 
     def stats(self):
         """

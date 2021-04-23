@@ -1,8 +1,27 @@
+from time import time
+from functools import wraps
+import logging
 import sys
 
 '''
 The module contains helper functions depends on Python features only.
 '''
+
+logger = logging.getLogger(__name__)
+
+def time_this(func):
+    """
+    A decorator to time functions.
+    """
+    @wraps(func)
+    def new_function(*args, **kwargs):
+        before = time()
+        x = func(*args, **kwargs)
+        after = time()
+        logger.info("Executing {}() took {:.3f}ms".format(func.__name__, (after - before) * 1000))
+        return x
+    return new_function
+
 
 def none_to_empty(x):
     """

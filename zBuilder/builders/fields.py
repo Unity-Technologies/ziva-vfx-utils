@@ -1,5 +1,6 @@
 from zBuilder.builder import Builder
 from zBuilder.mayaUtils import parse_maya_node_for_selection
+from zBuilder.commonUtils import time_this
 from maya import cmds
 
 class Fields(Builder):
@@ -9,7 +10,7 @@ class Fields(Builder):
     MAYA_FIELD_TYPE = ('airField', 'dragField', 'gravityField', 'newtonField', 'radialField',
                        'turbulenceField', 'uniformField', 'vortexField')
 
-    @Builder.time_this
+    @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         selection = parse_maya_node_for_selection(args)
 
@@ -20,7 +21,7 @@ class Fields(Builder):
             self.bundle.extend_scene_items(scene_items)
         self.stats()
 
-    @Builder.time_this
+    @time_this
     def build(self):
         for scene_item in self.get_scene_items():
             scene_item.build()
