@@ -1,12 +1,12 @@
 from zBuilder.bundle import Bundle
 from zBuilder.commonUtils import is_sequence
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
-import zBuilder.zMaya as mz
 import zBuilder.nodes
 import zBuilder.parameters
 from functools import wraps
 import datetime
 import inspect
+import json
 import logging
 import sys
 import time
@@ -189,15 +189,14 @@ class Builder(object):
             invert_match (bool): Invert the sense of matching, to select non-matching items.
                 Defaults to ``False``
         """
-        import zBuilder.IO as io
-        json_data = io.pack_zbuilder_contents(self,
-                                              type_filter=type_filter,
-                                              invert_match=invert_match)
 
+        from zBuilder.IO import pack_zbuilder_contents, BaseNodeEncoder
+        json_data = pack_zbuilder_contents(self, type_filter, invert_match)
+        with open(file_path, 'w') as outfile:
+            json.dump(json_data, outfile, cls=BaseNodeEncoder, sort_keys=True, indent=4, separators=(',', ': '))
 
-        if io.dump_json(file_path, json_data):
-            self.bundle.stats()
-            logger.info('Wrote File: %s' % file_path)
+        self.bundle.stats()
+        logger.info('Wrote File: %s' % file_path)
 
         # loop through the scene items
         for scene_item in self.get_scene_items():
@@ -215,10 +214,11 @@ class Builder(object):
             file_path (:obj:`str`): The file path to read from disk.
 
         """
-        import zBuilder.IO as io
+        from zBuilder.IO import load_base_node, unpack_zbuilder_contents
         before = datetime.datetime.now()
-        json_data = io.load_json(file_path)
-        io.unpack_zbuilder_contents(self, json_data)
+        with open(file_path, 'rb') as handle:
+            json_data = json.load(handle, object_hook=load_base_node)
+            unpack_zbuilder_contents(self, json_data)
 
         # The json data is now loaded.  We need to go through the defined scene item attributes
         # (The attributes that hold un-serializable scene items) and replace the string name

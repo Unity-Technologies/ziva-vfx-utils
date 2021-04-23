@@ -1,11 +1,8 @@
-import json
-import inspect
-import sys
-import logging
-
 import zBuilder
 import zBuilder.builder
 import zBuilder.updates as updates
+import json
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +18,7 @@ class BaseNodeEncoder(json.JSONEncoder):
             return super(BaseNodeEncoder, self).default(obj)
 
 
-def pack_zbuilder_contents(builder, type_filter=[], invert_match=False):
+def pack_zbuilder_contents(builder, type_filter, invert_match):
     """ Utility to package the data in a dictionary.
     """
     logger.info("packing zBuilder contents for json.")
@@ -59,49 +56,6 @@ def unpack_zbuilder_contents(builder, json_data):
             item.builder = builder
 
 
-def dump_json(file_path, json_data):
-    """ Saves a json file to disk given a file path and data.
-
-    Args:
-        file_path: The location to save the json file.
-        json_data: The data to save in the json.
-
-    Returns:
-        file path if successful.
-    """
-
-    with open(file_path, 'w') as outfile:
-        json.dump(json_data,
-                  outfile,
-                  cls=BaseNodeEncoder,
-                  sort_keys=True,
-                  indent=4,
-                  separators=(',', ': '))
-
-    return file_path
-
-
-def load_json(file_path):
-    """ loads a json file from disk given a file path.
-
-    Args:
-        file_path: The location to save the json file.
-
-    Returns:
-        json data
-
-    Raises:
-        IOError: If not able to read file.
-    """
-    try:
-        with open(file_path, 'rb') as handle:
-            json_data = json.load(handle, object_hook=load_base_node)
-    except IOError:
-        logger.error("Error: can\'t find file or read data")
-    else:
-        return json_data
-
-
 def load_base_node(json_object):
     """
     Loads json objects into proper classes.  Serves as object hook for loading
@@ -114,13 +68,9 @@ def load_base_node(json_object):
         obj:  Result of operation
     """
     if '_class' in json_object:
-        module_ = json_object['_class'][0]
         type_ = json_object.get('type', 'Base')
-
         builder_type = json_object['_builder_type']
-
         obj = zBuilder.builder.find_class(builder_type, type_)
-
         check_disk_version(json_object)
 
         # this catches the scene items for ui that slip in.
@@ -131,7 +81,6 @@ def load_base_node(json_object):
             return scene_item
         except TypeError:
             return json_object
-
     else:
         return json_object
 
