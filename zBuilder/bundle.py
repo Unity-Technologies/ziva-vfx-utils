@@ -1,4 +1,4 @@
-from zBuilder.commonUtils import is_sequence
+from zBuilder.commonUtils import is_string
 import logging
 import re
 
@@ -12,6 +12,7 @@ class Bundle(object):
     def __init__(self):
         self.scene_items = list()
 
+
     def __iter__(self):
         """ This iterates through the scene_items.
 
@@ -21,6 +22,7 @@ class Bundle(object):
         """
         return iter(self.scene_items)
 
+
     def __len__(self):
         """
 
@@ -29,33 +31,35 @@ class Bundle(object):
         """
         return len(self.scene_items)
 
+
     def __eq__(self, other):
         """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
         is equal.
         """
         return self.scene_items == other.scene_items
 
+
     def __ne__(self, other):
         """ Define a non-equality test
         """
         return not self == other
 
-    def print_(self, type_filter=list(), name_filter=list()):
+
+    def print_(self, type_filter, name_filter):
         """
         Prints out basic information for each scene item in the Builder.  Information is all
         information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
             type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
-                Defaults to :obj:`list`
             name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
-                Defaults to :obj:`list`
         """
 
-        for scene_item in self.get_scene_items(type_filter=type_filter, name_filter=name_filter):
+        for scene_item in self.get_scene_items(type_filter, name_filter, [], [], None, False):
             logger.debug(scene_item)
 
         logger.debug('----------------------------------------------------------------')
+
 
     def compare(self, type_filter=list(), name_filter=list()):
         """
@@ -69,20 +73,22 @@ class Bundle(object):
 
         """
 
-        for scene_item in self.get_scene_items(type_filter=type_filter, name_filter=name_filter):
+        for scene_item in self.get_scene_items(type_filter, name_filter, [], [], None, False):
             scene_item.compare()
 
-    def stats(self, type_filter=str()):
+
+    def stats(self, type_filter):
         """
         Prints out basic information in Maya script editor.  Information is scene item types and counts.
 
         Args:
             type_filter (:obj:`str`): filter by scene_item type.
-                Defaults to :obj:`str`
         """
+        if type_filter:
+            assert is_string(type_filter), "type_filter requires string type"
 
         tmp = {}
-        for i, d in enumerate(self):
+        for _, d in enumerate(self):
             t = d.type
             if type_filter:
                 if type_filter == t:
@@ -99,9 +105,11 @@ class Bundle(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
+
     def append_scene_item(self, scene_item):
         """ Deprecated. Use extend_scene_items instead, because batch processing is faster. """
         self.extend_scene_items(self, [scene_item])
+
 
     def extend_scene_items(self, scene_items):
         """
@@ -129,6 +137,7 @@ class Bundle(object):
             else:
                 self.scene_items.append(scene_item)
 
+
     def remove_scene_item(self, scene_item):
         """
         Removes a scene_item from the bundle list while keeping order.
@@ -137,47 +146,35 @@ class Bundle(object):
         """
         self.scene_items.remove(scene_item)
 
+
     def get_scene_items(self,
-                        type_filter=list(),
-                        name_filter=list(),
-                        name_regex=None,
-                        association_filter=list(),
-                        association_regex=None,
-                        invert_match=False):
+                        type_filter,
+                        name_filter,
+                        name_regex,
+                        association_filter,
+                        association_regex,
+                        invert_match):
         """
         Gets the scene items from builder for further inspection or modification.
 
         Args:
             type_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``type``.
-                Defaults to :obj:`list`.
             name_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``name``.
-                Defaults to :obj:`list`.
             name_regex (:obj:`str`): filter by scene_item name by regular expression.
-                Defaults to ``None``.
             association_filter (:obj:`str` or :obj:`list`, optional): filter by scene_item ``association``.
-                Defaults to :obj:`list`.
             association_regex (:obj:`str`): filter by scene_item ``association`` by regular expression.
-                Defaults to ``None``.
             invert_match (bool): Invert the sense of matching, to select non-matching items.
-                Defaults to ``False``
+
         Returns:
             list: List of scene items.
         """
         # if no filters are used just return full list as it is faster
-        if not type_filter and not association_filter and not name_filter and not name_regex and not association_regex:
+        if not type_filter and \
+           not association_filter and \
+           not name_filter and \
+           not name_regex and \
+           not association_regex:
             return self.scene_items
-
-        # put type filter in a list if it isn't
-        if not is_sequence(type_filter):
-            type_filter = [type_filter]
-
-        # put association filter in a list if it isn't
-        if not is_sequence(association_filter):
-            association_filter = [association_filter]
-
-        # put name filter in a list if it isn't
-        if not is_sequence(name_filter):
-            name_filter = [name_filter]
 
         type_set = set(type_filter)
         name_set = set(name_filter)
@@ -199,6 +196,7 @@ class Bundle(object):
             return not invert
 
         return [item for item in self if keep_me(item, invert_match)]
+
 
     def string_replace(self, search, replace):
         """

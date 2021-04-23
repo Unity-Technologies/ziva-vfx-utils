@@ -1,8 +1,7 @@
 from zBuilder.bundle import Bundle
 from zBuilder.commonUtils import is_sequence, time_this
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
-import zBuilder.nodes
-import zBuilder.parameters
+from maya import cmds
 import inspect
 import json
 import logging
@@ -19,9 +18,7 @@ class Builder(object):
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
-        from maya import cmds
         from zBuilder.nodes.base import Base
-
         self.root_node = Base()
         self.root_node.name = 'ROOT'
 
@@ -31,22 +28,27 @@ class Builder(object):
         self.info['maya_version'] = cmds.about(v=True)
         self.info['operating_system'] = cmds.about(os=True)
 
+
     def __eq__(self, other):
         """ Compares the builders.
         """
         return type(other) == type(self) and self.bundle == other.bundle
+
 
     def __ne__(self, other):
         """ Define a non-equality test
         """
         return not self == other
 
+
     def log(self):
         self.root_node.log()
+
 
     def view(self):
         import zBuilder.ui.reader as reader
         reader.view(root_node=self.root_node)
+
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
@@ -78,6 +80,7 @@ class Builder(object):
 
         return scene_items
 
+
     def get_node_parameters(self, node, types=[]):
         """
         Get parameters (e.g. maps and meshes) for the specified node.
@@ -101,6 +104,7 @@ class Builder(object):
 
         return parameters
 
+
     def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
         desired one based on arguments.
@@ -122,9 +126,10 @@ class Builder(object):
         if not is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
+        import zBuilder.parameters
         for _, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj) and parameter_type == obj.type:
-                scene_item_nodes = self.bundle.get_scene_items(type_filter=parameter_type)
+                scene_item_nodes = self.get_scene_items(type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
 
                 # the first element in parameter_args is the name.
@@ -139,6 +144,7 @@ class Builder(object):
                     # so lets create one and return that.
                     return obj(*parameter_args, builder=self)
 
+
     def make_node_connections(self):
         """This makes connections between this node and any other node in scene_items.  The expectations
         is that this gets run after anytime the scene items get populated.
@@ -146,11 +152,13 @@ class Builder(object):
         for item in self.get_scene_items():
             item.make_node_connections()
 
+
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
-        for scene_item in self.bundle.get_scene_items():
+        for scene_item in self.get_scene_items():
             scene_item.build(*args, **kwargs)
+
 
     def retrieve_from_scene(self, *args, **kwargs):
         """
@@ -161,7 +169,8 @@ class Builder(object):
             b_solver = self.node_factory(item)
             self.bundle.extend_scene_items(b_solver)
 
-        self.bundle.stats()
+        self.stats()
+
 
     @time_this
     def write(self, file_path, type_filter=[], invert_match=False):
@@ -179,7 +188,7 @@ class Builder(object):
         with open(file_path, 'w') as outfile:
             json.dump(json_data, outfile, cls=BaseNodeEncoder, sort_keys=True, indent=4, separators=(',', ': '))
 
-        self.bundle.stats()
+        self.stats()
         logger.info('Wrote File: %s' % file_path)
 
         # loop through the scene items
@@ -188,8 +197,9 @@ class Builder(object):
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
                     if scene_item.__dict__[attr]:
-                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        restored = self.restore_scene_items_from_string(scene_item.__dict__[attr])
                         scene_item.__dict__[attr] = restored
+
 
     @time_this
     def retrieve_from_file(self, file_path):
@@ -215,17 +225,18 @@ class Builder(object):
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
                     if scene_item.__dict__[attr]:
-                        restored = restore_scene_items_from_string(scene_item.__dict__[attr], self)
+                        restored = self.restore_scene_items_from_string(scene_item.__dict__[attr])
                         scene_item.__dict__[attr] = restored
 
-        self.bundle.stats()
+        self.stats()
 
 
     def stats(self):
         """
         Prints out basic information in Maya script editor.  Information is scene item types and counts.
         """
-        self.bundle.stats()
+        self.bundle.stats(None)
+
 
     def string_replace(self, search, replace):
         """
@@ -246,6 +257,7 @@ class Builder(object):
         """
         self.bundle.string_replace(search, replace)
 
+
     def print_(self, type_filter=list(), name_filter=list()):
         """
         Prints out basic information for each scene item in the Builder.  Information is all
@@ -257,7 +269,8 @@ class Builder(object):
             name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
                 Defaults to :obj:`list`
         """
-        self.bundle.print_(type_filter=type_filter, name_filter=name_filter)
+        self.bundle.print_(type_filter, name_filter)
+
 
     def get_scene_items(self,
                         type_filter=list(),
@@ -285,33 +298,60 @@ class Builder(object):
         Returns:
             list: List of scene items.
         """
+        # put type filter in a list if it isn't
+        if not is_sequence(type_filter):
+            type_filter = [type_filter]
 
-        return self.bundle.get_scene_items(type_filter=type_filter,
-                                           name_filter=name_filter,
-                                           name_regex=name_regex,
-                                           association_filter=association_filter,
-                                           association_regex=association_regex,
-                                           invert_match=invert_match)
+        # put association filter in a list if it isn't
+        if not is_sequence(association_filter):
+            association_filter = [association_filter]
+
+        # put name filter in a list if it isn't
+        if not is_sequence(name_filter):
+            name_filter = [name_filter]
+
+        return self.bundle.get_scene_items(type_filter,
+                                           name_filter,
+                                           name_regex,
+                                           association_filter,
+                                           association_regex,
+                                           invert_match)
 
 
-def find_class(module_, type_):
-    """ Given a module and a type returns class object.  If no class objects are
+    def restore_scene_items_from_string(self, item):
+        if is_sequence(item):
+            if item:
+                item = self.get_scene_items(name_filter=item)
+        elif isinstance(item, dict):
+            for parm in item:
+                item[parm] = self.get_scene_items(name_filter=item[parm])
+        else:
+            item = self.get_scene_items(name_filter=item)
+            if item:
+                item = item[0]
+        return item
+
+
+def find_class(module, obj_type):
+    """
+    Given a module and a type returns class object. If no class objects are
     found it returns a DGNode class object.
 
     Args:
-        module_ (:obj:`str`): The module to look for.
-        type_ (:obj:`str`): The type to look for.
+        module (:obj:`str`): The module to look for.
+        obj_type (:obj:`str`): The type to look for.
 
     Returns:
         obj: class object.
     """
-    for name, obj in inspect.getmembers(sys.modules[module_]):
+    for _, obj in inspect.getmembers(sys.modules[module]):
         if inspect.isclass(obj):
-            if type_ in obj.TYPES or type_ == obj.type:
+            if obj_type in obj.TYPES or obj_type == obj.type:
                 return obj
 
     # if class object is not found lets return a DG node object
-    return zBuilder.nodes.DGNode
+    from zBuilder.nodes.dg_node import DGNode
+    return DGNode
 
 
 def get_node_types_with_maps():
@@ -326,17 +366,3 @@ def get_node_types_with_maps():
             if obj.MAP_LIST:
                 returns.append(obj.type)
     return returns
-
-
-def restore_scene_items_from_string(item, builder):
-    if is_sequence(item):
-        if item:
-            item = builder.get_scene_items(name_filter=item)
-    elif isinstance(item, dict):
-        for parm in item:
-            item[parm] = builder.get_scene_items(name_filter=item[parm])
-    else:
-        item = builder.get_scene_items(name_filter=item)
-        if item:
-            item = item[0]
-    return item
