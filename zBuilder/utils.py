@@ -222,7 +222,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
             # unlock can fail on referenced transforms, so 'catchQuiet' to ignore that
             mel.eval('catchQuiet(`setAttr -lock 0 ' + maya_mesh + '.' + attr + '`)')
 
-    mz.delete_rivet_from_solver(solvers)
+    remove_zRivetToBone_nodes(solvers)
     mel.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
         cmds.delete(to_erase)
@@ -674,7 +674,7 @@ def clean_scene():
     Deletes all ziva nodes in scene.  Effectively cleaning it up.
     """
     solvers = cmds.ls(type='zSolver')
-    mz.delete_rivet_from_solver(solvers)
+    remove_zRivetToBone_nodes(solvers)
 
     for node in ALL_ZIVA_NODES:
         in_scene = cmds.ls(type=node)

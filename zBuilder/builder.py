@@ -1,5 +1,5 @@
 from zBuilder.bundle import Bundle
-from zBuilder.commonUtils import is_sequence, time_this
+from zBuilder.commonUtils import is_sequence, is_string, time_this
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
 from maya import cmds
 import inspect
@@ -301,14 +301,20 @@ class Builder(object):
         # put type filter in a list if it isn't
         if not is_sequence(type_filter):
             type_filter = [type_filter]
+        if type_filter:
+            assert all(is_string(t) for t in type_filter), "type filter requires string type"
 
         # put association filter in a list if it isn't
         if not is_sequence(association_filter):
             association_filter = [association_filter]
+        if association_filter:
+            assert all(is_string(a) for a in association_filter), "association filter requires string type"
 
         # put name filter in a list if it isn't
         if not is_sequence(name_filter):
             name_filter = [name_filter]
+        if name_filter:
+            assert all(is_string(n) for n in name_filter), "name filter requires string type"
 
         return self.bundle.get_scene_items(type_filter,
                                            name_filter,

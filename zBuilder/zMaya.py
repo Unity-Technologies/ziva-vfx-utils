@@ -31,23 +31,6 @@ def check_body_type(bodies):
         return False
 
 
-def delete_rivet_from_solver(solvers):
-    """This deletes all items related to zRivetToBone from a connected solver.  This includes
-    The locator, locator transform and the zRivetToBone node.  current implementation of
-    zQuery does not handle rivets so this is temporary until we get a python version going.
-
-    Args:
-        solver ([list]): The solver/s that have the rivets that are to be deleted.
-    """
-    history = cmds.listHistory(solvers, allConnections=True, future=True)
-    if history:
-        locators = cmds.ls(history, type='zRivetToBoneLocator', l=True)
-        rivets = cmds.ls(history, type='zRivetToBone', l=True)
-        locator_parent = cmds.listRelatives(locators, parent=True, fullPath=True)
-        if rivets and locator_parent:
-            cmds.delete(rivets + locator_parent)
-
-
 def get_zSolver(body):
     """ Gets zSolver in scene.
     Args:
