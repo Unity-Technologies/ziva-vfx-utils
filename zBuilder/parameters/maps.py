@@ -1,5 +1,4 @@
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
-from utility.paintable_maps import get_paintable_map_fallback_impl
 from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh
 from zBuilder.nodes.base import Base
 from maya import cmds
@@ -64,17 +63,7 @@ class Map(Base):
         self.set_mesh(mesh_name)
         self.type = 'map'
 
-        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-        maya_version = int(cmds.about(version=True)[:4])
-        use_fallback_impl = False
-        if maya_version == 2022:
-            minor_version = int(cmds.about(minorVersion=True))
-            use_fallback_impl = (minor_version == 0)
-
-        if use_fallback_impl:
-            self.values = get_paintable_map_fallback_impl(mesh_name, map_name)
-        else:
-            self.values = get_weights(map_name)
+        self.values = get_weights(map_name, mesh_name)
 
         self.map_type = cmds.objectType(map_name)
 
@@ -184,15 +173,16 @@ def invert_weights(weights):
     return weights
 
 
-def get_weights(map_name):
+def get_weights(map_name, mesh_name=None):
     """ Gets the weights for the map.
     Args:
         map_name: Map to get weights from.
-
+        mesh_name: Mesh that the weights are painted on.
+            Needed as a workaround for a Maya 2022 regression.
     Returns:
         list(float)
     """
-    return get_paintable_map(*split_map_name(map_name))
+    return get_paintable_map(*split_map_name(map_name), mesh_name)
 
 
 def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):

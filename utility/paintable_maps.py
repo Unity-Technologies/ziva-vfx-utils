@@ -4,21 +4,6 @@ from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
 import re
 
-
-# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-def get_paintable_map_fallback_impl(mesh_name, map_name, vert_num=None):
-    """
-    Fallback implementation of get paintable map.
-    This is a work around to the Maya 2022 Python API regression.
-    """
-    vert_count = vert_num if vert_num else cmds.polyEvaluate(mesh_name, v=True)
-    try:
-        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
-    except ValueError:
-        value = cmds.getAttr(map_name)
-    return value
-# End of TODO
-
 def split_map_name(map_name):
     ''' Split map_name to node and attr, e.g.,
         u'l_tissue_1_zFiber.weightList[0].weights' -> 
@@ -32,8 +17,38 @@ def split_map_name(map_name):
     '''
     return map_name.split('.', 1)
 
+# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+def _use_paintable_map_fallback_impl():
+    """
+    Whether or not we need to use the fallback implementation of get_paintable_map()
+    This depends on whether we're using a Maya version with the relevant regression.
+    """
+    maya_version = int(cmds.about(version=True)[:4])
+    if maya_version == 2022:
+        minor_version = int(cmds.about(minorVersion=True))
+        if minor_version == 0:
+            return True
+    return False
+# End of TODO
 
-def get_paintable_map(node_name, attr_name):
+
+# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+def _get_paintable_map_fallback_impl(mesh_name, node_name, attr_name, vert_num=None):
+    """
+    Fallback implementation of get paintable map.
+    This is a work around to the Maya 2022 Python API regression.
+    """
+    map_name = '{}.{}'.format(node_name, attr_name)
+    vert_count = vert_num if vert_num else cmds.polyEvaluate(mesh_name, v=True)
+    try:
+        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
+    except ValueError:
+        value = cmds.getAttr(map_name)
+    return value
+# End of TODO
+
+
+def get_paintable_map(node_name, attr_name, mesh_name=None):
     # type: (str, str) -> List[float]
     """
     Get an array of paintable weights on some node.
@@ -54,6 +69,11 @@ def get_paintable_map(node_name, attr_name):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
+    # TODO: Delete mesh_name parameter once Maya 2022 retires or fixes the regression
+    # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+    if _use_paintable_map_fallback_impl():
+        return _get_paintable_map_fallback_impl(mesh_name, node_name, attr_name)
+    # End of TODO
 
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
@@ -181,11 +201,12 @@ def get_paintable_map_by_getAttr_numericArray(node_name, attr_name):
     return cmds.getAttr(node_dot_attr)
 
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-def set_paintable_map_fallback_impl(map_name, map_value):
+def _set_paintable_map_fallback_impl(node_name, attr_name, map_value):
     """
     Fallback implementation of set paintable map.
     This is a work around to the Maya 2022 Python API regression.
     """
+    map_name = '{}.{}'.format(node_name, attr_name)
     weight_map = '{}[0]'.format(map_name)
     if cmds.objExists(weight_map):
         if not cmds.getAttr(weight_map, l=True):
@@ -228,15 +249,8 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
     # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-    maya_version = int(cmds.about(version=True)[:4])
-    use_fallback_impl = False
-    if maya_version == 2022:
-        minor_version = int(cmds.about(minorVersion=True))
-        use_fallback_impl = (minor_version == 0)
-
-    if use_fallback_impl:
-        node_dot_attr = '{}.{}'.format(node_name, attr_name)
-        set_paintable_map_fallback_impl(node_dot_attr, new_weights)
+    if _use_paintable_map_fallback_impl():
+        _set_paintable_map_fallback_impl(node_name, attr_name, new_weights)
         return
     # End of TODO
 
