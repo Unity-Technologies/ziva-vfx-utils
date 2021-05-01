@@ -182,7 +182,8 @@ def get_weights(map_name, mesh_name=None):
     Returns:
         list(float)
     """
-    return get_paintable_map(*split_map_name(map_name), mesh_name)
+    split_map = split_map_name(map_name)
+    return get_paintable_map(split_map[0], split_map[1], mesh_name)
 
 
 def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
