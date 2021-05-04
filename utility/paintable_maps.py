@@ -20,29 +20,30 @@ def split_map_name(map_name):
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _use_paintable_map_fallback_impl():
     """
-    Whether or not we need to use the fallback implementation of get_paintable_map()
+    Whether or not we need to use the fallback implementation of 
+    set/get_paintable_map_by_MFnWeightGeometryFilter().
     This depends on whether we're using a Maya version with the relevant regression.
     """
     maya_version = int(cmds.about(version=True)[:4])
-    if maya_version == 2022:
-        minor_version = int(cmds.about(minorVersion=True))
-        if minor_version == 0:
-            return True
-    return False
+    # Refine Maya major/minor version once Autodesk fixes the regression
+    return maya_version >= 2022
 # End of TODO
 
 
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-def _get_paintable_map_fallback_impl(mesh_name, node_name, attr_name, vert_num=None):
+def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name):
     """
-    Fallback implementation of get paintable map.
+    Fallback implementation of get paintable map by MFnWeightGeometryFilter variant.
     This is a work around to the Maya 2022 Python API regression.
     """
     map_name = '{}.{}'.format(node_name, attr_name)
-    vert_count = vert_num if vert_num else cmds.polyEvaluate(mesh_name, v=True)
-    try:
-        value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
-    except ValueError:
+    if mesh_name:
+        try:
+            vert_count = cmds.polyEvaluate(mesh_name, v=True)
+            value = cmds.getAttr('{}[0:{}]'.format(map_name, vert_count - 1))
+        except Exception:
+            value = cmds.getAttr(map_name)
+    else:
         value = cmds.getAttr(map_name)
     return value
 # End of TODO
@@ -70,10 +71,6 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
     # TODO: Delete mesh_name parameter once Maya 2022 retires or fixes the regression
-    # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-    if _use_paintable_map_fallback_impl():
-        return _get_paintable_map_fallback_impl(mesh_name, node_name, attr_name)
-    # End of TODO
 
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
@@ -94,6 +91,11 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
+
+        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+        if _use_paintable_map_fallback_impl():
+            return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
+        # End of TODO
         return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
     # case 3
     return get_paintable_map_by_ArrayDataBuilder(node_name, attr_name)
@@ -201,9 +203,9 @@ def get_paintable_map_by_getAttr_numericArray(node_name, attr_name):
     return cmds.getAttr(node_dot_attr)
 
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-def _set_paintable_map_fallback_impl(node_name, attr_name, map_value):
+def _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, map_value):
     """
-    Fallback implementation of set paintable map.
+    Fallback implementation of set paintable map by MFnWeightGeometryFilter variant.
     This is a work around to the Maya 2022 Python API regression.
     """
     map_name = '{}.{}'.format(node_name, attr_name)
@@ -248,11 +250,6 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
-    # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-    if _use_paintable_map_fallback_impl():
-        _set_paintable_map_fallback_impl(node_name, attr_name, new_weights)
-        return
-    # End of TODO
 
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
@@ -270,7 +267,13 @@ def set_paintable_map(node_name, attr_name, new_weights):
     if is_multi:
         is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
         if is_deformer and child_attr == 'weights':
-            set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
+            # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
+            if _use_paintable_map_fallback_impl():
+                _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
+                return
+            # End of TODO
+            else:
+                set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         else:
             set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights)
     else:

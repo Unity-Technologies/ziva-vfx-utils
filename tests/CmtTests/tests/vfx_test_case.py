@@ -140,7 +140,8 @@ class VfxTestCase(TestCase):
         """
         items = builder.get_scene_items(type_filter=['map'])
         for item in items:
-            scene_map_value = get_paintable_map(*split_map_name(item.name))
+            node_name, attr_name = split_map_name(item.name)
+            scene_map_value = get_paintable_map(node_name, attr_name, item._mesh)
             self.assertEqual(item.values, scene_map_value)
 
     def compare_builder_restshapes_with_scene_restshapes(self, builder):
