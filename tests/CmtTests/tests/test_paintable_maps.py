@@ -1,5 +1,4 @@
 from utility.paintable_maps import get_paintable_map, set_paintable_map
-from utility.paintable_maps import get_paintable_map_fallback_impl
 import vfx_test_case
 from maya import cmds
 from maya import mel
@@ -62,25 +61,13 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
 
     def check_set_paintable_map(self, test_cases, mesh_name):
         # SETUP was done by caller.
-        
         # TODO: Delete mesh_name parameter once Maya 2022 retires or fixes the regression
-        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-        maya_version = int(cmds.about(version=True)[:4])
-        use_fallback_impl = False
-        if maya_version == 2022:
-            minor_version = int(cmds.about(minorVersion=True))
-            use_fallback_impl = (minor_version == 0)
-
         for node, attr, weights in test_cases:
             print('node, attr = {}, {}'.format(node, attr))  # so we can tell what failed
-            set_paintable_map(node, attr, weights)
+
             ## ACT ###############
-            observed_weights = None
-            if use_fallback_impl and mesh_name:
-                node_dot_attr = '{}.{}'.format(node, attr)
-                observed_weights = get_paintable_map_fallback_impl(mesh_name, node_dot_attr)
-            else:
-                observed_weights = get_paintable_map(node, attr)
+            set_paintable_map(node, attr, weights)
+            observed_weights = get_paintable_map(node, attr, mesh_name)
 
             ## VERIFY #######################
             self.assertAllApproxEqual(weights, observed_weights)

@@ -2,7 +2,6 @@ import zBuilder.builders.ziva as zva
 import zBuilder.utils as utils
 from zBuilder.commonUtils import is_sequence
 from utility.paintable_maps import split_map_name, get_paintable_map
-from utility.paintable_maps import get_paintable_map_fallback_impl
 import tests.utils as test_utils
 from cmt.test import TestCase
 from maya import cmds
@@ -139,22 +138,11 @@ class VfxTestCase(TestCase):
         """
         Checking maps in builder against ones in scene
         """
-        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-        maya_version = int(cmds.about(version=True)[:4])
-        use_fallback_impl = False
-        if maya_version == 2022:
-            minor_version = int(cmds.about(minorVersion=True))
-            use_fallback_impl = (minor_version == 0)
-
         items = builder.get_scene_items(type_filter=['map'])
-        if use_fallback_impl:
-            for item in items:
-                scene_map_value = get_paintable_map_fallback_impl(item._mesh, item.name)
-                self.assertEqual(item.values, scene_map_value)
-        else:
-            for item in items:
-                scene_map_value = get_paintable_map(*split_map_name(item.name))
-                self.assertEqual(item.values, scene_map_value)
+        for item in items:
+            node_name, attr_name = split_map_name(item.name)
+            scene_map_value = get_paintable_map(node_name, attr_name, item._mesh)
+            self.assertEqual(item.values, scene_map_value)
 
     def compare_builder_restshapes_with_scene_restshapes(self, builder):
         # checking the actual restshapes got hooked up in maya
