@@ -10,14 +10,18 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
-1.0.12
+1.1.0
 ------
+- Add support for Maya 2022.
+- Add support for Python 3.
+- Phase out support for Maya 2018 and older
 
 Bug Fixes
----------
++++++++++
 - **zBuilder:** zRivet locator names now stored and re-applied
 - **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
 - **zBuilder:** Scene Panel and Copy Paste did not work in some cases with sub-tissues.
+
 
 1.0.11
 ------
