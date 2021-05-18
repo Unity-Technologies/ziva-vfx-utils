@@ -175,6 +175,7 @@ def invert_weights(weights):
 
 def get_weights(map_name, mesh_name=None):
     """ Gets the weights for the map.
+
     Args:
         map_name: Map to get weights from.
         mesh_name: Mesh that the weights are painted on.
