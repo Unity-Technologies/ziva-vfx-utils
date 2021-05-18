@@ -16,12 +16,19 @@ Release Notes
 - Add support for Python 3.
 - Phase out support for Maya 2018 and older
 
+Functionality
++++++++++++++
+- Automatically output logging information to a zBuilder log file.
+- Set ZIVA_ZBUILDER_DEBUG=1 environment variable before launching Maya to get extra debug info.
+
 Bug Fixes
 +++++++++
 - **zBuilder:** zRivet locator names now stored and re-applied
 - **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
-- **zBuilder:** Scene Panel and Copy Paste did not work in some cases with sub-tissues.
-
+- **zBuilder:** Scene Panel refresh and Copy-Paste did not work in some cases with sub-tissues.
+- **zBuilder:** Trying to paint a map from scene panel would fail due to an AttributeError.
+- **zBuilder:** Can now open zBuilder files created in ZivaVFX 1.7 or older.
+- **zBuilder:** Workaround breakage of MFnGeometryFilter.deformerSet() in Maya 2022. This API breakage is related to the new "component tag" feature of Geometry Filters in Maya 2022. Performance may be reduced when serializing large scenes in Maya 2022.
 
 1.0.11
 ------
