@@ -19,7 +19,7 @@ Release Notes
 Functionality
 +++++++++++++
 - Automatically output logging information to a zBuilder log file.
-- Set ZIVA_ZBUILDER_DEBUG=1 environment variable before launching Maya to get extra debug info.
+- Set *ZIVA_ZBUILDER_DEBUG=1* environment variable before launching Maya to get extra debug info.
 - Add utility function *remove_zRivetToBone_nodes()* -- correctly remove a zRivetToBone object from the scene.
 
 Bug Fixes
