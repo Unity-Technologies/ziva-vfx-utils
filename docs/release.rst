@@ -241,5 +241,5 @@ Bug Fixes
 0.9.4
 -----
 * retrieving from scene in ZivaSetup now works by passing nodes or not.  Default behavior is unchanged.
-* restoring user selection when using zMap.py methods.
+* restoring user selection when using zMaya.py methods.
 * added support for cloth
