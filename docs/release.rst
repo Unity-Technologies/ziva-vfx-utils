@@ -2,7 +2,7 @@ Release Notes
 =============
 
 .. == STYLE ==
-.. For consistency, prefer to use an imperative stlye, like:
+.. For consistency, prefer to use an imperative style, like:
 .. - Add a new widget for pies.
 .. - Fix broken rendering.
 .. - Allow foo.
@@ -10,20 +10,32 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
-1.0.12
+1.1.0
 ------
+- Add support for Maya 2022.
+- Add support for Python 3.
+- Phase out support for Maya 2018 and older
+
+Functionality
++++++++++++++
+- Automatically output logging information to a zBuilder log file.
+- Set *ZIVA_ZBUILDER_DEBUG=1* environment variable before launching Maya to get extra debug info.
+- Add utility function *remove_zRivetToBone_nodes()* -- correctly remove a zRivetToBone object from the scene.
 
 Bug Fixes
----------
++++++++++
 - **zBuilder:** zRivet locator names now stored and re-applied
 - **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
-- **zBuilder:** Scene Panel and Copy Paste did not work in some cases with sub-tissues.
+- **zBuilder:** Scene Panel refresh and Copy-Paste did not work in some cases with sub-tissues.
+- **zBuilder:** Trying to paint a map from scene panel would fail due to an AttributeError.
+- **zBuilder:** Can now open zBuilder files created in ZivaVFX 1.7 or older.
+- **zBuilder:** Workaround breakage of MFnGeometryFilter.deformerSet() in Maya 2022. This API breakage is related to the new "component tag" feature of Geometry Filters in Maya 2022. Performance may be reduced when serializing large scenes in Maya 2022.
 
 1.0.11
 ------
 
 Functionality
--------------
++++++++++++++
 - **Scene Panel:** Now able to rename nodes by double-clicking on them.
 - **Scene Panel:** Add right-click menu for zSolver.
 - **Scene Panel:** Update icons.
@@ -66,7 +78,7 @@ Benchmark Runtimes (in seconds, lower is better):
 +---------------------+------------------------+--------------------+-------------------+-------------------+
 
 Bug Fixes
----------
++++++++++
 - **Scene Panel:** Opening Node Editor clears Scene Panel content while detached from the dock.
 - **Scene Panel:** Some maps in Scene Panel right click menu did not work.
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.
@@ -77,7 +89,7 @@ Bug Fixes
 ------
 
 Functionality
--------------
++++++++++++++
 - **Scene Panel:** Updated the right-click menu: added copy/paste/invert and paint to maps; added copy/paste for attributes.
 - **Scene Panel:** Changed appearance of the Scene Panel.
 - **Ziva VFX Utils:** Added ``utils.merge_solvers()`` function.
@@ -126,7 +138,7 @@ Benchmark Runtimes (in seconds, lower is better):
 - **zBuilder:** Added a bunch of unit tests.
 
 Bug Fixes
----------
++++++++++
 - **zBuilder:** When retrieving multiple times in a scene strange things could end up in builder.
 - **zBuilder:** zBuilder ``build()`` would fail when something was connected to ``enable`` attribute.
 - **zBuilder:** zBuilder being too chatty when building by printing out every node type. Now only the ones it operated on.
@@ -143,11 +155,11 @@ Bug Fixes
 * Improvements to serialization and deserialization
 * Support for multiple curves for zLineOfAction
 * Storing mObjectHandle instead of mObject for robustness
-* Adding zRivet and repective curves to Scene Panel
+* Adding zRivet and respective curves to Scene Panel
 * Fix for zCloth objects not mirroring
 * Storing intermediate shape of mesh
 * Fix for zTissue attributes not updating in some edge cases
-* Genreal bug fixes and cleanup
+* General bug fixes and cleanup
 
 1.0.8
 -----
@@ -191,7 +203,7 @@ Bug Fixes
 ------
 * zBuilder support for sub-tissues
 * mirroring of geo before application (experimental)
-* zLineOfAction functionality added to retrieve_from_scene_selecton
+* zLineOfAction functionality added to retrieve_from_scene_selection
 * general bug fixes
 
 
@@ -211,13 +223,13 @@ Bug Fixes
 0.11.0
 ------
 * removed abstract methods from NodeCollection
-* depractated set_attrs and set_weights in favor of using a MayaMixin class
+* deprecated set_attrs and set_weights in favor of using a MayaMixin class
 * storing mObjects internally during node creation to get around maya renaming 
 * zMaya.rename_ziva_nodes() handles zBones and zCloth
 
 0.10.0
 ------
-* save out component data and node data seperatly
+* save out component data and node data separately
 * changed map.py to maps.py
 * fixed bug in cloth creation
 * changed node_filter to name_filter.  Better representation on what it is.
@@ -229,5 +241,5 @@ Bug Fixes
 0.9.4
 -----
 * retrieving from scene in ZivaSetup now works by passing nodes or not.  Default behavior is unchanged.
-* restoring user selection when using zMapa.py methods.
+* restoring user selection when using zMaya.py methods.
 * added support for cloth
