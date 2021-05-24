@@ -14,7 +14,7 @@ menuItem -label "Create" -ec true -ecr true -c "ziva -s" -ann "Creates an empty 
 menuItem -label "Info" -ec true -ecr true -c "ziva -i" -ann "Outputs solver statistics.";
 menuItem -label "Select" -ec true -ecr true -c "ziva -sel" -ann "Selects (via Maya selection) the solver node that contains the selected Ziva object. If selection contains no Ziva objects, selects the solver (if there is exactly 1 solver in the scene), or the default solver (if 2 or more solvers in the scene).";
 menuItem -ob yes -ann "options" -c "ziva_selectSolver(0)";
-menuItem -label "Set Default" -ec true -ecr true -c "ziva -ds" -ann "Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.";
+menuItem -label "Set Default" -ec true -ecr true -c "ziva -defaultSolver" -ann "Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.";
 menuItem -ob yes -ann "options" -c "ziva_selectSolver(1)";
 menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"from zBuilder import utils;from maya import cmds;utils.merge_solvers(cmds.ls(sl=True));\")" -ann "Merges selected solvers into one.";
 menuItem -label "Launch Scene Panel" -ec true -ecr true -c "python(\"from zBuilder.ui import zUI;zivaUI = zUI.run()\")" -ann "Launches a Scene Panel for inspecting the solver components." -i "scene_panel.png";

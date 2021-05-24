@@ -106,7 +106,7 @@ global proc ziva_selectSolverApply(int $method)
     }
     if ($method == 1)
     {
-      string $melCommand = "ziva -ds " + $newDefaultSolver;
+      string $melCommand = "ziva -defaultSolver " + $newDefaultSolver;
       eval($melCommand);
     }
   }
@@ -121,7 +121,7 @@ global proc ziva_selectSolver(int $method)
     return;
   }
 
-  string $defaultSolvers[] = `zQuery -ds`;
+  string $defaultSolvers[] = `zQuery -defaultSolver`;
   string $defaultSolver = "";
   if (size($defaultSolvers) > 0)
   {
