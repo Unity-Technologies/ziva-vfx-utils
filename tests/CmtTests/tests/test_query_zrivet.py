@@ -151,11 +151,11 @@ class QueryRivetTestCase(VfxTestCase):
         # Bone1 in Solver1, Bone2 in Solver2
         solver1 = mel.eval('ziva -s')
         cmds.select(solver1[1], r=True)
-        cmds.ziva(ds=True)
+        cmds.ziva(defaultSolver=True)
         bone1 = self.create_bone('bone1', (-1, 0, 0))
         solver2 = mel.eval('ziva -s')
         cmds.select(solver2[1], r=True)
-        cmds.ziva(ds=True)
+        cmds.ziva(defaultSolver=True)
         bone2 = self.create_bone('bone2', (1, 0, 0))
         # Lines' endpoints rivets to bones respectively
         line1 = self.create_line((-1, 0, -1), (1, 0, -1), 'line1')
