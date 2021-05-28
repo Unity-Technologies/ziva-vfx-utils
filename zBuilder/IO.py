@@ -99,7 +99,5 @@ def check_disk_version(json_object):
     json_version = json_object['info']['version'].split('.')
     json_version = [int(v) for v in json_version]
 
-    for ten, json_ in zip(one_ten, json_version):
-        if ten > json_:
-            updates.update_json_pre_1_0_11(json_object)
-            break
+    if json_version <= one_ten:
+        updates.update_json_pre_1_0_11(json_object)
