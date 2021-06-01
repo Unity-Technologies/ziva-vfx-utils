@@ -1,25 +1,18 @@
-try:
-    from PySide2.QtCore import *
-    from PySide2.QtGui import *
-    from PySide2.QtWidgets import *
-    from PySide2 import __version__
-    from shiboken2 import wrapInstance
-except ImportError:
-    from PySide.QtCore import *
-    from PySide.QtGui import *
-    from PySide import __version__
-    from shiboken import wrapInstance
-
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+from PySide2 import __version__
+from shiboken2 import wrapInstance
 from maya import OpenMayaUI as mui
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
 from maya import cmds
 
-from licenseRegister import register_node_locked_license, register_floating_license, LICENSE_FILE_NAME
+from .licenseRegister import register_node_locked_license, register_floating_license, LICENSE_FILE_NAME
 from os import path
 import re
 
 mayaMainWindowPtr = mui.MQtUtil.mainWindow()
-mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
+mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 
 
 class LicenseRegisterWidget(MayaQWidgetBaseMixin, QWidget):
