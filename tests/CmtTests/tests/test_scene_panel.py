@@ -1,29 +1,22 @@
-import os
-from maya import cmds
 from vfx_test_case import VfxTestCase
 import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 from zBuilder.commonUtils import is_string
-
-try:
-    from PySide2 import QtCore
-    from zBuilder.ui import model
-    wrong_maya_version = False
-except ImportError:
-    wrong_maya_version = True
-
+from zBuilder.ui.model import SceneGraphModel
+from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
 from zBuilder.nodes.dg_node import DGNode
+from maya import cmds
+from PySide2 import QtCore
+import os
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
     def setUp(self):
-        if wrong_maya_version:
-            self.skipTest('Maya version is not supported')
         super(ZivaScenePanelTestCase, self).setUp()
         test_utils.load_scene()
         builder = zva.Ziva()
         builder.retrieve_connections()
-        self.model = model.SceneGraphModel(builder)
+        self.model = SceneGraphModel(builder)
 
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
@@ -34,16 +27,16 @@ class ZivaScenePanelTestCase(VfxTestCase):
         name = self.model.data(index, QtCore.Qt.DisplayRole)
         self.assertTrue(is_string(name))
 
-        node_type = self.model.data(index, self.model.sortRole)
+        node_type = self.model.data(index, sortRole)
         self.assertTrue(is_string(node_type))
 
-        node = self.model.data(index, self.model.nodeRole)
+        node = self.model.data(index, nodeRole)
         self.assertIsInstance(node, DGNode)
 
-        long_name = self.model.data(index, self.model.longNameRole)
+        long_name = self.model.data(index, longNameRole)
         self.assertTrue(is_string(long_name))
 
-        enable = self.model.data(index, self.model.enableRole)
+        enable = self.model.data(index, enableRole)
         self.assertIn(enable, [True, False, 0, 1])
 
     def recursive_check_model_data_returns_right_types(self, index):

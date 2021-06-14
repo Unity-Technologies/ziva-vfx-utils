@@ -1,18 +1,16 @@
-import weakref
-from functools import partial
-
-from maya import cmds
-from maya import mel
-
-from PySide2 import QtGui, QtWidgets, QtCore
-from zBuilder.ui.utils import dock_window
-
-from . import model
-from . import view
-from . import icons
-import os
+from .model import SceneGraphModel, TreeItemDelegate
+from .view import SceneTreeView
+from zBuilder.uiUtils import dock_window, get_icon_path_from_name
+from zBuilder.uiUtils import sortRole, nodeRole, longNameRole
 import zBuilder.builders.ziva as zva
 from zBuilder.nodes.base import Base
+from maya import cmds
+from maya import mel
+from PySide2 import QtGui, QtWidgets, QtCore
+from functools import partial
+import os
+import weakref
+
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
@@ -127,17 +125,17 @@ class MyDockingUI(QtWidgets.QWidget):
         self.maps_clipboard = None
 
         self._proxy_model = QtCore.QSortFilterProxyModel()
-        self._model = model.SceneGraphModel(self.builder, self._proxy_model)
+        self._model = SceneGraphModel(self.builder, self._proxy_model)
         self._proxy_model.setSourceModel(self._model)
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
-        self.treeView = view.SceneTreeView(self)
+        self.treeView = SceneTreeView(self)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.open_menu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.treeView.setModel(self._proxy_model)
-        self.treeView.setItemDelegate(model.TreeItemDelegate())
+        self.treeView.setItemDelegate(TreeItemDelegate())
         self.treeView.setIndentation(15)
 
         # must be after .setModel because assigning model resets item expansion
@@ -170,7 +168,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.tool_bar.addAction(self.actionRefresh)
 
     def _setup_actions(self):
-        refresh_path = icons.get_icon_path_from_name('refresh')
+        refresh_path = get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRefresh = QtWidgets.QAction(self)
@@ -194,7 +192,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def paste_weights(self, node, new_map_index):
         new_map = node.parameters['map'][new_map_index]
-        """Pasting the maps.  Terms used here
+        """
+        Pasting the maps.  Terms used here
             orig/new.
             The map/node the items were copied from are prefixed with orig.
             The map/node the items are going to be pasted onto are prefixed with new
@@ -228,7 +227,8 @@ class MyDockingUI(QtWidgets.QWidget):
 
     def paste_attrs(self, node):
         # type: (zBuilder.whatever.Base) -> None
-        """ Paste the attributes from the clipboard onto given node.
+        """
+        Paste the attributes from the clipboard onto given node.
         @pre The node's type has an entry in the clipboard.
         """
         assert isinstance(
@@ -254,16 +254,17 @@ class MyDockingUI(QtWidgets.QWidget):
         self.attrs_clipboard[node.type] = node.attrs.copy()
 
     def select_source_and_target(self):
-        """Selects the source and target mesh of an attachment. This is a menu
-        command.
+        """
+        Selects the source and target mesh of an attachment. This is a menu command.
         """
 
         indexes = self.treeView.selectedIndexes()[0]
-        node = indexes.data(model.SceneGraphModel.nodeRole)
+        node = indexes.data(nodeRole)
         cmds.select(node.nice_association)
 
     def open_menu(self, position):
-        """Generates menu for tree items
+        """
+        Generates menu for tree items
 
         We are getting the zBuilder node in the tree item and checking type.
         With that we can build a custom menu per type.  If there are more then
@@ -287,7 +288,7 @@ class MyDockingUI(QtWidgets.QWidget):
             'zSolverTransform': self.open_solver_menu
         }
 
-        node = indexes[0].data(model.SceneGraphModel.nodeRole)
+        node = indexes[0].data(nodeRole)
         if node.type in menu_dict:
             menu = QtWidgets.QMenu(self)
             method = menu_dict[node.type]
@@ -295,7 +296,8 @@ class MyDockingUI(QtWidgets.QWidget):
             menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
     def add_map_actions_to_menu(self, menu, node, map_index):
-        """Add map actions to the menu
+        """
+        Add map actions to the menu
         Args:
             menu (QMenu): menu to add option to
             node (zBuilder object): zBuilder.nodes object
@@ -441,13 +443,14 @@ class MyDockingUI(QtWidgets.QWidget):
         node.attrs[attr]['value'] = value
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
-    def tree_changed(self):
-        """When the tree selection changes this gets executed to select
+    def tree_changed(self, selected, deselected):
+        """
+        When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
         """
-        indexes = self.treeView.selectedIndexes()
-        if indexes:
-            nodes = [x.data(model.SceneGraphModel.nodeRole).long_name for x in indexes]
+        selectedIndexList = selected.indexes()
+        if selectedIndexList:
+            nodes = [x.data(nodeRole).long_name for x in selectedIndexList]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(nodes, l=True)
             if scene_nodes:
@@ -458,7 +461,8 @@ class MyDockingUI(QtWidgets.QWidget):
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
     def set_builder(self, builder=None):
-        """This builds and/or resets the tree given a builder.  The builder
+        """
+        This builds and/or resets the tree given a builder.  The builder
         is a zBuilder object that the tree is built from.  If None is passed
         it uses the scene selection to build a new builder.
 
@@ -487,7 +491,7 @@ class MyDockingUI(QtWidgets.QWidget):
             self.expand(names_to_expand)
         else:
             indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.sortRole, "zSolverTransform",
+                                              sortRole, "zSolverTransform",
                                               -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)
@@ -497,7 +501,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # expand item in view.
         if sel:
             checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.longNameRole, sel[0], -1,
+                                              longNameRole, sel[0], -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
@@ -518,7 +522,7 @@ class MyDockingUI(QtWidgets.QWidget):
         expanded = []
         for index in self._proxy_model.persistentIndexList():
             if self.treeView.isExpanded(index):
-                expanded.append(index.data(model.SceneGraphModel.longNameRole))
+                expanded.append(index.data(longNameRole))
 
         return expanded
 
@@ -532,7 +536,7 @@ class MyDockingUI(QtWidgets.QWidget):
         self.treeView.collapseAll()
         for name in names:
             indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              model.SceneGraphModel.longNameRole, name, -1,
+                                              longNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)

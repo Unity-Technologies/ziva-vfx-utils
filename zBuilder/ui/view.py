@@ -1,5 +1,5 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-from . import icons
+from zBuilder.uiUtils import get_icon_path_from_name
 
 
 class SceneTreeView(QtWidgets.QTreeView):
@@ -10,12 +10,12 @@ class SceneTreeView(QtWidgets.QTreeView):
         super(SceneTreeView, self).__init__(parent)
 
     def drawBranches(self, painter, rect, index):
-        image_line = QtGui.QImage(icons.get_icon_path_from_name('vline'))
-        image_opened = QtGui.QImage(icons.get_icon_path_from_name('branch-opened'))
-        image_closed = QtGui.QImage(icons.get_icon_path_from_name('branch-closed'))
-        image_more = QtGui.QImage(icons.get_icon_path_from_name('branch-more'))
-        image_child = QtGui.QImage(icons.get_icon_path_from_name('branch-child'))
-        image_end = QtGui.QImage(icons.get_icon_path_from_name('branch-end'))
+        image_line = QtGui.QImage(get_icon_path_from_name('vline'))
+        image_opened = QtGui.QImage(get_icon_path_from_name('branch-opened'))
+        image_closed = QtGui.QImage(get_icon_path_from_name('branch-closed'))
+        image_more = QtGui.QImage(get_icon_path_from_name('branch-more'))
+        image_child = QtGui.QImage(get_icon_path_from_name('branch-child'))
+        image_end = QtGui.QImage(get_icon_path_from_name('branch-end'))
 
         column_count = rect.width() // self.indentation()
         model_index = self.model().mapToSource(index)

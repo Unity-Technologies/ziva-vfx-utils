@@ -1,19 +1,10 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-from .icons import get_icon_path_from_node
-import zBuilder.zMaya as mz
+from zBuilder.uiUtils import get_icon_path_from_node
+from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
 from maya import cmds
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
-    # scene_item.type ( zTissue, zBone, ... )
-    sortRole = QtCore.Qt.UserRole
-    # scene_item object
-    nodeRole = QtCore.Qt.UserRole + 1
-    # long name of scene_item object in the scene
-    longNameRole = QtCore.Qt.UserRole + 2
-    # is node enabled
-    enableRole = QtCore.Qt.UserRole + 3
-
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
@@ -38,21 +29,15 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return "Scene Items"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-
-        if index.isValid():
-
-            if role == QtCore.Qt.EditRole:
-
-                node = index.internalPointer()
-                long_name = node.long_name
-                short_name = node.name
-                if value and value != short_name:
-                    name = cmds.rename(long_name, value)
-                    self.builder.string_replace("^{}$".format(short_name), name)
-                    node.name = name
-
-                return True
-
+        if index.isValid() and (role == QtCore.Qt.EditRole):
+            node = index.internalPointer()
+            long_name = node.long_name
+            short_name = node.name
+            if value and value != short_name:
+                name = cmds.rename(long_name, value)
+                self.builder.string_replace("^{}$".format(short_name), name)
+                node.name = name
+            return True
         return False
 
     def data(self, index, role):
@@ -68,18 +53,18 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if hasattr(node, 'type'):
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
 
-        if role == SceneGraphModel.sortRole:
+        if role == sortRole:
             if hasattr(node, 'type'):
                 return node.type
 
-        if role == SceneGraphModel.nodeRole:
+        if role == nodeRole:
             if hasattr(node, 'type'):
                 return node
 
-        if role == SceneGraphModel.longNameRole:
+        if role == longNameRole:
             return node.long_name
 
-        if role == SceneGraphModel.enableRole:
+        if role == enableRole:
             enable = True
             node = index.internalPointer()
 
@@ -137,7 +122,7 @@ class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
 
         if index_model.isValid():
             model = index_model.model()
-            enable = model.data(index_model, model.enableRole)
+            enable = model.data(index_model, enableRole)
             if not enable:
                 if option.state & QtWidgets.QStyle.State_Selected:
                     option.state &= ~QtWidgets.QStyle.State_Selected
