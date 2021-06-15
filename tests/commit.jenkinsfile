@@ -36,7 +36,7 @@ pipeline {
                 stage('windows') {
                     agent { label 'win && vfx && nogpu' }
                     environment {
-                        mayaVersion = "2018" // variations: 2018, 2019, 2020
+                        mayaVersion = "2018" // variations: 2018, 2019, 2020, 2022
                     }
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
@@ -50,7 +50,7 @@ pipeline {
                 stage('centos7') {
                     agent { label 'cent7 && vfx && nogpu' }
                     environment {
-                        mayaVersion = "2019"
+                        mayaVersion = "2022" // variations: 2019, 2020, 2022
                     }
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
@@ -115,7 +115,8 @@ def runLinuxTestStage() {
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
             sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
-            sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+            // Run Maya 2022 in Python 2 environment
+            sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion} --py2"
         }
     }
 }
