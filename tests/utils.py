@@ -21,7 +21,7 @@ def get_tmp_file_location():
     Returns:
         string: file path 
     """
-    temp = tempfile.TemporaryFile()
+    temp = tempfile.NamedTemporaryFile()
 
     # this closes the file and deletes it.  We just need to name of it.
     temp.close()
