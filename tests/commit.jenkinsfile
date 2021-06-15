@@ -47,7 +47,7 @@ pipeline {
                     post { cleanup { cleanWs() } }
                 }
 
-                stage('centos7') {
+                stage('centos7-py2') {
                     agent { label 'cent7 && vfx && nogpu' }
                     environment {
                         mayaVersion = "2022" // variations: 2019, 2020, 2022
@@ -55,7 +55,21 @@ pipeline {
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
                             unstash 'main'
-                            runLinuxTestStage()
+                            runLinuxTestStage(true)
+                        }
+                    }
+                    post { cleanup { cleanWs() } }
+                }
+
+                stage('centos7-py3') {
+                    agent { label 'cent7 && vfx && nogpu' }
+                    environment {
+                        mayaVersion = "2022" // variations: 2019, 2020, 2022
+                    }
+                    steps {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            unstash 'main'
+                            runLinuxTestStage(false)
                         }
                     }
                     post { cleanup { cleanWs() } }
@@ -107,7 +121,7 @@ def runWindowsTestStage() {
     }
 }
 
-def runLinuxTestStage() {
+def runLinuxTestStage(runInPython2Env) {
     echo "running linux test stage"
 
     dir('ziva-vfx-utils') {
@@ -115,8 +129,11 @@ def runLinuxTestStage() {
           "zivadyn_LICENSE=${env.zivadyn_LICENSE}:/var/ziva"
         ]) {
             sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
-            // Run Maya 2022 in Python 2 environment
-            sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion} --py2"
+            if (runInPython2Env) {
+                sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion} --py2"
+            } else {
+                sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+            }
         }
     }
 }

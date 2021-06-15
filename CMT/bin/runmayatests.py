@@ -97,15 +97,31 @@ def test_output_looks_okay(output, maya_version):
 
     This is to help us ignore random Maya crashes when exiting.
     """
+    # ----------
+    # First check
+    # Search the stderr log for:
+    # 1. failed test cases(with FAIL suffix),
+    # 2. runtime error test cases(with ERROR suffix)
+    # If none is found, we consider this run is good.
+    # 'ok', 'skip' and 'expected failure' are valid results.
+
+    # Note this check has a potential problem:
+    # The stderror log doesn't contain last test case result,
+    # it only has '...' but no status.
+    # If the last test case failed in Maya 2022 Linux platform,
+    # it passes first check and skips the second check(see skip logic below).
+    # Let's hope this never happens.
+    failed_testcase_patterns = ("... FAIL", "... ERROR")
+    if any(x in output for x in failed_testcase_patterns):
+        return False
+
     # Maya 2022 runs on Linux does not return message with OK.
-    # Instead it shows error message like,
-    # "This plugin does not support createPlatformOpenGLContext!",
-    # or show a long callstack, looks like the unit test failed.
-    # But the return code is 0, which means successful.
-    # We have to skip the return string check for it.
+    # We consider it is good as it has passed first check.
     if platform.system() == 'Linux' and int(maya_version) == 2022:
         return True
 
+    # ----------
+    # Second check
     # After the tests are run, this big bar is printed.
     # Search for it so we can look at the summary that comes after.
     sep = "----------------------------------------------------------------------"
@@ -122,7 +138,6 @@ def test_output_looks_okay(output, maya_version):
     import re
     okay_pattern = "^OK"
     return re.search(okay_pattern, summary, flags=re.MULTILINE)
-
 
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
@@ -202,19 +217,24 @@ def main():
         # with errors or segfaults or other silly things, even when all of the tests pass.
         # So, we do not depend on the error code. Instead, we look for the final "OK"
         # from python's unit tests runner. If that OK was printed, then the tests are good.
-        if (exitCode != 0) and test_output_looks_okay(stderr, pargs.maya):
+
+        output_looks_ok = test_output_looks_okay(stderr, pargs.maya)
+        if (exitCode != 0) and output_looks_ok:
+            # Make this case phenomenal
+            for i in range(5):
+                print('#' * 80)
             print("WARNING mayapy exited with {0}, but the tests look okay\n".format(exitCode))
             sys.exit(0)
 
         # This rarely happens. If it does, test_output_looks_okay() needs overhaul
-        if (exitCode == 0) and not test_output_looks_okay(stderr, pargs.maya):
+        if (exitCode == 0) and not output_looks_ok:
             # Make this unusual case phenomenal
             for i in range(5):
                 print('@' * 80)
             print("WARNING mayapy runs well but stderr does not look okay.\n Error message: {0}\n\n".format(stderr))
             sys.exit(1)
 
-        # print stderr to output if the test output doesn't look okay
+        # print stderr as diagnose info
         print(stderr)
 
     except subprocess.CalledProcessError as error:
