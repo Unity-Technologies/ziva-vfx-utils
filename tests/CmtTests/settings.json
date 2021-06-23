@@ -1,8 +1,10 @@
 {
     "plugin_path": {
+        "win_2022": "c:/ImmutablePast/test-develop/win2022/ziva.mll",
         "win_2020": "c:/ImmutablePast/test-develop/win2020/ziva.mll",
         "win_2019": "c:/ImmutablePast/test-develop/win2019/ziva.mll",
         "win_2018": "c:/ImmutablePast/test-develop/win2018/ziva.mll",
+        "lin_2022": "/home/centos/ImmutablePast/test-develop/lin2022/ziva.so",
         "lin_2020": "/home/centos/ImmutablePast/test-develop/lin2020/ziva.so",
         "lin_2019": "/home/centos/ImmutablePast/test-develop/lin2019/ziva.so"
     }
