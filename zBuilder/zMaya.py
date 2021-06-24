@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def check_body_type(bodies):
     """ Checks if given bodies are either zTissue, zCloth and or zBone.  Mostly
     used to see if we can create a zAttachment before we try.  Additionally

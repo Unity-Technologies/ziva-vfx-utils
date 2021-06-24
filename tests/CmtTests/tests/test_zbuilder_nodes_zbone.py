@@ -123,7 +123,6 @@ class ZivaBoneMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zBone1, zBone2, zBone3
 
     """
-
     def setUp(self):
         super(ZivaBoneMirrorTestCase, self).setUp()
 
@@ -152,7 +151,6 @@ class ZivaBoneUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaBoneUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -191,7 +189,6 @@ class ZivaBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaBoneMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -225,7 +222,6 @@ class ZivaBoneUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaBoneUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')

@@ -5,6 +5,7 @@ from vfx_test_case import VfxTestCase
 from maya import cmds
 from maya import mel
 
+
 class ZivaRivetTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaRivetTestCase, self).setUp()

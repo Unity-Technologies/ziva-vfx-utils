@@ -6,10 +6,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Constraints(Builder):
     """To capture Maya constraints.  Supports point, orient and parent constraints.
     """
-
     def __init__(self):
         Builder.__init__(self)
 

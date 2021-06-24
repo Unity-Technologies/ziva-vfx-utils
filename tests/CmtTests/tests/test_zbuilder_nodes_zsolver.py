@@ -262,7 +262,6 @@ class ZivaSolverMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zSolver1, zSolver2, zSolver3
 
     """
-
     def setUp(self):
         super(ZivaSolverMirrorTestCase, self).setUp()
 
@@ -289,7 +288,6 @@ class ZivaSolverUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaSolverUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -326,7 +324,6 @@ class ZivaSolverMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaSolverMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -358,7 +355,6 @@ class ZivaSolverUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaSolverUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')

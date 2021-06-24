@@ -14,7 +14,6 @@ class SolverNode(Ziva):
 
     type = 'zSolver'
     """ The type of node. """
-
     def build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 

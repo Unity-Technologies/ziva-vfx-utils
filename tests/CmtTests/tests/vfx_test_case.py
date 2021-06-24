@@ -8,7 +8,6 @@ from maya import cmds
 import os
 
 
-
 def isApprox(a, b, eps=1e-6):
     if hasattr(type(a), '__iter__'):
         if len(a) != len(b):
@@ -91,7 +90,6 @@ class VfxTestCase(TestCase):
             self.assertItemsEqual(a, b)
         else:
             self.assertCountEqual(a, b)
-
 
     def check_tissue_node_subtissue_builder_and_scene(self, scene_items):
 

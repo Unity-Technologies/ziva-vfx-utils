@@ -2,12 +2,12 @@ from time import time
 from functools import wraps
 import logging
 import sys
-
 '''
 The module contains helper functions depends on Python features only.
 '''
 
 logger = logging.getLogger(__name__)
+
 
 def time_this(func):
     """
@@ -20,6 +20,7 @@ def time_this(func):
         after = time()
         logger.info("Executing {}() took {:.3f}ms".format(func.__name__, (after - before) * 1000))
         return x
+
     return new_function
 
 
@@ -60,6 +61,7 @@ def is_sequence(var):
     False otherwise.
     """
     return isinstance(var, (list, tuple)) and not is_string(var)
+
 
 def get_first_element(maya_node):
     return maya_node[0] if is_sequence(maya_node) else maya_node

@@ -6,6 +6,7 @@ from vfx_test_case import VfxTestCase
 from maya import cmds
 from maya import mel
 
+
 class ZivaMirrorTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaMirrorTestCase, self).setUp()

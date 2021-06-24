@@ -2,10 +2,10 @@ from zBuilder.commonUtils import is_sequence
 from maya import cmds
 from maya import OpenMaya as om
 import re
-
 '''
 The module contains helper functions depends on Maya Python API.
 '''
+
 
 def get_short_name(node_name):
     # type: (str) -> str
@@ -68,6 +68,7 @@ def parse_maya_node_for_selection(args):
             raise Exception('Nothing selected or passed, please select something and try again.')
     return selection
 
+
 def replace_long_name(search, replace, long_name):
     """ does a search and replace on a long name.  It splits it up by ('|') then
     performs it on each piece
@@ -115,6 +116,7 @@ def replace_long_name(search, replace, long_name):
 
     return new_name
 
+
 def replace_dict_keys(search, replace, dictionary):
     """
     Does a search and replace on dictionary keys
@@ -133,6 +135,7 @@ def replace_dict_keys(search, replace, dictionary):
         tmp[new] = dictionary[key]
 
     return tmp
+
 
 def build_attr_list(selection):
     """
@@ -163,6 +166,7 @@ def build_attr_list(selection):
 
     return attribute_names
 
+
 def build_attr_key_values(selection, attr_list):
     """ Builds a dictionary of attribute key/values.  Stores the value, type, and
     locked status.
@@ -190,6 +194,7 @@ def build_attr_key_values(selection, attr_list):
 
     return attr_dict
 
+
 def safe_rename(old_name, new_name):
     """
     Same as cmds.rename but does not throw an exception if renaming failed
@@ -203,6 +208,7 @@ def safe_rename(old_name, new_name):
 
     return old_name
 
+
 def get_mdagpath_from_mesh(mesh_name):
     """ Maya stuff, getting the dagpath from a mesh name
 
@@ -215,6 +221,7 @@ def get_mdagpath_from_mesh(mesh_name):
     sel_list.getDagPath(0, mesh_m_dag_path)
 
     return mesh_m_dag_path
+
 
 def get_name_from_m_object(m_object, long_name=True):
     """ Gets maya scene name from given mObject.
@@ -236,4 +243,3 @@ def get_name_from_m_object(m_object, long_name=True):
     else:
         name = om.MFnDependencyNode(m_object).name()
     return name
-

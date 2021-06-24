@@ -48,7 +48,6 @@ class Mesh(Base):
         self.set_polygon_connects(polygon_connects)
         self.set_point_list(points)
 
-
     def set_polygon_counts(self, pCountList):
         """ Stores the polygon counts.
 

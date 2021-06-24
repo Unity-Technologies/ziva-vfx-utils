@@ -113,7 +113,6 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
             generated_content = lic_file.read()
             self.assertEqual(self.new_node_locked_license_content1, generated_content)
 
-
     def test_overriding_existing_node_based_license(self):
         '''
         Test overriding existing node locked license file.

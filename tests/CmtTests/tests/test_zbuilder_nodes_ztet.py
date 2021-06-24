@@ -125,7 +125,6 @@ class ZivaTetMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zTet1, zTet2, zTet3
 
     """
-
     def setUp(self):
         super(ZivaTetMirrorTestCase, self).setUp()
 
@@ -154,7 +153,6 @@ class ZivaTetUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaTetUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -193,7 +191,6 @@ class ZivaTetMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaTetMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -227,7 +224,6 @@ class ZivaTetUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaTetUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')

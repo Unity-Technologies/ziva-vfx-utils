@@ -6,6 +6,7 @@ from maya import cmds
 import os
 import tempfile
 
+
 class IOTestCase(VfxTestCase):
     def setUp(self):
         super(IOTestCase, self).setUp()
@@ -51,7 +52,7 @@ class IOTestCase(VfxTestCase):
         cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
-        
+
         # Action
         file_name = test_utils.get_tmp_file_location()
         z.write(file_name)

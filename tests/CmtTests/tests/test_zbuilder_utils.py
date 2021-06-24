@@ -9,6 +9,7 @@ from maya import mel
 import tempfile
 import os
 
+
 class BuilderMayaTestCase(VfxTestCase):
     def test_replace_long_name_usecase1(self):
         # searching and replacing r_ at begining of string

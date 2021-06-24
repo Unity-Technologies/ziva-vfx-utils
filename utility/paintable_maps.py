@@ -4,6 +4,7 @@ from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
 import re
 
+
 def split_map_name(map_name):
     ''' Split map_name to node and attr, e.g.,
         u'l_tissue_1_zFiber.weightList[0].weights' -> 
@@ -17,6 +18,7 @@ def split_map_name(map_name):
     '''
     return map_name.split('.', 1)
 
+
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _use_paintable_map_fallback_impl():
     """
@@ -27,6 +29,8 @@ def _use_paintable_map_fallback_impl():
     maya_version = int(cmds.about(version=True)[:4])
     # Refine Maya major/minor version once Autodesk fixes the regression
     return maya_version >= 2022
+
+
 # End of TODO
 
 
@@ -46,6 +50,8 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
     else:
         value = cmds.getAttr(map_name)
     return value
+
+
 # End of TODO
 
 
@@ -94,7 +100,8 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
 
         # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
         if _use_paintable_map_fallback_impl():
-            return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
+            return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
+                mesh_name, node_name, attr_name)
         # End of TODO
         return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
     # case 3
@@ -202,6 +209,7 @@ def get_paintable_map_by_getAttr_numericArray(node_name, attr_name):
             node_dot_attr, datatype))
     return cmds.getAttr(node_dot_attr)
 
+
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, map_value):
     """
@@ -222,7 +230,10 @@ def _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_
         # applying doubleArray maps
         if cmds.objExists(map_name):
             cmds.setAttr(map_name, map_value, type='doubleArray')
+
+
 # End of TODO
+
 
 def set_paintable_map(node_name, attr_name, new_weights):
     # type: (str, str, List[float]) -> None
@@ -269,7 +280,8 @@ def set_paintable_map(node_name, attr_name, new_weights):
         if is_deformer and child_attr == 'weights':
             # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
             if _use_paintable_map_fallback_impl():
-                _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
+                _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
+                    node_name, attr_name, new_weights)
                 return
             # End of TODO
             else:

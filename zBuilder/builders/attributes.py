@@ -6,7 +6,6 @@ from maya import cmds
 class Attributes(Builder):
     """Storing maya attributes
     """
-
     @time_this
     def retrieve_from_scene(self):
         selection = cmds.ls(sl=True, l=True)

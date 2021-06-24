@@ -80,4 +80,3 @@ class ZivaScenePanelTestCase(VfxTestCase):
         # zBuilder node has a new name
         node = child_index.internalPointer()
         self.assertEqual(node.name, "renamed_zSolver")
-

@@ -213,7 +213,6 @@ class ZivaLineOfActionMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zLineOfAction1, zLineOfAction2, zLineOfAction3
 
     """
-
     def setUp(self):
         super(ZivaLineOfActionMirrorTestCase, self).setUp()
 
@@ -242,7 +241,6 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
-
     def setUp(self):
         super(ZivaLineOfActionUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
@@ -281,7 +279,6 @@ class ZivaLineOfActionUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
-
     def setUp(self):
         super(ZivaLineOfActionUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')

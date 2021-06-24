@@ -4,6 +4,7 @@ import tests.utils as test_utils
 from vfx_test_case import VfxTestCase
 import os
 
+
 class Builder1_7_to_1_9TestCase(VfxTestCase):
     def setUp(self):
         super(Builder1_7_to_1_9TestCase, self).setUp()

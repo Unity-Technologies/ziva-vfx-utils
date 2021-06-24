@@ -15,7 +15,6 @@ class SkinCluster(DGNode):
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
-
     def __init__(self, parent=None, builder=None):
         super(SkinCluster, self).__init__(parent=parent, builder=builder)
         self.influences = list()

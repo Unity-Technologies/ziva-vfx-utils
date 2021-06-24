@@ -3,6 +3,7 @@ from zBuilder.mayaUtils import parse_maya_node_for_selection
 from zBuilder.commonUtils import time_this
 from maya import cmds
 
+
 class Fields(Builder):
     """Storing maya fields.
     """

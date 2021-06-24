@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Deformers(Builder):
     """Test setup to play with deformers and how they are ordered on a mesh.
     """

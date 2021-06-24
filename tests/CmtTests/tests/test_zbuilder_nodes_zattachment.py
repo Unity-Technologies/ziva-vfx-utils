@@ -349,4 +349,3 @@ class ZivaAttachmentMirrorTestCaseB(ZivaUpdateTestCase):
     def test_check_attachment_map(self):
         self.assertEqual(cmds.getAttr('zAttachment1.weightList[0].weights'),
                          cmds.getAttr('zAttachment2.weightList[0].weights'))
-

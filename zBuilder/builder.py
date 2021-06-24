@@ -28,27 +28,22 @@ class Builder(object):
         self.info['maya_version'] = cmds.about(v=True)
         self.info['operating_system'] = cmds.about(os=True)
 
-
     def __eq__(self, other):
         """ Compares the builders.
         """
         return type(other) == type(self) and self.bundle == other.bundle
-
 
     def __ne__(self, other):
         """ Define a non-equality test
         """
         return not self == other
 
-
     def log(self):
         self.root_node.log()
-
 
     def view(self):
         import zBuilder.ui.reader as reader
         reader.view(root_node=self.root_node)
-
 
     def node_factory(self, node, parent=None, get_parameters=True):
         """Given a maya node, this checks objType and instantiates the proper
@@ -80,7 +75,6 @@ class Builder(object):
 
         return scene_items
 
-
     def get_node_parameters(self, node, types=[]):
         """
         Get parameters (e.g. maps and meshes) for the specified node.
@@ -103,7 +97,6 @@ class Builder(object):
                     parameters.append(parameter)
 
         return parameters
-
 
     def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
@@ -144,7 +137,6 @@ class Builder(object):
                     # so lets create one and return that.
                     return obj(*parameter_args, builder=self)
 
-
     def make_node_connections(self):
         """This makes connections between this node and any other node in scene_items.  The expectations
         is that this gets run after anytime the scene items get populated.
@@ -152,13 +144,11 @@ class Builder(object):
         for item in self.get_scene_items():
             item.make_node_connections()
 
-
     def build(self, *args, **kwargs):
         logger.info('Building....')
 
         for scene_item in self.get_scene_items():
             scene_item.build(*args, **kwargs)
-
 
     def retrieve_from_scene(self, *args, **kwargs):
         """
@@ -170,7 +160,6 @@ class Builder(object):
             self.bundle.extend_scene_items(b_solver)
 
         self.stats()
-
 
     @time_this
     def write(self, file_path, type_filter=[], invert_match=False):
@@ -186,7 +175,12 @@ class Builder(object):
         from zBuilder.IO import pack_zbuilder_contents, BaseNodeEncoder
         json_data = pack_zbuilder_contents(self, type_filter, invert_match)
         with open(file_path, 'w') as outfile:
-            json.dump(json_data, outfile, cls=BaseNodeEncoder, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(json_data,
+                      outfile,
+                      cls=BaseNodeEncoder,
+                      sort_keys=True,
+                      indent=4,
+                      separators=(',', ': '))
 
         self.stats()
         logger.info('Wrote File: %s' % file_path)
@@ -199,7 +193,6 @@ class Builder(object):
                     if scene_item.__dict__[attr]:
                         restored = self.restore_scene_items_from_string(scene_item.__dict__[attr])
                         scene_item.__dict__[attr] = restored
-
 
     @time_this
     def retrieve_from_file(self, file_path):
@@ -230,13 +223,11 @@ class Builder(object):
 
         self.stats()
 
-
     def stats(self):
         """
         Prints out basic information in Maya script editor.  Information is scene item types and counts.
         """
         self.bundle.stats(None)
-
 
     def string_replace(self, search, replace):
         """
@@ -257,7 +248,6 @@ class Builder(object):
         """
         self.bundle.string_replace(search, replace)
 
-
     def print_(self, type_filter=list(), name_filter=list()):
         """
         Prints out basic information for each scene item in the Builder.  Information is all
@@ -270,7 +260,6 @@ class Builder(object):
                 Defaults to :obj:`list`
         """
         self.bundle.print_(type_filter, name_filter)
-
 
     def get_scene_items(self,
                         type_filter=list(),
@@ -308,7 +297,8 @@ class Builder(object):
         if not is_sequence(association_filter):
             association_filter = [association_filter]
         if association_filter:
-            assert all(is_string(a) for a in association_filter), "association filter requires string type"
+            assert all(is_string(a)
+                       for a in association_filter), "association filter requires string type"
 
         # put name filter in a list if it isn't
         if not is_sequence(name_filter):
@@ -316,13 +306,8 @@ class Builder(object):
         if name_filter:
             assert all(is_string(n) for n in name_filter), "name filter requires string type"
 
-        return self.bundle.get_scene_items(type_filter,
-                                           name_filter,
-                                           name_regex,
-                                           association_filter,
-                                           association_regex,
-                                           invert_match)
-
+        return self.bundle.get_scene_items(type_filter, name_filter, name_regex, association_filter,
+                                           association_regex, invert_match)
 
     def restore_scene_items_from_string(self, item):
         if is_sequence(item):

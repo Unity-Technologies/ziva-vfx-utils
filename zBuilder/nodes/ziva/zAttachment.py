@@ -8,6 +8,7 @@ from zBuilder.mayaUtils import safe_rename
 
 logger = logging.getLogger(__name__)
 
+
 class AttachmentNode(Ziva):
     """ This node for storing information related to zAttachments.
     """

@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class SkinCluster(Builder):
     """Capturing Maya skinClusters
     """

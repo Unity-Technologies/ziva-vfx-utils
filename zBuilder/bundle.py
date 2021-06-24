@@ -12,7 +12,6 @@ class Bundle(object):
     def __init__(self):
         self.scene_items = list()
 
-
     def __iter__(self):
         """ This iterates through the scene_items.
 
@@ -22,7 +21,6 @@ class Bundle(object):
         """
         return iter(self.scene_items)
 
-
     def __len__(self):
         """
 
@@ -31,19 +29,16 @@ class Bundle(object):
         """
         return len(self.scene_items)
 
-
     def __eq__(self, other):
         """ Compares the bundles list.  Makes sure lists are in same order and every element in list 
         is equal.
         """
         return self.scene_items == other.scene_items
 
-
     def __ne__(self, other):
         """ Define a non-equality test
         """
         return not self == other
-
 
     def print_(self, type_filter, name_filter):
         """
@@ -60,7 +55,6 @@ class Bundle(object):
 
         logger.debug('----------------------------------------------------------------')
 
-
     def compare(self, type_filter=list(), name_filter=list()):
         """
         Compares info in memory with that which is in scene.
@@ -75,7 +69,6 @@ class Bundle(object):
 
         for scene_item in self.get_scene_items(type_filter, name_filter, [], [], None, False):
             scene_item.compare()
-
 
     def stats(self, type_filter):
         """
@@ -105,11 +98,9 @@ class Bundle(object):
         for key in tmp:
             logger.info('{} {}'.format(key, len(tmp[key])))
 
-
     def append_scene_item(self, scene_item):
         """ Deprecated. Use extend_scene_items instead, because batch processing is faster. """
         self.extend_scene_items(self, [scene_item])
-
 
     def extend_scene_items(self, scene_items):
         """
@@ -137,7 +128,6 @@ class Bundle(object):
             else:
                 self.scene_items.append(scene_item)
 
-
     def remove_scene_item(self, scene_item):
         """
         Removes a scene_item from the bundle list while keeping order.
@@ -146,14 +136,8 @@ class Bundle(object):
         """
         self.scene_items.remove(scene_item)
 
-
-    def get_scene_items(self,
-                        type_filter,
-                        name_filter,
-                        name_regex,
-                        association_filter,
-                        association_regex,
-                        invert_match):
+    def get_scene_items(self, type_filter, name_filter, name_regex, association_filter,
+                        association_regex, invert_match):
         """
         Gets the scene items from builder for further inspection or modification.
 
@@ -196,7 +180,6 @@ class Bundle(object):
             return not invert
 
         return [item for item in self if keep_me(item, invert_match)]
-
 
     def string_replace(self, search, replace):
         """

@@ -680,4 +680,3 @@ def clean_scene():
         in_scene = cmds.ls(type=node)
         if in_scene:
             cmds.delete(in_scene)
-
