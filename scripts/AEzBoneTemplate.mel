@@ -10,7 +10,7 @@ global proc AEzBoneTemplate( string $nodeName )
   editorTemplate -addControl "contactStiffness";
   editorTemplate -addControl "contactStiffnessExp";
 
-  // suppress attributes attribute
+  // suppress attributes
   editorTemplate -suppress "caching";
   editorTemplate -suppress "nodeState";
   editorTemplate -suppress "frozen";

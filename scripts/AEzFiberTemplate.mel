@@ -8,6 +8,9 @@ global proc AEzFiberTemplate( string $nodeName )
   editorTemplate -addControl "strengthExp";
   editorTemplate -addControl "contractionLimit";
   editorTemplate -addControl "excitation";
+  editorTemplate -addControl "enableMuscleGrowth";
+  editorTemplate -addControl "muscleGrowthScale";
+  editorTemplate -addControl "useLoaForMuscleGrowth";
 
   // suppress attributes attribute
   editorTemplate -suppress "iGeo";
@@ -20,6 +23,7 @@ global proc AEzFiberTemplate( string $nodeName )
   editorTemplate -suppress "weightList";
   editorTemplate -suppress "endPoints";
   editorTemplate -suppress "map64BitIndices";
+  editorTemplate -suppress "iLineOfActionData";
 
   editorTemplate -addExtraControls;
   editorTemplate -endScrollLayout;

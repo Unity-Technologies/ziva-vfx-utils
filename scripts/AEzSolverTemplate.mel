@@ -16,9 +16,12 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addSeparator;
 
     // other controls
+    editorTemplate -addControl "integrator";
+    editorTemplate -addControl "lineSearch";
     editorTemplate -addControl "collisionDetection";
     editorTemplate -addControl "collisionPointSpacing";
     editorTemplate -addControl "maxNewtonIterations";
+    editorTemplate -addControl "newtonToleranceFactor";
     editorTemplate -addControl "substeps";
     editorTemplate -addControl "framesPerSecond";
     editorTemplate -addControl "stiffnessDamping";
@@ -34,7 +37,6 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "showAttachments";
     editorTemplate -addControl "showCollisions";
     editorTemplate -addControl "showMaterials";
-    editorTemplate -addControl "oCache";
 
     AEaddRampControl( $nodeName + ".attachmentColorRamp" );
     AEaddRampControl( $nodeName + ".collisionColorRamp" );
@@ -50,6 +52,7 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -suppress "iSolverParams";
     editorTemplate -suppress "iCacheParams";
     editorTemplate -suppress "oSolved";
+    editorTemplate -suppress "oCache";
 
     editorTemplate -addExtraControls;
 

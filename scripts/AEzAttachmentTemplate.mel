@@ -11,7 +11,7 @@ global proc AEzAttachmentTemplate( string $nodeName )
   editorTemplate -addControl "correspondence";
   editorTemplate -addControl "show";
 
-  // suppress attributes attribute
+  // suppress attributes
   editorTemplate -suppress "iGeo1";
   editorTemplate -suppress "iGeo2";
   editorTemplate -suppress "oAttachment";

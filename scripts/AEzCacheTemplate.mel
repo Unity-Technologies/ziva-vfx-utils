@@ -5,7 +5,7 @@ global proc AEzCacheTemplate( string $nodeName )
   // Add our controls
   editorTemplate -addControl "iCache";
 
-  // suppress attributes attribute
+  // suppress attributes
   editorTemplate -suppress "localPosition";
   editorTemplate -suppress "localScale";
 
