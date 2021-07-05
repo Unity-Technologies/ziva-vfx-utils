@@ -6,8 +6,8 @@ import zBuilder.utils as utils
 import zBuilder.builders.ziva as zva
 from maya import cmds
 from maya import mel
-import tempfile
 import os
+
 
 class BuilderMayaTestCase(VfxTestCase):
     def test_replace_long_name_usecase1(self):
@@ -212,35 +212,34 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             utils.rig_copy()
 
     def test_save_rig(self):
-        # find a temp file location
-        fd, file_name = tempfile.mkstemp(suffix='.zBuilder')
-
+        # Setup
+        file_name = test_utils.get_tmp_file_location('.zBuilder')
         cmds.select('zSolver1')
 
+        # Action
         utils.save_rig(file_name)
 
-        # simply check if file exists, if it does it passes
+        # Verify
+        # simply check if file exists
         self.assertTrue(os.path.exists(file_name))
         self.assertGreater(os.path.getsize(file_name), 1000)
 
-        os.close(fd)
         os.remove(file_name)
 
     def test_load_rig(self):
-        # find a temp file location
-        fd, file_name = tempfile.mkstemp(suffix='.zBuilder')
-
+        # Setup
+        file_name = test_utils.get_tmp_file_location('.zBuilder')
         cmds.select('zSolver1')
-
         utils.save_rig(file_name)
-
         # clean scene so we just have geo
         utils.clean_scene()
 
+        # Action
         utils.load_rig(file_name)
+
+        # Verify
         self.assertSceneHasNodes(['zSolver1'])
 
-        os.close(fd)
         os.remove(file_name)
 
     def test_update_1_solver_nothing_selected(self):

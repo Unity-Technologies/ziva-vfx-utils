@@ -1,24 +1,14 @@
 import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene
+from zBuilder.utils import clean_scene, load_rig
 from vfx_test_case import VfxTestCase
 import tests.utils as test_utils
 from maya import cmds
 import os
-import tempfile
+
 
 class IOTestCase(VfxTestCase):
     def setUp(self):
         super(IOTestCase, self).setUp()
-        # Build a basic setup
-        test_utils.build_mirror_sample_geo()
-        test_utils.ziva_mirror_sample_geo()
-
-        cmds.select(cl=True)
-
-        # use builder to retrieve from scene
-        self.z = zva.Ziva()
-        self.z.retrieve_from_scene()
-
         self.temp_files = []
 
     def tearDown(self):
@@ -29,6 +19,13 @@ class IOTestCase(VfxTestCase):
         super(IOTestCase, self).tearDown()
 
     def test_builder_write(self):
+        # Setup
+        test_utils.build_mirror_sample_geo()
+        test_utils.ziva_mirror_sample_geo()
+        cmds.select(cl=True)
+        # use builder to retrieve from scene
+        self.z = zva.Ziva()
+        self.z.retrieve_from_scene()
 
         # Action
         file_name = test_utils.get_tmp_file_location()
@@ -36,7 +33,7 @@ class IOTestCase(VfxTestCase):
         self.temp_files.append(file_name)
 
         # Verify
-        # simply check if file exists, if it does it passes
+        # simply check if file exists
         self.assertTrue(os.path.exists(file_name))
 
     def test_builder_write_build(self):
@@ -51,7 +48,7 @@ class IOTestCase(VfxTestCase):
         cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
-        
+
         # Action
         file_name = test_utils.get_tmp_file_location()
         z.write(file_name)
@@ -62,3 +59,20 @@ class IOTestCase(VfxTestCase):
 
         # Verify
         self.assertSceneHasNodes(['r_bicep_muscle_zTissue'])
+
+    def test_0load_zBuilder_file(self):
+        '''
+        This test covers VFXACT-955 ticket, a regression in v1.1.0
+        The test case name starts with '0' is on purpose,
+        to make it run before other cases, 
+        otherwise the missing module will load and assert won't trigger.
+        '''
+        # Setup
+        cmds.polySphere()
+        tissue_setup = test_utils.get_test_asset_path('tissue.zBuilder')
+
+        # Action
+        load_rig(tissue_setup)
+
+        # Verify
+        self.assertSceneHasNodes(['zSolver1'])
