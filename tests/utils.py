@@ -14,19 +14,23 @@ outside of testing.
 CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_tmp_file_location():
+def get_tmp_file_location(suffix=""):
     """Using the tempfile module this creates a tempfile and deletes it (os.close) and 
     returns the name/location which is all we need to deal with files.
     
     Returns:
         string: file path 
     """
-    temp = tempfile.NamedTemporaryFile()
+    temp = tempfile.NamedTemporaryFile(suffix=suffix)
 
     # this closes the file and deletes it.  We just need to name of it.
     temp.close()
 
     return temp.name
+
+
+def get_test_asset_path(scene_name):
+    return "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
 
 
 def build_mirror_sample_geo():
@@ -80,7 +84,7 @@ def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
         namespace (str, optional): The namespace to use for referenced file.
                                             ":" is equal to no namespace. Defaults to "TEMP".
     """
-    path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
+    path = get_test_asset_path(scene_name)
     if new_scene:
         cmds.file(new=True, force=True)
 
@@ -88,7 +92,7 @@ def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
 
 
 def load_scene(new_scene=True, scene_name='generic.ma'):
-    path = "{}/assets/{}".format(CURRENT_DIRECTORY_PATH, scene_name)
+    path = get_test_asset_path(scene_name)
     if new_scene:
         cmds.file(new=True, force=True)
 
@@ -104,7 +108,7 @@ def get_1_7_builder_files():
         list of str: list of paths to 1_7 zBuilder files. 
     """
     directory = "{}/assets".format(CURRENT_DIRECTORY_PATH)
-    builders = glob.glob(directory + '/*.zBuilder')
+    builders = glob.glob(directory + '/*1_7.zBuilder')
     return builders
 
 
