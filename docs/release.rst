@@ -12,7 +12,6 @@ Release Notes
 
 1.1.1
 ------
-- Regression bug fix.
 
 Bug Fixes
 +++++++++
