@@ -14,18 +14,16 @@ outside of testing.
 CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_tmp_file_location(suffix=""):
+def get_tmp_file_location(suffix="", prefix='tmp', dir=None):
     """Using the tempfile module this creates a tempfile and deletes it (os.close) and 
     returns the name/location which is all we need to deal with files.
     
     Returns:
         string: file path 
     """
-    temp = tempfile.NamedTemporaryFile(suffix=suffix)
-
-    # this closes the file and deletes it.  We just need to name of it.
+    temp = tempfile.NamedTemporaryFile(suffix=suffix, prefix=prefix, dir=dir)
+    # this closes the file and deletes it.  We just need the file name.
     temp.close()
-
     return temp.name
 
 
