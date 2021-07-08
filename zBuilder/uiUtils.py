@@ -1,4 +1,4 @@
-from maya import cmds
+from maya import cmds, mel
 from maya import OpenMayaUI as mui
 from shiboken2 import wrapInstance
 from PySide2 import QtWidgets, QtCore
@@ -44,16 +44,30 @@ def dock_window(dialog_class, *args, **kwargs):
     return dialog_class(control_wrap, *args, **kwargs)
 
 
-def get_icon_path_from_node(node):
+def get_icon_path_from_node(node, parent):
     """
     Given a node, find the corresponding icon path that matches its type.
 
     Args:
         node (node): A node object to query.
+        parent: parent of the node in scene panel tree
 
     Returns:
-        str: The path to the matching icon.
+        str: The path to the matching icon. For 'zAttachment' node,
+             it return seperate icons based on source and target.
     """
+    if node.type == "zAttachment" and parent:
+        target_cmd = 'zQuery -at {}'.format(node.name)
+        target_attachment = mel.eval(target_cmd)
+
+        source_cmd = 'zQuery -as {}'.format(node.name)
+        source_attachment = mel.eval(source_cmd)
+
+        if source_attachment[0] == parent:
+            return get_icon_path_from_name(node.type+"Source")
+        elif target_attachment[0] == parent:
+            return get_icon_path_from_name(node.type+"Target")
+
     return get_icon_path_from_name(node.type)
 
 
