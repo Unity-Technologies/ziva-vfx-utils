@@ -1,6 +1,6 @@
-import unittest
 import os
 from os import path
+import shutil
 import tempfile
 from vfx_test_case import VfxTestCase
 from utility.licenseRegister.licenseRegister import LICENSE_FILE_NAME
@@ -70,7 +70,7 @@ LICENSE zivadyn ziva-vfx-author 1.99 1-mar-2020 uncounted hostid=ANY
         delete_file(cls.new_license_file_path)
 
         if path.exists(cls.module_path) and path.isdir(cls.module_path):
-            os.removedirs(cls.module_path)
+            shutil.rmtree(cls.module_path)
 
     def tearDown(self):
         # delete these files as their content changes between test cases
