@@ -80,6 +80,18 @@ class ScenePanel2(QtWidgets.QWidget):
         self._sceneGraphModel.builder = builder
         self._sceneGraphModel.endResetModel()
 
+        # show expanded view of the tree
+        self._tvGeo.expandAll()
+
+        # select item in treeview that is selected in maya
+        sel = cmds.ls(sl=True, long=True)
+        if sel:
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
+                                              longNameRole, sel[0], -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            for index in checked:
+                self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+
     def _setup_ui(self, parent):
         self.toolbar = QtWidgets.QToolBar(self)
         self.toolbar.setIconSize(QtCore.QSize(27, 27))
