@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def getNode(index, defaultNode):
     """
     Given QModelIndex, return zBuilder node
@@ -16,8 +17,8 @@ def getNode(index, defaultNode):
             return node
     return defaultNode
 
-class SceneGraphModel(QtCore.QAbstractItemModel):
 
+class SceneGraphModel(QtCore.QAbstractItemModel):
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
@@ -126,47 +127,3 @@ class zGeoFilterProxyModel(QtCore.QSortFilterProxyModel):
         geoUINodes = ['ui_{}_body'.format(item) for item in geoNodes]
         solverNodes = ('zSolverTransform', 'zSolver')
         return (srcNode.type in geoUINodes) or (srcNode.type in solverNodes)
-
-
-class SelectedGeoListModel(QtCore.QAbstractListModel):
-    """
-    List model for Component view.
-    It stores selected zGeo items from zGeoTreeView.
-    """
-    def __init__(self, parent=None):
-        super(SelectedGeoListModel, self).__init__(parent)
-        self._selectedNodeList = ["PlaceHolder1", "PlaceHolder2", "PlaceHolder3"]
-
-    def rowCount(self, parent):
-        return len(self._selectedNodeList)
-    
-    def columnCount(self, parent):
-        return 1
-
-    def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
-
-    def headerData(self, section, orientation, role):
-        if role == QtCore.Qt.DisplayRole:
-            return "Component List"
-
-    def data(self, index, role):
-        if not index.isValid():
-            return None
-
-        node = self._selectedNodeList[index.row()]
-        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            return node
-
-        if role == nodeRole:
-            if hasattr(node, 'type'):
-                return node
-
-    def index(self, row, column, parent):
-        node = self._selectedNodeList[row]
-        return self.createIndex(row, column, node)
-
-    def setNewSelection(self, newSelection):
-        self._selectedNodeList.clear()
-        for item in newSelection:
-            self._selectedNodeList.append(getNode(item, None))

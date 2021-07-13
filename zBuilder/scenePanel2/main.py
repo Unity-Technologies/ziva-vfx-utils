@@ -1,16 +1,19 @@
-from .model import SceneGraphModel, zGeoFilterProxyModel, SelectedGeoListModel
-from .zGeoView import zGeoTreeView
-from maya import cmds
-from PySide2 import QtGui, QtWidgets, QtCore
 import zBuilder.builders.ziva as zva
-from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 import os
 import weakref
 import logging
 
+from .model import SceneGraphModel, zGeoFilterProxyModel
+from .zGeoView import zGeoTreeView
+from .componentWidget import SelectedGeoListModel
+from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
+from maya import cmds
+from PySide2 import QtGui, QtWidgets, QtCore
+
 logger = logging.getLogger(__name__)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
+
 
 class ScenePanel2(QtWidgets.QWidget):
     instances = list()
@@ -116,7 +119,7 @@ class ScenePanel2(QtWidgets.QWidget):
         lytGeo.addWidget(self._tvGeo)
         grpGeo = QtWidgets.QGroupBox("Scene Panel")
         grpGeo.setLayout(lytGeo)
-        
+
         self._lvComponent = QtWidgets.QListView(self)
         self._lvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         lytComponent = QtWidgets.QVBoxLayout()
@@ -150,27 +153,28 @@ class ScenePanel2(QtWidgets.QWidget):
         self.actionRefresh.triggered.connect(self._set_builder)
         self.toolbar.addAction(self.actionRefresh)
 
-        self._tvGeo.selectionModel().selectionChanged.connect(self.on__tvGeo_selectionChanged)
+        self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
 
-    def on__tvGeo_selectionChanged(self, selected, deselected):
+    def on_tvGeo_selectionChanged(self, selected, deselected):
         """
         When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
         """
-        selectedIndexList = selected.indexes()
-        self._selectedGeoModel.beginResetModel()
-        #self._selectedGeoModel.setNewSelection(selectedIndexList)
-        self._selectedGeoModel.endResetModel()
-        for selectedItem in selectedIndexList:
-            logger.info("selectedItem = {}".format(selectedItem))
-
+        selectedIndexList = self._tvGeo.selectedIndexes()
         if selectedIndexList:
             nodes = [x.data(nodeRole) for x in selectedIndexList]
+            nodes = list(set(nodes))
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
             if scene_nodes:
                 cmds.select(scene_nodes)
+
+            # filter non-exist nodes and solver nodes
+            selected_nodes = list(
+                filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith('zSolver'),
+                       nodes))
+            self._selectedGeoModel.setNewSelection(selected_nodes)
 
             not_found_nodes = [name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
@@ -198,8 +202,7 @@ class ScenePanel2(QtWidgets.QWidget):
         # otherwise new items might not be displayed ( Qt bug )
         self._tvGeo.collapseAll()
         for name in names:
-            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              longNameRole, name, -1,
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self._tvGeo.expand(index)

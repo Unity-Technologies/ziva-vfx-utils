@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class zGeoTreeView(QtWidgets.QTreeView):
     # pixel offset from the left horizontally
     offset = 20
@@ -21,7 +22,6 @@ class zGeoTreeView(QtWidgets.QTreeView):
         column_count = rect.width() // self.indentation()
         model_index = self.model().mapToSource(index)
         node = model_index.internalPointer()
-        #oldNode = index.internalPointer()
         row_count = self.model().rowCount(index.parent())
 
         geoNodes = ('zTissue', 'zBone', 'zCloth')
@@ -33,7 +33,7 @@ class zGeoTreeView(QtWidgets.QTreeView):
             width = self.indentation()
             height = rect.height()
             rect = QtCore.QRect(pos_x + zGeoTreeView.offset, pos_y, width, height)
-            
+
             if column == column_count - 1:
                 if node.type in geoUINodes:
                     painter.drawImage(rect, zGeoTreeView.image_child)
