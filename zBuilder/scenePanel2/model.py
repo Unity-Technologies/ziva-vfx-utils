@@ -23,6 +23,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
         self.builder = builder
+        self.current_parent = None
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -69,7 +70,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DecorationRole:
             if hasattr(node, 'type'):
-                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
+                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node, self.current_parent)))
 
         if role == sortRole:
             if hasattr(node, 'type'):
@@ -112,6 +113,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if childItem:
             return self.createIndex(row, column, childItem)
         return QtCore.QModelIndex()
+
+    def set_current_parent(self, parent):
+        self.current_parent = parent
 
 
 class zGeoFilterProxyModel(QtCore.QSortFilterProxyModel):
