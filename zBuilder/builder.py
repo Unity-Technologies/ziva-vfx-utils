@@ -2,6 +2,8 @@ from zBuilder.bundle import Bundle
 from zBuilder.commonUtils import is_sequence, is_string, time_this
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
 from maya import cmds
+# For parameter_factory() and find_class(), though not use directly,
+import zBuilder.parameters
 import inspect
 import json
 import logging
@@ -119,7 +121,6 @@ class Builder(object):
         if not is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
-        import zBuilder.parameters
         for _, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
             if inspect.isclass(obj) and parameter_type == obj.type:
                 scene_item_nodes = self.get_scene_items(type_filter=parameter_type)

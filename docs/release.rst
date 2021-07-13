@@ -10,6 +10,13 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
+1.1.1
+------
+
+Bug Fixes
++++++++++
+- **zBuilder:** Load zBuilder setup reports error if no other zBuilder operation runs before.
+
 1.1.0
 ------
 - Add support for Maya 2022.
