@@ -1,5 +1,5 @@
 from zBuilder.uiUtils import nodeRole
-from PySide2 import QtCore
+from PySide2 import QtCore, QtGui
 
 
 class SelectedGeoListModel(QtCore.QAbstractListModel):
@@ -34,6 +34,11 @@ class SelectedGeoListModel(QtCore.QAbstractListModel):
 
         if role == nodeRole and hasattr(node, 'type'):
             return node
+
+        if role == QtCore.Qt.BackgroundRole:
+            if (index.row() % 2 == 0):
+                return QtGui.QColor(80, 80, 80) # gray
+
 
     def index(self, row, column, parent):
         node = self._selectedNodeList[row]
