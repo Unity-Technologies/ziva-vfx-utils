@@ -89,9 +89,8 @@ class ScenePanel2(QtWidgets.QWidget):
         # select item in treeview that is selected in maya
         sel = cmds.ls(sl=True, long=True)
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              longNameRole, sel[0], -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, sel[0],
+                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
@@ -163,7 +162,6 @@ class ScenePanel2(QtWidgets.QWidget):
         selectedIndexList = self._tvGeo.selectedIndexes()
         if selectedIndexList:
             nodes = [x.data(nodeRole) for x in selectedIndexList]
-            nodes = list(set(nodes))
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
