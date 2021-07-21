@@ -9,6 +9,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
         self.builder = builder
+        self.current_parent = None
 
     def rowCount(self, parent):
         if not parent.isValid():
@@ -51,7 +52,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DecorationRole:
             if hasattr(node, 'type'):
-                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node)))
+                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node, self.current_parent)))
 
         if role == sortRole:
             if hasattr(node, 'type'):
@@ -111,6 +112,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         return self.builder.root_node
 
+    def set_current_parent(self, parent):
+        self.current_parent = parent
 
 class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
@@ -122,6 +125,14 @@ class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
 
         if index_model.isValid():
             model = index_model.model()
+            # lookup parent if any, this is used for 'zAttachment' source/target
+            # here 'index' and 'parent' both are QModelIndex objects representing
+            # items of the Scene Panel 'zBuilder' tree.
+            parent = index.parent()
+            parent_proxy_model = parent.model()
+            if parent_proxy_model:
+                current_parent = parent_proxy_model.data(parent)
+                model.set_current_parent(current_parent)
             enable = model.data(index_model, enableRole)
             if not enable:
                 if option.state & QtWidgets.QStyle.State_Selected:
