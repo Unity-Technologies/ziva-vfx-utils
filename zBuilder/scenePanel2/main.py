@@ -9,6 +9,7 @@ from .componentWidget import SelectedGeoListModel
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 from maya import cmds
 from PySide2 import QtGui, QtWidgets, QtCore
+from functools import partial
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +103,8 @@ class ScenePanel2(QtWidgets.QWidget):
         lytToolbar.addWidget(self.toolbar)
 
         self._tvGeo = zGeoTreeView(self)
+        self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._tvGeo.customContextMenuRequested.connect(self.open_menu)
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self._tvGeo.setIndentation(15)
         # changing header size
@@ -205,6 +208,56 @@ class ScenePanel2(QtWidgets.QWidget):
             for index in indexes:
                 self._tvGeo.expand(index)
 
+    def open_menu(self, position):
+        """
+        Generates menu for 'zSolver' item.
+
+        If there are more than one object selected in UI a menu does not appear.
+        """
+        indexes = self._tvGeo.selectedIndexes()
+
+        if len(indexes) != 1:
+            return
+
+        node = indexes[0].data(nodeRole)
+        if node.type == 'zSolverTransform':
+            menu = QtWidgets.QMenu(self)
+            method = self.open_solver_menu
+            method(menu, node)
+            menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
+
+    def open_solver_menu(self, menu, node):
+        solver_transform = node
+        solver = node.children[0]
+
+        self.add_zsolver_menu_action(menu, solver_transform, 'Enable', 'enable')
+        self.add_zsolver_menu_action(menu, solver, 'Collision Detection', 'collisionDetection')
+        self.add_zsolver_menu_action(menu, solver, 'Show Bones', 'showBones')
+        self.add_zsolver_menu_action(menu, solver, 'Show Tet Meshes', 'showTetMeshes')
+        self.add_zsolver_menu_action(menu, solver, 'Show Muscle Fibers', 'showMuscleFibers')
+        self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
+        self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
+        self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
+
+    def add_zsolver_menu_action(self, menu, node, text, attr):
+        action = QtWidgets.QAction(self)
+        action.setText(text)
+        action.setCheckable(True)
+        action.setChecked(node.attrs[attr]['value'])
+        action.changed.connect(partial(self.toggle_attribute, node, attr))
+        menu.addAction(action)
+
+    def toggle_attribute(self, node, attr):
+        value = node.attrs[attr]['value']
+        if isinstance(value, bool):
+            value = not value
+        elif isinstance(value, int):
+            value = 1 - value
+        else:
+            cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
+            return
+        node.attrs[attr]['value'] = value
+        cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
 # Show window with docking ability
 def run():
