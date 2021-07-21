@@ -72,7 +72,7 @@
                         "type": "long",
                         "value": 10
                     },
-                    "newtonToleranceFactor": {
+                    "solverToleranceFactor": {
                         "alias": null,
                         "locked": false,
                         "type": "double",
