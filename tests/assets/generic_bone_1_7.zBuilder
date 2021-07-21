@@ -62,7 +62,7 @@
                         "type": "double",
                         "value": 0.0
                     },
-                    "maxNewtonIterations": {
+                    "maxSolverIterations": {
                         "alias": null,
                         "locked": false,
                         "type": "long",
