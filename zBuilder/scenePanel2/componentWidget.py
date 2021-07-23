@@ -37,7 +37,7 @@ class SelectedGeoListModel(QtCore.QAbstractListModel):
 
         if role == QtCore.Qt.BackgroundRole:
             if (index.row() % 2 == 0):
-                return QtGui.QColor(80, 80, 80) # gray
+                return QtGui.QColor(54, 54, 54) # gray
 
 
     def index(self, row, column, parent):
