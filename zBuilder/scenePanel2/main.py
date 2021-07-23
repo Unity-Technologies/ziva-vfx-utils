@@ -106,6 +106,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvGeo.setAlternatingRowColors(True)
         self._tvGeo.setIndentation(15)
         # changing header size
         # this used to create some space between left/top side of the tree view and it items
@@ -222,6 +223,7 @@ class ScenePanel2(QtWidgets.QWidget):
         node = indexes[0].data(nodeRole)
         if node.type == 'zSolverTransform':
             menu = QtWidgets.QMenu(self)
+            menu.setToolTipsVisible(True)
             method = self.open_solver_menu
             method(menu, node)
             menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
@@ -238,6 +240,20 @@ class ScenePanel2(QtWidgets.QWidget):
         self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
         self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
         self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
+        menu.addSeparator()
+        menu.addAction(self.add_info_action())
+
+    def add_info_action(self):
+        action = QtWidgets.QAction(self)
+        action.setText('Info')
+        action.setToolTip('Outputs solver statistics.')
+        action.triggered.connect(self.run_info_command)
+        return action
+
+    def run_info_command(self):
+        sel = cmds.ls(sl=True)
+        cmdOut = cmds.ziva(sel[0], i=True) # only allow one
+        print(cmdOut) #print result in maya
 
     def add_zsolver_menu_action(self, menu, node, text, attr):
         action = QtWidgets.QAction(self)
