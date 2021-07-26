@@ -241,18 +241,31 @@ class ScenePanel2(QtWidgets.QWidget):
         self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
         self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
         menu.addSeparator()
-        menu.addAction(self.add_info_action())
+        self.add_info_action(menu)
+        self.add_set_default_action(menu)
 
-    def add_info_action(self):
+    def add_info_action(self, menu):
         action = QtWidgets.QAction(self)
         action.setText('Info')
         action.setToolTip('Outputs solver statistics.')
         action.triggered.connect(self.run_info_command)
-        return action
+        menu.addAction(action)
 
     def run_info_command(self):
         sel = cmds.ls(sl=True)
         cmdOut = cmds.ziva(sel[0], i=True) # only allow one
+        print(cmdOut) #print result in maya
+
+    def add_set_default_action(self, menu):
+        action = QtWidgets.QAction(self)
+        action.setText('Set Default')
+        action.setToolTip('Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.')
+        action.triggered.connect(self.run_set_default_command)
+        menu.addAction(action)
+
+    def run_set_default_command(self):
+        sel = cmds.ls(sl=True)
+        cmdOut = cmds.ziva(sel[0], defaultSolver=True) # only allow one
         print(cmdOut) #print result in maya
 
     def add_zsolver_menu_action(self, menu, node, text, attr):
