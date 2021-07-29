@@ -260,12 +260,15 @@ class ScenePanel2(QtWidgets.QWidget):
         action = QtWidgets.QAction(self)
         action.setText('Set Default')
         action.setToolTip('Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.')
-        action.triggered.connect(self.run_set_default_command)
+        sel = cmds.ls(sl=True)
+        defaultSolver = cmds.zQuery(defaultSolver=True)
+        if defaultSolver and defaultSolver[0] == sel[0]:
+            action.setEnabled(False)
+        action.triggered.connect(lambda: self.run_set_default_command(sel[0]))
         menu.addAction(action)
 
-    def run_set_default_command(self):
-        sel = cmds.ls(sl=True)
-        cmdOut = cmds.ziva(sel[0], defaultSolver=True) # only allow one
+    def run_set_default_command(self, sel):
+        cmdOut = cmds.ziva(sel, defaultSolver=True) # only allow one
         print(cmdOut) #print result in maya
 
     def add_zsolver_menu_action(self, menu, node, text, attr):

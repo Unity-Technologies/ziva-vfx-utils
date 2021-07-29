@@ -14,7 +14,7 @@ cd ${SCRIPT_DIR}
 # -o .           : Put output files in `pwd`
 # ../zBuilder    : The module to parse
 # ../zBuilder/ui : Skip this module, because shiboken and PySide break the doc gen.
-sphinx-apidoc --force -o . ../zBuilder ../zBuilder/ui*
+sphinx-apidoc --force -o . ../zBuilder ../zBuilder/ui* ../zBuilder/scenePanel2*
 
 rm -rf _build
 sphinx-build -W --keep-going -b html . _build
