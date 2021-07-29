@@ -96,11 +96,41 @@ class ScenePanel2(QtWidgets.QWidget):
                 self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
     def _setup_ui(self, parent):
-        self.toolbar = QtWidgets.QToolBar(self)
-        self.toolbar.setIconSize(QtCore.QSize(27, 27))
-        self.toolbar.setObjectName("toolBar")
+        self.toolbarCreate = QtWidgets.QToolBar(self)
+        self.toolbarCreate.setWindowTitle("Create")
+        self.toolbarCreate.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarCreate.setObjectName("toolBarCreate")
+
+        lytToolbarCreate = QtWidgets.QVBoxLayout()
+        labelCreate = QtWidgets.QLabel("Create")
+        labelCreate.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        lytToolbarCreate.addWidget(labelCreate)
+        lytToolbarCreate.addWidget(self.toolbarCreate)
+
+        self.toolbarAdd = QtWidgets.QToolBar(self)
+        self.toolbarAdd.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarAdd.setObjectName("toolBarAdd")
+
+        lytToolbarAdd = QtWidgets.QVBoxLayout()
+        labelAdd = QtWidgets.QLabel("Add")
+        labelAdd.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        lytToolbarAdd.addWidget(labelAdd)
+        lytToolbarAdd.addWidget(self.toolbarAdd)
+
+        self.toolbarEdit = QtWidgets.QToolBar(self)
+        self.toolbarEdit.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarEdit.setObjectName("toolBarEdit")
+
+        lytToolbarEdit = QtWidgets.QVBoxLayout()
+        labelEdit = QtWidgets.QLabel("Edit")
+        labelEdit.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        lytToolbarEdit.addWidget(labelEdit)
+        lytToolbarEdit.addWidget(self.toolbarEdit)
+
         lytToolbar = QtWidgets.QHBoxLayout()
-        lytToolbar.addWidget(self.toolbar)
+        lytToolbar.addLayout(lytToolbarCreate)
+        lytToolbar.addLayout(lytToolbarAdd)
+        lytToolbar.addLayout(lytToolbarEdit)
 
         self._tvGeo = zGeoTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -146,6 +176,73 @@ class ScenePanel2(QtWidgets.QWidget):
         lytMain.addLayout(lytTwoPanel)
 
     def _setup_actions(self):
+        self._setup_toolbar_action('zSolver', 'Create zSolver', 'actionCreateSolver', self.toolbarCreate, self._create_zSolver)
+        self._setup_toolbar_action('zTissue', 'Create zTissue', 'actionCreateTissue', self.toolbarCreate, self._create_zTissue)
+        self._setup_toolbar_action('zBone', 'Create zBone', 'actionCreateBone', self.toolbarCreate, self._create_zBone)
+        self._setup_toolbar_action('zCloth', 'Create zCloth', 'actionCreateCloth', self.toolbarCreate, self._create_zCloth)
+        self._setup_toolbar_action('zAttachmentPlus', 'Create zAttachment: select source vertices and target object', 'actionCreateAttachment', self.toolbarCreate, self._create_zAttachment)
+        self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry', 'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
+        self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber', self.toolbarAdd, self._add_zFiber)
+        self._setup_toolbar_action('subtissue', 'Add zSubtissue: select parent and then child tissue mesh', 'actionAddSubtissue',  self.toolbarAdd, self._add_zSubtissue)
+        self._setup_toolbar_action('zRestShape', 'Add zRestShape: select tissue mesh and then restShape mesh', 'actionAddRestShape', self.toolbarAdd, self._add_zRestShape)
+        self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve', 'actionAddLineOfAction', self.toolbarAdd, self._add_zLineOfAction)
+        self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve', self.toolbarAdd, self._add_fiberCurve)
+        self._setup_toolbar_action('zRivetToBone', 'Add zRivetToBone: select target curve vertex and bone mesh', 'actionAddRivetToBone', self.toolbarAdd, self._add_rivetToBone)
+        self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd, self._add_cache)
+        self._setup_refresh_action()
+
+    def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
+        icon_path = get_icon_path_from_name(name)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(icon_path))
+        action = QtWidgets.QAction(self)
+        action.setText(text)
+        action.setIcon(icon)
+        action.setObjectName(objectName)
+        action.triggered.connect(slot)
+        toolbar.addAction(action)
+
+    def _create_zSolver(self):
+        newSolver = cmds.ziva(s=True)
+        cmds.ziva(newSolver[1], defaultSolver=True)
+
+    def _create_zTissue(self):
+        cmds.ziva(t=True)
+
+    def _create_zBone(self):
+        cmds.ziva(b=True)
+
+    def _create_zCloth(self):
+        cmds.ziva(c=True)
+
+    def _create_zAttachment(self):
+        cmds.ziva(a=True)
+
+    def _add_zMaterial(self):
+        cmds.ziva(m=True)
+
+    def _add_zFiber(self):
+        cmds.ziva(f=True)
+
+    def _add_zSubtissue(self):
+        cmds.ziva(ast=True)
+
+    def _add_zRestShape(self):
+        cmds.zRestShape(a=True)
+
+    def _add_zLineOfAction(self):
+        cmds.ziva(loa=True)
+
+    def _add_fiberCurve(self):
+        cmds.zLineOfActionUtil()
+
+    def _add_rivetToBone(self):
+        cmds.zRivetToBone()
+
+    def _add_cache(self):
+        cmds.ziva(acn=True)
+
+    def _setup_refresh_action(self):
         refresh_path = get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
         refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -154,7 +251,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
         self.actionRefresh.triggered.connect(self._set_builder)
-        self.toolbar.addAction(self.actionRefresh)
+        self.toolbarEdit.addAction(self.actionRefresh)
 
         self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
 

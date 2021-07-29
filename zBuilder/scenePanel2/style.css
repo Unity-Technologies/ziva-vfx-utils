@@ -35,3 +35,20 @@ QHeaderView
     background: rgb(54, 54, 54);
     color: transparent;
 }
+
+QToolBar {
+    border-style: outset;
+    border-width: 2px;
+    border-color: rgb(81, 81, 81);
+    border-style: solid;
+    border-radius: 5px;
+}
+
+QLabel {
+    border-color: rgb(81, 81, 81);
+    background: rgb(81, 81, 81);
+    border-spacing: 0px 0px;
+    margin: 0px;
+    border-style: solid;
+    border-radius: 5px;
+}
