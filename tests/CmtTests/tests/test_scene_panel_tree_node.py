@@ -1,5 +1,11 @@
+import zBuilder.builders.ziva as zva
+
 from vfx_test_case import VfxTestCase
-from zBuilder.scenePanel2.treeNode import TreeNode
+from zBuilder.scenePanel2.treeNode import TreeNode, build_scene_panel_tree
+from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
+from zBuilder.nodes.base import Base
+from zBuilder.builder import Builder
+from maya import cmds
 
 
 class ScenePanelTreeNodeTestCase(VfxTestCase):
@@ -77,3 +83,70 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         self.assertIs(child1.child(1), grand_child2)
         self.assertEqual(grand_child1.row(), 0)
         self.assertEqual(grand_child2.row(), 1)
+
+    def test_build_treenode_with_empty_solver(self):
+        # Setup
+        # Create an empty solver and retrieve it
+        cmds.ziva(s=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # Action
+        sp_root_tree_node = build_scene_panel_tree(builder)
+
+        # Verify
+        self.assertIsNotNone(sp_root_tree_node)
+        sp_root_tree_node = sp_root_tree_node[0]
+        self.assertTrue(sp_root_tree_node.is_root_node())
+        self.assertEqual(sp_root_tree_node.child_count(), 1)
+
+        solver_transform_tree_node = sp_root_tree_node.children[0]
+        self.assertFalse(solver_transform_tree_node.is_root_node())
+        self.assertEqual(solver_transform_tree_node.child_count(), 1)
+        solver_transform_data = solver_transform_tree_node.data
+        self.assertIsInstance(solver_transform_data, SolverTransformNode)
+
+        solver_tree_node = solver_transform_tree_node.children[0]
+        self.assertEqual(solver_tree_node.child_count(), 0)
+        solver_data = solver_tree_node.data
+        self.assertIsInstance(solver_data, SolverNode)
+
+        self.assertTrue(isinstance(DGNode(), Base))
+        self.assertTrue(isinstance(zva.Ziva(), Builder))
+
+    def test_build_treenode_with_node_type_filter(self):
+        ''' Verify build_scene_panel_tree() function's node_type_filter parameter
+        Create a tissue with 2 material nodes.
+        Use node_type_filter to create a tree structure as follows:
+        ROOT
+          `- Tissue
+               |- Material1
+               `- Material2
+        '''
+        # Setup
+        cmds.polyCube(n='tissue')
+        cmds.ziva('tissue', t=True)
+        cmds.ziva(m=True)  # Add second material
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # Action
+        sp_root_tree_node = build_scene_panel_tree(builder, ['ui_zTissue_body', 'zMaterial'])
+
+        # Verify
+        self.assertIsNotNone(sp_root_tree_node)
+        sp_root_tree_node = sp_root_tree_node[0]
+        self.assertTrue(sp_root_tree_node.is_root_node())
+        self.assertEqual(sp_root_tree_node.child_count(), 1)
+
+        tissue_tree_node = sp_root_tree_node.children[0]
+        self.assertFalse(tissue_tree_node.is_root_node())
+        self.assertEqual(tissue_tree_node.child_count(), 2)
+        tissue_data = tissue_tree_node.data
+        # Maya mesh is a DGNode, not a zTissue node
+        self.assertIsInstance(tissue_data, DGNode)
+
+        for material_tree_node in tissue_tree_node.children:
+            self.assertEqual(material_tree_node.child_count(), 0)
+            material_data = material_tree_node.data
+            self.assertIsInstance(material_data, MaterialNode)

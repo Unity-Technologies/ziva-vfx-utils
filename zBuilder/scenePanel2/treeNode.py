@@ -1,5 +1,7 @@
 import logging
 
+from zBuilder.nodes.base import Base
+from zBuilder.builder import Builder
 from zBuilder.commonUtils import is_sequence
 
 logger = logging.getLogger(__name__)
@@ -119,3 +121,51 @@ class TreeNode(object):
         This is required by Qt tree view.
         '''
         raise NotImplementedError
+
+
+def build_scene_panel_tree(input_node, node_type_filter=None):
+    ''' Create and return the corresponding Scene Panel tree strucutre by given node.
+    Args:
+        input_node(:obj:`Base, Builder`): Either Base or Builder class instance.
+        node_type_filer (:obj:`list[str]`): List of node type names.
+            If provide, only node type in this list  will be created.
+            If None, all nodes are created.
+    Returns:
+        1. If input_node is a valid node, return list constains single TreeNode element
+           correspond to input_node, with all its valid descendents.
+        2. If input node is an invalid node, return list of all its valid descendents.
+        3. Empty list if none valid node is found.
+    '''
+    assert isinstance(
+        input_node,
+        (Base,
+         Builder)), "Input node: {} must be Base or Builder class instance.".format(input_node)
+
+    if node_type_filter:
+        assert is_sequence(node_type_filter), "node_type_filter needs to be sequence type."
+
+    builder_node = input_node.root_node if isinstance(input_node, Builder) else input_node
+    # Following node is valid:
+    # 1. When node filter is emtpy, all nodes are valid
+    # 2. Root node is always valid
+    # 3. Nodes that matches node type filter
+    is_valid_node = lambda node: (not node_type_filter) or (node.name is "ROOT") or (
+        node.type in node_type_filter)
+
+    # If input node is invalid type, skip it.
+    # Instead, go through its children and find valid nodes. Group them as a list
+    return_nodes = TreeNode(None, builder_node) if is_valid_node(builder_node) else []
+
+    if builder_node and builder_node.child_count() > 0:
+        # Recursive create child TreeNode
+        for builder_child_node in builder_node.children:
+            child_node = build_scene_panel_tree(builder_child_node, node_type_filter)
+            if child_node:
+                if is_sequence(return_nodes):
+                    return_nodes.extend(child_node)
+                else:
+                    return_nodes.append_children(child_node)
+
+    if return_nodes and not is_sequence(return_nodes):
+        return_nodes = [return_nodes]
+    return return_nodes
