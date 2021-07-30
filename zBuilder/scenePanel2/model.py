@@ -1,5 +1,5 @@
 from PySide2 import QtGui, QtCore
-from zBuilder.uiUtils import get_icon_path_from_node
+from zBuilder.uiUtils import get_icon_path_from_node, zGeo_UI_node_types
 from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
 from maya import cmds
 import logging
@@ -43,16 +43,15 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return "Scene Items"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if index.isValid():
-            if role == QtCore.Qt.EditRole:
-                node = index.internalPointer()
-                long_name = node.long_name
-                short_name = node.name
-                if value and value != short_name:
-                    name = cmds.rename(long_name, value)
-                    self.builder.string_replace("^{}$".format(short_name), name)
-                    node.name = name
-                return True
+        if index.isValid() and role == QtCore.Qt.EditRole:
+            node = index.internalPointer()
+            long_name = node.long_name
+            short_name = node.name
+            if value and value != short_name:
+                name = cmds.rename(long_name, value)
+                self.builder.string_replace("^{}$".format(short_name), name)
+                node.name = name
+            return True
         return False
 
     def data(self, index, role):
@@ -70,7 +69,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DecorationRole:
             if hasattr(node, 'type'):
-                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node, self.current_parent)))
+                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node,
+                                                                         self.current_parent)))
 
         if role == sortRole:
             if hasattr(node, 'type'):
@@ -126,8 +126,4 @@ class zGeoFilterProxyModel(QtCore.QSortFilterProxyModel):
         srcIndex = self.sourceModel().index(srcRow, 0, srcParent)
         srcNode = getNode(srcIndex, None)
         assert srcNode, "Invalid source index."
-
-        geoNodes = ('zTissue', 'zBone', 'zCloth')
-        geoUINodes = ['ui_{}_body'.format(item) for item in geoNodes]
-        solverNodes = ('zSolverTransform', 'zSolver')
-        return (srcNode.type in geoUINodes) or (srcNode.type in solverNodes)
+        return (srcNode.type in zGeo_UI_node_types) or srcNode.type.startswith('zSolver')

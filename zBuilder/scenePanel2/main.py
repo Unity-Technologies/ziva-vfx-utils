@@ -5,7 +5,7 @@ import logging
 
 from .model import SceneGraphModel, zGeoFilterProxyModel
 from .zGeoView import zGeoTreeView
-from .componentWidget import SelectedGeoListModel
+from .componentWidget import ComponentWidget
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 from maya import cmds
 from PySide2 import QtGui, QtWidgets, QtCore
@@ -59,9 +59,6 @@ class ScenePanel2(QtWidgets.QWidget):
         self._proxy_model.setDynamicSortFilter(True)
         self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self._tvGeo.setModel(self._proxy_model)
-
-        self._selectedGeoModel = SelectedGeoListModel(self)
-        self._lvComponent.setModel(self._selectedGeoModel)
 
     def _set_builder(self, builder):
         """
@@ -136,27 +133,15 @@ class ScenePanel2(QtWidgets.QWidget):
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self._tvGeo.setAlternatingRowColors(True)
-        self._tvGeo.setIndentation(15)
-        # changing header size
-        # this used to create some space between left/top side of the tree view and it items
-        # "razzle dazzle" but the only way I could handle that
-        # height - defines padding from top
-        # offset - defines padding from left
-        # opposite value of offset should be applied in view.py in drawBranches method
-        header = self._tvGeo.header()
-        header.setOffset(-zGeoTreeView.offset)
-        header.setFixedHeight(10)
 
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._tvGeo)
         grpGeo = QtWidgets.QGroupBox("Scene Panel")
         grpGeo.setLayout(lytGeo)
 
-        self._lvComponent = QtWidgets.QListView(self)
-        self._lvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._wgtComponent = ComponentWidget(self)
         lytComponent = QtWidgets.QVBoxLayout()
-        lytComponent.addWidget(self._lvComponent)
+        lytComponent.addWidget(self._wgtComponent)
         grpComponent = QtWidgets.QGroupBox("Component")
         grpComponent.setLayout(lytComponent)
 
@@ -245,7 +230,7 @@ class ScenePanel2(QtWidgets.QWidget):
     def _setup_refresh_action(self):
         refresh_path = get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path))
         self.actionRefresh = QtWidgets.QAction(self)
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
@@ -271,9 +256,10 @@ class ScenePanel2(QtWidgets.QWidget):
 
             # filter non-exist nodes and solver nodes
             selected_nodes = list(
-                filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith('zSolver'),
+                filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith("zSolver"),
                        nodes))
-            self._selectedGeoModel.setNewSelection(selected_nodes)
+
+            self._wgtComponent.reset_model(selected_nodes)
 
             not_found_nodes = [name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
@@ -350,13 +336,15 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def run_info_command(self):
         sel = cmds.ls(sl=True)
-        cmdOut = cmds.ziva(sel[0], i=True) # only allow one
-        print(cmdOut) #print result in maya
+        cmdOut = cmds.ziva(sel[0], i=True)  # only allow one
+        print(cmdOut)  #print result in maya
 
     def add_set_default_action(self, menu):
         action = QtWidgets.QAction(self)
         action.setText('Set Default')
-        action.setToolTip('Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.')
+        action.setToolTip(
+            'Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.'
+        )
         sel = cmds.ls(sl=True)
         defaultSolver = cmds.zQuery(defaultSolver=True)
         if defaultSolver and defaultSolver[0] == sel[0]:
@@ -365,8 +353,8 @@ class ScenePanel2(QtWidgets.QWidget):
         menu.addAction(action)
 
     def run_set_default_command(self, sel):
-        cmdOut = cmds.ziva(sel, defaultSolver=True) # only allow one
-        print(cmdOut) #print result in maya
+        cmdOut = cmds.ziva(sel, defaultSolver=True)  # only allow one
+        print(cmdOut)  #print result in maya
 
     def add_zsolver_menu_action(self, menu, node, text, attr):
         action = QtWidgets.QAction(self)
@@ -387,6 +375,7 @@ class ScenePanel2(QtWidgets.QWidget):
             return
         node.attrs[attr]['value'] = value
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
+
 
 # Show window with docking ability
 def run():

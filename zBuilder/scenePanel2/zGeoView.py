@@ -1,5 +1,5 @@
-from PySide2 import QtGui, QtWidgets, QtCore
-from zBuilder.uiUtils import get_icon_path_from_name
+from PySide2 import QtWidgets, QtGui, QtCore
+from ..uiUtils import get_icon_path_from_name
 import logging
 
 logger = logging.getLogger(__name__)
@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 class zGeoTreeView(QtWidgets.QTreeView):
     # pixel offset from the left horizontally
     offset = 20
+
     image_line = QtGui.QImage(get_icon_path_from_name('vline'))
     image_opened = QtGui.QImage(get_icon_path_from_name('branch-opened'))
     image_closed = QtGui.QImage(get_icon_path_from_name('branch-closed'))
@@ -17,15 +18,27 @@ class zGeoTreeView(QtWidgets.QTreeView):
 
     def __init__(self, parent=None):
         super(zGeoTreeView, self).__init__(parent)
+        self.setIndentation(15)
+        # changing header size
+        # this used to create some space between left/top side of the tree view and it items
+        # "razzle dazzle" but the only way I could handle that
+        # height - defines padding from top
+        # offset - defines padding from left
+        # opposite value of offset should be applied in view.py in drawBranches method
+        header = self.header()
+        header.setOffset(-zGeoTreeView.offset)
+        header.setFixedHeight(10)
+        # Apply BG color
+        self.setAlternatingRowColors(True)
 
     def drawBranches(self, painter, rect, index):
         column_count = rect.width() // self.indentation()
-        model_index = self.model().mapToSource(index)
+        tree_model = self.model()
+        model_index = tree_model.mapToSource(index) if isinstance(
+            tree_model, QtCore.QAbstractProxyModel) else index
         node = model_index.internalPointer()
-        row_count = self.model().rowCount(index.parent())
+        row_count = tree_model.rowCount(index.parent())
 
-        geoNodes = ('zTissue', 'zBone', 'zCloth')
-        geoUINodes = ['ui_{}_body'.format(item) for item in geoNodes]
         for column in range(column_count):
             # padding from the left side of widget
             pos_x = column * self.indentation()
@@ -35,16 +48,13 @@ class zGeoTreeView(QtWidgets.QTreeView):
             rect = QtCore.QRect(pos_x + zGeoTreeView.offset, pos_y, width, height)
 
             if column == column_count - 1:
-                if node.type in geoUINodes:
-                    painter.drawImage(rect, zGeoTreeView.image_child)
-                else:
-                    if node.child_count():
-                        if self.isExpanded(index):
-                            painter.drawImage(rect, zGeoTreeView.image_opened)
-                        else:
-                            painter.drawImage(rect, zGeoTreeView.image_closed)
+                if node.child_count():
+                    if self.isExpanded(index):
+                        painter.drawImage(rect, zGeoTreeView.image_opened)
                     else:
-                        painter.drawImage(rect, zGeoTreeView.image_child)
+                        painter.drawImage(rect, zGeoTreeView.image_closed)
+                else:
+                    painter.drawImage(rect, zGeoTreeView.image_child)
             elif column == column_count - 2:
                 if index.row() == row_count - 1:
                     painter.drawImage(rect, zGeoTreeView.image_end)
@@ -56,7 +66,7 @@ class zGeoTreeView(QtWidgets.QTreeView):
                 while parent.isValid():
                     all_parents.append(parent)
                     parent = parent.parent()
-                column_parent_row_count = self.model().rowCount(all_parents[-(column + 1)])
+                column_parent_row_count = tree_model.rowCount(all_parents[-(column + 1)])
                 column_row_count = all_parents[-(column + 2)].row()
                 if column_parent_row_count - 1 != column_row_count:
                     painter.drawImage(rect, zGeoTreeView.image_line)

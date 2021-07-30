@@ -12,6 +12,8 @@ nodeRole = QtCore.Qt.UserRole + 1  # scene_item object
 longNameRole = QtCore.Qt.UserRole + 2  # long name of scene_item object in the scene
 enableRole = QtCore.Qt.UserRole + 3  # is node enabled
 
+zGeo_UI_node_types = ['ui_{}_body'.format(item) for item in ('zTissue', 'zBone', 'zCloth')]
+
 
 def dock_window(dialog_class, *args, **kwargs):
     """
@@ -64,9 +66,9 @@ def get_icon_path_from_node(node, parent):
         source_attachment = mel.eval(source_cmd)
 
         if source_attachment[0] == parent:
-            return get_icon_path_from_name(node.type+"Source")
+            return get_icon_path_from_name(node.type + "Source")
         elif target_attachment[0] == parent:
-            return get_icon_path_from_name(node.type+"Target")
+            return get_icon_path_from_name(node.type + "Target")
 
     return get_icon_path_from_name(node.type)
 
