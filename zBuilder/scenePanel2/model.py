@@ -59,25 +59,20 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return None
 
         node = index.internalPointer()
-        '''
-        logger.info("index = {}".format(index))
-        logger.info("role = {}".format(role))
-        logger.info("node = {}".format(node))
-        '''
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             return node.name
 
         if role == QtCore.Qt.DecorationRole:
-            if hasattr(node, 'type'):
+            if hasattr(node, "type"):
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node,
                                                                          self.current_parent)))
 
         if role == sortRole:
-            if hasattr(node, 'type'):
+            if hasattr(node, "type"):
                 return node.type
 
         if role == nodeRole:
-            if hasattr(node, 'type'):
+            if hasattr(node, "type"):
                 return node
 
         if role == longNameRole:
@@ -88,7 +83,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             node = index.internalPointer()
 
             # If node is a mesh/curve, then take enable status from it's child
-            if hasattr(node, 'depends_on'):
+            if hasattr(node, "depends_on"):
                 node = node.depends_on
 
             # Maya nodes have either of two attributes showing if node is enabled
@@ -126,4 +121,4 @@ class zGeoFilterProxyModel(QtCore.QSortFilterProxyModel):
         srcIndex = self.sourceModel().index(srcRow, 0, srcParent)
         srcNode = getNode(srcIndex, None)
         assert srcNode, "Invalid source index."
-        return (srcNode.type in zGeo_UI_node_types) or srcNode.type.startswith('zSolver')
+        return (srcNode.type in zGeo_UI_node_types) or srcNode.type.startswith("zSolver")

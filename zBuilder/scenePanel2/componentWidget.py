@@ -11,16 +11,16 @@ logger = logging.getLogger(__name__)
 
 # Component for each zGeo node
 component_type_dict = {
-    'ui_zBone_body': ['zAttachment', 'zBone', 'zRivetToBone'],
-    'ui_zTissue_body':
-    ['zAttachment', 'zTissue', 'zTet', 'zMaterial', 'zFiber', 'zLineOfAction', 'zRestShape'],
-    'ui_zCloth_body': ['zAttachment', 'zCloth', 'zMaterial']
+    "ui_zBone_body": ["zAttachment", "zBone", "zRivetToBone"],
+    "ui_zTissue_body":
+    ["zAttachment", "zTissue", "zTet", "zMaterial", "zFiber", "zLineOfAction", "zRestShape"],
+    "ui_zCloth_body": ["zAttachment", "zCloth", "zMaterial"]
 }
 
 
 class ComponentTreeModel(QtCore.QAbstractItemModel):
-    ''' Tree model for each component
-    '''
+    """ Tree model for each component
+    """
     def __init__(self, root_node=None, parent=None):
         super(ComponentTreeModel, self).__init__(parent)
         self.root_node = root_node if root_node else TreeNode()
@@ -41,7 +41,7 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
-            return 'ComponentTreeModel'
+            return "ComponentTreeModel"
 
     def data(self, index, role):
         if not index.isValid():
@@ -51,10 +51,10 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             return node.data.name
         if role == QtCore.Qt.DecorationRole:
-            if hasattr(node.data, 'type'):
+            if hasattr(node.data, "type"):
                 parent_name = node.parent.data.name if node.parent.data else None
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
-        if role == nodeRole and hasattr(node.data, 'type'):
+        if role == nodeRole and hasattr(node.data, "type"):
             return node
         if role == QtCore.Qt.BackgroundRole:
             if (index.row() % 2 == 0):
@@ -78,8 +78,8 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
 
 
 class ComponentSectionWidget(QtWidgets.QWidget):
-    ''' Widget contains component tree view and affliated title bar
-    '''
+    """ Widget contains component tree view and affiliated title bar
+    """
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
 
@@ -105,10 +105,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
 
     def on_btnIcon_toggled(self, checked):
         self._tvComponent.setVisible(checked)
-        self.updateGeometry()
 
 
 class ComponentWidget(QtWidgets.QWidget):
+    """ The Comopnent tree view widget.
+    It contains a ComponentSectionWidget list, which include each component of current selected nodes.
+    """
     def __init__(self, parent=None):
         super(ComponentWidget, self).__init__(parent)
         # setup data
@@ -147,4 +149,3 @@ class ComponentWidget(QtWidgets.QWidget):
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(component_type, tree_model)
             self._lytAllSections.addWidget(wgtSection)
-            #self._lytAllSections.setAlignment(wgtSection, QtCore.Qt.AlignJustify)
