@@ -199,9 +199,9 @@ global proc ziva_main_oneOfEachCollisionTypes(int $newScene)
   setAttr "zSolver1.scaleY" 1.0;
   setAttr "zSolver1.scaleZ" 1.0;
 
-  // decrease the number of solver iterations to 1
+  // decrease the number of solver Newton iterations to 1
   // this increases simulation speed; the sim is still stable
-  setAttr "zSolver1.maxSolverIterations" 1;
+  setAttr "zSolver1.maxNewtonIterations" 1;
 
   // enable collision detection in the solver
   setAttr "zSolver1Shape.collisionDetection" 1;

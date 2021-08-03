@@ -136,7 +136,7 @@ def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
 
         cmds.setAttr('zSolver1.collisionDetection', 1)
         cmds.setAttr('zSolver1.substeps', 1)
-        cmds.setAttr('zSolver1.maxSolverIterations', 2)
+        cmds.setAttr('zSolver1.maxNewtonIterations', 2)
 
 
 def retrieve_builder_from_scene():
