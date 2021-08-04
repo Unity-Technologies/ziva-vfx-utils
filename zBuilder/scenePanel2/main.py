@@ -3,8 +3,8 @@ import os
 import weakref
 import logging
 
-from .model import SceneGraphModel, zGeoFilterProxyModel
-from .zGeoView import zGeoTreeView
+from .model import SceneGraphModel
+from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 from maya import cmds
@@ -53,12 +53,8 @@ class ScenePanel2(QtWidgets.QWidget):
         self._builder = builder or zva.Ziva()
         self._builder.retrieve_connections()
 
-        self._sceneGraphModel = SceneGraphModel(self._builder, self)
-        self._proxy_model = zGeoFilterProxyModel()
-        self._proxy_model.setSourceModel(self._sceneGraphModel)
-        self._proxy_model.setDynamicSortFilter(True)
-        self._proxy_model.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self._tvGeo.setModel(self._proxy_model)
+        self._zGeo_treemodel = SceneGraphModel(self._builder, self)
+        self._tvGeo.setModel(self._zGeo_treemodel)
 
     def _set_builder(self, builder):
         """
@@ -77,9 +73,7 @@ class ScenePanel2(QtWidgets.QWidget):
             self._builder.retrieve_connections()
             builder = self._builder
 
-        self._sceneGraphModel.beginResetModel()
-        self._sceneGraphModel.builder = builder
-        self._sceneGraphModel.endResetModel()
+        self._zGeo_treemodel.reset_model(builder)
 
         # show expanded view of the tree
         self._tvGeo.expandAll()
@@ -87,8 +81,9 @@ class ScenePanel2(QtWidgets.QWidget):
         # select item in treeview that is selected in maya
         sel = cmds.ls(sl=True, long=True)
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, sel[0],
-                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
+                                                 sel[0], -1,
+                                                 QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
@@ -129,7 +124,7 @@ class ScenePanel2(QtWidgets.QWidget):
         lytToolbar.addLayout(lytToolbarAdd)
         lytToolbar.addLayout(lytToolbarEdit)
 
-        self._tvGeo = zGeoTreeView(self)
+        self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -161,19 +156,38 @@ class ScenePanel2(QtWidgets.QWidget):
         lytMain.addLayout(lytTwoPanel)
 
     def _setup_actions(self):
-        self._setup_toolbar_action('zSolver', 'Create zSolver', 'actionCreateSolver', self.toolbarCreate, self._create_zSolver)
-        self._setup_toolbar_action('zTissue', 'Create zTissue', 'actionCreateTissue', self.toolbarCreate, self._create_zTissue)
-        self._setup_toolbar_action('zBone', 'Create zBone', 'actionCreateBone', self.toolbarCreate, self._create_zBone)
-        self._setup_toolbar_action('zCloth', 'Create zCloth', 'actionCreateCloth', self.toolbarCreate, self._create_zCloth)
-        self._setup_toolbar_action('zAttachmentPlus', 'Create zAttachment: select source vertices and target object', 'actionCreateAttachment', self.toolbarCreate, self._create_zAttachment)
-        self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry', 'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
-        self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber', self.toolbarAdd, self._add_zFiber)
-        self._setup_toolbar_action('subtissue', 'Add zSubtissue: select parent and then child tissue mesh', 'actionAddSubtissue',  self.toolbarAdd, self._add_zSubtissue)
-        self._setup_toolbar_action('zRestShape', 'Add zRestShape: select tissue mesh and then restShape mesh', 'actionAddRestShape', self.toolbarAdd, self._add_zRestShape)
-        self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve', 'actionAddLineOfAction', self.toolbarAdd, self._add_zLineOfAction)
-        self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve', self.toolbarAdd, self._add_fiberCurve)
-        self._setup_toolbar_action('zRivetToBone', 'Add zRivetToBone: select target curve vertex and bone mesh', 'actionAddRivetToBone', self.toolbarAdd, self._add_rivetToBone)
-        self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd, self._add_cache)
+        self._setup_toolbar_action('zSolver', 'Create zSolver', 'actionCreateSolver',
+                                   self.toolbarCreate, self._create_zSolver)
+        self._setup_toolbar_action('zTissue', 'Create zTissue', 'actionCreateTissue',
+                                   self.toolbarCreate, self._create_zTissue)
+        self._setup_toolbar_action('zBone', 'Create zBone', 'actionCreateBone', self.toolbarCreate,
+                                   self._create_zBone)
+        self._setup_toolbar_action('zCloth', 'Create zCloth', 'actionCreateCloth',
+                                   self.toolbarCreate, self._create_zCloth)
+        self._setup_toolbar_action('zAttachmentPlus',
+                                   'Create zAttachment: select source vertices and target object',
+                                   'actionCreateAttachment', self.toolbarCreate,
+                                   self._create_zAttachment)
+        self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
+                                   'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
+        self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
+                                   self.toolbarAdd, self._add_zFiber)
+        self._setup_toolbar_action('subtissue',
+                                   'Add zSubtissue: select parent and then child tissue mesh',
+                                   'actionAddSubtissue', self.toolbarAdd, self._add_zSubtissue)
+        self._setup_toolbar_action('zRestShape',
+                                   'Add zRestShape: select tissue mesh and then restShape mesh',
+                                   'actionAddRestShape', self.toolbarAdd, self._add_zRestShape)
+        self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve',
+                                   'actionAddLineOfAction', self.toolbarAdd,
+                                   self._add_zLineOfAction)
+        self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve',
+                                   self.toolbarAdd, self._add_fiberCurve)
+        self._setup_toolbar_action('zRivetToBone',
+                                   'Add zRivetToBone: select target curve vertex and bone mesh',
+                                   'actionAddRivetToBone', self.toolbarAdd, self._add_rivetToBone)
+        self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd,
+                                   self._add_cache)
         self._setup_refresh_action()
 
     def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
@@ -247,7 +261,7 @@ class ScenePanel2(QtWidgets.QWidget):
         """
         selectedIndexList = self._tvGeo.selectedIndexes()
         if selectedIndexList:
-            nodes = [x.data(nodeRole) for x in selectedIndexList]
+            nodes = [x.data(nodeRole).data for x in selectedIndexList]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -259,7 +273,7 @@ class ScenePanel2(QtWidgets.QWidget):
                 filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith("zSolver"),
                        nodes))
 
-            self._wgtComponent.reset_model(selected_nodes)
+            self._wgtComponent.reset_model(self._builder, selected_nodes)
 
             not_found_nodes = [name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
@@ -272,7 +286,7 @@ class ScenePanel2(QtWidgets.QWidget):
         """
         # store currently expanded items
         expanded = []
-        for index in self._proxy_model.persistentIndexList():
+        for index in self._zGeo_treemodel.persistentIndexList():
             if self._tvGeo.isExpanded(index):
                 expanded.append(index.data(longNameRole))
 
@@ -287,8 +301,9 @@ class ScenePanel2(QtWidgets.QWidget):
         # otherwise new items might not be displayed ( Qt bug )
         self._tvGeo.collapseAll()
         for name in names:
-            indexes = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, name, -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            indexes = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
+                                                 name, -1,
+                                                 QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self._tvGeo.expand(index)
 
@@ -303,7 +318,7 @@ class ScenePanel2(QtWidgets.QWidget):
         if len(indexes) != 1:
             return
 
-        node = indexes[0].data(nodeRole)
+        node = indexes[0].data(nodeRole).data
         if node.type == 'zSolverTransform':
             menu = QtWidgets.QMenu(self)
             menu.setToolTipsVisible(True)

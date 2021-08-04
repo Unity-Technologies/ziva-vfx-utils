@@ -1,57 +1,57 @@
-from PySide2 import QtGui, QtCore
-from zBuilder.uiUtils import get_icon_path_from_node, zGeo_UI_node_types
-from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
-from maya import cmds
 import logging
+
+from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
+from ..uiUtils import sortRole, nodeRole, longNameRole
+from .treeNode import build_scene_panel_tree
+from PySide2 import QtGui, QtCore
+from maya import cmds
 
 logger = logging.getLogger(__name__)
 
 
-def getNode(index, defaultNode):
-    """
-    Given QModelIndex, return zBuilder node
-    """
-    if index.isValid():
-        node = index.internalPointer()
-        if node:
-            return node
-    return defaultNode
-
-
 class SceneGraphModel(QtCore.QAbstractItemModel):
+    """ The tree model for zGeo TreeView.
+    """
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
-        self.builder = builder
-        self.current_parent = None
+        self.reset_model(builder)
 
+    def reset_model(self, new_builder):
+        self.beginResetModel()
+        self._builder = new_builder
+        self.root_node = build_scene_panel_tree(
+            new_builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+        self.endResetModel()
+
+    # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
-        if parent.isValid():
-            parentNode = parent.internalPointer()
-        else:
-            parentNode = self.builder.root_node
-        return parentNode.child_count()
+        parent_node = get_node_by_index(parent, self.root_node)
+        return parent_node.child_count()
 
     def columnCount(self, parent):
         return 1
 
     def flags(self, index):
+        if not index.isValid():
+            return QtCore.Qt.NoItemFlags
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
-            return "Scene Items"
+            return "zGeo Tree Model"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if index.isValid() and role == QtCore.Qt.EditRole:
-            node = index.internalPointer()
-            long_name = node.long_name
-            short_name = node.name
-            if value and value != short_name:
-                name = cmds.rename(long_name, value)
-                self.builder.string_replace("^{}$".format(short_name), name)
-                node.name = name
-            return True
+        if role == QtCore.Qt.EditRole:
+            node = get_node_by_index(index, None)
+            if node:
+                long_name = node.data.long_name
+                short_name = node.data.name
+                if value and value != short_name:
+                    name = cmds.rename(long_name, value)
+                    self._builder.string_replace("^{}$".format(short_name), name)
+                    node.data.name = name
+                return True
         return False
 
     def data(self, index, role):
@@ -60,65 +60,32 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         node = index.internalPointer()
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            return node.name
-
-        if role == QtCore.Qt.DecorationRole:
-            if hasattr(node, "type"):
-                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node,
-                                                                         self.current_parent)))
-
-        if role == sortRole:
-            if hasattr(node, "type"):
-                return node.type
-
-        if role == nodeRole:
-            if hasattr(node, "type"):
-                return node
-
+            return node.data.name
+        if role == QtCore.Qt.DecorationRole and hasattr(node.data, "type"):
+            parent_name = node.parent.data.name if node.parent.data else None
+            return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
+        if role == nodeRole and hasattr(node.data, "type"):
+            return node
+        if role == sortRole and hasattr(node.data, "type"):
+            return node.data.type
         if role == longNameRole:
-            return node.long_name
-
-        if role == enableRole:
-            enable = True
-            node = index.internalPointer()
-
-            # If node is a mesh/curve, then take enable status from it's child
-            if hasattr(node, "depends_on"):
-                node = node.depends_on
-
-            # Maya nodes have either of two attributes showing if node is enabled
-            # need to check both of them
-            attrs = node.attrs
-            if "envelope" in attrs:
-                enable = attrs["envelope"]["value"]
-            elif "enable" in attrs:
-                enable = attrs["enable"]["value"]
-            return enable
+            return node.data.long_name
+        if role == QtCore.Qt.BackgroundRole:
+            if index.row() % 2 == 0:
+                return QtGui.QColor(54, 54, 54)  # gray
 
     def parent(self, index):
-        node = getNode(index, self.builder.root_node)
-        parentNode = node.parent
-        if parentNode == self.builder.root_node or parentNode == None:
+        child_node = get_node_by_index(index, self.root_node)
+        parent_node = child_node.parent
+        if parent_node == self.root_node or parent_node is None:
             return QtCore.QModelIndex()
-        return self.createIndex(parentNode.row(), 0, parentNode)
+        return self.createIndex(parent_node.row(), 0, parent_node)
 
-    def index(self, row, column, parent):
-        parentNode = getNode(parent, self.builder.root_node)
-        childItem = parentNode.child(row)
-        if childItem:
-            return self.createIndex(row, column, childItem)
-        return QtCore.QModelIndex()
+    def index(self, row, column, parent=QtCore.QModelIndex()):
+        if not self.hasIndex(row, column, parent):
+            return QtCore.QModelIndex()
 
-    def set_current_parent(self, parent):
-        self.current_parent = parent
+        parent_node = get_node_by_index(parent, self.root_node)
+        return self.createIndex(row, column, parent_node.child(row))
 
-
-class zGeoFilterProxyModel(QtCore.QSortFilterProxyModel):
-    """
-    Provide zGeo nodes to connected views
-    """
-    def filterAcceptsRow(self, srcRow, srcParent):
-        srcIndex = self.sourceModel().index(srcRow, 0, srcParent)
-        srcNode = getNode(srcIndex, None)
-        assert srcNode, "Invalid source index."
-        return (srcNode.type in zGeo_UI_node_types) or srcNode.type.startswith("zSolver")
+    # End of QtCore.QAbstractItemModel override functions
