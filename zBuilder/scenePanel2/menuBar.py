@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets
 
 class ScenePanel2MenuBar(QtWidgets.QMenuBar):
     def __init__(self, parent=None):
@@ -13,6 +13,6 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.help_menu = self.addMenu("Help")
 
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-       
+      
    
 
