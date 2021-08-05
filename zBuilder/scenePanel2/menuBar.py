@@ -12,6 +12,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.tool_menu = self.addMenu("Tool")
         self.help_menu = self.addMenu("Help")
 
+        # restrict the size of the menubar to prevent uneven expansion
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
       
    
