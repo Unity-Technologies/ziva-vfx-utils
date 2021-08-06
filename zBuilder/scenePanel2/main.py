@@ -147,8 +147,12 @@ class ScenePanel2(QtWidgets.QWidget):
 
         lytMenuBar = ScenePanel2MenuBar(self)
 
+        lytMenuBarContainer = QtWidgets.QHBoxLayout()
+        lytMenuBarContainer.addWidget(lytMenuBar)
+        lytMenuBarContainer.setAlignment(lytMenuBar, QtCore.Qt.AlignRight)
+
         lytTwoPanel = QtWidgets.QVBoxLayout()
-        lytTwoPanel.addWidget(lytMenuBar)
+        lytTwoPanel.addLayout(lytMenuBarContainer)
         lytTwoPanel.addLayout(lytToolbar)
         lytTwoPanel.addWidget(splTreeView)
 
