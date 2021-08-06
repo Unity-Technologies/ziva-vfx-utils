@@ -8,12 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class TreeNode(object):
-    ''' Tree data structure for tree views in Scene Panel 2.
+    """ Tree data structure for tree views in Scene Panel 2.
     It organizes zBuilder nodes, and other Scene Panel nodes as a tree structure.
     Its interface is similar to zBuilder Base class. 
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
     The TreeNode class serves for Qt model/view paradigm, it accepts any data types that can be shown in the Scene Panel.
-    '''
+    """
     def __init__(self, parent=None, data=None):
         super(TreeNode, self).__init__()
         if parent:
@@ -46,9 +46,9 @@ class TreeNode(object):
         return self._parent is None
 
     def child(self, row):
-        ''' Return child node according to specified index.
+        """ Return child node according to specified index.
         This is for QtCore.QAbstractItemModel.index() function.
-        '''
+        """
         return self._children[row]
 
     @property
@@ -59,10 +59,10 @@ class TreeNode(object):
         return len(self._children)
 
     def append_children(self, new_children):
-        '''Append children to children list
+        """Append children to children list
         Args:
             new_children (:obj:`list[TreeNode]`): nodes to append
-        '''
+        """
         if not new_children:
             return
 
@@ -80,10 +80,10 @@ class TreeNode(object):
             self._children.append(new_child)
 
     def remove_children(self, children):
-        '''Remove child from children list
+        """Remove child from children list
         Args:
             children (:obj:`list[TreeNode]`): nodes to remove
-        '''
+        """
         assert children, "Children to remove is None."
         if not is_sequence(children):
             children = [children]
@@ -94,10 +94,10 @@ class TreeNode(object):
             child._parent = None
 
     def row(self):
-        ''' Return the index of the node from parent view.
+        """ Return the index of the node from parent view.
         Return 0 if parent is None.
         This is required by Qt tree view.
-        '''
+        """
         if self.parent:
             return self.parent.children.index(self)
         return 0
@@ -111,20 +111,20 @@ class TreeNode(object):
         self._data = new_data
 
     def data_by_column(self, column):
-        ''' Return tree node data with give columen index.
+        """ Return tree node data with give columen index.
         This is required by Qt tree view.
-        '''
+        """
         raise NotImplementedError
 
     def column_count(self):
-        ''' Return number of column to display for the tree node data.
+        """ Return number of column to display for the tree node data.
         This is required by Qt tree view.
-        '''
+        """
         raise NotImplementedError
 
 
 def build_scene_panel_tree(input_node, node_type_filter=None):
-    ''' Create and return the corresponding Scene Panel tree strucutre by given node.
+    """ Create and return the corresponding Scene Panel tree strucutre by given node.
     Args:
         input_node(:obj:`Base, Builder`): Either Base or Builder class instance.
         node_type_filer (:obj:`list[str]`): List of node type names.
@@ -135,7 +135,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
            correspond to input_node, with all its valid descendents.
         2. If input node is an invalid node, return list of all its valid descendents.
         3. Empty list if none valid node is found.
-    '''
+    """
     assert isinstance(
         input_node,
         (Base,
@@ -169,3 +169,32 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
     if return_nodes and not is_sequence(return_nodes):
         return_nodes = [return_nodes]
     return return_nodes
+
+
+def prune_child_nodes(nodes):
+    """ Given TreeNode list, prune the child nodes whose parent node also in the list.
+    """
+    pruned_node_list = []
+    for node in nodes:
+        cur_node = node
+        find_duplicate = False
+        # Recursively check each node till root node
+        while not cur_node.parent.is_root_node():
+            if cur_node.parent in nodes:
+                find_duplicate = True
+                break
+            cur_node = cur_node.parent
+        if not find_duplicate:
+            pruned_node_list.append(node)
+    return pruned_node_list
+
+
+def create_subtree(child_nodes, new_node_data=None):
+    """ Given TreeNode list, return a new TreeNode that contains them.
+    The child_nodes may contain parent-child relation nodes,
+    their relationship will be kept.
+    Only the outmost nodes will be attached to the new node.
+    """
+    new_node = TreeNode(None, new_node_data)
+    new_node.append_children(prune_child_nodes(child_nodes))
+    return new_node
