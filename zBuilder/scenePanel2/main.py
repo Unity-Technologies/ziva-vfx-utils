@@ -168,6 +168,10 @@ class ScenePanel2(QtWidgets.QWidget):
                                    'Create zAttachment: select source vertices and target object',
                                    'actionCreateAttachment', self.toolbarCreate,
                                    self._create_zAttachment)
+        self._setup_toolbar_action('create-group-plus',
+                                   'Create group',
+                                   'actionCreateGroup', self.toolbarCreate,
+                                   self._create_group)
         self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
                                    'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
         self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
@@ -216,6 +220,11 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def _create_zAttachment(self):
         cmds.ziva(a=True)
+
+    def _create_group(self):
+        treemodel_root = self._zGeo_treemodel.index(0, 0) # TODO: include selection
+        child_rows = self._zGeo_treemodel.rowCount(treemodel_root)
+        self._zGeo_treemodel.insertRows(treemodel_root.row(), child_rows, treemodel_root)
 
     def _add_zMaterial(self):
         cmds.ziva(m=True)

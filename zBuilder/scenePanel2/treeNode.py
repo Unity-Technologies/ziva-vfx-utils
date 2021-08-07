@@ -8,12 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class TreeNode(object):
-    ''' Tree data structure for tree views in Scene Panel 2.
+    """ Tree data structure for tree views in Scene Panel 2.
     It organizes zBuilder nodes, and other Scene Panel nodes as a tree structure.
     Its interface is similar to zBuilder Base class. 
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
     The TreeNode class serves for Qt model/view paradigm, it accepts any data types that can be shown in the Scene Panel.
-    '''
+    """
     def __init__(self, parent=None, data=None):
         super(TreeNode, self).__init__()
         if parent:
@@ -46,9 +46,9 @@ class TreeNode(object):
         return self._parent is None
 
     def child(self, row):
-        ''' Return child node according to specified index.
+        """ Return child node according to specified index.
         This is for QtCore.QAbstractItemModel.index() function.
-        '''
+        """
         return self._children[row]
 
     @property
@@ -59,10 +59,10 @@ class TreeNode(object):
         return len(self._children)
 
     def append_children(self, new_children):
-        '''Append children to children list
+        """Append children to children list
         Args:
             new_children (:obj:`list[TreeNode]`): nodes to append
-        '''
+        """
         if not new_children:
             return
 
@@ -80,10 +80,10 @@ class TreeNode(object):
             self._children.append(new_child)
 
     def remove_children(self, children):
-        '''Remove child from children list
+        """Remove child from children list
         Args:
             children (:obj:`list[TreeNode]`): nodes to remove
-        '''
+        """
         assert children, "Children to remove is None."
         if not is_sequence(children):
             children = [children]
@@ -94,10 +94,10 @@ class TreeNode(object):
             child._parent = None
 
     def row(self):
-        ''' Return the index of the node from parent view.
+        """ Return the index of the node from parent view.
         Return 0 if parent is None.
         This is required by Qt tree view.
-        '''
+        """
         if self.parent:
             return self.parent.children.index(self)
         return 0
@@ -111,31 +111,31 @@ class TreeNode(object):
         self._data = new_data
 
     def data_by_column(self, column):
-        ''' Return tree node data with give columen index.
+        """ Return tree node data with give column index.
         This is required by Qt tree view.
-        '''
+        """
         raise NotImplementedError
 
     def column_count(self):
-        ''' Return number of column to display for the tree node data.
+        """ Return number of column to display for the tree node data.
         This is required by Qt tree view.
-        '''
+        """
         raise NotImplementedError
 
 
 def build_scene_panel_tree(input_node, node_type_filter=None):
-    ''' Create and return the corresponding Scene Panel tree strucutre by given node.
+    """ Create and return the corresponding Scene Panel tree structure by given node.
     Args:
         input_node(:obj:`Base, Builder`): Either Base or Builder class instance.
         node_type_filer (:obj:`list[str]`): List of node type names.
             If provide, only node type in this list  will be created.
             If None, all nodes are created.
     Returns:
-        1. If input_node is a valid node, return list constains single TreeNode element
-           correspond to input_node, with all its valid descendents.
-        2. If input node is an invalid node, return list of all its valid descendents.
+        1. If input_node is a valid node, return list contains single TreeNode element
+           correspond to input_node, with all its valid descendants.
+        2. If input node is an invalid node, return list of all its valid descendants.
         3. Empty list if none valid node is found.
-    '''
+    """
     assert isinstance(
         input_node,
         (Base,
@@ -146,7 +146,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
 
     builder_node = input_node.root_node if isinstance(input_node, Builder) else input_node
     # Following node is valid:
-    # 1. When node filter is emtpy, all nodes are valid
+    # 1. When node filter is empty, all nodes are valid
     # 2. Root node is always valid
     # 3. Nodes that matches node type filter
     is_valid_node = lambda node: (not node_type_filter) or (node.name is "ROOT") or (

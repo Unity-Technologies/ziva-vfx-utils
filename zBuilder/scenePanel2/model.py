@@ -3,6 +3,8 @@ import logging
 from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
 from ..uiUtils import sortRole, nodeRole, longNameRole
 from .treeNode import build_scene_panel_tree
+from .groupNode import GroupNode
+from .treeNode import TreeNode
 from PySide2 import QtGui, QtCore
 from maya import cmds
 
@@ -16,17 +18,24 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
         self.reset_model(builder)
+        self._group_count = 0
 
     def reset_model(self, new_builder):
         self.beginResetModel()
         self._builder = new_builder
-        self.root_node = build_scene_panel_tree(
+        self._root_node = build_scene_panel_tree(
             new_builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
         self.endResetModel()
 
+    def tree_root(self):
+        return self._root_node
+
+    def get_solver_transform(self):
+        return self._root_node.children[0]
+
     # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
-        parent_node = get_node_by_index(parent, self.root_node)
+        parent_node = get_node_by_index(parent, self._root_node)
         return parent_node.child_count()
 
     def columnCount(self, parent):
@@ -75,9 +84,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return QtGui.QColor(54, 54, 54)  # gray
 
     def parent(self, index):
-        child_node = get_node_by_index(index, self.root_node)
+        child_node = get_node_by_index(index, self._root_node)
         parent_node = child_node.parent
-        if parent_node == self.root_node or parent_node is None:
+        if parent_node == self._root_node or parent_node is None:
             return QtCore.QModelIndex()
         return self.createIndex(parent_node.row(), 0, parent_node)
 
@@ -85,7 +94,22 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QtCore.QModelIndex()
 
-        parent_node = get_node_by_index(parent, self.root_node)
+        parent_node = get_node_by_index(parent, self._root_node)
         return self.createIndex(row, column, parent_node.child(row))
+
+    def insertRows(self, position, rows, index):
+        self.layoutAboutToBeChanged.emit()
+        self.beginInsertRows(index, position, position+rows-1)
+
+        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check
+        group_node = GroupNode("Group"+str(self._group_count))
+        parent_node = get_node_by_index(index, None)
+        assert parent_node, "Missing parent node, failed to insert row!"
+        parent_node.append_children(TreeNode(None, group_node)) # TODO: multiple addition
+
+        self.endInsertRows()
+        self.layoutChanged.emit()
+
+        return True
 
     # End of QtCore.QAbstractItemModel override functions
