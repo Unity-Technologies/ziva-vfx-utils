@@ -6,6 +6,7 @@ import logging
 from .model import SceneGraphModel
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
+from .menuBar import ScenePanel2MenuBar
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 from maya import cmds
 from PySide2 import QtGui, QtWidgets, QtCore
@@ -144,7 +145,14 @@ class ScenePanel2(QtWidgets.QWidget):
         splTreeView.addWidget(grpGeo)
         splTreeView.addWidget(grpComponent)
 
+        lytMenuBar = ScenePanel2MenuBar(self)
+
+        lytMenuBarContainer = QtWidgets.QHBoxLayout()
+        lytMenuBarContainer.addWidget(lytMenuBar)
+        lytMenuBarContainer.setAlignment(lytMenuBar, QtCore.Qt.AlignRight)
+
         lytTwoPanel = QtWidgets.QVBoxLayout()
+        lytTwoPanel.addLayout(lytMenuBarContainer)
         lytTwoPanel.addLayout(lytToolbar)
         lytTwoPanel.addWidget(splTreeView)
 

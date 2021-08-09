@@ -169,3 +169,32 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
     if return_nodes and not is_sequence(return_nodes):
         return_nodes = [return_nodes]
     return return_nodes
+
+
+def prune_child_nodes(nodes):
+    """ Given TreeNode list, prune the child nodes whose parent node also in the list.
+    """
+    pruned_node_list = []
+    for node in nodes:
+        cur_node = node
+        find_duplicate = False
+        # Recursively check each node till root node
+        while not cur_node.parent.is_root_node():
+            if cur_node.parent in nodes:
+                find_duplicate = True
+                break
+            cur_node = cur_node.parent
+        if not find_duplicate:
+            pruned_node_list.append(node)
+    return pruned_node_list
+
+
+def create_subtree(child_nodes, new_node_data=None):
+    """ Given TreeNode list, return a new TreeNode that contains them.
+    The child_nodes may contain parent-child relation nodes,
+    their relationship will be kept.
+    Only the out most nodes will be attached to the new node.
+    """
+    new_node = TreeNode(None, new_node_data)
+    new_node.append_children(prune_child_nodes(child_nodes))
+    return new_node
