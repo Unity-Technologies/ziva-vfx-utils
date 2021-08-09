@@ -50,7 +50,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             run_rig_paste)
         self.file_menu.addSeparator()
         self.add_menu_actions(
-            self.file_menu, "Copy/Paste With Name Substitution",
+            self.file_menu, "Copy/Paste With Name Substitution...",
             "Copy/pastes Ziva rig items using a name substitution (defined via regular expressions). Useful for mirroring the Ziva rig from one side of a character onto the other. Select the objects whose Ziva rig is to be copy/pasted. Selected objects should come from exactly one solver.",
             run_rig_copy_paste_with_name_substitution_options)
         self.add_menu_actions(
