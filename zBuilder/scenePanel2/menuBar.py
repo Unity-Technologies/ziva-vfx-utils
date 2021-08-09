@@ -58,7 +58,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             "Update Ziva rig in the selected solver to use the current geometry. Useful if you modified geometry after converting it to Ziva bodies. This updates the solver to use the new geometry.",
             run_rig_update)
         self.add_menu_actions(
-            self.file_menu, "Transfer",
+            self.file_menu, "Transfer...",
             "Transfer Ziva rig from one solver into another. Two copies of geometries must exist in the scene; the target copies must be prefixed with a specified prefix.",
             run_rig_transfer_options)
 
