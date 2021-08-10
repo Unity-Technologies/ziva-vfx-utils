@@ -22,23 +22,17 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.add_file_menu_actions()
         self.add_cache_menu_actions()
 
-    def add_menu_actions(self, menu, action_name, statusbar_text, action_slot):
-        action = QtWidgets.QAction(self)
-        action.setText(action_name)
-        action.setStatusTip(statusbar_text)
-        action.triggered.connect(action_slot)
-        menu.addAction(action)
+    def add_menu_actions(self, menu, action_name, statusbar_text, action_slot, icon_name=None):
 
-    def add_menu_actions_with_icons(self, menu, action_name, statusbar_text, action_slot,
-                                    icon_name):
-        icon_path = get_icon_path_from_name(icon_name)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(icon_path))
         action = QtWidgets.QAction(self)
         action.setText(action_name)
-        action.setIcon(icon)
         action.setStatusTip(statusbar_text)
         action.triggered.connect(action_slot)
+        if icon_name != None:
+            icon_path = get_icon_path_from_name(icon_name)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(icon_path))
+            action.setIcon(icon)
         menu.addAction(action)
 
     def add_file_menu_actions(self):
@@ -77,11 +71,11 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             run_rig_transfer_options)
 
     def add_cache_menu_actions(self):
-        self.add_menu_actions_with_icons(
+        self.add_menu_actions(
             self.cache_menu, "Create",
             "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.",
             run_create_cache, "zCache")
-        self.add_menu_actions_with_icons(
+        self.add_menu_actions(
             self.cache_menu, "Clear",
             "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached.",
             run_clear_cache, "clear_zCache")
