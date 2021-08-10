@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets
 import maya.mel as mel
+from utility.licenseRegister import licenseRegisterWidget
 import zBuilder.utils as utility
 
 
@@ -19,6 +20,8 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.add_file_menu_actions()
+
+        self.add_help_menu_actions()
 
     def add_menu_actions(self, menu, action_name, statusbar_text, action_function):
         action = QtWidgets.QAction(self)
@@ -62,6 +65,49 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             "Transfer Ziva rig from one solver into another. Two copies of geometries must exist in the scene; the target copies must be prefixed with a specified prefix.",
             run_rig_transfer_options)
 
+    def add_help_menu_actions(self):
+        self.add_menu_actions(self.help_menu, "Ziva Command Help",
+                              "Print Ziva command help to the Maya script editor.",
+                              run_ziva_command_help)
+
+        self.run_demo_sub_menu = self.help_menu.addMenu("Run Demo")
+        self.add_menu_actions(self.run_demo_sub_menu, "Anatomical Arm",
+                              "Demonstrates an anatomical human arm.", run_anatomical_arm_demo)
+        self.add_menu_actions(
+            self.run_demo_sub_menu,
+            "Goaling, Self-Collisions, Ziva Cache and Spatially Varying Materials",
+            "Demonstrates goaling, self-collisions, Ziva caching, and spatially varying materials, on a Maya-rigged fish example.",
+            run_goaling_self_collisions_demo)
+        self.add_menu_actions(
+            self.run_demo_sub_menu, "Self-Collisions, Ziva Cache and Delaunay Tet Mesher",
+            "Demonstrates self-collisions, Ziva cache and the Delaunay tet mesher.",
+            run_self_collisions_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Attachments", "Demonstrates attachments.",
+                              run_attachments_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Collisions", "Demonstrates collisions",
+                              run_collisions_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "One Of Each Attachments",
+                              "Demonstrates one of each of the four attachment types.",
+                              run_one_of_each_attachments_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "One Of Each Collision Types",
+                              "Demonstrates one of each of the four collision types.",
+                              run_one_of_each_collisions_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Spatially Varying Materials",
+                              "Demonstrates spatially varying materials.",
+                              run_spatially_varying_materials_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Cloth",
+                              "Demonstrates cloth and cloth-object collisions.", run_cloth_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Cloth Rest Scale and Pressure",
+                              "Demonstrates cloth rest scale and pressure.",
+                              run_rest_scale_and_pressure_demo)
+        self.add_menu_actions(self.run_demo_sub_menu, "Isomesher",
+                              "Demonstrates the Ziva isomesher.", run_isomesher_demo)
+        self.add_menu_actions(self.help_menu, "Register License...", "Register Ziva VFX license.",
+                              run_register_license)
+        self.add_menu_actions(self.help_menu, "About", "About the Ziva Maya plug-in.", run_about)
+        self.add_menu_actions(self.help_menu, "Online Resources", "Loads Ziva resource library.",
+                              run_online_resources)
+
 
 def run_load_rig_options():
     mel.eval('zLoadRigOptions()')
@@ -93,3 +139,63 @@ def run_rig_update():
 
 def run_rig_transfer_options():
     mel.eval('zRigTransferOptions()')
+
+
+def run_ziva_command_help():
+    mel.eval('ziva -h')
+
+
+def run_register_license():
+    licenseRegisterWidget.main()
+
+
+def run_about():
+    mel.eval('ziva -z')
+
+
+def run_online_resources():
+    mel.eval("launch -webPage \"http://zivadynamics.com/resource-library\"")
+
+
+def run_anatomical_arm_demo():
+    mel.eval("ziva_main_anatomicalArmDemo(1)")
+
+
+def run_goaling_self_collisions_demo():
+    mel.eval('ziva_main_goalingDemo(1)')
+
+
+def run_self_collisions_demo():
+    mel.eval('ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(1)')
+
+
+def run_attachments_demo():
+    mel.eval('ziva_main_attachmentTest(1)')
+
+
+def run_collisions_demo():
+    mel.eval('ziva_main_collisionTest(1)')
+
+
+def run_one_of_each_attachments_demo():
+    mel.eval('ziva_main_oneOfEachAttachments(1)')
+
+
+def run_one_of_each_collisions_demo():
+    mel.eval('ziva_main_oneOfEachCollisionTypes(1)')
+
+
+def run_spatially_varying_materials_demo():
+    mel.eval('ziva_main_spatiallyVaryingMaterials(1)')
+
+
+def run_cloth_demo():
+    mel.eval('ziva_main_clothDemo(1)')
+
+
+def run_rest_scale_and_pressure_demo():
+    mel.eval('ziva_main_restScalePressureDemo(1)')
+
+
+def run_isomesher_demo():
+    mel.eval('ziva_main_isoMesherDemo(1)')
