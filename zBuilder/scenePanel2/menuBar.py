@@ -1,6 +1,6 @@
 from PySide2 import QtWidgets
-import maya.mel as mel
-from maya import cmds
+from maya import cmds, mel
+
 import zBuilder.utils as utility
 
 
