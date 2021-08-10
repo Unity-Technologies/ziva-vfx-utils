@@ -2,9 +2,9 @@ import logging
 
 from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
 from ..uiUtils import sortRole, nodeRole, longNameRole
-from .treeNode import build_scene_panel_tree
+from .treeItem import build_scene_panel_tree
+from .treeItem import TreeItem
 from .groupNode import GroupNode
-from .treeNode import TreeNode
 from PySide2 import QtGui, QtCore
 from maya import cmds
 

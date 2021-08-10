@@ -7,15 +7,14 @@ from zBuilder.commonUtils import is_sequence
 logger = logging.getLogger(__name__)
 
 
-class TreeNode(object):
-    """ Tree data structure for tree views in Scene Panel 2.
-    It organizes zBuilder nodes, and other Scene Panel nodes as a tree structure.
-    Its interface is similar to zBuilder Base class. 
+class TreeItem(object):
+    """ Data structure for tree models in Scene Panel 2.
+    It stores zBuilder nodes, Group node and other Scene Panel nodes as a tree structure.
+    Its interface is similar to zBuilder Base class.
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
-    The TreeNode class serves for Qt model/view paradigm, it accepts any data types that can be shown in the Scene Panel.
     """
     def __init__(self, parent=None, data=None):
-        super(TreeNode, self).__init__()
+        super(TreeItem, self).__init__()
         if parent:
             parent._children.append(self)
         self._parent = parent
@@ -61,7 +60,7 @@ class TreeNode(object):
     def append_children(self, new_children):
         """ Append children to children list
         Args:
-            new_children (list[TreeNode]): nodes to append
+            new_children (list[TreeItem]): nodes to append
         """
         if not new_children:
             return
@@ -83,7 +82,7 @@ class TreeNode(object):
         """ Insert children to index position
         Args:
             index(int): insertion point
-            new_children (list[TreeNode]): nodes to append
+            new_children (list[TreeItem]): nodes to append
         """
         if not new_children:
             return
@@ -106,7 +105,7 @@ class TreeNode(object):
     def remove_children(self, children):
         """Remove child from children list
         Args:
-            children (list[TreeNode]): nodes to remove
+            children (list[TreeItem]): nodes to remove
         """
         assert children, "Children to remove is None."
         if not is_sequence(children):
@@ -155,7 +154,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
             If provide, only node type in this list  will be created.
             If None, all nodes are created.
     Returns:
-        1. If input_node is a valid node, return list contains single TreeNode element
+        1. If input_node is a valid node, return list contains single TreeItem element
            correspond to input_node, with all its valid descendants.
         2. If input node is an invalid node, return list of all its valid descendants.
         3. Empty list if none valid node is found.
@@ -178,10 +177,10 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
 
     # If input node is invalid type, skip it.
     # Instead, go through its children and find valid nodes. Group them as a list
-    return_nodes = TreeNode(None, builder_node) if is_valid_node(builder_node) else []
+    return_nodes = TreeItem(None, builder_node) if is_valid_node(builder_node) else []
 
     if builder_node and builder_node.child_count() > 0:
-        # Recursive create child TreeNode
+        # Recursive create child TreeItem
         for builder_child_node in builder_node.children:
             child_node = build_scene_panel_tree(builder_child_node, node_type_filter)
             if child_node:
@@ -196,7 +195,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
 
 
 def prune_child_nodes(nodes):
-    """ Given TreeNode list, prune the child nodes whose parent node also in the list.
+    """ Given TreeItem list, prune the child nodes whose parent node also in the list.
     """
     pruned_node_list = []
     for node in nodes:
@@ -214,12 +213,12 @@ def prune_child_nodes(nodes):
 
 
 def create_subtree(child_nodes, new_node_data=None):
-    """ Given TreeNode list, return a new TreeNode that contains them.
+    """ Given TreeItem list, return a new TreeItem that contains them.
     The child_nodes may contain parent-child relation nodes,
     their relationship will be kept.
     Only the out most nodes will be attached to the new node.
     """
-    new_node = TreeNode(None, new_node_data)
+    new_node = TreeItem(None, new_node_data)
     new_node.append_children(prune_child_nodes(child_nodes))
     return new_node
 
@@ -227,7 +226,7 @@ def create_subtree(child_nodes, new_node_data=None):
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
     """ Delete the given node, move its decendants to its parent node.
     Args:
-        node_to_pick_out(TreeNode): The TreeNode to pick out
+        node_to_pick_out(TreeItem): The TreeItem to pick out
         node_duplicate_proc(function): A predicate that check whether
             the pick out node's children conflicts with the sibling nodes.
         fix_duplication_proc(function): A procedure that fixes the node duplication

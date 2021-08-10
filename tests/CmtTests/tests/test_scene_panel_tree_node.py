@@ -2,9 +2,9 @@ import zBuilder.builders.ziva as zva
 import re
 
 from vfx_test_case import VfxTestCase
-from zBuilder.scenePanel2.treeNode import TreeNode
 from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeNode import build_scene_panel_tree, create_subtree, pick_out_node
+from zBuilder.scenePanel2.treeItem import TreeItem
+from zBuilder.scenePanel2.treeItem import build_scene_panel_tree, create_subtree, pick_out_node
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -12,13 +12,13 @@ from maya import cmds
 
 
 class ScenePanelTreeNodeTestCase(VfxTestCase):
-    """ Test TreeNode class used for Scene Panel tree view
+    """ Test TreeItem class used for Scene Panel tree view
     """
     def test_basic_tree_node_behavior(self):
         """ Test some basic tree data structure operations
         """
         # Setup root node
-        root = TreeNode()
+        root = TreeItem()
         # Verify
         self.assertIsNone(root.parent)
         self.assertTrue(root.is_root_node())
@@ -27,7 +27,7 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         self.assertIsNone(root.data)
 
         # Action: create first child node
-        child1 = TreeNode(root)
+        child1 = TreeItem(root)
         # Verify
         self.assertIs(child1.parent, root)
         self.assertEqual(child1.children, [])
@@ -35,7 +35,7 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         self.assertEqual(root.child_count(), 1)
 
         # Action: create second child node
-        child2 = TreeNode()
+        child2 = TreeItem()
         child2.parent = root
         # Verify
         self.assertIs(child2.parent, root)
@@ -44,11 +44,11 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         self.assertEqual(root.child_count(), 2)
 
         # Action: create grand child nodes
-        grand_child1 = TreeNode(child1)
-        grand_child2 = TreeNode()
-        grand_child3 = TreeNode()
+        grand_child1 = TreeItem(child1)
+        grand_child2 = TreeItem()
+        grand_child3 = TreeItem()
         child1.append_children([grand_child2, grand_child3])
-        grand_child4 = TreeNode(child2)
+        grand_child4 = TreeItem(child2)
         # Verify
         self.assertEqual(child1.child_count(), 3)
         self.assertEqual(child2.child_count(), 1)
@@ -68,14 +68,14 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         self.assertIsNone(grand_child3.parent)
 
     def test_tree_node_functions_for_qt(self):
-        """ Test some TreeNode member functions for Qt tree model API
+        """ Test some TreeItem member functions for Qt tree model API
         """
         # Setup
-        root = TreeNode()
-        child1 = TreeNode(root)
-        root.append_children([TreeNode(), TreeNode()])
-        grand_child1 = TreeNode(child1)
-        grand_child2 = TreeNode(child1)
+        root = TreeItem()
+        child1 = TreeItem(root)
+        root.append_children([TreeItem(), TreeItem()])
+        grand_child1 = TreeItem(child1)
+        grand_child2 = TreeItem(child1)
 
         # Verify
         self.assertEqual(root.child_count(), 3)
@@ -191,12 +191,12 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertEqual(tissue2_node.data.type, "ui_zTissue_body")
         self.assertEqual(tissue2_node.data.name, "tissue2")
         # Create nested group nodes
-        group1_node = TreeNode(solverTM_node, GroupNode("Group1"))
-        subgroup1_node = TreeNode(group1_node, GroupNode("Subgroup1"))
-        subsubgroup1_node = TreeNode(subgroup1_node, GroupNode("Subsubgroup1"))
+        group1_node = TreeItem(solverTM_node, GroupNode("Group1"))
+        subgroup1_node = TreeItem(group1_node, GroupNode("Subgroup1"))
+        subsubgroup1_node = TreeItem(subgroup1_node, GroupNode("Subsubgroup1"))
         subsubgroup1_node.append_children(tissue1_node)
-        group2_node = TreeNode(solverTM_node, GroupNode("Group2"))
-        subgroup2_node = TreeNode(group2_node, GroupNode("Subgroup2"))
+        group2_node = TreeItem(solverTM_node, GroupNode("Group2"))
+        subgroup2_node = TreeItem(group2_node, GroupNode("Subgroup2"))
         subgroup2_node.append_children(tissue2_node)
 
         # Action: build subtree with selected nodes
@@ -269,12 +269,12 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertEqual(tissue2_node.data.type, "ui_zTissue_body")
         self.assertEqual(tissue2_node.data.name, "tissue2")
         # Create nested group nodes
-        group1_node = TreeNode(solverTM_node, GroupNode("Group1"))
-        subgroup1_node = TreeNode(group1_node, GroupNode("Subgroup1"))
-        subsubgroup1_node = TreeNode(subgroup1_node, GroupNode("Subgroup1"))
+        group1_node = TreeItem(solverTM_node, GroupNode("Group1"))
+        subgroup1_node = TreeItem(group1_node, GroupNode("Subgroup1"))
+        subsubgroup1_node = TreeItem(subgroup1_node, GroupNode("Subgroup1"))
         subsubgroup1_node.append_children(tissue1_node)
-        group2_node = TreeNode(solverTM_node, GroupNode("Group2"))
-        subgroup2_node = TreeNode(group2_node, GroupNode("Subgroup1"))
+        group2_node = TreeItem(solverTM_node, GroupNode("Group2"))
+        subgroup2_node = TreeItem(group2_node, GroupNode("Subgroup1"))
         subgroup2_node.append_children(tissue2_node)
 
         # Helper functions for pick_out_node().

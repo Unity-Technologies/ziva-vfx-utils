@@ -2,7 +2,7 @@ import logging
 
 from ..uiUtils import nodeRole, get_icon_path_from_name, get_icon_path_from_node, get_node_by_index
 from .zTreeView import zTreeView
-from .treeNode import TreeNode, build_scene_panel_tree
+from .treeItem import TreeItem, build_scene_panel_tree
 from PySide2 import QtCore, QtGui, QtWidgets
 from maya import cmds
 from collections import defaultdict
@@ -24,7 +24,7 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, builder, root_node=None, parent=None):
         super(ComponentTreeModel, self).__init__(parent)
         self._builder = builder
-        self._root_node = root_node if root_node else TreeNode()
+        self._root_node = root_node if root_node else TreeItem()
         self._component_nodes_dict = defaultdict(list)
 
     # QtCore.QAbstractItemModel override functions
@@ -171,12 +171,12 @@ class ComponentWidget(QtWidgets.QWidget):
                 self._component_nodes_dict[component].append(node)
 
         for component_type, node_list in self._component_nodes_dict.items():
-            root_node = TreeNode()
+            root_node = TreeItem()
             has_data = False
             for node in node_list:
                 child_nodes = build_scene_panel_tree(node, [component_type])
                 if child_nodes:
-                    zGeo_node = TreeNode(root_node, node)
+                    zGeo_node = TreeItem(root_node, node)
                     zGeo_node.append_children(child_nodes)
                     has_data = True
             if has_data:
