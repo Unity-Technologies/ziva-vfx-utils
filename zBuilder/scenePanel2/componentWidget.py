@@ -110,15 +110,37 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self._tvComponent = zTreeView()
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
+        self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         lytSection = QtWidgets.QVBoxLayout()
         lytSection.addLayout(lytTitle)
         lytSection.addWidget(self._tvComponent)
         self.setLayout(lytSection)
 
         btnIcon.toggled.connect(self.on_btnIcon_toggled)
+        self._tvComponent.selectionModel().selectionChanged.connect(
+            self.on_tvComponent_selectionChanged)
 
     def on_btnIcon_toggled(self, checked):
         self._tvComponent.setVisible(checked)
+
+    def on_tvComponent_selectionChanged(self, selected, deselected):
+        """
+        When the tree selection changes this gets executed to select
+        corresponding item in Maya scene.
+        """
+        selection_list = self._tvComponent.selectedIndexes()
+        if selection_list:
+            nodes = [x.data(nodeRole).data for x in selection_list]
+            node_names = [x.long_name for x in nodes]
+            # find nodes that exist in the scene
+            scene_nodes = cmds.ls(node_names, l=True)
+            if scene_nodes:
+                cmds.select(scene_nodes)
+
+            not_found_nodes = [name for name in node_names if name not in scene_nodes]
+            if not_found_nodes:
+                cmds.warning(
+                    "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
 
 class ComponentWidget(QtWidgets.QWidget):

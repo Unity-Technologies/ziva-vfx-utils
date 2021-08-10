@@ -287,9 +287,9 @@ class ScenePanel2(QtWidgets.QWidget):
         When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
         """
-        selectedIndexList = self._tvGeo.selectedIndexes()
-        if selectedIndexList:
-            nodes = [x.data(nodeRole).data for x in selectedIndexList]
+        selection_list = self._tvGeo.selectedIndexes()
+        if selection_list:
+            nodes = [x.data(nodeRole).data for x in selection_list]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
