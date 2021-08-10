@@ -47,6 +47,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
         if role == QtCore.Qt.EditRole:
+            assert node, "Can't get node through QModelIndex."
             long_name = node.data.long_name
             short_name = node.data.name
             if value and value != short_name:
