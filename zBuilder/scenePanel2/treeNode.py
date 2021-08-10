@@ -59,9 +59,9 @@ class TreeNode(object):
         return len(self._children)
 
     def append_children(self, new_children):
-        """Append children to children list
+        """ Append children to children list
         Args:
-            new_children (:obj:`list[TreeNode]`): nodes to append
+            new_children (list[TreeNode]): nodes to append
         """
         if not new_children:
             return
@@ -79,10 +79,34 @@ class TreeNode(object):
             new_child._parent = self
             self._children.append(new_child)
 
+    def insert_children(self, index, new_children):
+        """ Insert children to index position
+        Args:
+            index(int): insertion point
+            new_children (list[TreeNode]): nodes to append
+        """
+        if not new_children:
+            return
+
+        if not is_sequence(new_children):
+            new_children = [new_children]
+
+        offset = 0  # to keep the new_children's insertion order
+        for new_child in new_children:
+            if new_child._parent is self:
+                # Skip self assignment
+                continue
+
+            if new_child._parent:
+                new_child._parent._children.remove(new_child)
+            new_child._parent = self
+            self._children.insert(index + offset, new_child)
+            offset += 1
+
     def remove_children(self, children):
         """Remove child from children list
         Args:
-            children (:obj:`list[TreeNode]`): nodes to remove
+            children (list[TreeNode]): nodes to remove
         """
         assert children, "Children to remove is None."
         if not is_sequence(children):
@@ -198,3 +222,26 @@ def create_subtree(child_nodes, new_node_data=None):
     new_node = TreeNode(None, new_node_data)
     new_node.append_children(prune_child_nodes(child_nodes))
     return new_node
+
+
+def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
+    """ Delete the given node, move its decendants to its parent node.
+    Args:
+        node_to_pick_out(TreeNode): The TreeNode to pick out
+        node_duplicate_proc(function): A predicate that check whether
+            the pick out node's children conflicts with the sibling nodes.
+        fix_duplication_proc(function): A procedure that fixes the node duplication
+    """
+    parent_node = node_to_pick_out.parent
+    assert parent_node, "Pick out node has no parent."
+    insert_point = node_to_pick_out.row()
+    sibling_nodes = [node for node in parent_node.children if node is not node_to_pick_out]
+    child_nodes_to_move = node_to_pick_out.children
+    parent_node.remove_children(node_to_pick_out)
+
+    for child in child_nodes_to_move:
+        # Check child nodes against its sibling node
+        if is_node_duplicated_pred(child, sibling_nodes):
+            fix_duplication_proc(child, sibling_nodes)
+        # Ready to insert
+        parent_node.insert_children(insert_point, child)
