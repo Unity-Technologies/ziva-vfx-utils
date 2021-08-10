@@ -129,7 +129,7 @@ def run_rig_transfer_options():
 
 
 def run_create_cache():
-    mel.eval('zica -acn')
+    mel.eval('ziva -acn')
 
 
 def run_clear_cache():
