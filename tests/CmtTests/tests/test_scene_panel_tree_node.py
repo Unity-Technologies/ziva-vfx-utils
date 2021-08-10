@@ -3,6 +3,7 @@ import re
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.treeNode import TreeNode
+from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeNode import build_scene_panel_tree, create_subtree, pick_out_node
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
@@ -152,21 +153,6 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
             self.assertEqual(material_tree_node.child_count(), 0)
             material_data = material_tree_node.data
             self.assertIsInstance(material_data, MaterialNode)
-
-
-class GroupNode(object):
-    """ Mockup class for unit test. Once formal group node class is ready, replace it.
-    """
-    def __init__(self, name):
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, new_val):
-        self._name = new_val
 
 
 class ScenePanelGroupNodeTestCase(VfxTestCase):
