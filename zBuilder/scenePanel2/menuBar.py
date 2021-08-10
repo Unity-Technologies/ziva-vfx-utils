@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets
 import maya.mel as mel
+from maya import cmds
 import zBuilder.utils as utility
 
 
@@ -12,13 +13,14 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
     def setup_menu_items(self):
         self.file_menu = self.addMenu("File")
         self.cache_menu = self.addMenu("Cache")
-        self.tool_menu = self.addMenu("Tool")
+        self.tool_menu = self.addMenu("Tools")
         self.help_menu = self.addMenu("Help")
 
         # restrict the size of the menubar to prevent uneven expansion
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.add_file_menu_actions()
+        self.add_tool_menu_actions()
 
     def add_menu_actions(self, menu, action_name, statusbar_text, action_function):
         action = QtWidgets.QAction(self)
@@ -62,6 +64,41 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             "Transfer Ziva rig from one solver into another. Two copies of geometries must exist in the scene; the target copies must be prefixed with a specified prefix.",
             run_rig_transfer_options)
 
+    def add_tool_menu_actions(self):
+        self.add_menu_actions(self.tool_menu, "Merge Solvers", "Merges selected solvers into one.",
+                              run_merge_solvers)
+        self.add_menu_actions(self.tool_menu, "Toggle Enabled Bodies",
+                              "Toggles the active state of the selected Ziva objects.",
+                              run_toggle_enabled_bodies)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(self.tool_menu, "zPolyCombine",
+                              "Will combine multiple polySets into a single polySet.",
+                              run_z_poly_combine)
+        self.add_menu_actions(self.tool_menu, "Create Line-Of-Action Curve",
+                              "Create simple curves from the selected tissues/fibers.",
+                              run_create_line_of_action_curve)
+        self.add_menu_actions(
+            self.tool_menu, "Extract RestShape",
+            "Extracts a new shape from a simulated mesh + sculpted mesh that can be used as a Rest Shape target",
+            run_extract_rest_shape)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(self.tool_menu, "Run Mesh Analysis",
+                              "Quality-check the selected mesh(es).", run_mesh_analysis)
+        self.add_menu_actions(self.tool_menu, "Find Intersections",
+                              "Find intersections between Maya meshes.", run_find_intersections)
+        self.add_menu_actions(self.tool_menu, "Find Self Intersections",
+                              "Find self-intersections (self-collisions) on a Maya mesh.",
+                              run_find_self_intersections)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(
+            self.tool_menu, "Select Vertices",
+            "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.",
+            run_select_vertices)
+        self.add_menu_actions(
+            self.tool_menu, "Paint Attachments By Proximity",
+            "For a selected existing attachment, choose new source vertices (and repaint the source attachment map accordingly), by selecting the vertices that are within the specified distance threshold to the attachment target object.",
+            run_paint_attachments_by_proximity)
+
 
 def run_load_rig_options():
     mel.eval('zLoadRigOptions()')
@@ -93,3 +130,45 @@ def run_rig_update():
 
 def run_rig_transfer_options():
     mel.eval('zRigTransferOptions()')
+
+
+def run_merge_solvers():
+    utility.merge_solvers(cmds.ls(sl=True))
+
+
+def run_toggle_enabled_bodies():
+    mel.eval('ZivaToggleEnabled')
+
+
+def run_z_poly_combine():
+    mel.eval('zPolyCombine')
+
+
+def run_create_line_of_action_curve():
+    mel.eval('zLineOfActionUtil')
+
+
+def run_extract_rest_shape():
+    mel.eval('zRestShape -pg')
+
+
+def run_mesh_analysis():
+    mel.eval('zMeshCheck -select')
+
+
+def run_find_intersections():
+    mel.eval('ZivaSelectIntersections')
+
+
+def run_find_self_intersections():
+    mel.eval('ZivaSelectSelfIntersections')
+
+
+def run_select_vertices():
+    mel.eval('zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat')
+
+
+def run_paint_attachments_by_proximity():
+    mel.eval(
+        'zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat'
+    )
