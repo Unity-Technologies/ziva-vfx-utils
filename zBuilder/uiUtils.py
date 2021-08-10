@@ -33,12 +33,12 @@ def dock_window(dialog_class, *args, **kwargs):
                                          wp="preferred",
                                          label=dialog_class.DOCK_LABEL_NAME)
 
-    # after maya is ready we should restore the window since it may not be visible
+    # after Maya is ready we should restore the window since it may not be visible
     cmds.evalDeferred(lambda: cmds.workspaceControl(main_control, e=True, rs=True))
 
     # now lets get a C++ pointer to it using OpenMaya
     control_widget = mui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
-    # conver the C++ pointer to Qt object we can use
+    # convert the C++ pointer to Qt object we can use
     control_wrap = wrapInstance(int(control_widget), QtWidgets.QWidget)
 
     # control_wrap is the widget of the docking window and now we can start working with it:
@@ -54,8 +54,9 @@ def get_icon_path_from_node(node, parent):
 
     Returns:
         str: The path to the matching icon. For "zAttachment" node,
-             it return seperate icons based on source and target.
+             it return separate icons based on source and target.
     """
+
     if node.type == "zAttachment" and parent:
         target_cmd = "zQuery -at {}".format(node.name)
         target_attachment = mel.eval(target_cmd)

@@ -111,7 +111,7 @@ class TreeNode(object):
         self._data = new_data
 
     def data_by_column(self, column):
-        """ Return tree node data with give columen index.
+        """ Return tree node data with give column index.
         This is required by Qt tree view.
         """
         raise NotImplementedError
@@ -124,16 +124,16 @@ class TreeNode(object):
 
 
 def build_scene_panel_tree(input_node, node_type_filter=None):
-    """ Create and return the corresponding Scene Panel tree strucutre by given node.
+    """ Create and return the corresponding Scene Panel tree structure by given node.
     Args:
         input_node(:obj:`Base, Builder`): Either Base or Builder class instance.
         node_type_filer (:obj:`list[str]`): List of node type names.
             If provide, only node type in this list  will be created.
             If None, all nodes are created.
     Returns:
-        1. If input_node is a valid node, return list constains single TreeNode element
-           correspond to input_node, with all its valid descendents.
-        2. If input node is an invalid node, return list of all its valid descendents.
+        1. If input_node is a valid node, return list contains single TreeNode element
+           correspond to input_node, with all its valid descendants.
+        2. If input node is an invalid node, return list of all its valid descendants.
         3. Empty list if none valid node is found.
     """
     assert isinstance(
@@ -146,7 +146,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
 
     builder_node = input_node.root_node if isinstance(input_node, Builder) else input_node
     # Following node is valid:
-    # 1. When node filter is emtpy, all nodes are valid
+    # 1. When node filter is empty, all nodes are valid
     # 2. Root node is always valid
     # 3. Nodes that matches node type filter
     is_valid_node = lambda node: (not node_type_filter) or (node.name is "ROOT") or (
@@ -193,7 +193,7 @@ def create_subtree(child_nodes, new_node_data=None):
     """ Given TreeNode list, return a new TreeNode that contains them.
     The child_nodes may contain parent-child relation nodes,
     their relationship will be kept.
-    Only the outmost nodes will be attached to the new node.
+    Only the out most nodes will be attached to the new node.
     """
     new_node = TreeNode(None, new_node_data)
     new_node.append_children(prune_child_nodes(child_nodes))
