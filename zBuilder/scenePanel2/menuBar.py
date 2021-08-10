@@ -72,7 +72,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
 
     def add_cache_menu_actions(self):
         self.add_menu_actions(
-            self.cache_menu, "Create",
+            self.cache_menu, "Add",
             "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.",
             run_create_cache, "zCache")
         self.add_menu_actions(
