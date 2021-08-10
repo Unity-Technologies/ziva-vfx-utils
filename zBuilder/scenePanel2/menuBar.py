@@ -28,7 +28,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         action.setText(action_name)
         action.setStatusTip(statusbar_text)
         action.triggered.connect(action_slot)
-        if icon_name != None:
+        if icon_name:
             icon_path = get_icon_path_from_name(icon_name)
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap(icon_path))
