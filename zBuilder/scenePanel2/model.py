@@ -18,7 +18,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
         self.reset_model(builder)
-        self._group_count = 0
 
     def reset_model(self, new_builder):
         self.beginResetModel()
@@ -26,12 +25,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self._root_node = build_scene_panel_tree(
             new_builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
         self.endResetModel()
-
-    def tree_root(self):
-        return self._root_node
-
-    def get_solver_transform(self):
-        return self._root_node.children[0]
 
     # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
@@ -51,22 +44,24 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return "zGeo Tree Model"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
+        node = get_node_by_index(index, None)
+        assert node, "Can't get node through QModelIndex."
         if role == QtCore.Qt.EditRole:
-            node = get_node_by_index(index, None)
-            if node:
-                long_name = node.data.long_name
-                short_name = node.data.name
-                if value and value != short_name:
-                    name = cmds.rename(long_name, value)
-                    self._builder.string_replace("^{}$".format(short_name), name)
-                    node.data.name = name
-                return True
+            long_name = node.data.long_name
+            short_name = node.data.name
+            if value and value != short_name:
+                name = cmds.rename(long_name, value)
+                self._builder.string_replace("^{}$".format(short_name), name)
+                node.data.name = name
+            return True
+        if role == nodeRole:
+            node.data = value
+            return True
         return False
 
     def data(self, index, role):
         if not index.isValid():
             return None
-
         node = index.internalPointer()
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             return node.data.name
@@ -97,18 +92,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         parent_node = get_node_by_index(parent, self._root_node)
         return self.createIndex(row, column, parent_node.child(row))
 
-    def insertRows(self, position, rows, index):
-        self.layoutAboutToBeChanged.emit()
-        self.beginInsertRows(index, position, position+rows-1)
-
-        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check
-        group_node = GroupNode("Group"+str(self._group_count))
-        parent_node = get_node_by_index(index, None)
-        assert parent_node, "Missing parent node, failed to insert row!"
-        parent_node.append_children(TreeNode(None, group_node)) # TODO: multiple addition
-
+    def insertRows(self, row, count, parent):
+        self.beginInsertRows(parent, row, row+count-1)
+        parent_node = get_node_by_index(parent, None)
+        assert parent_node, "Could not find parent node, failed to insert child row."
+        parent_node.append_children(TreeNode(None, None)) # TODO: multiple addition
         self.endInsertRows()
-        self.layoutChanged.emit()
 
         return True
 
