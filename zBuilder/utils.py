@@ -20,7 +20,7 @@ ALL_ZIVA_NODES = [
     'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
     'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
 ]
-""" All available ziva nodes to be able to cleanup. """
+""" All available Ziva nodes to be able to cleanup. """
 
 
 def return_copy_buffer():
@@ -346,7 +346,7 @@ def rig_paste():
         mel.eval('error -n "Ziva clipboard is empty. Need to cut/copy into it."')
         return
 
-    # We need to do a deepcopy of ziva_clipboard_zbuilder because we want to manipulate
+    # We need to do a deep copy of ziva_clipboard_zbuilder because we want to manipulate
     # it (using string_replace), and not change the original ziva_clipboard_zbuilder object.
     # In this way, we can paste the same clipboard multiple times.
 
@@ -383,7 +383,7 @@ def rig_update(solvers=None):
         raise Exception("No solver in scene.")
 
     for solver in solvers:
-        # select the solver, and read the ziva setup from solver into the zBuilder object
+        # select the solver, and read the Ziva setup from solver into the zBuilder object
         cmds.select(solver)
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -504,7 +504,7 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
 def next_free_plug_in_array(dst_plug):
     # type: (str) -> str
     """ Use this to work around the fact that zSolver.iGeo (and other attrs)
-    have indexMatters=True even though the index doesn't matter. As a result,
+    have indexMatters=True even though the index does n't matter. As a result,
     connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
     find a specific array element to connect to instead.
     
@@ -671,7 +671,7 @@ def merge_solvers(solver_transforms):
 
 def clean_scene():
     """
-    Deletes all ziva nodes in scene.  Effectively cleaning it up.
+    Deletes all Ziva nodes in scene.  Effectively cleaning it up.
     """
     solvers = cmds.ls(type='zSolver')
     remove_zRivetToBone_nodes(solvers)
@@ -680,3 +680,43 @@ def clean_scene():
         in_scene = cmds.ls(type=node)
         if in_scene:
             cmds.delete(in_scene)
+
+def create_zSolver(self):
+    newSolver = cmds.ziva(s=True)
+    cmds.ziva(newSolver[1], defaultSolver=True)
+
+def create_zTissue(self):
+    cmds.ziva(t=True)
+
+def create_zBone(self):
+    cmds.ziva(b=True)
+
+def create_zCloth(self):
+    cmds.ziva(c=True)
+
+def create_zAttachment(self):
+    cmds.ziva(a=True)
+
+def add_zMaterial(self):
+    cmds.ziva(m=True)
+
+def add_zFiber(self):
+    cmds.ziva(f=True)
+
+def add_zSubtissue(self):
+    cmds.ziva(ast=True)
+
+def add_zRestShape(self):
+    cmds.zRestShape(a=True)
+
+def add_zLineOfAction(self):
+    cmds.ziva(loa=True)
+
+def add_fiberCurve(self):
+    cmds.zLineOfActionUtil()
+
+def add_rivetToBone(self):
+    cmds.zRivetToBone()
+
+def add_cache(self):
+    cmds.ziva(acn=True)
