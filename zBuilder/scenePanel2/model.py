@@ -47,7 +47,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
         if role == QtCore.Qt.EditRole:
-            assert node, "Can't get node through QModelIndex."
             long_name = node.data.long_name
             short_name = node.data.name
             if value and value != short_name:
@@ -97,10 +96,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return self.createIndex(row, column, parent_node.child(row))
 
     def insertRows(self, row, count, parent):
-        self.beginInsertRows(parent, row, row+count-1)
+        self.beginInsertRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
         assert parent_node, "Could not find parent node, failed to insert child row."
-        parent_node.append_children(TreeNode(None, None)) # TODO: multiple addition
+        parent_node.append_children(TreeNode(None, None))  # TODO: multiple addition
         self.endInsertRows()
 
         return True

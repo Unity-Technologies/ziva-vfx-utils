@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class TreeItem(object):
     """ Data structure for tree models in Scene Panel 2.
-    It stores zBuilder nodes, Group node and other Scene Panel nodes as a tree structure.
+    It stores zBuilder nodes, GroupNode and other Scene Panel nodes as a tree structure.
     Its interface is similar to zBuilder Base class.
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
     """
