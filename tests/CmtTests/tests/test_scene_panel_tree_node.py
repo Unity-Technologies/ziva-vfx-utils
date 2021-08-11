@@ -1,10 +1,9 @@
 import zBuilder.builders.ziva as zva
-import re
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem
-from zBuilder.scenePanel2.treeItem import build_scene_panel_tree, create_subtree, pick_out_node
+from zBuilder.scenePanel2.treeItem import *
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -276,35 +275,6 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         group2_node = TreeItem(solverTM_node, GroupNode("Group2"))
         subgroup2_node = TreeItem(group2_node, GroupNode("Subgroup1"))
         subgroup2_node.append_children(tissue2_node)
-
-        # Helper functions for pick_out_node().
-        # They ought to be defined in real code.
-        # Replace them once that happens.
-        def is_node_name_duplicate(node_to_check, node_list):
-            for node in node_list:
-                if node.data.name == node_to_check.data.name:
-                    return True
-            return False
-
-        def fix_node_name_duplication(node_to_fix, node_list):
-            # Find ending digits, if any
-            pattern = re.compile(r".*?(\d+)$")
-            new_node_name = node_to_fix.data.name
-            result = re.match(pattern, new_node_name)
-            base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
-            index = 1
-            while True:
-                find_conflict = False
-                for node in node_list:
-                    if node.data.name == new_node_name:
-                        find_conflict = True
-                        break
-                if find_conflict:
-                    new_node_name = "{}{}".format(base_name, index)
-                    index += 1
-                else:
-                    break
-            node_to_fix.data.name = new_node_name
 
         # Action: delete some Group nodes
         # Note: Order of nodes to delete matters because the node name may conflict and

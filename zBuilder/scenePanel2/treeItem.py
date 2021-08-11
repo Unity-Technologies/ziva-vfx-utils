@@ -1,4 +1,5 @@
 import logging
+import re
 
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -221,6 +222,35 @@ def create_subtree(child_nodes, new_node_data=None):
     new_node = TreeItem(None, new_node_data)
     new_node.append_children(prune_child_nodes(child_nodes))
     return new_node
+
+
+# Helper functions for pick_out_node()
+def is_node_name_duplicate(node_to_check, node_list):
+    for node in node_list:
+        if node.data.name == node_to_check.data.name:
+            return True
+    return False
+
+
+def fix_node_name_duplication(node_to_fix, node_list):
+    # Find ending digits, if any
+    pattern = re.compile(r".*?(\d+)$")
+    new_node_name = node_to_fix.data.name
+    result = re.match(pattern, new_node_name)
+    base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
+    index = 1
+    while True:
+        find_conflict = False
+        for node in node_list:
+            if node.data.name == new_node_name:
+                find_conflict = True
+                break
+        if find_conflict:
+            new_node_name = "{}{}".format(base_name, index)
+            index += 1
+        else:
+            break
+    node_to_fix.data.name = new_node_name
 
 
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
