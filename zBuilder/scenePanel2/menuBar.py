@@ -1,5 +1,6 @@
 import zBuilder.utils as utility
 import maya.mel as mel
+import maya.cmds as cmds
 
 from PySide2 import QtWidgets, QtGui
 from utility.licenseRegister import licenseRegisterWidget
@@ -168,7 +169,7 @@ def run_rig_transfer_options():
 
 
 def run_ziva_command_help():
-    mel.eval('ziva -h')
+    print(cmds.ziva(h=True))
 
 
 def run_register_license():
@@ -176,7 +177,7 @@ def run_register_license():
 
 
 def run_about():
-    mel.eval('ziva -z')
+    print(cmds.ziva(z=True))
 
 
 def run_online_resources():
