@@ -1,9 +1,14 @@
 import zBuilder.utils as utility
 import maya.mel as mel
+import zBuilder.utils as utility
 
 from PySide2 import QtWidgets, QtGui
+from maya import cmds, mel
 from utility.licenseRegister import licenseRegisterWidget
 from zBuilder.uiUtils import get_icon_path_from_name
+
+
+
 
 
 class ScenePanel2MenuBar(QtWidgets.QMenuBar):
@@ -15,13 +20,16 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
     def setup_menu_items(self):
         self.file_menu = self.addMenu("File")
         self.cache_menu = self.addMenu("Cache")
-        self.tool_menu = self.addMenu("Tool")
+        self.tool_menu = self.addMenu("Tools")
         self.help_menu = self.addMenu("Help")
 
         # restrict the size of the menubar to prevent uneven expansion
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.add_file_menu_actions()
+
+        self.add_tool_menu_actions()
+
         self.add_cache_menu_actions()
         self.add_help_menu_actions()
 
@@ -115,6 +123,41 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.add_menu_actions(self.help_menu, "Online Resources", "Loads Ziva resource library.",
                               run_online_resources)
 
+    def add_tool_menu_actions(self):
+        self.add_menu_actions(self.tool_menu, "Merge Solvers", "Merges selected solvers into one.",
+                              run_merge_solvers)
+        self.add_menu_actions(self.tool_menu, "Toggle Enabled Bodies",
+                              "Toggles the active state of the selected Ziva objects.",
+                              run_toggle_enabled_bodies)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(self.tool_menu, "zPolyCombine",
+                              "Will combine multiple polySets into a single polySet.",
+                              run_z_poly_combine)
+        self.add_menu_actions(self.tool_menu, "Create Line-Of-Action Curve",
+                              "Create simple curves from the selected tissues/fibers.",
+                              run_create_line_of_action_curve)
+        self.add_menu_actions(
+            self.tool_menu, "Extract RestShape",
+            "Extracts a new shape from a simulated mesh + sculpted mesh that can be used as a Rest Shape target",
+            run_extract_rest_shape)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(self.tool_menu, "Run Mesh Analysis",
+                              "Quality-check the selected mesh(es).", run_mesh_analysis)
+        self.add_menu_actions(self.tool_menu, "Find Intersections",
+                              "Find intersections between Maya meshes.", run_find_intersections)
+        self.add_menu_actions(self.tool_menu, "Find Self Intersections",
+                              "Find self-intersections (self-collisions) on a Maya mesh.",
+                              run_find_self_intersections)
+        self.tool_menu.addSeparator()
+        self.add_menu_actions(
+            self.tool_menu, "Select Vertices",
+            "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.",
+            run_select_vertices)
+        self.add_menu_actions(
+            self.tool_menu, "Paint Attachments By Proximity",
+            "For a selected existing attachment, choose new source vertices (and repaint the source attachment map accordingly), by selecting the vertices that are within the specified distance threshold to the attachment target object.",
+            run_paint_attachments_by_proximity)
+
     def add_cache_menu_actions(self):
         self.add_menu_actions(
             self.cache_menu, "Add",
@@ -133,6 +176,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
                               run_save_cache)
         self.add_menu_actions(self.cache_menu, "Select",
                               "Select the solver's simulation cache node.", run_select_cache)
+
 
 
 def run_load_rig_options():
@@ -226,6 +270,47 @@ def run_rest_scale_and_pressure_demo():
 def run_isomesher_demo():
     mel.eval('ziva_main_isoMesherDemo(1)')
 
+
+def run_merge_solvers():
+    utility.merge_solvers(cmds.ls(sl=True))
+
+
+def run_toggle_enabled_bodies():
+    mel.eval('ZivaToggleEnabled')
+
+
+def run_z_poly_combine():
+    mel.eval('zPolyCombine')
+
+
+def run_create_line_of_action_curve():
+    mel.eval('zLineOfActionUtil')
+
+
+def run_extract_rest_shape():
+    mel.eval('zRestShape -pg')
+
+
+def run_mesh_analysis():
+    mel.eval('zMeshCheck -select')
+
+
+def run_find_intersections():
+    mel.eval('ZivaSelectIntersections')
+
+
+def run_find_self_intersections():
+    mel.eval('ZivaSelectSelfIntersections')
+
+
+def run_select_vertices():
+    mel.eval('zSelectVerticesByProximityRadius $ZivaSelectByProximityRadiusFloat')
+
+
+def run_paint_attachments_by_proximity():
+    mel.eval(
+        'zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat'
+    )
 
 def run_create_cache():
     mel.eval('ziva -acn')

@@ -7,6 +7,7 @@ from .model import SceneGraphModel
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
 from ..uiUtils import nodeRole
+from ..utils import *
 from .groupNode import GroupNode
 from .menuBar import ScenePanel2MenuBar
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
@@ -168,41 +169,41 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def _setup_actions(self):
         self._setup_toolbar_action('zSolver', 'Create zSolver', 'actionCreateSolver',
-                                   self.toolbarCreate, self._create_zSolver)
+                                   self.toolbarCreate, create_zSolver)
         self._setup_toolbar_action('zTissue', 'Create zTissue', 'actionCreateTissue',
-                                   self.toolbarCreate, self._create_zTissue)
+                                   self.toolbarCreate, create_zTissue)
         self._setup_toolbar_action('zBone', 'Create zBone', 'actionCreateBone', self.toolbarCreate,
-                                   self._create_zBone)
+                                   create_zBone)
         self._setup_toolbar_action('zCloth', 'Create zCloth', 'actionCreateCloth',
-                                   self.toolbarCreate, self._create_zCloth)
+                                   self.toolbarCreate, create_zCloth)
         self._setup_toolbar_action('zAttachmentPlus',
                                    'Create zAttachment: select source vertices and target object',
                                    'actionCreateAttachment', self.toolbarCreate,
-                                   self._create_zAttachment)
+                                   create_zAttachment)
         self._setup_toolbar_action('create-group-plus',
                                    'Create group',
                                    'actionCreateGroup', self.toolbarCreate,
                                    self._create_group)
         self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
-                                   'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
+                                   'actionAddMaterial', self.toolbarAdd, add_zMaterial)
         self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
-                                   self.toolbarAdd, self._add_zFiber)
+                                   self.toolbarAdd, add_zFiber)
         self._setup_toolbar_action('subtissue',
                                    'Add zSubtissue: select parent and then child tissue mesh',
-                                   'actionAddSubtissue', self.toolbarAdd, self._add_zSubtissue)
+                                   'actionAddSubtissue', self.toolbarAdd, add_zSubtissue)
         self._setup_toolbar_action('zRestShape',
                                    'Add zRestShape: select tissue mesh and then restShape mesh',
-                                   'actionAddRestShape', self.toolbarAdd, self._add_zRestShape)
+                                   'actionAddRestShape', self.toolbarAdd, add_zRestShape)
         self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve',
                                    'actionAddLineOfAction', self.toolbarAdd,
-                                   self._add_zLineOfAction)
+                                   add_zLineOfAction)
         self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve',
-                                   self.toolbarAdd, self._add_fiberCurve)
+                                   self.toolbarAdd, add_fiberCurve)
         self._setup_toolbar_action('zRivetToBone',
                                    'Add zRivetToBone: select target curve vertex and bone mesh',
-                                   'actionAddRivetToBone', self.toolbarAdd, self._add_rivetToBone)
+                                   'actionAddRivetToBone', self.toolbarAdd, add_rivetToBone)
         self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd,
-                                   self._add_cache)
+                                   add_cache)
         self._setup_refresh_action()
 
     def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
@@ -216,22 +217,6 @@ class ScenePanel2(QtWidgets.QWidget):
         action.triggered.connect(slot)
         toolbar.addAction(action)
 
-    def _create_zSolver(self):
-        newSolver = cmds.ziva(s=True)
-        cmds.ziva(newSolver[1], defaultSolver=True)
-
-    def _create_zTissue(self):
-        cmds.ziva(t=True)
-
-    def _create_zBone(self):
-        cmds.ziva(b=True)
-
-    def _create_zCloth(self):
-        cmds.ziva(c=True)
-
-    def _create_zAttachment(self):
-        cmds.ziva(a=True)
-
     def _create_group(self):
         treemodel_root = self._zGeo_treemodel.index(0, 0) # TODO: include selection
 
@@ -244,30 +229,6 @@ class ScenePanel2(QtWidgets.QWidget):
             self._zGeo_treemodel.setData(child_index, group_node, nodeRole)
         else:
             logger.warning("Failed to insert row to TreeView model!")
-
-    def _add_zMaterial(self):
-        cmds.ziva(m=True)
-
-    def _add_zFiber(self):
-        cmds.ziva(f=True)
-
-    def _add_zSubtissue(self):
-        cmds.ziva(ast=True)
-
-    def _add_zRestShape(self):
-        cmds.zRestShape(a=True)
-
-    def _add_zLineOfAction(self):
-        cmds.ziva(loa=True)
-
-    def _add_fiberCurve(self):
-        cmds.zLineOfActionUtil()
-
-    def _add_rivetToBone(self):
-        cmds.zRivetToBone()
-
-    def _add_cache(self):
-        cmds.ziva(acn=True)
 
     def _setup_refresh_action(self):
         refresh_path = get_icon_path_from_name('refresh')
