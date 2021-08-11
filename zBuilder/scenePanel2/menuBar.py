@@ -1,7 +1,9 @@
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtGui
 from maya import cmds, mel
+from zBuilder.uiUtils import get_icon_path_from_name
 
 import zBuilder.utils as utility
+
 
 
 class ScenePanel2MenuBar(QtWidgets.QMenuBar):
@@ -20,13 +22,21 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.add_file_menu_actions()
+
         self.add_tool_menu_actions()
 
-    def add_menu_actions(self, menu, action_name, statusbar_text, action_function):
+        self.add_cache_menu_actions()
+
+    def add_menu_actions(self, menu, action_name, statusbar_text, action_slot, icon_name=None):
         action = QtWidgets.QAction(self)
         action.setText(action_name)
         action.setStatusTip(statusbar_text)
-        action.triggered.connect(action_function)
+        action.triggered.connect(action_slot)
+        if icon_name:
+            icon_path = get_icon_path_from_name(icon_name)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(icon_path))
+            action.setIcon(icon)
         menu.addAction(action)
 
     def add_file_menu_actions(self):
@@ -64,6 +74,7 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             "Transfer Ziva rig from one solver into another. Two copies of geometries must exist in the scene; the target copies must be prefixed with a specified prefix.",
             run_rig_transfer_options)
 
+
     def add_tool_menu_actions(self):
         self.add_menu_actions(self.tool_menu, "Merge Solvers", "Merges selected solvers into one.",
                               run_merge_solvers)
@@ -99,6 +110,26 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
             "For a selected existing attachment, choose new source vertices (and repaint the source attachment map accordingly), by selecting the vertices that are within the specified distance threshold to the attachment target object.",
             run_paint_attachments_by_proximity)
 
+    def add_cache_menu_actions(self):
+        self.add_menu_actions(
+            self.cache_menu, "Add",
+            "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.",
+            run_create_cache, "zCache")
+        self.add_menu_actions(
+            self.cache_menu, "Clear",
+            "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached.",
+            run_clear_cache, "clear_zCache")
+        self.add_menu_actions(
+            self.cache_menu, "Load",
+            "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
+            run_load_cache)
+        self.add_menu_actions(self.cache_menu, "Save",
+                              "Saves the solver's simulation cache to a .zcache file.",
+                              run_save_cache)
+        self.add_menu_actions(self.cache_menu, "Select",
+                              "Select the solver's simulation cache node.", run_select_cache)
+
+
 
 def run_load_rig_options():
     mel.eval('zLoadRigOptions()')
@@ -130,6 +161,7 @@ def run_rig_update():
 
 def run_rig_transfer_options():
     mel.eval('zRigTransferOptions()')
+
 
 
 def run_merge_solvers():
@@ -172,3 +204,22 @@ def run_paint_attachments_by_proximity():
     mel.eval(
         'zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat'
     )
+
+def run_create_cache():
+    mel.eval('ziva -acn')
+
+
+def run_clear_cache():
+    mel.eval('zCache -c')
+
+
+def run_load_cache():
+    mel.eval('ZivaLoadCache')
+
+
+def run_save_cache():
+    mel.eval('ZivaSaveCache')
+
+
+def run_select_cache():
+    mel.eval("select -r `zQuery -t zCacheTransform`")

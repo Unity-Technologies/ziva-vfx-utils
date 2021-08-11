@@ -6,6 +6,8 @@ import logging
 from .model import SceneGraphModel
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
+from ..uiUtils import nodeRole
+from .groupNode import GroupNode
 from .menuBar import ScenePanel2MenuBar
 from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
 from maya import cmds
@@ -54,6 +56,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self._builder = builder or zva.Ziva()
         self._builder.retrieve_connections()
 
+        self._group_count = 0
         self._zGeo_treemodel = SceneGraphModel(self._builder, self)
         self._tvGeo.setModel(self._zGeo_treemodel)
 
@@ -79,7 +82,7 @@ class ScenePanel2(QtWidgets.QWidget):
         # show expanded view of the tree
         self._tvGeo.expandAll()
 
-        # select item in treeview that is selected in maya
+        # select item in TreeView that is selected in Maya
         sel = cmds.ls(sl=True, long=True)
         if sel:
             checked = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
@@ -176,6 +179,10 @@ class ScenePanel2(QtWidgets.QWidget):
                                    'Create zAttachment: select source vertices and target object',
                                    'actionCreateAttachment', self.toolbarCreate,
                                    self._create_zAttachment)
+        self._setup_toolbar_action('create-group-plus',
+                                   'Create group',
+                                   'actionCreateGroup', self.toolbarCreate,
+                                   self._create_group)
         self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
                                    'actionAddMaterial', self.toolbarAdd, self._add_zMaterial)
         self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
@@ -225,6 +232,19 @@ class ScenePanel2(QtWidgets.QWidget):
     def _create_zAttachment(self):
         cmds.ziva(a=True)
 
+    def _create_group(self):
+        treemodel_root = self._zGeo_treemodel.index(0, 0) # TODO: include selection
+
+        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check
+        group_node = GroupNode("Group"+str(self._group_count))
+        row_count = self._zGeo_treemodel.rowCount(treemodel_root)
+
+        if self._zGeo_treemodel.insertRow(row_count, treemodel_root):
+            child_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
+            self._zGeo_treemodel.setData(child_index, group_node, nodeRole)
+        else:
+            logger.warning("Failed to insert row to TreeView model!")
+
     def _add_zMaterial(self):
         cmds.ziva(m=True)
 
@@ -267,9 +287,9 @@ class ScenePanel2(QtWidgets.QWidget):
         When the tree selection changes this gets executed to select
         corresponding item in Maya scene.
         """
-        selectedIndexList = self._tvGeo.selectedIndexes()
-        if selectedIndexList:
-            nodes = [x.data(nodeRole).data for x in selectedIndexList]
+        selection_list = self._tvGeo.selectedIndexes()
+        if selection_list:
+            nodes = [x.data(nodeRole) for x in selection_list]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -326,7 +346,7 @@ class ScenePanel2(QtWidgets.QWidget):
         if len(indexes) != 1:
             return
 
-        node = indexes[0].data(nodeRole).data
+        node = indexes[0].data(nodeRole)
         if node.type == 'zSolverTransform':
             menu = QtWidgets.QMenu(self)
             menu.setToolTipsVisible(True)
@@ -360,7 +380,7 @@ class ScenePanel2(QtWidgets.QWidget):
     def run_info_command(self):
         sel = cmds.ls(sl=True)
         cmdOut = cmds.ziva(sel[0], i=True)  # only allow one
-        print(cmdOut)  #print result in maya
+        print(cmdOut)  #print result in Maya
 
     def add_set_default_action(self, menu):
         action = QtWidgets.QAction(self)
@@ -377,7 +397,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def run_set_default_command(self, sel):
         cmdOut = cmds.ziva(sel, defaultSolver=True)  # only allow one
-        print(cmdOut)  #print result in maya
+        print(cmdOut)  #print result in Maya
 
     def add_zsolver_menu_action(self, menu, node, text, attr):
         action = QtWidgets.QAction(self)
