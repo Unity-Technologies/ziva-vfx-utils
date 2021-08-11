@@ -6,11 +6,10 @@ import logging
 from .model import SceneGraphModel
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
-from ..uiUtils import nodeRole
-from ..utils import *
 from .groupNode import GroupNode
 from .menuBar import ScenePanel2MenuBar
-from zBuilder.uiUtils import nodeRole, longNameRole, dock_window, get_icon_path_from_name
+from ..uiUtils import *
+from ..utils import *
 from maya import cmds
 from PySide2 import QtGui, QtWidgets, QtCore
 from functools import partial
@@ -178,12 +177,9 @@ class ScenePanel2(QtWidgets.QWidget):
                                    self.toolbarCreate, create_zCloth)
         self._setup_toolbar_action('zAttachmentPlus',
                                    'Create zAttachment: select source vertices and target object',
-                                   'actionCreateAttachment', self.toolbarCreate,
-                                   create_zAttachment)
-        self._setup_toolbar_action('create-group-plus',
-                                   'Create group',
-                                   'actionCreateGroup', self.toolbarCreate,
-                                   self._create_group)
+                                   'actionCreateAttachment', self.toolbarCreate, create_zAttachment)
+        self._setup_toolbar_action('create-group-plus', 'Create group', 'actionCreateGroup',
+                                   self.toolbarCreate, self._create_group)
         self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
                                    'actionAddMaterial', self.toolbarAdd, add_zMaterial)
         self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
@@ -195,8 +191,7 @@ class ScenePanel2(QtWidgets.QWidget):
                                    'Add zRestShape: select tissue mesh and then restShape mesh',
                                    'actionAddRestShape', self.toolbarAdd, add_zRestShape)
         self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve',
-                                   'actionAddLineOfAction', self.toolbarAdd,
-                                   add_zLineOfAction)
+                                   'actionAddLineOfAction', self.toolbarAdd, add_zLineOfAction)
         self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve',
                                    self.toolbarAdd, add_fiberCurve)
         self._setup_toolbar_action('zRivetToBone',
@@ -205,6 +200,8 @@ class ScenePanel2(QtWidgets.QWidget):
         self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd,
                                    add_cache)
         self._setup_refresh_action()
+
+        self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
 
     def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
         icon_path = get_icon_path_from_name(name)
@@ -218,10 +215,10 @@ class ScenePanel2(QtWidgets.QWidget):
         toolbar.addAction(action)
 
     def _create_group(self):
-        treemodel_root = self._zGeo_treemodel.index(0, 0) # TODO: include selection
+        treemodel_root = self._zGeo_treemodel.index(0, 0)  # TODO: include selection
 
-        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check
-        group_node = GroupNode("Group"+str(self._group_count))
+        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check
+        group_node = GroupNode("Group" + str(self._group_count))
         row_count = self._zGeo_treemodel.rowCount(treemodel_root)
 
         if self._zGeo_treemodel.insertRow(row_count, treemodel_root):
@@ -240,8 +237,6 @@ class ScenePanel2(QtWidgets.QWidget):
         self.actionRefresh.setObjectName("actionRefresh")
         self.actionRefresh.triggered.connect(self._set_builder)
         self.toolbarEdit.addAction(self.actionRefresh)
-
-        self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
 
     def on_tvGeo_selectionChanged(self, selected, deselected):
         """
@@ -303,12 +298,11 @@ class ScenePanel2(QtWidgets.QWidget):
         If there are more than one object selected in UI a menu does not appear.
         """
         indexes = self._tvGeo.selectedIndexes()
-
         if len(indexes) != 1:
             return
 
         node = indexes[0].data(nodeRole)
-        if node.type == 'zSolverTransform':
+        if node.type == "zSolverTransform":
             menu = QtWidgets.QMenu(self)
             menu.setToolTipsVisible(True)
             method = self.open_solver_menu
