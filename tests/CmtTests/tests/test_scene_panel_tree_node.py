@@ -1,7 +1,10 @@
 import zBuilder.builders.ziva as zva
+import re
 
 from vfx_test_case import VfxTestCase
-from zBuilder.scenePanel2.treeNode import TreeNode, build_scene_panel_tree, create_subtree
+from zBuilder.scenePanel2.treeNode import TreeNode
+from zBuilder.scenePanel2.groupNode import GroupNode
+from zBuilder.scenePanel2.treeNode import build_scene_panel_tree, create_subtree, pick_out_node
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -152,17 +155,6 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
             self.assertIsInstance(material_data, MaterialNode)
 
 
-class GroupNode(object):
-    """ Mockup class for unit test. Once formal group node class is ready, replace it.
-    """
-    def __init__(self, name):
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-
 class ScenePanelGroupNodeTestCase(VfxTestCase):
     """ Test group node related operations
     """
@@ -240,5 +232,106 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertIs(subgroup1_node.children[0], subsubgroup1_node)
         self.assertEqual(len(subsubgroup1_node.children), 1)
         self.assertIs(subsubgroup1_node.children[0], tissue1_node)
+        self.assertEqual(len(subgroup2_node.children), 1)
+        self.assertIs(subgroup2_node.children[0], tissue2_node)
+
+    def test_delete_group_nodes(self):
+        """ Setup some nested group nodes,
+        delete some group nodes while move their decendents to the existing position.
+        Auto renaming shall apply when name conflict happens.
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |  `- Subgroup1
+        #     |    `- Subgroup1
+        #     |      `- tissue1
+        #     `- Group2
+        #       `- Subgroup1
+        #         `- tissue2
+        cmds.polyCube(n="tissue1")
+        cmds.polyCube(n="tissue2")
+        cmds.ziva("tissue1", "tissue2", t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+        solverTM_node = root_node.children[0]
+        child_nodes = solverTM_node.children
+        # child_nodes[0] is zSolver node
+        tissue1_node = child_nodes[1]
+        tissue2_node = child_nodes[2]
+        self.assertEqual(tissue1_node.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue1_node.data.name, "tissue1")
+        self.assertEqual(tissue2_node.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue2_node.data.name, "tissue2")
+        # Create nested group nodes
+        group1_node = TreeNode(solverTM_node, GroupNode("Group1"))
+        subgroup1_node = TreeNode(group1_node, GroupNode("Subgroup1"))
+        subsubgroup1_node = TreeNode(subgroup1_node, GroupNode("Subgroup1"))
+        subsubgroup1_node.append_children(tissue1_node)
+        group2_node = TreeNode(solverTM_node, GroupNode("Group2"))
+        subgroup2_node = TreeNode(group2_node, GroupNode("Subgroup1"))
+        subgroup2_node.append_children(tissue2_node)
+
+        # Helper functions for pick_out_node().
+        # They ought to be defined in real code.
+        # Replace them once that happens.
+        def is_node_name_duplicate(node_to_check, node_list):
+            for node in node_list:
+                if node.data.name == node_to_check.data.name:
+                    return True
+            return False
+
+        def fix_node_name_duplication(node_to_fix, node_list):
+            # Find ending digits, if any
+            pattern = re.compile(r".*?(\d+)$")
+            new_node_name = node_to_fix.data.name
+            result = re.match(pattern, new_node_name)
+            base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
+            index = 1
+            while True:
+                find_conflict = False
+                for node in node_list:
+                    if node.data.name == new_node_name:
+                        find_conflict = True
+                        break
+                if find_conflict:
+                    new_node_name = "{}{}".format(base_name, index)
+                    index += 1
+                else:
+                    break
+            node_to_fix.data.name = new_node_name
+
+        # Action: delete some Group nodes
+        # Note: Order of nodes to delete matters because the node name may conflict and
+        # auto renaming applies to the latter nodes.
+        pick_out_nodes = [group2_node, subgroup1_node, group1_node]
+        for node in pick_out_nodes:
+            pick_out_node(node, is_node_name_duplicate, fix_node_name_duplication)
+
+        # Verify: Expected tree structure after action:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Subgroup1
+        #     |  `- tissue2
+        #     `- Subgroup2
+        #        `- tissue1
+
+        # The zSolverTM still has 3 children
+        self.assertEqual(len(child_nodes), 3)
+        self.assertIs(child_nodes[1], subsubgroup1_node)
+        self.assertIs(child_nodes[2], subgroup2_node)
+
+        # Subsubgroup is escalated
+        self.assertEqual(subsubgroup1_node.data.name, "Subgroup2")
+        self.assertEqual(len(subsubgroup1_node.children), 1)
+        self.assertIs(subsubgroup1_node.children[0], tissue1_node)
+
+        self.assertEqual(subgroup2_node.data.name, "Subgroup1")
         self.assertEqual(len(subgroup2_node.children), 1)
         self.assertIs(subgroup2_node.children[0], tissue2_node)

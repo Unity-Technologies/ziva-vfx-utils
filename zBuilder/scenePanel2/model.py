@@ -64,12 +64,15 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return None
         node = index.internalPointer()
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            # text
             return node.data.name
         if role == QtCore.Qt.DecorationRole and hasattr(node.data, "type"):
+            # icon
             parent_name = node.parent.data.name if node.parent.data else None
             return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
         if role == nodeRole and hasattr(node.data, "type"):
-            return node
+            # node
+            return node.data
         if role == sortRole and hasattr(node.data, "type"):
             return node.data.type
         if role == longNameRole:

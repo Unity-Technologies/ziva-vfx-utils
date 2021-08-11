@@ -289,7 +289,7 @@ class ScenePanel2(QtWidgets.QWidget):
         """
         selection_list = self._tvGeo.selectedIndexes()
         if selection_list:
-            nodes = [x.data(nodeRole).data for x in selection_list]
+            nodes = [x.data(nodeRole) for x in selection_list]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -346,7 +346,7 @@ class ScenePanel2(QtWidgets.QWidget):
         if len(indexes) != 1:
             return
 
-        node = indexes[0].data(nodeRole).data
+        node = indexes[0].data(nodeRole)
         if node.type == 'zSolverTransform':
             menu = QtWidgets.QMenu(self)
             menu.setToolTipsVisible(True)
