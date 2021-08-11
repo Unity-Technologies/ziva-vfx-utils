@@ -1,7 +1,9 @@
-from PySide2 import QtWidgets
-import maya.mel as mel
-from utility.licenseRegister import licenseRegisterWidget
 import zBuilder.utils as utility
+import maya.mel as mel
+
+from PySide2 import QtWidgets, QtGui
+from utility.licenseRegister import licenseRegisterWidget
+from zBuilder.uiUtils import get_icon_path_from_name
 
 
 class ScenePanel2MenuBar(QtWidgets.QMenuBar):
@@ -20,14 +22,19 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.add_file_menu_actions()
-
+        self.add_cache_menu_actions()
         self.add_help_menu_actions()
 
-    def add_menu_actions(self, menu, action_name, statusbar_text, action_function):
+    def add_menu_actions(self, menu, action_name, statusbar_text, action_slot, icon_name=None):
         action = QtWidgets.QAction(self)
         action.setText(action_name)
         action.setStatusTip(statusbar_text)
-        action.triggered.connect(action_function)
+        action.triggered.connect(action_slot)
+        if icon_name:
+            icon_path = get_icon_path_from_name(icon_name)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(icon_path))
+            action.setIcon(icon)
         menu.addAction(action)
 
     def add_file_menu_actions(self):
@@ -107,6 +114,25 @@ class ScenePanel2MenuBar(QtWidgets.QMenuBar):
         self.add_menu_actions(self.help_menu, "About", "About the Ziva Maya plug-in.", run_about)
         self.add_menu_actions(self.help_menu, "Online Resources", "Loads Ziva resource library.",
                               run_online_resources)
+
+    def add_cache_menu_actions(self):
+        self.add_menu_actions(
+            self.cache_menu, "Add",
+            "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically.",
+            run_create_cache, "zCache")
+        self.add_menu_actions(
+            self.cache_menu, "Clear",
+            "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached.",
+            run_clear_cache, "clear_zCache")
+        self.add_menu_actions(
+            self.cache_menu, "Load",
+            "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
+            run_load_cache)
+        self.add_menu_actions(self.cache_menu, "Save",
+                              "Saves the solver's simulation cache to a .zcache file.",
+                              run_save_cache)
+        self.add_menu_actions(self.cache_menu, "Select",
+                              "Select the solver's simulation cache node.", run_select_cache)
 
 
 def run_load_rig_options():
@@ -199,3 +225,23 @@ def run_rest_scale_and_pressure_demo():
 
 def run_isomesher_demo():
     mel.eval('ziva_main_isoMesherDemo(1)')
+
+
+def run_create_cache():
+    mel.eval('ziva -acn')
+
+
+def run_clear_cache():
+    mel.eval('zCache -c')
+
+
+def run_load_cache():
+    mel.eval('ZivaLoadCache')
+
+
+def run_save_cache():
+    mel.eval('ZivaSaveCache')
+
+
+def run_select_cache():
+    mel.eval("select -r `zQuery -t zCacheTransform`")
