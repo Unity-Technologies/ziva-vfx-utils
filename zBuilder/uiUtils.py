@@ -1,7 +1,7 @@
 import logging
 import os
 
-from maya import cmds, mel
+from maya import cmds
 from maya import OpenMayaUI as mui
 from shiboken2 import wrapInstance
 from PySide2 import QtWidgets, QtCore
@@ -58,11 +58,12 @@ def get_icon_path_from_node(node, parent):
     """
 
     if node.type == "zAttachment" and parent:
-        target_cmd = "zQuery -at {}".format(node.name)
-        target_attachment = mel.eval(target_cmd)
-
-        source_cmd = "zQuery -as {}".format(node.name)
-        source_attachment = mel.eval(source_cmd)
+        try:
+            source_attachment = cmds.zQuery(node.name, attachmentSource=True)
+            target_attachment = cmds.zQuery(node.name, attachmentTarget=True)
+        except:
+            # fallback to normal attachment icon if error happens
+            return get_icon_path_from_name(node.type)
 
         if source_attachment[0] == parent:
             return get_icon_path_from_name(node.type + "Source")
