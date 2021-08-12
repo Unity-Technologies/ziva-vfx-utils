@@ -2,9 +2,7 @@ import logging
 
 from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
 from ..uiUtils import sortRole, nodeRole, longNameRole
-from .treeItem import build_scene_panel_tree
-from .treeItem import TreeItem
-from .groupNode import GroupNode
+from .treeItem import *
 from PySide2 import QtGui, QtCore
 from maya import cmds
 
@@ -99,9 +97,23 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
         assert parent_node, "Could not find parent node, failed to insert child row."
-        parent_node.append_children(TreeNode(None, None))  # TODO: multiple addition
+        parent_node.append_children(TreeItem(None, None))  # TODO: multiple addition
         self.endInsertRows()
 
+        return True
+
+    def removeRows(self, row, count, parent):
+        self.beginRemoveRows(parent, row, row + count - 1)
+        parent_node = get_node_by_index(parent, None)
+        assert parent_node, "Could not find parent node, failed to delete child row."
+        for i in range(row, row + count):
+            try:
+                node_to_pick_out = parent_node.child(i)
+            except:
+                logger.error("The {}'s {}th child doesn't exist.".format(parent_node, i))
+                continue
+            pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
+        self.endRemoveRows()
         return True
 
     # End of QtCore.QAbstractItemModel override functions

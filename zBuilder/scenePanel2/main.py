@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 
+def is_group_node(node):
+    return node.type == "group"
+
+
 class ScenePanel2(QtWidgets.QWidget):
     instances = list()
     CONTROL_NAME = 'zfxScenePanel2'
@@ -202,6 +206,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self._setup_refresh_action()
 
         self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
+        self._tvGeo.installEventFilter(self)
 
     def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
         icon_path = get_icon_path_from_name(name)
@@ -246,6 +251,7 @@ class ScenePanel2(QtWidgets.QWidget):
         selection_list = self._tvGeo.selectedIndexes()
         if selection_list:
             nodes = [x.data(nodeRole) for x in selection_list]
+            nodes = filter(lambda n: not is_group_node(n), nodes)
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -373,6 +379,34 @@ class ScenePanel2(QtWidgets.QWidget):
             return
         node.attrs[attr]['value'] = value
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
+
+    def _delete_zGeo_treeview_nodes(self):
+        """ Delete current selected nodes in zGeo treeview.
+        Currently we only support delete one item each
+        """
+        selection_list = self._tvGeo.selectedIndexes()
+        # TODO: Add support for multiple nodes deletion
+        if len(selection_list) != 1:
+            return
+
+        cur_sel = selection_list[0]
+        node = cur_sel.data(nodeRole)
+        if is_group_node(node):
+            self._zGeo_treemodel.removeRow(cur_sel.row(), cur_sel.parent())
+        # TODO: Add support for zGeo node delete
+
+    # Override
+    def eventFilter(self, obj, event):
+        """ Handle key press event for treeviews
+        """
+        if event.type() == QtCore.QEvent.KeyPress:
+            # Delete operation on zGeo tree view
+            if (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_Delete):
+                self._delete_zGeo_treeview_nodes()
+                return True
+
+        # standard event processing
+        return QtCore.QObject.eventFilter(self, obj, event)
 
 
 # Show window with docking ability
