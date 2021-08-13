@@ -220,15 +220,37 @@ class ScenePanel2(QtWidgets.QWidget):
         toolbar.addAction(action)
 
     def _create_group(self):
-        treemodel_root = self._zGeo_treemodel.index(0, 0)  # TODO: include selection
+        treemodel_root = self._zGeo_treemodel.index(0, 0)
 
-        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check
-        group_node = GroupNode("Group" + str(self._group_count))
+        # tree item selection
+        selected_nodes = []
+        selectedIndexList = self._tvGeo.selectedIndexes()
+        if selectedIndexList:
+            selected_nodes = [x.data(nodeRole) for x in selectedIndexList]
+
+        # add group end of the top tree. TODO: This will change with nested group.
+        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check.
+        group_name = "Group" + str(self._group_count)
+        group_node = GroupNode(group_name)
+
+        # add selected nodes as children of newly created group node and remove from top tree.
         row_count = self._zGeo_treemodel.rowCount(treemodel_root)
-
         if self._zGeo_treemodel.insertRow(row_count, treemodel_root):
-            child_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
-            self._zGeo_treemodel.setData(child_index, group_node, nodeRole)
+            new_group_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
+            self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
+
+            for node in selected_nodes:
+                new_row_count = self._zGeo_treemodel.rowCount(new_group_index)
+                if self._zGeo_treemodel.insertRow(new_row_count, new_group_index):
+                    new_node_index = self._zGeo_treemodel.index(new_row_count, 0, new_group_index)
+                    self._zGeo_treemodel.setData(new_node_index, node, nodeRole)
+                    match_index = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
+                                                 node.long_name, 1,
+                                                 QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                    # TODO: add long name for GroupNode
+                    self._zGeo_treemodel.removeRow(match_index[0].row(), match_index[0].parent())
+                else:
+                    logger.warning("Failed to insert row to TreeView model for {}!", group_name)
         else:
             logger.warning("Failed to insert row to TreeView model!")
 
@@ -395,6 +417,7 @@ class ScenePanel2(QtWidgets.QWidget):
             self._zGeo_treemodel.removeRow(cur_sel.row(), cur_sel.parent())
         # TODO: Add support for zGeo node delete
 
+
     # Override
     def eventFilter(self, obj, event):
         """ Handle key press event for treeviews
@@ -407,7 +430,6 @@ class ScenePanel2(QtWidgets.QWidget):
 
         # standard event processing
         return QtCore.QObject.eventFilter(self, obj, event)
-
 
 # Show window with docking ability
 def run():
