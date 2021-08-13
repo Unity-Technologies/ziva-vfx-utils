@@ -31,7 +31,7 @@ class zTreeView(QtWidgets.QTreeView):
         header = self.header()
         header.setOffset(-zTreeView.offset)
         header.setFixedHeight(10)
-        # Apply BG color
+        # Apply background color
         self.setAlternatingRowColors(True)
 
     # override

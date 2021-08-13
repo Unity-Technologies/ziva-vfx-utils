@@ -1,13 +1,16 @@
 import logging
+import pickle
 
 from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
 from ..uiUtils import sortRole, nodeRole, longNameRole
+from .groupNode import GroupNode
 from .treeItem import *
+
 from PySide2 import QtGui, QtCore
 from maya import cmds
 
 logger = logging.getLogger(__name__)
-
+_mimeType = 'application/x-scenepanelzgeoitemdata'
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
     """ The tree model for zGeo TreeView.
@@ -35,7 +38,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | \
+               QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -112,8 +116,53 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             except:
                 logger.error("The {}'s {}th child doesn't exist.".format(parent_node, i))
                 continue
-            pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
+
+            if isinstance(node_to_pick_out, GroupNode):
+                pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
+            else:
+                parent_node.remove_children(node_to_pick_out)
         self.endRemoveRows()
+
+        return True
+
+    def supportedDropActions(self):
+        return QtCore.Qt.MoveAction
+
+    def mimeTypes(self):
+        return [_mimeType]
+
+    def mimeData(self, indexes):
+        mimeData = QtCore.QMimeData()
+        data = [index.data(nodeRole) for index in indexes]
+        mimeData.setData(_mimeType, pickle.dumps(data))
+        return mimeData
+
+    def dropMimeData(self, data, action, row, column, parent):
+        dest_node = parent.data(nodeRole)
+        # TODO: add support for multiple move, currently doesn't work'
+        moved_node_data = pickle.loads(data.data(_mimeType))[0]
+
+        if dest_node.type != "group":
+            logger.warning("Cannot move {} into {}".format(moved_node_data.type, dest_node.type))
+            return False
+
+        logger.info("Moving {} into {}".format(moved_node_data.name, dest_node.name))
+        row_count = self.rowCount(parent)
+        if self.insertRow(row_count, parent):
+            child_index = self.index(row_count, 0, parent)
+            self.setData(child_index, moved_node_data, nodeRole)
+        else:
+            logger.error("Failed to move {} into {}!".format(node.name, dest_node.name))
+            return False
+        return True
+
+    def canDropMimeData(self, data, action, row, column, parent):
+        if not parent.isValid():
+            return False
+        elif not data.hasFormat(_mimeType):
+            return False
+        elif len(pickle.loads(data.data(_mimeType))) > 1: # Only allowing 1 node drop at the moment
+            return False
         return True
 
     # End of QtCore.QAbstractItemModel override functions
