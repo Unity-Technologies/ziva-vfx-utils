@@ -251,7 +251,7 @@ class ScenePanel2(QtWidgets.QWidget):
         selection_list = self._tvGeo.selectedIndexes()
         if selection_list:
             nodes = [x.data(nodeRole) for x in selection_list]
-            nodes = filter(lambda n: not is_group_node(n), nodes)
+            non_group_nodes = filter(lambda n: not is_group_node(n), nodes)
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -261,7 +261,7 @@ class ScenePanel2(QtWidgets.QWidget):
             # filter non-exist nodes and solver nodes
             selected_nodes = list(
                 filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith("zSolver"),
-                       nodes))
+                       non_group_nodes))
 
             self._wgtComponent.reset_model(self._builder, selected_nodes)
 
