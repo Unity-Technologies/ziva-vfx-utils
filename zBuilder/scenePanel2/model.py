@@ -19,6 +19,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
+        self._parent_widget = parent
         self.reset_model(builder)
 
     def reset_model(self, new_builder):
@@ -39,8 +40,23 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | \
-               QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
+
+        node = get_node_by_index(index, None)
+        assert node, "Can't get node through QModelIndex."
+
+        if node.data.type.startswith("zSolver"):
+            # zSolver* nodes are NOT pinable, NOT drag&drop-able
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        elif node.data.type == "group":
+            # Group node is pinable, partially pinable and drag&drop-able
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsUserTristate \
+                | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
+
+        # zGeo node is pinable, drag-able, NOT drop-able
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+            | QtCore.Qt.ItemIsUserCheckable \
+            | QtCore.Qt.ItemIsDragEnabled
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -67,6 +83,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         elif role == nodeRole:
             node.data = value
             is_data_set = True
+        elif role == QtCore.Qt.CheckStateRole:
+            node.pin_state = value
+            self._parent_widget.on_tvGeo_pinStateChanged(node)
+            is_data_set = True
 
         if is_data_set:
             self.dataChanged.emit(index, index, role)
@@ -83,6 +103,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             # icon
             parent_name = node.parent.data.name if node.parent.data else None
             return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
+        if role == QtCore.Qt.CheckStateRole:
+            # checkbox
+            return node.pin_state
         if role == nodeRole and hasattr(node.data, "type"):
             # node
             return node.data

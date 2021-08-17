@@ -14,6 +14,12 @@ class TreeItem(object):
     Its interface is similar to zBuilder Base class.
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
     """
+
+    # TreeItem pin states, correspond to Qt.CheckState
+    Unpinned = 0
+    PartiallyPinned = 1  # for Group node
+    Pinned = 2
+
     def __init__(self, parent=None, data=None):
         super(TreeItem, self).__init__()
         if parent:
@@ -23,6 +29,7 @@ class TreeItem(object):
         self._children = []
         # Union of zBuilder node type, or Scene Panel related data types, such as Group node.
         self._data = data
+        self._pin_state = TreeItem.Unpinned
 
     @property
     def parent(self):
@@ -148,6 +155,14 @@ class TreeItem(object):
         This is required by Qt tree view.
         """
         raise NotImplementedError
+
+    @property
+    def pin_state(self):
+        return self._pin_state
+
+    @pin_state.setter
+    def pin_state(self, new_state):
+        self._pin_state = new_state
 
 
 def build_scene_panel_tree(input_node, node_type_filter=None):
