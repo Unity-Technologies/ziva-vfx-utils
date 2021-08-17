@@ -235,7 +235,7 @@ class ScenePanel2(QtWidgets.QWidget):
             selected_nodes = [x.data(nodeRole) for x in selectedIndexList]
 
         # add group end of the top tree. TODO: This will change with nested group.
-        self._group_count = self._group_count + 1 # TODO: temporary method for unique name. Update with proper check.
+        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check.
         group_name = "Group" + str(self._group_count)
         group_node = GroupNode(group_name)
 
@@ -250,9 +250,9 @@ class ScenePanel2(QtWidgets.QWidget):
                 if self._zGeo_treemodel.insertRow(new_row_count, new_group_index):
                     new_node_index = self._zGeo_treemodel.index(new_row_count, 0, new_group_index)
                     self._zGeo_treemodel.setData(new_node_index, node, nodeRole)
-                    match_index = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
-                                                 node.long_name, 1,
-                                                 QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                    match_index = self._zGeo_treemodel.match(
+                        self._zGeo_treemodel.index(0, 0), longNameRole, node.long_name, 1,
+                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
                     # TODO: add long name for GroupNode
                     self._zGeo_treemodel.removeRow(match_index[0].row(), match_index[0].parent())
                 else:
@@ -423,7 +423,6 @@ class ScenePanel2(QtWidgets.QWidget):
             self._zGeo_treemodel.removeRow(cur_sel.row(), cur_sel.parent())
         # TODO: Add support for zGeo node delete
 
-
     # Override
     def eventFilter(self, obj, event):
         """ Handle key press event for TreeViews
@@ -442,6 +441,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
         # standard event processing
         return QtCore.QObject.eventFilter(self, obj, event)
+
 
 # Show window with docking ability
 def run():

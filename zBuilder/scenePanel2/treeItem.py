@@ -229,10 +229,7 @@ def create_subtree(child_nodes, new_node_data=None):
 
 # Helper functions for pick_out_node()
 def is_node_name_duplicate(node_to_check, node_list):
-    for node in node_list:
-        if node.data.name == node_to_check.data.name:
-            return True
-    return False
+    return any(node.data.name == node_to_check.data.name for node in node_list)
 
 
 def fix_node_name_duplication(node_to_fix, node_list):
@@ -243,11 +240,7 @@ def fix_node_name_duplication(node_to_fix, node_list):
     base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
     index = 1
     while True:
-        find_conflict = False
-        for node in node_list:
-            if node.data.name == new_node_name:
-                find_conflict = True
-                break
+        find_conflict = any(node.data.name == new_node_name for node in node_list)
         if find_conflict:
             new_node_name = "{}{}".format(base_name, index)
             index += 1
@@ -277,3 +270,6 @@ def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_pro
             fix_duplication_proc(child, sibling_nodes)
         # Ready to insert
         parent_node.insert_children(insert_point, child)
+
+
+# End of helper functions for pick_out_node()

@@ -12,6 +12,7 @@ from maya import cmds
 logger = logging.getLogger(__name__)
 _mimeType = 'application/x-scenepanelzgeoitemdata'
 
+
 class SceneGraphModel(QtCore.QAbstractItemModel):
     """ The tree model for zGeo TreeView.
     """
@@ -48,6 +49,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def setData(self, index, value, role=QtCore.Qt.EditRole):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
+        is_data_set = False
         if role == QtCore.Qt.EditRole:
             long_name = node.data.long_name
             short_name = node.data.name
@@ -61,11 +63,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                     name = cmds.rename(long_name, value)
                     self._builder.string_replace("^{}$".format(short_name), name)
                     node.data.name = name
-            return True
-        if role == nodeRole:
+                is_data_set = True
+        elif role == nodeRole:
             node.data = value
-            return True
-        return False
+            is_data_set = True
+
+        if is_data_set:
+            self.dataChanged.emit(index, index, role)
+        return is_data_set
 
     def data(self, index, role):
         if not index.isValid():
@@ -167,7 +172,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return False
         elif not data.hasFormat(_mimeType):
             return False
-        elif len(pickle.loads(data.data(_mimeType))) > 1: # Only allowing 1 node drop at the moment
+        elif len(pickle.loads(data.data(_mimeType))) > 1:  # Only allowing 1 node drop at the moment
             return False
         return True
 
