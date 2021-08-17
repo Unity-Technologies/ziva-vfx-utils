@@ -58,6 +58,9 @@ class TreeItem(object):
     def child_count(self):
         return len(self._children)
 
+    def get_siblings(self):
+        return [sibling_node for sibling_node in self.parent.children if sibling_node is not self]
+
     def append_children(self, new_children):
         """ Append children to children list
         Args:
@@ -254,7 +257,7 @@ def fix_node_name_duplication(node_to_fix, node_list):
 
 
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
-    """ Delete the given node, move its decendants to its parent node.
+    """ Delete the given node, move its descendants to its parent node.
     Args:
         node_to_pick_out(TreeItem): The TreeItem to pick out
         node_duplicate_proc(function): A predicate that check whether
@@ -264,7 +267,7 @@ def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_pro
     parent_node = node_to_pick_out.parent
     assert parent_node, "Pick out node has no parent."
     insert_point = node_to_pick_out.row()
-    sibling_nodes = [node for node in parent_node.children if node is not node_to_pick_out]
+    sibling_nodes = node_to_pick_out.get_siblings()
     child_nodes_to_move = node_to_pick_out.children
     parent_node.remove_children(node_to_pick_out)
 

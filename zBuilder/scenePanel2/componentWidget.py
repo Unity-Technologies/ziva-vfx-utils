@@ -144,7 +144,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
 
 
 class ComponentWidget(QtWidgets.QWidget):
-    """ The Comopnent tree view widget.
+    """ The Component tree view widget.
     It contains a ComponentSectionWidget list, which include each component of current selected nodes.
     """
     def __init__(self, parent=None):

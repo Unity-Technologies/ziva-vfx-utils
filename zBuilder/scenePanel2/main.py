@@ -280,7 +280,7 @@ class ScenePanel2(QtWidgets.QWidget):
         if selection_list:
             nodes = [x.data(nodeRole) for x in selection_list]
             non_group_nodes = filter(lambda n: not is_group_node(n), nodes)
-            node_names = [x.long_name for x in nodes]
+            node_names = [x.long_name for x in non_group_nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
             if scene_nodes:
