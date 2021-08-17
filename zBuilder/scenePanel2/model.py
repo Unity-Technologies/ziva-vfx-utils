@@ -52,9 +52,15 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             long_name = node.data.long_name
             short_name = node.data.name
             if value and value != short_name:
-                name = cmds.rename(long_name, value)
-                self._builder.string_replace("^{}$".format(short_name), name)
-                node.data.name = name
+                if isinstance(node.data, GroupNode):
+                    node.data.name = value
+                    sibling_nodes = node.get_siblings()
+                    if is_node_name_duplicate(node, sibling_nodes):
+                        fix_node_name_duplication(node, sibling_nodes)
+                else:
+                    name = cmds.rename(long_name, value)
+                    self._builder.string_replace("^{}$".format(short_name), name)
+                    node.data.name = name
             return True
         if role == nodeRole:
             node.data = value
