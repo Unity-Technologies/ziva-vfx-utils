@@ -135,7 +135,13 @@ class ScenePanel2(QtWidgets.QWidget):
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
+
+        # selection and move setup
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvGeo.setDragEnabled(True)
+        self._tvGeo.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self._tvGeo.setAcceptDrops(True)
+        self._tvGeo.setDropIndicatorShown(True)
 
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._tvGeo)
@@ -403,7 +409,7 @@ class ScenePanel2(QtWidgets.QWidget):
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
     def _delete_zGeo_treeview_nodes(self):
-        """ Delete current selected nodes in zGeo treeview.
+        """ Delete current selected nodes in zGeo TreeView.
         Currently we only support delete one item each
         """
         selection_list = self._tvGeo.selectedIndexes()
@@ -420,7 +426,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
     # Override
     def eventFilter(self, obj, event):
-        """ Handle key press event for treeviews
+        """ Handle key press event for TreeViews
         """
         if event.type() == QtCore.QEvent.KeyPress:
             # Delete operation on zGeo tree view
