@@ -434,6 +434,12 @@ class ScenePanel2(QtWidgets.QWidget):
                 self._delete_zGeo_treeview_nodes()
                 return True
 
+            # group creation
+            elif (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_G) \
+                and (event.modifiers() == QtCore.Qt.ControlModifier):
+                self._create_group()
+                return True
+
         # standard event processing
         return QtCore.QObject.eventFilter(self, obj, event)
 
