@@ -6,6 +6,8 @@ from .treeItem import TreeItem, build_scene_panel_tree
 from PySide2 import QtCore, QtGui, QtWidgets
 from maya import cmds
 from collections import defaultdict
+from functools import partial
+from zBuilder.nodes.base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -45,17 +47,22 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
             return "ComponentTreeModel"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
+        node = get_node_by_index(index, None)
+        assert node, "Can't get node through QModelIndex."
+
+        is_data_set = False
         if role == QtCore.Qt.EditRole:
-            node = get_node_by_index(index, None)
-            if node:
-                long_name = node.data.long_name
-                short_name = node.data.name
-                if value and value != short_name:
-                    name = cmds.rename(long_name, value)
-                    self._builder.string_replace("^{}$".format(short_name), name)
-                    node.data.name = name
-                return True
-        return False
+            long_name = node.data.long_name
+            short_name = node.data.name
+            if value and value != short_name:
+                name = cmds.rename(long_name, value)
+                self._builder.string_replace("^{}$".format(short_name), name)
+                node.data.name = name
+                is_data_set = True
+
+        if is_data_set:
+            self.dataChanged.emit(index, index, role)
+        return is_data_set
 
     def data(self, index, role):
         if not index.isValid():
@@ -63,13 +70,16 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
 
         node = index.internalPointer()
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            # text
             return node.data.name
         if role == QtCore.Qt.DecorationRole:
+            # icon
             if hasattr(node.data, "type"):
                 parent_name = node.parent.data.name if node.parent.data else None
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
         if role == nodeRole and hasattr(node.data, "type"):
-            return node
+            # node
+            return node.data
         if role == QtCore.Qt.BackgroundRole:
             if index.row() % 2 == 0:
                 return QtGui.QColor(54, 54, 54)  # gray
@@ -97,6 +107,11 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
 
+        # clipboard for copied attributes
+        self.attrs_clipboard = {}
+         # clipboard for the maps.  This is either a zBuilder Map object or None.
+        self.maps_clipboard = None
+
         lblTitle = QtWidgets.QLabel(component_type)
         btnIcon = QtWidgets.QPushButton()
         btnIcon.setIcon(QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name(component_type))))
@@ -108,6 +123,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         lytTitle.setAlignment(btnIcon, QtCore.Qt.AlignRight)
 
         self._tvComponent = zTreeView()
+        self._tvComponent.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._tvComponent.customContextMenuRequested.connect(self.open_menu)
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
         self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -120,6 +137,23 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self._tvComponent.selectionModel().selectionChanged.connect(
             self.on_tvComponent_selectionChanged)
 
+    def open_menu(self, position):
+        indexes = self._tvComponent.selectedIndexes()
+
+        if len(indexes) != 1:
+            return
+
+        menu_dict = {
+            'zTissue': self.open_tissue_menu,
+        }
+
+        node = indexes[0].data(nodeRole)
+        if node.type in menu_dict:
+            menu = QtWidgets.QMenu(self)
+            method = menu_dict[node.type]
+            method(menu, node)
+            menu.exec_(self._tvComponent.viewport().mapToGlobal(position))
+
     def on_btnIcon_toggled(self, checked):
         self._tvComponent.setVisible(checked)
 
@@ -130,7 +164,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         """
         selection_list = self._tvComponent.selectedIndexes()
         if selection_list:
-            nodes = [x.data(nodeRole).data for x in selection_list]
+            nodes = [x.data(nodeRole) for x in selection_list]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -142,9 +176,94 @@ class ComponentSectionWidget(QtWidgets.QWidget):
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
+    def add_map_actions_to_menu(self, menu, node, map_index):
+        """
+        Add map actions to the menu
+        Args:
+            menu (QMenu): menu to add option to
+            node (zBuilder object): zBuilder.nodes object
+            map_index (int): map index. 0 for source map 1 for target/endPoints map
+        """
+        paint_action = QtWidgets.QAction(self)
+        paint_action.setText('Paint')
+        paint_action.setObjectName("actionPaint")
+        paint_action.triggered.connect(partial(node.parameters['map'][map_index].open_paint_tool))
+        menu.addAction(paint_action)
+
+        invert_action = QtWidgets.QAction(self)
+        invert_action.setText('Invert')
+        invert_action.setObjectName('actionInvertWeights')
+        invert_action.triggered.connect(partial(self.invert_weights, node, map_index))
+        menu.addAction(invert_action)
+
+        menu.addSeparator()
+
+        copy_action = QtWidgets.QAction(self)
+        copy_action.setText('Copy')
+        copy_action.setObjectName('actionCopyWeights')
+        copy_action.triggered.connect(partial(self.copy_weights, node, map_index))
+        menu.addAction(copy_action)
+
+        paste_action = QtWidgets.QAction(self)
+        paste_action.setText('Paste')
+        paste_action.setObjectName('actionPasteWeights')
+        paste_action.triggered.connect(partial(self.paste_weights, node, map_index))
+        paste_action.setEnabled(bool(self.maps_clipboard))
+        menu.addAction(paste_action)
+
+    def add_attribute_actions_to_menu(self, menu, node):
+        attrs_menu = menu.addMenu('Attributes')
+
+        copy_attrs_action = QtWidgets.QAction(self)
+        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setObjectName("actionCopyAttrs")
+        copy_attrs_action.triggered.connect(partial(self.copy_attrs, node))
+
+        paste_attrs_action = QtWidgets.QAction(self)
+        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setObjectName("actionPasteAttrs")
+        paste_attrs_action.triggered.connect(partial(self.paste_attrs, node))
+
+        # only enable 'paste' IF it is same type as what is in buffer
+        paste_attrs_action.setEnabled(node.type in self.attrs_clipboard)
+
+        attrs_menu.addAction(copy_attrs_action)
+        attrs_menu.addAction(paste_attrs_action)
+
+    def open_tissue_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def copy_attrs(self, node):
+        # update the model in case maya updated
+        node.get_maya_attrs()
+
+        self.attrs_clipboard = {}
+        self.attrs_clipboard[node.type] = node.attrs.copy()
+
+    def paste_attrs(self, node):
+        # type: (zBuilder.whatever.Base) -> None
+        """
+        Paste the attributes from the clipboard onto given node.
+        @pre The node's type has an entry in the clipboard.
+        """
+        assert isinstance(
+            node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+        assert node.type in self.attrs_clipboard, "Precondition violated: node type is not in the clipboard"
+        orig_node_attrs = self.attrs_clipboard[node.type]
+        assert isinstance(orig_node_attrs,
+                          dict), "Invariant violated: value in attrs clipboard must be a dict"
+
+        # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
+        assert set(node.attrs) == set(
+            orig_node_attrs
+        ), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+        node.attrs = orig_node_attrs.copy(
+        )  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
+        node.set_maya_attrs()
+    
 
 class ComponentWidget(QtWidgets.QWidget):
-    """ The Comopnent tree view widget.
+    """ The Component tree view widget.
     It contains a ComponentSectionWidget list, which include each component of current selected nodes.
     """
     def __init__(self, parent=None):
@@ -186,3 +305,4 @@ class ComponentWidget(QtWidgets.QWidget):
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(component_type, tree_model)
             self._lytAllSections.addWidget(wgtSection)
+
