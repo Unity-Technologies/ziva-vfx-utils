@@ -1,12 +1,16 @@
 import logging
+import pickle
 
 from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
 from ..uiUtils import sortRole, nodeRole, longNameRole
+from .groupNode import GroupNode
 from .treeItem import *
+
 from PySide2 import QtGui, QtCore
 from maya import cmds
 
 logger = logging.getLogger(__name__)
+_mimeType = 'application/x-scenepanelzgeoitemdata'
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
@@ -15,6 +19,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
+        self._parent_widget = parent
         self.reset_model(builder)
 
     def reset_model(self, new_builder):
@@ -35,7 +40,23 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def flags(self, index):
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+
+        node = get_node_by_index(index, None)
+        assert node, "Can't get node through QModelIndex."
+
+        if node.data.type.startswith("zSolver"):
+            # zSolver* nodes are NOT pinable, NOT drag&drop-able
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        elif node.data.type == "group":
+            # Group node is pinable, partially pinable and drag&drop-able
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsUserTristate \
+                | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
+
+        # zGeo node is pinable, drag-able, NOT drop-able
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+            | QtCore.Qt.ItemIsUserCheckable \
+            | QtCore.Qt.ItemIsDragEnabled
 
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
@@ -44,18 +65,32 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def setData(self, index, value, role=QtCore.Qt.EditRole):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
+        is_data_set = False
         if role == QtCore.Qt.EditRole:
             long_name = node.data.long_name
             short_name = node.data.name
             if value and value != short_name:
-                name = cmds.rename(long_name, value)
-                self._builder.string_replace("^{}$".format(short_name), name)
-                node.data.name = name
-            return True
-        if role == nodeRole:
+                if isinstance(node.data, GroupNode):
+                    node.data.name = value
+                    sibling_nodes = node.get_siblings()
+                    if is_node_name_duplicate(node, sibling_nodes):
+                        fix_node_name_duplication(node, sibling_nodes)
+                else:
+                    name = cmds.rename(long_name, value)
+                    self._builder.string_replace("^{}$".format(short_name), name)
+                    node.data.name = name
+                is_data_set = True
+        elif role == nodeRole:
             node.data = value
-            return True
-        return False
+            is_data_set = True
+        elif role == QtCore.Qt.CheckStateRole:
+            node.pin_state = value
+            self._parent_widget.on_tvGeo_pinStateChanged(node)
+            is_data_set = True
+
+        if is_data_set:
+            self.dataChanged.emit(index, index, role)
+        return is_data_set
 
     def data(self, index, role):
         if not index.isValid():
@@ -68,6 +103,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             # icon
             parent_name = node.parent.data.name if node.parent.data else None
             return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
+        if role == QtCore.Qt.CheckStateRole:
+            # checkbox
+            return node.pin_state
         if role == nodeRole and hasattr(node.data, "type"):
             # node
             return node.data
@@ -112,8 +150,53 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             except:
                 logger.error("The {}'s {}th child doesn't exist.".format(parent_node, i))
                 continue
-            pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
+
+            if isinstance(node_to_pick_out, GroupNode):
+                pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
+            else:
+                parent_node.remove_children(node_to_pick_out)
         self.endRemoveRows()
+
+        return True
+
+    def supportedDropActions(self):
+        return QtCore.Qt.MoveAction
+
+    def mimeTypes(self):
+        return [_mimeType]
+
+    def mimeData(self, indexes):
+        mimeData = QtCore.QMimeData()
+        data = [index.data(nodeRole) for index in indexes]
+        mimeData.setData(_mimeType, pickle.dumps(data))
+        return mimeData
+
+    def dropMimeData(self, data, action, row, column, parent):
+        dest_node = parent.data(nodeRole)
+        # TODO: add support for multiple move, currently doesn't work'
+        moved_node_data = pickle.loads(data.data(_mimeType))[0]
+
+        if dest_node.type != "group":
+            logger.warning("Cannot move {} into {}".format(moved_node_data.type, dest_node.type))
+            return False
+
+        logger.info("Moving {} into {}".format(moved_node_data.name, dest_node.name))
+        row_count = self.rowCount(parent)
+        if self.insertRow(row_count, parent):
+            child_index = self.index(row_count, 0, parent)
+            self.setData(child_index, moved_node_data, nodeRole)
+        else:
+            logger.error("Failed to move {} into {}!".format(node.name, dest_node.name))
+            return False
+        return True
+
+    def canDropMimeData(self, data, action, row, column, parent):
+        if not parent.isValid():
+            return False
+        elif not data.hasFormat(_mimeType):
+            return False
+        elif len(pickle.loads(data.data(_mimeType))) > 1:  # Only allowing 1 node drop at the moment
+            return False
         return True
 
     # End of QtCore.QAbstractItemModel override functions

@@ -18,16 +18,16 @@ class DGNode(Base):
         attrs (dict): A place for the maya attributes dictionary.
 
     """
-    """ Types of maya nodes this parameter is aware of.  Only needed 
-        if parameter can deal with multiple types.  Else leave at None """
+
+    # List of maya node attribute names that represent the paintable map.
     MAP_LIST = []
-    """ List of maya node attribute names that represent the paintable map. """
+
+    # A list of attribute names in __dict__ to exclude from the string_replace method.
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
-    """ A list of attribute names in __dict__ to
-            exclude from the string_replace method. """
+
+    # List of maya node attribute names to add to the auto generated attribute list to include.
     EXTEND_ATTR_LIST = list()
-    """ List of maya node attribute names to add
-            to the auto generated attribute list to include."""
+
     def __init__(self, parent=None, builder=None):
         super(DGNode, self).__init__(parent=parent, builder=builder)
 

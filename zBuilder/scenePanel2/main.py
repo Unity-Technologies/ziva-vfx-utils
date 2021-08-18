@@ -50,6 +50,15 @@ class ScenePanel2(QtWidgets.QWidget):
         ScenePanel2.instances.append(weakref.proxy(self))
         cmds.workspaceControlState(ScenePanel2.CONTROL_NAME, widthHeight=[500, 600])
 
+        # member variable declaration and initilization
+        self._builder = None
+        self._zGeo_treemodel = None
+        self._group_count = None
+        self._tvGeo = None
+        self._wgtComponent = None
+        self._selected_nodes = list()
+        self._pinned_nodes = list()
+
         self._setup_ui(parent)
         self._setup_model(builder)
         # must be after _setup_model() because assigning model resets item expansion
@@ -135,7 +144,13 @@ class ScenePanel2(QtWidgets.QWidget):
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
+
+        # selection and move setup
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvGeo.setDragEnabled(True)
+        self._tvGeo.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self._tvGeo.setAcceptDrops(True)
+        self._tvGeo.setDropIndicatorShown(True)
 
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._tvGeo)
@@ -220,15 +235,37 @@ class ScenePanel2(QtWidgets.QWidget):
         toolbar.addAction(action)
 
     def _create_group(self):
-        treemodel_root = self._zGeo_treemodel.index(0, 0)  # TODO: include selection
+        treemodel_root = self._zGeo_treemodel.index(0, 0)
 
-        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check
-        group_node = GroupNode("Group" + str(self._group_count))
+        # tree item selection
+        selected_nodes = []
+        selectedIndexList = self._tvGeo.selectedIndexes()
+        if selectedIndexList:
+            selected_nodes = [x.data(nodeRole) for x in selectedIndexList]
+
+        # add group end of the top tree. TODO: This will change with nested group.
+        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check.
+        group_name = "Group" + str(self._group_count)
+        group_node = GroupNode(group_name)
+
+        # add selected nodes as children of newly created group node and remove from top tree.
         row_count = self._zGeo_treemodel.rowCount(treemodel_root)
-
         if self._zGeo_treemodel.insertRow(row_count, treemodel_root):
-            child_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
-            self._zGeo_treemodel.setData(child_index, group_node, nodeRole)
+            new_group_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
+            self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
+
+            for node in selected_nodes:
+                new_row_count = self._zGeo_treemodel.rowCount(new_group_index)
+                if self._zGeo_treemodel.insertRow(new_row_count, new_group_index):
+                    new_node_index = self._zGeo_treemodel.index(new_row_count, 0, new_group_index)
+                    self._zGeo_treemodel.setData(new_node_index, node, nodeRole)
+                    match_index = self._zGeo_treemodel.match(
+                        self._zGeo_treemodel.index(0, 0), longNameRole, node.long_name, 1,
+                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+                    # TODO: add long name for GroupNode
+                    self._zGeo_treemodel.removeRow(match_index[0].row(), match_index[0].parent())
+                else:
+                    logger.warning("Failed to insert row to TreeView model for {}!", group_name)
         else:
             logger.warning("Failed to insert row to TreeView model!")
 
@@ -251,24 +288,71 @@ class ScenePanel2(QtWidgets.QWidget):
         selection_list = self._tvGeo.selectedIndexes()
         if selection_list:
             nodes = [x.data(nodeRole) for x in selection_list]
-            nodes = filter(lambda n: not is_group_node(n), nodes)
-            node_names = [x.long_name for x in nodes]
+            non_group_nodes = list(filter(lambda n: not is_group_node(n), nodes))
+            node_names = [x.long_name for x in non_group_nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
             if scene_nodes:
                 cmds.select(scene_nodes)
 
             # filter non-exist nodes and solver nodes
-            selected_nodes = list(
+            self._selected_nodes = list(
                 filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith("zSolver"),
-                       nodes))
-
-            self._wgtComponent.reset_model(self._builder, selected_nodes)
+                       non_group_nodes))
 
             not_found_nodes = [name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
+        else:
+            self._selected_nodes = []
+
+        self._wgtComponent.reset_model(self._builder,
+                                       list(set(self._selected_nodes) | set(self._pinned_nodes)))
+
+    def on_tvGeo_pinStateChanged(self, item_list):
+        """ Update component treeview when zGeo TreeView item's pin state changed.
+        """
+        def get_all_zGeo_items(item_list):
+            """ Given TreeItem(s), return all TreeItem that is zGeo node type
+            """
+            if not is_sequence(item_list):
+                item_list = [item_list]
+
+            zGeo_items = []
+            for item in item_list:
+                if is_group_node(item.data):
+                    zGeo_items.extend(get_all_zGeo_items(item.children))
+                else:
+                    assert len(item.children
+                               ) == 0, "Non group node has child node. Need revamp code logic."
+                    zGeo_items.append(item)
+
+            return zGeo_items
+
+        zGeo_treeItems = get_all_zGeo_items(item_list)
+        node_names = [item.data.long_name for item in zGeo_treeItems]
+        # find nodes that exist in the scene, filter non-exist nodes
+        scene_nodes = cmds.ls(node_names, l=True)
+        valid_zGeo_treeItems = list(
+            filter(lambda n: (n.data.long_name in scene_nodes), zGeo_treeItems))
+        pinned_zGeo_treeItems = list(
+            filter(lambda n: QtCore.Qt.Checked == n.pin_state, valid_zGeo_treeItems))
+        unpinned_zGeo_treeItems = set(valid_zGeo_treeItems) - set(pinned_zGeo_treeItems)
+
+        # Update the pinned tree items
+        pinned_zGeo_nodes = [item.data for item in pinned_zGeo_treeItems]
+        unpinned_nodes = [item.data for item in unpinned_zGeo_treeItems]
+        # Be careful about set operator precedence, the "-" has higher precedence than "|".
+        # Refer to https://stackoverflow.com/questions/54735175/set-operator-precedence
+        self._pinned_nodes = list((set(self._pinned_nodes) | set(pinned_zGeo_nodes)) -
+                                  set(unpinned_nodes))
+        self._wgtComponent.reset_model(self._builder,
+                                       list(set(self._selected_nodes) | set(self._pinned_nodes)))
+
+        not_found_nodes = [name for name in node_names if name not in scene_nodes]
+        if not_found_nodes:
+            cmds.warning("Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
     def get_expanded(self):
         """
@@ -381,7 +465,7 @@ class ScenePanel2(QtWidgets.QWidget):
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
 
     def _delete_zGeo_treeview_nodes(self):
-        """ Delete current selected nodes in zGeo treeview.
+        """ Delete current selected nodes in zGeo TreeView.
         Currently we only support delete one item each
         """
         selection_list = self._tvGeo.selectedIndexes()
@@ -397,12 +481,18 @@ class ScenePanel2(QtWidgets.QWidget):
 
     # Override
     def eventFilter(self, obj, event):
-        """ Handle key press event for treeviews
+        """ Handle key press event for TreeViews
         """
         if event.type() == QtCore.QEvent.KeyPress:
             # Delete operation on zGeo tree view
             if (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_Delete):
                 self._delete_zGeo_treeview_nodes()
+                return True
+
+            # group creation
+            elif (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_G) \
+                and (event.modifiers() == QtCore.Qt.ControlModifier):
+                self._create_group()
                 return True
 
         # standard event processing

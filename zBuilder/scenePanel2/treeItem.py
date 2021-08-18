@@ -14,6 +14,12 @@ class TreeItem(object):
     Its interface is similar to zBuilder Base class.
     The main difference is the Base class is derived by Maya scene nodes and contains ZivaVFX nodes info.
     """
+
+    # TreeItem pin states, correspond to Qt.CheckState
+    Unpinned = 0
+    PartiallyPinned = 1  # for Group node
+    Pinned = 2
+
     def __init__(self, parent=None, data=None):
         super(TreeItem, self).__init__()
         if parent:
@@ -23,6 +29,7 @@ class TreeItem(object):
         self._children = []
         # Union of zBuilder node type, or Scene Panel related data types, such as Group node.
         self._data = data
+        self._pin_state = TreeItem.Unpinned
 
     @property
     def parent(self):
@@ -57,6 +64,9 @@ class TreeItem(object):
 
     def child_count(self):
         return len(self._children)
+
+    def get_siblings(self):
+        return [sibling_node for sibling_node in self.parent.children if sibling_node is not self]
 
     def append_children(self, new_children):
         """ Append children to children list
@@ -146,6 +156,14 @@ class TreeItem(object):
         """
         raise NotImplementedError
 
+    @property
+    def pin_state(self):
+        return self._pin_state
+
+    @pin_state.setter
+    def pin_state(self, new_state):
+        self._pin_state = new_state
+
 
 def build_scene_panel_tree(input_node, node_type_filter=None):
     """ Create and return the corresponding Scene Panel tree structure by given node.
@@ -226,10 +244,7 @@ def create_subtree(child_nodes, new_node_data=None):
 
 # Helper functions for pick_out_node()
 def is_node_name_duplicate(node_to_check, node_list):
-    for node in node_list:
-        if node.data.name == node_to_check.data.name:
-            return True
-    return False
+    return any(node.data.name == node_to_check.data.name for node in node_list)
 
 
 def fix_node_name_duplication(node_to_fix, node_list):
@@ -240,11 +255,7 @@ def fix_node_name_duplication(node_to_fix, node_list):
     base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
     index = 1
     while True:
-        find_conflict = False
-        for node in node_list:
-            if node.data.name == new_node_name:
-                find_conflict = True
-                break
+        find_conflict = any(node.data.name == new_node_name for node in node_list)
         if find_conflict:
             new_node_name = "{}{}".format(base_name, index)
             index += 1
@@ -254,7 +265,7 @@ def fix_node_name_duplication(node_to_fix, node_list):
 
 
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
-    """ Delete the given node, move its decendants to its parent node.
+    """ Delete the given node, move its descendants to its parent node.
     Args:
         node_to_pick_out(TreeItem): The TreeItem to pick out
         node_duplicate_proc(function): A predicate that check whether
@@ -264,7 +275,7 @@ def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_pro
     parent_node = node_to_pick_out.parent
     assert parent_node, "Pick out node has no parent."
     insert_point = node_to_pick_out.row()
-    sibling_nodes = [node for node in parent_node.children if node is not node_to_pick_out]
+    sibling_nodes = node_to_pick_out.get_siblings()
     child_nodes_to_move = node_to_pick_out.children
     parent_node.remove_children(node_to_pick_out)
 
@@ -274,3 +285,6 @@ def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_pro
             fix_duplication_proc(child, sibling_nodes)
         # Ready to insert
         parent_node.insert_children(insert_point, child)
+
+
+# End of helper functions for pick_out_node()
