@@ -45,17 +45,22 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
             return "ComponentTreeModel"
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
+        node = get_node_by_index(index, None)
+        assert node, "Can't get node through QModelIndex."
+
+        is_data_set = False
         if role == QtCore.Qt.EditRole:
-            node = get_node_by_index(index, None)
-            if node:
-                long_name = node.data.long_name
-                short_name = node.data.name
-                if value and value != short_name:
-                    name = cmds.rename(long_name, value)
-                    self._builder.string_replace("^{}$".format(short_name), name)
-                    node.data.name = name
-                return True
-        return False
+            long_name = node.data.long_name
+            short_name = node.data.name
+            if value and value != short_name:
+                name = cmds.rename(long_name, value)
+                self._builder.string_replace("^{}$".format(short_name), name)
+                node.data.name = name
+                is_data_set = True
+
+        if is_data_set:
+            self.dataChanged.emit(index, index, role)
+        return is_data_set
 
     def data(self, index, role):
         if not index.isValid():
@@ -63,13 +68,16 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
 
         node = index.internalPointer()
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            # text
             return node.data.name
         if role == QtCore.Qt.DecorationRole:
+            # icon
             if hasattr(node.data, "type"):
                 parent_name = node.parent.data.name if node.parent.data else None
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
         if role == nodeRole and hasattr(node.data, "type"):
-            return node
+            # attached node, such as zBuilder node
+            return node.data
         if role == QtCore.Qt.BackgroundRole:
             if index.row() % 2 == 0:
                 return QtGui.QColor(54, 54, 54)  # gray
@@ -130,7 +138,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         """
         selection_list = self._tvComponent.selectedIndexes()
         if selection_list:
-            nodes = [x.data(nodeRole).data for x in selection_list]
+            nodes = [x.data(nodeRole) for x in selection_list]
             node_names = [x.long_name for x in nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)

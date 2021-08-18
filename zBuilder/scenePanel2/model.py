@@ -107,7 +107,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             # checkbox
             return node.pin_state
         if role == nodeRole and hasattr(node.data, "type"):
-            # node
+            # attached node, such as zBuilder node
             return node.data
         if role == sortRole and hasattr(node.data, "type"):
             return node.data.type
