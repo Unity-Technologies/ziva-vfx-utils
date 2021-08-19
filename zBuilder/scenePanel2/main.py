@@ -50,10 +50,9 @@ class ScenePanel2(QtWidgets.QWidget):
         ScenePanel2.instances.append(weakref.proxy(self))
         cmds.workspaceControlState(ScenePanel2.CONTROL_NAME, widthHeight=[500, 600])
 
-        # member variable declaration and initilization
+        # member variable declaration and initialization
         self._builder = None
         self._zGeo_treemodel = None
-        self._group_count = None
         self._tvGeo = None
         self._wgtComponent = None
         self._selected_nodes = list()
@@ -69,7 +68,6 @@ class ScenePanel2(QtWidgets.QWidget):
         self._builder = builder or zva.Ziva()
         self._builder.retrieve_connections()
 
-        self._group_count = 0
         self._zGeo_treemodel = SceneGraphModel(self._builder, self)
         self._tvGeo.setModel(self._zGeo_treemodel)
 
@@ -243,15 +241,22 @@ class ScenePanel2(QtWidgets.QWidget):
         if selectedIndexList:
             selected_nodes = [x.data(nodeRole) for x in selectedIndexList]
 
-        # add group end of the top tree. TODO: This will change with nested group.
-        self._group_count = self._group_count + 1  # TODO: temporary method for unique name. Update with proper check.
-        group_name = "Group" + str(self._group_count)
+        # add selected nodes as children of newly created group node and remove from top tree.
+        # TODO: Change top tree to any parent
+        parent_index = treemodel_root
+        row_count = self._zGeo_treemodel.rowCount(parent_index)
+
+        # pre-check group name with its future siblings
+        names_to_check = []
+        for rowIndx in range(0 , row_count):
+            sibl_node = self._zGeo_treemodel.index(rowIndx, 0, parent_index).data(nodeRole)
+            names_to_check.append(sibl_node.name)
+        group_name = get_unique_name("Group", names_to_check)
         group_node = GroupNode(group_name)
 
-        # add selected nodes as children of newly created group node and remove from top tree.
-        row_count = self._zGeo_treemodel.rowCount(treemodel_root)
-        if self._zGeo_treemodel.insertRow(row_count, treemodel_root):
-            new_group_index = self._zGeo_treemodel.index(row_count, 0, treemodel_root)
+        # TODO: change parent with parent of selected nodes instead of root node of model
+        if self._zGeo_treemodel.insertRow(row_count, parent_index):
+            new_group_index = self._zGeo_treemodel.index(row_count, 0, parent_index)
             self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
 
             for node in selected_nodes:

@@ -1,9 +1,9 @@
 import logging
-import re
 
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
 from zBuilder.commonUtils import is_sequence
+from ..uiUtils import get_unique_name
 
 logger = logging.getLogger(__name__)
 
@@ -248,20 +248,9 @@ def is_node_name_duplicate(node_to_check, node_list):
 
 
 def fix_node_name_duplication(node_to_fix, node_list):
-    # Find ending digits, if any
-    pattern = re.compile(r".*?(\d+)$")
-    new_node_name = node_to_fix.data.name
-    result = re.match(pattern, new_node_name)
-    base_name = new_node_name.rstrip(result.group(1)) if result else new_node_name
-    index = 1
-    while True:
-        find_conflict = any(node.data.name == new_node_name for node in node_list)
-        if find_conflict:
-            new_node_name = "{}{}".format(base_name, index)
-            index += 1
-        else:
-            break
-    node_to_fix.data.name = new_node_name
+    proposed_node_name = node_to_fix.data.name
+    name_list = [node.data.name for node in  node_list]
+    node_to_fix.data.name = get_unique_name(proposed_node_name, name_list)
 
 
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
