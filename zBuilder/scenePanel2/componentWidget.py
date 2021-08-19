@@ -109,7 +109,7 @@ class ComponentTreeModel(QtCore.QAbstractItemModel):
                 parent_name = node.parent.data.name if node.parent.data else None
                 return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node.data, parent_name)))
         if role == nodeRole and hasattr(node.data, "type"):
-            # node
+            # attached node, such as zBuilder node
             return node.data
         if role == QtCore.Qt.BackgroundRole:
             if index.row() % 2 == 0:
