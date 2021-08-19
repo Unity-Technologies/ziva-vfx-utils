@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 from maya import cmds
 from maya import OpenMayaUI as mui
@@ -15,6 +16,7 @@ enableRole = QtCore.Qt.UserRole + 3  # is node enabled
 
 zGeo_UI_node_types = ["ui_{}_body".format(item) for item in ("zTissue", "zBone", "zCloth")]
 
+name_check_pattern = re.compile(r".*?(\d+)$")
 
 def dock_window(dialog_class, *args, **kwargs):
     """ Create dock window for Maya
@@ -102,3 +104,27 @@ def get_node_by_index(index, fallback_val):
         if node:
             return node
     return fallback_val
+
+def get_unique_name(proposed_name, list_of_names):
+    """
+    Given a proposed name and a list of names to check against, this function
+    checks for duplicate names and generates a unique name if duplicate found.
+    Args:
+        proposed_name (str): The proposed name
+        list_of_names (list): Names to check against for duplicates
+    Returns:
+        str: A unique name
+    """
+    # Find ending digits, if any
+
+    result = re.match(name_check_pattern, proposed_name)
+    base_name = proposed_name.rstrip(result.group(1)) if result else proposed_name
+    index = 1
+    while True:
+        find_conflict = any(name == proposed_name for name in list_of_names)
+        if find_conflict:
+            proposed_name = "{}{}".format(base_name, index)
+            index += 1
+        else:
+            break
+    return proposed_name
