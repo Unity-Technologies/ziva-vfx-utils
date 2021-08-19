@@ -156,13 +156,38 @@ class TreeItem(object):
         """
         raise NotImplementedError
 
+    def _is_group_item(self):
+        """ The TreeItem class should know nothing about the data it stores.
+        But to support pin state switch correctly, 
+        we need to handle the Group node's tri-state, 
+        thus add this helper function.
+        """
+        return self.data.type == "group"
+
     @property
     def pin_state(self):
-        return self._pin_state
+        # if this is a leaf node or empty group node,
+        # simply return pin state
+        if not (self._is_group_item() and self.child_count() > 0):
+            return self._pin_state
+
+        if all(child.pin_state == TreeItem.Pinned for child in self._children):
+            self._pin_state = TreeItem.Pinned
+            return TreeItem.Pinned
+        if all(child.pin_state == TreeItem.Unpinned for child in self._children):
+            self._pin_state = TreeItem.Unpinned
+            return TreeItem.Unpinned
+
+        self._pin_state = TreeItem.PartiallyPinned
+        return TreeItem.PartiallyPinned
 
     @pin_state.setter
     def pin_state(self, new_state):
         self._pin_state = new_state
+        if self._is_group_item() and self.child_count() > 0:
+            # Apply pin state to the child nodes recusively
+            for child in self._children:
+                child.pin_state = new_state
 
 
 def build_scene_panel_tree(input_node, node_type_filter=None):

@@ -50,7 +50,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         elif node.data.type == "group":
             # Group node is pinable, partially pinable and drag&drop-able
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
-                | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsUserTristate \
+                | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsAutoTristate \
                 | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
 
         # zGeo node is pinable, drag-able, NOT drop-able
@@ -107,7 +107,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             # checkbox
             return node.pin_state
         if role == nodeRole and hasattr(node.data, "type"):
-            # node
+            # attached node, such as zBuilder node
             return node.data
         if role == sortRole and hasattr(node.data, "type"):
             return node.data.type

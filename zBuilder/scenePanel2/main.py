@@ -381,6 +381,7 @@ class ScenePanel2(QtWidgets.QWidget):
             for index in indexes:
                 self._tvGeo.expand(index)
 
+    # Begin zGeo treeview popup menu
     def open_menu(self, position):
         """
         Generates menu for 'zSolver' item.
@@ -397,6 +398,12 @@ class ScenePanel2(QtWidgets.QWidget):
             menu.setToolTipsVisible(True)
             method = self.open_solver_menu
             method(menu, node)
+            menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
+        elif node.type == "group":
+            menu = QtWidgets.QMenu(self)
+            menu.setToolTipsVisible(True)
+            method = self.open_group_node_menu
+            method(menu, indexes[0])
             menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
 
     def open_solver_menu(self, menu, node):
@@ -463,6 +470,43 @@ class ScenePanel2(QtWidgets.QWidget):
             return
         node.attrs[attr]['value'] = value
         cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
+
+    def _select_group_hierarchy(self, group_index):
+        def get_all_zGeo_indices(index_list):
+            """ Given QModelIndex list, return all child QModelIndex that is zGeo node type
+            """
+            if not is_sequence(index_list):
+                index_list = [index_list]
+
+            zGeo_indices = []
+            for index in index_list:
+                treeitem = get_node_by_index(index, None)
+                assert treeitem, "Can't get TreeItem through QModelIndex."
+
+                if is_group_node(treeitem.data):
+                    # Collect all child QModelIndex and recursively process
+                    model = index.model()
+                    child_index_list = [
+                        model.index(i, 0, index) for i in range(model.rowCount(index))
+                    ]
+                    zGeo_indices.extend(get_all_zGeo_indices(child_index_list))
+                else:
+                    assert len(treeitem.children
+                               ) == 0, "Non group node has child node. Need revamp code logic."
+                    zGeo_indices.append(index)
+            return zGeo_indices
+
+        zGeo_indices = get_all_zGeo_indices(group_index)
+        for index in zGeo_indices:
+            self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+
+    def open_group_node_menu(self, menu, group_index):
+        action = QtWidgets.QAction(self)
+        action.setText("Select Hierarchy")
+        action.triggered.connect(partial(self._select_group_hierarchy, group_index))
+        menu.addAction(action)
+
+    # End zGeo treeview popup menu
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete current selected nodes in zGeo TreeView.

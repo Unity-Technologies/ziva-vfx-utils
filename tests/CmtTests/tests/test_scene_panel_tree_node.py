@@ -305,3 +305,113 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertEqual(subgroup2_node.data.name, "Subgroup1")
         self.assertEqual(len(subgroup2_node.children), 1)
         self.assertIs(subgroup2_node.children[0], tissue2_node)
+
+
+class ScenePanelPinStateTestCase(VfxTestCase):
+    """ Test TreeItem pin state logic
+    """
+    def test_treeitem_pin_state(self):
+        """ Test all kinds of pin state changes on different TreeItem structure
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |  |- Subgroup1
+        #     |  |   |- tissue1
+        #     |  |   `- tissue2
+        #     |  `- Subgroup2
+        #     |      `- tissue3
+        #     |- Group2
+        #     `- tissue4
+        for i in range(4):
+            tissue_name = "tissue{}".format(i + 1)
+            cmds.polyCube(n=tissue_name)
+            cmds.ziva(tissue_name, t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+        solverTM_node = root_node.children[0]
+        child_nodes = solverTM_node.children
+        # child_nodes[0] is zSolver node
+        tissue_nodes = child_nodes[1:]
+        for i in range(4):
+            tissue_name = "tissue{}".format(i + 1)
+            self.assertEqual(tissue_nodes[i].data.type, "ui_zTissue_body")
+            self.assertEqual(tissue_nodes[i].data.name, tissue_name)
+
+        # Create group nodes
+        group1_node = TreeItem(solverTM_node, GroupNode("Group1"))
+        subgroup1_node = TreeItem(group1_node, GroupNode("Subgroup1"))
+        subgroup2_node = TreeItem(group1_node, GroupNode("Subgroup2"))
+        subgroup1_node.append_children([tissue_nodes[0], tissue_nodes[1]])
+        subgroup2_node.append_children(tissue_nodes[2])
+        group2_node = TreeItem(solverTM_node, GroupNode("Group2"))
+
+        # ---------------------------------------------------------------------
+        # Action 1
+        # Check init state
+        self.assertEqual(tissue_nodes[3].pin_state, TreeItem.Unpinned)
+        self.assertEqual(group2_node.pin_state, TreeItem.Unpinned)
+        # Pin tissue4 and Group2
+        tissue_nodes[3].pin_state = TreeItem.Pinned
+        group2_node.pin_state = TreeItem.Pinned
+        # Verify
+        self.assertEqual(tissue_nodes[3].pin_state, TreeItem.Pinned)
+        self.assertEqual(group2_node.pin_state, TreeItem.Pinned)
+        # Unpin tissue4 and Group2
+        tissue_nodes[3].pin_state = TreeItem.Unpinned
+        group2_node.pin_state = TreeItem.Unpinned
+        # Verify
+        self.assertEqual(tissue_nodes[3].pin_state, TreeItem.Unpinned)
+        self.assertEqual(group2_node.pin_state, TreeItem.Unpinned)
+
+        # ---------------------------------------------------------------------
+        # Action 2
+        # Check init state
+        self.assertEqual(group1_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Unpinned)
+        # Pin tissue3 to trigger Subgroup2 and Group1 pin state change
+        tissue_nodes[2].pin_state = TreeItem.Pinned
+        # Verify
+        self.assertEqual(group1_node.pin_state, TreeItem.PartiallyPinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
+        # Unpin tissue3 to trigger Subgroup2 and Group1 pin state change
+        tissue_nodes[2].pin_state = TreeItem.Unpinned
+        # Verify
+        self.assertEqual(group1_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Unpinned)
+
+        # ---------------------------------------------------------------------
+        # Action 3
+        # Check init state
+        self.assertEqual(group1_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(subgroup1_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[0].pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Unpinned)
+        # Pin group1 to change all its desendants pin state
+        group1_node.pin_state = TreeItem.Pinned
+        # Verify
+        self.assertEqual(group1_node.pin_state, TreeItem.Pinned)
+        self.assertEqual(subgroup1_node.pin_state, TreeItem.Pinned)
+        self.assertEqual(tissue_nodes[0].pin_state, TreeItem.Pinned)
+        self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Pinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
+        # Unpin subgroup1 to trigger its descendants and Group1 pin state change
+        subgroup1_node.pin_state = TreeItem.Unpinned
+        # Verify
+        self.assertEqual(group1_node.pin_state, TreeItem.PartiallyPinned)
+        self.assertEqual(subgroup1_node.pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[0].pin_state, TreeItem.Unpinned)
+        self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
+        self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
+        self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
