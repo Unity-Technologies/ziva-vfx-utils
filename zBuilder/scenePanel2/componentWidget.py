@@ -6,6 +6,8 @@ from .treeItem import TreeItem, build_scene_panel_tree
 from PySide2 import QtCore, QtGui, QtWidgets
 from maya import cmds
 from collections import defaultdict
+from functools import partial
+from zBuilder.nodes.base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +18,37 @@ component_type_dict = {
     ["zAttachment", "zTissue", "zTet", "zMaterial", "zFiber", "zLineOfAction", "zRestShape"],
     "ui_zCloth_body": ["zAttachment", "zCloth", "zMaterial"]
 }
+
+# clipboard for copied attributes
+attrs_clipboard = {}
+# clipboard for the maps.  This is either a zBuilder Map object or None.
+maps_clipboard = None
+
+
+def copy_attrs(node):
+    # update the model in case maya updated
+    node.get_maya_attrs()
+
+    global attrs_clipboard
+    attrs_clipboard = {}
+    attrs_clipboard[node.type] = node.attrs.copy()
+
+
+def paste_attrs(node):
+    # type: (zBuilder.whatever.Base) -> None
+    """
+    Paste the attributes from the clipboard onto given node.
+    @pre The node's type has an entry in the clipboard.
+    """
+    assert isinstance(node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+    assert node.type in attrs_clipboard, "Precondition violated: node type is not in the clipboard"
+    orig_node_attrs = attrs_clipboard[node.type]
+    assert isinstance(orig_node_attrs, dict), "Invariant violated: value in attrs clipboard must be a dict"
+
+    # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
+    assert set(node.attrs) == set(orig_node_attrs), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+    node.attrs = orig_node_attrs.copy()  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
+    node.set_maya_attrs()
 
 
 class ComponentTreeModel(QtCore.QAbstractItemModel):
@@ -116,6 +149,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         lytTitle.setAlignment(btnIcon, QtCore.Qt.AlignRight)
 
         self._tvComponent = zTreeView()
+        self._tvComponent.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._tvComponent.customContextMenuRequested.connect(self.open_menu)
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
         self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -127,6 +162,21 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         btnIcon.toggled.connect(self.on_btnIcon_toggled)
         self._tvComponent.selectionModel().selectionChanged.connect(
             self.on_tvComponent_selectionChanged)
+
+    def open_menu(self, position):
+        indexes = self._tvComponent.selectedIndexes()
+
+        if len(indexes) != 1:
+            return
+
+        menu_dict = {'zTissue': self.open_tissue_menu}
+
+        node = indexes[0].data(nodeRole)
+        if node.type in menu_dict:
+            menu = QtWidgets.QMenu(self)
+            method = menu_dict[node.type]
+            method(menu, node)
+            menu.exec_(self._tvComponent.viewport().mapToGlobal(position))
 
     def on_btnIcon_toggled(self, checked):
         self._tvComponent.setVisible(checked)
@@ -149,6 +199,28 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             if not_found_nodes:
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
+
+    def add_attribute_actions_to_menu(self, menu, node):
+        attrs_menu = menu.addMenu('Attributes')
+
+        copy_attrs_action = QtWidgets.QAction(self)
+        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setObjectName("actionCopyAttrs")
+        copy_attrs_action.triggered.connect(partial(copy_attrs, node))
+
+        paste_attrs_action = QtWidgets.QAction(self)
+        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setObjectName("actionPasteAttrs")
+        paste_attrs_action.triggered.connect(partial(paste_attrs, node))
+
+        # only enable 'paste' IF it is same type as what is in buffer
+        paste_attrs_action.setEnabled(node.type in attrs_clipboard)
+
+        attrs_menu.addAction(copy_attrs_action)
+        attrs_menu.addAction(paste_attrs_action)
+
+    def open_tissue_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
 
 
 class ComponentWidget(QtWidgets.QWidget):
