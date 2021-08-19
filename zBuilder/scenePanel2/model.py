@@ -159,6 +159,28 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         return True
 
+    def moveRows(self, source_parent, source_row, count, dest_parent, dest_row):
+        # TODO: This case can happen if we want to move around items in the same level. Revisit.
+        # check source and destination are not same
+        if source_parent == dest_parent:
+            return False
+
+        # validate data
+        source_parent_node = get_node_by_index(source_parent, None)
+        assert source_parent_node, "Could not find source parent node, failed to move row."
+        dest_parent_node = get_node_by_index(dest_parent, None)
+        assert dest_parent_node, "Could not find destination parent node, failed to move row."
+
+        self.beginMoveRows(source_parent, source_row, source_row + count, dest_parent, dest_row)
+        for i in range(source_row, source_row + count):
+            try:
+                dest_parent_node.insert_children(dest_row, source_parent_node.child(i))
+            except:
+                logger.error("{}th child of {} doesn't exist.".format(i, source_parent_node))
+                continue
+        self.endMoveRows()
+        return True
+
     def supportedDropActions(self):
         return QtCore.Qt.MoveAction
 

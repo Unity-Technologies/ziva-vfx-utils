@@ -50,7 +50,7 @@ class ScenePanel2(QtWidgets.QWidget):
         ScenePanel2.instances.append(weakref.proxy(self))
         cmds.workspaceControlState(ScenePanel2.CONTROL_NAME, widthHeight=[500, 600])
 
-        # member variable declaration and initilization
+        # member variable declaration and initialization
         self._builder = None
         self._zGeo_treemodel = None
         self._group_count = None
@@ -469,14 +469,21 @@ class ScenePanel2(QtWidgets.QWidget):
         Currently we only support delete one item each
         """
         selection_list = self._tvGeo.selectedIndexes()
-        # TODO: Add support for multiple nodes deletion
+        # TODO: Add support for multiple node deletion
         if len(selection_list) != 1:
             return
 
         cur_sel = selection_list[0]
         node = cur_sel.data(nodeRole)
         if is_group_node(node):
-            self._zGeo_treemodel.removeRow(cur_sel.row(), cur_sel.parent())
+            row_count = self._zGeo_treemodel.rowCount(cur_sel)
+            parent = cur_sel.parent()
+            # move children
+            if row_count > 0:
+                for i in range (0, row_count):
+                    # always move the top child. After each move, index auto updates
+                    self._zGeo_treemodel.moveRow(cur_sel, 0, parent, self._zGeo_treemodel.rowCount(parent))
+            self._zGeo_treemodel.removeRow(cur_sel.row(), parent)
         # TODO: Add support for zGeo node delete
 
     # Override
