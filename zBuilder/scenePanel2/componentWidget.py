@@ -169,7 +169,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         if len(indexes) != 1:
             return
 
-        menu_dict = {'zTissue': self.open_tissue_menu}
+        menu_dict = {
+            'zTissue': self.open_tissue_menu, 
+            'zBone': self.open_bone_menu,
+            'zLineOfAction': self.open_line_of_action_menu,
+            'zRestShape': self.open_rest_shape_menu
+            }
 
         node = indexes[0].data(nodeRole)
         if node.type in menu_dict:
@@ -220,6 +225,15 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         attrs_menu.addAction(paste_attrs_action)
 
     def open_tissue_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_bone_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_line_of_action_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_rest_shape_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
 
 
