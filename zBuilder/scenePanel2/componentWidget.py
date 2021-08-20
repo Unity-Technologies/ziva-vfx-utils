@@ -8,6 +8,7 @@ from maya import cmds, mel
 from collections import defaultdict
 from functools import partial
 from zBuilder.nodes.base import Base
+from zBuilder.uiUtils import ProximityWidget, MenuLineEdit
 
 logger = logging.getLogger(__name__)
 
@@ -95,80 +96,6 @@ def paste_weights(node, new_map_index):
     if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
         new_map.copy_values_from(orig_map)
         new_map.apply_weights()
-
-class ProximityWidget(QtWidgets.QWidget):
-    """
-    Widget in right-click menu to change map weights for attachments
-    """
-    def __init__(self, parent=None):
-        super(ProximityWidget, self).__init__(parent)
-        h_layout = QtWidgets.QHBoxLayout(self)
-        h_layout.setContentsMargins(15, 15, 15, 15)
-        self.from_edit = MenuLineEdit()
-        self.from_edit.setFixedHeight(24)
-        self.from_edit.setPlaceholderText("From")
-        self.from_edit.setText("0.1")
-        self.from_edit.setFixedWidth(40)
-        self.to_edit = MenuLineEdit()
-        self.to_edit.setFixedHeight(24)
-        self.to_edit.setPlaceholderText("To")
-        self.to_edit.setText("0.2")
-        self.to_edit.setFixedWidth(40)
-        ok_button = QtWidgets.QPushButton()
-        ok_button.setText("Ok")
-        h_layout.addWidget(self.from_edit)
-        h_layout.addWidget(self.to_edit)
-        h_layout.addWidget(ok_button)
-        ok_button.clicked.connect(self.paint_by_prox)
-        # setTabOrder doesn't work when used for menu
-        # need to use next 2 lines as a workaround
-        self.setFocusProxy(self.to_edit)
-        ok_button.setFocusProxy(self.from_edit)
-        self.from_edit.acceptSignal.connect(self.paint_by_prox)
-        self.to_edit.acceptSignal.connect(self.paint_by_prox)
-
-    def paint_by_prox(self):
-        """Paints attachment map by proximity.
-        """
-        # to_edit can't have smaller value then from_edit
-        from_value = float(self.from_edit.text())
-        to_value = float(self.to_edit.text())
-        if to_value < from_value:
-            self.to_edit.setText(str(from_value))
-        mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(
-            self.from_edit.text(), self.to_edit.text()))
-
-class MenuLineEdit(QtWidgets.QLineEdit):
-    """
-    Groups LineEdits together so after you press Tab it switch focus to sibling_right.
-    If Shift+Tab pressed it uses sibling_left.
-    Sends acceptSignal when Enter or Return button is pressed.
-    This is for use in Menus, where tab navigation is broken out of the box,
-    and the 'entered pressed' action undesirably causes the menu to close sometimes.
-    """
-    acceptSignal = QtCore.Signal()
-
-    def __init__(self, parent=None):
-        super(MenuLineEdit, self).__init__(parent)
-
-    def event(self, event):
-        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
-            self.nextInFocusChain().setFocus()
-            return True
-        if event.type() == QtCore.QEvent.KeyPress and event.modifiers() == QtCore.Qt.ShiftModifier:
-            # PySide bug, have to use this number instead of Key_Tab with modifiers
-            if event.key() == 16777218:
-                self.previousInFocusChain().setFocus()
-                return True
-
-        if event.type() == QtCore.QEvent.KeyPress and event.key() in [
-                QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return
-        ]:
-            self.acceptSignal.emit()
-            # This will prevent menu to close after Enter/Return is pressed
-            return True
-
-        return super(MenuLineEdit, self).event(event)
 
 
 class ComponentTreeModel(QtCore.QAbstractItemModel):
