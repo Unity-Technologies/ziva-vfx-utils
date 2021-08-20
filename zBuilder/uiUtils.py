@@ -141,3 +141,13 @@ def validate_group_node_name(name):
         bool: result of validity check
     """
     return re.match(name_validation_pattern, name)
+
+def is_zsolver_node(node):
+    """
+    Checks if a node type is "zSolver".
+    Args:
+        node: node to check
+    Returns:
+        bool: result of "zSolver" node type check
+    """
+    return node.type.startswith("zSolver")
