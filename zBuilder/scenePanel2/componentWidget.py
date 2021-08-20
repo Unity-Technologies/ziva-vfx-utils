@@ -337,6 +337,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
 
+
 class ComponentWidget(QtWidgets.QWidget):
     """ The Component tree view widget.
     It contains a ComponentSectionWidget list, which include each component of current selected nodes.

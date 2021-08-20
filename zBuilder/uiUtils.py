@@ -16,7 +16,9 @@ enableRole = QtCore.Qt.UserRole + 3  # is node enabled
 
 zGeo_UI_node_types = ["ui_{}_body".format(item) for item in ("zTissue", "zBone", "zCloth")]
 
-name_check_pattern = re.compile(r".*?(\d+)$")
+name_duplication_check_pattern = re.compile(r".*?(\d+)$")
+
+name_validation_pattern = re.compile(r"[a-zA-Z][\w]*")
 
 def dock_window(dialog_class, *args, **kwargs):
     """ Create dock window for Maya
@@ -117,7 +119,7 @@ def get_unique_name(proposed_name, list_of_names):
     """
     # Find ending digits, if any
 
-    result = re.match(name_check_pattern, proposed_name)
+    result = re.match(name_duplication_check_pattern, proposed_name)
     base_name = proposed_name.rstrip(result.group(1)) if result else proposed_name
     index = 1
     while True:
@@ -128,3 +130,14 @@ def get_unique_name(proposed_name, list_of_names):
         else:
             break
     return proposed_name
+
+def validate_group_node_name(name):
+    """
+    Given a name, this method checks its validity by checking if the name starts
+    with alphabet and can only have alphanumeric values and underscore.
+    Args:
+        name (str): name for checking validity
+    Returns:
+        bool: result of validity check
+    """
+    return re.match(name_validation_pattern, name)
