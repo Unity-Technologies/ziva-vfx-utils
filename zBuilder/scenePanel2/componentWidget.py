@@ -62,7 +62,6 @@ def copy_weights(node, map_index):
     maps_clipboard = node.parameters['map'][map_index]
 
 def paste_weights(node, new_map_index):
-    new_map = node.parameters['map'][new_map_index]
     """
     Pasting the maps.  Terms used here
         orig/new.
@@ -78,6 +77,7 @@ def paste_weights(node, new_map_index):
     # It will be simple for a user to paste the wrong map in wrong location
     # here we are comparing the length of the maps and if they are different we can bring up
     # a dialog to warn user unexpected results may happen,
+    new_map = node.parameters['map'][new_map_index]
     orig_map_length = len(orig_map.values)
     new_map_length = len(new_map.values)
 
