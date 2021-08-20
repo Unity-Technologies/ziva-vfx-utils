@@ -185,7 +185,7 @@ class TreeItem(object):
     def pin_state(self, new_state):
         self._pin_state = new_state
         if self._is_group_item() and self.child_count() > 0:
-            # Apply pin state to the child nodes recusively
+            # Apply pin state to the child nodes recursively
             for child in self._children:
                 child.pin_state = new_state
 

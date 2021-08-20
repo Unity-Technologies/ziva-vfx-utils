@@ -1,8 +1,7 @@
 import logging
 import pickle
 
-from ..uiUtils import get_icon_path_from_node, get_node_by_index, zGeo_UI_node_types
-from ..uiUtils import sortRole, nodeRole, longNameRole
+from ..uiUtils import *
 from .groupNode import GroupNode
 from .treeItem import *
 
@@ -71,6 +70,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             short_name = node.data.name
             if value and value != short_name:
                 if isinstance(node.data, GroupNode):
+                    if not validate_group_node_name(value):
+                        logger.warning("Group name must start with alphabet and can only have alphanumeric values and underscore in it.")
+                        return False
                     node.data.name = value
                     sibling_nodes = node.get_siblings()
                     if is_node_name_duplicate(node, sibling_nodes):
