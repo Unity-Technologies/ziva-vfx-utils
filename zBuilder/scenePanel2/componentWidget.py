@@ -51,6 +51,51 @@ def paste_attrs(node):
     node.set_maya_attrs()
 
 
+def invert_weights(node, map_index):
+    map_ = node.parameters['map'][map_index]
+    map_.invert()
+    map_.apply_weights()
+
+
+def copy_weights(node, map_index):
+    global maps_clipboard
+    maps_clipboard = node.parameters['map'][map_index]
+
+def paste_weights(node, new_map_index):
+    new_map = node.parameters['map'][new_map_index]
+    """
+    Pasting the maps.  Terms used here
+        orig/new.
+        The map/node the items were copied from are prefixed with orig.
+        The map/node the items are going to be pasted onto are prefixed with new
+
+    """
+    if maps_clipboard:
+        orig_map = maps_clipboard
+    else:
+        return
+
+    # It will be simple for a user to paste the wrong map in wrong location
+    # here we are comparing the length of the maps and if they are different we can bring up
+    # a dialog to warn user unexpected results may happen,
+    orig_map_length = len(orig_map.values)
+    new_map_length = len(new_map.values)
+
+    dialog_return = None
+    if orig_map_length != new_map_length:
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setText(
+            "The map you are copying from ({}) and pasting to ({}) have a different length.  Unexpected results may happen."
+            .format(orig_map_length, new_map_length))
+        msg_box.setInformativeText("Are you sure you want to continue?")
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+        dialog_return = msg_box.exec_()
+
+    if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
+        new_map.copy_values_from(orig_map)
+        new_map.apply_weights()
+
 class ComponentTreeModel(QtCore.QAbstractItemModel):
     """ Tree model for each component
     """
@@ -169,7 +214,14 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         if len(indexes) != 1:
             return
 
-        menu_dict = {'zTissue': self.open_tissue_menu}
+        menu_dict = {
+            'zTissue': self.open_tissue_menu, 
+            'zBone': self.open_bone_menu,
+            'zLineOfAction': self.open_line_of_action_menu,
+            'zRestShape': self.open_rest_shape_menu,
+            'zTet': self.open_tet_menu,
+            'zFiber': self.open_fiber_menu
+            }
 
         node = indexes[0].data(nodeRole)
         if node.type in menu_dict:
@@ -221,6 +273,68 @@ class ComponentSectionWidget(QtWidgets.QWidget):
 
     def open_tissue_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
+
+    def open_bone_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_line_of_action_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def open_rest_shape_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+
+    def add_map_actions_to_menu(self, menu, node, map_index):
+        """
+        Add map actions to the menu
+        Args:
+            menu (QMenu): menu to add option to
+            node (zBuilder object): zBuilder.nodes object
+            map_index (int): map index. 0 for source map 1 for target/endPoints map
+        """
+        paint_action = QtWidgets.QAction(self)
+        paint_action.setText('Paint')
+        paint_action.setObjectName("actionPaint")
+        paint_action.triggered.connect(partial(node.parameters['map'][map_index].open_paint_tool))
+        menu.addAction(paint_action)
+
+        invert_action = QtWidgets.QAction(self)
+        invert_action.setText('Invert')
+        invert_action.setObjectName('actionInvertWeights')
+        invert_action.triggered.connect(partial(invert_weights, node, map_index))
+        menu.addAction(invert_action)
+
+        menu.addSeparator()
+
+        copy_action = QtWidgets.QAction(self)
+        copy_action.setText('Copy')
+        copy_action.setObjectName('actionCopyWeights')
+        copy_action.triggered.connect(partial(copy_weights, node, map_index))
+        menu.addAction(copy_action)
+
+        paste_action = QtWidgets.QAction(self)
+        paste_action.setText('Paste')
+        paste_action.setObjectName('actionPasteWeights')
+        paste_action.triggered.connect(partial(paste_weights, node, map_index))
+        paste_action.setEnabled(bool(maps_clipboard))
+        menu.addAction(paste_action)
+
+    def open_tet_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+
+        weight_map_menu = menu.addMenu('Weight')
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
+
+    def open_fiber_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+
+        weight_map_menu = menu.addMenu('Weight')
+
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
+
+        end_points_map_menu = menu.addMenu('EndPoints')
+        self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
 
 class ComponentWidget(QtWidgets.QWidget):
