@@ -43,9 +43,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
 
-        if node.data.type.startswith("zSolver"):
-            # zSolver* nodes are NOT pinable, NOT drag&drop-able
-            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        if is_zsolver_node(node.data):
+            # zSolver* nodes are NOT pin-able, NOT drop-able but drag-able as one can re-order items.
+            # Making "zSolver" node drag-able also allows us to visually show that it is not drop-able.
+            # On the contrary, if we just make it NOT drag&drop-able, once selected and dragged, it
+            # selects multiple items, which is not the expected behavior.
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                | QtCore.Qt.ItemIsDragEnabled
         elif node.data.type == "group":
             # Group node is pinable, partially pinable and drag&drop-able
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
@@ -200,10 +204,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         # TODO: add support for multiple move, currently doesn't work'
         moved_node_data = pickle.loads(data.data(_mimeType))[0]
 
-        if dest_node.type != "group":
-            logger.warning("Cannot move {} into {}".format(moved_node_data.type, dest_node.type))
-            return False
-
         logger.info("Moving {} into {}".format(moved_node_data.name, dest_node.name))
         row_count = self.rowCount(parent)
         if self.insertRow(row_count, parent):
@@ -219,8 +219,22 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return False
         elif not data.hasFormat(_mimeType):
             return False
-        elif len(pickle.loads(data.data(_mimeType))) > 1:  # Only allowing 1 node drop at the moment
+
+        drop_candidate_data = pickle.loads(data.data(_mimeType))
+        parent_node = get_node_by_index(parent, None)
+
+        if not parent_node:
+            logger.error("Drop item contains Invalid data!")
             return False
+        elif parent_node.data.type != "group":
+            return False
+        elif len(drop_candidate_data) > 1:  #TODO: Remove this condition when multiple drop bug is fixed
+            return False
+
+        for i in range (0, len(drop_candidate_data)):
+            if is_zsolver_node(drop_candidate_data[i]):
+                return False
+
         return True
 
     # End of QtCore.QAbstractItemModel override functions
