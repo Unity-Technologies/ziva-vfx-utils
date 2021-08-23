@@ -74,6 +74,9 @@ def get_icon_path_from_node(node, parent):
         if target_attachment[0] == parent:
             return get_icon_path_from_name(node.type + "Target")
 
+    elif is_zsolver_node(node) and is_default_solver(node):
+        return get_icon_path_from_name(node.type + "Default")
+
     return get_icon_path_from_name(node.type)
 
 
@@ -151,3 +154,20 @@ def is_zsolver_node(node):
         bool: result of "zSolver" node type check
     """
     return node.type.startswith("zSolver")
+
+def is_default_solver(node):
+    """
+    Checks if a solver node is the default solver.
+    Args:
+        node: node to check
+    Returns:
+        bool: result of default solver check
+    """
+    defaultSolver = cmds.zQuery(defaultSolver=True)
+
+    if node.type == "zSolverTransform":
+        return  defaultSolver and defaultSolver[0] == node.name
+    elif node.type == "zSolver":
+        return defaultSolver and defaultSolver[0] == node.parent.name  # "defaultSolver" command returns name of the Transform node
+    else:
+        return False
