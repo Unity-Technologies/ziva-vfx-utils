@@ -75,7 +75,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if value and value != short_name:
                 if isinstance(node.data, GroupNode):
                     if not validate_group_node_name(value):
-                        logger.warning("Group name must start with alphabet and can only have alphanumeric values and underscore in it.")
+                        logger.warning(
+                            "Group name must start with alphabet and can only have alphanumeric values and underscore in it."
+                        )
                         return False
                     node.data.name = value
                     sibling_nodes = node.get_siblings()
@@ -141,9 +143,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
         assert parent_node, "Could not find parent node, failed to insert child row."
-        parent_node.append_children(TreeItem(None, None))  # TODO: multiple addition
+        nodes_to_insert = []
+        for _ in range(count):
+            nodes_to_insert.append(TreeItem(None, None))
+        parent_node.insert_children(row, nodes_to_insert)
         self.endInsertRows()
-
         return True
 
     def removeRows(self, row, count, parent):
@@ -163,28 +167,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 parent_node.remove_children(node_to_pick_out)
         self.endRemoveRows()
 
-        return True
-
-    def moveRows(self, source_parent, source_row, count, dest_parent, dest_row):
-        # TODO: This case can happen if we want to move around items in the same level. Revisit.
-        # check source and destination are not same
-        if source_parent == dest_parent:
-            return False
-
-        # validate data
-        source_parent_node = get_node_by_index(source_parent, None)
-        assert source_parent_node, "Could not find source parent node, failed to move row."
-        dest_parent_node = get_node_by_index(dest_parent, None)
-        assert dest_parent_node, "Could not find destination parent node, failed to move row."
-
-        self.beginMoveRows(source_parent, source_row, source_row + count, dest_parent, dest_row)
-        for i in range(source_row, source_row + count):
-            try:
-                dest_parent_node.insert_children(dest_row, source_parent_node.child(i))
-            except:
-                logger.error("{}th child of {} doesn't exist.".format(i, source_parent_node))
-                continue
-        self.endMoveRows()
         return True
 
     def supportedDropActions(self):
@@ -228,13 +210,53 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return False
         elif parent_node.data.type != "group":
             return False
-        elif len(drop_candidate_data) > 1:  #TODO: Remove this condition when multiple drop bug is fixed
+        elif len(drop_candidate_data
+                 ) > 1:  #TODO: Remove this condition when multiple drop bug is fixed
             return False
 
-        for i in range (0, len(drop_candidate_data)):
+        for i in range(0, len(drop_candidate_data)):
             if is_zsolver_node(drop_candidate_data[i]):
                 return False
 
         return True
 
     # End of QtCore.QAbstractItemModel override functions
+
+    def move_items(self, index_list_to_move, dst_parent_index, dst_row):
+        """ Move specifed item to the destination parent at desitination row.
+        The Qt moveRows() API can't handle complex move items logic.
+        After reading https://doc.qt.io/qt-5/model-view-programming.html#resizable-models,
+        we choose to manage the index change by ourselves.
+
+        Arguments:
+            index_list_to_move (list[QModelIndex]): List of model index. Can be any row at any parent.
+            dst_parent_index (QModelIndex): Model index to move to
+            dst_row (int): Row position of the destination parent
+
+        Return:
+            True if succeeded, False otherwise.
+            Error message prints to logger.
+        """
+        self.layoutAboutToBeChanged.emit()
+        dst_treeitem = get_node_by_index(dst_parent_index, None)
+        if dst_treeitem is None:
+            # Do nothing if destination parent is None
+            logger.error(
+                "Can't get destination parent tree item through QModelIndex, failed to move items.")
+            self.layoutChanged.emit()
+            return False
+
+        treeitems_to_move = [get_node_by_index(index, None) for index in index_list_to_move]
+        if any(item is None for item in treeitems_to_move):
+            # Do nothing if there's invalid item in the move list
+            logger.error(
+                "QModelIndex move list contains invalid entry that has no attached tree item, failed to move items."
+            )
+            self.layoutChanged.emit()
+            return False
+
+        # Move items and create a lookup dict
+        dst_treeitem.insert_children(dst_row, treeitems_to_move)
+
+        self.layoutChanged.emit()
+        return True

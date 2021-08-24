@@ -233,49 +233,47 @@ class ScenePanel2(QtWidgets.QWidget):
         toolbar.addAction(action)
 
     def _create_group(self):
-        treemodel_root = self._zGeo_treemodel.index(0, 0)
+        """ Create Group node according to current selection.
+        It follow the Maya's group node creation logic:
+        - If selection is empty, append a new empty Group node at the end of top level;
+        - If the selection has same parent, insert a new Group node at the last item position;
+        - If the selection has different parent, append a new Group at the end of top level;
+        """
+        insertion_parent_index = self._zGeo_treemodel.index(0, 0)
+        insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
+        # Exclude zSolver* items
+        selected_index_list = list(
+            filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
+                   self._tvGeo.selectedIndexes()))
+        if selected_index_list:
+            # Decide insertion position
+            all_items_have_same_parent = all(index.parent() == selected_index_list[0].parent()
+                                             for index in selected_index_list)
+            if all_items_have_same_parent:
+                # Get common parent index as insertion parent
+                insertion_parent_index = selected_index_list[0].parent()
+                # Get last row index as insertion point
+                insertion_row = max(map(lambda index: index.row(), selected_index_list))
 
-        # tree item selection
-        selected_nodes = []
-        selectedIndexList = self._tvGeo.selectedIndexes()
-        if selectedIndexList:
-            selected_nodes = [x.data(nodeRole) for x in selectedIndexList]
-
-        # add selected nodes as children of newly created group node and remove from top tree.
-        # TODO: Change top tree to any parent
-        parent_index = treemodel_root
-        row_count = self._zGeo_treemodel.rowCount(parent_index)
-
-        # pre-check group name with its future siblings
+        # Create Group node with proper name
         names_to_check = []
-        for rowIndx in range(0 , row_count):
-            sibl_node = self._zGeo_treemodel.index(rowIndx, 0, parent_index).data(nodeRole)
-            names_to_check.append(sibl_node.name)
+        for rowIdx in range(0, self._zGeo_treemodel.rowCount(insertion_parent_index)):
+            names_to_check.append(
+                self._zGeo_treemodel.index(rowIdx, 0,
+                                           insertion_parent_index).data(QtCore.Qt.DisplayRole))
         group_name = get_unique_name("Group1", names_to_check)
         group_node = GroupNode(group_name)
 
-        # TODO: change parent with parent of selected nodes instead of root node of model
-        if self._zGeo_treemodel.insertRow(row_count, parent_index):
-            new_group_index = self._zGeo_treemodel.index(row_count, 0, parent_index)
+        logger.debug("Create Group node in node {} at row {}".format(
+            insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
+        if self._zGeo_treemodel.insertRow(insertion_row, insertion_parent_index):
+            new_group_index = self._zGeo_treemodel.index(insertion_row, 0, insertion_parent_index)
             self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
-
-            for node in selected_nodes:
-                if is_zsolver_node(node):
-                    logger.warning("zSolver node cannot be grouped, skipping this node ....")
-                    continue
-                new_row_count = self._zGeo_treemodel.rowCount(new_group_index)
-                if self._zGeo_treemodel.insertRow(new_row_count, new_group_index):
-                    new_node_index = self._zGeo_treemodel.index(new_row_count, 0, new_group_index)
-                    self._zGeo_treemodel.setData(new_node_index, node, nodeRole)
-                    match_index = self._zGeo_treemodel.match(
-                        self._zGeo_treemodel.index(0, 0), longNameRole, node.long_name, 1,
-                        QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
-                    # TODO: add long name for GroupNode
-                    self._zGeo_treemodel.removeRow(match_index[0].row(), match_index[0].parent())
-                else:
-                    logger.warning("Failed to insert row to TreeView model for {}!", group_name)
+            # Move selectd nodes to the Group node
+            self._zGeo_treemodel.move_items(selected_index_list, new_group_index, 0)
         else:
-            logger.warning("Failed to insert row to TreeView model!")
+            logger.warning("Failed to create group node in node {} at row {}.".format(
+                insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
 
     def _setup_refresh_action(self):
         refresh_path = get_icon_path_from_name('refresh')
@@ -532,9 +530,10 @@ class ScenePanel2(QtWidgets.QWidget):
             parent = cur_sel.parent()
             # move children
             if row_count > 0:
-                for i in range (0, row_count):
+                for i in range(0, row_count):
                     # always move the top child. After each move, index auto updates
-                    self._zGeo_treemodel.moveRow(cur_sel, 0, parent, self._zGeo_treemodel.rowCount(parent))
+                    self._zGeo_treemodel.moveRow(cur_sel, 0, parent,
+                                                 self._zGeo_treemodel.rowCount(parent))
             self._zGeo_treemodel.removeRow(cur_sel.row(), parent)
         # TODO: Add support for zGeo node delete
 
