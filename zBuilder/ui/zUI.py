@@ -3,14 +3,15 @@ from .view import SceneTreeView
 from zBuilder.uiUtils import dock_window, get_icon_path_from_name
 from zBuilder.uiUtils import sortRole, nodeRole, longNameRole
 from zBuilder.uiUtils import ProximityWidget, MenuLineEdit
-import zBuilder.builders.ziva as zva
 from zBuilder.nodes.base import Base
 from maya import cmds
 from maya import mel
 from PySide2 import QtGui, QtWidgets, QtCore
 from functools import partial
+
 import os
 import weakref
+import zBuilder.builders.ziva as zva
 
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")

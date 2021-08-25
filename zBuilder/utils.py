@@ -683,7 +683,6 @@ def clean_scene():
 
 def create_zSolver(self):
     newSolver = cmds.ziva(s=True)
-    cmds.ziva(newSolver[1], defaultSolver=True)
 
 def create_zTissue(self):
     cmds.ziva(t=True)

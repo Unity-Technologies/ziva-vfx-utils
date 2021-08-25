@@ -306,6 +306,98 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertEqual(len(subgroup2_node.children), 1)
         self.assertIs(subgroup2_node.children[0], tissue2_node)
 
+    def test_move_child_nodes(self):
+        """ Test move multiple consecutive or separate child nodes
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- tissue1
+        #     |- tissue2
+        #     |- tissue3
+        #     `- tissue4
+        for i in range(4):
+            tissue_name = "tissue{}".format(i + 1)
+            cmds.polyCube(n=tissue_name)
+            cmds.ziva(tissue_name, t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+        solverTM_node = root_node.children[0]
+        child_nodes = solverTM_node.children
+        # child_nodes[0] is zSolver node
+        self.assertEqual(solverTM_node.child_count(), 5)
+        tissue_nodes = child_nodes[1:]
+        for i in range(4):
+            tissue_name = "tissue{}".format(i + 1)
+            self.assertEqual(tissue_nodes[i].data.type, "ui_zTissue_body")
+            self.assertEqual(tissue_nodes[i].data.name, tissue_name)
+
+        # ---------------------------------------------------------------------
+        # Action: group tissue1, tissue2 to group1 node
+        group1_node = TreeItem(solverTM_node, GroupNode("Group1"))
+        group1_node.insert_children(0, tissue_nodes[:2])
+        # Verify
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |    |- tissue1
+        #     |    `- tissue2
+        #     |- tissue3
+        #     `- tissue4
+        self.assertEqual(len(child_nodes), 4)
+        self.assertEqual(group1_node.child_count(), 2)
+        self.assertIs(group1_node.children[0], tissue_nodes[0])
+        self.assertIs(group1_node.children[1], tissue_nodes[1])
+
+        # ---------------------------------------------------------------------
+        # Action: group tissue3, tissue4 to group2/subgroup1 node
+        group2_node = TreeItem(solverTM_node, GroupNode("Group2"))
+        subgroup1_node = TreeItem(group2_node, GroupNode("Subgroup1"))
+        subgroup1_node.insert_children(0, tissue_nodes[2:])
+        # Verify
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |    |- tissue1
+        #     |    `- tissue2
+        #     `- Group2
+        #        `- Subgroup1
+        #           |- tissue3
+        #           `- tissue4
+        self.assertEqual(len(child_nodes), 3)
+        self.assertEqual(group2_node.child_count(), 1)
+        self.assertEqual(subgroup1_node.child_count(), 2)
+        self.assertIs(subgroup1_node.children[0], tissue_nodes[2])
+        self.assertIs(subgroup1_node.children[1], tissue_nodes[3])
+
+        # ---------------------------------------------------------------------
+        # Action: Move tissue3, tissue1 to group2 node
+        group2_node.insert_children(0, [tissue_nodes[2], tissue_nodes[0]])
+        # Verify
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |  `- tissue2
+        #     `- Group2
+        #        |- tissue3
+        #        |- tissue1
+        #        `- Subgroup1
+        #           `- tissue4
+        self.assertEqual(group1_node.child_count(), 1)
+        self.assertIs(group1_node.children[0], tissue_nodes[1])
+        self.assertEqual(subgroup1_node.child_count(), 1)
+        self.assertIs(subgroup1_node.children[0], tissue_nodes[3])
+        self.assertEqual(group2_node.child_count(), 3)
+        self.assertIs(group2_node.children[0], tissue_nodes[2])
+        self.assertIs(group2_node.children[1], tissue_nodes[0])
+
 
 class ScenePanelPinStateTestCase(VfxTestCase):
     """ Test TreeItem pin state logic

@@ -251,7 +251,7 @@ class ScenePanel2(QtWidgets.QWidget):
         for rowIndx in range(0 , row_count):
             sibl_node = self._zGeo_treemodel.index(rowIndx, 0, parent_index).data(nodeRole)
             names_to_check.append(sibl_node.name)
-        group_name = get_unique_name("Group", names_to_check)
+        group_name = get_unique_name("Group1", names_to_check)
         group_node = GroupNode(group_name)
 
         # TODO: change parent with parent of selected nodes instead of root node of model
@@ -260,6 +260,9 @@ class ScenePanel2(QtWidgets.QWidget):
             self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
 
             for node in selected_nodes:
+                if is_zsolver_node(node):
+                    logger.warning("zSolver node cannot be grouped, skipping this node ....")
+                    continue
                 new_row_count = self._zGeo_treemodel.rowCount(new_group_index)
                 if self._zGeo_treemodel.insertRow(new_row_count, new_group_index):
                     new_node_index = self._zGeo_treemodel.index(new_row_count, 0, new_group_index)
@@ -302,7 +305,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
             # filter non-exist nodes and solver nodes
             self._selected_nodes = list(
-                filter(lambda n: (n.long_name in scene_nodes) and not n.type.startswith("zSolver"),
+                filter(lambda n: (n.long_name in scene_nodes) and not is_zsolver_node(n),
                        non_group_nodes))
 
             not_found_nodes = [name for name in node_names if name not in scene_nodes]
@@ -316,7 +319,7 @@ class ScenePanel2(QtWidgets.QWidget):
                                        list(set(self._selected_nodes) | set(self._pinned_nodes)))
 
     def on_tvGeo_pinStateChanged(self, item_list):
-        """ Update component treeview when zGeo TreeView item's pin state changed.
+        """ Update component TreeView when zGeo TreeView item's pin state changed.
         """
         def get_all_zGeo_items(item_list):
             """ Given TreeItem(s), return all TreeItem that is zGeo node type
@@ -386,7 +389,7 @@ class ScenePanel2(QtWidgets.QWidget):
             for index in indexes:
                 self._tvGeo.expand(index)
 
-    # Begin zGeo treeview popup menu
+    # Begin zGeo TreeView pop-up menu
     def open_menu(self, position):
         """
         Generates menu for 'zSolver' item.
@@ -511,7 +514,7 @@ class ScenePanel2(QtWidgets.QWidget):
         action.triggered.connect(partial(self._select_group_hierarchy, group_index))
         menu.addAction(action)
 
-    # End zGeo treeview popup menu
+    # End zGeo TreeView pop-up menu
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete current selected nodes in zGeo TreeView.
