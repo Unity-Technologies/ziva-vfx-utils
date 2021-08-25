@@ -237,13 +237,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             True if succeeded, False otherwise.
             Error message prints to logger.
         """
-        self.layoutAboutToBeChanged.emit()
         dst_treeitem = get_node_by_index(dst_parent_index, None)
         if dst_treeitem is None:
             # Do nothing if destination parent is None
             logger.error(
                 "Can't get destination parent tree item through QModelIndex, failed to move items.")
-            self.layoutChanged.emit()
             return False
 
         treeitems_to_move = [get_node_by_index(index, None) for index in index_list_to_move]
@@ -252,11 +250,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             logger.error(
                 "QModelIndex move list contains invalid entry that has no attached tree item, failed to move items."
             )
-            self.layoutChanged.emit()
             return False
 
-        # Move items and create a lookup dict
+        self.layoutAboutToBeChanged.emit()
+        # Move items
         dst_treeitem.insert_children(dst_row, treeitems_to_move)
-
         self.layoutChanged.emit()
         return True
