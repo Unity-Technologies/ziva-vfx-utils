@@ -232,49 +232,6 @@ class ScenePanel2(QtWidgets.QWidget):
         action.triggered.connect(slot)
         toolbar.addAction(action)
 
-    def _create_group(self):
-        """ Create Group node according to current selection.
-        It follow the Maya's group node creation logic:
-        - If selection is empty, append a new empty Group node at the end of top level;
-        - If the selection has same parent, insert a new Group node at the last item position;
-        - If the selection has different parent, append a new Group at the end of top level;
-        """
-        insertion_parent_index = self._zGeo_treemodel.index(0, 0)
-        insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
-        # Exclude zSolver* items
-        selected_index_list = list(
-            filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
-                   self._tvGeo.selectedIndexes()))
-        if selected_index_list:
-            # Decide insertion position
-            all_items_have_same_parent = all(index.parent() == selected_index_list[0].parent()
-                                             for index in selected_index_list)
-            if all_items_have_same_parent:
-                # Get common parent index as insertion parent
-                insertion_parent_index = selected_index_list[0].parent()
-                # Get last row index as insertion point
-                insertion_row = max(map(lambda index: index.row(), selected_index_list))
-
-        # Create Group node with proper name
-        names_to_check = []
-        for rowIdx in range(0, self._zGeo_treemodel.rowCount(insertion_parent_index)):
-            names_to_check.append(
-                self._zGeo_treemodel.index(rowIdx, 0,
-                                           insertion_parent_index).data(QtCore.Qt.DisplayRole))
-        group_name = get_unique_name("Group1", names_to_check)
-        group_node = GroupNode(group_name)
-
-        logger.debug("Create Group node in node {} at row {}".format(
-            insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
-        if self._zGeo_treemodel.insertRow(insertion_row, insertion_parent_index):
-            new_group_index = self._zGeo_treemodel.index(insertion_row, 0, insertion_parent_index)
-            self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
-            # Move selectd nodes to the Group node
-            self._zGeo_treemodel.move_items(selected_index_list, new_group_index, 0)
-        else:
-            logger.warning("Failed to create group node in node {} at row {}.".format(
-                insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
-
     def _setup_refresh_action(self):
         refresh_path = get_icon_path_from_name('refresh')
         refresh_icon = QtGui.QIcon()
@@ -513,6 +470,49 @@ class ScenePanel2(QtWidgets.QWidget):
         menu.addAction(action)
 
     # End zGeo TreeView pop-up menu
+
+    def _create_group(self):
+        """ Create Group node according to current selection.
+        It follow the Maya's group node creation logic:
+        - If selection is empty, append a new empty Group node at the end of top level;
+        - If the selection has same parent, insert a new Group node at the last item position;
+        - If the selection has different parent, append a new Group at the end of top level;
+        """
+        insertion_parent_index = self._zGeo_treemodel.index(0, 0)
+        insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
+        # Exclude zSolver* items
+        selected_index_list = list(
+            filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
+                   self._tvGeo.selectedIndexes()))
+        if selected_index_list:
+            # Decide insertion position
+            all_items_have_same_parent = all(index.parent() == selected_index_list[0].parent()
+                                             for index in selected_index_list)
+            if all_items_have_same_parent:
+                # Get common parent index as insertion parent
+                insertion_parent_index = selected_index_list[0].parent()
+                # Get last row index as insertion point
+                insertion_row = max(map(lambda index: index.row(), selected_index_list))
+
+        # Create Group node with proper name
+        names_to_check = []
+        for rowIdx in range(0, self._zGeo_treemodel.rowCount(insertion_parent_index)):
+            names_to_check.append(
+                self._zGeo_treemodel.index(rowIdx, 0,
+                                           insertion_parent_index).data(QtCore.Qt.DisplayRole))
+        group_name = get_unique_name("Group1", names_to_check)
+        group_node = GroupNode(group_name)
+
+        logger.debug("Create Group node in node {} at row {}".format(
+            insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
+        if self._zGeo_treemodel.insertRow(insertion_row, insertion_parent_index):
+            new_group_index = self._zGeo_treemodel.index(insertion_row, 0, insertion_parent_index)
+            self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
+            # Move selectd nodes to the Group node
+            self._zGeo_treemodel.move_items(selected_index_list, new_group_index, 0)
+        else:
+            logger.warning("Failed to create group node in node {} at row {}.".format(
+                insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete current selected nodes in zGeo TreeView.
