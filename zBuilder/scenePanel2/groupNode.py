@@ -11,10 +11,6 @@ class GroupNode(object):
     def name(self):
         return self._name
 
-    @property
-    def long_name(self):
-        return self._name # TODO: replace with long name generation method
-
     @name.setter
     def name(self, new_val):
         self._name = new_val

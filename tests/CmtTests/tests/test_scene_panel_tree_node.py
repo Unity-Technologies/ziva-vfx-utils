@@ -236,7 +236,7 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
 
     def test_delete_group_nodes(self):
         """ Setup some nested group nodes,
-        delete some group nodes while move their decendents to the existing position.
+        delete some group nodes while move their descendants to the existing position.
         Auto renaming shall apply when name conflict happens.
         """
         # Setup: construct tree structure as follows:
@@ -398,6 +398,53 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertIs(group2_node.children[0], tissue_nodes[2])
         self.assertIs(group2_node.children[1], tissue_nodes[0])
 
+    def test_tree_path(self):
+        """ Test tree path generates correct result when moved around
+        """
+        # Verify get_tree_path() returns correct paths for the tree below
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |- tissue1
+
+        # generate above tree model
+        cmds.polyCube(n="tissue1")
+        cmds.ziva("tissue1", t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+        self.assertEqual(root_node.get_tree_path(), "|")
+        solver_node = root_node.children[0]
+        self.assertEqual(solver_node.get_tree_path(), "|zSolver1")
+        solverShape_node = solver_node.children[0]
+        self.assertEqual(solverShape_node.get_tree_path(), "|zSolver1|zSolver1Shape")
+        tissue1_node = solver_node.children[1]
+        self.assertEqual(tissue1_node.get_tree_path(), "|zSolver1|tissue1")
+
+        # Add group and test path
+        group1_node = TreeItem(solver_node, GroupNode("Group1"))
+        self.assertEqual(group1_node.get_tree_path(), "|zSolver1|Group1")
+
+        # Verify after moving items of the existing tree,
+        # get_tree_path() returns right results.
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- Group1
+        #     |  - Group1
+        #     |  - tissue1
+        new_group1_node = TreeItem(solver_node, GroupNode("Group1"))
+        new_group1_node.insert_children(0, group1_node)
+        self.assertEqual(new_group1_node.child_count(), 1)
+        new_group1_node.insert_children(1, tissue1_node)
+        self.assertEqual(new_group1_node.child_count(), 2)
+        self.assertEqual(new_group1_node.get_tree_path(), "|zSolver1|Group1")
+        self.assertEqual(group1_node.get_tree_path(), "|zSolver1|Group1|Group1")
+        self.assertEqual(tissue1_node.get_tree_path(), "|zSolver1|Group1|tissue1")
+
 
 class ScenePanelPinStateTestCase(VfxTestCase):
     """ Test TreeItem pin state logic
@@ -489,7 +536,7 @@ class ScenePanelPinStateTestCase(VfxTestCase):
         self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
         self.assertEqual(subgroup2_node.pin_state, TreeItem.Unpinned)
         self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Unpinned)
-        # Pin group1 to change all its desendants pin state
+        # Pin group1 to change all its descendants pin state
         group1_node.pin_state = TreeItem.Pinned
         # Verify
         self.assertEqual(group1_node.pin_state, TreeItem.Pinned)

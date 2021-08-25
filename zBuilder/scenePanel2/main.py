@@ -508,7 +508,7 @@ class ScenePanel2(QtWidgets.QWidget):
         if self._zGeo_treemodel.insertRow(insertion_row, insertion_parent_index):
             new_group_index = self._zGeo_treemodel.index(insertion_row, 0, insertion_parent_index)
             self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
-            # Move selectd nodes to the Group node
+            # Move selected nodes to the Group node
             self._zGeo_treemodel.move_items(selected_index_list, new_group_index, 0)
         else:
             logger.warning("Failed to create group node in node {} at row {}.".format(
