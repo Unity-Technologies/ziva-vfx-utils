@@ -4,10 +4,11 @@ from ..uiUtils import nodeRole, get_icon_path_from_name, get_icon_path_from_node
 from .zTreeView import zTreeView
 from .treeItem import TreeItem, build_scene_panel_tree
 from PySide2 import QtCore, QtGui, QtWidgets
-from maya import cmds
+from maya import cmds, mel
 from collections import defaultdict
 from functools import partial
 from zBuilder.nodes.base import Base
+from zBuilder.uiUtils import ProximityWidget, MenuLineEdit
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ def paste_weights(node, new_map_index):
     if dialog_return == QtWidgets.QMessageBox.Yes or orig_map_length == new_map_length:
         new_map.copy_values_from(orig_map)
         new_map.apply_weights()
+
 
 class ComponentTreeModel(QtCore.QAbstractItemModel):
     """ Tree model for each component
@@ -208,6 +210,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self._tvComponent.selectionModel().selectionChanged.connect(
             self.on_tvComponent_selectionChanged)
 
+        self._setup_actions()
+
     def open_menu(self, position):
         indexes = self._tvComponent.selectedIndexes()
 
@@ -220,7 +224,9 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             'zLineOfAction': self.open_line_of_action_menu,
             'zRestShape': self.open_rest_shape_menu,
             'zTet': self.open_tet_menu,
-            'zFiber': self.open_fiber_menu
+            'zFiber': self.open_fiber_menu,
+            'zMaterial': self.open_material_menu,
+            'zAttachment': self.open_attachment_menu,
             }
 
         node = indexes[0].data(nodeRole)
@@ -336,6 +342,50 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         end_points_map_menu = menu.addMenu('EndPoints')
         self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
+    def open_material_menu(self, menu, node):
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addSection('Maps')
+        weight_map_menu = menu.addMenu('Weight')
+
+        self.add_map_actions_to_menu(weight_map_menu, node, 0)
+
+    def select_source_and_target(self):
+        """
+        Selects the source and target mesh of an attachment. This is a menu command.
+        """
+        indexes = self._tvComponent.selectedIndexes()[0]
+        node = indexes.data(nodeRole)
+        cmds.select(node.nice_association)
+
+    def _setup_actions(self):
+        self.actionSelectST = QtWidgets.QAction(self)
+        self.actionSelectST.setText('Select Source and Target')
+        self.actionSelectST.setObjectName("actionSelectST")
+        self.actionSelectST.triggered.connect(self.select_source_and_target)
+
+    def open_attachment_menu(self, menu, node):
+        source_mesh_name = node.association[0]
+        target_mesh_name = node.association[1]
+
+        self.add_attribute_actions_to_menu(menu, node)
+        menu.addAction(self.actionSelectST)
+        menu.addSection('Maps')
+        truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
+        source_menu_text = 'Source ({})'.format(truncate(source_mesh_name))
+        target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
+
+        source_map_menu = menu.addMenu(source_menu_text)
+        self.add_map_actions_to_menu(source_map_menu, node, 0)
+
+        target_map_menu = menu.addMenu(target_menu_text)
+        self.add_map_actions_to_menu(target_map_menu, node, 1)
+
+        menu.addSection('')
+        proximity_menu = menu.addMenu('Paint By Proximity')
+        prox_widget = ProximityWidget()
+        action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
+        action_paint_by_prox.setDefaultWidget(prox_widget)
+        proximity_menu.addAction(action_paint_by_prox)
 
 
 class ComponentWidget(QtWidgets.QWidget):
