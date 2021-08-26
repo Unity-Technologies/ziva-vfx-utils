@@ -6,10 +6,10 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -beginLayout "Runup Settings" -collapse false;
       editorTemplate -addControl "runupWeight";
       editorTemplate -addControl "affectSolverGravity";
-      editorTemplate -addControl "affectTissueInertialDamping";
-      editorTemplate -addControl "affectMaterialPressure";
-      editorTemplate -addControl "affectMaterialSurfaceTension";
-      editorTemplate -addControl "affectMaterialRestScale";
+      editorTemplate -addControl "affectSoftBodyInertialDamping";
+      editorTemplate -addControl "affectSoftBodyPressureEnvelope";
+      editorTemplate -addControl "affectSoftBodySurfaceTensionEnvelope";
+      editorTemplate -addControl "affectSoftBodyRestScaleEnvelope";
       editorTemplate -addControl "affectFiberExcitation";
     editorTemplate -endLayout;
   
