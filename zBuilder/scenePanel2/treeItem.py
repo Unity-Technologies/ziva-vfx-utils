@@ -164,6 +164,23 @@ class TreeItem(object):
         """
         return self.data.type == "group"
 
+    def get_tree_path(self):
+        """ Generates path from root to the current node TreeItem,
+        adding intermediate node names and separating each by "|".
+        """
+        parent = self.parent
+        if not parent: 
+            return "|"
+
+        tree_path = self.data.name
+        while parent:
+            if parent.data.name == "ROOT":
+                return "|" + tree_path
+
+            tree_path = parent.data.name + "|" + tree_path
+            parent = parent.parent
+        return tree_path
+
     @property
     def pin_state(self):
         # if this is a leaf node or empty group node,
