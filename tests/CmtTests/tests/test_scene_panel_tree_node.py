@@ -2,8 +2,8 @@ import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import TreeItem
 from zBuilder.scenePanel2.treeItem import *
+from zBuilder.scenePanel2.serialize import *
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -554,3 +554,98 @@ class ScenePanelPinStateTestCase(VfxTestCase):
         self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
         self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
         self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
+
+class ScenePanelSerializationTestCase(VfxTestCase):
+    """ Test serialization operations
+    """
+    def test_serialized_node_data(self):
+        """ Setup some nodes, both group and DgNode and
+        test serialized data.
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- group1
+        #     |  `- Sub-group1
+        #     |    `- Sub-sub-group1
+        #     |      `- tissue1
+        #     |           `- zTissue1
+        #     |           `- zTet1
+        #     |           `- zMaterial1
+        #     |- group2
+        #     |  `- Subgroup1
+        #     |    `- tissue2
+        #     |      `- zTissue2
+        #     |      `- zTet2
+        #     |      `- zMaterial2
+        cmds.polyCube(n="tissue1")
+        cmds.polyCube(n="tissue2")
+        cmds.ziva("tissue1", "tissue2", t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+        solver_node = root_node.children[0]
+        child_nodes = solver_node.children
+
+        # Create tissue nodes
+        tissue1_node = child_nodes[1]
+        tissue2_node = child_nodes[2]
+        self.assertEqual(tissue1_node.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue1_node.data.name, "tissue1")
+        self.assertEqual(tissue2_node.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue2_node.data.name, "tissue2")
+
+        # Create nested group nodes
+        group1_node = TreeItem(solver_node, GroupNode("group1"))
+        sub_group1_node = TreeItem(group1_node, GroupNode("Sub-group1"))
+        sub_sub_group1_node = TreeItem(sub_group1_node, GroupNode("Sub-sub-group1"))
+        sub_sub_group1_node.append_children(tissue1_node)
+        group2_node = TreeItem(solver_node, GroupNode("group2"))
+        sub_group2_node = TreeItem(group2_node, GroupNode("Sub-group2"))
+        sub_group2_node.append_children(tissue2_node)
+
+        # Test serialized data
+        serialized_data = serialize_tree_model(root_node)
+        self.assertEqual(type(serialized_data), dict)
+        self.assertEqual(len(serialized_data), 2)
+        self.assertEqual(type(serialized_data["version"]), int)
+        self.assertEqual(type(serialized_data["nodes"]), dict)
+        self.assertEqual(len(serialized_data["nodes"]), 15)
+
+        # test keys starts with index value and index, name
+        # pin state and long_name data has been saved (based
+        # on the node type).
+        for key in serialized_data["nodes"].keys():
+            split_key = key.split("|")
+            assert str(split_key[0]).isdigit()
+            test_node = serialized_data["nodes"][key]
+            assert "index" in test_node
+            assert "name" in test_node
+
+            if "group" not in split_key[-1]:
+                assert "long_name" in test_node
+                if "Solver" not in split_key[-1]:
+                    assert "pin_state" in test_node
+
+    def test_serialized_json_to_string(self):
+        """ Test that serialized data can be passed as a string.
+        """
+        # create tree
+        cmds.polyCube(n="tissue1")
+        cmds.polyCube(n="tissue2")
+        cmds.ziva("tissue1", "tissue2", t=True)
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder)[0]
+
+        # serialize data
+        serialized_data = serialize_tree_model(root_node)
+        self.assertEqual(type(serialized_data), dict)
+
+        # check data type returned by "json_to_string" method
+        serialized_str = json_to_string(serialized_data)
+        self.assertEqual(type(serialized_str), str)
