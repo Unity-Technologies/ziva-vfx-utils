@@ -4,6 +4,7 @@ from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem
 from zBuilder.scenePanel2.treeItem import *
+from zBuilder.scenePanel2.serialize import *
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -554,3 +555,312 @@ class ScenePanelPinStateTestCase(VfxTestCase):
         self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
         self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
         self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
+
+
+class ScenePanelSerializationTestCase(VfxTestCase):
+
+    def test_serialized_node_data(self):
+        """ Setup some nodes, both group and DgNode and
+        test serialized data.
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- group1
+        #     |  `- Sub-group1
+        #     |    `- Sub-sub-group1
+        #     |      `- tissue1
+        #     |- group2
+        #     |  `- Subgroup1
+        #     |    `- tissue2
+
+        cmds.polyCube(n="tissue1")
+        cmds.polyCube(n="tissue2")
+        cmds.ziva("tissue1", "tissue2", t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder, ["zSolver", "zSolverTransform", "ui_zTissue_body"])[0]
+        solver_node = root_node.children[0]
+        child_nodes = solver_node.children
+
+        # Create tissue nodes
+        tissue1_node = child_nodes[1]
+        tissue2_node = child_nodes[2]
+
+        # Create nested group nodes
+        group1_node = TreeItem(solver_node, GroupNode("group1"))
+        sub_group1_node = TreeItem(group1_node, GroupNode("Sub-group1"))
+        sub_sub_group1_node = TreeItem(sub_group1_node, GroupNode("Sub-sub-group1"))
+        sub_sub_group1_node.append_children(tissue1_node)
+        group2_node = TreeItem(solver_node, GroupNode("group2"))
+        sub_group2_node = TreeItem(group2_node, GroupNode("Sub-group2"))
+        sub_group2_node.append_children(tissue2_node)
+
+        # Test serialized data has expected type and length
+        serialized_data = serialize_tree_model(root_node)
+        self.assertEqual(type(serialized_data), dict)
+        self.assertEqual(len(serialized_data), 2)
+        self.assertEqual(type(serialized_data["version"]), int)
+        self.assertEqual(type(serialized_data["nodes"]), dict)
+        self.assertEqual(len(serialized_data["nodes"]), 9)
+
+        # node data to match with
+        match_data = {  "0|zSolver1": {'pin_state': 0, 'name': '|zSolver1', 'type': 'zSolverTransform'},
+                        "0|zSolver1|zSolver1Shape": {'pin_state': 0, 'name': '|zSolver1|zSolver1Shape', 'type': 'zSolver'},
+                        "1|zSolver1|group1": {'name': 'group1', 'type': 'group'},
+                        "2|zSolver1|group2": {'name': 'group2', 'type': 'group'},
+                        "0|zSolver1|group1|Sub-group1": {'name': 'Sub-group1', 'type': 'group'},
+                        "0|zSolver1|group2|Sub-group2": {'name': 'Sub-group2', 'type': 'group'},
+                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1": {'name': 'Sub-sub-group1', 'type': 'group'},
+                        "0|zSolver1|group2|Sub-group2|tissue2": {'pin_state': 0, 'name': '|tissue2', 'type': 'ui_zTissue_body'},
+                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1|tissue1": {'pin_state': 0, 'name': '|tissue1', 'type': 'ui_zTissue_body'}}
+
+        # Test serialized node data matches with expected result
+        self.assertDictEqual(match_data, serialized_data["nodes"])
+
+
+    def test_deserialized_node_data(self):
+        """ Test de-serialization of scene panel data.
+        """
+        # data to de-serialize
+        serialized_data_1 ={  "version": 1,
+                            "nodes": { "0|zSolver1":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1",
+                                                "type": "zSolverTransform"},
+                                        "0|zSolver1|zSolver1Shape":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1|zSolver1Shape",
+                                                "type": "zSolver"},
+                                        "1|zSolver1|group1":
+                                            {   "name": "group1",
+                                                "type": "group"},
+                                        "2|zSolver1|group2":
+                                            {   "name": "group2",
+                                                "type": "group"},
+                                        "0|zSolver1|group1|Sub-group1":
+                                            {   "name": "Sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group2|Sub-group2":
+                                            {   "name": "Sub-group2",
+                                                "type": "group"},
+                                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1":
+                                            {   "name": "Sub-sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group2|Sub-group2|tissue2":
+                                            {   "pin_state": 0,
+                                                "name": "|tissue2",
+                                                "type": "ui_zTissue_body"},
+                                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1|tissue1":
+                                            {   "pin_state": 0,
+                                                "name": "|tissue1",
+                                                "type": "ui_zTissue_body"}
+                                        }
+                        }
+
+        # Verify above data returns a tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- group1
+        #     |  `- Sub-group1
+        #     |    `- Sub-sub-group1
+        #     |      `- tissue1
+        #     |- group2
+        #     |  `- Sub-group1
+        #     |    `- tissue2
+        tree_root_node1 = deserialize_tree_model(serialized_data_1)
+        self.assertIsNone(tree_root_node1.parent)
+        self.assertTrue(tree_root_node1.is_root_node())
+        solver_node1 = tree_root_node1.children[0]
+        self.assertEqual(solver_node1.data.type, "zSolverTransform")
+        self.assertEqual(solver_node1.data.name, "zSolver1")
+        self.assertEqual(solver_node1.pin_state, 0)
+        solver_shape_node1 = solver_node1.children[0]
+        self.assertEqual(solver_shape_node1.data.type, "zSolver")
+        self.assertEqual(solver_shape_node1.data.name, "zSolver1Shape")
+        self.assertEqual(solver_shape_node1.pin_state, 0)
+
+        group1_node1 = solver_node1.children[1]
+        group2_node1 = solver_node1.children[2]
+        self.assertEqual(group1_node1.data.type, "group")
+        self.assertEqual(group1_node1.data.name, "group1")
+        self.assertEqual(group1_node1.child_count(), 1)
+        self.assertEqual(group2_node1.data.type, "group")
+        self.assertEqual(group2_node1.data.name, "group2")
+        self.assertEqual(group2_node1.child_count(), 1)
+
+        sub_group1 = group1_node1.children[0]
+        sub_group2 = group2_node1.children[0]
+        self.assertEqual(sub_group1.data.type, "group")
+        self.assertEqual(sub_group1.data.name, "Sub-group1")
+        self.assertEqual(sub_group1.child_count(), 1)
+        self.assertEqual(sub_group2.data.type, "group")
+        self.assertEqual(sub_group2.data.name, "Sub-group2")
+        self.assertEqual(sub_group2.child_count(), 1)
+
+        sub_sub_group1 = sub_group1.children[0]
+        tissue2 = sub_group2.children[0]
+        self.assertEqual(sub_sub_group1.data.type, "group")
+        self.assertEqual(sub_sub_group1.data.name, "Sub-sub-group1")
+        self.assertEqual(sub_sub_group1.child_count(), 1)
+
+        self.assertEqual(tissue2.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue2.data.name, "tissue2")
+        self.assertEqual(tissue2.child_count(), 0)
+
+        tissue1 = sub_sub_group1.children[0]
+        self.assertEqual(tissue1.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue1.data.name, "tissue1")
+        self.assertEqual(tissue1.child_count(), 0)
+
+        # data to de-serialize
+        serialized_data_2 ={  "version": 1,
+                            "nodes": { "0|zSolver1":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1",
+                                                "type": "zSolverTransform"},
+                                        "0|zSolver1|zSolver1Shape":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1|zSolver1Shape",
+                                                "type": "zSolver"},
+                                        "1|zSolver1|group1":
+                                            {   "name": "group1",
+                                                "type": "group"},
+                                        "2|zSolver1|group2":
+                                            {   "name": "group2",
+                                                "type": "group"},
+                                        "0|zSolver1|group1|Sub-group1":
+                                            {   "name": "Sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1":
+                                            {   "name": "Sub-sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group1|Sub-group1|Sub-sub-group1|tissue1":
+                                            {   "pin_state": 0,
+                                                "name": "|tissue1",
+                                                "type": "ui_zTissue_body"}
+                                        }
+                        }
+
+        # Verify above data returns a tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- group1
+        #     |  `- Sub-group1
+        #     |    `- Sub-sub-group1
+        #     |      `- tissue1
+        #     |- group2
+        tree_root_node2 = deserialize_tree_model(serialized_data_2)
+        self.assertIsNone(tree_root_node2.parent)
+        self.assertTrue(tree_root_node2.is_root_node())
+        solver_node2 = tree_root_node2.children[0]
+        self.assertEqual(solver_node2.data.type, "zSolverTransform")
+        self.assertEqual(solver_node2.data.name, "zSolver1")
+        self.assertEqual(solver_node2.pin_state, 0)
+        solver_shape_node2 = solver_node2.children[0]
+        self.assertEqual(solver_shape_node2.data.type, "zSolver")
+        self.assertEqual(solver_shape_node2.data.name, "zSolver1Shape")
+        self.assertEqual(solver_shape_node2.pin_state, 0)
+
+        group1_node2 = solver_node2.children[1]
+        group2_node2 = solver_node2.children[2]
+        self.assertEqual(group1_node2.data.type, "group")
+        self.assertEqual(group1_node2.data.name, "group1")
+        self.assertEqual(group1_node2.child_count(), 1)
+        self.assertEqual(group2_node2.data.type, "group")
+        self.assertEqual(group2_node2.data.name, "group2")
+        self.assertEqual(group2_node2.child_count(), 0)
+
+        sub_group1_node2 = group1_node2.children[0]
+        self.assertEqual(sub_group1_node2.data.type, "group")
+        self.assertEqual(sub_group1_node2.data.name, "Sub-group1")
+        self.assertEqual(sub_group1_node2.child_count(), 1)
+
+        sub_sub_group1_node2 = sub_group1_node2.children[0]
+        self.assertEqual(sub_sub_group1_node2.data.type, "group")
+        self.assertEqual(sub_sub_group1_node2.data.name, "Sub-sub-group1")
+        self.assertEqual(sub_sub_group1_node2.child_count(), 1)
+
+        tissue1_node2 = sub_sub_group1_node2.children[0]
+        self.assertEqual(tissue1_node2.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue1_node2.data.name, "tissue1")
+        self.assertEqual(tissue1_node2.child_count(), 0)
+
+        # data to de-serialize
+        serialized_data_3 ={  "version": 1,
+                            "nodes": { "0|zSolver1":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1",
+                                                "type": "zSolverTransform"},
+                                        "0|zSolver1|zSolver1Shape":
+                                            {   "pin_state": 0,
+                                                "name": "|zSolver1|zSolver1Shape",
+                                                "type": "zSolver"},
+                                        "1|zSolver1|group1":
+                                            {   "name": "group1",
+                                                "type": "group"},
+                                        "2|zSolver1|group2":
+                                            {   "name": "group2",
+                                                "type": "group"},
+                                        "0|zSolver1|group2|Sub-group1":
+                                            {   "name": "Sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group2|Sub-group1|Sub-sub-group1":
+                                            {   "name": "Sub-sub-group1",
+                                                "type": "group"},
+                                        "0|zSolver1|group2|Sub-group1|Sub-sub-group1|tissue1":
+                                            {   "pin_state": 0,
+                                                "name": "|tissue1",
+                                                "type": "ui_zTissue_body"}
+                                        }
+                        }
+
+        # Verify above data returns a tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     |- group1
+        #     |- group2
+        #     |  `- Sub-group1
+        #     |    `- Sub-sub-group1
+        #     |      `- tissue1
+        tree_root_node3 = deserialize_tree_model(serialized_data_3)
+        self.assertIsNone(tree_root_node3.parent)
+        self.assertTrue(tree_root_node3.is_root_node())
+        solver_node3 = tree_root_node3.children[0]
+        self.assertEqual(solver_node3.data.type, "zSolverTransform")
+        self.assertEqual(solver_node3.data.name, "zSolver1")
+        self.assertEqual(solver_node3.pin_state, 0)
+        solver_shape_node3 = solver_node3.children[0]
+        self.assertEqual(solver_shape_node3.data.type, "zSolver")
+        self.assertEqual(solver_shape_node3.data.name, "zSolver1Shape")
+        self.assertEqual(solver_shape_node3.pin_state, 0)
+
+        group1_node3 = solver_node3.children[1]
+        group2_node3 = solver_node3.children[2]
+        self.assertEqual(group1_node3.data.type, "group")
+        self.assertEqual(group1_node3.data.name, "group1")
+        self.assertEqual(group1_node3.child_count(), 0)
+        self.assertEqual(group2_node3.data.type, "group")
+        self.assertEqual(group2_node3.data.name, "group2")
+        self.assertEqual(group2_node3.child_count(), 1)
+
+        sub_group1_node3 = group2_node3.children[0]
+        self.assertEqual(sub_group1_node3.data.type, "group")
+        self.assertEqual(sub_group1_node3.data.name, "Sub-group1")
+        self.assertEqual(sub_group1_node3.child_count(), 1)
+
+        sub_sub_group1_node3 = sub_group1_node3.children[0]
+        self.assertEqual(sub_sub_group1_node3.data.type, "group")
+        self.assertEqual(sub_sub_group1_node3.data.name, "Sub-sub-group1")
+        self.assertEqual(sub_sub_group1_node3.child_count(), 1)
+
+        tissue1_node3 = sub_sub_group1_node3.children[0]
+        self.assertEqual(tissue1_node3.data.type, "ui_zTissue_body")
+        self.assertEqual(tissue1_node3.data.name, "tissue1")
+        self.assertEqual(tissue1_node3.child_count(), 0)
