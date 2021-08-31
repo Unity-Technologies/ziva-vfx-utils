@@ -27,22 +27,14 @@ def serialize_tree_model(root_node):
 
             if current_node._is_group_item():
                 tree_nodes[node_key] ={
-                                           "index": index,
                                            "name": current_node.data.name,
                                            "type": current_node.data.type}
-            elif is_zsolver_node(current_node.data):
-                tree_nodes[node_key] = {
-                                            "index": index,
-                                            "name": current_node.data.name,
-                                            "type": current_node.data.type,
-                                            "long_name": current_node.data.long_name}
             else:
                 tree_nodes[node_key] = {
-                                            "index": index,
                                             "pin_state": current_node.pin_state,
-                                            "name": current_node.data.name,
-                                            "type": current_node.data.type,
-                                            "long_name": current_node.data.long_name}
+                                            # since long name cannot be set, we store "long_name" as name
+                                            "name": current_node.data.long_name,
+                                            "type": current_node.data.type}
             # add children
             if current_node.children:
                 list_to_traverse.extend(current_node.children)
@@ -50,6 +42,7 @@ def serialize_tree_model(root_node):
     tree_data["nodes"] = tree_nodes
     json_to_string(tree_data)
     return tree_data
+
 
 def json_to_string(data):
     """Returns json data as a string.
