@@ -1,4 +1,4 @@
-__version__ = '1.1.1'
+__version__ = '2.0'
 
 from datetime import datetime
 import logging
@@ -11,7 +11,8 @@ log_file_path = os.path.join(gettempdir(),
                              'zBuilder_{}.log'.format(cur_time.strftime('%Y-%m-%d_%H-%M-%S')))
 handler = logging.FileHandler(log_file_path)
 handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(funcName)s(%(lineno)d) - %(levelname)s: %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(funcName)s(%(lineno)d) - %(levelname)s: %(message)s')
 handler.setFormatter(formatter)
 
 logger = logging.getLogger(__name__)
