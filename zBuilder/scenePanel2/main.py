@@ -495,8 +495,10 @@ class ScenePanel2(QtWidgets.QWidget):
             if all_items_have_same_parent:
                 # Get common parent index as insertion parent
                 insertion_parent_index = selected_index_list[0].parent()
-                # Get last row index as insertion point
-                insertion_row = max(map(lambda index: index.row(), selected_index_list))
+                # Get first row index as insertion point
+                insertion_row = min(map(lambda index: index.row(), selected_index_list))
+        # Clear the current selection to avoid Maya crash
+        self._tvGeo.selectionModel().clear()
 
         # Create Group node with proper name
         names_to_check = []
@@ -507,16 +509,8 @@ class ScenePanel2(QtWidgets.QWidget):
         group_name = get_unique_name("Group1", names_to_check)
         group_node = GroupNode(group_name)
 
-        logger.debug("Create Group node in node {} at row {}".format(
-            insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
-        if self._zGeo_treemodel.insertRow(insertion_row, insertion_parent_index):
-            new_group_index = self._zGeo_treemodel.index(insertion_row, 0, insertion_parent_index)
-            self._zGeo_treemodel.setData(new_group_index, group_node, nodeRole)
-            # Move selected nodes to the Group node
-            self._zGeo_treemodel.move_items(selected_index_list, new_group_index, 0)
-        else:
-            logger.warning("Failed to create group node in node {} at row {}.".format(
-                insertion_parent_index.data(QtCore.Qt.DisplayRole), insertion_row))
+        self._zGeo_treemodel.group_items(insertion_parent_index, insertion_row, group_node,
+                                         selected_index_list)
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete current selected nodes in zGeo TreeView.

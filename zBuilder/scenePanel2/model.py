@@ -222,6 +222,42 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     # End of QtCore.QAbstractItemModel override functions
 
+    def group_items(self, group_parent_index, group_item_row, group_node, index_list_to_move):
+        """ Create a group item at given parent position, and move other items to it.
+        
+        Arguments:
+            group_parent_index(QModelIndex): Index refers to the newly added group item's parent.
+            group_item_row(int): Row position the group item will insert to.
+            group_node(GroupNode): The group item's data
+            index_list_to_move(list[QModelIndex]): List of model index that will be moved to the group item.
+
+        Return:
+            True if succeeded, False otherwise.
+            Error message prints to logger.
+        """
+        group_parent_item = get_node_by_index(group_parent_index, None)
+        if not group_parent_item:
+            logger.error("Can't get group parent item through QModelIndex, failed to group items.")
+            return False
+
+        treeitems_to_move = [get_node_by_index(index, None) for index in index_list_to_move]
+        if any(item is None for item in treeitems_to_move):
+            # Do nothing if there's invalid item in the move list
+            logger.error(
+                "QModelIndex move list contains invalid entry that has no attached tree item, "
+                "failed to group items.")
+            return False
+
+        logger.debug("Create Group item {} in parent item {} at row {}".format(
+            group_node.name, group_parent_item.data.name, group_item_row))
+
+        self.layoutAboutToBeChanged.emit()
+        group_item = TreeItem(None, group_node)
+        group_item.append_children(treeitems_to_move)
+        group_parent_item.insert_children(group_item_row, group_item)
+        self.layoutChanged.emit()
+        return True
+
     def move_items(self, index_list_to_move, dst_parent_index, dst_row):
         """ Move specifed item to the destination parent at desitination row.
         The Qt moveRows() API can't handle complex move items logic.
