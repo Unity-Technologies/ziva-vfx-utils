@@ -154,19 +154,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.beginRemoveRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
         assert parent_node, "Could not find parent node, failed to delete child row."
-        for i in range(row, row + count):
-            try:
-                node_to_pick_out = parent_node.child(i)
-            except:
-                logger.error("The {}'s {}th child doesn't exist.".format(parent_node, i))
-                continue
-
-            if isinstance(node_to_pick_out, GroupNode):
-                pick_out_node(node_to_pick_out, is_node_name_duplicate, fix_node_name_duplication)
-            else:
-                parent_node.remove_children(node_to_pick_out)
+        parent_node.remove_children(parent_node.children[row:row + count])
         self.endRemoveRows()
-
         return True
 
     def supportedDropActions(self):
@@ -291,5 +280,21 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.layoutAboutToBeChanged.emit()
         # Move items
         dst_treeitem.insert_children(dst_row, treeitems_to_move)
+        self.layoutChanged.emit()
+        return True
+
+    def delete_group_items(self, group_index_to_delete):
+        """ Given group index list, delete those items at the outmost level.
+        """
+        group_item_to_delete = [get_node_by_index(index, None) for index in group_index_to_delete]
+        if any(item is None for item in group_item_to_delete):
+            logger.error(
+                "Can't get group treeitem through QModelIndex, failed to delete group items.")
+            return False
+
+        self.layoutAboutToBeChanged.emit()
+        items_to_delete = [item for item in prune_child_nodes(group_item_to_delete)]
+        for item in items_to_delete:
+            pick_out_node(item, is_node_name_duplicate, fix_node_name_duplication)
         self.layoutChanged.emit()
         return True

@@ -513,27 +513,18 @@ class ScenePanel2(QtWidgets.QWidget):
                                          selected_index_list)
 
     def _delete_zGeo_treeview_nodes(self):
-        """ Delete current selected nodes in zGeo TreeView.
-        Currently we only support delete one item each
+        """ Delete outmost group items in the current selection in the zGeo TreeView.
+        Currently we only support delete group items.
+        The child group nodes in the selection will not be deleted.
         """
-        selection_list = self._tvGeo.selectedIndexes()
-        # TODO: Add support for multiple node deletion
-        if len(selection_list) != 1:
-            return
-
-        cur_sel = selection_list[0]
-        node = cur_sel.data(nodeRole)
-        if is_group_node(node):
-            row_count = self._zGeo_treemodel.rowCount(cur_sel)
-            parent = cur_sel.parent()
-            # move children
-            if row_count > 0:
-                for i in range(0, row_count):
-                    # always move the top child. After each move, index auto updates
-                    self._zGeo_treemodel.moveRow(cur_sel, 0, parent,
-                                                 self._zGeo_treemodel.rowCount(parent))
-            self._zGeo_treemodel.removeRow(cur_sel.row(), parent)
-        # TODO: Add support for zGeo node delete
+        # Make a group index copy list and clear the current selection.
+        # This is to avoid Maya Qt crash after deleting these tree items.
+        group_index_to_delete = list(
+            filter(lambda index: is_group_node(index.data(nodeRole)),
+                   self._tvGeo.selectedIndexes()))
+        self._tvGeo.selectionModel().clear()
+        self._zGeo_treemodel.delete_group_items(group_index_to_delete)
+        # TODO: Add support for zGeo node deletion
 
     # Override
     def eventFilter(self, obj, event):
