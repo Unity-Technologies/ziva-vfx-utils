@@ -105,11 +105,17 @@ class TreeItem(object):
         for new_child in new_children:
             if new_child._parent is self:
                 # Skip self assignment
+                logger.debug("Skip self assign child node {}".format(new_child.data.name))
                 continue
 
             if new_child._parent:
+                logger.debug("Unlink child node {} from old parent {} at row {}".format(
+                    new_child.data.name, new_child._parent.data.name, new_child.row()))
                 new_child._parent._children.remove(new_child)
             new_child._parent = self
+            logger.debug("Insert child node {} to new parent {} at row {}".format(
+                new_child.data.name if new_child.data else new_child.data, self._data.name,
+                index + offset))
             self._children.insert(index + offset, new_child)
             offset += 1
 
@@ -291,8 +297,11 @@ def is_node_name_duplicate(node_to_check, node_list):
 
 def fix_node_name_duplication(node_to_fix, node_list):
     proposed_node_name = node_to_fix.data.name
-    name_list = [node.data.name for node in  node_list]
+    name_list = [node.data.name for node in node_list]
     node_to_fix.data.name = get_unique_name(proposed_node_name, name_list)
+
+
+# End of helper functions for pick_out_node()
 
 
 def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_proc):
@@ -307,15 +316,22 @@ def pick_out_node(node_to_pick_out, is_node_duplicated_pred, fix_duplication_pro
     assert parent_node, "Pick out node has no parent."
     insert_point = node_to_pick_out.row()
     sibling_nodes = node_to_pick_out.get_siblings()
-    child_nodes_to_move = node_to_pick_out.children
-    parent_node.remove_children(node_to_pick_out)
+    # Make a copy to avoid referenced list changes during the following move operations
+    child_nodes_to_move = node_to_pick_out.children[:]
 
+    logger.debug("Move {} child nodes to {}".format(len(child_nodes_to_move),
+                                                    parent_node.data.name))
     for child in child_nodes_to_move:
         # Check child nodes against its sibling node
         if is_node_duplicated_pred(child, sibling_nodes):
+            old_name = child.data.name
             fix_duplication_proc(child, sibling_nodes)
+            new_name = child.data.name
+            logger.debug("Rename child node name from {} to {}".format(old_name, new_name))
         # Ready to insert
+        logger.debug("Insert child node {} to parent node {} at row {}".format(
+            child.data.name, parent_node.data.name, insert_point))
         parent_node.insert_children(insert_point, child)
 
-
-# End of helper functions for pick_out_node()
+    logger.debug("Delete pick out node {}".format(node_to_pick_out.data.name))
+    parent_node.remove_children(node_to_pick_out)
