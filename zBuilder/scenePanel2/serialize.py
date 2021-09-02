@@ -44,6 +44,7 @@ def serialize_tree_model(root_node):
     json_to_string(tree_data)
     return tree_data
 
+
 def json_to_string(data):
     """Returns json data as a string.
     """

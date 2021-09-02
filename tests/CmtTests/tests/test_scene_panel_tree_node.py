@@ -2,7 +2,6 @@ import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import TreeItem
 from zBuilder.scenePanel2.treeItem import *
 from zBuilder.scenePanel2.serialize import *
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
@@ -864,3 +863,4 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(tissue1_node3.data.type, "ui_zTissue_body")
         self.assertEqual(tissue1_node3.data.name, "tissue1")
         self.assertEqual(tissue1_node3.child_count(), 0)
+

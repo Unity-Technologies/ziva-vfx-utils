@@ -106,6 +106,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self.toolbarCreate = QtWidgets.QToolBar(self)
         self.toolbarCreate.setWindowTitle("Create")
         self.toolbarCreate.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarCreate.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.toolbarCreate.setObjectName("toolBarCreate")
 
         lytToolbarCreate = QtWidgets.QVBoxLayout()
@@ -116,6 +117,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
         self.toolbarAdd = QtWidgets.QToolBar(self)
         self.toolbarAdd.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarAdd.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.toolbarAdd.setObjectName("toolBarAdd")
 
         lytToolbarAdd = QtWidgets.QVBoxLayout()
@@ -126,6 +128,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
         self.toolbarEdit = QtWidgets.QToolBar(self)
         self.toolbarEdit.setIconSize(QtCore.QSize(27, 27))
+        self.toolbarEdit.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.toolbarEdit.setObjectName("toolBarEdit")
 
         lytToolbarEdit = QtWidgets.QVBoxLayout()
@@ -135,6 +138,7 @@ class ScenePanel2(QtWidgets.QWidget):
         lytToolbarEdit.addWidget(self.toolbarEdit)
 
         lytToolbar = QtWidgets.QHBoxLayout()
+        lytToolbar.setAlignment(QtCore.Qt.AlignLeft)
         lytToolbar.addLayout(lytToolbarCreate)
         lytToolbar.addLayout(lytToolbarAdd)
         lytToolbar.addLayout(lytToolbarEdit)
