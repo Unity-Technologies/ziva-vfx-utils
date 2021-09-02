@@ -513,7 +513,7 @@ class ScenePanel2(QtWidgets.QWidget):
                                          selected_index_list)
 
     def _delete_zGeo_treeview_nodes(self):
-        """ Delete outmost group items in the current selection in the zGeo TreeView.
+        """ Delete top level group items in the current selection in the zGeo TreeView.
         Currently we only support delete group items.
         The child group nodes in the selection will not be deleted.
         """

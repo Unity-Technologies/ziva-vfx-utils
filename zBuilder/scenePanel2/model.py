@@ -151,6 +151,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True
 
     def removeRows(self, row, count, parent):
+        """ This only for remove single or multiple consecutive rows.
+        For remove rows from different parents, or non-consecutive items,
+        refer to delete_group_items() and implement our own version.
+        """
         self.beginRemoveRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
         assert parent_node, "Could not find parent node, failed to delete child row."
@@ -284,7 +288,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True
 
     def delete_group_items(self, group_index_to_delete):
-        """ Given group index list, delete those items at the outmost level.
+        """ Given group index list, delete those items at the top level.
         """
         group_item_to_delete = [get_node_by_index(index, None) for index in group_index_to_delete]
         if any(item is None for item in group_item_to_delete):
