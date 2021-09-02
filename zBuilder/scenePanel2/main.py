@@ -1,4 +1,5 @@
 import zBuilder.builders.ziva as zva
+import maya.OpenMaya as om
 import os
 import weakref
 import logging
@@ -32,6 +33,7 @@ class ScenePanel2(QtWidgets.QWidget):
     def delete_instances():
         for ins in ScenePanel2.instances:
             try:
+                ins.remove_callbacks()
                 ins.setParent(None)
                 ins.deleteLater()
             except:
@@ -42,13 +44,20 @@ class ScenePanel2(QtWidgets.QWidget):
             ScenePanel2.instances.remove(ins)
             del ins
 
-    def __init__(self, parent=None, builder=None):
+    def __init__(self, parent=None):
         super(ScenePanel2, self).__init__(parent)
 
         # let's keep track of our docks so we only have one at a time.
         ScenePanel2.delete_instances()
         ScenePanel2.instances.append(weakref.proxy(self))
         cmds.workspaceControlState(ScenePanel2.CONTROL_NAME, widthHeight=[500, 600])
+
+        # Register callbacks for scene save/load
+        logger.debug("Register Scene Panel callbacks.")
+        cmds.scriptJob(event=["PostSceneRead", self.on_post_scene_read])
+        cmds.scriptJob(event=["NewSceneOpened", self.on_new_scene_opened])
+        self._scene_presave_callback_id = om.MSceneMessage.addCallback(
+            om.MSceneMessage.kBeforeSave, self.on_scene_presave)
 
         # member variable declaration and initialization
         self._builder = None
@@ -59,36 +68,22 @@ class ScenePanel2(QtWidgets.QWidget):
         self._pinned_nodes = list()
 
         self._setup_ui(parent)
-        self._setup_model(builder)
-        # must be after _setup_model() because assigning model resets item expansion
-        self._set_builder(self._builder)
         self._setup_actions()
+        self._reset_builder()
 
-    def _setup_model(self, builder):
-        self._builder = builder or zva.Ziva()
+    def _reset_builder(self):
+        """ Build and set the zGeo treeview. This forces a complete redraw of the zGeo treeview.
+        """
+        solver_nodes = cmds.ls(type='zSolver')
+        if not solver_nodes:
+            # Clear the treeview and do early return if there's no solver node in the scene
+            self._zGeo_treemodel.reset_model(None)
+            self._wgtComponent.reset_model(None, [])
+            return
+
+        self._builder = zva.Ziva()
         self._builder.retrieve_connections()
-
-        self._zGeo_treemodel = SceneGraphModel(self._builder, self)
-        self._tvGeo.setModel(self._zGeo_treemodel)
-
-    def _set_builder(self, builder):
-        """
-        This builds and/or resets the tree given a builder.
-        The builder is a zBuilder object that the tree is built from.
-        If None is passed it uses the scene selection to build a new builder.
-        This forces a complete redraw of the ui tree.
-
-        Args:
-            builder (:obj:`obj`): The zBuilder builder to build tree from.
-        """
-
-        if not builder:
-            # reset builder
-            self._builder = zva.Ziva()
-            self._builder.retrieve_connections()
-            builder = self._builder
-
-        self._zGeo_treemodel.reset_model(builder)
+        self._zGeo_treemodel.reset_model(self._builder)
 
         # show expanded view of the tree
         self._tvGeo.expandAll()
@@ -153,6 +148,9 @@ class ScenePanel2(QtWidgets.QWidget):
         self._tvGeo.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self._tvGeo.setAcceptDrops(True)
         self._tvGeo.setDropIndicatorShown(True)
+
+        self._zGeo_treemodel = SceneGraphModel(self)
+        self._tvGeo.setModel(self._zGeo_treemodel)
 
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._tvGeo)
@@ -244,7 +242,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self.actionRefresh.setText('Refresh')
         self.actionRefresh.setIcon(refresh_icon)
         self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self._set_builder)
+        self.actionRefresh.triggered.connect(self._reset_builder)
         self.toolbarEdit.addAction(self.actionRefresh)
 
     def on_tvGeo_selectionChanged(self, selected, deselected):
@@ -320,6 +318,28 @@ class ScenePanel2(QtWidgets.QWidget):
         not_found_nodes = [name for name in node_names if name not in scene_nodes]
         if not_found_nodes:
             cmds.warning("Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
+
+    def remove_callbacks(self):
+        logger.debug("Remove Scene Panel callbacks.")
+        om.MMessage.removeCallback(self._scene_presave_callback_id)
+
+    def on_post_scene_read(self):
+        """ Callback invoked after Maya load the scene
+        """
+        self._reset_builder()
+
+    def on_new_scene_opened(self):
+        """ Callback invoked after Maya create the empty scene
+        """
+        self._reset_builder()
+
+    def on_scene_presave(self, client_data):
+        """ Callback invoked before Maya save the scene
+        """
+        logger.debug("Saving zGeo treeview data...")
+        solver_nodes = cmds.ls(type='zSolver')
+        # TODO: Save zGeo treeview data to respective zSolver node's plug
+        logger.debug("zGeo treeview data saved.")
 
     def get_expanded(self):
         """
@@ -482,6 +502,10 @@ class ScenePanel2(QtWidgets.QWidget):
         - If the selection has same parent, insert a new Group node at the last item position;
         - If the selection has different parent, append a new Group at the end of top level;
         """
+        if self._zGeo_treemodel.rowCount(self._zGeo_treemodel.index(0, 0)) == 0:
+            logger.warning("Can't create Group node since no zSolver node exists.")
+            return
+
         insertion_parent_index = self._zGeo_treemodel.index(0, 0)
         insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
         # Exclude zSolver* items

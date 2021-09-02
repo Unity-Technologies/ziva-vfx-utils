@@ -15,23 +15,24 @@ _mimeType = 'application/x-scenepanelzgeoitemdata'
 class SceneGraphModel(QtCore.QAbstractItemModel):
     """ The tree model for zGeo TreeView.
     """
-    def __init__(self, builder, parent=None):
+    def __init__(self, parent=None):
         super(SceneGraphModel, self).__init__(parent)
-        assert builder, "Missing builder parameter in SceneGraphModel"
         self._parent_widget = parent
-        self.reset_model(builder)
+        self._builder = None
+        self._root_node = None
 
     def reset_model(self, new_builder):
         self.beginResetModel()
         self._builder = new_builder
         self._root_node = build_scene_panel_tree(
-            new_builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+            new_builder, zGeo_UI_node_types +
+            ["zSolver", "zSolverTransform"])[0] if new_builder else None
         self.endResetModel()
 
     # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
         parent_node = get_node_by_index(parent, self._root_node)
-        return parent_node.child_count()
+        return parent_node.child_count() if parent_node else 0
 
     def columnCount(self, parent):
         return 1

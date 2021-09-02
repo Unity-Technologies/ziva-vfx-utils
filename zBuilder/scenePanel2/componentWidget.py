@@ -4,11 +4,11 @@ from ..uiUtils import nodeRole, get_icon_path_from_name, get_icon_path_from_node
 from .zTreeView import zTreeView
 from .treeItem import TreeItem, build_scene_panel_tree
 from PySide2 import QtCore, QtGui, QtWidgets
-from maya import cmds, mel
+from maya import cmds
 from collections import defaultdict
 from functools import partial
 from zBuilder.nodes.base import Base
-from zBuilder.uiUtils import ProximityWidget, MenuLineEdit
+from zBuilder.uiUtils import ProximityWidget
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +41,19 @@ def paste_attrs(node):
     Paste the attributes from the clipboard onto given node.
     @pre The node's type has an entry in the clipboard.
     """
-    assert isinstance(node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
+    assert isinstance(
+        node, Base), "Precondition violated: argument needs to be a zBuilder node of some type"
     assert node.type in attrs_clipboard, "Precondition violated: node type is not in the clipboard"
     orig_node_attrs = attrs_clipboard[node.type]
-    assert isinstance(orig_node_attrs, dict), "Invariant violated: value in attrs clipboard must be a dict"
+    assert isinstance(orig_node_attrs,
+                      dict), "Invariant violated: value in attrs clipboard must be a dict"
 
     # Here, we expect the keys to be the same on node.attrs and orig_node_attrs. We probably don't need to check, but we could:
-    assert set(node.attrs) == set(orig_node_attrs), "Invariant violated: copied attribute list do not match paste-target's attribute list"
-    node.attrs = orig_node_attrs.copy()  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
+    assert set(node.attrs) == set(
+        orig_node_attrs
+    ), "Invariant violated: copied attribute list do not match paste-target's attribute list"
+    node.attrs = orig_node_attrs.copy(
+    )  # Note: given the above invariant, this should be the same as node.attrs.update(orig_node_attrs)
     node.set_maya_attrs()
 
 
@@ -61,6 +66,7 @@ def invert_weights(node, map_index):
 def copy_weights(node, map_index):
     global maps_clipboard
     maps_clipboard = node.parameters['map'][map_index]
+
 
 def paste_weights(node, new_map_index):
     """
@@ -209,6 +215,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         btnIcon.toggled.connect(self.on_btnIcon_toggled)
         self._tvComponent.selectionModel().selectionChanged.connect(
             self.on_tvComponent_selectionChanged)
+        self._tvComponent.installEventFilter(self)
 
         self._setup_actions()
 
@@ -219,7 +226,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             return
 
         menu_dict = {
-            'zTissue': self.open_tissue_menu, 
+            'zTissue': self.open_tissue_menu,
             'zBone': self.open_bone_menu,
             'zLineOfAction': self.open_line_of_action_menu,
             'zRestShape': self.open_rest_shape_menu,
@@ -227,7 +234,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             'zFiber': self.open_fiber_menu,
             'zMaterial': self.open_material_menu,
             'zAttachment': self.open_attachment_menu,
-            }
+        }
 
         node = indexes[0].data(nodeRole)
         if node.type in menu_dict:
@@ -386,6 +393,19 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
         action_paint_by_prox.setDefaultWidget(prox_widget)
         proximity_menu.addAction(action_paint_by_prox)
+
+    # Override
+    def eventFilter(self, obj, event):
+        """ Handle key press event for TreeViews
+        """
+        if event.type() == QtCore.QEvent.KeyPress:
+            if (obj is self._tvComponent) and (event.key() == QtCore.Qt.Key_Delete):
+                # Mute delete key event on component tree view
+                # TODO: handle component-wise deletion
+                return True
+
+        # standard event processing
+        return QtCore.QObject.eventFilter(self, obj, event)
 
 
 class ComponentWidget(QtWidgets.QWidget):
