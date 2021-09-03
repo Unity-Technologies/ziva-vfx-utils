@@ -28,7 +28,6 @@ def serialize_tree_model(root_node):
 
             if current_node._is_group_item():
                 tree_nodes[node_key] ={
-                                           "name": current_node.data.name,
                                            "type": current_node.data.type}
             else:
                 tree_nodes[node_key] = {
@@ -41,7 +40,7 @@ def serialize_tree_model(root_node):
                 list_to_traverse.extend(current_node.children)
 
     tree_data["nodes"] = tree_nodes
-    json_to_string(tree_data)
+
     return tree_data
 
 
@@ -81,8 +80,7 @@ def deserialize_tree_model(serialized_data):
 
     if serialized_data["version"] == 1:
         # sort keys by tree item level, and then by tree item index
-        tree_keys = list(serialized_data["nodes"].keys()) # need to use explicit conversion for python 3
-        tree_keys.sort(key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
+        tree_keys = sorted(serialized_data["nodes"].keys(), key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
 
         # initialize values for tree traversal
         current_level_count = 0
@@ -109,27 +107,27 @@ def deserialize_tree_model(serialized_data):
             # processing children of next level from the tree and finding right parent.
             # A group node might not have any child
             if current_level_count > previous_level_count or current_index <= previous_index:
-                while(parent_to_visit):
-                    parent_key_tuple = parent_to_visit.pop(0)
+                for parent in parent_to_visit:
+                    parent_key_tuple = parent
                     current_parent = parent_key_tuple[0]
                     parent_key = parent_key_tuple[1]
                     if key.split("|")[1:-1] == parent_key.split("|")[1:]:
+                        parent_to_visit.remove(parent)
                         break
 
             if current_node["type"] == "group":
-               child_node = TreeItem(current_parent, GroupNode(path_node_list[-1]))
-               # a GroupNode can be a parent
-               parent_to_visit.append((child_node, key))
+                child_node = TreeItem(current_parent, GroupNode(path_node_list[-1]))
             else:
                 # TODO: resolve conflict with loaded tree here
                 child_base_data = Base()
-                child_base_data.name = path_node_list[-1]
+                child_base_data.name = current_node["name"]
                 child_base_data.type = current_node["type"]
                 child_node = TreeItem(current_parent, child_base_data)
                 child_node.pin_state = current_node["pin_state"]
-                # a "zSolverTransform" node can be a parent node
-                if current_node["type"] == "zSolverTransform":
-                    parent_to_visit.append((child_node, key))
+            # a "group" or a "zSolverTransform" node can be a parent node
+            if current_node["type"] in {"group", "zSolverTransform"}:
+                parent_to_visit.append((child_node, key))
+
     return root_node
 
 
