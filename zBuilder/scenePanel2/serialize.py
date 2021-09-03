@@ -2,7 +2,8 @@ import json
 import logging
 
 from .treeItem import *
-from ..uiUtils import is_zsolver_node
+from .groupNode import GroupNode
+from zBuilder.nodes.base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,6 @@ def serialize_tree_model(root_node):
 
             if current_node._is_group_item():
                 tree_nodes[node_key] ={
-                                           "name": current_node.data.name,
                                            "type": current_node.data.type}
             else:
                 tree_nodes[node_key] = {
@@ -40,7 +40,7 @@ def serialize_tree_model(root_node):
                 list_to_traverse.extend(current_node.children)
 
     tree_data["nodes"] = tree_nodes
-    json_to_string(tree_data)
+
     return tree_data
 
 
@@ -65,3 +65,73 @@ def write_serialized_data_to_file(data, file_path):
         logger.debug("Finished writing serialized data to {}.".format(file_path))
     except:
         logger.error("Failed to write serialized data to {}.".format(file_path))
+
+
+def deserialize_tree_model(serialized_data):
+    """
+    De-serializes data to represent model of ScenePanel2 TreeView
+    """
+    tree_nodes = serialized_data["nodes"]
+
+    # set root node
+    root_base_node = Base()
+    root_base_node.name = "ROOT"
+    root_node = TreeItem(None, root_base_node)
+
+    if serialized_data["version"] == 1:
+        # sort keys by tree item level, and then by tree item index
+        tree_keys = sorted(serialized_data["nodes"].keys(), key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
+
+        # initialize values for tree traversal
+        current_level_count = 0
+        current_index = 0
+        previous_index = 0
+        current_parent = None
+        parent_key = "ROOT"
+        parent_to_visit = [(root_node, parent_key)]
+
+        for key in tree_keys:
+            previous_level_count = current_level_count
+            current_level_count = key.count("|")
+
+            # Since the keys are sorted by depth level and then by index, we can run BFS
+            # on the tree with those keys and store parents that we need to process next.
+            # We pop the next parent to add child once we have traversed the previous level
+            # or found children of a node on the same level by comparing index which are
+            # sorted for each node. Then we compare key with parent key to make sure we found
+            # the right parent.
+            path_node_list = key.split("|")
+            previous_index = current_index
+            current_index = int(path_node_list[0])
+            current_node = tree_nodes[key]
+            # processing children of next level from the tree and finding right parent.
+            # A group node might not have any child
+            if current_level_count > previous_level_count or current_index <= previous_index:
+                for parent in parent_to_visit:
+                    parent_key_tuple = parent
+                    current_parent = parent_key_tuple[0]
+                    parent_key = parent_key_tuple[1]
+                    if key.split("|")[1:-1] == parent_key.split("|")[1:]:
+                        parent_to_visit.remove(parent)
+                        break
+
+            if current_node["type"] == "group":
+                child_node = TreeItem(current_parent, GroupNode(path_node_list[-1]))
+            else:
+                # TODO: resolve conflict with loaded tree here
+                child_base_data = Base()
+                child_base_data.name = current_node["name"]
+                child_base_data.type = current_node["type"]
+                child_node = TreeItem(current_parent, child_base_data)
+                child_node.pin_state = current_node["pin_state"]
+            # a "group" or a "zSolverTransform" node can be a parent node
+            if current_node["type"] in {"group", "zSolverTransform"}:
+                parent_to_visit.append((child_node, key))
+
+    return root_node
+
+
+def string_to_json(data):
+    """Returns json data from string.
+    """
+    return json.loads(data)
