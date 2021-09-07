@@ -19,6 +19,6 @@ logger.addHandler(handler)
 logger.info('Logging to file: "{}"'.format(log_file_path))
 
 # Maya default logging output level is info.
-# Swtich to debug level when ZIVA_ZBUILDER_DEBUG is defined.
+# Switch to debug level when ZIVA_ZBUILDER_DEBUG is defined.
 if 'ZIVA_ZBUILDER_DEBUG' in os.environ:
     logger.setLevel(logging.DEBUG)
