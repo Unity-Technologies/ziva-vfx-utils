@@ -8,6 +8,15 @@ from ..uiUtils import get_unique_name
 logger = logging.getLogger(__name__)
 
 
+def is_group_item(item):
+    """ The TreeItem class should know nothing about the data it stores.
+    But to support pin state switch correctly, 
+    we need to handle the Group node's tri-state, 
+    thus add this helper function.
+    """
+    return item.data.type == "group"
+
+
 class TreeItem(object):
     """ Data structure for tree models in Scene Panel 2.
     It stores zBuilder nodes, GroupNode and other Scene Panel nodes as a tree structure.
@@ -162,20 +171,12 @@ class TreeItem(object):
         """
         raise NotImplementedError
 
-    def _is_group_item(self):
-        """ The TreeItem class should know nothing about the data it stores.
-        But to support pin state switch correctly, 
-        we need to handle the Group node's tri-state, 
-        thus add this helper function.
-        """
-        return self.data.type == "group"
-
     def get_tree_path(self):
         """ Generates path from root to the current node TreeItem,
         adding intermediate node names and separating each by "|".
         """
         parent = self.parent
-        if not parent: 
+        if not parent:
             return "|"
 
         tree_path = self.data.name
@@ -191,7 +192,7 @@ class TreeItem(object):
     def pin_state(self):
         # if this is a leaf node or empty group node,
         # simply return pin state
-        if not (self._is_group_item() and self.child_count() > 0):
+        if not (is_group_item(self) and self.child_count() > 0):
             return self._pin_state
 
         if all(child.pin_state == TreeItem.Pinned for child in self._children):
@@ -207,7 +208,7 @@ class TreeItem(object):
     @pin_state.setter
     def pin_state(self, new_state):
         self._pin_state = new_state
-        if self._is_group_item() and self.child_count() > 0:
+        if is_group_item(self) and self.child_count() > 0:
             # Apply pin state to the child nodes recursively
             for child in self._children:
                 child.pin_state = new_state

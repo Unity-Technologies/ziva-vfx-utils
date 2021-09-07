@@ -54,7 +54,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             # selects multiple items, which is not the expected behavior.
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
                 | QtCore.Qt.ItemIsDragEnabled
-        elif node.data.type == "group":
+
+        if is_group_item(node):
             # Group node is pinable, partially pinable and drag&drop-able
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
                 | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsAutoTristate \
