@@ -90,27 +90,31 @@ def deserialize_tree_model(serialized_data):
         parent_key = "ROOT"
         parent_to_visit = [(root_node, parent_key)]
 
+        # Since the keys are sorted by depth level and then by index,
+        # we can run BFS on the tree with those keys based on level.
+        # For each key node we process,
+        # we store its children (only if "group" or "zSolverTransform") as parents for later processing by storing in "parent_to_visit".
+        # We pick the next parent from "parent_to_visit" in two cases -
+        # 1) when moving to the next level or
+        # 2) processing child node of a different parent (on the same level if an index is equal or smaller).
+        # Next we need to find the right parent from the "parent_to_visit" list.
+        # We do that by comparing current node key and parent node key.
+        # Once found, we remove the parent from "parent_to_visit" and add its children to the tree.
         for key in tree_keys:
             previous_level_count = current_level_count
             current_level_count = key.count("|")
-
-            # Since the keys are sorted by depth level and then by index, we can run BFS
-            # on the tree with those keys and store parents that we need to process next.
-            # We pop the next parent to add child once we have traversed the previous level
-            # or found children of a node on the same level by comparing index which are
-            # sorted for each node. Then we compare key with parent key to make sure we found
-            # the right parent.
             path_node_list = key.split("|")
             previous_index = current_index
             current_index = int(path_node_list[0])
             current_node = tree_nodes[key]
-            # processing children of next level from the tree and finding right parent.
-            # A group node might not have any child
+            # find next parent when moving to next level or next node in the same level
             if current_level_count > previous_level_count or current_index <= previous_index:
+                # Finding the right parent from the list, a group node might not have any child
                 for parent in parent_to_visit:
                     parent_key_tuple = parent
                     current_parent = parent_key_tuple[0]
                     parent_key = parent_key_tuple[1]
+                    # found parent
                     if key.split("|")[1:-1] == parent_key.split("|")[1:]:
                         parent_to_visit.remove(parent)
                         break
