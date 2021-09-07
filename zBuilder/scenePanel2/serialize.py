@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 
@@ -139,3 +140,12 @@ def string_to_json(data):
     """Returns json data from string.
     """
     return json.loads(data)
+
+
+def is_save_serialized_data_to_zsolver_plug():
+    """Returns based on value of "ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" environment variable.
+    """
+    if "ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" in os.environ:
+        return False
+    else:
+        return True

@@ -5,6 +5,7 @@ import weakref
 import logging
 
 from .model import SceneGraphModel
+from serialize import *
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
 from .groupNode import GroupNode
@@ -72,11 +73,11 @@ class ScenePanel2(QtWidgets.QWidget):
         self._reset_builder()
 
     def _reset_builder(self):
-        """ Build and set the zGeo treeview. This forces a complete redraw of the zGeo treeview.
+        """ Build and set the zGeo TreeView. This forces a complete redraw of the zGeo TreeView.
         """
         solver_nodes = cmds.ls(type='zSolver')
         if not solver_nodes:
-            # Clear the treeview and do early return if there's no solver node in the scene
+            # Clear the TreeView and do early return if there's no solver node in the scene
             self._zGeo_treemodel.reset_model(None)
             self._wgtComponent.reset_model(None, [])
             return
@@ -326,7 +327,17 @@ class ScenePanel2(QtWidgets.QWidget):
     def on_post_scene_read(self):
         """ Callback invoked after Maya load the scene
         """
+        solver_nodes = cmds.ls(type='zSolver')
+        solver_serialized_data_tuple_list = []
+        attr = "scenePanelSerializedData"
+        for node in solver_nodes:
+            attr_exists = cmds.attributeQuery(attr, node)
+            if attr_exists:
+                serialized_data = cmds.getAttr('{}.{}'.format(node, attr))
+                if serialized_data:
+                    solver_serialized_data_tuple_list.append(('{}'.format(node), serialized_data))
         self._reset_builder()
+        # TODO: resolve conflict
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
@@ -336,10 +347,19 @@ class ScenePanel2(QtWidgets.QWidget):
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
         """
-        logger.debug("Saving zGeo treeview data...")
         solver_nodes = cmds.ls(type='zSolver')
-        # TODO: Save zGeo treeview data to respective zSolver node's plug
-        logger.debug("zGeo treeview data saved.")
+        if is_save_serialized_data_to_zsolver_plug():
+            cmds.select(cl=True)
+            builder = zva.Ziva()
+            builder.retrieve_connections()
+            # TODO: resolve conflict
+            model_root_index = self._zGeo_treemodel.index(0, 0)
+            root_node = get_node_by_index(model_root_index, None)
+            # TODO: Add filter by solver
+            string_to_save = json_to_string(serialize_tree_model(root_node))
+            for node in solver_nodes:
+                cmds.setAttr('{}.scenePanelSerializedData'.format(node), string_to_save, type='string')
+            logger.info("zGeo TreeView data saved.")
 
     def get_expanded(self):
         """

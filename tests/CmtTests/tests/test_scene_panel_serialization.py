@@ -393,3 +393,4 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(deserialized_tissue2_node.data.name, "tissue2")
         self.assertEqual(deserialized_tissue2_node.pin_state,  TreeItem.Unpinned)
         self.assertEqual(deserialized_tissue2_node.child_count(), 0)
+
