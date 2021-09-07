@@ -47,13 +47,22 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
 
-        if is_zsolver_node(node.data):
-            # zSolver* nodes are NOT pin-able, NOT drop-able but drag-able as one can re-order items.
-            # Making "zSolver" node drag-able also allows us to visually show that it is not drop-able.
+        if node.data.type == "zSolver":
+            # zSolver node is NOT pin-able, NOT drop-able but drag-able as one can re-order items.
+            # Making zSolver node drag-able also allows us to visually show that it is not drop-able.
             # On the contrary, if we just make it NOT drag&drop-able, once selected and dragged, it
             # selects multiple items, which is not the expected behavior.
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
                 | QtCore.Qt.ItemIsDragEnabled
+
+        if node.data.type == "zSolverTransform":
+            # zSolverTransform node is NOT pin-able, and drag&drop-able.
+            # Making zSolverTransform node drag-able also allows us to visually show that it is not drop-able.
+            # On the contrary, if we just make it NOT drag&drop-able, once selected and dragged, it
+            # selects multiple items, which is not the expected behavior.
+            # Making zSolverTransform node drop-able because we need to support reorder its child nodes.
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
 
         if is_group_item(node):
             # Group node is pinable, partially pinable and drag&drop-able
@@ -145,12 +154,17 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return self.createIndex(row, column, parent_node.child(row))
 
     def insertRows(self, row, count, parent):
-        self.beginInsertRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
-        assert parent_node, "Could not find parent node, failed to insert child row."
+        if not parent_node:
+            logger.error("Can't get parent item through QModelIndex, failed to insert rows.")
+            return False
+
+        self.beginInsertRows(parent, row, row + count - 1)
         nodes_to_insert = []
         for _ in range(count):
             nodes_to_insert.append(TreeItem(None, None))
+        logger.debug("Insert {} rows to node {} at row {}.".format(count, parent_node.data.name,
+                                                                   row))
         parent_node.insert_children(row, nodes_to_insert)
         self.endInsertRows()
         return True
@@ -160,9 +174,17 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         For remove rows from different parents, or non-consecutive items,
         refer to delete_group_items() and implement our own version.
         """
-        self.beginRemoveRows(parent, row, row + count - 1)
         parent_node = get_node_by_index(parent, None)
-        assert parent_node, "Could not find parent node, failed to delete child row."
+        if not parent_node:
+            logger.error("Can't get parent item through QModelIndex, failed to remove rows.")
+            return False
+
+        self.beginRemoveRows(parent, row, row + count - 1)
+        logger.debug("Remove {} rows from node {} at row {}.".format(count, parent_node.data.name,
+                                                                     row))
+        remove_item_name = ",".join(
+            [node.data.name for node in parent_node.children[row:row + count]])
+        logger.debug("Remove items: {}".format(remove_item_name))
         parent_node.remove_children(parent_node.children[row:row + count])
         self.endRemoveRows()
         return True
@@ -175,47 +197,66 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     def mimeData(self, indexes):
         mimeData = QtCore.QMimeData()
-        data = [index.data(nodeRole) for index in indexes]
-        mimeData.setData(_mimeType, pickle.dumps(data))
+        treeitem_list = [index.internalPointer() for index in indexes]
+        pruned_treeitem_list = prune_child_nodes(treeitem_list)
+        mimeData.setData(_mimeType, pickle.dumps(pruned_treeitem_list))
         return mimeData
 
     def dropMimeData(self, data, action, row, column, parent):
-        dest_node = parent.data(nodeRole)
-        # TODO: add support for multiple move, currently doesn't work'
-        moved_node_data = pickle.loads(data.data(_mimeType))[0]
+        drop_items = pickle.loads(data.data(_mimeType))
+        drop_node_name = ",".join([item.data.name for item in drop_items])
+        parent_node = parent.data(nodeRole)
+        logger.debug("Dropping mimedata {} to parent {} at row {}".format(
+            drop_node_name, parent_node.name, row))
 
-        logger.info("Moving {} into {}".format(moved_node_data.name, dest_node.name))
-        row_count = self.rowCount(parent)
-        if self.insertRow(row_count, parent):
-            child_index = self.index(row_count, 0, parent)
-            self.setData(child_index, moved_node_data, nodeRole)
-        else:
-            logger.error("Failed to move {} into {}!".format(node.name, dest_node.name))
-            return False
-        return True
+        insertion_row = self.rowCount(parent) if (row == -1) else row
+        count = 0
+        if self.insertRows(insertion_row, len(drop_items), parent):
+            # After new rows are created, copy drop item's data and its children
+            for item in drop_items:
+                child_index = self.index(insertion_row + count, 0, parent)
+                self.setData(child_index, item.data, nodeRole)
+                child_item = get_node_by_index(child_index, None)
+                child_list_copy = item.children[:]
+                child_item.append_children(child_list_copy)
+                count += 1
+            logger.debug("Dropped mimedata {} to parent {} at row {}".format(
+                drop_node_name, parent_node.name, row))
+            return True
+
+        logger.error("Failed to drop mime data {} to {} at row {}.".format(
+            drop_node_name, parent_node.name, row))
+        return False
 
     def canDropMimeData(self, data, action, row, column, parent):
+        # Verify parent item
         if not parent.isValid():
+            logger.debug("Can't drop because parent is not valid")
             return False
-        elif not data.hasFormat(_mimeType):
-            return False
-
-        drop_candidate_data = pickle.loads(data.data(_mimeType))
         parent_node = get_node_by_index(parent, None)
-
         if not parent_node:
             logger.error("Drop item contains Invalid data!")
             return False
-        elif parent_node.data.type != "group":
-            return False
-        elif len(drop_candidate_data
-                 ) > 1:  #TODO: Remove this condition when multiple drop bug is fixed
+        logger.debug("parent_node: {}, type: {}".format(parent_node.data.name,
+                                                        parent_node.data.type))
+
+        if parent_node.data.type == "zSolverTransform" and row == 0:
+            # Special case: no node can insert before zSolver item
+            logger.debug("Can't drop because it's not group or zsolver node")
             return False
 
-        for i in range(0, len(drop_candidate_data)):
-            if is_zsolver_node(drop_candidate_data[i]):
-                return False
-
+        logger.debug("drop row = {}".format(row))
+        # Verify drop data
+        if not data.hasFormat(_mimeType):
+            logger.debug("Can't drop because mime type mismatch")
+            return False
+        drop_items = pickle.loads(data.data(_mimeType))
+        drop_node_name = ",".join([item.data.name for item in drop_items])
+        logger.debug("Drop data: {}".format(drop_node_name))
+        if any(is_zsolver_node(item.data) for item in drop_items):
+            logger.debug("Can't drop because drop data contain zsolver node")
+            return False
+        logger.debug("Can drop data")
         return True
 
     # End of QtCore.QAbstractItemModel override functions
@@ -253,42 +294,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         group_item = TreeItem(None, group_node)
         group_item.append_children(treeitems_to_move)
         group_parent_item.insert_children(group_item_row, group_item)
-        self.layoutChanged.emit()
-        return True
-
-    def move_items(self, index_list_to_move, dst_parent_index, dst_row):
-        """ Move specified item to the destination parent at destination row.
-        The Qt moveRows() API can't handle complex move items logic.
-        After reading https://doc.qt.io/qt-5/model-view-programming.html#resizable-models,
-        we choose to manage the index change by ourselves.
-
-        Arguments:
-            index_list_to_move (list[QModelIndex]): List of model index. Can be any row at any parent.
-            dst_parent_index (QModelIndex): Model index to move to
-            dst_row (int): Row position of the destination parent
-
-        Return:
-            True if succeeded, False otherwise.
-            Error message prints to logger.
-        """
-        dst_treeitem = get_node_by_index(dst_parent_index, None)
-        if dst_treeitem is None:
-            # Do nothing if destination parent is None
-            logger.error(
-                "Can't get destination parent tree item through QModelIndex, failed to move items.")
-            return False
-
-        treeitems_to_move = [get_node_by_index(index, None) for index in index_list_to_move]
-        if any(item is None for item in treeitems_to_move):
-            # Do nothing if there's invalid item in the move list
-            logger.error(
-                "QModelIndex move list contains invalid entry that has no attached tree item, failed to move items."
-            )
-            return False
-
-        self.layoutAboutToBeChanged.emit()
-        # Move items
-        dst_treeitem.insert_children(dst_row, treeitems_to_move)
         self.layoutChanged.emit()
         return True
 
