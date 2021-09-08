@@ -331,7 +331,7 @@ class ScenePanel2(QtWidgets.QWidget):
         solver_serialized_data_tuple_list = []
         attr = "scenePanelSerializedData"
         for node in solver_nodes:
-            attr_exists = cmds.attributeQuery(attr, node)
+            attr_exists = cmds.attributeQuery(attr, node=node, exists=1)
             if attr_exists:
                 serialized_data = cmds.getAttr('{}.{}'.format(node, attr))
                 if serialized_data:
@@ -353,12 +353,10 @@ class ScenePanel2(QtWidgets.QWidget):
             builder = zva.Ziva()
             builder.retrieve_connections()
             # TODO: resolve conflict
-            model_root_index = self._zGeo_treemodel.index(0, 0)
-            root_node = get_node_by_index(model_root_index, None)
-            # TODO: Add filter by solver
-            string_to_save = json_to_string(serialize_tree_model(root_node))
-            for node in solver_nodes:
-                cmds.setAttr('{}.scenePanelSerializedData'.format(node), string_to_save, type='string')
+            root_node = self._zGeo_treemodel.root_node()
+            for node in root_node.children:
+                string_to_save = json_to_string(serialize_tree_model(node))
+                cmds.setAttr('{}.scenePanelSerializedData'.format(node.data.name), string_to_save, type='string')
             logger.info("zGeo TreeView data saved.")
 
     def get_expanded(self):

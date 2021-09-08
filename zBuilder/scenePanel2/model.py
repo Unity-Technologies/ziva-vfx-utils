@@ -29,6 +29,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             ["zSolver", "zSolverTransform"])[0] if new_builder else None
         self.endResetModel()
 
+    def root_node(self):
+        return self._root_node
+
     # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
         parent_node = get_node_by_index(parent, self._root_node)
@@ -253,7 +256,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True
 
     def move_items(self, index_list_to_move, dst_parent_index, dst_row):
-        """ Move specifed item to the destination parent at desitination row.
+        """ Move specified item to the destination parent at destination row.
         The Qt moveRows() API can't handle complex move items logic.
         After reading https://doc.qt.io/qt-5/model-view-programming.html#resizable-models,
         we choose to manage the index change by ourselves.
