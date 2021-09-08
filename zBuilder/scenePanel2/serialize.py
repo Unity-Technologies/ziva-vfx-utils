@@ -12,7 +12,7 @@ _version = 1
 
 def serialize_tree_model(root_node):
     """
-    Serializes tree items representing model of the ScenePanel2 TreeView 
+    Serializes tree items representing model of the ScenePanel2 TreeView.
     """
     tree_data = dict()
     tree_data["version"] = _version
@@ -20,7 +20,10 @@ def serialize_tree_model(root_node):
 
     if _version == 1:
         # traverse nodes in DFS order and record each node
-        list_to_traverse = root_node.children[:]
+        if root_node.is_root_node(): # skip root node
+            list_to_traverse = root_node.children[:]
+        else:
+            list_to_traverse = [root_node]
         while list_to_traverse:
             current_node = list_to_traverse.pop(0)
             path_to_node = current_node.get_tree_path()
@@ -123,7 +126,6 @@ def deserialize_tree_model(serialized_data):
             if current_node["type"] == "group":
                 child_node = TreeItem(current_parent, GroupNode(path_node_list[-1]))
             else:
-                # TODO: resolve conflict with loaded tree here
                 child_base_data = Base()
                 child_base_data.name = current_node["name"]
                 child_base_data.type = current_node["type"]

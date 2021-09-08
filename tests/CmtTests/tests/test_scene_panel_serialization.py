@@ -394,3 +394,104 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(deserialized_tissue2_node.pin_state,  TreeItem.Unpinned)
         self.assertEqual(deserialized_tissue2_node.child_count(), 0)
 
+    def test_data_serialization_with_non_root_node(self):
+        """ Here we test serialization of partial tree.
+        """
+        # Setup: construct tree structure as follows:
+        # ROOT
+        #   `- zSolver1Transform
+        #     |- zSolver1
+        #     |- group1
+        #     |   - tissue1
+        #   `- zSolver2Transform
+        #     |- zSolver2
+        #     |- group2
+        #     |   - tissue2
+        #   `- zSolver3Transform
+        #     |- zSolver3
+        #     |- tissue3
+        cmds.ziva(s=True)
+        cmds.polyCube(n="tissue1")
+        cmds.ziva("tissue1", t=True)
+        cmds.ziva(s=True)
+        cmds.polyCube(n="tissue2")
+        cmds.ziva("tissue2", t=True)
+        cmds.ziva(s=True)
+        cmds.polyCube(n="tissue3")
+        cmds.ziva("tissue3", t=True)
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        root_node = build_scene_panel_tree(builder, ["zSolver", "zSolverTransform", "ui_zTissue_body"])[0]
+
+        # get tissue nodes
+        solver1 = root_node.children[0]
+        tissue1 = solver1.children[1]
+        solver2 = root_node.children[1]
+        tissue2 = solver2.children[1]
+        tissue2.pin_state = TreeItem.Pinned
+        solver3 = root_node.children[2]
+        tissue3 = solver3.children[1]
+
+        # Create group nodes and add tissue nodes as child
+        group1 = TreeItem(solver1, GroupNode("group1"))
+        group1.append_children(tissue1)
+        group2 = TreeItem(solver2, GroupNode("group2"))
+        group2.append_children(tissue2)
+
+        # test serialized data for solver1 tree below
+        # ROOT
+        #   `- zSolver1Transform
+        #     |- zSolver1
+        #     |- group1
+        #     |   - tissue1
+        serialized_solver1_data = serialize_tree_model(solver1)
+
+        self.assertEqual(type(serialized_solver1_data), dict)
+        self.assertEqual(len(serialized_solver1_data), 2)
+        self.assertEqual(type(serialized_solver1_data["version"]), int)
+        self.assertEqual(type(serialized_solver1_data["nodes"]), dict)
+        self.assertEqual(len(serialized_solver1_data["nodes"]), 4)
+
+        # node data to match with
+        match_data1 = { "0|zSolver1": {'pin_state': 0, 'name': '|zSolver1', 'type': 'zSolverTransform'},
+                        "0|zSolver1|zSolver1Shape": {'pin_state': 0, 'name': '|zSolver1|zSolver1Shape', 'type': 'zSolver'},
+                        "1|zSolver1|group1": {'type': 'group'},
+                        "0|zSolver1|group1|tissue1": {'pin_state': 0, 'name': '|tissue1', 'type': 'ui_zTissue_body'}}
+        print(serialized_solver1_data)
+        # Test serialized node data matches with expected result
+        self.assertDictEqual(match_data1, serialized_solver1_data["nodes"])
+
+        # test serialized data for solver2 tree below
+        # ROOT
+        #   `- zSolver2Transform
+        #     |- zSolver2
+        #     |- group2
+        #     |   - tissue2
+        serialized_solver2_data = serialize_tree_model(solver2)
+        self.assertEqual(len(serialized_solver2_data["nodes"]), 4)
+        print(serialized_solver2_data)
+        # node data to match with
+        match_data2 = { "1|zSolver2": {'pin_state': 0, 'name': '|zSolver2', 'type': 'zSolverTransform'},
+                        "0|zSolver2|zSolver2Shape": {'pin_state': 0, 'name': '|zSolver2|zSolver2Shape', 'type': 'zSolver'},
+                        "1|zSolver2|group2": {'type': 'group'},
+                        "0|zSolver2|group2|tissue2": {'pin_state': 2, 'name': '|tissue2', 'type': 'ui_zTissue_body'}}
+
+        # Test serialized node data matches with expected result
+        self.assertDictEqual(match_data2, serialized_solver2_data["nodes"])
+
+        # test serialized data for solver3 tree below
+        # ROOT
+        #   `- zSolver3Transform
+        #     |- zSolver3
+        #     |- tissue3
+        serialized_solver3_data = serialize_tree_model(solver3)
+        self.assertEqual(len(serialized_solver3_data["nodes"]), 3)
+        print(serialized_solver3_data["nodes"])
+        # node data to match with
+        match_data3 = { "2|zSolver3": {'pin_state': 0, 'name': '|zSolver3', 'type': 'zSolverTransform'},
+                        "0|zSolver3|zSolver3Shape": {'pin_state': 0, 'name': '|zSolver3|zSolver3Shape', 'type': 'zSolver'},
+                        "1|zSolver3|tissue3": {'pin_state': 0, 'name': '|tissue3', 'type': 'ui_zTissue_body'}}
+
+        # Test serialized node data matches with expected result
+        self.assertDictEqual(match_data3, serialized_solver3_data["nodes"])
