@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 _version = 1
 
+
 def serialize_tree_model(root_node):
     """
     Serializes tree items representing model of the ScenePanel2 TreeView.
@@ -28,17 +29,17 @@ def serialize_tree_model(root_node):
             current_node = list_to_traverse.pop(0)
             path_to_node = current_node.get_tree_path()
             index = current_node.row()
-            node_key = str(index) + str(path_to_node) # index is needed for key uniqueness
+            node_key = str(index) + str(path_to_node)  # index is needed for key uniqueness
 
-            if current_node._is_group_item():
-                tree_nodes[node_key] ={
-                                           "type": current_node.data.type}
+            if is_group_item(current_node):
+                tree_nodes[node_key] = {"type": current_node.data.type}
             else:
                 tree_nodes[node_key] = {
-                                            "pin_state": current_node.pin_state,
-                                            # since long name cannot be set, we store "long_name" as name
-                                            "name": current_node.data.long_name,
-                                            "type": current_node.data.type}
+                    "pin_state": current_node.pin_state,
+                    # since long name cannot be set, we store "long_name" as name
+                    "name": current_node.data.long_name,
+                    "type": current_node.data.type
+                }
             # add children
             if current_node.children:
                 list_to_traverse.extend(current_node.children)
@@ -61,11 +62,7 @@ def write_serialized_data_to_file(data, file_path):
 
     try:
         with open(file_path, 'w') as output_file:
-                json.dump(data,
-                          output_file,
-                          sort_keys=True,
-                          indent=4,
-                          separators=(',', ': '))
+            json.dump(data, output_file, sort_keys=True, indent=4, separators=(',', ': '))
         logger.debug("Finished writing serialized data to {}.".format(file_path))
     except:
         logger.error("Failed to write serialized data to {}.".format(file_path))
@@ -84,7 +81,8 @@ def deserialize_tree_model(serialized_data):
 
     if serialized_data["version"] == 1:
         # sort keys by tree item level, and then by tree item index
-        tree_keys = sorted(serialized_data["nodes"].keys(), key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
+        tree_keys = sorted(serialized_data["nodes"].keys(),
+                           key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
 
         # initialize values for tree traversal
         current_level_count = 0
