@@ -1,19 +1,20 @@
-from vfx_test_case import VfxTestCase
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
+import os
+
+from tests.utils import load_scene
+from vfx_test_case import VfxTestCase
 from zBuilder.commonUtils import is_string
 from zBuilder.ui.model import SceneGraphModel
-from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
+from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole, validate_group_node_name
 from zBuilder.nodes.dg_node import DGNode
-from maya import cmds
 from PySide2 import QtCore
-import os
+from maya import cmds
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaScenePanelTestCase, self).setUp()
-        test_utils.load_scene()
+        load_scene()
         builder = zva.Ziva()
         builder.retrieve_connections()
         self.model = SceneGraphModel(builder)
@@ -73,3 +74,12 @@ class ZivaScenePanelTestCase(VfxTestCase):
         # zBuilder node has a new name
         node = child_index.internalPointer()
         self.assertEqual(node.name, "renamed_zSolver")
+
+    def test_group_name_validation(self):
+        """ Only starts with alphabet, digits and underscore are allowed after that.
+        """
+        self.assertTrue(validate_group_node_name("A1b2c"))
+        self.assertTrue(validate_group_node_name("a1b2c_"))
+        self.assertFalse(validate_group_node_name("1b2c_"))
+        self.assertFalse(validate_group_node_name("_a1b2c_"))
+        self.assertFalse(validate_group_node_name("abc**"))

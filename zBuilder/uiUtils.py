@@ -18,7 +18,8 @@ zGeo_UI_node_types = ["ui_{}_body".format(item) for item in ("zTissue", "zBone",
 
 name_duplication_check_pattern = re.compile(r".*?(\d+)$")
 
-name_validation_pattern = re.compile(r"[a-zA-Z][\w]*")
+name_validation_pattern = re.compile(r"^[a-zA-Z][\w]*$")
+
 
 def dock_window(dialog_class, *args, **kwargs):
     """ Create dock window for Maya
@@ -110,10 +111,11 @@ def get_node_by_index(index, fallback_val):
             return node
     return fallback_val
 
+
 def get_unique_name(proposed_name, list_of_names):
-    """
-    Given a proposed name and a list of names to check against, this function
-    checks for duplicate names and generates a unique name if duplicate found.
+    """ Given a proposed name and a list of names to check against, 
+    this function checks for duplicate names and generates a unique name if duplicate found.
+
     Args:
         proposed_name (str): The proposed name
         list_of_names (list): Names to check against for duplicates
@@ -121,7 +123,6 @@ def get_unique_name(proposed_name, list_of_names):
         str: A unique name
     """
     # Find ending digits, if any
-
     result = re.match(name_duplication_check_pattern, proposed_name)
     base_name = proposed_name.rstrip(result.group(1)) if result else proposed_name
     index = 1
@@ -134,10 +135,12 @@ def get_unique_name(proposed_name, list_of_names):
             break
     return proposed_name
 
+
 def validate_group_node_name(name):
-    """
-    Given a name, this method checks its validity by checking if the name starts
-    with alphabet and can only have alphanumeric values and underscore.
+    """ Given a name, this method checks its validity by checking
+    if the name starts with alphabet and
+    can only have alphanumeric values and underscore.
+
     Args:
         name (str): name for checking validity
     Returns:
@@ -147,8 +150,7 @@ def validate_group_node_name(name):
 
 
 class ProximityWidget(QtWidgets.QWidget):
-    """
-    Widget in right-click menu to change map weights for attachments
+    """ Widget in right-click menu to change map weights for attachments
     """
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
@@ -188,9 +190,9 @@ class ProximityWidget(QtWidgets.QWidget):
         mel.eval('zPaintAttachmentsByProximity -min {} -max {}'.format(
             self.from_edit.text(), self.to_edit.text()))
 
+
 class MenuLineEdit(QtWidgets.QLineEdit):
-    """
-    Groups LineEdits together so after you press Tab it switch focus to sibling_right.
+    """ Groups LineEdits together so after you press Tab it switch focus to sibling_right.
     If Shift+Tab pressed it uses sibling_left.
     Sends acceptSignal when Enter or Return button is pressed.
     This is for use in Menus, where tab navigation is broken out of the box,
@@ -219,30 +221,31 @@ class MenuLineEdit(QtWidgets.QLineEdit):
             return True
         return super(MenuLineEdit, self).event(event)
 
+
 def is_zsolver_node(node):
-    """
-    Checks if a node type is "zSolver".
+    """ Checks if a node type is "zSolver" or "zSolverTransform".
+
     Args:
         node: node to check
+
     Returns:
         bool: result of "zSolver" node type check
     """
     return node.type.startswith("zSolver")
 
+
 def is_default_solver(node):
-    """
-    Checks if a solver node is the default solver.
+    """ Checks if a solver node is the default solver.
+
     Args:
         node: node to check
     Returns:
         bool: result of default solver check
     """
+    # "defaultSolver" command returns name of the Transform node
     defaultSolver = cmds.zQuery(defaultSolver=True)
-
     if node.type == "zSolverTransform":
-        return  defaultSolver and defaultSolver[0] == node.name
-    elif node.type == "zSolver":
-        return defaultSolver and defaultSolver[0] == node.parent.name  # "defaultSolver" command returns name of the Transform node
-    else:
-        return False
-
+        return defaultSolver and defaultSolver[0] == node.name
+    if node.type == "zSolver":
+        return defaultSolver and defaultSolver[0] == node.parent.name
+    return False

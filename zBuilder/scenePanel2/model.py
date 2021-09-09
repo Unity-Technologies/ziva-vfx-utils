@@ -84,7 +84,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         assert node, "Can't get node through QModelIndex."
         is_data_set = False
         if role == QtCore.Qt.EditRole:
-            long_name = node.data.long_name
             short_name = node.data.name
             if value and value != short_name:
                 if isinstance(node.data, GroupNode):
@@ -98,7 +97,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                     if is_node_name_duplicate(node, sibling_nodes):
                         fix_node_name_duplication(node, sibling_nodes)
                 else:
-                    name = cmds.rename(long_name, value)
+                    name = cmds.rename(node.data.long_name, value)
                     self._builder.string_replace("^{}$".format(short_name), name)
                     node.data.name = name
                 is_data_set = True
