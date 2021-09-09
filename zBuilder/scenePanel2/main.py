@@ -5,7 +5,7 @@ import weakref
 import logging
 
 from .model import SceneGraphModel
-from serialize import *
+from .serialize import *
 from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
 from .groupNode import GroupNode
@@ -331,7 +331,7 @@ class ScenePanel2(QtWidgets.QWidget):
         solver_serialized_data_tuple_list = []
         attr = "scenePanelSerializedData"
         for node in solver_nodes:
-            attr_exists = cmds.attributeQuery(attr, node=node, exists=1)
+            attr_exists = cmds.attributeQuery(attr, node=node, exists=True)
             if attr_exists:
                 serialized_data = cmds.getAttr('{}.{}'.format(node, attr))
                 if serialized_data:
@@ -359,27 +359,23 @@ class ScenePanel2(QtWidgets.QWidget):
                 cmds.setAttr('{}.scenePanelSerializedData'.format(node.data.name), string_to_save, type='string')
             logger.info("zGeo TreeView data saved.")
 
-    def get_expanded(self):
+    def get_expand_item_name(self):
+        """ Returns name list of the current expanded items in zGeoTreeView
         """
-        Returns: array of item names that are currently expanded in zGeoTreeView
-        """
-        # store currently expanded items
-        expanded = []
-        for index in self._zGeo_treemodel.persistentIndexList():
-            if self._tvGeo.isExpanded(index):
-                expanded.append(index.data(longNameRole))
+        return [
+            index.data(longNameRole) for index in self._zGeo_treemodel.persistentIndexList()
+            if self._tvGeo.isExpanded(index)
+        ]
 
-        return expanded
-
-    def expand(self, names):
+    def expand_item_by_name(self, name_list):
         """
         Args:
-            names (list): names to expand in zGeoTreeView
+            name_list (list(str)): names to expand in zGeoTreeView
         """
         # collapseAll added in case refreshing of zGeoTreeView needed
         # otherwise new items might not be displayed ( Qt bug )
         self._tvGeo.collapseAll()
-        for name in names:
+        for name in name_list:
             indexes = self._zGeo_treemodel.match(self._zGeo_treemodel.index(0, 0), longNameRole,
                                                  name, -1,
                                                  QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
@@ -539,8 +535,6 @@ class ScenePanel2(QtWidgets.QWidget):
                 insertion_parent_index = selected_index_list[0].parent()
                 # Get first row index as insertion point
                 insertion_row = min(map(lambda index: index.row(), selected_index_list))
-        # Clear the current selection to avoid Maya crash
-        self._tvGeo.selectionModel().clear()
 
         # Create Group node with proper name
         names_to_check = []
@@ -550,22 +544,23 @@ class ScenePanel2(QtWidgets.QWidget):
                                            insertion_parent_index).data(QtCore.Qt.DisplayRole))
         group_name = get_unique_name("Group1", names_to_check)
         group_node = GroupNode(group_name)
-
+        expanded_item_list = self.get_expand_item_name()
         self._zGeo_treemodel.group_items(insertion_parent_index, insertion_row, group_node,
                                          selected_index_list)
+        self.expand_item_by_name(expanded_item_list)
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete top level group items in the current selection in the zGeo TreeView.
         Currently we only support delete group items.
         The child group nodes in the selection will not be deleted.
         """
-        # Make a group index copy list and clear the current selection.
-        # This is to avoid Maya Qt crash after deleting these tree items.
         group_index_to_delete = list(
             filter(lambda index: is_group_node(index.data(nodeRole)),
                    self._tvGeo.selectedIndexes()))
-        self._tvGeo.selectionModel().clear()
+
+        expanded_item_list = self.get_expand_item_name()
         self._zGeo_treemodel.delete_group_items(group_index_to_delete)
+        self.expand_item_by_name(expanded_item_list)
         # TODO: Add support for zGeo node deletion
 
     # Override

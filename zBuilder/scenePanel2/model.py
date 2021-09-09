@@ -134,7 +134,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == sortRole and hasattr(node.data, "type"):
             return node.data.type
         if role == longNameRole:
-            return node.data.long_name
+            if hasattr(node.data, "long_name"):
+                # Return full path for Maya DGNode
+                return node.data.long_name
+            # Return TreeItem path for non Maya DGNode
+            return node.get_tree_path()
         if role == QtCore.Qt.BackgroundRole:
             if index.row() % 2 == 0:
                 return QtGui.QColor(54, 54, 54)  # gray
@@ -293,11 +297,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         logger.debug("Create Group item {} in parent item {} at row {}".format(
             group_node.name, group_parent_item.data.name, group_item_row))
 
-        self.layoutAboutToBeChanged.emit()
+        self.beginResetModel()
         group_item = TreeItem(None, group_node)
         group_item.append_children(treeitems_to_move)
         group_parent_item.insert_children(group_item_row, group_item)
-        self.layoutChanged.emit()
+        self.endResetModel()
         return True
 
     def delete_group_items(self, group_index_to_delete):
@@ -309,9 +313,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 "Can't get group treeitem through QModelIndex, failed to delete group items.")
             return False
 
-        self.layoutAboutToBeChanged.emit()
+        self.beginResetModel()
         items_to_delete = [item for item in prune_child_nodes(group_item_to_delete)]
         for item in items_to_delete:
             pick_out_node(item, is_node_name_duplicate, fix_node_name_duplication)
-        self.layoutChanged.emit()
+        self.endResetModel()
         return True
