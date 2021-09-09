@@ -88,9 +88,6 @@ class TreeItem(object):
         if not is_sequence(new_children):
             new_children = [new_children]
 
-        new_child_name = ",".join(
-            [new_child.data.name if new_child.data else "NONE" for new_child in new_children])
-        logger.debug("{} child to append: {}".format(len(new_children), new_child_name))
         for new_child in new_children:
             cur_child_name = new_child.data.name if new_child.data else "NONE"
             if new_child._parent is self:
@@ -99,9 +96,6 @@ class TreeItem(object):
                 continue
 
             if new_child._parent:
-                old_parent_name = new_child._parent.data.name if new_child._parent.data else "NONE"
-                logger.debug("Unlink child node {} from old parent {} at row {}".format(
-                    cur_child_name, old_parent_name, new_child.row()))
                 new_child._parent._children.remove(new_child)
             new_child._parent = self
             self._children.append(new_child)
@@ -126,13 +120,8 @@ class TreeItem(object):
                 continue
 
             if new_child._parent:
-                logger.debug("Unlink child node {} from old parent {} at row {}".format(
-                    new_child.data.name, new_child._parent.data.name, new_child.row()))
                 new_child._parent._children.remove(new_child)
             new_child._parent = self
-            logger.debug("Insert child node {} to new parent {} at row {}".format(
-                new_child.data.name if new_child.data else new_child.data, self._data.name,
-                index + offset))
             self._children.insert(index + offset, new_child)
             offset += 1
 
