@@ -249,3 +249,15 @@ def is_default_solver(node):
     if node.type == "zSolver":
         return defaultSolver and defaultSolver[0] == node.parent.name
     return False
+
+
+def get_zSolverTransform_treeitem(item):
+    """ Given a TreeItem instance, return its zSolverTransform TreeItem.
+    If not found, return None.
+    """
+    cur_item = item
+    while cur_item:
+        if cur_item.data.type == "zSolverTransform":
+            return cur_item
+        cur_item = cur_item.parent
+    return None

@@ -356,7 +356,9 @@ class ScenePanel2(QtWidgets.QWidget):
             root_node = self._zGeo_treemodel.root_node()
             for node in root_node.children:
                 string_to_save = json_to_string(serialize_tree_model(node))
-                cmds.setAttr('{}.scenePanelSerializedData'.format(node.data.name), string_to_save, type='string')
+                cmds.setAttr('{}.scenePanelSerializedData'.format(node.data.name),
+                             string_to_save,
+                             type='string')
             logger.info("zGeo TreeView data saved.")
 
     def get_expand_item_name(self):
@@ -516,16 +518,37 @@ class ScenePanel2(QtWidgets.QWidget):
         - If the selection has same parent, insert a new Group node at the last item position;
         - If the selection has different parent, append a new Group at the end of top level;
         """
-        if self._zGeo_treemodel.rowCount(self._zGeo_treemodel.index(0, 0)) == 0:
+        root_index = QtCore.QModelIndex()
+        if self._zGeo_treemodel.rowCount(root_index) == 0:
             logger.warning("Can't create Group node since no zSolver node exists.")
             return
 
-        insertion_parent_index = self._zGeo_treemodel.index(0, 0)
-        insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
         # Exclude zSolver* items
         selected_index_list = list(
             filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
                    self._tvGeo.selectedIndexes()))
+        # Make sure all select items come from same zSolverTransform node.
+        # Otherwise, do early return.
+        solver_list = list(
+            set([
+                get_zSolverTransform_treeitem(get_node_by_index(index, None))
+                for index in selected_index_list
+            ]))
+        if len(solver_list) != 1:
+            logger.warning("Can't create group node. Selected items come from different zSolver.")
+            return
+        assert solver_list[0], "Selected items belong to different zSolverTransform nodes."\
+            "There's bug in the code logic."
+
+        # Find zSolverTransform index through TreeItem
+        insertion_parent_index = None
+        for rowIdx in range(self._zGeo_treemodel.rowCount(root_index)):
+            cur_index = self._zGeo_treemodel.index(rowIdx, 0, root_index)
+            if get_zSolverTransform_treeitem(get_node_by_index(cur_index, None)) == solver_list[0]:
+                insertion_parent_index = cur_index
+        assert insertion_parent_index, "Can't find solver index through zSolverTransform TreeItem."
+
+        insertion_row = self._zGeo_treemodel.rowCount(insertion_parent_index)
         if selected_index_list:
             # Decide insertion position
             all_items_have_same_parent = all(index.parent() == selected_index_list[0].parent()
@@ -538,7 +561,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
         # Create Group node with proper name
         names_to_check = []
-        for rowIdx in range(0, self._zGeo_treemodel.rowCount(insertion_parent_index)):
+        for rowIdx in range(self._zGeo_treemodel.rowCount(insertion_parent_index)):
             names_to_check.append(
                 self._zGeo_treemodel.index(rowIdx, 0,
                                            insertion_parent_index).data(QtCore.Qt.DisplayRole))
