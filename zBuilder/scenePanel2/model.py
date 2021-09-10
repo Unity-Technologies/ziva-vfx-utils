@@ -198,6 +198,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def mimeData(self, indexes):
         mimeData = QtCore.QMimeData()
         treeitem_list = [index.internalPointer() for index in indexes]
+        # When both parent and child node in the drag&drop list,
+        # make sure only parent nodes are pickled.
+        # Otherwise the child nodes will separate from the parent node.
         pruned_treeitem_list = prune_child_nodes(treeitem_list)
         mimeData.setData(_mimeType, pickle.dumps(pruned_treeitem_list))
         return mimeData
