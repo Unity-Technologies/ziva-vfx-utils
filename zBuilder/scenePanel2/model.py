@@ -241,28 +241,38 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return False
         parent_node = get_node_by_index(parent, None)
         if not parent_node:
-            logger.error("Drop item contains Invalid data!")
+            logger.error("Failed to get parent TreeItem through QModelIndex in canDropMimeData().")
             return False
-        logger.debug("parent_node: {}, type: {}".format(parent_node.data.name,
-                                                        parent_node.data.type))
-
         if parent_node.data.type == "zSolverTransform" and row == 0:
             # Special case: no node can insert before zSolver item
             logger.debug("Can't drop because it's not group or zsolver node")
             return False
 
-        logger.debug("drop row = {}".format(row))
         # Verify drop data
         if not data.hasFormat(_mimeType):
             logger.debug("Can't drop because mime type mismatch")
             return False
         drop_items = pickle.loads(data.data(_mimeType))
-        drop_node_name = ",".join([item.data.name for item in drop_items])
-        logger.debug("Drop data: {}".format(drop_node_name))
         if any(is_zsolver_node(item.data) for item in drop_items):
             logger.debug("Can't drop because drop data contain zsolver node")
             return False
-        logger.debug("Can drop data")
+        # Make sure all select items come from same zSolverTransform node.
+        # Otherwise, do early return.
+        solver_list = list(set([get_zSolverTransform_treeitem(item) for item in drop_items]))
+        if len(solver_list) != 1:
+            logger.debug("Can't drop data. Selected items come from different zSolver.")
+            return False
+        assert solver_list[0], "Selected items belong to different zSolverTransform nodes."\
+            "There's bug in the code logic."
+        parent_solverTM = get_zSolverTransform_treeitem(parent_node)
+        if solver_list[0].data != parent_solverTM.data:
+            logger.debug("Can't drop selected items to different zSolver.")
+            return False
+
+        # Valid drop, good to go
+        drop_node_name = ",".join([item.data.name for item in drop_items])
+        logger.debug("Can drop data {} to parent node {} at row {}".format(
+            drop_node_name, parent_node.data.name, row))
         return True
 
     # End of QtCore.QAbstractItemModel override functions
