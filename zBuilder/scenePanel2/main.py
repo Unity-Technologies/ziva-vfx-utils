@@ -25,10 +25,23 @@ def is_group_node(node):
     return node.type == "group"
 
 
+def setup_toolbar_action(parent, name, text, tooltip, toolbar, slot):
+    icon_path = get_icon_path_from_name(name)
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap(icon_path))
+    action = QtWidgets.QAction(parent)
+    action.setText(text)
+    action.setIcon(icon)
+    if tooltip:
+        action.setToolTip(tooltip)
+    action.triggered.connect(slot)
+    toolbar.addAction(action)
+
+
 class ScenePanel2(QtWidgets.QWidget):
     instances = list()
-    CONTROL_NAME = 'zfxScenePanel2'
-    DOCK_LABEL_NAME = 'Ziva VFX Scene Panel 2'
+    CONTROL_NAME = "zfxScenePanel2"
+    DOCK_LABEL_NAME = "Ziva VFX Scene Panel 2"
 
     @staticmethod
     def delete_instances():
@@ -75,7 +88,7 @@ class ScenePanel2(QtWidgets.QWidget):
     def _reset_builder(self):
         """ Build and set the zGeo TreeView. This forces a complete redraw of the zGeo TreeView.
         """
-        solver_nodes = cmds.ls(type='zSolver')
+        solver_nodes = cmds.ls(type="zSolver")
         if not solver_nodes:
             # Clear the TreeView and do early return if there's no solver node in the scene
             self._zGeo_treemodel.reset_model(None)
@@ -187,64 +200,47 @@ class ScenePanel2(QtWidgets.QWidget):
         lytMain.addLayout(lytTwoPanel)
 
     def _setup_actions(self):
-        self._setup_toolbar_action('zSolver', 'Create zSolver', 'actionCreateSolver',
-                                   self.toolbarCreate, create_zSolver)
-        self._setup_toolbar_action('zTissue', 'Create zTissue', 'actionCreateTissue',
-                                   self.toolbarCreate, create_zTissue)
-        self._setup_toolbar_action('zBone', 'Create zBone', 'actionCreateBone', self.toolbarCreate,
-                                   create_zBone)
-        self._setup_toolbar_action('zCloth', 'Create zCloth', 'actionCreateCloth',
-                                   self.toolbarCreate, create_zCloth)
-        self._setup_toolbar_action('zAttachmentPlus',
-                                   'Create zAttachment: select source vertices and target object',
-                                   'actionCreateAttachment', self.toolbarCreate, create_zAttachment)
-        self._setup_toolbar_action('create-group-plus', 'Create group', 'actionCreateGroup',
-                                   self.toolbarCreate, self._create_group)
-        self._setup_toolbar_action('zMaterial', 'Add zMaterial: select tissue geometry',
-                                   'actionAddMaterial', self.toolbarAdd, add_zMaterial)
-        self._setup_toolbar_action('zFiber', 'Add zFiber: select tissue geometry', 'actionAddFiber',
-                                   self.toolbarAdd, add_zFiber)
-        self._setup_toolbar_action('subtissue',
-                                   'Add zSubtissue: select parent and then child tissue mesh',
-                                   'actionAddSubtissue', self.toolbarAdd, add_zSubtissue)
-        self._setup_toolbar_action('zRestShape',
-                                   'Add zRestShape: select tissue mesh and then restShape mesh',
-                                   'actionAddRestShape', self.toolbarAdd, add_zRestShape)
-        self._setup_toolbar_action('zLineOfAction', 'Add zLineOfAction: select zFiber and curve',
-                                   'actionAddLineOfAction', self.toolbarAdd, add_zLineOfAction)
-        self._setup_toolbar_action('curve', 'Add Fiber Curve: select zFiber', 'actionAddFiberCurve',
-                                   self.toolbarAdd, add_fiberCurve)
-        self._setup_toolbar_action('zRivetToBone',
-                                   'Add zRivetToBone: select target curve vertex and bone mesh',
-                                   'actionAddRivetToBone', self.toolbarAdd, add_rivetToBone)
-        self._setup_toolbar_action('zCache', 'Add zCache', 'actionAddCache', self.toolbarAdd,
-                                   add_cache)
-        self._setup_refresh_action()
+        # Create section
+        setup_toolbar_action(self, "zSolver", "Create zSolver", None, self.toolbarCreate,
+                             create_zSolver)
+        setup_toolbar_action(self, "zTissue", "Create zTissue", None, self.toolbarCreate,
+                             create_zTissue)
+        setup_toolbar_action(self, "zBone", "Create zBone", None, self.toolbarCreate, create_zBone)
+        setup_toolbar_action(self, "zCloth", "Create zCloth", None, self.toolbarCreate,
+                             create_zCloth)
+        setup_toolbar_action(self, "zAttachmentPlus", "Create zAttachment",
+                             "Create zAttachment: select source vertices and target object",
+                             self.toolbarCreate, create_zAttachment)
+        setup_toolbar_action(self, "create-group-plus", "Create Group",
+                             "Create Group: select tree view items", self.toolbarCreate,
+                             self._create_group)
+        # Add section
+        setup_toolbar_action(self, "zMaterial", "Add zMaterial",
+                             "Add zMaterial: select tissue geometry", self.toolbarAdd,
+                             add_zMaterial)
+        setup_toolbar_action(self, "zFiber", "Add zFiber", "Add zFiber: select tissue geometry",
+                             self.toolbarAdd, add_zFiber)
+        setup_toolbar_action(self, "subtissue", "Add zSubtissue",
+                             "Add Subtissue: select parent and then child tissue mesh",
+                             self.toolbarAdd, add_zSubtissue)
+        setup_toolbar_action(self, "zRestShape", "Add zRestShape",
+                             "Add zRestShape: select tissue mesh and then restShape mesh",
+                             self.toolbarAdd, add_zRestShape)
+        setup_toolbar_action(self, "zLineOfAction", "Add zLineOfAction",
+                             "Add zLineOfAction: select zFiber and curve", self.toolbarAdd,
+                             add_zLineOfAction)
+        setup_toolbar_action(self, "curve", "Add Fiber Curve", "Add Fiber Curve: select zFiber",
+                             self.toolbarAdd, add_fiberCurve)
+        setup_toolbar_action(self, "zRivetToBone", "Add zRivetToBone",
+                             "Add zRivetToBone: select target curve vertex and bone mesh",
+                             self.toolbarAdd, add_rivetToBone)
+        setup_toolbar_action(self, "zCache", "Add zCache", None, self.toolbarAdd, add_cache)
+        # Edit section
+        setup_toolbar_action(self, "refresh", "Refresh the Scene Panel tree view", None,
+                             self.toolbarEdit, self._reset_builder)
 
         self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
-
-    def _setup_toolbar_action(self, name, text, objectName, toolbar, slot):
-        icon_path = get_icon_path_from_name(name)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(icon_path))
-        action = QtWidgets.QAction(self)
-        action.setText(text)
-        action.setIcon(icon)
-        action.setObjectName(objectName)
-        action.triggered.connect(slot)
-        toolbar.addAction(action)
-
-    def _setup_refresh_action(self):
-        refresh_path = get_icon_path_from_name('refresh')
-        refresh_icon = QtGui.QIcon()
-        refresh_icon.addPixmap(QtGui.QPixmap(refresh_path))
-        self.actionRefresh = QtWidgets.QAction(self)
-        self.actionRefresh.setText('Refresh')
-        self.actionRefresh.setIcon(refresh_icon)
-        self.actionRefresh.setObjectName("actionRefresh")
-        self.actionRefresh.triggered.connect(self._reset_builder)
-        self.toolbarEdit.addAction(self.actionRefresh)
 
     def on_tvGeo_selectionChanged(self, selected, deselected):
         """
@@ -327,15 +323,15 @@ class ScenePanel2(QtWidgets.QWidget):
     def on_post_scene_read(self):
         """ Callback invoked after Maya load the scene
         """
-        solver_nodes = cmds.ls(type='zSolver')
+        solver_nodes = cmds.ls(type="zSolver")
         solver_serialized_data_tuple_list = []
         attr = "scenePanelSerializedData"
         for node in solver_nodes:
             attr_exists = cmds.attributeQuery(attr, node=node, exists=True)
             if attr_exists:
-                serialized_data = cmds.getAttr('{}.{}'.format(node, attr))
+                serialized_data = cmds.getAttr("{}.{}".format(node, attr))
                 if serialized_data:
-                    solver_serialized_data_tuple_list.append(('{}'.format(node), serialized_data))
+                    solver_serialized_data_tuple_list.append(("{}".format(node), serialized_data))
         self._reset_builder()
         # TODO: resolve conflict
 
@@ -347,7 +343,7 @@ class ScenePanel2(QtWidgets.QWidget):
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
         """
-        solver_nodes = cmds.ls(type='zSolver')
+        solver_nodes = cmds.ls(type="zSolver")
         if is_save_serialized_data_to_zsolver_plug():
             cmds.select(cl=True)
             builder = zva.Ziva()
@@ -356,9 +352,9 @@ class ScenePanel2(QtWidgets.QWidget):
             root_node = self._zGeo_treemodel.root_node()
             for node in root_node.children:
                 string_to_save = json_to_string(serialize_tree_model(node))
-                cmds.setAttr('{}.scenePanelSerializedData'.format(node.data.name),
+                cmds.setAttr("{}.scenePanelSerializedData".format(node.data.name),
                              string_to_save,
-                             type='string')
+                             type="string")
             logger.info("zGeo TreeView data saved.")
 
     def get_expand_item_name(self):
@@ -387,7 +383,7 @@ class ScenePanel2(QtWidgets.QWidget):
     # Begin zGeo TreeView pop-up menu
     def open_menu(self, position):
         """
-        Generates menu for 'zSolver' item.
+        Generates menu for zSolver item.
 
         If there are more than one object selected in UI a menu does not appear.
         """
@@ -413,22 +409,22 @@ class ScenePanel2(QtWidgets.QWidget):
         solver_transform = node
         solver = node.children[0]
 
-        self.add_zsolver_menu_action(menu, solver_transform, 'Enable', 'enable')
-        self.add_zsolver_menu_action(menu, solver, 'Collision Detection', 'collisionDetection')
-        self.add_zsolver_menu_action(menu, solver, 'Show Bones', 'showBones')
-        self.add_zsolver_menu_action(menu, solver, 'Show Tet Meshes', 'showTetMeshes')
-        self.add_zsolver_menu_action(menu, solver, 'Show Muscle Fibers', 'showMuscleFibers')
-        self.add_zsolver_menu_action(menu, solver, 'Show Attachments', 'showAttachments')
-        self.add_zsolver_menu_action(menu, solver, 'Show Collisions', 'showCollisions')
-        self.add_zsolver_menu_action(menu, solver, 'Show Materials', 'showMaterials')
+        self.add_zsolver_menu_action(menu, solver_transform, "Enable", "enable")
+        self.add_zsolver_menu_action(menu, solver, "Collision Detection", "collisionDetection")
+        self.add_zsolver_menu_action(menu, solver, "Show Bones", "showBones")
+        self.add_zsolver_menu_action(menu, solver, "Show Tet Meshes", "showTetMeshes")
+        self.add_zsolver_menu_action(menu, solver, "Show Muscle Fibers", "showMuscleFibers")
+        self.add_zsolver_menu_action(menu, solver, "Show Attachments", "showAttachments")
+        self.add_zsolver_menu_action(menu, solver, "Show Collisions", "showCollisions")
+        self.add_zsolver_menu_action(menu, solver, "Show Materials", "showMaterials")
         menu.addSeparator()
         self.add_info_action(menu)
         self.add_set_default_action(menu)
 
     def add_info_action(self, menu):
         action = QtWidgets.QAction(self)
-        action.setText('Info')
-        action.setToolTip('Outputs solver statistics.')
+        action.setText("Info")
+        action.setToolTip("Outputs solver statistics.")
         action.triggered.connect(self.run_info_command)
         menu.addAction(action)
 
@@ -439,9 +435,10 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def add_set_default_action(self, menu):
         action = QtWidgets.QAction(self)
-        action.setText('Set Default')
+        action.setText("Set Default")
         action.setToolTip(
-            'Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.'
+            "Set the default solver to the solver inferred from selection."\
+            "The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene."
         )
         sel = cmds.ls(sl=True)
         defaultSolver = cmds.zQuery(defaultSolver=True)
@@ -458,12 +455,12 @@ class ScenePanel2(QtWidgets.QWidget):
         action = QtWidgets.QAction(self)
         action.setText(text)
         action.setCheckable(True)
-        action.setChecked(node.attrs[attr]['value'])
+        action.setChecked(node.attrs[attr]["value"])
         action.changed.connect(partial(self.toggle_attribute, node, attr))
         menu.addAction(action)
 
     def toggle_attribute(self, node, attr):
-        value = node.attrs[attr]['value']
+        value = node.attrs[attr]["value"]
         if isinstance(value, bool):
             value = not value
         elif isinstance(value, int):
@@ -471,8 +468,8 @@ class ScenePanel2(QtWidgets.QWidget):
         else:
             cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
             return
-        node.attrs[attr]['value'] = value
-        cmds.setAttr('{}.{}'.format(node.long_name, attr), value)
+        node.attrs[attr]["value"] = value
+        cmds.setAttr("{}.{}".format(node.long_name, attr), value)
 
     def _select_group_hierarchy(self, group_index):
         def get_all_zGeo_indices(index_list):
