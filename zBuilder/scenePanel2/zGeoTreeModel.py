@@ -12,11 +12,11 @@ logger = logging.getLogger(__name__)
 _mimeType = 'application/x-scenepanelzgeoitemdata'
 
 
-class SceneGraphModel(QtCore.QAbstractItemModel):
+class zGeoTreeModel(QtCore.QAbstractItemModel):
     """ The tree model for zGeo TreeView.
     """
     def __init__(self, parent=None):
-        super(SceneGraphModel, self).__init__(parent)
+        super(zGeoTreeModel, self).__init__(parent)
         self._parent_widget = parent
         self._builder = None
         self._root_node = None
@@ -106,7 +106,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             is_data_set = True
         elif role == QtCore.Qt.CheckStateRole:
             node.pin_state = value
-            self._parent_widget.on_tvGeo_pinStateChanged(node)
+            self._parent_widget._on_tvGeo_pinStateChanged(node)
             is_data_set = True
 
         if is_data_set:

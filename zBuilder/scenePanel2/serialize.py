@@ -2,75 +2,73 @@ import os
 import json
 import logging
 
-from .treeItem import *
+from .treeItem import TreeItem, is_group_item
 from .groupNode import GroupNode
-from zBuilder.nodes.base import Base
+from ..nodes.base import Base
 
 logger = logging.getLogger(__name__)
 
-_version = 1
+_version = 1  # Serialization format version
 
 
 def serialize_tree_model(root_node):
+    """ Serializes tree items representing model of the ScenePanel2 TreeView.
+    Traverse nodes in DFS order and record each node.
+
+    Returns:
+        Dictionary with tree nodes and version info
     """
-    Serializes tree items representing model of the ScenePanel2 TreeView.
-    """
-    tree_data = dict()
-    tree_data["version"] = _version
     tree_nodes = dict()
+    if root_node.is_root_node():  # skip root node
+        list_to_traverse = root_node.children[:]
+    else:
+        list_to_traverse = [root_node]
+    while list_to_traverse:
+        current_node = list_to_traverse.pop(0)
+        path_to_node = current_node.get_tree_path()
+        index = current_node.row()
+        node_key = str(index) + str(path_to_node)  # Construct unique index for each node
 
-    if _version == 1:
-        # traverse nodes in DFS order and record each node
-        if root_node.is_root_node(): # skip root node
-            list_to_traverse = root_node.children[:]
+        if is_group_item(current_node):
+            tree_nodes[node_key] = {"type": current_node.data.type}
         else:
-            list_to_traverse = [root_node]
-        while list_to_traverse:
-            current_node = list_to_traverse.pop(0)
-            path_to_node = current_node.get_tree_path()
-            index = current_node.row()
-            node_key = str(index) + str(path_to_node)  # index is needed for key uniqueness
+            tree_nodes[node_key] = {
+                "pin_state": current_node.pin_state,
+                # since long name cannot be set, we store "long_name" as name
+                "name": current_node.data.long_name,
+                "type": current_node.data.type
+            }
+        # add children
+        if current_node.children:
+            list_to_traverse.extend(current_node.children)
 
-            if is_group_item(current_node):
-                tree_nodes[node_key] = {"type": current_node.data.type}
-            else:
-                tree_nodes[node_key] = {
-                    "pin_state": current_node.pin_state,
-                    # since long name cannot be set, we store "long_name" as name
-                    "name": current_node.data.long_name,
-                    "type": current_node.data.type
-                }
-            # add children
-            if current_node.children:
-                list_to_traverse.extend(current_node.children)
-
+    tree_data = dict()
+    tree_data["version"] = _version  # Always serialize the latest format version
     tree_data["nodes"] = tree_nodes
-
     return tree_data
 
 
 def json_to_string(data):
-    """Returns json data as a string.
+    """ Returns json data as a string.
     """
     return json.dumps(data)
 
 
 def write_serialized_data_to_file(data, file_path):
-    """Writes json data to a given file.
+    """ Writes json data to a given file.
     """
     logger.debug("Serializing Scene Panel2 tree structure to {}.".format(file_path))
 
     try:
-        with open(file_path, 'w') as output_file:
-            json.dump(data, output_file, sort_keys=True, indent=4, separators=(',', ': '))
+        with open(file_path, "w") as output_file:
+            json.dump(data, output_file, sort_keys=True, indent=4, separators=(",", ": "))
         logger.debug("Finished writing serialized data to {}.".format(file_path))
     except:
         logger.error("Failed to write serialized data to {}.".format(file_path))
 
 
 def deserialize_tree_model(serialized_data):
-    """
-    De-serializes data to represent model of ScenePanel2 TreeView
+    """ De-serializes data to represent model of ScenePanel2 TreeView
     """
     tree_nodes = serialized_data["nodes"]
 
@@ -137,15 +135,15 @@ def deserialize_tree_model(serialized_data):
 
 
 def string_to_json(data):
-    """Returns json data from string.
+    """ Returns json data from string.
     """
     return json.loads(data)
 
 
-def is_save_serialized_data_to_zsolver_plug():
-    """Returns based on value of "ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" environment variable.
+def is_serialize_data_to_zsolver_node():
+    """ Helper function to determine whether to save Scene Panel data to zSolver plug.
+    Since the saving process requires de-select first, it may cause un-wanted result.
+    Provide the ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA env var to give users option
+    to stop proceed the saving process.
     """
-    if "ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" in os.environ:
-        return False
-    else:
-        return True
+    return not ("ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" in os.environ)
