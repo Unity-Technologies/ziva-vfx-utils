@@ -10,10 +10,10 @@ from .zTreeView import zTreeView
 from .componentWidget import ComponentWidget
 from .groupNode import GroupNode
 from .menuBar import ScenePanel2MenuBar
+from .toolbar import setup_toolbar
 from ..uiUtils import *
-from ..utils import *
 from maya import cmds
-from PySide2 import QtGui, QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore
 from functools import partial
 
 logger = logging.getLogger(__name__)
@@ -23,19 +23,6 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
 def is_group_node(node):
     return node.type == "group"
-
-
-def setup_toolbar_action(parent, name, text, tooltip, toolbar, slot):
-    icon_path = get_icon_path_from_name(name)
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(icon_path))
-    action = QtWidgets.QAction(parent)
-    action.setText(text)
-    action.setIcon(icon)
-    if tooltip:
-        action.setToolTip(tooltip)
-    action.triggered.connect(slot)
-    toolbar.addAction(action)
 
 
 class ScenePanel2(QtWidgets.QWidget):
@@ -112,45 +99,7 @@ class ScenePanel2(QtWidgets.QWidget):
                 self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
     def _setup_ui(self, parent):
-        self.toolbarCreate = QtWidgets.QToolBar(self)
-        self.toolbarCreate.setWindowTitle("Create")
-        self.toolbarCreate.setIconSize(QtCore.QSize(27, 27))
-        self.toolbarCreate.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.toolbarCreate.setObjectName("toolBarCreate")
-
-        lytToolbarCreate = QtWidgets.QVBoxLayout()
-        labelCreate = QtWidgets.QLabel("Create")
-        labelCreate.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        lytToolbarCreate.addWidget(labelCreate)
-        lytToolbarCreate.addWidget(self.toolbarCreate)
-
-        self.toolbarAdd = QtWidgets.QToolBar(self)
-        self.toolbarAdd.setIconSize(QtCore.QSize(27, 27))
-        self.toolbarAdd.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.toolbarAdd.setObjectName("toolBarAdd")
-
-        lytToolbarAdd = QtWidgets.QVBoxLayout()
-        labelAdd = QtWidgets.QLabel("Add")
-        labelAdd.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        lytToolbarAdd.addWidget(labelAdd)
-        lytToolbarAdd.addWidget(self.toolbarAdd)
-
-        self.toolbarEdit = QtWidgets.QToolBar(self)
-        self.toolbarEdit.setIconSize(QtCore.QSize(27, 27))
-        self.toolbarEdit.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.toolbarEdit.setObjectName("toolBarEdit")
-
-        lytToolbarEdit = QtWidgets.QVBoxLayout()
-        labelEdit = QtWidgets.QLabel("Edit")
-        labelEdit.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        lytToolbarEdit.addWidget(labelEdit)
-        lytToolbarEdit.addWidget(self.toolbarEdit)
-
-        lytToolbar = QtWidgets.QHBoxLayout()
-        lytToolbar.setAlignment(QtCore.Qt.AlignLeft)
-        lytToolbar.addLayout(lytToolbarCreate)
-        lytToolbar.addLayout(lytToolbarAdd)
-        lytToolbar.addLayout(lytToolbarEdit)
+        lytToolbar = setup_toolbar()
 
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -200,45 +149,6 @@ class ScenePanel2(QtWidgets.QWidget):
         lytMain.addLayout(lytTwoPanel)
 
     def _setup_actions(self):
-        # Create section
-        setup_toolbar_action(self, "zSolver", "Create zSolver", None, self.toolbarCreate,
-                             create_zSolver)
-        setup_toolbar_action(self, "zTissue", "Create zTissue", None, self.toolbarCreate,
-                             create_zTissue)
-        setup_toolbar_action(self, "zBone", "Create zBone", None, self.toolbarCreate, create_zBone)
-        setup_toolbar_action(self, "zCloth", "Create zCloth", None, self.toolbarCreate,
-                             create_zCloth)
-        setup_toolbar_action(self, "zAttachmentPlus", "Create zAttachment",
-                             "Create zAttachment: select source vertices and target object",
-                             self.toolbarCreate, create_zAttachment)
-        setup_toolbar_action(self, "create-group-plus", "Create Group",
-                             "Create Group: select tree view items", self.toolbarCreate,
-                             self._create_group)
-        # Add section
-        setup_toolbar_action(self, "zMaterial", "Add zMaterial",
-                             "Add zMaterial: select tissue geometry", self.toolbarAdd,
-                             add_zMaterial)
-        setup_toolbar_action(self, "zFiber", "Add zFiber", "Add zFiber: select tissue geometry",
-                             self.toolbarAdd, add_zFiber)
-        setup_toolbar_action(self, "subtissue", "Add zSubtissue",
-                             "Add Subtissue: select parent and then child tissue mesh",
-                             self.toolbarAdd, add_zSubtissue)
-        setup_toolbar_action(self, "zRestShape", "Add zRestShape",
-                             "Add zRestShape: select tissue mesh and then restShape mesh",
-                             self.toolbarAdd, add_zRestShape)
-        setup_toolbar_action(self, "zLineOfAction", "Add zLineOfAction",
-                             "Add zLineOfAction: select zFiber and curve", self.toolbarAdd,
-                             add_zLineOfAction)
-        setup_toolbar_action(self, "curve", "Add Fiber Curve", "Add Fiber Curve: select zFiber",
-                             self.toolbarAdd, add_fiberCurve)
-        setup_toolbar_action(self, "zRivetToBone", "Add zRivetToBone",
-                             "Add zRivetToBone: select target curve vertex and bone mesh",
-                             self.toolbarAdd, add_rivetToBone)
-        setup_toolbar_action(self, "zCache", "Add zCache", None, self.toolbarAdd, add_cache)
-        # Edit section
-        setup_toolbar_action(self, "refresh", "Refresh the Scene Panel tree view", None,
-                             self.toolbarEdit, self._reset_builder)
-
         self._tvGeo.selectionModel().selectionChanged.connect(self.on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
 
