@@ -52,23 +52,21 @@ class ScenePanel2(QtWidgets.QWidget):
             om.MSceneMessage.kBeforeSave, self.on_scene_presave)
 
         # member variable declaration and initialization
-        self._wgtGeo = None
-        self._wgtComponent = None
+        self._wgtGeo = zGeoWidget(self)
+        self._wgtComponent = ComponentWidget(self)
 
         self._setup_ui(parent)
         self._wgtGeo.set_component_widget(self._wgtComponent)
         self._wgtGeo.reset_builder()
 
     def _setup_ui(self, parent):
-        lytToolbar = setup_toolbar()
+        lytToolbar = setup_toolbar(self._wgtGeo)
 
-        self._wgtGeo = zGeoWidget(self)
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._wgtGeo)
         grpGeo = QtWidgets.QGroupBox("Scene Panel")
         grpGeo.setLayout(lytGeo)
 
-        self._wgtComponent = ComponentWidget(self)
         lytComponent = QtWidgets.QVBoxLayout()
         lytComponent.addWidget(self._wgtComponent)
         grpComponent = QtWidgets.QGroupBox("Component")

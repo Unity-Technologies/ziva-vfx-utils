@@ -282,7 +282,7 @@ class zGeoWidget(QtWidgets.QWidget):
             for index in indexes:
                 self._tvGeo.expand(index)
 
-    def _create_group(self):
+    def create_group(self):
         """ Create Group node according to current selection.
         It follow the Maya's group node creation logic:
         - If selection is empty, append a new empty Group node at the end of top level;
@@ -369,7 +369,7 @@ class zGeoWidget(QtWidgets.QWidget):
             # group creation
             elif (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_G) \
                 and (event.modifiers() == QtCore.Qt.ControlModifier):
-                self._create_group()
+                self.create_group()
                 return True
 
         # standard event processing
