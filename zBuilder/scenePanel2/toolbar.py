@@ -23,8 +23,28 @@ _create_section_tuple = (
     ("zTissue", "Create zTissue", None, lambda: cmds.ziva(t=True)),
     ("zBone", "Create zBone", None, lambda: cmds.ziva(b=True)),
     ("zCloth", "Create zCloth", None, lambda: cmds.ziva(c=True)),
-    ("zAttachment", "Create zAttachment",
-     "Create zAttachment: select source vertices and target object", lambda: cmds.ziva(a=True)),
+    (
+        (
+            "zAttachment",
+            "Create zAttachment",
+            "Create zAttachment: select source vertices and target object",
+            lambda: cmds.ziva(a=True),
+        ),
+        (
+            None,
+            "Goal Attachment",
+            "Attracts (goals) the selected tissue to the selected bone, "
+            "using an adjustable soft constraint. "
+            "Bone may deform and/or be animated using any Maya technique.",
+            lambda: cmds.ziva(ga=True),
+        ),
+        (
+            None,
+            "Swap Attachment Direction",
+            "Swaps the source and target Ziva objects of the selected attachment.",
+            lambda: cmds.ziva(sai=True),
+        ),
+    ),
     (
         (
             "zCache",
