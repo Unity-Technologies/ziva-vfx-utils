@@ -11,21 +11,24 @@ logger = logging.getLogger(__name__)
 
 class Base(object):
 
+    # SEARCH_EXCLUDE is a list of attribute names that get excluded during a string_replace()
+    # The reason these are excluded is because we do not want these to be user changable.
+    # If someone does a string_replace() and it happens to change the value of one of those attributes
+    # unexpected results will happen.
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
-    """ SEARCH_EXCLUDE is a list of attribute names that get excluded during a string_replace()
-    The reason these are excluded is because we do not want these to be user changable.  If someone 
-    does a string_replace() and it happens to change the value of one of those attributes 
-    unexpected results will happen.
-    """
 
     TYPES = []
-    type = None
-    """ type of scene item """
+    type = None  # type of scene item
 
+    # A list of attribute names in __dict__ to exclude from any comparisons.
+    # Anything using __eq__.
     COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on', '_children', '_parent']
-    """ A list of attribute names in __dict__ to exclude from
-            any comparisons.  Anything using __eq__. """
 
+    # The attributes that contain a scene item used as a pointer to the scene item in the bundle.
+    # This will convert scene items to a string before serialization and
+    # resetup the pointer upon deserilization,
+    # Note that this attribute values gets added to COMPARE_EXCLUDE for excluding purposes,
+    # else there is a cycle.
     SCENE_ITEM_ATTRIBUTES = [
         'parameters',
         'fiber_item',
@@ -34,10 +37,7 @@ class Base(object):
         'parent_tissue',  # for sub-tissues
         'children_tissues',  # for sub-tissues
     ]
-    """ The attributes that contain a scene item used as a pointer to the scene item in the bundle.
-            This will convert scene items to a string before serialization and resetup the pointer
-            upon deserilization,  Note that this attributes values gets added to COMPARE_EXCLUDE for 
-            excluding purposes, else there is a cycle."""
+
     def __init__(self, *args, **kwargs):
         self._name = None
         self._class = (self.__class__.__module__, self.__class__.__name__)
@@ -71,6 +71,16 @@ class Base(object):
         """ Define a non-equality test
         """
         return not self == other
+
+    def __hash__(self):
+        """
+        This is required by Python 3, to use DGNode class in the set().
+        Note this is not the correct way to hash a class.
+        Refer to following Python doc,
+        https://docs.python.org/3/reference/datamodel.html#object.__hash__
+        https://docs.python.org/2/reference/datamodel.html#object.__hash__
+        """
+        return id(self)
 
     def add_child(self, child):
         if child not in self.children:

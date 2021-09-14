@@ -1,0 +1,54 @@
+QWidget
+{
+    font-family: "Verdana";
+}
+
+QTreeView
+{
+    selection-color: rgb(68, 136, 204);
+    selection-background-color: transparent;
+    outline: 0;
+    font-size: 12px;
+    icon-size: 18px;
+    font-family: "Verdana";
+    background: rgb(54, 54, 54);
+}
+
+QTreeView::item
+{
+    border: none;
+    height: 21px;
+}
+
+QTreeView QLineEdit
+{
+    font-size: 12px;
+    border: 2px solid rgb(77, 117, 144);
+    border-radius: 3px;
+    padding: 0 2px;
+    selection-background-color: rgb(81, 81, 81);
+    font-family: "Verdana";
+}
+
+QHeaderView
+{
+    background: rgb(54, 54, 54);
+    color: transparent;
+}
+
+QToolBar {
+    border-style: outset;
+    border-width: 2px;
+    border-color: rgb(81, 81, 81);
+    border-style: solid;
+    border-radius: 5px;
+}
+
+QLabel {
+    border-color: rgb(81, 81, 81);
+    background: rgb(81, 81, 81);
+    border-spacing: 0px 0px;
+    margin: 0px;
+    border-style: solid;
+    border-radius: 5px;
+}
