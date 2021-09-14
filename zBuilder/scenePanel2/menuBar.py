@@ -84,7 +84,7 @@ _menubar_dict = {
             "Toggles the active state of the selected Ziva objects.",
             lambda: mel.eval("ZivaToggleEnabled"),
         ),
-        (),  # separator
+        ("Meshing", ),  # separator
         (
             "zPolyCombine",
             "Will combine multiple polySets into a single polySet.",
@@ -95,7 +95,7 @@ _menubar_dict = {
             "Extracts a new shape from a simulated mesh + sculpted mesh that can be used as a Rest Shape target",
             lambda: cmds.zRestShape(pg=True),
         ),
-        (),  # separator
+        ("Mesh Inspection", ),  # separator
         (
             "Run Mesh Analysis",
             "Quality-check the selected mesh(es).",
@@ -111,7 +111,7 @@ _menubar_dict = {
             "Find self-intersections (self-collisions) on a Maya mesh.",
             lambda: mel.eval("ZivaSelectSelfIntersections"),
         ),
-        (),  # separator
+        ("Proximity Tools", ),  # separator
         (
             "Select Vertices",
             "Selects vertices on the first Maya mesh based on their distance to the second selected Maya mesh.",
@@ -229,10 +229,13 @@ def _add_menu_actions(menu, text, statusbar_text, slot, icon_name=None):
 
 def _create_menu(menubar, menu_name, menu_action_tuple):
     menu = menubar.addMenu(menu_name)
+    menu.setToolTipsVisible(True)
     for item in menu_action_tuple:
         if item:
-            if isinstance(item, tuple):
+            if isinstance(item, tuple) and len(item) > 1:
                 _add_menu_actions(menu, *item)
+            elif item and isinstance(item, tuple) and len(item) == 1:
+                menu.addSection(item[0])
             elif isinstance(item, dict):
                 for name, actions in item.items():
                     _create_menu(menu, name, actions)

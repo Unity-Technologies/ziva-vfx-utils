@@ -108,6 +108,7 @@ _edit_section_tuple = (
             None,
             lambda: cmds.ziva(loa=True),
         ),
+        ("Remove", ),  # separator
         (
             None,
             "Remove Rest Shape",
@@ -152,6 +153,76 @@ _edit_section_tuple = (
             lambda: mel.eval("ZivaDeleteSelection"),
         ),
     ),
+    (
+        (
+            "out_zTissue",
+            "Select zTissues",
+            "Selects zTissue nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zTissue`"),
+        ),
+        ("Select Connected", ),  # separator
+        (
+            "out_zBone",
+            "Select zBones",
+            "Selects zBones nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zBone`"),
+        ),
+        (
+            "out_zCloth",
+            "Select zCloth",
+            "Selects zCloth nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zCloth`"),
+        ),
+        (
+            "out_zAttachment",
+            "Select zAttachments",
+            "Selects zAttachments nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zAttachment`"),
+        ),
+        (
+            "out_zRestShape",
+            "Select zRestShape",
+            "Selects zRestShape nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zRestShape`"),
+        ),
+        (
+            "out_zTet",
+            "Select zTet",
+            "Selects zTet nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zTet`"),
+        ),
+        (
+            "out_zMaterial",
+            "Select zMaterials",
+            "Selects zMaterials nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zMaterial`"),
+        ),
+        (
+            "out_zFiber",
+            "Select zFibers",
+            "Selects zFibers nodes that are connected to the currently selected mesh(es).",
+            lambda: mel.eval("select -r `zQuery -t zFiber`"),
+        ),
+        ("Select in Hierarchy", ),  # separator
+        (
+            "out_zTissue",
+            "Tissues",
+            "Selects tissue meshes in the currently selected hierarchy.",
+            lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+        ),
+        (
+            "out_zBone",
+            "Bones",
+            "Selects bone meshes in the currently selected hierarchy.",
+            lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+        ),
+        (
+            "out_zCloth",
+            "Cloth",
+            "Selects cloth meshes in the currently selected hierarchy.",
+            lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+        ),
+    ),
 )
 
 
@@ -183,8 +254,11 @@ def _setup_toolbar_menu(zGeo_widget_inst, parent, action_tuple):
     """
     assert len(action_tuple) > 1, "Toolbar action tuple {} has only one item.".format(
         action_tuple[0][0])
+    # First item is a toolbar action
     action = _setup_toolbar_action(zGeo_widget_inst, parent, *(action_tuple[0]))
+    # The rest items form a menu
     menu = QtWidgets.QMenu()
+    menu.setToolTipsVisible(True)
     for item in action_tuple[1:]:
         if item and len(item) > 1:
             menu.addAction(_setup_toolbar_action(zGeo_widget_inst, parent, *item))
