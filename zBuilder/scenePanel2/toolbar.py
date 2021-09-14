@@ -86,6 +86,9 @@ def setup_toolbar(zGeo_widget_inst):
     Args:
         zGeo_widget_inst(zGeoWidget): 
             zGeoWidget instance for bind its member functions to some buttons.
+
+    Returns: 
+        Toolbar layout instance.
     """
     lytToolbar = QtWidgets.QHBoxLayout()
     lytToolbar.setAlignment(QtCore.Qt.AlignLeft)

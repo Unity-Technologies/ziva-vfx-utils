@@ -5,7 +5,7 @@ import weakref
 
 from .zGeoWidget import zGeoWidget
 from .componentWidget import ComponentWidget
-from .menuBar import ScenePanel2MenuBar
+from .menuBar import setup_menubar
 from .toolbar import setup_toolbar
 from ..uiUtils import dock_window
 from maya import cmds
@@ -60,13 +60,16 @@ class ScenePanel2(QtWidgets.QWidget):
         self._wgtGeo.reset_builder()
 
     def _setup_ui(self, parent):
+        lytMenuBar = setup_menubar(self)
         lytToolbar = setup_toolbar(self._wgtGeo)
 
+        # zGeo widget(left panel)
         lytGeo = QtWidgets.QVBoxLayout()
         lytGeo.addWidget(self._wgtGeo)
         grpGeo = QtWidgets.QGroupBox("Scene Panel")
         grpGeo.setLayout(lytGeo)
 
+        # component widget(right panel)
         lytComponent = QtWidgets.QVBoxLayout()
         lytComponent.addWidget(self._wgtComponent)
         grpComponent = QtWidgets.QGroupBox("Component")
@@ -76,14 +79,8 @@ class ScenePanel2(QtWidgets.QWidget):
         splTreeView.addWidget(grpGeo)
         splTreeView.addWidget(grpComponent)
 
-        lytMenuBar = ScenePanel2MenuBar(self)
-
-        lytMenuBarContainer = QtWidgets.QHBoxLayout()
-        lytMenuBarContainer.addWidget(lytMenuBar)
-        lytMenuBarContainer.setAlignment(lytMenuBar, QtCore.Qt.AlignRight)
-
         lytTwoPanel = QtWidgets.QVBoxLayout()
-        lytTwoPanel.addLayout(lytMenuBarContainer)
+        lytTwoPanel.addLayout(lytMenuBar)
         lytTwoPanel.addLayout(lytToolbar)
         lytTwoPanel.addWidget(splTreeView)
 
