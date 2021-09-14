@@ -3,6 +3,7 @@
 from .zGeoWidget import zGeoWidget
 from ..uiUtils import get_icon_path_from_name
 from ..commonUtils import is_string
+from ..utils import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
 from functools import partial
@@ -98,8 +99,60 @@ _add_section_tuple = (
      "Add zRivetToBone: select target curve vertex and bone mesh", cmds.zRivetToBone),
 )
 
-_edit_section_tuple = (("Refresh", "Refresh the Scene Panel tree view", None,
-                        (zGeoWidget.reset_builder, )), )
+_edit_section_tuple = (
+    ("Refresh", "Refresh the Scene Panel tree view", None, (zGeoWidget.reset_builder, )),
+    (
+        (
+            "remove_body",
+            "Remove zTissue/zBone/zCloth from selected mesh",
+            None,
+            lambda: cmds.ziva(loa=True),
+        ),
+        (
+            None,
+            "Remove Rest Shape",
+            "Removes rest shape(s) from a tissue.",
+            lambda: mel.eval("ZivaDeleteSelectedRestShape"),
+        ),
+        (
+            None,
+            "Remove Rest Shape Target Mesh",
+            "Removes rest shape target mesh from a tissue.",
+            lambda: cmds.zRestShape(r=True),
+        ),
+        (
+            None,
+            "Remove Rivet to Bone",
+            "Removes zRivetToBone and its connected locator node.",
+            lambda: remove_zRivetToBone_nodes(cmds.ls(sl=True)),
+        ),
+        (
+            None,
+            "Remove Subtissue",
+            "Removes subtissue connections, making the selected tissues full tissues again.",
+            lambda: cmds.ziva(rst=True),
+        ),
+        (
+            "remove_zSolver",
+            "Remove Selected Solver(s)",
+            "Removes the solver(s) inferred from selection, including their Ziva rigs.",
+            lambda: remove_solver(askForConfirmation=False),
+        ),
+        (
+            None,
+            "Remove All Solvers",
+            "Removes all Ziva solvers from the scene, including all Ziva rigs.",
+            lambda: remove_all_solvers(confirmation=False),
+        ),
+        ("Delete", ),  # separator
+        (
+            None,
+            "Delete selection",
+            "Deletes the selected objects after first removing them from the solver.",
+            lambda: mel.eval("ZivaDeleteSelection"),
+        ),
+    ),
+)
 
 
 def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot):
@@ -112,6 +165,7 @@ def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(icon_path))
         action.setIcon(icon)
+
     if tooltip:
         action.setToolTip(tooltip)
 
@@ -132,7 +186,13 @@ def _setup_toolbar_menu(zGeo_widget_inst, parent, action_tuple):
     action = _setup_toolbar_action(zGeo_widget_inst, parent, *(action_tuple[0]))
     menu = QtWidgets.QMenu()
     for item in action_tuple[1:]:
-        menu.addAction(_setup_toolbar_action(zGeo_widget_inst, parent, *item))
+        if item and len(item) > 1:
+            menu.addAction(_setup_toolbar_action(zGeo_widget_inst, parent, *item))
+        elif item and len(item) == 1:
+            menu.addSection(item[0])
+        else:
+            menu.addSeparator()
+
     action.setMenu(menu)
     return action
 
