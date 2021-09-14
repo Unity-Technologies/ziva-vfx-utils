@@ -2,15 +2,22 @@
 """
 from .zGeoWidget import zGeoWidget
 from ..uiUtils import get_icon_path_from_name
+from ..commonUtils import is_string
 from PySide2 import QtGui, QtWidgets, QtCore
-from maya import cmds
+from maya import cmds, mel
 from functools import partial
 
-# Toolbar QAction data structure, include following items:
+# Toolbar action data structure, it can be a single QAction item with following items:
 # - Icon name
 # - Title text
 # - Tooltip text, pass None if not available
 # - slot function
+# Or it can be a QAction with menu. The first entry is a normal QAction,
+# while the rest entries form a QMenu items:
+# - Icon name(optional for menu item)
+# - Action name
+# - Status bar text
+# - Slot
 _create_section_tuple = (
     ("zSolver", "Create zSolver", None, lambda: cmds.ziva(s=True)),
     ("zTissue", "Create zTissue", None, lambda: cmds.ziva(t=True)),
@@ -18,7 +25,40 @@ _create_section_tuple = (
     ("zCloth", "Create zCloth", None, lambda: cmds.ziva(c=True)),
     ("zAttachment", "Create zAttachment",
      "Create zAttachment: select source vertices and target object", lambda: cmds.ziva(a=True)),
-    ("zCache", "Add zCache", None, lambda: cmds.ziva(acn=True)),
+    (
+        (
+            "zCache",
+            "Add zCache",
+            "Adds a cache node to the selected solver. Once a cache node is added, "
+            "simulations are cached automatically.",
+            lambda: cmds.ziva(acn=True),
+        ),
+        (
+            "clear_zCache",
+            "Clear",
+            "Clears the solver's simulation cache. "
+            "Do this each time before re-running a simulation that was previously cached.",
+            lambda: cmds.zCache(c=True),
+        ),
+        (
+            None,
+            "Load",
+            "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
+            lambda: mel.eval("ZivaLoadCache"),
+        ),
+        (
+            None,
+            "Save",
+            "Saves the solver's simulation cache to a .zcache file.",
+            lambda: mel.eval("ZivaSaveCache"),
+        ),
+        (
+            None,
+            "Select",
+            "Select the solver's simulation cache node.",
+            lambda: mel.eval("select -r `zQuery -t zCacheTransform`"),
+        ),
+    ),
     ("create-group-plus", "Create Group", "Create Group: select tree view items",
      (zGeoWidget.create_group, )),
 )
@@ -42,13 +82,16 @@ _edit_section_tuple = (("Refresh", "Refresh the Scene Panel tree view", None,
                         (zGeoWidget.reset_builder, )), )
 
 
-def _setup_toolbar_action(zGeo_widget_inst, toolbar, name, text, tooltip, slot):
-    icon_path = get_icon_path_from_name(name)
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(icon_path))
-    action = QtWidgets.QAction(toolbar)
+def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot):
+    """ Create a single toolbar button
+    """
+    action = QtWidgets.QAction(parent)
     action.setText(text)
-    action.setIcon(icon)
+    if name:
+        icon_path = get_icon_path_from_name(name)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(icon_path))
+        action.setIcon(icon)
     if tooltip:
         action.setToolTip(tooltip)
 
@@ -61,6 +104,19 @@ def _setup_toolbar_action(zGeo_widget_inst, toolbar, name, text, tooltip, slot):
     return action
 
 
+def _setup_toolbar_menu(zGeo_widget_inst, parent, action_tuple):
+    """ Create a toolbar action with menu, which has with multiple actions.
+    """
+    assert len(action_tuple) > 1, "Toolbar action tuple {} has only one item.".format(
+        action_tuple[0][0])
+    action = _setup_toolbar_action(zGeo_widget_inst, parent, *(action_tuple[0]))
+    menu = QtWidgets.QMenu()
+    for item in action_tuple[1:]:
+        menu.addAction(_setup_toolbar_action(zGeo_widget_inst, parent, *item))
+    action.setMenu(menu)
+    return action
+
+
 def _create_toolbar(zGeo_widget_inst, title, action_tuple):
     """ Create the toolbar and label combo.
     Return the layout that contain both widgets.
@@ -69,7 +125,13 @@ def _create_toolbar(zGeo_widget_inst, title, action_tuple):
     toolbar.setIconSize(QtCore.QSize(27, 27))
     toolbar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
     for item in action_tuple:
-        toolbar.addAction(_setup_toolbar_action(zGeo_widget_inst, toolbar, *item))
+        action = None
+        if is_string(item[0]):  # single action
+            action = _setup_toolbar_action(zGeo_widget_inst, toolbar, *item)
+        elif isinstance(item[0], tuple):  # action with menu
+            action = _setup_toolbar_menu(zGeo_widget_inst, toolbar, item)
+        assert action, "Unknown toolbar action type, check the data table."
+        toolbar.addAction(action)
 
     lblTitle = QtWidgets.QLabel(title)
     lblTitle.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -84,10 +146,10 @@ def setup_toolbar(zGeo_widget_inst):
     """ Entry function to create the toolbar.
 
     Args:
-        zGeo_widget_inst(zGeoWidget): 
+        zGeo_widget_inst(zGeoWidget):
             zGeoWidget instance for bind its member functions to some buttons.
 
-    Returns: 
+    Returns:
         Toolbar layout instance.
     """
     lytToolbar = QtWidgets.QHBoxLayout()
