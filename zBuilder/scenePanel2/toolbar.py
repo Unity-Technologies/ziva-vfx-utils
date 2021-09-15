@@ -106,7 +106,7 @@ _edit_section_tuple = (
             "remove_body",
             "Remove zTissue/zBone/zCloth from selected mesh",
             None,
-            lambda: cmds.ziva(loa=True),
+            lambda: cmds.ziva(rm=True),
         ),
         ("Remove", ),  # separator
         (

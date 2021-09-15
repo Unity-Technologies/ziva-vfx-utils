@@ -298,6 +298,7 @@ class zGeoWidget(QtWidgets.QWidget):
         selected_index_list = list(
             filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
                    self._tvGeo.selectedIndexes()))
+
         # Make sure all select items come from same zSolverTransform node.
         # Otherwise, do early return.
         solver_list = list(
@@ -305,10 +306,13 @@ class zGeoWidget(QtWidgets.QWidget):
                 get_zSolverTransform_treeitem(get_node_by_index(index, None))
                 for index in selected_index_list
             ]))
-        if len(solver_list) != 1:
+        if len(solver_list) > 1:
             logger.warning("Can't create group node. Selected items come from different zSolver.")
             return
-        assert solver_list[0], "Selected items belong to different zSolverTransform nodes."\
+        if len(solver_list) == 0:
+            logger.warning("Please select the items other than zSolver nodes to create the group.")
+            return
+        assert solver_list[0], "Selected items should only belong to one zSolverTransform node."\
             "There's bug in the code logic."
 
         # Find zSolverTransform index through TreeItem
