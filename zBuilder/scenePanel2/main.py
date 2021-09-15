@@ -93,16 +93,11 @@ class ScenePanel2(QtWidgets.QWidget):
         {{
             image: url({}); 
         }}
-        QTreeView::indicator:unchecked
-        {{
-            image: url({});
-        }}
         QTreeView::indicator:indeterminate
         {{
             image: url({});
         }}
-        """.format(get_icon_path_from_name("pinned"), get_icon_path_from_name("unpinned"),
-                   get_icon_path_from_name("partially_pinned"))
+        """.format(get_icon_path_from_name("pinned"), get_icon_path_from_name("partially_pinned"))
         pin_state_stylesheet = pin_state_stylesheet.replace("\\", "//")
         parent.setStyleSheet(style_sheet + pin_state_stylesheet)
 
