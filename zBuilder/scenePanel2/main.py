@@ -7,7 +7,7 @@ from .zGeoWidget import zGeoWidget
 from .componentWidget import ComponentWidget
 from .menuBar import setup_menubar
 from .toolbar import setup_toolbar
-from ..uiUtils import dock_window
+from ..uiUtils import dock_window, get_icon_path_from_name
 from maya import cmds
 from PySide2 import QtWidgets, QtCore
 
@@ -84,9 +84,27 @@ class ScenePanel2(QtWidgets.QWidget):
         lytTwoPanel.addLayout(lytToolbar)
         lytTwoPanel.addWidget(splTreeView)
 
+        # Load style sheet and append more
+        style_sheet = ""
         with open(os.path.join(DIR_PATH, "style.css"), "r") as f:
             style_sheet = f.read()
-            parent.setStyleSheet(style_sheet)
+        pin_state_stylesheet = """
+        QTreeView::indicator:checked
+        {{
+            image: url({}); 
+        }}
+        QTreeView::indicator:unchecked
+        {{
+            image: url({});
+        }}
+        QTreeView::indicator:indeterminate
+        {{
+            image: url({});
+        }}
+        """.format(get_icon_path_from_name("pinned"), get_icon_path_from_name("unpinned"),
+                   get_icon_path_from_name("partially_pinned"))
+        pin_state_stylesheet = pin_state_stylesheet.replace("\\", "//")
+        parent.setStyleSheet(style_sheet + pin_state_stylesheet)
 
         lytMain = parent.layout()
         lytMain.addLayout(lytTwoPanel)
