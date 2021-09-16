@@ -6,7 +6,7 @@
                 "help": "Open Scene Panel",
                 "image": "scene_panel.png",
                 "commandType": "python",
-                "command": "import os\nif 'ZIVA_ZBUILDER_SCENE_PANEL2' not in os.environ:\n\tfrom zBuilder.scenePanel2 import main as sp2\n\tsp2.run()\nelse:\n\tfrom zBuilder.ui import zUI\n\tzivaUI = zUI.run()"
+                "command": "import os; from zBuilder.ui import zUI as sp1; from zBuilder.scenePanel2 import main as sp2; sp1.run() if 'ZIVA_ZBUILDER_USE_SCENE_PANEL1' in os.environ else sp2.run();"
             },
             "shelfSep_1": {
                 "separator": true,
@@ -117,8 +117,8 @@
             "intPlayback": {
                 "help": "Interactive Playback",
                 "image": "interactive_playback.png",
-                "commandType": "python",
-                "command": "import os\nif 'ZIVA_ZBUILDER_SCENE_PANEL2' in os.environ:\n\tfrom zBuilder.scenePanel2 import main as sp2\n\tsp2.run()\nelse:\n\tfrom zBuilder.ui import zUI\n\tzivaUI = zUI.run()"
+                "commandType": "mel",
+                "command": "play -record;"
             }
         }
     }
