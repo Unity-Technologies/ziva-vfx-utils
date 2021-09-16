@@ -18,7 +18,7 @@ def time_this(func):
         before = time()
         x = func(*args, **kwargs)
         after = time()
-        logger.info("Executing {}() took {:.3f}ms".format(func.__name__, (after - before) * 1000))
+        logger.info("Executing {}() took {:.3f}s".format(func.__name__, (after - before)))
         return x
 
     return new_function
