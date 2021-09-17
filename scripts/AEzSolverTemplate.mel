@@ -16,6 +16,7 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addSeparator;
 
     // other controls
+    editorTemplate -addControl "solver";
     editorTemplate -addControl "integrator";
     editorTemplate -addControl "lineSearch";
     editorTemplate -addControl "collisionDetection";
