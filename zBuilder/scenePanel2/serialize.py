@@ -16,120 +16,114 @@ def serialize_tree_model(root_node):
     Traverse nodes in DFS order and record each node.
 
     Returns:
-        Dictionary with tree nodes and version info
+        List of tree nodes (tree item path, row index, item type, node data) tuple
     """
-    tree_nodes = dict()
+    tree_nodes = []
+    list_to_traverse = []
     if root_node.is_root_node():  # skip root node
-        list_to_traverse = root_node.children[:]
+        list_to_traverse.extend(root_node.children)
     else:
-        list_to_traverse = [root_node]
+        list_to_traverse.append(root_node)
     while list_to_traverse:
         current_node = list_to_traverse.pop(0)
-        path_to_node = current_node.get_tree_path()
-        index = current_node.row()
-        node_key = str(index) + str(path_to_node)  # Construct unique index for each node
-
-        if is_group_item(current_node):
-            tree_nodes[node_key] = {"type": current_node.data.type}
-        else:
-            tree_nodes[node_key] = {
+        # Append entry
+        entry = [
+            current_node.get_tree_path(),
+            current_node.row(),
+            current_node.data.type,
+            {} if is_group_item(current_node) else {
                 "pin_state": current_node.pin_state,
-                # since long name cannot be set, we store "long_name" as name
-                "name": current_node.data.long_name,
-                "type": current_node.data.type
+                "name": current_node.data.long_name,  # Store Maya DGNode long_name
             }
-        # add children
+        ]
+        tree_nodes.append(entry)
+        # Add child items, if any
         if current_node.children:
             list_to_traverse.extend(current_node.children)
+    # Sort tree_nodes firstly by tree item level, then by tree item index
+    # Refer to deserialize_tree_model() for details.
+    tree_nodes.sort(key=lambda x: (x[0].count("|"), x[1]))
+    return tree_nodes
 
-    tree_data = dict()
-    tree_data["version"] = _version  # Always serialize the latest format version
-    tree_data["nodes"] = tree_nodes
-    return tree_data
 
-
-def json_to_string(data):
+def to_json_string(tree_nodes):
     """ Returns json data as a string.
     """
+    data = dict()
+    data["version"] = _version  # Always serialize the latest format version
+    data["nodes"] = tree_nodes
     return json.dumps(data)
 
 
-def write_serialized_data_to_file(data, file_path):
+def to_json_file(tree_nodes, file_path):
     """ Writes json data to a given file.
+    This is an internal helper function for debugging.
     """
-    logger.debug("Serializing Scene Panel2 tree structure to {}.".format(file_path))
-
-    try:
-        with open(file_path, "w") as output_file:
-            json.dump(data, output_file, sort_keys=True, indent=4, separators=(",", ": "))
-        logger.debug("Finished writing serialized data to {}.".format(file_path))
-    except:
-        logger.error("Failed to write serialized data to {}.".format(file_path))
+    data = dict()
+    data["version"] = _version  # Set the version you want to test
+    data["nodes"] = tree_nodes
+    with open(file_path, "w") as output_file:
+        json.dump(data, output_file, sort_keys=True, indent=4, separators=(",", ": "))
+    logger.debug("Finished writing serialized data to {}.".format(file_path))
 
 
-def deserialize_tree_model(serialized_data):
+def deserialize_tree_model(tree_nodes, version):
     """ De-serializes data to represent model of ScenePanel2 TreeView
     """
-    tree_nodes = serialized_data["nodes"]
-
     # set root node
     root_base_node = Base()
     root_base_node.name = "ROOT"
     root_node = TreeItem(None, root_base_node)
 
-    if serialized_data["version"] == 1:
-        # sort keys by tree item level, and then by tree item index
-        tree_keys = sorted(serialized_data["nodes"].keys(),
-                           key=lambda x: (x.count("|"), int(x.split("|", 1)[0])))
-
+    if version == 1:
         # initialize values for tree traversal
         current_level_count = 0
         current_index = 0
         previous_index = 0
-        current_parent = None
-        parent_key = "ROOT"
-        parent_to_visit = [(root_node, parent_key)]
+        current_parent_node = None
+        parent_to_visit = [(root_node, "ROOT")]
 
-        # Since the keys are sorted by depth level and then by index,
+        # Since the tree nodes are sorted firstly by depth level then by index,
         # we can run BFS on the tree with those keys based on level.
-        # For each key node we process,
-        # we store its children (only if "group" or "zSolverTransform") as parents for later processing by storing in "parent_to_visit".
-        # We pick the next parent from "parent_to_visit" in two cases -
+        # For each node we process, we store its children (only if "group" or "zSolverTransform")
+        # as parents for later processing by storing in "parent_to_visit".
+        # We pick the next parent from "parent_to_visit" in two cases:
         # 1) when moving to the next level or
         # 2) processing child node of a different parent (on the same level if an index is equal or smaller).
         # Next we need to find the right parent from the "parent_to_visit" list.
         # We do that by comparing current node key and parent node key.
         # Once found, we remove the parent from "parent_to_visit" and add its children to the tree.
-        for key in tree_keys:
+        for entry in tree_nodes:
+            # Assign triplet value to each variable
+            tree_item_path, row_index, node_type, node_data = entry
             previous_level_count = current_level_count
-            current_level_count = key.count("|")
-            path_node_list = key.split("|")
+            current_level_count = tree_item_path.count("|")
+            path_node_list = tree_item_path.split("|")
             previous_index = current_index
-            current_index = int(path_node_list[0])
-            current_node = tree_nodes[key]
+            current_index = row_index
+            current_node = node_data
             # find next parent when moving to next level or next node in the same level
             if current_level_count > previous_level_count or current_index <= previous_index:
                 # Finding the right parent from the list, a group node might not have any child
-                for parent in parent_to_visit:
-                    parent_key_tuple = parent
-                    current_parent = parent_key_tuple[0]
-                    parent_key = parent_key_tuple[1]
+                for parent_entry in parent_to_visit:
+                    current_parent_node, current_parent_item_path = parent_entry
                     # found parent
-                    if key.split("|")[1:-1] == parent_key.split("|")[1:]:
-                        parent_to_visit.remove(parent)
+                    if tree_item_path.split("|")[1:-1] == current_parent_item_path.split("|")[1:]:
+                        parent_to_visit.remove(parent_entry)
                         break
 
-            if current_node["type"] == "group":
-                child_node = TreeItem(current_parent, GroupNode(path_node_list[-1]))
+            if node_type == "group":
+                child_node = TreeItem(current_parent_node, GroupNode(path_node_list[-1]))
             else:
                 child_base_data = Base()
                 child_base_data.name = current_node["name"]
-                child_base_data.type = current_node["type"]
-                child_node = TreeItem(current_parent, child_base_data)
+                child_base_data.type = node_type
+                child_node = TreeItem(current_parent_node, child_base_data)
                 child_node.pin_state = current_node["pin_state"]
-            # a "group" or a "zSolverTransform" node can be a parent node
-            if current_node["type"] in {"group", "zSolverTransform"}:
-                parent_to_visit.append((child_node, key))
+
+            container_node_type = ("group", "zSolverTransform")
+            if node_type in container_node_type:
+                parent_to_visit.append((child_node, tree_item_path))
 
     return root_node
 
