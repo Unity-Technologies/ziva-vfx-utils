@@ -102,8 +102,8 @@ class Ziva(Builder):
             grp = DGNode()
             grp.name = item.nice_association[0]
             grp.type = 'ui_{}_body'.format(item.type)
-            # store ziva node this geometry depends on
-            # to synchronize enable/envelope behaviour in the scene panel
+            # store Ziva node this geometry depends on
+            # to synchronize enable/envelope behavior in the scene panel
             grp.depends_on = item
             self.geo[item.nice_association[0]] = grp
 

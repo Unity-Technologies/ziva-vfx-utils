@@ -105,9 +105,9 @@ class Builder(object):
         desired one based on arguments.
         
         Args:
-            type_ (str): The type of parameter to instentiate (map or mesh)
-            names (str or list): The name of parameter to instentiate.  This should be 
-                a node in the maya scene.  Either a mesh or a map name.
+            type_ (str): The type of parameter to instantiate (map or mesh)
+            names (str or list): The name of parameter to instantiate.  This should be
+                a node in the Maya scene.  Either a mesh or a map name.
 
                 Currently sometimes parameter_names could be a list.  It is a list
                 when dealing with a map.  The second element is the payload 
@@ -134,7 +134,7 @@ class Builder(object):
                     index = scene_item_names.index(parameter_name)
                     return scene_item_nodes[index]
                 except ValueError:
-                    # When valueerror there is no exisitng scene item with that name
+                    # When valueerror there is no existing scene item with that name
                     # so lets create one and return that.
                     return obj(*parameter_args, builder=self)
 
