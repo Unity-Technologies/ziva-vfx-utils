@@ -2,13 +2,14 @@ import zBuilder.builders.ziva as zva
 import logging
 import weakref
 
+from .groupNode import GroupNode
+from .serialize import is_serialize_data_to_zsolver_node, to_json_string, serialize_tree_model
+from .treeItem import build_scene_panel_tree
 from .zGeoTreeModel import zGeoTreeModel
 from .zTreeView import zTreeView
-from .groupNode import GroupNode
-from .serialize import is_serialize_data_to_zsolver_node, json_to_string, serialize_tree_model
-from ..uiUtils import nodeRole, longNameRole
-from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
 from ..commonUtils import is_sequence
+from ..uiUtils import nodeRole, longNameRole, zGeo_UI_node_types
+from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
 from PySide2 import QtCore, QtWidgets
 from maya import cmds
 from functools import partial
@@ -28,8 +29,9 @@ class zGeoWidget(QtWidgets.QWidget):
         # member variable declaration and initialization
         self._tmGeo = None
         self._tvGeo = None
-        self._wgtComponentRef = None
+        self._wgtComponent_ref = None
         self._builder = None
+        self._whole_scene_tree = None
         self._selected_nodes = list()
         self._pinned_nodes = list()
 
@@ -85,8 +87,8 @@ class zGeoWidget(QtWidgets.QWidget):
         else:
             self._selected_nodes = []
 
-        self._wgtComponentRef.reset_model(self._builder,
-                                          list(set(self._selected_nodes) | set(self._pinned_nodes)))
+        self._wgtComponent_ref.reset_model(
+            self._builder, list(set(self._selected_nodes) | set(self._pinned_nodes)))
 
     def _on_tvGeo_pinStateChanged(self, item_list):
         """ Update component TreeView when zGeo TreeView item's pin state changed.
@@ -125,8 +127,8 @@ class zGeoWidget(QtWidgets.QWidget):
         # Refer to https://stackoverflow.com/questions/54735175/set-operator-precedence
         self._pinned_nodes = list((set(self._pinned_nodes) | set(pinned_zGeo_nodes)) -
                                   set(unpinned_nodes))
-        self._wgtComponentRef.reset_model(self._builder,
-                                          list(set(self._selected_nodes) | set(self._pinned_nodes)))
+        self._wgtComponent_ref.reset_model(
+            self._builder, list(set(self._selected_nodes) | set(self._pinned_nodes)))
 
         not_found_nodes = [name for name in node_names if name not in scene_nodes]
         if not_found_nodes:
@@ -381,7 +383,7 @@ class zGeoWidget(QtWidgets.QWidget):
 
     # Public functions
     def set_component_widget(self, wgtComponent):
-        self._wgtComponentRef = weakref.proxy(wgtComponent)
+        self._wgtComponent_ref = weakref.proxy(wgtComponent)
 
     def reset_builder(self):
         """ Build and set the zGeo TreeView. This forces a complete redraw of the zGeo TreeView.
@@ -389,36 +391,47 @@ class zGeoWidget(QtWidgets.QWidget):
         solver_nodes = cmds.ls(type="zSolver")
         if not solver_nodes:
             # Clear the TreeView and do early return if there's no solver node in the scene
-            self._tmGeo.reset_model(None)
-            self._wgtComponentRef.reset_model(None, [])
+            self._tmGeo.reset_model(None, None)
+            self._wgtComponent_ref.reset_model(None, [])
             return
 
         self._builder = zva.Ziva()
         self._builder.retrieve_connections()
-        self._tmGeo.reset_model(self._builder)
+        # TODO: merge latest zBuilder data with existing zGeo Tree Model data
+        self._whole_scene_tree = build_scene_panel_tree(
+            self._builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+        self._tmGeo.reset_model(self._builder, self._whole_scene_tree)
 
         # show expanded view of the tree
         self._tvGeo.expandAll()
 
         # select item in TreeView that is selected in Maya
-        sel = cmds.ls(sl=True, long=True)
-        if sel:
-            checked = self._tmGeo.match(self._tmGeo.index(0, 0), longNameRole, sel[0], -1,
+        for sel in cmds.ls(sl=True, long=True):
+            checked = self._tmGeo.match(self._tmGeo.index(0, 0), longNameRole, sel, -1,
                                         QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
     def save(self):
+        """ Save the zGeo tree data to solver node respectively.
+        It first rebuilds the whole scene, then merge it with current TreeItem data.
+        Finally save data to each solver's plug.
+        """
         solver_nodes = cmds.ls(type="zSolver")
-        if is_serialize_data_to_zsolver_node():
-            cmds.select(cl=True)
-            builder = zva.Ziva()
-            builder.retrieve_connections()
-            # TODO: resolve conflict
-            root_node = self._zGeo_treemodel.root_node()
-            for node in root_node.children:
-                string_to_save = json_to_string(serialize_tree_model(node))
-                cmds.setAttr("{}.scenePanelSerializedData".format(node.data.name),
-                             string_to_save,
-                             type="string")
-            logger.info("zGeo TreeView data saved.")
+        if not solver_nodes:
+            logger.debug("No solver node found, skip saving process.")
+            return
+        if not is_serialize_data_to_zsolver_node():
+            return
+
+        # Clear the selection to retrieve whole scene
+        cmds.select(cl=True)
+        self.reset_builder()
+        # Save to each solver node's plug
+        root_node = self._tmGeo.root_node()
+        for solver_item in root_node.children:
+            string_to_save = to_json_string(serialize_tree_model(solver_item))
+            cmds.setAttr("{}.scenePanelSerializedData".format(solver_item.data.name),
+                         string_to_save,
+                         type="string")
+        logger.info("zGeo tree data saved.")

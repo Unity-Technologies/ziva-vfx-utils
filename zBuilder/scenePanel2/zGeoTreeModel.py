@@ -1,5 +1,6 @@
 import logging
 import pickle
+import weakref
 
 from ..uiUtils import *
 from .groupNode import GroupNode
@@ -18,23 +19,21 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, parent=None):
         super(zGeoTreeModel, self).__init__(parent)
         self._parent_widget = parent
-        self._builder = None
-        self._root_node = None
+        self._builder_ref = None
+        self._root_node_ref = None
 
-    def reset_model(self, new_builder):
+    def reset_model(self, builder, root_node):
         self.beginResetModel()
-        self._builder = new_builder
-        self._root_node = build_scene_panel_tree(
-            new_builder, zGeo_UI_node_types +
-            ["zSolver", "zSolverTransform"])[0] if new_builder else None
+        self._builder_ref = weakref.proxy(builder) if builder else None
+        self._root_node_ref = weakref.proxy(root_node) if root_node else None
         self.endResetModel()
 
     def root_node(self):
-        return self._root_node
+        return self._root_node_ref
 
     # QtCore.QAbstractItemModel override functions
     def rowCount(self, parent):
-        parent_node = get_node_by_index(parent, self._root_node)
+        parent_node = get_node_by_index(parent, self._root_node_ref)
         return parent_node.child_count() if parent_node else 0
 
     def columnCount(self, parent):
@@ -98,7 +97,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
                         fix_node_name_duplication(node, sibling_nodes)
                 else:
                     name = cmds.rename(node.data.long_name, value)
-                    self._builder.string_replace("^{}$".format(short_name), name)
+                    self._builder_ref.string_replace("^{}$".format(short_name), name)
                     node.data.name = name
                 is_data_set = True
         elif role == nodeRole:
@@ -143,9 +142,9 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
                 return QtGui.QColor(54, 54, 54)  # gray
 
     def parent(self, index):
-        child_node = get_node_by_index(index, self._root_node)
+        child_node = get_node_by_index(index, self._root_node_ref)
         parent_node = child_node.parent
-        if parent_node == self._root_node or parent_node is None:
+        if parent_node == self._root_node_ref or parent_node is None:
             return QtCore.QModelIndex()
         return self.createIndex(parent_node.row(), 0, parent_node)
 
@@ -153,7 +152,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return QtCore.QModelIndex()
 
-        parent_node = get_node_by_index(parent, self._root_node)
+        parent_node = get_node_by_index(parent, self._root_node_ref)
         return self.createIndex(row, column, parent_node.child(row))
 
     def insertRows(self, row, count, parent):
