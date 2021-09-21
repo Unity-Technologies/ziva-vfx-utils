@@ -65,12 +65,16 @@ class ScenePanel2(QtWidgets.QWidget):
 
         # zGeo widget(left panel)
         lytGeo = QtWidgets.QVBoxLayout()
+        lytGeo.setSpacing(0)
+        lytGeo.setContentsMargins(0, 0, 0, 0)
         lytGeo.addWidget(self._wgtGeo)
         grpGeo = QtWidgets.QGroupBox("Scene Panel")
         grpGeo.setLayout(lytGeo)
 
         # component widget(right panel)
         lytComponent = QtWidgets.QVBoxLayout()
+        lytComponent.setSpacing(0)
+        lytComponent.setContentsMargins(0, 0, 0, 0)
         lytComponent.addWidget(self._wgtComponent)
         grpComponent = QtWidgets.QGroupBox("Component")
         grpComponent.setLayout(lytComponent)
@@ -80,6 +84,8 @@ class ScenePanel2(QtWidgets.QWidget):
         splTreeView.addWidget(grpComponent)
 
         lytTwoPanel = QtWidgets.QVBoxLayout()
+        lytTwoPanel.setSpacing(0)
+        lytTwoPanel.setContentsMargins(0, 0, 0, 0)
         lytTwoPanel.addLayout(lytMenuBar)
         lytTwoPanel.addLayout(lytToolbar)
         lytTwoPanel.addWidget(splTreeView)
