@@ -80,7 +80,7 @@ _create_section_tuple = (
             lambda: mel.eval("select -r `zQuery -t zCacheTransform`"),
         ),
     ),
-    ("create-group-plus", "Create Group", "Create Group: select tree view items",
+    ("create-group", "Create Group", "Create Group: select tree view items",
      (zGeoWidget.create_group, )),
 )
 
