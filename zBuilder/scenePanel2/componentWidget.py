@@ -448,6 +448,8 @@ class ComponentWidget(QtWidgets.QWidget):
                 self._component_tree_model_dict[component_type] = ComponentTreeModel(
                     builder, root_node)
 
+        componentWidgetSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(component_type, tree_model)
-            self._lytAllSections.addWidget(wgtSection)
+            componentWidgetSplitter.addWidget(wgtSection)
+        self._lytAllSections.addWidget(componentWidgetSplitter)
