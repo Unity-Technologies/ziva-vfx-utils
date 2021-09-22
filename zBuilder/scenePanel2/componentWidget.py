@@ -1,14 +1,14 @@
 import logging
 
-from ..uiUtils import nodeRole, get_icon_path_from_name, get_icon_path_from_node, get_node_by_index
 from .zTreeView import zTreeView
 from .treeItem import TreeItem, build_scene_panel_tree
+from ..uiUtils import get_icon_path_from_name, get_icon_path_from_node, get_node_by_index
+from ..uiUtils import ProximityWidget, nodeRole
+from ..nodes.base import Base
 from PySide2 import QtCore, QtGui, QtWidgets
 from maya import cmds
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from functools import partial
-from zBuilder.nodes.base import Base
-from zBuilder.uiUtils import ProximityWidget
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 component_type_dict = {
     "ui_zBone_body": ["zAttachment", "zBone", "zRivetToBone"],
     "ui_zTissue_body":
-    ["zAttachment", "zTissue", "zTet", "zMaterial", "zFiber", "zLineOfAction", "zRestShape"],
-    "ui_zCloth_body": ["zAttachment", "zCloth", "zMaterial"]
+    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber", "zLineOfAction", "zRestShape"],
+    "ui_zCloth_body": ["zCloth", "zMaterial", "zAttachment"]
 }
 
 # clipboard for copied attributes
@@ -420,8 +420,8 @@ class ComponentWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(ComponentWidget, self).__init__(parent)
         # setup data
-        self._component_nodes_dict = defaultdict(list)
-        self._component_tree_model_dict = dict()
+        self._component_nodes_dict = OrderedDict()
+        self._component_tree_model_dict = OrderedDict()
         # setup ui
         self._lytAllSections = QtWidgets.QVBoxLayout(self)
         self.setLayout(self._lytAllSections)
@@ -438,7 +438,7 @@ class ComponentWidget(QtWidgets.QWidget):
 
         for node in new_selection:
             for component in component_type_dict[node.type]:
-                self._component_nodes_dict[component].append(node)
+                self._component_nodes_dict.setdefault(component, []).append(node)
 
         for component_type, node_list in self._component_nodes_dict.items():
             root_node = TreeItem()
