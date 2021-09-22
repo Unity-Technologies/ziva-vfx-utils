@@ -58,14 +58,14 @@ def paste_attrs(node):
 
 
 def invert_weights(node, map_index):
-    map_ = node.parameters['map'][map_index]
+    map_ = node.parameters["map"][map_index]
     map_.invert()
     map_.apply_weights()
 
 
 def copy_weights(node, map_index):
     global maps_clipboard
-    maps_clipboard = node.parameters['map'][map_index]
+    maps_clipboard = node.parameters["map"][map_index]
 
 
 def paste_weights(node, new_map_index):
@@ -84,7 +84,7 @@ def paste_weights(node, new_map_index):
     # It will be simple for a user to paste the wrong map in wrong location
     # here we are comparing the length of the maps and if they are different we can bring up
     # a dialog to warn user unexpected results may happen,
-    new_map = node.parameters['map'][new_map_index]
+    new_map = node.parameters["map"][new_map_index]
     orig_map_length = len(orig_map.values)
     new_map_length = len(new_map.values)
 
@@ -231,14 +231,14 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             return
 
         menu_dict = {
-            'zTissue': self.open_tissue_menu,
-            'zBone': self.open_bone_menu,
-            'zLineOfAction': self.open_line_of_action_menu,
-            'zRestShape': self.open_rest_shape_menu,
-            'zTet': self.open_tet_menu,
-            'zFiber': self.open_fiber_menu,
-            'zMaterial': self.open_material_menu,
-            'zAttachment': self.open_attachment_menu,
+            "zTissue": self.open_tissue_menu,
+            "zBone": self.open_bone_menu,
+            "zLineOfAction": self.open_line_of_action_menu,
+            "zRestShape": self.open_rest_shape_menu,
+            "zTet": self.open_tet_menu,
+            "zFiber": self.open_fiber_menu,
+            "zMaterial": self.open_material_menu,
+            "zAttachment": self.open_attachment_menu,
         }
 
         node = indexes[0].data(nodeRole)
@@ -271,19 +271,19 @@ class ComponentSectionWidget(QtWidgets.QWidget):
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
     def add_attribute_actions_to_menu(self, menu, node):
-        attrs_menu = menu.addMenu('Attributes')
+        attrs_menu = menu.addMenu("Attributes")
 
         copy_attrs_action = QtWidgets.QAction(self)
-        copy_attrs_action.setText('Copy')
+        copy_attrs_action.setText("Copy")
         copy_attrs_action.setObjectName("actionCopyAttrs")
         copy_attrs_action.triggered.connect(partial(copy_attrs, node))
 
         paste_attrs_action = QtWidgets.QAction(self)
-        paste_attrs_action.setText('Paste')
+        paste_attrs_action.setText("Paste")
         paste_attrs_action.setObjectName("actionPasteAttrs")
         paste_attrs_action.triggered.connect(partial(paste_attrs, node))
 
-        # only enable 'paste' IF it is same type as what is in buffer
+        # only enable "paste" IF it is same type as what is in buffer
         paste_attrs_action.setEnabled(node.type in attrs_clipboard)
 
         attrs_menu.addAction(copy_attrs_action)
@@ -310,54 +310,54 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             map_index (int): map index. 0 for source map 1 for target/endPoints map
         """
         paint_action = QtWidgets.QAction(self)
-        paint_action.setText('Paint')
+        paint_action.setText("Paint")
         paint_action.setObjectName("actionPaint")
-        paint_action.triggered.connect(partial(node.parameters['map'][map_index].open_paint_tool))
+        paint_action.triggered.connect(partial(node.parameters["map"][map_index].open_paint_tool))
         menu.addAction(paint_action)
 
         invert_action = QtWidgets.QAction(self)
-        invert_action.setText('Invert')
-        invert_action.setObjectName('actionInvertWeights')
+        invert_action.setText("Invert")
+        invert_action.setObjectName("actionInvertWeights")
         invert_action.triggered.connect(partial(invert_weights, node, map_index))
         menu.addAction(invert_action)
 
         menu.addSeparator()
 
         copy_action = QtWidgets.QAction(self)
-        copy_action.setText('Copy')
-        copy_action.setObjectName('actionCopyWeights')
+        copy_action.setText("Copy")
+        copy_action.setObjectName("actionCopyWeights")
         copy_action.triggered.connect(partial(copy_weights, node, map_index))
         menu.addAction(copy_action)
 
         paste_action = QtWidgets.QAction(self)
-        paste_action.setText('Paste')
-        paste_action.setObjectName('actionPasteWeights')
+        paste_action.setText("Paste")
+        paste_action.setObjectName("actionPasteWeights")
         paste_action.triggered.connect(partial(paste_weights, node, map_index))
         paste_action.setEnabled(bool(maps_clipboard))
         menu.addAction(paste_action)
 
     def open_tet_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
-        menu.addSection('Maps')
+        menu.addSection("Maps")
 
-        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu = menu.addMenu("Weight")
         self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
     def open_fiber_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
-        menu.addSection('Maps')
+        menu.addSection("Maps")
 
-        weight_map_menu = menu.addMenu('Weight')
+        weight_map_menu = menu.addMenu("Weight")
 
         self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
-        end_points_map_menu = menu.addMenu('EndPoints')
+        end_points_map_menu = menu.addMenu("EndPoints")
         self.add_map_actions_to_menu(end_points_map_menu, node, 1)
 
     def open_material_menu(self, menu, node):
         self.add_attribute_actions_to_menu(menu, node)
-        menu.addSection('Maps')
-        weight_map_menu = menu.addMenu('Weight')
+        menu.addSection("Maps")
+        weight_map_menu = menu.addMenu("Weight")
 
         self.add_map_actions_to_menu(weight_map_menu, node, 0)
 
@@ -371,7 +371,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
 
     def _setup_actions(self):
         self.actionSelectST = QtWidgets.QAction(self)
-        self.actionSelectST.setText('Select Source and Target')
+        self.actionSelectST.setText("Select Source and Target")
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
@@ -381,10 +381,10 @@ class ComponentSectionWidget(QtWidgets.QWidget):
 
         self.add_attribute_actions_to_menu(menu, node)
         menu.addAction(self.actionSelectST)
-        menu.addSection('Maps')
-        truncate = lambda x: (x[:12] + '..') if len(x) > 14 else x
-        source_menu_text = 'Source ({})'.format(truncate(source_mesh_name))
-        target_menu_text = 'Target ({})'.format(truncate(target_mesh_name))
+        menu.addSection("Maps")
+        truncate = lambda x: (x[:12] + "..") if len(x) > 14 else x
+        source_menu_text = "Source ({})".format(truncate(source_mesh_name))
+        target_menu_text = "Target ({})".format(truncate(target_mesh_name))
 
         source_map_menu = menu.addMenu(source_menu_text)
         self.add_map_actions_to_menu(source_map_menu, node, 0)
@@ -392,8 +392,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         target_map_menu = menu.addMenu(target_menu_text)
         self.add_map_actions_to_menu(target_map_menu, node, 1)
 
-        menu.addSection('')
-        proximity_menu = menu.addMenu('Paint By Proximity')
+        menu.addSection("")
+        proximity_menu = menu.addMenu("Paint By Proximity")
         prox_widget = ProximityWidget()
         action_paint_by_prox = QtWidgets.QWidgetAction(proximity_menu)
         action_paint_by_prox.setDefaultWidget(prox_widget)
