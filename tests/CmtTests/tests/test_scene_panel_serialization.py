@@ -50,7 +50,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         sub_group2_node.append_children(tissue2_node)
 
         # Action
-        serialized_data = serialize_tree_model(root_node)
+        serialized_data = [entry.to_json_object() for entry in flatten_tree(root_node)]
 
         # Verify
         self.assertEqual(type(serialized_data), list)
@@ -122,7 +122,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = deserialize_tree_model(serialized_data, 1)
+        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -206,7 +206,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = deserialize_tree_model(serialized_data, 1)
+        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -280,7 +280,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = deserialize_tree_model(serialized_data, 1)
+        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -363,9 +363,9 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         sub_group2_node.append_children(tissue2_node)
 
         # Action: serialize and then de-serialize the serialized data
-        serialized_data = serialize_tree_model(root_node)
-        print("serialized_data: ", serialized_data)
-        deserialized_root_node = deserialize_tree_model(serialized_data, 1)
+        json_string = to_json_string(flatten_tree(root_node))
+        print("json_string: ", json_string)
+        deserialized_root_node = construct_tree(*to_tree_entry_list(json_string))
 
         # Verify: compare results with original tree items
         self.assertIsNone(deserialized_root_node.parent)
@@ -460,7 +460,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #     |- zSolver1
         #     |- group1
         #     |   - tissue1
-        serialized_solver1_data = serialize_tree_model(solver1)
+        serialized_solver1_data = [entry.to_json_object() for entry in flatten_tree(solver1)]
 
         # Verify
         self.assertEqual(type(serialized_solver1_data), list)
@@ -494,7 +494,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #     |- zSolver2
         #     |- group2
         #     |   - tissue2
-        serialized_solver2_data = serialize_tree_model(solver2)
+        serialized_solver2_data = [entry.to_json_object() for entry in flatten_tree(solver2)]
 
         # Verify
         self.assertEqual(len(serialized_solver2_data), 4)
@@ -526,7 +526,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #   `- zSolver3Transform
         #     |- zSolver3
         #     |- tissue3
-        serialized_solver3_data = serialize_tree_model(solver3)
+        serialized_solver3_data = [entry.to_json_object() for entry in flatten_tree(solver3)]
 
         # Verify
         self.assertEqual(len(serialized_solver3_data), 3)
