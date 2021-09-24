@@ -126,22 +126,36 @@ def to_json_file(tree_entry_list, file_path):
     logger.debug("Finished writing serialized data to {}.".format(file_path))
 
 
-def to_tree_entry_list(json_data):
-    """ Convert json string to (PendingTreeEntry list, version number) tuple.
+def to_tree_entry_list(json_data, version=None):
+    """ Convert json string to PendingTreeEntry list.
+
+    Args:
+        json_data(str, list): The input Json data.
+            It is string type in normal case and is list type for internal use.
+        version(int): Specified Json data version number, for internal use.
+
+    Returns:
+        PendingTreeEntry list
     """
     # Normal workflow, json string load from solverTM plug
     if isinstance(json_data, str):
         dict_data = json.loads(json_data)
-        tree_entries = [PendingTreeEntry(*entry) for entry in dict_data["nodes"]]
-        return tree_entries, dict_data["version"]
+        if dict_data["version"] == 1:
+            # Create entry data according to version number
+            tree_entries = [PendingTreeEntry(*entry) for entry in dict_data["nodes"]]
+            return tree_entries
 
     # Internal workflow for unit test, manually constructed json string
     if isinstance(json_data, list):
-        tree_entries = [PendingTreeEntry(*entry) for entry in json_data]
-        return tree_entries, _version
+        if version == 1:
+            # Create entry data according to version number
+            tree_entries = [PendingTreeEntry(*entry) for entry in json_data]
+            return tree_entries
+
+    raise RuntimeError("Unhandled Json data or invalid version number.")
 
 
-def construct_tree(tree_entry_list, version):
+def construct_tree(tree_entry_list):
     """ Construct a TreeItem tree according to PendingTreeEntry list
     """
     # set root node
@@ -149,53 +163,52 @@ def construct_tree(tree_entry_list, version):
     root_base_node.name = "ROOT"
     root_node = TreeItem(None, root_base_node)
 
-    if version == 1:
-        # initialize values for tree traversal
-        curr_entry_depth = 0
-        curr_entry_index = 0
-        prev_entry_index = 0
-        curr_parent_item = None
-        parent_to_visit = [(root_node, "ROOT")]
+    # initialize values for tree traversal
+    curr_entry_depth = 0
+    curr_entry_index = 0
+    prev_entry_index = 0
+    curr_parent_item = None
+    parent_to_visit = [(root_node, "ROOT")]
 
-        # The tree entries are sorted firstly by depth then by row index,
-        # we can run BFS on the tree with those keys based on depth.
-        for entry in tree_entry_list:
-            prev_entry_depth = curr_entry_depth
-            curr_entry_depth = entry.depth
-            prev_entry_index = curr_entry_index
-            curr_entry_index = entry.row_index
-            curr_entry_data = entry.node_data
+    # The tree entries are sorted firstly by depth then by row index,
+    # we can run BFS on the tree with those keys based on depth.
+    for entry in tree_entry_list:
+        prev_entry_depth = curr_entry_depth
+        curr_entry_depth = entry.depth
+        prev_entry_index = curr_entry_index
+        curr_entry_index = entry.row_index
+        curr_entry_data = entry.node_data
 
-            # We pick the next parent from "parent_to_visit" when
-            # 1. Moving to the next depth
-            # 2. Processing other entry from a different parent, i.e.,
-            #    on the same depth but row index <= current entry
-            if curr_entry_depth > prev_entry_depth or curr_entry_index <= prev_entry_index:
-                # Finding the right parent from the list.
-                # Note: Group node might not have any child.
-                for parent_item in parent_to_visit:
-                    curr_parent_item, curr_parent_tree_path = parent_item
-                    # Next we need to find the right parent from the "parent_to_visit" list.
-                    # We do that by comparing current node key and parent node key.
-                    if entry.dir_tree_path == curr_parent_tree_path:
-                        # Once found, remove the parent from "parent_to_visit"
-                        # and add its children to the tree.
-                        parent_to_visit.remove(parent_item)
-                        break
+        # We pick the next parent from "parent_to_visit" when
+        # 1. Moving to the next depth
+        # 2. Processing other entry from a different parent, i.e.,
+        #    on the same depth but row index <= current entry
+        if curr_entry_depth > prev_entry_depth or curr_entry_index <= prev_entry_index:
+            # Finding the right parent from the list.
+            # Note: Group node might not have any child.
+            for parent_item in parent_to_visit:
+                curr_parent_item, curr_parent_tree_path = parent_item
+                # Next we need to find the right parent from the "parent_to_visit" list.
+                # We do that by comparing current node key and parent node key.
+                if entry.dir_tree_path == curr_parent_tree_path:
+                    # Once found, remove the parent from "parent_to_visit"
+                    # and add its children to the tree.
+                    parent_to_visit.remove(parent_item)
+                    break
 
-            node_type = entry.node_type
-            if node_type == "group":
-                item = TreeItem(curr_parent_item, GroupNode(entry.group_name))
-            else:
-                zbuilder_node = Base()
-                zbuilder_node.name = curr_entry_data["name"]
-                zbuilder_node.type = node_type
-                item = TreeItem(curr_parent_item, zbuilder_node)
-                item.pin_state = curr_entry_data["pin_state"]
+        node_type = entry.node_type
+        if node_type == "group":
+            item = TreeItem(curr_parent_item, GroupNode(entry.group_name))
+        else:
+            zbuilder_node = Base()
+            zbuilder_node.name = curr_entry_data["name"]
+            zbuilder_node.type = node_type
+            item = TreeItem(curr_parent_item, zbuilder_node)
+            item.pin_state = curr_entry_data["pin_state"]
 
-            # Save the container node to the "parent_to_visit" list for later processing
-            container_node_type = ("group", "zSolverTransform")
-            if node_type in container_node_type:
-                parent_to_visit.append((item, entry.tree_path))
+        # Save the container node to the "parent_to_visit" list for later processing
+        container_node_type = ("group", "zSolverTransform")
+        if node_type in container_node_type:
+            parent_to_visit.append((item, entry.tree_path))
 
     return root_node

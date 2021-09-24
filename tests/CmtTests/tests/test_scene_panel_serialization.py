@@ -3,7 +3,8 @@ import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import *
-from zBuilder.scenePanel2.serialize import *
+from zBuilder.scenePanel2.serialize import flatten_tree, to_tree_entry_list, construct_tree, to_json_string
+from zBuilder.scenePanel2.serialize import _version
 from maya import cmds
 
 
@@ -122,7 +123,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
+        tree_root_node = construct_tree(to_tree_entry_list(serialized_data, _version))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -206,7 +207,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
+        tree_root_node = construct_tree(to_tree_entry_list(serialized_data, _version))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -280,7 +281,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        tree_root_node = construct_tree(*to_tree_entry_list(serialized_data))
+        tree_root_node = construct_tree(to_tree_entry_list(serialized_data, _version))
 
         # Verify above data returns a tree structure as follows:
         # ROOT
@@ -365,7 +366,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         # Action: serialize and then de-serialize the serialized data
         json_string = to_json_string(flatten_tree(root_node))
         print("json_string: ", json_string)
-        deserialized_root_node = construct_tree(*to_tree_entry_list(json_string))
+        deserialized_root_node = construct_tree(to_tree_entry_list(json_string))
 
         # Verify: compare results with original tree items
         self.assertIsNone(deserialized_root_node.parent)
