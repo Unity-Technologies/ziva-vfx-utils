@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 # Component for each zGeo node
 component_type_dict = {
-    "ui_zBone_body": ["zAttachment", "zBone", "zRivetToBone"],
+    "ui_zBone_body": ["zAttachment", "zBone"],
     "ui_zTissue_body":
-    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber", "zLineOfAction", "zRestShape"],
+    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber", "zRestShape"],
     "ui_zCloth_body": ["zCloth", "zMaterial", "zAttachment"]
 }
 
@@ -444,7 +444,11 @@ class ComponentWidget(QtWidgets.QWidget):
             root_node = TreeItem()
             has_data = False
             for node in node_list:
-                child_nodes = build_scene_panel_tree(node, [component_type])
+                if component_type == "zFiber":
+                    # extend the node filter type to preview up strem connections of "zFiber" node
+                    child_nodes = build_scene_panel_tree(node, [component_type, "zLineOfAction", "zRivetToBone", "ui_curve_body"])
+                else:
+                    child_nodes = build_scene_panel_tree(node, [component_type])
                 if child_nodes:
                     zGeo_node = TreeItem(root_node, node)
                     zGeo_node.append_children(child_nodes)
