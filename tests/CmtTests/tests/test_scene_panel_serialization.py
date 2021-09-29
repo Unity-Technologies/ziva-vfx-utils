@@ -2,7 +2,7 @@ import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import *
+from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
 from zBuilder.scenePanel2.serialize import flatten_tree, to_tree_entry_list, construct_tree, to_json_string
 from zBuilder.scenePanel2.serialize import _version
 from maya import cmds
@@ -137,7 +137,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #     |  `- Sub-group2
         #     |    `- tissue2
         self.assertIsNone(tree_root_node.parent)
-        self.assertTrue(tree_root_node.is_root_node())
+        self.assertFalse(tree_root_node.parent)
         solver_node = tree_root_node.children[0]
         self.assertEqual(solver_node.data.type, "zSolverTransform")
         self.assertEqual(solver_node.data.name, "zSolver1")
@@ -218,8 +218,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #     |    `- Sub-sub-group1
         #     |      `- tissue1
         #     |- group2
-        self.assertIsNone(tree_root_node.parent)
-        self.assertTrue(tree_root_node.is_root_node())
+        self.assertFalse(tree_root_node.parent)
         solver_node = tree_root_node.children[0]
         self.assertEqual(solver_node.data.type, "zSolverTransform")
         self.assertEqual(solver_node.data.name, "zSolver1")
@@ -292,8 +291,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         #     |  `- Sub-group1
         #     |    `- Sub-sub-group1
         #     |      `- tissue1
-        self.assertIsNone(tree_root_node.parent)
-        self.assertTrue(tree_root_node.is_root_node())
+        self.assertFalse(tree_root_node.parent)
         solver_node = tree_root_node.children[0]
         self.assertEqual(solver_node.data.type, "zSolverTransform")
         self.assertEqual(solver_node.data.name, "zSolver1")
@@ -369,8 +367,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         deserialized_root_node = construct_tree(to_tree_entry_list(json_string))
 
         # Verify: compare results with original tree items
-        self.assertIsNone(deserialized_root_node.parent)
-        self.assertTrue(deserialized_root_node.is_root_node())
+        self.assertFalse(deserialized_root_node.parent)
         deserialized_solver_node = deserialized_root_node.children[0]
         self.assertEqual(deserialized_solver_node.data.type, "zSolverTransform")
         self.assertEqual(deserialized_solver_node.data.name, "zSolver1")

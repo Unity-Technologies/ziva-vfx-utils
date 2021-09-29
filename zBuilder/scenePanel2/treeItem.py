@@ -59,7 +59,7 @@ class TreeItem(object):
             new_parent._children.append(self)
 
     def is_root_node(self):
-        return self._parent is None
+        return self._parent is None and type(self.data) is Base
 
     def child(self, row):
         """ Return child node according to specified index.
@@ -267,7 +267,7 @@ def prune_child_nodes(nodes):
         cur_node = node
         find_duplicate = False
         # Recursively check each node till root node
-        while not cur_node.parent.is_root_node():
+        while cur_node.parent:
             if cur_node.parent in nodes:
                 find_duplicate = True
                 break
