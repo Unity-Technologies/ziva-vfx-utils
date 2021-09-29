@@ -21,13 +21,15 @@ def is_serialize_data_to_zsolver_node():
 
 
 class PendingTreeEntry(object):
+    """ Data structure for merging zBuilder node and tree view data.
+    """
     def __init__(self, *args):
-        """ Overloaded construtor
+        """ Overloaded construtor for different data types.
         """
         if len(args) == 1:
-            # Take TreeItem as input argument
+            assert isinstance(args[0], TreeItem)
+            # Create entry through TreeItem
             tree_item = args[0]
-            assert isinstance(tree_item, TreeItem)
             self._tree_path = tree_item.get_tree_path()
             self._row_index = tree_item.row()
             self._node_type = tree_item.data.type
@@ -35,15 +37,20 @@ class PendingTreeEntry(object):
                 "pin_state": tree_item.pin_state,
                 "name": tree_item.data.long_name,  # Store Maya DGNode long_name
             }
-        else:
-            # Take json data as input arguments
-            self._tree_path = args[0]
-            self._row_index = args[1]
-            self._node_type = args[2]
-            self._node_data = args[3]
+            return
+
+        # Create entry with Json data and version number
+        version = args[-1]
+        assert isinstance(
+            version, int) and version > 0, "Version must be an integer. Got: {}".format(version)
+        self._tree_path = args[0]
+        self._row_index = args[1]
+        self._node_type = args[2]
+        self._node_data = args[3]
 
     @property
     def tree_path(self):
+        assert self._tree_path
         return self._tree_path
 
     @property
@@ -51,6 +58,7 @@ class PendingTreeEntry(object):
         """ Return tree path excludes last segement.
         E.g., "|a|b|c" --> "|a|b"
         """
+        assert self._tree_path
         return self._tree_path.rsplit("|", 1)[0]
 
     @property
@@ -60,10 +68,12 @@ class PendingTreeEntry(object):
 
     @property
     def depth(self):
+        assert self._tree_path
         return self._tree_path.count("|")
 
     @property
     def row_index(self):
+        assert self._row_index >= 0
         return self._row_index
 
     @property
@@ -74,7 +84,14 @@ class PendingTreeEntry(object):
     def node_data(self):
         return self._node_data
 
+    @property
+    def long_name(self):
+        assert "group" != self._node_type, "Only zBuilder node has long name."
+        return self._node_data["name"]
+
     def to_json_object(self):
+        assert self._tree_path
+        assert self._row_index >= 0
         return [self._tree_path, self._row_index, self._node_type, self._node_data]
 
 
@@ -140,19 +157,27 @@ def to_tree_entry_list(json_data, version=None):
     # Normal workflow, json string load from solverTM plug
     if isinstance(json_data, str):
         dict_data = json.loads(json_data)
-        if dict_data["version"] == 1:
-            # Create entry data according to version number
-            tree_entries = [PendingTreeEntry(*entry) for entry in dict_data["nodes"]]
-            return tree_entries
+        json_data_version = dict_data["version"]
+        # Create entry data according to version number
+        # TODO: Since Python 3.5, Additional Unpacking Generalizations is valid, see
+        # https://stackoverflow.com/questions/12720450/unpacking-arguments-only-named-arguments-may-follow-expression
+        # Once switch to Python 3 only, change this grammar
+        tree_entries = [
+            PendingTreeEntry(*(entry + [json_data_version])) for entry in dict_data["nodes"]
+        ]
+        return tree_entries
 
     # Internal workflow for unit test, manually constructed json string
+    # The version number is manually specified to test version handling.
     if isinstance(json_data, list):
-        if version == 1:
-            # Create entry data according to version number
-            tree_entries = [PendingTreeEntry(*entry) for entry in json_data]
-            return tree_entries
+        assert version, "Version number is not set."
+        assert isinstance(version, int), "Version is not an integer."
+        tree_entries = [PendingTreeEntry(*(entry + [version])) for entry in json_data]
+        return tree_entries
 
-    raise RuntimeError("Unhandled Json data or invalid version number.")
+    raise RuntimeError(
+        "Unhandled Json data and/or invalid version number: input data = {}, version = {}".format(
+            json_data, version))
 
 
 def construct_tree(tree_entry_list):

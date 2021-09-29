@@ -3,7 +3,7 @@ import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import *
-from zBuilder.scenePanel2.serialize import PendingTreeEntry
+from zBuilder.scenePanel2.serialize import PendingTreeEntry, _version
 from maya import cmds
 
 
@@ -76,8 +76,8 @@ class PendingTreeEntryTestCase(VfxTestCase):
 
         # ---------------------------------------------------------------------
         # Action, construct by json object
-        another_sub_group1_entry = PendingTreeEntry(*sub_group1_json_object)
-        another_tissue2_entry = PendingTreeEntry(*tissue2_json_object)
+        another_sub_group1_entry = PendingTreeEntry(*(sub_group1_json_object + [_version]))
+        another_tissue2_entry = PendingTreeEntry(*(tissue2_json_object + [_version]))
 
         # Verify
         self.assertEqual(another_sub_group1_entry.tree_path, expected_sub_group1_json_object[0])
