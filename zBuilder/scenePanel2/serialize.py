@@ -2,8 +2,9 @@ import os
 import json
 import logging
 
-from .treeItem import TreeItem, is_group_item
+from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
+from ..uiUtils import zGeo_UI_node_types
 from ..nodes.base import Base
 
 logger = logging.getLogger(__name__)
@@ -237,3 +238,25 @@ def construct_tree(tree_entry_list):
             parent_to_visit.append((item, entry.tree_path))
 
     return root_node
+
+
+def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
+    """ Merge data between zBuilder parse result and tree_entry_list.
+
+    Args:
+        zBuilder_node_list: zBuilder node retrieved from current scene.
+        tree_entry_list: PendingTreeEntry list from tree view,
+            or deserialized from solverTM plug.
+    
+    Return:
+        Merged TreeItem tree.
+    """
+    assert zBuilder_node_list
+    if not tree_view_entry_list:
+        # zGeo Tree View has no data, create the tree from zBuilder node list
+        solverTM = list(filter(lambda node: node.type == "zSolverTransform", zBuilder_node_list))[0]
+        return build_scene_panel_tree(solverTM,
+                                      zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+
+    # TODO: Merge zBuilder node list and tree view entry list
+    return construct_tree(tree_view_entry_list)
