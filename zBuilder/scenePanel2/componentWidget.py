@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 component_type_dict = {
     "ui_zBone_body": ["zAttachment", "zBone"],
     "ui_zTissue_body":
-    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber", "zRestShape"],
+    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber"],
     "ui_zCloth_body": ["zCloth", "zMaterial", "zAttachment"]
 }
 
@@ -447,6 +447,9 @@ class ComponentWidget(QtWidgets.QWidget):
                 if component_type == "zFiber":
                     # extend the node filter type to preview up strem connections of "zFiber" node
                     child_nodes = build_scene_panel_tree(node, [component_type, "zLineOfAction", "zRivetToBone", "ui_curve_body"])
+                elif component_type == "zTissue":
+                    # extend the node filter type to preview rest shape connection nodes
+                    child_nodes = build_scene_panel_tree(node, [component_type, "zRestShape", "ui_target_body"])
                 else:
                     child_nodes = build_scene_panel_tree(node, [component_type])
                 if child_nodes:
