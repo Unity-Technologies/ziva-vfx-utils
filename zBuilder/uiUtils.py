@@ -20,6 +20,9 @@ name_duplication_check_pattern = re.compile(r".*?(\d+)$")
 
 name_validation_pattern = re.compile(r"^[a-zA-Z][\w]*$")
 
+# Attribute name of the zSolver node that stores scene panel data
+SCENE_PANEL_DATA_ATTR_NAME = "scenePanelSerializedData"
+
 
 def dock_window(dialog_class, *args, **kwargs):
     """ Create dock window for Maya

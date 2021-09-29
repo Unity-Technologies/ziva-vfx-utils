@@ -1,20 +1,20 @@
+""" This is the widget contains tree model and view for the zGeo view.
+"""
 import zBuilder.builders.ziva as zva
 import logging
 import weakref
 
 from .groupNode import GroupNode
-from .serialize import is_serialize_data_to_zsolver_node, to_json_string, serialize_tree_model
+from .serialize import is_serialize_data_to_zsolver_node, to_json_string, flatten_tree
 from .treeItem import build_scene_panel_tree
 from .zGeoTreeModel import zGeoTreeModel
 from .zTreeView import zTreeView
 from ..commonUtils import is_sequence
-from ..uiUtils import nodeRole, longNameRole, zGeo_UI_node_types
+from ..uiUtils import nodeRole, longNameRole, zGeo_UI_node_types, SCENE_PANEL_DATA_ATTR_NAME
 from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
 from PySide2 import QtCore, QtWidgets
 from maya import cmds
 from functools import partial
-""" This is the widget contains tree model and view for the zGeo view.
-"""
 
 logger = logging.getLogger(__name__)
 
@@ -385,11 +385,15 @@ class zGeoWidget(QtWidgets.QWidget):
     def set_component_widget(self, wgtComponent):
         self._wgtComponent_ref = weakref.proxy(wgtComponent)
 
-    def reset_builder(self):
-        """ Build and set the zGeo TreeView. This forces a complete redraw of the zGeo TreeView.
+    def reset_builder(self, load_plug_data):
+        """ Update and merge zBuilder parse result with zGeo Tree View then set the zGeo TreeView.
+        This forces a complete redraw of the zGeo TreeView.
+
+        Args:
+            load_plug_data(bool): Whether to load json data from solverTM plug.
         """
-        solver_nodes = cmds.ls(type="zSolver")
-        if not solver_nodes:
+        solverTM_nodes = cmds.ls(type="zSolverTransform")
+        if not solverTM_nodes:
             # Clear the TreeView and do early return if there's no solver node in the scene
             self._tmGeo.reset_model(None, None)
             self._wgtComponent_ref.reset_model(None, [])
@@ -417,21 +421,22 @@ class zGeoWidget(QtWidgets.QWidget):
         It first rebuilds the whole scene, then merge it with current TreeItem data.
         Finally save data to each solver's plug.
         """
-        solver_nodes = cmds.ls(type="zSolver")
-        if not solver_nodes:
+        solverTM_nodes = cmds.ls(type="zSolverTransform")
+        if not solverTM_nodes:
             logger.debug("No solver node found, skip saving process.")
             return
         if not is_serialize_data_to_zsolver_node():
             return
 
-        # Clear the selection to retrieve whole scene
-        cmds.select(cl=True)
-        self.reset_builder()
+        # TODO: Clear the selection to retrieve whole scene
+        # cmds.select(cl=True)
+        # self.reset_builder(False)
+
         # Save to each solver node's plug
         root_node = self._tmGeo.root_node()
-        for solver_item in root_node.children:
-            string_to_save = to_json_string(serialize_tree_model(solver_item))
-            cmds.setAttr("{}.scenePanelSerializedData".format(solver_item.data.name),
+        for solverTM_item in root_node.children:
+            string_to_save = to_json_string(flatten_tree(solverTM_item))
+            cmds.setAttr("{}.{}".format(solverTM_item.data.name, SCENE_PANEL_DATA_ATTR_NAME),
                          string_to_save,
                          type="string")
         logger.info("zGeo tree data saved.")

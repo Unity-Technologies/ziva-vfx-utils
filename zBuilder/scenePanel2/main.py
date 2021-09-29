@@ -57,7 +57,7 @@ class ScenePanel2(QtWidgets.QWidget):
 
         self._setup_ui(parent)
         self._wgtGeo.set_component_widget(self._wgtComponent)
-        self._wgtGeo.reset_builder()
+        self._wgtGeo.reset_builder(True)
 
     def _setup_ui(self, parent):
         lytMenuBar = setup_menubar(self)
@@ -117,22 +117,12 @@ class ScenePanel2(QtWidgets.QWidget):
     def on_post_scene_read(self):
         """ Callback invoked after Maya load the scene
         """
-        solver_nodes = cmds.ls(type="zSolver")
-        solver_serialized_data_tuple_list = []
-        attr = "scenePanelSerializedData"
-        for node in solver_nodes:
-            attr_exists = cmds.attributeQuery(attr, node=node, exists=True)
-            if attr_exists:
-                serialized_data = cmds.getAttr("{}.{}".format(node, attr))
-                if serialized_data:
-                    solver_serialized_data_tuple_list.append(("{}".format(node), serialized_data))
-        self._wgtGeo.reset_builder()
-        # TODO: resolve conflict
+        self._wgtGeo.reset_builder(True)
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
         """
-        self._wgtGeo.reset_builder()
+        self._wgtGeo.reset_builder(False)
 
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
