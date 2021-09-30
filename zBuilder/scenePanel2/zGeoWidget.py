@@ -434,9 +434,7 @@ class zGeoWidget(QtWidgets.QWidget):
             resolved_tree = merge_tree_data(
                 self._get_zGeo_nodes_by_solverTM(solverTM),
                 to_tree_entry_list(json_string) if json_string else None)
-            # Append resolved solverTM to the root
-            merged_tree.append_children(
-                resolved_tree.children if resolved_tree.is_root_node() else resolved_tree)
+            merged_tree.append_children(resolved_tree)
 
         self._whole_scene_tree = merged_tree
         self._tmGeo.reset_model(self._builder, self._whole_scene_tree)
