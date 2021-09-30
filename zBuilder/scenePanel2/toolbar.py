@@ -94,9 +94,10 @@ _add_section_tuple = (
      lambda: cmds.zRestShape(a=True)),
     ("zLineOfAction", "Add zLineOfAction", "Add zLineOfAction: select zFiber and curve",
      lambda: cmds.ziva(loa=True)),
-    ("curve", "Add Fiber Curve", "Add Fiber Curve: select zFiber", cmds.zLineOfActionUtil),
+    ("curve", "Add Fiber Curve", "Add Fiber Curve: select zFiber",
+     lambda: cmds.zLineOfActionUtil()),
     ("zRivetToBone", "Add zRivetToBone",
-     "Add zRivetToBone: select target curve vertex and bone mesh", cmds.zRivetToBone),
+     "Add zRivetToBone: select target curve vertex and bone mesh", lambda: cmds.zRivetToBone()),
 )
 
 _edit_section_tuple = (

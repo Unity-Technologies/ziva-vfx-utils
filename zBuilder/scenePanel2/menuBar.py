@@ -93,7 +93,7 @@ _menubar_dict["Tools"] = (
     (
         "zPolyCombine",
         "Will combine multiple polySets into a single polySet.",
-        cmds.zPolyCombine,
+        lambda: cmds.zPolyCombine(),
     ),
     (
         "Extract RestShape",
