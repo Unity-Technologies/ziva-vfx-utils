@@ -12,13 +12,14 @@ from functools import partial
 # - Icon name
 # - Title text
 # - Tooltip text, pass None if not available
-# - slot function
+# - Slot function
+# - Slot arguments
 # Or it can be a QAction with menu. The first entry is a normal QAction,
 # while the rest entries form a QMenu items:
 # - Icon name(optional for menu item)
 # - Action name
-# - Status bar text
-# - Slot
+# - Tooltip text, pass None if not available
+# - Slot function
 _create_section_tuple = (
     ("zSolver", "Create zSolver", None, lambda: cmds.ziva(s=True)),
     ("zTissue", "Create zTissue", None, lambda: cmds.ziva(t=True)),
@@ -101,8 +102,8 @@ _add_section_tuple = (
 )
 
 _edit_section_tuple = (
-    ("refresh", "Refresh the Scene Panel tree view", None, (zGeoWidget.reset_builder, )),
-    (
+    ("refresh", "Refresh the Scene Panel tree view", None, (zGeoWidget.reset_builder, ), (False, )),
+    (  # Remove menu items
         (
             "remove_body",
             "Remove zTissue/zBone/zCloth from selected mesh",
@@ -154,7 +155,7 @@ _edit_section_tuple = (
             lambda: mel.eval("ZivaDeleteSelection"),
         ),
     ),
-    (
+    (  # Select menu items
         (
             "out_zTissue",
             "Select zTissues",
@@ -227,7 +228,7 @@ _edit_section_tuple = (
 )
 
 
-def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot):
+def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot, slot_arguments=None):
     """ Create a single toolbar button
     """
     action = QtWidgets.QAction(parent)
@@ -242,11 +243,17 @@ def _setup_toolbar_action(zGeo_widget_inst, parent, name, text, tooltip, slot):
         action.setToolTip(tooltip)
 
     if callable(slot):  # If it's a normal function, bind it directly
-        action.triggered.connect(slot)
+        if slot_arguments:
+            action.triggered.connect(slot, *slot_arguments)
+        else:
+            action.triggered.connect(slot)
     else:
         # If this is a tuple, that means it's a class member function.
         # bind with widget instance first
-        action.triggered.connect(partial(slot[0], zGeo_widget_inst))
+        if slot_arguments:
+            action.triggered.connect(partial(slot[0], zGeo_widget_inst, *slot_arguments))
+        else:
+            action.triggered.connect(partial(slot[0], zGeo_widget_inst))
     return action
 
 

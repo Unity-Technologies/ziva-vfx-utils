@@ -2,7 +2,8 @@ import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
 from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import *
+from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree, create_subtree
+from zBuilder.scenePanel2.treeItem import pick_out_node, is_node_name_duplicate, fix_node_name_duplication
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
 from zBuilder.builder import Builder
@@ -16,13 +17,13 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
         """ Test some basic tree data structure operations
         """
         # Setup root node
-        root = TreeItem()
+        root = TreeItem(None, Base())
         # Verify
         self.assertIsNone(root.parent)
         self.assertTrue(root.is_root_node())
         self.assertEqual(root.child_count(), 0)
         self.assertEqual(root.children, [])
-        self.assertIsNone(root.data)
+        self.assertIs(type(root.data), Base)
 
         # Action: create first child node
         child1 = TreeItem(root)
@@ -553,4 +554,3 @@ class ScenePanelPinStateTestCase(VfxTestCase):
         self.assertEqual(tissue_nodes[1].pin_state, TreeItem.Unpinned)
         self.assertEqual(subgroup2_node.pin_state, TreeItem.Pinned)
         self.assertEqual(tissue_nodes[2].pin_state, TreeItem.Pinned)
-

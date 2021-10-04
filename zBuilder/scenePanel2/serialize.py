@@ -2,136 +2,14 @@ import os
 import json
 import logging
 
-from .treeItem import TreeItem, is_group_item
+from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
+from ..uiUtils import zGeo_UI_node_types
 from ..nodes.base import Base
 
 logger = logging.getLogger(__name__)
 
 _version = 1  # Serialization format version
-
-
-def serialize_tree_model(root_node):
-    """ Serializes tree items representing model of the ScenePanel2 TreeView.
-    Traverse nodes in DFS order and record each node.
-
-    Returns:
-        List of tree nodes (tree item path, row index, item type, node data) tuple
-    """
-    tree_nodes = []
-    list_to_traverse = []
-    if root_node.is_root_node():  # skip root node
-        list_to_traverse.extend(root_node.children)
-    else:
-        list_to_traverse.append(root_node)
-    while list_to_traverse:
-        current_node = list_to_traverse.pop(0)
-        # Append entry
-        entry = [
-            current_node.get_tree_path(),
-            current_node.row(),
-            current_node.data.type,
-            {} if is_group_item(current_node) else {
-                "pin_state": current_node.pin_state,
-                "name": current_node.data.long_name,  # Store Maya DGNode long_name
-            }
-        ]
-        tree_nodes.append(entry)
-        # Add child items, if any
-        if current_node.children:
-            list_to_traverse.extend(current_node.children)
-    # Sort tree_nodes firstly by tree item level, then by tree item index
-    # Refer to deserialize_tree_model() for details.
-    tree_nodes.sort(key=lambda x: (x[0].count("|"), x[1]))
-    return tree_nodes
-
-
-def to_json_string(tree_nodes):
-    """ Returns json data as a string.
-    """
-    data = dict()
-    data["version"] = _version  # Always serialize the latest format version
-    data["nodes"] = tree_nodes
-    return json.dumps(data)
-
-
-def to_json_file(tree_nodes, file_path):
-    """ Writes json data to a given file.
-    This is an internal helper function for debugging.
-    """
-    data = dict()
-    data["version"] = _version  # Set the version you want to test
-    data["nodes"] = tree_nodes
-    with open(file_path, "w") as output_file:
-        json.dump(data, output_file, sort_keys=True, indent=4, separators=(",", ": "))
-    logger.debug("Finished writing serialized data to {}.".format(file_path))
-
-
-def deserialize_tree_model(tree_nodes, version):
-    """ De-serializes data to represent model of ScenePanel2 TreeView
-    """
-    # set root node
-    root_base_node = Base()
-    root_base_node.name = "ROOT"
-    root_node = TreeItem(None, root_base_node)
-
-    if version == 1:
-        # initialize values for tree traversal
-        current_level_count = 0
-        current_index = 0
-        previous_index = 0
-        current_parent_node = None
-        parent_to_visit = [(root_node, "ROOT")]
-
-        # Since the tree nodes are sorted firstly by depth level then by index,
-        # we can run BFS on the tree with those keys based on level.
-        # For each node we process, we store its children (only if "group" or "zSolverTransform")
-        # as parents for later processing by storing in "parent_to_visit".
-        # We pick the next parent from "parent_to_visit" in two cases:
-        # 1) when moving to the next level or
-        # 2) processing child node of a different parent (on the same level if an index is equal or smaller).
-        # Next we need to find the right parent from the "parent_to_visit" list.
-        # We do that by comparing current node key and parent node key.
-        # Once found, we remove the parent from "parent_to_visit" and add its children to the tree.
-        for entry in tree_nodes:
-            # Assign triplet value to each variable
-            tree_item_path, row_index, node_type, node_data = entry
-            previous_level_count = current_level_count
-            current_level_count = tree_item_path.count("|")
-            path_node_list = tree_item_path.split("|")
-            previous_index = current_index
-            current_index = row_index
-            current_node = node_data
-            # find next parent when moving to next level or next node in the same level
-            if current_level_count > previous_level_count or current_index <= previous_index:
-                # Finding the right parent from the list, a group node might not have any child
-                for parent_entry in parent_to_visit:
-                    current_parent_node, current_parent_item_path = parent_entry
-                    # found parent
-                    if tree_item_path.split("|")[1:-1] == current_parent_item_path.split("|")[1:]:
-                        parent_to_visit.remove(parent_entry)
-                        break
-
-            if node_type == "group":
-                child_node = TreeItem(current_parent_node, GroupNode(path_node_list[-1]))
-            else:
-                child_base_data = Base()
-                child_base_data.name = current_node["name"]
-                child_base_data.type = node_type
-                child_node = TreeItem(current_parent_node, child_base_data)
-                child_node.pin_state = current_node["pin_state"]
-
-            container_node_type = ("group", "zSolverTransform")
-            if node_type in container_node_type:
-                parent_to_visit.append((child_node, tree_item_path))
-
-    return root_node
-
-
-def string_to_json(data):
-    """ Returns json data from string.
-    """
-    return json.loads(data)
 
 
 def is_serialize_data_to_zsolver_node():
@@ -140,4 +18,246 @@ def is_serialize_data_to_zsolver_node():
     Provide the ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA env var to give users option
     to stop proceed the saving process.
     """
-    return not ("ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" in os.environ)
+    return "ZIVA_ZBUILDER_DONT_SAVE_SCENE_PANEL_DATA" not in os.environ
+
+
+class PendingTreeEntry(object):
+    """ Data structure for merging zBuilder node and tree view data.
+    """
+    def __init__(self, *args):
+        """ Overloaded construtor for different data types.
+        """
+        if len(args) == 1:
+            assert isinstance(args[0], TreeItem)
+            # Create entry through TreeItem
+            tree_item = args[0]
+            self._tree_path = tree_item.get_tree_path()
+            self._row_index = tree_item.row()
+            self._node_type = tree_item.data.type
+            self._node_data = {} if is_group_item(tree_item) else {
+                "pin_state": tree_item.pin_state,
+                "name": tree_item.data.long_name,  # Store Maya DGNode long_name
+            }
+            return
+
+        # Create entry with Json data and version number
+        version = args[-1]
+        assert isinstance(
+            version, int) and version > 0, "Version must be an integer. Got: {}".format(version)
+        self._tree_path = args[0]
+        self._row_index = args[1]
+        self._node_type = args[2]
+        self._node_data = args[3]
+
+    @property
+    def tree_path(self):
+        assert self._tree_path
+        return self._tree_path
+
+    @property
+    def dir_tree_path(self):
+        """ Return tree path excludes last segement.
+        E.g., "|a|b|c" --> "|a|b"
+        """
+        assert self._tree_path
+        return self._tree_path.rsplit("|", 1)[0]
+
+    @property
+    def group_name(self):
+        assert "group" == self._node_type
+        return self._tree_path.split("|")[-1]
+
+    @property
+    def depth(self):
+        assert self._tree_path
+        return self._tree_path.count("|")
+
+    @property
+    def row_index(self):
+        assert self._row_index >= 0
+        return self._row_index
+
+    @property
+    def node_type(self):
+        return self._node_type
+
+    @property
+    def node_data(self):
+        return self._node_data
+
+    @property
+    def long_name(self):
+        assert "group" != self._node_type, "Only zBuilder node has long name."
+        return self._node_data["name"]
+
+    def to_json_object(self):
+        assert self._tree_path
+        assert self._row_index >= 0
+        return [self._tree_path, self._row_index, self._node_type, self._node_data]
+
+
+def flatten_tree(root_node):
+    """ Flatten a TreeItem tree which represents model of the ScenePanel2 TreeView,
+    to a PendingTreeEntry list.
+    It traverses nodes in DFS order and append each node to list.
+    At the end, it sorts the list according to tree node depth(primary) and row index(secondary).
+
+    Returns:
+        PendingTreeEntry list
+    """
+    tree_entry_list = []
+    list_to_traverse = []
+    if root_node.is_root_node():  # skip root node
+        list_to_traverse.extend(root_node.children)
+    else:
+        list_to_traverse.append(root_node)
+    while list_to_traverse:
+        current_node = list_to_traverse.pop(0)
+        tree_entry_list.append(PendingTreeEntry(current_node))
+        # Add child items, if any
+        if current_node.children:
+            list_to_traverse.extend(current_node.children)
+    # Sort entry firstly by tree item depth, then by tree item index.
+    # Refer to construct_tree() for details.
+    tree_entry_list.sort(key=lambda entry: (entry.depth, entry.row_index))
+    return tree_entry_list
+
+
+def to_json_string(tree_entry_list):
+    """ Convert dict of PendingTreeEntry list and version number to a json string
+    """
+    data = dict()
+    data["version"] = _version  # Always serialize the latest format version
+    data["nodes"] = [entry.to_json_object() for entry in tree_entry_list]
+    return json.dumps(data)
+
+
+def to_json_file(tree_entry_list, file_path):
+    """ Convert dict of PendingTreeEntry list and version number to a json file.
+    This is an internal helper function for debugging.
+    """
+    data = dict()
+    data["version"] = _version  # Set the version you want to test
+    data["nodes"] = [entry.to_json_object() for entry in tree_entry_list]
+    with open(file_path, "w") as output_file:
+        json.dump(data, output_file, sort_keys=True, indent=4, separators=(",", ": "))
+    logger.debug("Finished writing serialized data to {}.".format(file_path))
+
+
+def to_tree_entry_list(json_data, version=None):
+    """ Convert json string to PendingTreeEntry list.
+
+    Args:
+        json_data(str, list): The input Json data.
+            It is string type in normal case and is list type for internal use.
+        version(int): Specified Json data version number, for internal use.
+
+    Returns:
+        PendingTreeEntry list
+    """
+    # Normal workflow, json string load from solverTM plug
+    if isinstance(json_data, str):
+        dict_data = json.loads(json_data)
+        json_data_version = dict_data["version"]
+        # Create entry data according to version number
+        # TODO: Since Python 3.5, Additional Unpacking Generalizations is valid, see
+        # https://stackoverflow.com/questions/12720450/unpacking-arguments-only-named-arguments-may-follow-expression
+        # Once switch to Python 3 only, change this grammar
+        tree_entries = [
+            PendingTreeEntry(*(entry + [json_data_version])) for entry in dict_data["nodes"]
+        ]
+        return tree_entries
+
+    # Internal workflow for unit test, manually constructed json string
+    # The version number is manually specified to test version handling.
+    if isinstance(json_data, list):
+        assert version, "Version number is not set."
+        assert isinstance(version, int), "Version is not an integer."
+        tree_entries = [PendingTreeEntry(*(entry + [version])) for entry in json_data]
+        return tree_entries
+
+    raise RuntimeError(
+        "Unhandled Json data and/or invalid version number: input data = {}, version = {}".format(
+            json_data, version))
+
+
+def construct_tree(tree_entry_list):
+    """ Construct a TreeItem tree according to PendingTreeEntry list
+    """
+    # set root node
+    root_base_node = Base()
+    root_base_node.name = "ROOT"
+    root_node = TreeItem(None, root_base_node)
+
+    # initialize values for tree traversal
+    curr_entry_depth = 0
+    curr_entry_index = 0
+    prev_entry_index = 0
+    curr_parent_item = None
+    parent_to_visit = [(root_node, "ROOT")]
+
+    # The tree entries are sorted firstly by depth then by row index,
+    # we can run BFS on the tree with those keys based on depth.
+    for entry in tree_entry_list:
+        prev_entry_depth = curr_entry_depth
+        curr_entry_depth = entry.depth
+        prev_entry_index = curr_entry_index
+        curr_entry_index = entry.row_index
+        curr_entry_data = entry.node_data
+
+        # We pick the next parent from "parent_to_visit" when
+        # 1. Moving to the next depth
+        # 2. Processing other entry from a different parent, i.e.,
+        #    on the same depth but row index <= current entry
+        if curr_entry_depth > prev_entry_depth or curr_entry_index <= prev_entry_index:
+            # Finding the right parent from the list.
+            # Note: Group node might not have any child.
+            for parent_item in parent_to_visit:
+                curr_parent_item, curr_parent_tree_path = parent_item
+                # Next we need to find the right parent from the "parent_to_visit" list.
+                # We do that by comparing current node key and parent node key.
+                if entry.dir_tree_path == curr_parent_tree_path:
+                    # Once found, remove the parent from "parent_to_visit"
+                    # and add its children to the tree.
+                    parent_to_visit.remove(parent_item)
+                    break
+
+        node_type = entry.node_type
+        if node_type == "group":
+            item = TreeItem(curr_parent_item, GroupNode(entry.group_name))
+        else:
+            zbuilder_node = Base()
+            zbuilder_node.name = curr_entry_data["name"]
+            zbuilder_node.type = node_type
+            item = TreeItem(curr_parent_item, zbuilder_node)
+            item.pin_state = curr_entry_data["pin_state"]
+
+        # Save the container node to the "parent_to_visit" list for later processing
+        container_node_type = ("group", "zSolverTransform")
+        if node_type in container_node_type:
+            parent_to_visit.append((item, entry.tree_path))
+
+    return root_node
+
+
+def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
+    """ Merge data between zBuilder parse result and tree_entry_list.
+
+    Args:
+        zBuilder_node_list: zBuilder node retrieved from current scene.
+            They need to belong to the same solver.
+        tree_entry_list: PendingTreeEntry list from tree view,
+            or deserialized from solverTM plug.
+    
+    Return:
+        Merged TreeItem tree.
+    """
+    assert zBuilder_node_list
+    if not tree_view_entry_list:
+        # zGeo Tree View has no data, create the tree from zBuilder node list
+        solverTM = list(filter(lambda node: node.type == "zSolverTransform", zBuilder_node_list))[0]
+        return build_scene_panel_tree(solverTM,
+                                      zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+
+    # TODO: Merge zBuilder node list and tree view entry list
+    return construct_tree(tree_view_entry_list)
