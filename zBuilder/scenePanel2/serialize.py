@@ -245,6 +245,7 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
 
     Args:
         zBuilder_node_list: zBuilder node retrieved from current scene.
+            They need to belong to the same solver.
         tree_entry_list: PendingTreeEntry list from tree view,
             or deserialized from solverTM plug.
     
