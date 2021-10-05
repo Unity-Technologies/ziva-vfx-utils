@@ -96,7 +96,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
     def test_construct_tree_function(self):
         # Action
         solverTM = construct_tree(
-            to_tree_entry_list(ScenePanelSerializationTestCase.test_tree_data, _version))
+            to_tree_entry_list(ScenePanelSerializationTestCase.test_tree_data, _version), True)
 
         # Verify: return value constructs the test_tree_data tree structure.
         # Note the ROOT node is not included.
@@ -167,7 +167,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        solverTM = construct_tree(to_tree_entry_list(serialized_data, _version))
+        solverTM = construct_tree(to_tree_entry_list(serialized_data, _version), True)
 
         # Verify above data returns a tree structure as follows:
         # zSolver1
@@ -214,7 +214,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
 
         # Action
         json_string = to_json_string(flatten_tree(root_node))
-        deserialized_solverTM = construct_tree(to_tree_entry_list(json_string))
+        deserialized_solverTM = construct_tree(to_tree_entry_list(json_string), True)
 
         # Verify: compare results with original tree items
         self.assertIsNone(deserialized_solverTM.parent)

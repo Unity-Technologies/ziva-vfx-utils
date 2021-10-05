@@ -451,6 +451,7 @@ def rivet_to_bone_rename_helper(rtbs, postfix, replace):
 
     return old_names, new_names, rtbs_curves_tuple
 
+
 def rivet_to_bone_locator_rename_helper(rtbs, rtbs_curves_tuple):
     """
     Rename 'zRivetToBone' locator nodes.
@@ -682,3 +683,22 @@ def check_map_validity(map_parameters):
         logger.info('Check these maps: {}'.format(report))
     cmds.select(sel)
     return report
+
+
+def get_zGeo_nodes_by_solverTM(ziva_builder, solverTM):
+    """ Return solver and zGeo nodes by given ziva builder and solverTransform node.
+    This helpfer function is for rebuilding Scene Panel 2 zGeo tree view.
+    """
+    solver_name = cmds.listRelatives(solverTM, shapes=True)[0]
+    all_zGeo_nodes = ziva_builder.get_scene_items(
+        type_filter=["zSolverTransform", "zSolver", "zBone", "zTissue", "zCloth"])
+    solver_zGeo_nodes = []
+    zGeo_node_types = ("zBone", "zTissue", "zCloth")
+    for node in filter(lambda node: node.solver.name == solver_name, all_zGeo_nodes):
+        if node.type in zGeo_node_types:
+            # The zGeo tree view stores the Maya mesh each zGeo build upon,
+            # it can be get through builder.geo dict
+            solver_zGeo_nodes.append(ziva_builder.geo[node.nice_association[0]])
+        else:
+            solver_zGeo_nodes.append(node)
+    return solver_zGeo_nodes

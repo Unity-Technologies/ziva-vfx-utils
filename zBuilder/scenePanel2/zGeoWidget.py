@@ -13,6 +13,7 @@ from ..commonUtils import is_sequence
 from ..nodes.base import Base
 from ..uiUtils import nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME
 from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
+from ..zMaya import get_zGeo_nodes_by_solverTM
 from PySide2 import QtCore, QtWidgets
 from maya import cmds
 from functools import partial
@@ -134,23 +135,6 @@ class zGeoWidget(QtWidgets.QWidget):
         not_found_nodes = [name for name in node_names if name not in scene_nodes]
         if not_found_nodes:
             cmds.warning("Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
-
-    def _get_zGeo_nodes_by_solverTM(self, solverTM):
-        """
-        """
-        solver_name = cmds.listRelatives(solverTM, shapes=True)[0]
-        all_zGeo_nodes = self._builder.get_scene_items(
-            type_filter=["zSolverTransform", "zSolver", "zBone", "zTissue", "zCloth"])
-        cur_solver_zGeo_nodes = []
-        zGeo_node_types = ("zBone", "zTissue", "zCloth")
-        for node in filter(lambda node: node.solver.name == solver_name, all_zGeo_nodes):
-            if node.type in zGeo_node_types:
-                # The zGeo tree view stores the Maya mesh each zGeo build upon,
-                # it can be get through builder.geo dict
-                cur_solver_zGeo_nodes.append(self._builder.geo[node.nice_association[0]])
-            else:
-                cur_solver_zGeo_nodes.append(node)
-        return cur_solver_zGeo_nodes
 
     # Begin zGeo TreeView pop-up menu
     def open_menu(self, position):
@@ -432,7 +416,7 @@ class zGeoWidget(QtWidgets.QWidget):
                     json_string = cmds.getAttr("{}.{}".format(solverTM, SCENE_PANEL_DATA_ATTR_NAME))
 
             resolved_tree = merge_tree_data(
-                self._get_zGeo_nodes_by_solverTM(solverTM),
+                get_zGeo_nodes_by_solverTM(self._builder, solverTM),
                 to_tree_entry_list(json_string) if json_string else None)
             merged_tree.append_children(resolved_tree)
 
@@ -461,11 +445,11 @@ class zGeoWidget(QtWidgets.QWidget):
         if not is_serialize_data_to_zsolver_node():
             return
 
-        # TODO: Clear the selection to retrieve whole scene
-        # cmds.select(cl=True)
-        # self.reset_builder(False)
-
-        # Save to each solver node's plug
+        # Clear the selection to retrieve whole scene
+        cmds.select(cl=True)
+        # Merge tree view with latest zBuilder retrieve result
+        self.reset_builder(False)
+        # Save merged data to each solver node's plug
         root_node = self._tmGeo.root_node()
         for solverTM_item in root_node.children:
             string_to_save = to_json_string(flatten_tree(solverTM_item))
