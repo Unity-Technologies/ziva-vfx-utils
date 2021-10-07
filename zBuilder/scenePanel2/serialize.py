@@ -260,11 +260,15 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
     Args:
         zBuilder_node_list: zBuilder node retrieved from current scene.
             They need to belong to the same solver.
+            The node type must be one of following types:
+                zSolverTransform, zSolver, ui_zBone_body, ui_zTissue_body, ui_zCloth_body
+
         tree_entry_list: PendingTreeEntry list from tree view,
             or deserialized from solverTM plug.
 
     Return:
         Merged TreeItem tree.
+        The root TreeItem data type must be zSolverTransform.
     """
     assert zBuilder_node_list
     if not tree_view_entry_list:
@@ -274,10 +278,26 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
                                       zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
 
     # TODO: Merge zBuilder node list and tree view entry list
+    # Create lookup table
+    node_dict = {node.long_name: node for node in zBuilder_node_list}
+    entry_dict = {
+        entry.long_name: entry
+        for entry in tree_view_entry_list if entry.node_type != "group"
+    }
+    node_name_set = set(node_dict.keys())
+    entry_name_set = set(entry_dict.keys())
+    assert len(node_dict) == len(node_name_set)
+    assert len(entry_dict) == len(entry_name_set)
 
+    node_to_add = list(node_name_set - entry_name_set)
     # Map zBuilder nodes to tree enties
     node_dict = {node.long_name: node for node in zBuilder_node_list}
     for entry in tree_view_entry_list:
         if entry.node_type != "group":
             entry.zBuilder_node = node_dict[entry.long_name]
-    return construct_tree(tree_view_entry_list, False)
+    merged_tree = construct_tree(tree_view_entry_list, False)
+    # Append newly added item at the end of solverTM child list
+    assert merged_tree.data.type == "zSolverTransform"
+    for node_name in node_to_add:
+        merged_tree.append_children(TreeItem(None, node_dict[node_name]))
+    return merged_tree

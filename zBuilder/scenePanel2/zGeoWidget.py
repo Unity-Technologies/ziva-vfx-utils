@@ -394,11 +394,15 @@ class zGeoWidget(QtWidgets.QWidget):
         Args:
             load_plug_data(bool): Whether to load json data from solverTM plug.
         """
-        solverTM_nodes = cmds.ls(type="zSolverTransform")
+        solverTM_nodes = cmds.ls(type="zSolverTransform", l=True)
+        # Clear the TreeView and do early return if there's no solver node in the scene
         if not solverTM_nodes:
-            # Clear the TreeView and do early return if there's no solver node in the scene
             self._tmGeo.reset_model(None, None)
             self._wgtComponent_ref.reset_model(None, [])
+            self._builder = None
+            self._whole_scene_tree = None
+            self._selected_nodes = list()
+            self._pinned_nodes = list()
             return
 
         self._builder = zva.Ziva()
@@ -406,18 +410,25 @@ class zGeoWidget(QtWidgets.QWidget):
         merged_tree = TreeItem(None, Base())
         # Merge each zBuilder solver tree with zGeo view tree
         for solverTM in solverTM_nodes:
-            json_string = None
+            entry_list = None
             if load_plug_data:
-                # Only zSolverTM node after Ziva VFX v2.0 has this attribute
+                # Only zSolverTM node after zBuilder v2.0 has this attribute
                 attr_exists = cmds.attributeQuery(SCENE_PANEL_DATA_ATTR_NAME,
                                                   node=solverTM,
                                                   exists=True)
                 if attr_exists:
                     json_string = cmds.getAttr("{}.{}".format(solverTM, SCENE_PANEL_DATA_ATTR_NAME))
-
-            resolved_tree = merge_tree_data(
-                get_zGeo_nodes_by_solverTM(self._builder, solverTM),
-                to_tree_entry_list(json_string) if json_string else None)
+                    if json_string:
+                        entry_list = to_tree_entry_list(json_string)
+            elif self._whole_scene_tree:
+                # Try finding the solver tree and convert it to tree entry list
+                for solverTM_item in self._whole_scene_tree.children:
+                    if solverTM_item.data.long_name == solverTM:
+                        entry_list = flatten_tree(solverTM_item)
+                        break
+            # Merge current zBuilder nodes with tree view
+            resolved_tree = merge_tree_data(get_zGeo_nodes_by_solverTM(self._builder, solverTM),
+                                            entry_list)
             merged_tree.append_children(resolved_tree)
 
         self._whole_scene_tree = merged_tree
