@@ -6,6 +6,7 @@ from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
 from ..uiUtils import zGeo_UI_node_types
 from ..nodes.base import Base
+from ..commonUtils import is_string
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +164,7 @@ def to_tree_entry_list(json_data, version=None):
         PendingTreeEntry list
     """
     # Normal workflow, json string load from solverTM plug
-    if isinstance(json_data, str):
+    if is_string(json_data):
         dict_data = json.loads(json_data)
         json_data_version = dict_data["version"]
         # Create entry data according to version number
