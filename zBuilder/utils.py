@@ -487,6 +487,7 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection()
     builder.string_replace(regular_expression, string_to_substitute_matches_with)
+    # TODO: pass mirror=True to let build know that its a mirror build. VFXACT-1111
     builder.build()
 
     # Select the new items that have been pasted, for better visual feedback to the user.
