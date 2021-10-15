@@ -122,7 +122,29 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
         utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("l_tissue_1__c_bone_1_zAttachment")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_1__c_bone_1_zAttachment")), 1)
+
+    def test_multiple_copy_paste_with_name_substitution(self):
+        """ This unit test checks that multiple copy paste with name
+        substitution creates only one copy of the copied item even if
+        that item already exists in the scene. Fix for: VFXACT-1107.
+        """
+        # check if zAttachment does not exist before making it
+        self.assertEqual(cmds.ls("r_tissue_1__c_bone_1_zAttachment"), [])
+
+        ## copy/paste
+        cmds.select("l_tissue_1")
+        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+
+        ## check a new attachment was created
+        self.assertEqual(len(cmds.ls("r_tissue_1__c_bone_1_zAttachment")), 1)
+
+        ## copy/paste again
+        cmds.select("l_tissue_1")
+        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+
+        ## check number of attachments
+        self.assertEqual(len(cmds.ls("r_tissue_1__c_bone_1_zAttachment*")), 1)
 
     def test_weight_interpolation(self):
         ## SETUP

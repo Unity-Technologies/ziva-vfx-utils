@@ -524,7 +524,6 @@ class Ziva(Builder):
         """
         This instantiates a builder node and populates it with given maya node.
         """
-
         for node in nodes:
             parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
             self.bundle.extend_scene_items(parameter)
@@ -576,6 +575,7 @@ class Ziva(Builder):
                 tmp = {'zSolver':['substeps']}
             association_filter (str): filter by node association.  Defaults to list()
         """
+        # TODO: This mirror check needs to be removed or updated. See JIRA task VFXACT-1111.
         if mirror:
             for item in self.get_scene_items(type_filter='mesh'):
                 item.mirror()
@@ -592,7 +592,6 @@ class Ziva(Builder):
             solvers.append('zSolverTransform')
 
             # build the nodes by calling build method on each one
-
             for scene_item in self.get_scene_items(type_filter=solvers,
                                                    association_filter=association_filter):
                 logger.info('Building: {}'.format(scene_item.type))

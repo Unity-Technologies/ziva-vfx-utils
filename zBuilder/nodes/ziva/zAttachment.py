@@ -42,8 +42,8 @@ class AttachmentNode(Ziva):
             existing = []
             if existing_attachments:
                 for existing_attachment in existing_attachments:
-                    att_s = mel.eval('zQuery -as ' + existing_attachment)[0]
-                    att_t = mel.eval('zQuery -at ' + existing_attachment)[0]
+                    att_s = mel.eval('zQuery -as -l ' + existing_attachment)[0]
+                    att_t = mel.eval('zQuery -at -l ' + existing_attachment)[0]
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
@@ -59,6 +59,7 @@ class AttachmentNode(Ziva):
             d_index = data.index(self)
 
             if existing:
+                # TODO: Update following logic. Check JIRA issue VFXACT-1110
                 if d_index < len(existing):
                     self.name = safe_rename(existing[d_index], self.name)
                 else:
