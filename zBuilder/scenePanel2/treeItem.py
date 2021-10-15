@@ -178,7 +178,7 @@ class TreeItem(object):
 
         tree_path = self.data.name
         while parent:
-            if parent.data.name == "ROOT":
+            if type(parent.data) is Base:
                 return "|" + tree_path
 
             tree_path = parent.data.name + "|" + tree_path
