@@ -118,7 +118,11 @@ class PendingTreeEntryTestCase(VfxTestCase):
         self.assertListEqual(another_tissue2_entry.to_json_object(), expected_tissue2_json_object)
 
         # ---------------------------------------------------------------------
-        # Action & Verify, zBuilder_node property can only set to zBuilder tree item
+        # Action & Verify, zBuilder_node property can only set to zBuilder tree item.
+        # The zBuilder_node property only applies to TreeItem that is a non-Group node,
+        # otherwise it triggers assertion.
+        # This test tries to assign zBuilder_node value to a Group node,
+        # which triggers the assertion and get caught.
         with self.assertRaises(AssertionError):
             sub_group1_entry.zBuilder_node = None
 
