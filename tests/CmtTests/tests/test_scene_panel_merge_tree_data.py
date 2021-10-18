@@ -2,6 +2,7 @@ import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
 from zBuilder.zMaya import get_zGeo_nodes_by_solverTM
+from zBuilder.mayaUtils import safe_rename
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
 from zBuilder.scenePanel2.serialize import PendingTreeEntry, flatten_tree, merge_tree_data, _version
@@ -30,6 +31,7 @@ def setup_scene():
                                        ["zSolver", "zSolverTransform", "ui_zTissue_body"])[0]
     solverTM = root_node.children[0]
     child_nodes = solverTM.children
+    solver = child_nodes[0]
     # Create tissue nodes
     tissue1_item = child_nodes[1]
     tissue2_item = child_nodes[2]
@@ -39,7 +41,7 @@ def setup_scene():
     sub_group1_item = TreeItem(group1_item, GroupNode("Sub-group1"))
     sub_group1_item.append_children([tissue1_item, tissue2_item])
     # Return items used for unit test verification
-    return builder, root_node, solverTM, group1_item, sub_group1_item, tissue1_item, tissue2_item
+    return builder, root_node, solverTM, solver, group1_item, sub_group1_item, tissue1_item, tissue2_item
 
 
 def get_mesh_node_by_zGeo_node(builder, node_name):
@@ -59,7 +61,7 @@ class PendingTreeEntryTestCase(VfxTestCase):
         """ Test PendingTreeEntry overload ctor
         """
         # Setup
-        _, _, _, _, sub_group1_item, _, tissue2_item = setup_scene()
+        _, _, _, _, _, sub_group1_item, _, tissue2_item = setup_scene()
 
         # ---------------------------------------------------------------------
         # Action, construct by TreeItem
@@ -135,7 +137,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         This happens when loading ZivaVFX setup whose solver node has no scene panel data.
         """
         # Setup
-        _, _, solverTM, _, _, tissue1, tissue2 = setup_scene()
+        _, _, solverTM, _, _, _, tissue1, tissue2 = setup_scene()
 
         # Action
         new_solverTM = merge_tree_data([solverTM.data], None)
@@ -170,7 +172,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         """ Test merge zBuilder result and tree entry list without conflict.
         """
         # Setup
-        builder, _, solverTM, _, _, tissue1, tissue2 = setup_scene()
+        builder, _, solverTM, _, _, _, tissue1, tissue2 = setup_scene()
         solverTM_maya_node = cmds.ls(solverTM.data.long_name)
         # Action
         tree_entry_list = flatten_tree(solverTM)
@@ -216,7 +218,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         """ Test merge zBuilder w/ new node added with tree entry list.
         """
         # Setup
-        _, _, solverTM, _, _, _, _ = setup_scene()
+        _, _, solverTM, _, _, _, _, _ = setup_scene()
         tree_entry_list = flatten_tree(solverTM)
         solverTM_maya_node = cmds.ls(solverTM.data.long_name)
 
@@ -275,3 +277,115 @@ class MergeTreeDataTestCase(VfxTestCase):
         # The new merge tree item refer to the input zBuilder nodes
         self.assertIs(new_tissue3.data, tissue3_node)
         self.assertEqual(len(new_tissue3.children), 0)
+
+    def test_merge_on_node_deleted(self):
+        """ Test merge zBuilder w/ existing node deleted with tree entry list.
+        """
+        # Setup
+        _, _, solverTM, _, _, _, _, _ = setup_scene()
+        tree_entry_list = flatten_tree(solverTM)
+        solverTM_maya_node = cmds.ls(solverTM.data.long_name)
+
+        # Action: delete tissue1, then mock the Scene Panel "Refresh" operation
+        cmds.select("tissue1")
+        cmds.ziva(rm=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        new_builder = zva.Ziva()
+        new_builder.retrieve_connections()
+        tissue2_node = get_mesh_node_by_zGeo_node(new_builder, "tissue2")
+
+        zGeo_node_list = get_zGeo_nodes_by_solverTM(new_builder, solverTM_maya_node)
+        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+
+        # Verify: new node should append at the end of solverTM child list
+        self.assertIsNot(new_solverTM, solverTM)
+        self.assertIsInstance(new_solverTM, TreeItem)
+        self.assertIsInstance(new_solverTM.data, SolverTransformNode)
+        self.assertEqual(len(new_solverTM.children), 2)
+
+        new_solver = new_solverTM.children[0]
+        self.assertIsInstance(new_solver, TreeItem)
+        self.assertIsInstance(new_solver.data, SolverNode)
+        self.assertEqual(len(new_solver.children), 0)
+
+        new_group1 = new_solverTM.children[1]
+        self.assertIsInstance(new_group1, TreeItem)
+        self.assertIsInstance(new_group1.data, GroupNode)
+        self.assertEqual(len(new_group1.children), 1)
+
+        new_subgroup1 = new_group1.children[0]
+        self.assertIsInstance(new_subgroup1, TreeItem)
+        self.assertIsInstance(new_subgroup1.data, GroupNode)
+        self.assertEqual(len(new_subgroup1.children), 1)
+
+        new_tissue2 = new_subgroup1.children[0]
+        self.assertIsInstance(new_tissue2, TreeItem)
+        self.assertEqual(new_tissue2.pin_state, TreeItem.Pinned)
+        # The new merge tree item refer to the input zBuilder nodes
+        self.assertIs(new_tissue2.data, tissue2_node)
+        self.assertEqual(len(new_tissue2.children), 0)
+
+    def test_merge_on_node_renamed(self):
+        """ Test merge zBuilder w/ existing node renamed with tree entry list.
+        The renamed item will move to the end of the zSolverTM child list.
+        The renamed zSolverTM/zSolver nodes will not be moved.
+        """
+        # Setup
+        _, _, solverTM, solver, _, _, _, _ = setup_scene()
+        tree_entry_list = flatten_tree(solverTM)
+        solverTM_maya_node = cmds.ls(solverTM.data.long_name)
+        solver_maya_node = cmds.ls(solver.data.long_name)
+
+        # Action
+        # Rename tissue1 mesh, zSolverTM/zSolver nodes,
+        # then mock the Scene Panel "Refresh" operation
+        safe_rename("tissue1", "new_tissue1")
+        new_solverTM_name = "new1_{}".format(solverTM_maya_node[0])
+        new_solver_name = "new2_{}".format(solver_maya_node[0])
+        safe_rename(solverTM_maya_node, new_solverTM_name)
+        safe_rename(solver_maya_node, new_solver_name)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        new_builder = zva.Ziva()
+        new_builder.retrieve_connections()
+        tissue1_node = get_mesh_node_by_zGeo_node(new_builder, "new_tissue1")
+        tissue2_node = get_mesh_node_by_zGeo_node(new_builder, "tissue2")
+
+        zGeo_node_list = get_zGeo_nodes_by_solverTM(new_builder, new_solverTM_name)
+        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+
+        # Verify: new node should append at the end of solverTM child list
+        self.assertIsNot(new_solverTM, solverTM)
+        self.assertIsInstance(new_solverTM, TreeItem)
+        self.assertIsInstance(new_solverTM.data, SolverTransformNode)
+        self.assertEqual(len(new_solverTM.children), 3)
+
+        new_solver = new_solverTM.children[0]
+        self.assertIsInstance(new_solver, TreeItem)
+        self.assertIsInstance(new_solver.data, SolverNode)
+        self.assertEqual(len(new_solver.children), 0)
+
+        new_group1 = new_solverTM.children[1]
+        self.assertIsInstance(new_group1, TreeItem)
+        self.assertIsInstance(new_group1.data, GroupNode)
+        self.assertEqual(len(new_group1.children), 1)
+
+        new_subgroup1 = new_group1.children[0]
+        self.assertIsInstance(new_subgroup1, TreeItem)
+        self.assertIsInstance(new_subgroup1.data, GroupNode)
+        self.assertEqual(len(new_subgroup1.children), 1)
+
+        new_tissue2 = new_subgroup1.children[0]
+        self.assertIsInstance(new_tissue2, TreeItem)
+        self.assertEqual(new_tissue2.pin_state, TreeItem.Pinned)
+        # The new merge tree item refer to the input zBuilder nodes
+        self.assertIs(new_tissue2.data, tissue2_node)
+        self.assertEqual(len(new_tissue2.children), 0)
+
+        new_tissue1 = new_solverTM.children[2]
+        self.assertIsInstance(new_tissue1, TreeItem)
+        self.assertEqual(new_tissue1.pin_state, TreeItem.Unpinned)
+        # The new merge tree item refer to the input zBuilder nodes
+        self.assertIs(new_tissue1.data, tissue1_node)
+        self.assertEqual(len(new_tissue1.children), 0)

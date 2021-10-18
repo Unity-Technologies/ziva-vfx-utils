@@ -4,7 +4,7 @@ import logging
 
 from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
-from ..uiUtils import zGeo_UI_node_types
+from ..uiUtils import zGeo_UI_node_types, is_zsolver_node
 from ..nodes.base import Base
 from ..commonUtils import is_string
 
@@ -278,8 +278,8 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
         return build_scene_panel_tree(solverTM,
                                       zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
 
-    # TODO: Merge zBuilder node list and tree view entry list
-    # Create lookup table
+    # Merge zBuilder node list and tree view entry list
+    # 1. Create lookup table
     node_dict = {node.long_name: node for node in zBuilder_node_list}
     entry_dict = {
         entry.long_name: entry
@@ -289,16 +289,54 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
     entry_name_set = set(entry_dict.keys())
     assert len(node_dict) == len(node_name_set)
     assert len(entry_dict) == len(entry_name_set)
-
     node_to_add = list(node_name_set - entry_name_set)
-    # Map zBuilder nodes to tree enties
-    node_dict = {node.long_name: node for node in zBuilder_node_list}
+    node_to_del = list(entry_name_set - node_name_set)
+
+    # 2. Remove deleted entries
+    valid_tree_view_entry_list = []
     for entry in tree_view_entry_list:
+        if entry.node_type == "group" or entry.node_type.startswith("zSolver"):
+            # Skip group node and zSolverTM/zSolver nodes.
+            # The former won't be in the delete list,
+            # the latter are handled in step 3.
+            valid_tree_view_entry_list.append(entry)
+        elif entry.long_name not in node_to_del:
+            valid_tree_view_entry_list.append(entry)
+
+    # 3. Map zBuilder nodes to tree enties
+    node_dict = {node.long_name: node for node in zBuilder_node_list}
+    for entry in valid_tree_view_entry_list:
         if entry.node_type != "group":
-            entry.zBuilder_node = node_dict[entry.long_name]
-    merged_tree = construct_tree(tree_view_entry_list, False)
-    # Append newly added item at the end of solverTM child list
+            if entry.node_type.startswith("zSolver"):
+                # 3.1 zSolverTM/zSolver node needs special handling.
+                # They need to stick at the beginning position even if they are renamed.
+                # Thus we find them by type, not by name.
+                # Note: we only update the zBuilder_node property.
+                # The tree path and long name are actually out of sync,
+                # we don't care about them because they are not used in the construct_tree().
+                solver_zBuilder_node = [
+                    node for node in zBuilder_node_list if node.type == entry.node_type
+                ]
+                assert solver_zBuilder_node, "Can't find {} type node in the zBuilder list.".format(
+                    entry.node_type)
+                assert len(
+                    solver_zBuilder_node
+                ) == 1, "More than 1 instance of {} type node found in the zBuilder list.".format(
+                    entry.node_type)
+                entry.zBuilder_node = solver_zBuilder_node[0]
+
+            else:
+                entry.zBuilder_node = node_dict[entry.long_name]
+
+    # 4. Construct new TreeItem tree
+    merged_tree = construct_tree(valid_tree_view_entry_list, False)
     assert merged_tree.data.type == "zSolverTransform"
+
+    # 5. Append newly added item at the end of solverTM child list
     for node_name in node_to_add:
+        if is_zsolver_node(node_dict[node_name]):
+            # The zSolverTM/zSolver renamed nodes are handled in step 3,
+            # We don't want to append them here.
+            continue
         merged_tree.append_children(TreeItem(None, node_dict[node_name]))
     return merged_tree
