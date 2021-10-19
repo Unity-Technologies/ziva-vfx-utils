@@ -21,8 +21,10 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         self._parent_widget = parent
         self._builder_ref = None
         self._root_node_ref = None
+        self._is_partial_view = False
 
-    def reset_model(self, builder, root_node):
+    def reset_model(self, builder, root_node, partial_view):
+        self._is_partial_view = partial_view
         self.beginResetModel()
         self._builder_ref = weakref.proxy(builder) if builder else None
         self._root_node_ref = weakref.proxy(root_node) if root_node else None
@@ -208,6 +210,8 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         return mimeData
 
     def dropMimeData(self, data, action, row, column, parent):
+        assert not self._is_partial_view
+
         drop_items = pickle.loads(data.data(_mimeType))
         drop_node_name = ",".join([item.data.name for item in drop_items])
         parent_node = parent.data(nodeRole)
@@ -236,6 +240,9 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         return False
 
     def canDropMimeData(self, data, action, row, column, parent):
+        if self._is_partial_view:
+            return False
+
         # Verify parent item
         if not parent.isValid():
             logger.debug("Can't drop because parent is not valid")
@@ -291,6 +298,8 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             True if succeeded, False otherwise.
             Error message prints to logger.
         """
+        assert not self._is_partial_view
+
         group_parent_item = get_node_by_index(group_parent_index, None)
         if not group_parent_item:
             logger.error("Can't get group parent item through QModelIndex, failed to group items.")
@@ -317,6 +326,8 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
     def delete_group_items(self, group_index_to_delete):
         """ Given group index list, delete those items at the top level.
         """
+        assert not self._is_partial_view
+
         group_item_to_delete = [get_node_by_index(index, None) for index in group_index_to_delete]
         if any(item is None for item in group_item_to_delete):
             logger.error(

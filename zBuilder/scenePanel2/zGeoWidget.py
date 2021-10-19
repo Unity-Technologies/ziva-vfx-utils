@@ -6,12 +6,12 @@ import weakref
 
 from .groupNode import GroupNode
 from .serialize import is_serialize_data_to_zsolver_node, to_json_string, flatten_tree, to_tree_entry_list, merge_tree_data
-from .treeItem import TreeItem
+from .treeItem import TreeItem, build_scene_panel_tree
 from .zGeoTreeModel import zGeoTreeModel
 from .zTreeView import zTreeView
 from ..commonUtils import is_sequence
 from ..nodes.base import Base
-from ..uiUtils import nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME
+from ..uiUtils import nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME, zGeo_UI_node_types
 from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
 from ..zMaya import get_zGeo_nodes_by_solverTM
 from PySide2 import QtCore, QtWidgets
@@ -33,7 +33,9 @@ class zGeoWidget(QtWidgets.QWidget):
         self._tvGeo = None
         self._wgtComponent_ref = None
         self._builder = None
-        self._whole_scene_tree = None
+        self._whole_scene_tree = None  # hold whole scene tree data, with Group nodes
+        self._cur_selection_tree = None  # hold current selection tree data, no Group nodes
+        self._is_partial_tree_view = False  # Show current tree view status
         self._selected_nodes = list()
         self._pinned_nodes = list()
 
@@ -298,6 +300,11 @@ class zGeoWidget(QtWidgets.QWidget):
             logger.warning("Can't create Group node since no zSolver node exists.")
             return
 
+        if self._is_partial_tree_view:
+            logger.warning("Can't create group node because current scene is partial view."
+                           "Please deselect and click Refresh button.")
+            return
+
         # Exclude zSolver* items
         selected_index_list = list(
             filter(lambda index: not is_zsolver_node(index.data(nodeRole)),
@@ -397,46 +404,56 @@ class zGeoWidget(QtWidgets.QWidget):
         solverTM_nodes = cmds.ls(type="zSolverTransform", l=True)
         # Clear the TreeView and do early return if there's no solver node in the scene
         if not solverTM_nodes:
-            self._tmGeo.reset_model(None, None)
+            self._tmGeo.reset_model(None, None, False)
             self._wgtComponent_ref.reset_model(None, [])
             self._builder = None
             self._whole_scene_tree = None
+            self._cur_selection_tree = None
+            self._is_partial_tree_view = False
             self._selected_nodes = list()
             self._pinned_nodes = list()
             return
 
         self._builder = zva.Ziva()
         self._builder.retrieve_connections()
-        merged_tree = TreeItem(None, Base())
-        # Merge each zBuilder solver tree with zGeo view tree
-        for solverTM in solverTM_nodes:
-            entry_list = None
-            if load_plug_data:
-                # Only zSolverTM node after zBuilder v2.0 has this attribute
-                attr_exists = cmds.attributeQuery(SCENE_PANEL_DATA_ATTR_NAME,
-                                                  node=solverTM,
-                                                  exists=True)
-                if attr_exists:
-                    json_string = cmds.getAttr("{}.{}".format(solverTM, SCENE_PANEL_DATA_ATTR_NAME))
-                    if json_string:
-                        entry_list = to_tree_entry_list(json_string)
-            elif self._whole_scene_tree:
-                # Try finding the solver tree and convert it to tree entry list
-                for solverTM_item in self._whole_scene_tree.children:
-                    if solverTM_item.data.long_name == solverTM:
-                        entry_list = flatten_tree(solverTM_item)
-                        break
-            # Merge current zBuilder nodes with tree view
-            resolved_tree = merge_tree_data(get_zGeo_nodes_by_solverTM(self._builder, solverTM),
-                                            entry_list)
-            merged_tree.append_children(resolved_tree)
-
-        self._whole_scene_tree = merged_tree
-        self._tmGeo.reset_model(self._builder, self._whole_scene_tree)
+        self._is_partial_tree_view = bool(cmds.ls(sl=True))
+        if self._is_partial_tree_view:
+            # Current selection is not None, show partial tree view.
+            self._cur_selection_tree = build_scene_panel_tree(
+                self._builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+            self._tmGeo.reset_model(self._builder, self._cur_selection_tree,
+                                    self._is_partial_tree_view)
+        else:
+            merged_tree = TreeItem(None, Base())
+            # Merge each zBuilder solver tree with zGeo view tree
+            for solverTM in solverTM_nodes:
+                entry_list = None
+                if load_plug_data:
+                    # Only zSolverTM node after zBuilder v2.0 has this attribute
+                    attr_exists = cmds.attributeQuery(SCENE_PANEL_DATA_ATTR_NAME,
+                                                      node=solverTM,
+                                                      exists=True)
+                    if attr_exists:
+                        json_string = cmds.getAttr("{}.{}".format(solverTM,
+                                                                  SCENE_PANEL_DATA_ATTR_NAME))
+                        if json_string:
+                            entry_list = to_tree_entry_list(json_string)
+                elif self._whole_scene_tree:
+                    # Try finding the solver tree and convert it to tree entry list
+                    for solverTM_item in self._whole_scene_tree.children:
+                        if solverTM_item.data.long_name == solverTM:
+                            entry_list = flatten_tree(solverTM_item)
+                            break
+                # Merge current zBuilder nodes with tree view
+                resolved_tree = merge_tree_data(get_zGeo_nodes_by_solverTM(self._builder, solverTM),
+                                                entry_list)
+                merged_tree.append_children(resolved_tree)
+            self._whole_scene_tree = merged_tree
+            self._tmGeo.reset_model(self._builder, self._whole_scene_tree,
+                                    self._is_partial_tree_view)
 
         # show expanded view of the tree
         self._tvGeo.expandAll()
-
         # select item in TreeView that is selected in Maya
         for sel in cmds.ls(sl=True, long=True):
             checked = self._tmGeo.match(self._tmGeo.index(0, 0), longNameRole, sel, -1,
