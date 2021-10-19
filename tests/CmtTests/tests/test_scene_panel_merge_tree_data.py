@@ -217,6 +217,16 @@ class MergeTreeDataTestCase(VfxTestCase):
     def test_merge_on_new_node_added(self):
         """ Test merge zBuilder w/ new node added with tree entry list.
         """
+        # Construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     `- group1
+        #        `- Sub-group1
+        #          |- tissue1
+        #          `- tissue2
+        #      * tissue3 <-- new item append here
+
         # Setup
         _, _, solverTM, _, _, _, _, _ = setup_scene()
         tree_entry_list = flatten_tree(solverTM)
@@ -281,6 +291,15 @@ class MergeTreeDataTestCase(VfxTestCase):
     def test_merge_on_node_deleted(self):
         """ Test merge zBuilder w/ existing node deleted with tree entry list.
         """
+        # Construct tree structure as follows:
+        # ROOT
+        #   `- zSolverTransform
+        #     |- zSolver
+        #     `- group1
+        #        `- Sub-group1
+        #          |- tissue1  <-- This item will be deleted
+        #          `- tissue2
+
         # Setup
         _, _, solverTM, _, _, _, _, _ = setup_scene()
         tree_entry_list = flatten_tree(solverTM)
@@ -331,6 +350,16 @@ class MergeTreeDataTestCase(VfxTestCase):
         The renamed item will move to the end of the zSolverTM child list.
         The renamed zSolverTM/zSolver nodes will not be moved.
         """
+        # Construct tree structure as follows:
+        # ROOT
+        #   `- zSolver1         <-- rename to new1_zSolver
+        #     |- zSolver1Shape  <-- rename to new2_zSolver1Shape
+        #     `- group1
+        #        `- Sub-group1
+        #          |- tissue1   <-- delete after rename
+        #          `- tissue2
+        #      * new_tissue1    <-- "tissue1" is appended as new node
+
         # Setup
         _, _, solverTM, solver, _, _, _, _ = setup_scene()
         tree_entry_list = flatten_tree(solverTM)
