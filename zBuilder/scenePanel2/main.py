@@ -60,7 +60,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self._wgtGeo.reset_builder(True)
 
     def _setup_ui(self, parent):
-        lytMenuBar = setup_menubar(self)
+        lytMenuBar = setup_menubar(self._wgtGeo)
         lytToolbar = setup_toolbar(self._wgtGeo)
 
         # zGeo widget(left panel)

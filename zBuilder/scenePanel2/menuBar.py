@@ -1,13 +1,16 @@
+""" Helper functions to create Scene Panel 2 menubar
+"""
 import logging
 
+from .zGeoWidget import zGeoWidget
 from ..uiUtils import get_icon_path_from_name
 from ..utils import rig_cut, rig_copy, rig_paste, rig_update, merge_solvers
+from ..utils import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
 from utility.licenseRegister import licenseRegisterWidget
 from PySide2 import QtWidgets, QtGui, QtCore
 from maya import cmds, mel
 from collections import OrderedDict
-""" Helper functions to create Scene Panel 2 menubar
-"""
+from functools import partial
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +23,7 @@ logger = logging.getLogger(__name__)
 # - Icon name(optional)
 # Or it can be another submenu dict with same structure.
 _menubar_dict = OrderedDict()
+
 _menubar_dict["File"] = (
     (
         "Load...",
@@ -78,6 +82,271 @@ _menubar_dict["File"] = (
         lambda: mel.eval("zRigTransferOptions()"),
     ),
 )
+
+_menubar_dict["Edit"] = (
+    {
+        "Remove": (
+            ("Remove", ),  # separator
+            (
+                "zTissue/zBone/zCloth",
+                "Remove zTissue/zBone/zCloth from selected mesh",
+                lambda: cmds.ziva(rm=True),
+                "remove_body",
+            ),
+            (
+                "Rest Shape",
+                "Removes rest shape(s) from a tissue.",
+                lambda: mel.eval("ZivaDeleteSelectedRestShape"),
+            ),
+            (
+                "Rest Shape Target Mesh",
+                "Removes rest shape target mesh from a tissue.",
+                lambda: cmds.zRestShape(r=True),
+            ),
+            (
+                "Rivet to Bone",
+                "Removes zRivetToBone and its connected locator node.",
+                lambda: remove_zRivetToBone_nodes(cmds.ls(sl=True)),
+            ),
+            (
+                "Subtissue",
+                "Removes subtissue connections, making the selected tissues full tissues again.",
+                lambda: cmds.ziva(rst=True),
+            ),
+            (
+                "Selected Solver(s)",
+                "Removes the solver(s) inferred from selection, including their Ziva rigs.",
+                lambda: remove_solver(askForConfirmation=False),
+                "remove_zSolver",
+            ),
+            (
+                "All Solvers",
+                "Removes all Ziva solvers from the scene, including all Ziva rigs.",
+                lambda: remove_all_solvers(confirmation=False),
+            ),
+            ("Delete", ),  # separator
+            (
+                "Delete selection",
+                "Deletes the selected objects after first removing them from the solver.",
+                lambda: mel.eval("ZivaDeleteSelection"),
+            ),
+        ),
+    },
+    {
+        "Select": (
+            ("Select Connected", ),  # separator
+            (
+                "zTissues",
+                "Selects zTissue nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zTissue`"),
+                "out_zTissue",
+            ),
+            (
+                "zBones",
+                "Selects zBones nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zBone`"),
+                "out_zBone",
+            ),
+            (
+                "zCloth",
+                "Selects zCloth nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zCloth`"),
+                "out_zCloth",
+            ),
+            (
+                "zAttachments",
+                "Selects zAttachments nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zAttachment`"),
+                "out_zAttachment",
+            ),
+            (
+                "zRestShape",
+                "Selects zRestShape nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zRestShape`"),
+                "out_zRestShape",
+            ),
+            (
+                "zTet",
+                "Selects zTet nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zTet`"),
+                "out_zTet",
+            ),
+            (
+                "zMaterials",
+                "Selects zMaterials nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zMaterial`"),
+                "out_zMaterial",
+            ),
+            (
+                "zFibers",
+                "Selects zFibers nodes that are connected to the currently selected mesh(es).",
+                lambda: mel.eval("select -r `zQuery -t zFiber`"),
+                "out_zFiber",
+            ),
+            ("Select in Hierarchy", ),  # separator
+            (
+                "Tissues",
+                "Selects tissue meshes in the currently selected hierarchy.",
+                lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+                "out_zTissue",
+            ),
+            (
+                "Bones",
+                "Selects bone meshes in the currently selected hierarchy.",
+                lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+                "out_zBone",
+            ),
+            (
+                "Cloth",
+                "Selects cloth meshes in the currently selected hierarchy.",
+                lambda: mel.eval("ZivaSelectInHierarchy zTissue"),
+                "out_zCloth",
+            ),
+        ),
+    },
+)
+
+_menubar_dict["Create"] = (
+    (
+        "Solver",
+        "Creates an empty solver.",
+        lambda: cmds.ziva(s=True),
+        "out_zSolver",
+    ),
+    (
+        "Tissue",
+        "Converts the selected Maya mesh(es) to tissue(s)."
+        "Tissues are solid deformable objects (examples: muscles, fat, skin).",
+        lambda: cmds.ziva(t=True),
+        "out_zTissue",
+    ),
+    (
+        "Bone",
+        "Converts the selected Maya mesh(es) to bone(s)."
+        "Bones are externally animated Maya meshes of any geometry and purpose whatsoever."
+        "The bones may deform and/or be animated using any Maya technique."
+        "They are *not* simulated using the Ziva solver.",
+        lambda: cmds.ziva(b=True),
+        "out_zBone",
+    ),
+    (
+        "Cloth",
+        "Converts the selected Maya mesh(es) to cloth."
+        "Cloth objects are thin deformable objects (examples: sheets, textile, skin, membranes).",
+        lambda: cmds.ziva(c=True),
+        "out_zCloth",
+    ),
+    {
+        "Attachment": (
+            (
+                "Attachment",
+                "Creates an attachment (a constraint) between two selected Ziva objects and/or their selected vertices."
+                "Parts of the mesh where constraints apply may be painted"
+                "(default: entire surface, or the selected vertices if they are provided)."
+                "For a sliding attachment, vertices of the first object will slide on the second object.",
+                lambda: cmds.ziva(a=True),
+                "out_zAttachment",
+            ),
+            (
+                "Goal Attachment",
+                "Attracts (goals) the selected tissue to the selected bone, "
+                "using an adjustable soft constraint. "
+                "Bone may deform and/or be animated using any Maya technique.",
+                lambda: cmds.ziva(ga=True),
+            ),
+            (
+                "Swap Attachment Direction",
+                "Swaps the source and target Ziva objects of the selected attachment.",
+                lambda: cmds.ziva(sai=True),
+            ),
+        ),
+    },
+    {
+        "Cache": (
+            (
+                "Add zCache",
+                "Adds a cache node to the selected solver. Once a cache node is added, "
+                "simulations are cached automatically.",
+                lambda: cmds.ziva(acn=True),
+                "out_zCache",
+            ),
+            (
+                "Clear",
+                "Clears the solver's simulation cache. "
+                "Do this each time before re-running a simulation that was previously cached.",
+                lambda: cmds.zCache(c=True),
+                "clear_zCache",
+            ),
+            (
+                "Load",
+                "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
+                lambda: mel.eval("ZivaLoadCache"),
+            ),
+            (
+                "Save",
+                "Saves the solver's simulation cache to a .zcache file.",
+                lambda: mel.eval("ZivaSaveCache"),
+            ),
+            (
+                "Select",
+                "Select the solver's simulation cache node.",
+                lambda: mel.eval("select -r `zQuery -t zCacheTransform`"),
+            ),
+        ),
+    },
+    (
+        "Group",
+        "Create Group: select tree view items",
+        (zGeoWidget.create_group, ),
+        "create-group",
+    ),
+)
+
+_menubar_dict["Add"] = (
+    (
+        "zMaterial",
+        "Add zMaterial: select tissue geometry",
+        lambda: cmds.ziva(m=True),
+        "out_zMaterial",
+    ),
+    (
+        "zFiber",
+        "Add zFiber: select tissue geometry",
+        lambda: cmds.ziva(f=True),
+        "out_zFiber",
+    ),
+    (
+        "zSubtissue",
+        "Add Subtissue: select parent and then child tissue mesh",
+        lambda: cmds.ziva(ast=True),
+        "subtissue",
+    ),
+    (
+        "zRestShape",
+        "Add zRestShape: select tissue mesh and then restShape mesh",
+        lambda: cmds.zRestShape(a=True),
+        "out_zRestShape",
+    ),
+    (
+        "zLineOfAction",
+        "Add zLineOfAction: select zFiber and curve",
+        lambda: cmds.ziva(loa=True),
+        "out_zLineOfAction",
+    ),
+    (
+        "Fiber Curve",
+        "Add Fiber Curve: select zFiber",
+        lambda: cmds.zLineOfActionUtil(),
+        "curve",
+    ),
+    (
+        "zRivetToBone",
+        "Add zRivetToBone: select target curve vertex and bone mesh",
+        lambda: cmds.zRivetToBone(),
+        "out_zRivetToBone",
+    ),
+)
+
 _menubar_dict["Tools"] = (
     (
         "Merge Solvers",
@@ -133,6 +402,7 @@ _menubar_dict["Tools"] = (
         ),
     ),
 )
+
 _menubar_dict["Help"] = (
     (
         "Ziva Command Help",
@@ -218,11 +488,18 @@ _menubar_dict["Help"] = (
 )
 
 
-def _add_menu_actions(menu, text, statusbar_text, slot, icon_name=None):
+def _add_menu_actions(zGeo_widget_inst, menu, text, statusbar_text, slot, icon_name=None):
     action = QtWidgets.QAction(menu)
     action.setText(text)
     action.setStatusTip(statusbar_text)
-    action.triggered.connect(slot)
+    if callable(slot):  # If it's a normal function, bind it directly
+        action.triggered.connect(slot)
+    else:
+        # If this is a tuple, that means it's a class member function.
+        # bind with widget instance first
+        print("slot[0]: ", slot[0])
+        action.triggered.connect(partial(slot[0], zGeo_widget_inst))
+
     if icon_name:
         icon = QtGui.QIcon()
         icon_path = get_icon_path_from_name(icon_name)
@@ -231,23 +508,23 @@ def _add_menu_actions(menu, text, statusbar_text, slot, icon_name=None):
     menu.addAction(action)
 
 
-def _create_menu(menubar, menu_name, menu_action_tuple):
+def _create_menu(zGeo_widget_inst, menubar, menu_name, menu_action_tuple):
     menu = menubar.addMenu(menu_name)
     menu.setToolTipsVisible(True)
     for item in menu_action_tuple:
         if item:
             if isinstance(item, tuple) and len(item) > 1:
-                _add_menu_actions(menu, *item)
+                _add_menu_actions(zGeo_widget_inst, menu, *item)
             elif item and isinstance(item, tuple) and len(item) == 1:
                 menu.addSection(item[0])
             elif isinstance(item, dict):
                 for name, actions in item.items():
-                    _create_menu(menu, name, actions)
+                    _create_menu(zGeo_widget_inst, menu, name, actions)
         else:  # empty tuple means a separator
             menu.addSeparator()
 
 
-def setup_menubar(parent):
+def setup_menubar(zGeo_widget_inst):
     """ Entry function to create the toolbar.
 
     Args:
@@ -256,9 +533,9 @@ def setup_menubar(parent):
     Returns:
         Menubar layout instance.
     """
-    menubar = QtWidgets.QMenuBar(parent)
+    menubar = QtWidgets.QMenuBar()
     for name, actions in _menubar_dict.items():
-        _create_menu(menubar, name, actions)
+        _create_menu(zGeo_widget_inst, menubar, name, actions)
     # restrict the size of the menubar to prevent uneven expansion
     menubar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
     lytMenuBar = QtWidgets.QHBoxLayout()
