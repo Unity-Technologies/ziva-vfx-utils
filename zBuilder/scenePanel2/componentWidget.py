@@ -2,6 +2,7 @@ import logging
 
 from .zTreeView import zTreeView
 from .treeItem import TreeItem, build_scene_panel_tree
+from ..commonUtils import is_sequence
 from ..uiUtils import get_icon_path_from_name, get_icon_path_from_node, get_node_by_index
 from ..uiUtils import ProximityWidget, nodeRole
 from ..nodes.base import Base
@@ -15,8 +16,12 @@ logger = logging.getLogger(__name__)
 # Component for each zGeo node
 component_type_dict = {
     "ui_zBone_body": ["zAttachment", "zBone"],
-    "ui_zTissue_body":
-    ["zTet", "zTissue", "zMaterial", "zAttachment", "zFiber"],
+    "ui_zTissue_body": [
+        ("zTet", "zTissue", "zRestShape", "ui_target_body"),
+        "zMaterial",
+        "zAttachment",
+        ("zFiber", "zLineOfAction", "zRivetToBone", "ui_curve_body"),
+    ],
     "ui_zCloth_body": ["zCloth", "zMaterial", "zAttachment"]
 }
 
@@ -191,25 +196,47 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
 
-        lblTitle = QtWidgets.QLabel(component_type)
+        # Title
+        # Concantenate type list and exclude those start with "ui_"
+        title = "/".join(filter(lambda t: not t.startswith("ui_"),
+                                component_type)) if is_sequence(component_type) else component_type
+        lblTitle = QtWidgets.QLabel(title)
         lblTitle.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        btnIcon = QtWidgets.QPushButton()
-        btnIcon.setIcon(QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name(component_type))))
-        btnIcon.setCheckable(True)
-        btnIcon.setChecked(True)
         lytTitle = QtWidgets.QHBoxLayout()
         lytTitle.setSpacing(0)
         lytTitle.setContentsMargins(0, 0, 0, 0)
         lytTitle.addWidget(lblTitle)
-        lytTitle.addWidget(btnIcon)
-        lytTitle.setAlignment(btnIcon, QtCore.Qt.AlignRight)
 
+        # Icons
+        lytIcons = QtWidgets.QHBoxLayout()
+        lytIcons.setSpacing(0)
+        lytIcons.setContentsMargins(0, 0, 0, 0)
+        if is_sequence(component_type):
+            for component in component_type:
+                lblIcon = QtWidgets.QLabel()
+                comp_img = QtGui.QPixmap(get_icon_path_from_name(component)).scaled(
+                    16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                lblIcon.setPixmap(comp_img)
+                lytIcons.addWidget(lblIcon)
+                lytIcons.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+        else:
+            lblIcon = QtWidgets.QLabel()
+            comp_img = QtGui.QPixmap(get_icon_path_from_name(component_type)).scaled(
+                16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            lblIcon.setPixmap(comp_img)
+            lytIcons.addWidget(lblIcon)
+            lytIcons.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+        lytTitle.addLayout(lytIcons)
+        lytTitle.setAlignment(lytIcons, QtCore.Qt.AlignRight)
+
+        # Tree view
         self._tvComponent = zTreeView()
         self._tvComponent.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvComponent.customContextMenuRequested.connect(self.open_menu)
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
         self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+
         lytSection = QtWidgets.QVBoxLayout()
         lytSection.setSpacing(0)
         lytSection.setContentsMargins(0, 0, 0, 0)
@@ -217,7 +244,6 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         lytSection.addWidget(self._tvComponent)
         self.setLayout(lytSection)
 
-        btnIcon.toggled.connect(self.on_btnIcon_toggled)
         self._tvComponent.selectionModel().selectionChanged.connect(
             self.on_tvComponent_selectionChanged)
         self._tvComponent.installEventFilter(self)
@@ -247,9 +273,6 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             method = menu_dict[node.type]
             method(menu, node)
             menu.exec_(self._tvComponent.viewport().mapToGlobal(position))
-
-    def on_btnIcon_toggled(self, checked):
-        self._tvComponent.setVisible(checked)
 
     def on_tvComponent_selectionChanged(self, selected, deselected):
         """
@@ -444,14 +467,8 @@ class ComponentWidget(QtWidgets.QWidget):
             root_node = TreeItem()
             has_data = False
             for node in node_list:
-                if component_type == "zFiber":
-                    # extend the node filter type to preview up strem connections of "zFiber" node
-                    child_nodes = build_scene_panel_tree(node, [component_type, "zLineOfAction", "zRivetToBone", "ui_curve_body"])
-                elif component_type == "zTissue":
-                    # extend the node filter type to preview rest shape connection nodes
-                    child_nodes = build_scene_panel_tree(node, [component_type, "zRestShape", "ui_target_body"])
-                else:
-                    child_nodes = build_scene_panel_tree(node, [component_type])
+                child_nodes = build_scene_panel_tree(
+                    node, component_type if is_sequence(component_type) else [component_type])
                 if child_nodes:
                     zGeo_node = TreeItem(root_node, node)
                     zGeo_node.append_children(child_nodes)
