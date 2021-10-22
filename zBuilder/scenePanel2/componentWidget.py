@@ -195,17 +195,27 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     """
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
+        self._parent = parent
+
+        # The following UI layout refer to
+        # https://stackoverflow.com/questions/32476006/how-to-make-an-expandable-collapsable-section-widget-in-qt
 
         # Title
         # Concantenate type list and exclude those start with "ui_"
         title = "/".join(filter(lambda t: not t.startswith("ui_"),
                                 component_type)) if is_sequence(component_type) else component_type
-        lblTitle = QtWidgets.QLabel(title)
-        lblTitle.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        lytTitle = QtWidgets.QHBoxLayout()
-        lytTitle.setSpacing(0)
-        lytTitle.setContentsMargins(0, 0, 0, 0)
-        lytTitle.addWidget(lblTitle)
+        self._btnFold = QtWidgets.QToolButton()
+        self._btnFold.setStyleSheet("QToolButton { border: none; }")
+        self._btnFold.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self._btnFold.setArrowType(QtCore.Qt.DownArrow)
+        self._btnFold.setText(title)
+        self._btnFold.setCheckable(True)
+        self._btnFold.setChecked(False)  # expanded by default
+
+        headerLine = QtWidgets.QFrame()
+        headerLine.setFrameShape(QtWidgets.QFrame.HLine)
+        headerLine.setFrameShadow(QtWidgets.QFrame.Sunken)
+        headerLine.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
 
         # Icons
         lytIcons = QtWidgets.QHBoxLayout()
@@ -226,8 +236,13 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             lblIcon.setPixmap(comp_img)
             lytIcons.addWidget(lblIcon)
             lytIcons.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+
+        lytTitle = QtWidgets.QHBoxLayout()
+        lytTitle.setSpacing(0)
+        lytTitle.setContentsMargins(0, 0, 0, 0)
+        lytTitle.addWidget(self._btnFold)
+        lytTitle.addWidget(headerLine)
         lytTitle.addLayout(lytIcons)
-        lytTitle.setAlignment(lytIcons, QtCore.Qt.AlignRight)
 
         # Tree view
         self._tvComponent = zTreeView()
@@ -243,10 +258,6 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         lytSection.addLayout(lytTitle)
         lytSection.addWidget(self._tvComponent)
         self.setLayout(lytSection)
-
-        self._tvComponent.selectionModel().selectionChanged.connect(
-            self.on_tvComponent_selectionChanged)
-        self._tvComponent.installEventFilter(self)
 
         self._setup_actions()
 
@@ -393,10 +404,23 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         cmds.select(node.nice_association)
 
     def _setup_actions(self):
+        self._btnFold.clicked.connect(self._on_btnFold_toggled)
+        self._tvComponent.selectionModel().selectionChanged.connect(
+            self.on_tvComponent_selectionChanged)
+        self._tvComponent.installEventFilter(self)
+
         self.actionSelectST = QtWidgets.QAction(self)
         self.actionSelectST.setText("Select Source and Target")
         self.actionSelectST.setObjectName("actionSelectST")
         self.actionSelectST.triggered.connect(self.select_source_and_target)
+
+    def _on_btnFold_toggled(self, checked):
+        """ Hide the tree view widget when checked is False, True otherwise.
+        """
+        self._btnFold.setArrowType(QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
+        self._tvComponent.setVisible(not checked)
+        # Ask parent to update the whole layout height
+        self._parent.on_section_toggled()
 
     def open_attachment_menu(self, menu, node):
         source_mesh_name = node.association[0]
@@ -454,7 +478,8 @@ class ComponentWidget(QtWidgets.QWidget):
         self._component_tree_model_dict.clear()
         while self._lytAllSections.count() > 0:
             lytItem = self._lytAllSections.takeAt(0)
-            lytItem.widget().deleteLater()
+            if lytItem.widget():
+                lytItem.widget().deleteLater()
 
         if len(new_selection) == 0:
             return  # Early return if nothing to show
@@ -477,8 +502,18 @@ class ComponentWidget(QtWidgets.QWidget):
                 self._component_tree_model_dict[component_type] = ComponentTreeModel(
                     builder, root_node)
 
-        componentWidgetSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        self._splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         for component_type, tree_model in self._component_tree_model_dict.items():
-            wgtSection = ComponentSectionWidget(component_type, tree_model)
-            componentWidgetSplitter.addWidget(wgtSection)
-        self._lytAllSections.addWidget(componentWidgetSplitter)
+            wgtSection = ComponentSectionWidget(component_type, tree_model, self)
+            self._splitter.addWidget(wgtSection)
+        self._lytAllSections.addWidget(self._splitter)
+        self._lytAllSections.setAlignment(self._splitter, QtCore.Qt.AlignTop)
+        self._lytAllSections.addStretch()
+
+    def on_section_toggled(self):
+        """ Update each section widget height to make their space compact.
+        """
+        new_widget_heights = []
+        for i in range(self._splitter.count()):
+            new_widget_heights.append(self._splitter.widget(i).sizeHint().height())
+        self._splitter.setSizes(new_widget_heights)
