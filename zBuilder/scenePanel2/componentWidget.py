@@ -218,24 +218,23 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         headerLine.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
 
         # Icons
+        def create_icon(component_name, parent_layout):
+            lblIcon = QtWidgets.QLabel()
+            comp_img = QtGui.QPixmap(get_icon_path_from_name(component_name)).scaled(
+                16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            lblIcon.setPixmap(comp_img)
+            lblIcon.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+            parent_layout.addWidget(lblIcon)
+            parent_layout.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+
         lytIcons = QtWidgets.QHBoxLayout()
         lytIcons.setSpacing(0)
         lytIcons.setContentsMargins(0, 0, 0, 0)
         if is_sequence(component_type):
             for component in component_type:
-                lblIcon = QtWidgets.QLabel()
-                comp_img = QtGui.QPixmap(get_icon_path_from_name(component)).scaled(
-                    16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                lblIcon.setPixmap(comp_img)
-                lytIcons.addWidget(lblIcon)
-                lytIcons.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+                create_icon(component, lytIcons)
         else:
-            lblIcon = QtWidgets.QLabel()
-            comp_img = QtGui.QPixmap(get_icon_path_from_name(component_type)).scaled(
-                16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            lblIcon.setPixmap(comp_img)
-            lytIcons.addWidget(lblIcon)
-            lytIcons.setAlignment(lblIcon, QtCore.Qt.AlignRight)
+            create_icon(component_type, lytIcons)
 
         lytTitle = QtWidgets.QHBoxLayout()
         lytTitle.setSpacing(0)
@@ -503,6 +502,7 @@ class ComponentWidget(QtWidgets.QWidget):
                     builder, root_node)
 
         self._splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        self._splitter.setChildrenCollapsible(False)
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(component_type, tree_model, self)
             self._splitter.addWidget(wgtSection)
