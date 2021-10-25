@@ -421,6 +421,14 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         # Ask parent to update the whole layout height
         self._parent.on_section_toggled()
 
+    def get_height(self):
+        """ Return widget height according to fold button state.
+        This is for compute the ComponentWidget's place holder control height.
+        """
+        if self._btnFold.isChecked():
+            return self._btnFold.height()
+        return self._btnFold.height() + self._tvComponent.height()
+
     def open_attachment_menu(self, menu, node):
         source_mesh_name = node.association[0]
         target_mesh_name = node.association[1]
@@ -477,8 +485,7 @@ class ComponentWidget(QtWidgets.QWidget):
         self._component_tree_model_dict.clear()
         while self._lytAllSections.count() > 0:
             lytItem = self._lytAllSections.takeAt(0)
-            if lytItem.widget():
-                lytItem.widget().deleteLater()
+            lytItem.widget().deleteLater()
 
         if len(new_selection) == 0:
             return  # Early return if nothing to show
@@ -506,14 +513,27 @@ class ComponentWidget(QtWidgets.QWidget):
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(component_type, tree_model, self)
             self._splitter.addWidget(wgtSection)
+
+        # Append the extra place holder control at the end to compact free space
+        # when ComponentSectionWidget are folded.
+        place_holder = QtWidgets.QFrame()
+        place_holder.setFrameShape(QtWidgets.QFrame.NoFrame)
+        place_holder.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self._splitter.addWidget(place_holder)
         self._lytAllSections.addWidget(self._splitter)
-        self._lytAllSections.setAlignment(self._splitter, QtCore.Qt.AlignTop)
-        self._lytAllSections.addStretch()
 
     def on_section_toggled(self):
-        """ Update each section widget height to make their space compact.
+        """ Update each section widget height according to fold state,
+        to make their space compact.
         """
         new_widget_heights = []
-        for i in range(self._splitter.count()):
-            new_widget_heights.append(self._splitter.widget(i).sizeHint().height())
+        for i in range(self._splitter.count() - 1):
+            # Add extra padding to prevent section widget height creeping
+            # when clicking the fold button repeatedly.
+            # This is an empirical value by trial-and-error.
+            new_height = self._splitter.widget(i).get_height() + self._splitter.handleWidth() * 2
+            new_widget_heights.append(new_height)
+
+        place_holder_height = self.height() - sum(new_widget_heights)
+        new_widget_heights.append(place_holder_height)
         self._splitter.setSizes(new_widget_heights)
