@@ -102,7 +102,6 @@ _add_section_tuple = (
 )
 
 _edit_section_tuple = (
-    ("refresh", "Refresh the Scene Panel tree view", None, (zGeoWidget.reset_builder, ), (False, )),
     (  # Remove menu items
         (
             "remove_body",

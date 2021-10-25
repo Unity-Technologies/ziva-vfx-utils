@@ -497,7 +497,6 @@ def _add_menu_actions(zGeo_widget_inst, menu, text, statusbar_text, slot, icon_n
     else:
         # If this is a tuple, that means it's a class member function.
         # bind with widget instance first
-        print("slot[0]: ", slot[0])
         action.triggered.connect(partial(slot[0], zGeo_widget_inst))
 
     if icon_name:

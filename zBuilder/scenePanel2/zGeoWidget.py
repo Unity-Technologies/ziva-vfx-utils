@@ -12,9 +12,9 @@ from .zTreeView import zTreeView
 from ..commonUtils import is_sequence
 from ..nodes.base import Base
 from ..uiUtils import nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME, zGeo_UI_node_types
-from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index
+from ..uiUtils import get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node, get_node_by_index, get_icon_path_from_name
 from ..zMaya import get_zGeo_nodes_by_solverTM
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtWidgets, QtGui
 from maya import cmds
 from functools import partial
 
@@ -43,8 +43,12 @@ class zGeoWidget(QtWidgets.QWidget):
         self._setup_actions()
 
     def _setup_ui(self):
-        self._tmGeo = zGeoTreeModel(self)
+        # Refresh button
+        icon = QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name("refresh")))
+        self._btnRefresh = QtWidgets.QPushButton(icon, "Refresh")
 
+        # Tree view
+        self._tmGeo = zGeoTreeModel(self)
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._tvGeo.customContextMenuRequested.connect(self.open_menu)
@@ -56,13 +60,18 @@ class zGeoWidget(QtWidgets.QWidget):
         self._tvGeo.setDropIndicatorShown(True)
         self._tvGeo.setModel(self._tmGeo)
 
-        self._lytGeo = QtWidgets.QVBoxLayout(self)
+        self._lytGeo = QtWidgets.QVBoxLayout()
+        self._lytGeo.addWidget(self._btnRefresh)
         self._lytGeo.addWidget(self._tvGeo)
         self.setLayout(self._lytGeo)
 
     def _setup_actions(self):
+        self._btnRefresh.clicked.connect(self._on_btnRefresh_clicked)
         self._tvGeo.selectionModel().selectionChanged.connect(self._on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
+
+    def _on_btnRefresh_clicked(self):
+        self.reset_builder(False)
 
     def _on_tvGeo_selectionChanged(self, selected, deselected):
         """
@@ -146,6 +155,18 @@ class zGeoWidget(QtWidgets.QWidget):
         If there are more than one object selected in UI a menu does not appear.
         """
         indexes = self._tvGeo.selectedIndexes()
+        # Select nothing, show Refresh context menu
+        if not indexes:
+            menu = QtWidgets.QMenu(self)
+            menu.setToolTipsVisible(True)
+            icon = QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name("refresh")))
+            action = QtWidgets.QAction(icon, "Refresh")
+            action.triggered.connect(self._on_btnRefresh_clicked)
+            menu.addAction(action)
+            menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
+            return
+
+        # TODO: Support multiple selection context menu
         if len(indexes) != 1:
             return
 
