@@ -10,6 +10,14 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
+2.0.0
+------
+
+Bug Fixes
++++++++++
+- **zBuilder:** VFXACT-1107	Mirror operation creates extra attachment copy
+
+
 1.1.1
 ------
 

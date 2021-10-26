@@ -38,6 +38,14 @@ zBuilder.bundle module
    :undoc-members:
    :show-inheritance:
 
+zBuilder.commonUtils module
+---------------------------
+
+.. automodule:: zBuilder.commonUtils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 zBuilder.mayaUtils module
 -------------------------
 
@@ -69,7 +77,6 @@ zBuilder.zMaya module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

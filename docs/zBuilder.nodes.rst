@@ -38,7 +38,6 @@ zBuilder.nodes.dg\_node module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

@@ -68,7 +68,6 @@ zBuilder.builders.ziva module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
