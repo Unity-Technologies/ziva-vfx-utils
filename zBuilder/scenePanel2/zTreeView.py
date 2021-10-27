@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 class zTreeView(QtWidgets.QTreeView):
-    """ Common tree view for all Scene Panel tree models.
+    """ Common tree view for all Scene Panel 2 tree models.
     """
-    # pixel offset from the left horizontally
+    # pixel offset from the left
     offset = 20
 
     image_line = QtGui.QImage(get_icon_path_from_name('vline'))
@@ -21,37 +21,42 @@ class zTreeView(QtWidgets.QTreeView):
 
     def __init__(self, parent=None):
         super(zTreeView, self).__init__(parent)
+
         self.setIndentation(15)
-        # changing header size
-        # this used to create some space between left/top side of the tree view and it items
-        # "razzle dazzle" but the only way I could handle that
-        # height - defines padding from top
-        # offset - defines padding from left
-        # opposite value of offset should be applied in view.py in drawBranches method
+        # Changing header size
+        # This used to create some space between left/top side of the tree view.
+        # It seems "razzle dazzle" but is the only way I could handle that
         header = self.header()
-        header.setOffset(-zTreeView.offset)
-        header.setFixedHeight(10)
+        header.setOffset(-zTreeView.offset)  # padding from left
+        header.setFixedHeight(10)  # padding from top
+
         # Apply background color
         self.setAlternatingRowColors(True)
 
     # override
     def drawBranches(self, painter, rect, index):
-        column_count = rect.width() // self.indentation()
         tree_model = self.model()
-        model_index = tree_model.mapToSource(index) if isinstance(
-            tree_model, QtCore.QAbstractProxyModel) else index
-        node = model_index.internalPointer()
+        node = index.internalPointer()
         row_count = tree_model.rowCount(index.parent())
 
-        for column in range(column_count):
-            # padding from the left side of widget
-            pos_x = column * self.indentation()
+        cur_index = None
+        cur_parent_index = index
+        column_count = rect.width() // self.indentation()
+        # Visit column from innermost so cur_index and cur_parent_index
+        # keep track of correct index
+        for column in reversed(range(column_count)):
+            pos_x = column * self.indentation() + zTreeView.offset
             pos_y = rect.top()
             width = self.indentation()
             height = rect.height()
-            rect = QtCore.QRect(pos_x + zTreeView.offset, pos_y, width, height)
+            rect = QtCore.QRect(pos_x, pos_y, width, height)
 
             if column == column_count - 1:
+                # Innermost column
+                # Show the item status:
+                # - expanded
+                # - folded
+                # - child
                 if node.child_count():
                     if self.isExpanded(index):
                         painter.drawImage(rect, zTreeView.image_opened)
@@ -60,17 +65,24 @@ class zTreeView(QtWidgets.QTreeView):
                 else:
                     painter.drawImage(rect, zTreeView.image_child)
             elif column == column_count - 2:
+                # Column next to innermost
+                # Display current parent status:
+                # - has more children
+                # - no more children
                 if index.row() == row_count - 1:
                     painter.drawImage(rect, zTreeView.image_end)
                 else:
                     painter.drawImage(rect, zTreeView.image_more)
             else:
-                all_parents = []
-                parent = index.parent()
-                while parent.isValid():
-                    all_parents.append(parent)
-                    parent = parent.parent()
-                column_parent_row_count = tree_model.rowCount(all_parents[-(column + 1)])
-                column_row_count = all_parents[-(column + 2)].row()
-                if column_parent_row_count - 1 != column_row_count:
+                # Column not relate to current item.
+                # Only 2 choice:
+                # - draw extension line
+                # - leave blank
+                cur_parent_row_count = tree_model.rowCount(cur_parent_index)
+                cur_index_row = cur_index.row()
+                if cur_parent_row_count - 1 > cur_index_row:
+                    # Draw extension line when current index row number < its parent row count
                     painter.drawImage(rect, zTreeView.image_line)
+            # Iterate to next parent
+            cur_index = cur_parent_index
+            cur_parent_index = cur_index.parent()
