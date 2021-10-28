@@ -251,6 +251,11 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         if not parent_node:
             logger.error("Failed to get parent TreeItem through QModelIndex in canDropMimeData().")
             return False
+        if parent_node.data.type is None:
+            # This is the ROOT node.
+            # We don't allow inserting items before first zSolverTransform item.
+            logger.debug("Can't drop because it's above the first zSolverTransform.")
+            return False
         if parent_node.data.type == "zSolverTransform" and row == 0:
             # Special case: no node can insert before zSolver item
             logger.debug("Can't drop because it's not group or zsolver node")

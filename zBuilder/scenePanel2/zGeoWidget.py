@@ -371,18 +371,16 @@ class zGeoWidget(QtWidgets.QWidget):
         if not is_serialize_data_to_zsolver_node():
             return
 
-        # Clear the selection to retrieve whole scene
-        cmds.select(cl=True)
-        # Merge tree view with latest zBuilder retrieve result
-        self.reset_builder(False)
-        # Save merged data to each solver node's plug
-        root_node = self._tmGeo.root_node()
-        for solverTM_item in root_node.children:
-            string_to_save = to_json_string(flatten_tree(solverTM_item))
-            cmds.setAttr("{}.{}".format(solverTM_item.data.name, SCENE_PANEL_DATA_ATTR_NAME),
-                         string_to_save,
-                         type="string")
-        logger.info("zGeo tree data saved.")
+        # Save data to each solver node's plug.
+        # It's fine to save staled zBuilder nodes info.
+        # When loading them back, they will be merged with latest tree structure.
+        if self._whole_scene_tree:
+            for solverTM_item in self._whole_scene_tree.children:
+                string_to_save = to_json_string(flatten_tree(solverTM_item))
+                cmds.setAttr("{}.{}".format(solverTM_item.data.name, SCENE_PANEL_DATA_ATTR_NAME),
+                             string_to_save,
+                             type="string")
+            logger.info("zGeo tree data saved.")
 
     def select_group_hierarchy(self, group_index):
         def get_all_zGeo_indices(index_list):
