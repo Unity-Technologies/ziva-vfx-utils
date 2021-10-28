@@ -7,6 +7,7 @@ import weakref
 from .groupNode import GroupNode
 from .serialize import is_serialize_data_to_zsolver_node, to_json_string, flatten_tree, to_tree_entry_list, merge_tree_data
 from .treeItem import TreeItem, build_scene_panel_tree
+from .zGeoContextMenu import create_general_context_menu, create_solver_context_menu, create_group_context_menu
 from .zGeoTreeModel import zGeoTreeModel
 from .zTreeView import zTreeView
 from ..commonUtils import is_sequence
@@ -51,7 +52,7 @@ class zGeoWidget(QtWidgets.QWidget):
         self._tmGeo = zGeoTreeModel(self)
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._tvGeo.customContextMenuRequested.connect(self.open_menu)
+        self._tvGeo.customContextMenuRequested.connect(self._create_context_menu)
         # selection and move setup
         self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self._tvGeo.setDragEnabled(True)
@@ -66,12 +67,9 @@ class zGeoWidget(QtWidgets.QWidget):
         self.setLayout(self._lytGeo)
 
     def _setup_actions(self):
-        self._btnRefresh.clicked.connect(self._on_btnRefresh_clicked)
+        self._btnRefresh.clicked.connect(partial(self.reset_builder, False))
         self._tvGeo.selectionModel().selectionChanged.connect(self._on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
-
-    def _on_btnRefresh_clicked(self):
-        self.reset_builder(False)
 
     def _on_tvGeo_selectionChanged(self, selected, deselected):
         """
@@ -147,22 +145,10 @@ class zGeoWidget(QtWidgets.QWidget):
         if not_found_nodes:
             cmds.warning("Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
-    # Begin zGeo TreeView pop-up menu
-    def open_menu(self, position):
-        """
-        Generates menu for zSolver item.
-
-        If there are more than one object selected in UI a menu does not appear.
-        """
+    def _create_context_menu(self, position):
         indexes = self._tvGeo.selectedIndexes()
-        # Select nothing, show Refresh context menu
         if not indexes:
-            menu = QtWidgets.QMenu(self)
-            menu.setToolTipsVisible(True)
-            icon = QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name("refresh")))
-            action = QtWidgets.QAction(icon, "Refresh")
-            action.triggered.connect(self._on_btnRefresh_clicked)
-            menu.addAction(action)
+            menu = create_general_context_menu(self)
             menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
             return
 
@@ -172,122 +158,13 @@ class zGeoWidget(QtWidgets.QWidget):
 
         node = indexes[0].data(nodeRole)
         if node.type == "zSolverTransform":
-            menu = QtWidgets.QMenu(self)
-            menu.setToolTipsVisible(True)
-            method = self.open_solver_menu
-            method(menu, node)
+            menu = create_solver_context_menu(self, node)
             menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
         elif node.type == "group":
-            menu = QtWidgets.QMenu(self)
-            menu.setToolTipsVisible(True)
-            method = self.open_group_node_menu
-            method(menu, indexes[0])
+            menu = create_group_context_menu(self, indexes[0])
             menu.exec_(self._tvGeo.viewport().mapToGlobal(position))
 
-    def open_solver_menu(self, menu, node):
-        solver_transform = node
-        solver = node.children[0]
-
-        self.add_zsolver_menu_action(menu, solver_transform, "Enable", "enable")
-        self.add_zsolver_menu_action(menu, solver, "Collision Detection", "collisionDetection")
-        self.add_zsolver_menu_action(menu, solver, "Show Bones", "showBones")
-        self.add_zsolver_menu_action(menu, solver, "Show Tet Meshes", "showTetMeshes")
-        self.add_zsolver_menu_action(menu, solver, "Show Muscle Fibers", "showMuscleFibers")
-        self.add_zsolver_menu_action(menu, solver, "Show Attachments", "showAttachments")
-        self.add_zsolver_menu_action(menu, solver, "Show Collisions", "showCollisions")
-        self.add_zsolver_menu_action(menu, solver, "Show Materials", "showMaterials")
-        menu.addSeparator()
-        self.add_info_action(menu)
-        self.add_set_default_action(menu)
-
-    def add_info_action(self, menu):
-        action = QtWidgets.QAction(self)
-        action.setText("Info")
-        action.setToolTip("Outputs solver statistics.")
-        action.triggered.connect(self.run_info_command)
-        menu.addAction(action)
-
-    def run_info_command(self):
-        sel = cmds.ls(sl=True)
-        cmdOut = cmds.ziva(sel[0], i=True)  # only allow one
-        print(cmdOut)  #print result in Maya
-
-    def add_set_default_action(self, menu):
-        action = QtWidgets.QAction(self)
-        action.setText("Set Default")
-        action.setToolTip(
-            "Set the default solver to the solver inferred from selection."\
-            "The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene."
-        )
-        sel = cmds.ls(sl=True)
-        defaultSolver = cmds.zQuery(defaultSolver=True)
-        if defaultSolver and defaultSolver[0] == sel[0]:
-            action.setEnabled(False)
-        action.triggered.connect(lambda: self.run_set_default_command(sel[0]))
-        menu.addAction(action)
-
-    def run_set_default_command(self, sel):
-        cmdOut = cmds.ziva(sel, defaultSolver=True)  # only allow one
-        print(cmdOut)  #print result in Maya
-
-    def add_zsolver_menu_action(self, menu, node, text, attr):
-        action = QtWidgets.QAction(self)
-        action.setText(text)
-        action.setCheckable(True)
-        action.setChecked(node.attrs[attr]["value"])
-        action.changed.connect(partial(self.toggle_attribute, node, attr))
-        menu.addAction(action)
-
-    def toggle_attribute(self, node, attr):
-        value = node.attrs[attr]["value"]
-        if isinstance(value, bool):
-            value = not value
-        elif isinstance(value, int):
-            value = 1 - value
-        else:
-            cmds.error("Attribute is not bool/int: {}.{}".format(node.name, attr))
-            return
-        node.attrs[attr]["value"] = value
-        cmds.setAttr("{}.{}".format(node.long_name, attr), value)
-
-    def _select_group_hierarchy(self, group_index):
-        def get_all_zGeo_indices(index_list):
-            """ Given QModelIndex list, return all child QModelIndex that is zGeo node type
-            """
-            if not is_sequence(index_list):
-                index_list = [index_list]
-
-            zGeo_indices = []
-            for index in index_list:
-                treeitem = get_node_by_index(index, None)
-                assert treeitem, "Can't get TreeItem through QModelIndex."
-
-                if is_group_node(treeitem.data):
-                    # Collect all child QModelIndex and recursively process
-                    model = index.model()
-                    child_index_list = [
-                        model.index(i, 0, index) for i in range(model.rowCount(index))
-                    ]
-                    zGeo_indices.extend(get_all_zGeo_indices(child_index_list))
-                else:
-                    assert len(treeitem.children
-                               ) == 0, "Non group node has child node. Need revamp code logic."
-                    zGeo_indices.append(index)
-            return zGeo_indices
-
-        zGeo_indices = get_all_zGeo_indices(group_index)
-        for index in zGeo_indices:
-            self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
-
-    def open_group_node_menu(self, menu, group_index):
-        action = QtWidgets.QAction(self)
-        action.setText("Select Hierarchy")
-        action.triggered.connect(partial(self._select_group_hierarchy, group_index))
-        menu.addAction(action)
-
-    # End zGeo TreeView pop-up menu
-
-    def get_expand_item_name(self):
+    def _get_expand_item_name(self):
         """ Returns name list of the current expanded items in zGeoTreeView
         """
         return [
@@ -295,7 +172,7 @@ class zGeoWidget(QtWidgets.QWidget):
             if self._tvGeo.isExpanded(index)
         ]
 
-    def expand_item_by_name(self, name_list):
+    def _expand_item_by_name(self, name_list):
         """
         Args:
             name_list (list(str)): names to expand in zGeoTreeView
@@ -373,10 +250,10 @@ class zGeoWidget(QtWidgets.QWidget):
                 self._tmGeo.index(rowIdx, 0, insertion_parent_index).data(QtCore.Qt.DisplayRole))
         group_name = get_unique_name("Group1", names_to_check)
         group_node = GroupNode(group_name)
-        expanded_item_list = self.get_expand_item_name()
+        expanded_item_list = self._get_expand_item_name()
         self._tmGeo.group_items(insertion_parent_index, insertion_row, group_node,
                                 selected_index_list)
-        self.expand_item_by_name(expanded_item_list)
+        self._expand_item_by_name(expanded_item_list)
 
     def _delete_zGeo_treeview_nodes(self):
         """ Delete top level group items in the current selection in the zGeo TreeView.
@@ -387,9 +264,9 @@ class zGeoWidget(QtWidgets.QWidget):
             filter(lambda index: is_group_node(index.data(nodeRole)),
                    self._tvGeo.selectedIndexes()))
 
-        expanded_item_list = self.get_expand_item_name()
+        expanded_item_list = self._get_expand_item_name()
         self._tmGeo.delete_group_items(group_index_to_delete)
-        self.expand_item_by_name(expanded_item_list)
+        self._expand_item_by_name(expanded_item_list)
         # TODO: Add support for zGeo node deletion
 
     # Override
@@ -506,3 +383,32 @@ class zGeoWidget(QtWidgets.QWidget):
                          string_to_save,
                          type="string")
         logger.info("zGeo tree data saved.")
+
+    def select_group_hierarchy(self, group_index):
+        def get_all_zGeo_indices(index_list):
+            """ Given QModelIndex list, return all child QModelIndex that is zGeo node type
+            """
+            if not is_sequence(index_list):
+                index_list = [index_list]
+
+            zGeo_indices = []
+            for index in index_list:
+                treeitem = get_node_by_index(index, None)
+                assert treeitem, "Can't get TreeItem through QModelIndex."
+
+                if is_group_node(treeitem.data):
+                    # Collect all child QModelIndex and recursively process
+                    model = index.model()
+                    child_index_list = [
+                        model.index(i, 0, index) for i in range(model.rowCount(index))
+                    ]
+                    zGeo_indices.extend(get_all_zGeo_indices(child_index_list))
+                else:
+                    assert len(treeitem.children
+                               ) == 0, "Non group node has child node. Need revamp code logic."
+                    zGeo_indices.append(index)
+            return zGeo_indices
+
+        zGeo_indices = get_all_zGeo_indices(group_index)
+        for index in zGeo_indices:
+            self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
