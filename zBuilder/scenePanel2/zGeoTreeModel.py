@@ -224,10 +224,11 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             # After new rows are created, copy drop item's data and its children
             for item in drop_items:
                 child_index = self.index(insertion_row + count, 0, parent)
-                self.setData(child_index, item.data, nodeRole)
-                if not is_group_item(item):
-                    self.setData(child_index, item.pin_state, QtCore.Qt.CheckStateRole)
                 child_item = get_node_by_index(child_index, None)
+                # We directly set values to avoid 'setData' call (reduces execution time)
+                child_item.data = item.data
+                if not is_group_item(item):
+                    child_item.pin_state = item.pin_state
                 child_list_copy = item.children[:]
                 child_item.append_children(child_list_copy)
                 count += 1
