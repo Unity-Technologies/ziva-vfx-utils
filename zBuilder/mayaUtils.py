@@ -7,6 +7,14 @@ The module contains helper functions depends on Maya Python API.
 '''
 
 
+def get_maya_api_version():
+    """ Return Maya API version.
+    Format: Major(4 digits), minor(2 digits), patch(2 digits).
+    E.g., 20200400
+    """
+    return cmds.about(apiVersion=True)
+
+
 def get_short_name(node_name):
     # type: (str) -> str
     '''

@@ -3,6 +3,7 @@ import pickle
 import weakref
 
 from ..uiUtils import *
+from ..mayaUtils import get_maya_api_version
 from .groupNode import GroupNode
 from .treeItem import *
 
@@ -48,8 +49,16 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         node = get_node_by_index(index, None)
         assert node, "Can't get node through QModelIndex."
 
+        # Disable drag&drop in Maya 2020 as it causes crash.
+        # TODO: Remove this logic when Maya 2020 retires.
+        def is_maya_2020():
+            return 20200000 <= get_maya_api_version() < 20210000
+
         if node.data.type == "zSolver":
+            if is_maya_2020():
+                return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
             # zSolver node is NOT pin-able, NOT drop-able but drag-able as one can re-order items.
+
             # Making zSolver node drag-able also allows us to visually show that it is not drop-able.
             # On the contrary, if we just make it NOT drag&drop-able, once selected and dragged, it
             # selects multiple items, which is not the expected behavior.
@@ -57,6 +66,8 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
                 | QtCore.Qt.ItemIsDragEnabled
 
         if node.data.type == "zSolverTransform":
+            if is_maya_2020():
+                return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
             # zSolverTransform node is NOT pin-able, and drag&drop-able.
             # Making zSolverTransform node drag-able also allows us to visually show that it is not drop-able.
             # On the contrary, if we just make it NOT drag&drop-able, once selected and dragged, it
@@ -66,12 +77,20 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
                 | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
 
         if is_group_item(node):
+            if is_maya_2020():
+                return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                    | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsAutoTristate
+
             # Group node is pinable, partially pinable and drag&drop-able
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
                 | QtCore.Qt.ItemIsUserCheckable |  QtCore.Qt.ItemIsAutoTristate \
                 | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
 
         # zGeo node is pinable, drag-able, NOT drop-able
+        if is_maya_2020():
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
+                | QtCore.Qt.ItemIsUserCheckable
+
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable \
             | QtCore.Qt.ItemIsUserCheckable \
             | QtCore.Qt.ItemIsDragEnabled

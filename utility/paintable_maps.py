@@ -1,3 +1,4 @@
+from zBuilder.mayaUtils import get_maya_api_version
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
@@ -22,19 +23,15 @@ def split_map_name(map_name):
 # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _use_paintable_map_fallback_impl():
     """
-    Whether or not we need to use the fallback implementation of 
-    set/get_paintable_map_by_MFnWeightGeometryFilter().
-    This depends on whether we're using a Maya version with the relevant regression.
+    The Maya 2022 introduces the "component Tag" feature.
+    It causes deformerSet() call throws exception.
+    This helper function decides whether to use the fallback implementation
+    of set/get_paintable_map_by_MFnWeightGeometryFilter().
     """
-    maya_version = int(cmds.about(version=True)[:4])
-    # Refine Maya major/minor version once Autodesk fixes the regression
-    return maya_version >= 2022
+    # Refine Maya version range when new Maya is available.
+    return 20220000 <= get_maya_api_version() < 20230000
 
 
-# End of TODO
-
-
-# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name):
     """
     Fallback implementation of get paintable map by MFnWeightGeometryFilter variant.
