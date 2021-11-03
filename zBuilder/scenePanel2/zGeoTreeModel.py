@@ -11,7 +11,6 @@ from PySide2 import QtGui, QtCore
 from maya import cmds
 
 logger = logging.getLogger(__name__)
-_mimeType = 'application/x-scenepanelzgeoitemdata'
 
 
 class zGeoTreeModel(QtCore.QAbstractItemModel):
@@ -23,6 +22,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         self._builder_ref = None
         self._root_node_ref = None
         self._is_partial_view = False
+        self._drop_items = []
 
     def reset_model(self, builder, root_node, partial_view):
         self._is_partial_view = partial_view
@@ -215,7 +215,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         return QtCore.Qt.MoveAction
 
     def mimeTypes(self):
-        return [_mimeType]
+        return ['text/plain']
 
     def mimeData(self, indexes):
         mimeData = QtCore.QMimeData()
@@ -223,24 +223,22 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         # When both parent and child node in the drag&drop list,
         # make sure only parent nodes are pickled.
         # Otherwise the child nodes will separate from the parent node.
-        pruned_treeitem_list = prune_child_nodes(treeitem_list)
-        mimeData.setData(_mimeType, pickle.dumps(pruned_treeitem_list))
+        self._drop_items = prune_child_nodes(treeitem_list)
         return mimeData
 
     def dropMimeData(self, data, action, row, column, parent):
         assert not self._is_partial_view
 
-        drop_items = pickle.loads(data.data(_mimeType))
-        drop_node_name = ",".join([item.data.name for item in drop_items])
+        drop_node_name = ",".join([item.data.name for item in self._drop_items])
         parent_node = parent.data(nodeRole)
         logger.debug("Dropping mimedata {} to parent {} at row {}".format(
             drop_node_name, parent_node.name, row))
 
         insertion_row = self.rowCount(parent) if (row == -1) else row
         count = 0
-        if self.insertRows(insertion_row, len(drop_items), parent):
+        if self.insertRows(insertion_row, len(self._drop_items), parent):
             # After new rows are created, copy drop item's data and its children
-            for item in drop_items:
+            for item in self._drop_items:
                 child_index = self.index(insertion_row + count, 0, parent)
                 child_item = get_node_by_index(child_index, None)
                 # We directly set values to avoid 'setData' call (reduces execution time)
@@ -281,16 +279,16 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             return False
 
         # Verify drop data
-        if not data.hasFormat(_mimeType):
-            logger.debug("Can't drop because mime type mismatch")
+        if not self._drop_items:
+            logger.debug("Can't drop because empty drop items")
             return False
-        drop_items = pickle.loads(data.data(_mimeType))
-        if any(is_zsolver_node(item.data) for item in drop_items):
+
+        if any(is_zsolver_node(item.data) for item in self._drop_items):
             logger.debug("Can't drop because drop data contain zsolver node")
             return False
         # Make sure all select items come from same zSolverTransform node.
         # Otherwise, do early return.
-        solver_list = list(set([get_zSolverTransform_treeitem(item) for item in drop_items]))
+        solver_list = list(set([get_zSolverTransform_treeitem(item) for item in self._drop_items]))
         if len(solver_list) != 1:
             logger.debug("Can't drop data. Selected items come from different zSolver.")
             return False
@@ -302,7 +300,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             return False
 
         # Valid drop, good to go
-        drop_node_name = ",".join([item.data.name for item in drop_items])
+        drop_node_name = ",".join([item.data.name for item in self._drop_items])
         logger.debug("Can drop data {} to parent node {} at row {}".format(
             drop_node_name, parent_node.data.name, row))
         return True
