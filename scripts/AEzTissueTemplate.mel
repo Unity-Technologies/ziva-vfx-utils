@@ -8,6 +8,7 @@ global proc AEzTissueTemplate( string $nodeName )
   editorTemplate -addControl "selfCollisions";
   editorTemplate -addControl "collisionVolume";
   editorTemplate -addControl "contactSliding";
+  editorTemplate -addControl "collisionSets";
   editorTemplate -addControl "contactStiffness";
   editorTemplate -addControl "contactStiffnessExp";
   editorTemplate -addControl "material";
