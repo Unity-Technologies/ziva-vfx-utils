@@ -62,10 +62,16 @@ class Builder(object):
             parent = self.root_node
 
         scene_items = []
+        node_created = True
         obj = find_class('zBuilder.nodes', type_)
         obb = obj(parent=parent, builder=self)
-        obb.populate(maya_node=node)
-        scene_items.append(obb)
+        try:
+            obb.populate(maya_node=node)
+        except Exception:
+            logger.exception('Failed to populate node: {}, skipped.'.format(node))
+            node_created = False
+        if node_created:
+            scene_items.append(obb)
 
         if get_parameters:
             for node in scene_items:
