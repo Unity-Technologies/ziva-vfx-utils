@@ -98,7 +98,7 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             "zRestShape": create_attr_context_menu,
             "zTet": create_attr_map_context_menu,
             "zFiber": create_fiber_context_menu,
-            "zMaterial": create_attr_context_menu,
+            "zMaterial": create_attr_map_context_menu,
             "zAttachment": create_attachment_context_menu,
         }
 

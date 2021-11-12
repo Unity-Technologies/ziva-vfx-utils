@@ -150,6 +150,7 @@ def create_attr_map_context_menu(parent, node):
 def create_fiber_context_menu(parent, node):
     menu = QtWidgets.QMenu(parent)
     append_attr_actions(parent, menu, node)
+    menu.addSection("Maps")
     append_map_actions(parent, menu, "Weight", node, 0)
     append_map_actions(parent, menu, "EndPoints", node, 1)
     return menu
