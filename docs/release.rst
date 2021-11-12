@@ -12,6 +12,9 @@ Release Notes
 
 2.0.0
 ------
+Functionality
++++++++++++++
+- Removed 'Select' option from Ziva menu.
 
 Bug Fixes
 +++++++++
