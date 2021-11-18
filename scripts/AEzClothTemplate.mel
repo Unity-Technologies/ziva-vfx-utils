@@ -7,6 +7,7 @@ global proc AEzClothTemplate( string $nodeName )
   editorTemplate -addControl "collisions";
   editorTemplate -addControl "selfCollisions";
   editorTemplate -addControl "contactSliding";
+  editorTemplate -addControl "collisionSets";
   editorTemplate -addControl "contactStiffness";
   editorTemplate -addControl "contactStiffnessExp";
   editorTemplate -addControl "material";
