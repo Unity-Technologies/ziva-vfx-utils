@@ -52,9 +52,11 @@ class zGeoWidget(QtWidgets.QWidget):
         self._tmGeo = zGeoTreeModel(self)
         self._tvGeo = zTreeView(self)
         self._tvGeo.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._tvGeo.customContextMenuRequested.connect(self._create_context_menu)
+        self._tvGeo.customContextMenuRequested.connect(
+            self._create_context_menu)
         # selection and move setup
-        self._tvGeo.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvGeo.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
         self._tvGeo.setDragEnabled(True)
         self._tvGeo.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self._tvGeo.setAcceptDrops(True)
@@ -68,7 +70,8 @@ class zGeoWidget(QtWidgets.QWidget):
 
     def _setup_actions(self):
         self._btnRefresh.clicked.connect(partial(self.reset_builder, False))
-        self._tvGeo.selectionModel().selectionChanged.connect(self._on_tvGeo_selectionChanged)
+        self._tvGeo.selectionModel().selectionChanged.connect(
+            self._on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
 
     def _on_tvGeo_selectionChanged(self, selected, deselected):
@@ -79,7 +82,8 @@ class zGeoWidget(QtWidgets.QWidget):
         selection_list = self._tvGeo.selectedIndexes()
         if selection_list:
             nodes = [x.data(nodeRole) for x in selection_list]
-            non_group_nodes = list(filter(lambda n: not is_group_node(n), nodes))
+            non_group_nodes = list(
+                filter(lambda n: not is_group_node(n), nodes))
             node_names = [x.long_name for x in non_group_nodes]
             # find nodes that exist in the scene
             scene_nodes = cmds.ls(node_names, l=True)
@@ -91,15 +95,17 @@ class zGeoWidget(QtWidgets.QWidget):
                 filter(lambda n: (n.long_name in scene_nodes) and not is_zsolver_node(n),
                        non_group_nodes))
 
-            not_found_nodes = [name for name in node_names if name not in scene_nodes]
+            not_found_nodes = [
+                name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
         else:
             self._selected_nodes = []
 
+        # create a list of unique maya dag node to view on the component widget
         self._wgtComponent_ref.reset_model(
-            self._builder, list(set(self._selected_nodes) | set(self._pinned_nodes)))
+            self._builder, self._get_unique_node_items(self._selected_nodes, self._pinned_nodes))
 
     def _on_tvGeo_pinStateChanged(self, item_list):
         """ Update component TreeView when zGeo TreeView item's pin state changed.
@@ -129,7 +135,8 @@ class zGeoWidget(QtWidgets.QWidget):
             filter(lambda n: (n.data.long_name in scene_nodes), zGeo_treeItems))
         pinned_zGeo_treeItems = list(
             filter(lambda n: QtCore.Qt.Checked == n.pin_state, valid_zGeo_treeItems))
-        unpinned_zGeo_treeItems = set(valid_zGeo_treeItems) - set(pinned_zGeo_treeItems)
+        unpinned_zGeo_treeItems = set(
+            valid_zGeo_treeItems) - set(pinned_zGeo_treeItems)
 
         # Update the pinned tree items
         pinned_zGeo_nodes = [item.data for item in pinned_zGeo_treeItems]
@@ -138,12 +145,16 @@ class zGeoWidget(QtWidgets.QWidget):
         # Refer to https://stackoverflow.com/questions/54735175/set-operator-precedence
         self._pinned_nodes = list((set(self._pinned_nodes) | set(pinned_zGeo_nodes)) -
                                   set(unpinned_nodes))
-        self._wgtComponent_ref.reset_model(
-            self._builder, list(set(self._selected_nodes) | set(self._pinned_nodes)))
 
-        not_found_nodes = [name for name in node_names if name not in scene_nodes]
+        # create a list of unique maya dag node to view on the component widget
+        self._wgtComponent_ref.reset_model(
+            self._builder, self._get_unique_node_items(self._selected_nodes, self._pinned_nodes))
+
+        not_found_nodes = [
+            name for name in node_names if name not in scene_nodes]
         if not_found_nodes:
-            cmds.warning("Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
+            cmds.warning(
+                "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
 
     def _create_context_menu(self, position):
         indexes = self._tvGeo.selectedIndexes()
@@ -172,6 +183,17 @@ class zGeoWidget(QtWidgets.QWidget):
             if self._tvGeo.isExpanded(index)
         ]
 
+    def _get_unique_node_items(self, node_list_1, node_list_2):
+        """
+        Returns a list of unique node items based on long name
+        Args:
+            node_list_1 (list): list of nodes
+            node_list_2 (list): list of nodes
+        """
+        node_long_name_dict = {
+            node.long_name: node for node in node_list_1 + node_list_2}
+        return node_long_name_dict.values()
+
     def _expand_item_by_name(self, name_list):
         """
         Args:
@@ -195,7 +217,8 @@ class zGeoWidget(QtWidgets.QWidget):
         """
         root_index = QtCore.QModelIndex()
         if self._tmGeo.rowCount(root_index) == 0:
-            logger.warning("Can't create Group node since no zSolver node exists.")
+            logger.warning(
+                "Can't create Group node since no zSolver node exists.")
             return
 
         if self._is_partial_tree_view:
@@ -216,10 +239,12 @@ class zGeoWidget(QtWidgets.QWidget):
                 for index in selected_index_list
             ]))
         if len(solver_list) > 1:
-            logger.warning("Can't create group node. Selected items come from different zSolver.")
+            logger.warning(
+                "Can't create group node. Selected items come from different zSolver.")
             return
         if len(solver_list) == 0:
-            logger.warning("Please select the items other than zSolver nodes to create the group.")
+            logger.warning(
+                "Please select the items other than zSolver nodes to create the group.")
             return
         assert solver_list[0], "Selected items should only belong to one zSolverTransform node."\
             "There's bug in the code logic."
@@ -241,7 +266,8 @@ class zGeoWidget(QtWidgets.QWidget):
                 # Get common parent index as insertion parent
                 insertion_parent_index = selected_index_list[0].parent()
                 # Get first row index as insertion point
-                insertion_row = min(map(lambda index: index.row(), selected_index_list))
+                insertion_row = min(
+                    map(lambda index: index.row(), selected_index_list))
 
         # Create Group node with proper name
         names_to_check = []
@@ -281,7 +307,7 @@ class zGeoWidget(QtWidgets.QWidget):
 
             # group creation
             elif (obj is self._tvGeo) and (event.key() == QtCore.Qt.Key_G) \
-                and (event.modifiers() == QtCore.Qt.ControlModifier):
+                    and (event.modifiers() == QtCore.Qt.ControlModifier):
                 self.create_group()
                 return True
 
