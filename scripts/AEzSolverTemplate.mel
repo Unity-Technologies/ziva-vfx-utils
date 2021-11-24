@@ -11,6 +11,7 @@ global proc AEzSolverTemplate( string $nodeName )
       editorTemplate -addControl "affectSurfaceTensionEnvelope";
       editorTemplate -addControl "affectRestScaleEnvelope";
       editorTemplate -addControl "affectFiberExcitation";
+      editorTemplate -addControl "affectRestShapeEnvelope";
     editorTemplate -endLayout;
   
     editorTemplate -addSeparator;
