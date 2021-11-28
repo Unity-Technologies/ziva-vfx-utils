@@ -1,14 +1,6 @@
-from maya import cmds
-from maya import mel
-import os
-import logging
-import sys
-
-import zBuilder.zMaya as mz
 import zBuilder.builders.attributes as atr
-
 from vfx_test_case import VfxTestCase
-
+from maya import cmds
 
 class AttributesBuilderTestCase(VfxTestCase):
     def test_retrieve_build(self):

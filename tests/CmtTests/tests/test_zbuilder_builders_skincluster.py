@@ -45,8 +45,9 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
 
     def test_build_restores_attr_values(self):
         plug_names = {
-            '{}.{}'.format(geo, attr)
-            for geo in self.skincluster_names for attr in self.skincluster_attrs
+            "{}.{}".format(geo, attr)
+            for geo in self.skincluster_names
+                for attr in self.skincluster_attrs
         }
         attrs_before = attr_values_from_scene(plug_names)
 

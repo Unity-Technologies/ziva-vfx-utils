@@ -1,11 +1,12 @@
 import os
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
-from maya import cmds
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from zBuilder.zMaya import rename_ziva_nodes
+from zBuilder.utils import copy_paste_with_substitution
+from tests.utils import load_scene
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase
+from vfx_test_case import ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from maya import cmds
 
 NODE_TYPE = 'zTissue'
 
@@ -21,7 +22,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaTissueGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene(scene_name="generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -60,7 +61,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         builder.retrieve_connections()
         self.check_retrieve_ztissue_looks_good(builder, {})
 
-    def test_retrieve_connections(self):
+    def test_retrieve_connections1(self):
         # this was failing, fix for this in VFXACT-645
         cmds.select('r_subtissue_1')
         builder = zva.Ziva()
@@ -97,7 +98,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_tissue_1_zTissue"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
@@ -117,10 +118,16 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
+
+    def test_builder_can_retrieve_collision_set_attr(self):
+        """ Check if the non-keyable collision set attr is retrieved.
+        """
+        tissue_node = self.builder.get_scene_items(name_filter="l_tissue_1_zTissue")[0]
+        self.assertIn("collisionSets", tissue_node.attrs)
 
 
 class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):
@@ -135,7 +142,7 @@ class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaTissueMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -162,10 +169,10 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     """
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -203,10 +210,10 @@ class ZivaTissueMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -233,7 +240,7 @@ class ZivaTissueUpdateTestCase(ZivaUpdateTestCase):
     """
     def setUp(self):
         super(ZivaTissueUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
