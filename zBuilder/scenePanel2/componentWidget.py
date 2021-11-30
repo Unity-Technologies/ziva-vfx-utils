@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 class ComponentSectionWidget(QtWidgets.QWidget):
     """ Widget contains component tree view and affiliated title bar
     """
+
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
         self._parent = parent
@@ -40,7 +41,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         headerLine = QtWidgets.QFrame()
         headerLine.setFrameShape(QtWidgets.QFrame.HLine)
         headerLine.setFrameShadow(QtWidgets.QFrame.Sunken)
-        headerLine.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
+        headerLine.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
 
         # Icons
         def create_icon(component_name, parent_layout):
@@ -48,7 +50,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             comp_img = QtGui.QPixmap(get_icon_path_from_name(component_name)).scaled(
                 16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             lblIcon.setPixmap(comp_img)
-            lblIcon.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+            lblIcon.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
             parent_layout.addWidget(lblIcon)
             parent_layout.setAlignment(lblIcon, QtCore.Qt.AlignRight)
 
@@ -71,10 +74,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         # Tree view
         self._tvComponent = zTreeView()
         self._tvComponent.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._tvComponent.customContextMenuRequested.connect(self._create_context_menu)
+        self._tvComponent.customContextMenuRequested.connect(
+            self._create_context_menu)
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
-        self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvComponent.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         lytSection = QtWidgets.QVBoxLayout()
         lytSection.setSpacing(0)
@@ -122,7 +127,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             if scene_nodes:
                 cmds.select(scene_nodes)
 
-            not_found_nodes = [name for name in node_names if name not in scene_nodes]
+            not_found_nodes = [
+                name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
@@ -136,7 +142,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     def _on_btnFold_toggled(self, checked):
         """ Hide the tree view widget when checked is False, True otherwise.
         """
-        self._btnFold.setArrowType(QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
+        self._btnFold.setArrowType(
+            QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
         self._tvComponent.setVisible(not checked)
         # Ask parent to update the whole layout height
         self._parent.on_section_toggled()
@@ -186,6 +193,7 @@ class ComponentWidget(QtWidgets.QWidget):
     """ The Component tree view widget.
     It contains a ComponentSectionWidget list, which include each component of current selected nodes.
     """
+
     def __init__(self, parent=None):
         super(ComponentWidget, self).__init__(parent)
         # setup data
@@ -207,7 +215,8 @@ class ComponentWidget(QtWidgets.QWidget):
 
         for node in new_selection:
             for component in component_type_dict[node.type]:
-                self._component_nodes_dict.setdefault(component, []).append(node)
+                self._component_nodes_dict.setdefault(
+                    component, []).append(node)
 
         for component_type, node_list in self._component_nodes_dict.items():
             root_node = TreeItem()
@@ -226,14 +235,16 @@ class ComponentWidget(QtWidgets.QWidget):
         self._splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self._splitter.setChildrenCollapsible(False)
         for component_type, tree_model in self._component_tree_model_dict.items():
-            wgtSection = ComponentSectionWidget(component_type, tree_model, self)
+            wgtSection = ComponentSectionWidget(
+                component_type, tree_model, self)
             self._splitter.addWidget(wgtSection)
 
         # Append the extra place holder control at the end to compact free space
         # when ComponentSectionWidget are folded.
         place_holder = QtWidgets.QFrame()
         place_holder.setFrameShape(QtWidgets.QFrame.NoFrame)
-        place_holder.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        place_holder.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self._splitter.addWidget(place_holder)
         self._lytAllSections.addWidget(self._splitter)
 
@@ -246,7 +257,8 @@ class ComponentWidget(QtWidgets.QWidget):
             # Add extra padding to prevent section widget height creeping
             # when clicking the fold button repeatedly.
             # This is an empirical value by trial-and-error.
-            new_height = self._splitter.widget(i).get_height() + self._splitter.handleWidth() * 2
+            new_height = self._splitter.widget(
+                i).get_height() + self._splitter.handleWidth() * 2
             new_widget_heights.append(new_height)
 
         place_holder_height = self.height() - sum(new_widget_heights)
