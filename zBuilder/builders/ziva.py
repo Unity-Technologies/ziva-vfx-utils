@@ -7,7 +7,7 @@ from ..commonUtils import none_to_empty, time_this
 from ..nodes.utils.fields import Field
 from maya import cmds
 from maya import mel
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 logger = logging.getLogger(__name__)
 
@@ -290,10 +290,10 @@ class Ziva(Builder):
             hist = cmds.listHistory(fibers)
             nodes.extend(cmds.ls(hist, type='zRivetToBone'))
 
-        def reorder_items_from_retrieve_connnections(nodes):
-            """ The items coming from retrieve_connections are coming in at wrong order.
-            Order should be same as what is listed in ZNODES.
-            This conforms nodes to that order.
+        def sort_node_by_type(nodes):
+            """ Sort node in proper order for the follow up populate operation.
+            It makes sure all its dependent nodes have been populated
+            before current node is populated.
 
             Args:
                 nodes (list): list of node names to re-order
@@ -301,31 +301,34 @@ class Ziva(Builder):
             Returns:
                 list: ordered list
             """
-            nodes_reordered = []
-            tmp = []
-            for item in ZNODES:
-                for x in nodes:
-                    if is_type(x, item):
-                        nodes_reordered.append(x)
-                    elif is_type(x, 'zGeo'):
-                        nodes.remove(x)
-                    else:
-                        tmp.append(x)
-            nodes = nodes_reordered + tmp
-            # remove duplicates
-            seen = set()
-            seen_add = seen.add
-            nodes = [x for x in nodes if not (x in seen or seen_add(x))]
-            return nodes
+            # Exclude unwanted node types and remove duplicates
+            exclude_node_list = [
+                'zGeo',
+            ]
+            # TODO: Use plain dict once Python 2 retires,
+            # Python 3 guarantees the inserted items are ordered.
+            nodes_reordered = list(
+                OrderedDict.fromkeys(filter(lambda n: get_type(n) not in exclude_node_list, nodes)))
+
+            # Sort nodes by order defined in the ZNODES list.
+            def key_fn(node):
+                try:
+                    return ZNODES.index(get_type(node))
+                except ValueError:
+                    # For unlist node types, return a big enough index value
+                    # to make them append at the end of the list.
+                    return 1000
+
+            nodes_reordered.sort(key=key_fn)
+            return nodes_reordered
 
         if nodes:
-            nodes = reorder_items_from_retrieve_connnections(nodes)
+            nodes = sort_node_by_type(nodes)
             self._populate_nodes(nodes, get_parameters)
             self.setup_tree_hierarchy()
 
         cmds.select(scene_selection)
         self.stats()
-
         self.make_node_connections()
 
     @time_this
