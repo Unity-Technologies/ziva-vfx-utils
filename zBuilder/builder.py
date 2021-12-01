@@ -83,12 +83,13 @@ class Builder(object):
 
         return scene_items
 
-    def get_node_parameters(self, node, types=[]):
+    def get_node_parameters(self, node, types=None):
         """
         Get parameters (e.g. maps and meshes) for the specified node.
         Args:
             node (zBuilder node): zBuilder scene item
-            types (list): node types to return, e.g. map, mesh. If empty return all types.
+            types (list, optional): node types to return, e.g. map, mesh.
+            If None return all types.
 
         Returns:
             list of zBuilder node parameters
@@ -109,19 +110,18 @@ class Builder(object):
     def parameter_factory(self, parameter_type, parameter_args):
         ''' This looks for zBuilder objects in sys.modules and instantiates
         desired one based on arguments.
-        
+
         Args:
             type_ (str): The type of parameter to instantiate (map or mesh)
-            names (str or list): The name of parameter to instantiate.  This should be
-                a node in the Maya scene.  Either a mesh or a map name.
+            names (str or list): The name of parameter to instantiate.
+                This should be a node in the Maya scene, either a mesh or a map name.
+                Currently sometimes parameter_names could be a list.
+                It is a list when dealing with a map.
+                The second element is the payload whereas the first is the name.
 
-                Currently sometimes parameter_names could be a list.  It is a list
-                when dealing with a map.  The second element is the payload 
-                whereas the first is the name.
-        
         Returns:
-            object: zBuilder parameter object, either one created or an existing one that has 
-            already been created.
+            object: zBuilder parameter object, either one created or
+            an existing one that has already been created.
         '''
         # put association filter in a list if it isn't
         if not is_sequence(parameter_args):
@@ -169,7 +169,7 @@ class Builder(object):
         self.stats()
 
     @time_this
-    def write(self, file_path, type_filter=[], invert_match=False):
+    def write(self, file_path, type_filter=None, invert_match=False):
         """ Writes out the scene items to a json file given a file path.
 
         Args:
@@ -255,24 +255,24 @@ class Builder(object):
         """
         self.bundle.string_replace(search, replace)
 
-    def print_(self, type_filter=list(), name_filter=list()):
+    def print_(self, type_filter=None, name_filter=None):
         """
         Prints out basic information for each scene item in the Builder.  Information is all
         information that is stored in the __dict__.  Useful for trouble shooting.
 
         Args:
             type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
-                Defaults to :obj:`list`
+                Defaults to :obj:`None`
             name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
-                Defaults to :obj:`list`
+                Defaults to :obj:`None`
         """
         self.bundle.print_(type_filter, name_filter)
 
     def get_scene_items(self,
-                        type_filter=list(),
-                        name_filter=list(),
+                        type_filter=None,
+                        name_filter=None,
                         name_regex=None,
-                        association_filter=list(),
+                        association_filter=None,
                         association_regex=None,
                         invert_match=False):
         """
@@ -296,20 +296,20 @@ class Builder(object):
         """
         # put type filter in a list if it isn't
         if not is_sequence(type_filter):
-            type_filter = [type_filter]
+            type_filter = [type_filter] if type_filter else None
         if type_filter:
             assert all(is_string(t) for t in type_filter), "type filter requires string type"
 
         # put association filter in a list if it isn't
         if not is_sequence(association_filter):
-            association_filter = [association_filter]
+            association_filter = [association_filter] if association_filter else None
         if association_filter:
             assert all(is_string(a)
                        for a in association_filter), "association filter requires string type"
 
         # put name filter in a list if it isn't
         if not is_sequence(name_filter):
-            name_filter = [name_filter]
+            name_filter = [name_filter] if name_filter else None
         if name_filter:
             assert all(is_string(n) for n in name_filter), "name filter requires string type"
 

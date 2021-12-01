@@ -531,7 +531,7 @@ class Ziva(Builder):
 
     @time_this
     def build(self,
-              association_filter=list(),
+              association_filter=None,
               attr_filter=None,
               interp_maps='auto',
               solver=True,
@@ -549,8 +549,8 @@ class Ziva(Builder):
               mirror=False,
               permissive=True):
         """
-        This builds the Ziva rig into the Maya scene.  It does not build geometry as the expectation is
-        that the geometry is in the scene.
+        This builds the Ziva rig into the Maya scene.
+        It does not build geometry as the expectation is that the geometry is in the scene.
 
         Args:
             solver (bool): Build the solver.
@@ -574,7 +574,7 @@ class Ziva(Builder):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            association_filter (str): filter by node association.  Defaults to list()
+            association_filter (str): filter by node association.  Defaults to None
         """
         # TODO: This mirror check needs to be removed or updated. See JIRA task VFXACT-1111.
         if mirror:

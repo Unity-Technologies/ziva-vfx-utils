@@ -55,15 +55,15 @@ class Bundle(object):
 
         logger.debug('----------------------------------------------------------------')
 
-    def compare(self, type_filter=list(), name_filter=list()):
+    def compare(self, type_filter=None, name_filter=None):
         """
         Compares info in memory with that which is in scene.
 
         Args:
             type_filter (:obj:`list` or :obj:`str`): filter by scene_item type.
-                Defaults to :obj:`list`
+                Defaults to :obj:`None`
             name_filter (:obj:`list` or :obj:`str`): filter by scene_item name.
-                Defaults to :obj:`list`
+                Defaults to :obj:`None`
 
         """
 
@@ -160,9 +160,9 @@ class Bundle(object):
            not association_regex:
             return self.scene_items
 
-        type_set = set(type_filter)
-        name_set = set(name_filter)
-        association_set = set(association_filter)
+        type_set = set(type_filter) if type_filter else None
+        name_set = set(name_filter) if name_filter else None
+        association_set = set(association_filter) if association_filter else None
 
         def keep_me(item, invert):
             if type_set and item.type not in type_set:
