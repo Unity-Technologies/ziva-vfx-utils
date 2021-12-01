@@ -1,6 +1,6 @@
+from ...mayaUtils import get_short_name, get_type
+from ...nodes.dg_node import DGNode
 from maya import cmds
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes.dg_node import DGNode
 
 
 class Constraint(DGNode):
@@ -111,7 +111,7 @@ def get_constrained(constraint_name):
 #     constraintData_dict = dict()
 #
 #     # Get generic stuff
-#     constraintData_dict['type'] = cmds.objectType(constraintName)
+#     constraintData_dict['type'] = get_type(constraintName)
 #     targetObjects_list = list()
 #     i = 0
 #     while not cmds.listConnections('%s.target[%i].targetParentMatrix' % (

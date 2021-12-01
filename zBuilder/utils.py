@@ -1,13 +1,14 @@
-from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
-from zBuilder.mayaUtils import get_short_name
-import zBuilder.builders.skinClusters as skn
 import zBuilder.builders.ziva as zva
 import zBuilder.zMaya as mz
-from maya import cmds
-from maya import mel
 import copy
 import logging
 import re
+
+from .builders.skinClusters import SkinCluster
+from .commonUtils import is_string, is_sequence, none_to_empty
+from .mayaUtils import get_short_name, get_type
+from maya import cmds
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +16,28 @@ ZIVA_CLIPBOARD_ZBUILDER = None
 ZIVA_CLIPBOARD_SELECTION = None
 ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False
 
+# All available Ziva nodes to be able to cleanup
 ALL_ZIVA_NODES = [
-    'zGeo', 'zSolver', 'zSolverTransform', 'zIsoMesh', 'zDelaunayTetMesh', 'zTet', 'zTissue',
-    'zBone', 'zCloth', 'zSolver', 'zCache', 'zEmbedder', 'zAttachment', 'zMaterial', 'zFiber',
-    'zCacheTransform', 'zFieldAdaptor', 'zRivetToBone', 'zRestShape'
+    'zGeo',
+    'zSolver',
+    'zSolverTransform',
+    'zIsoMesh',
+    'zDelaunayTetMesh',
+    'zTet',
+    'zTissue',
+    'zBone',
+    'zCloth',
+    'zSolver',
+    'zCache',
+    'zEmbedder',
+    'zAttachment',
+    'zMaterial',
+    'zFiber',
+    'zCacheTransform',
+    'zFieldAdaptor',
+    'zRivetToBone',
+    'zRestShape',
 ]
-""" All available Ziva nodes to be able to cleanup. """
 
 
 def return_copy_buffer():
@@ -103,7 +120,7 @@ def remove(nodes):
             mel.eval('ziva -rm')
         # Check again if node exists after the body has been removed.
         if cmds.objExists(node):
-            if cmds.objectType(node) in safe_to_delete:
+            if get_type(node) in safe_to_delete:
                 cmds.delete(node)
 
 
@@ -438,7 +455,7 @@ def skincluster_transfer(prefix=""):
     if prefix == "":
         cmds.error('Must specify a prefix.')
 
-    builder = skn.SkinCluster()
+    builder = SkinCluster()
     builder.retrieve_from_scene()
     builder.string_replace('^', prefix)
     builder.build()

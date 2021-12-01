@@ -1,7 +1,8 @@
-from zBuilder.commonUtils import get_first_element
-from zBuilder.mayaUtils import build_attr_list, build_attr_key_values
-from zBuilder.nodes.deformer import Deformer
 import zBuilder.zMaya as mz
+
+from ...commonUtils import get_first_element
+from ...mayaUtils import build_attr_list, build_attr_key_values, get_type
+from ..deformer import Deformer
 from maya import cmds
 from maya import mel
 
@@ -38,7 +39,7 @@ class Ziva(Deformer):
         maya_node = get_first_element(maya_node)
 
         self.name = maya_node
-        self.type = cmds.objectType(maya_node)
+        self.type = get_type(maya_node)
         attr_list = build_attr_list(maya_node)
         if self.EXTEND_ATTR_LIST:
             attr_list.extend(self.EXTEND_ATTR_LIST)

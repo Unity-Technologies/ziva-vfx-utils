@@ -36,6 +36,10 @@ def get_type(body):
     return cmds.objectType(body)
 
 
+def is_type(body, type_name):
+    return cmds.objectType(body, isType=type_name)
+
+
 def parse_maya_node_for_selection(args):
     """
     This is used to check passed args in a function to see if they are valid

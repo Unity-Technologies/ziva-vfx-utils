@@ -1,5 +1,5 @@
-from zBuilder.commonUtils import none_to_empty
-from zBuilder.mayaUtils import safe_rename
+from .commonUtils import none_to_empty
+from .mayaUtils import safe_rename, get_type, is_type
 from maya import cmds
 from maya import mel
 import logging
@@ -90,7 +90,7 @@ def isSolver(selection):
     """
     isSolver = False
     for s in selection:
-        if cmds.objectType(s) == 'zSolver' or cmds.objectType(s) == 'zSolverTransform':
+        if is_type(s, 'zSolver') or is_type(s, 'zSolverTransform'):
             isSolver = True
             continue
     return isSolver
@@ -328,7 +328,7 @@ def get_association(zNode):
     args:
         zNode (string): the zNode to find association of.
     """
-    _type = cmds.objectType(zNode)
+    _type = get_type(zNode)
 
     if _type == 'zAttachment':
         tmp = []
@@ -654,7 +654,7 @@ def check_map_validity(map_parameters):
     report = []
     for parameter in map_parameters:
         if cmds.objExists(parameter.name):
-            map_type = cmds.objectType(parameter.name)
+            map_type = get_type(parameter.name)
             if map_type == 'zAttachment':
                 values = parameter.values
                 if all(v == 0 for v in values):

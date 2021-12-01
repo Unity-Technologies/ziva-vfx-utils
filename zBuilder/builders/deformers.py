@@ -1,6 +1,6 @@
-from zBuilder.builder import Builder
-from zBuilder.mayaUtils import parse_maya_node_for_selection
-from zBuilder.commonUtils import time_this
+from ..builder import Builder
+from ..mayaUtils import parse_maya_node_for_selection, get_type
+from ..commonUtils import time_this
 from maya import cmds
 import logging
 
@@ -15,10 +15,6 @@ class Deformers(Builder):
         # parse args-----------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
 
-        # kwargs---------------------------------------------------------------
-        get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('construct_map_names', True)
-
         acquire = ['deltaMush', 'zRelaxer', 'zWrap', 'zItto', 'zPolyCombine', 'blendShape', 'wrap']
         tmp = list()
         history = cmds.listHistory(selection, f=True)
@@ -26,7 +22,7 @@ class Deformers(Builder):
         history = list(set(history))[::-1]
 
         for hist in history:
-            if cmds.objectType(hist) in acquire:
+            if get_type(hist) in acquire:
                 tmp.append(hist)
 
         for item in tmp:

@@ -1,14 +1,21 @@
 import zBuilder.zMaya as mz
-from zBuilder.builder import Builder
-from zBuilder.commonUtils import none_to_empty, time_this
-from zBuilder.nodes.utils.fields import Field
+import logging
+
+from ..builder import Builder
+from ..mayaUtils import get_type, is_type
+from ..commonUtils import none_to_empty, time_this
+from ..nodes.utils.fields import Field
 from maya import cmds
 from maya import mel
 from collections import defaultdict
-import logging
 
 logger = logging.getLogger(__name__)
 
+# This is order that the Ziva nodes get retrieved and built.
+# We need to have solver first then the bodies.
+# After that the order is not so crutial.
+# This is an uncomplete list as of now.
+# Some nodes get added on after, that will be changed in VFXACT-578
 ZNODES = [
     'zSolver',
     'zSolverTransform',
@@ -21,11 +28,6 @@ ZNODES = [
     'zFiber',
     'zEmbedder',
 ]
-"""This is order that the Ziva nodes get retrieved and built.  We need to have solver first 
-then the bodies.  After that the order is not so crutial.  
-This is an uncomplete list as of now.  Some nodes get added on after, that will be changed in
-VFXACT-578
-"""
 
 
 class SolverDisabler:
@@ -207,14 +209,14 @@ class Ziva(Builder):
 
         if nodes:
             # find zFiber---------------------------------------------
-            fiber_names = [x for x in nodes if cmds.objectType(x) == 'zFiber']
+            fiber_names = [x for x in nodes if get_type(x) == 'zFiber']
             if fiber_names:
                 # find line of action----------------------------------------
                 line_of_actions = cmds.listHistory(fiber_names)
                 line_of_actions = cmds.ls(line_of_actions, type='zLineOfAction')
                 nodes.extend(line_of_actions)
 
-            tet_names = [x for x in nodes if cmds.objectType(x) == 'zTet']
+            tet_names = [x for x in nodes if get_type(x) == 'zTet']
             for tet_name in tet_names:
                 # find the rest shape--------------------------------------
                 rest_shape = cmds.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
@@ -254,7 +256,7 @@ class Ziva(Builder):
         nodes.extend(self.__add_bodies(selection))
 
         # find attahment source and or targets to add to nodes.................
-        attachment_names = [x for x in nodes if cmds.objectType(x) == 'zAttachment']
+        attachment_names = [x for x in nodes if get_type(x) == 'zAttachment']
         meshes = []
         if attachment_names:
             for attachment in attachment_names:
@@ -265,7 +267,7 @@ class Ziva(Builder):
             nodes.extend(self.__add_bodies(meshes))
 
         # # find attahment source and or targets to add to nodes.................
-        tissue_names = [x for x in nodes if cmds.objectType(x) == 'zTissue']
+        tissue_names = [x for x in nodes if get_type(x) == 'zTissue']
 
         children = []
         for tissue in tissue_names:
@@ -274,7 +276,7 @@ class Ziva(Builder):
         if children:
             nodes.extend(self.__add_bodies(children))
 
-        body_names = [x for x in nodes if cmds.objectType(x) in ['zCloth', 'zTissue']]
+        body_names = [x for x in nodes if get_type(x) in ['zCloth', 'zTissue']]
         if body_names:
             history = cmds.listHistory(body_names)
             types = []
@@ -289,24 +291,23 @@ class Ziva(Builder):
             nodes.extend(cmds.ls(hist, type='zRivetToBone'))
 
         def reorder_items_from_retrieve_connnections(nodes):
-            """The items coming from retrieve_connections are coming in at wrong order.
-            order should be same as what is listed in ZNODES.  THis conforms nodes to
-            that order.
-            
+            """ The items coming from retrieve_connections are coming in at wrong order.
+            Order should be same as what is listed in ZNODES.
+            This conforms nodes to that order.
+
             Args:
                 nodes (list): list of node names to re-order
-            
+
             Returns:
                 list: ordered list
             """
-
             nodes_reordered = []
             tmp = []
             for item in ZNODES:
                 for x in nodes:
-                    if cmds.objectType(x) == item:
+                    if is_type(x, item):
                         nodes_reordered.append(x)
-                    elif cmds.objectType(x) == 'zGeo':
+                    elif is_type(x, 'zGeo'):
                         nodes.remove(x)
                     else:
                         tmp.append(x)
@@ -646,12 +647,12 @@ class Ziva(Builder):
 
 
 def transform_rivet_and_LoA_into_tissue_meshes(selection):
-    """ This takes a list of items from a maya scene and if it finds any 
+    """ This takes a list of items from a maya scene and if it finds any
     zLineOfAction or zRivetToBone it replaces that item with the corresponding
     tissued mesh.
 
     This is until zQuery is re-implemented in python.
-    
+
     Args:
         selection ([str]): List of items in mayas scene
 
@@ -663,7 +664,7 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
 
     output = []
     for item in selection:
-        if cmds.objectType(item) in type_:
+        if get_type(item) in type_:
             history = cmds.listHistory(item, future=True)
             fiber = cmds.ls(history, type='zFiber')
             cmds.select(fiber)
@@ -675,16 +676,17 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
 
 
 def zQuery(types, solver):
-    """ This is a wrapper around Ziva VFX zQuery as currently it does not handle 
-    all the queries needed.  This will sort through the types and if given a type that
+    """ This is a wrapper around Ziva VFX zQuery as currently 
+    it does not handle all the queries needed.
+    This will sort through the types and if given a type that
     zQuery is unfamiliar with it searches solver for it by history instead.
-    
+
     Args:
         types (list() of str()): The types of nodes to get information about
         solver (str()): The solver to query.
-    
+
     Returns:
-        list() of str(): 
+        list of str
     """
     return_value = []
 
@@ -700,7 +702,7 @@ def zQuery(types, solver):
 
     # Go through the full solver history and put items in a dictionary with type as key.
     for item in solver_history:
-        item_type = cmds.objectType(item)
+        item_type = get_type(item)
         if item_type in types_not_in_znodes:
             solver_history_dict[item_type].append(item)
 

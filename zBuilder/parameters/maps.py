@@ -1,6 +1,6 @@
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
-from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh
-from zBuilder.nodes.base import Base
+from ..mayaUtils import get_short_name, get_mdagpath_from_mesh, get_type
+from ..nodes.base import Base
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
@@ -66,7 +66,7 @@ class Map(Base):
 
         self.values = get_weights(map_name, mesh_name)
 
-        self.map_type = cmds.objectType(map_name)
+        self.map_type = get_type(map_name)
 
     def set_mesh(self, mesh):
         """ Stores the mesh name.

@@ -139,7 +139,6 @@ class ZivaBuildTestCase(VfxTestCase):
 
         # retrrieve from scene
         cmds.select('zSolver1')
-        import zBuilder.builders.ziva as zva
         z = zva.Ziva()
         z.retrieve_from_scene()
 

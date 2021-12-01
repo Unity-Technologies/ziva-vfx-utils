@@ -1,6 +1,6 @@
-from zBuilder.builder import Builder
-from zBuilder.mayaUtils import parse_maya_node_for_selection
-from zBuilder.commonUtils import time_this
+from ..builder import Builder
+from ..mayaUtils import parse_maya_node_for_selection, get_type
+from ..commonUtils import time_this
 from maya import cmds
 import logging
 
@@ -23,7 +23,7 @@ class Constraints(Builder):
         tmp = list()
         connections = list(set(cmds.listConnections(selection)))
 
-        tmp.extend([x for x in connections if cmds.objectType(x) in self.acquire])
+        tmp.extend([x for x in connections if get_type(x) in self.acquire])
 
         for item in tmp:
             parameter = self.node_factory(item)
