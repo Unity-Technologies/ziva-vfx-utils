@@ -14,6 +14,9 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
+# global dictionary for storing component widget heights
+component_height_dict = {}
+
 
 class ComponentSectionWidget(QtWidgets.QWidget):
     """ Widget contains component tree view and affiliated title bar
@@ -22,14 +25,14 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
         self._parent = parent
-
+        self._component_type = component_type
         # The following UI layout refer to
         # https://stackoverflow.com/questions/32476006/how-to-make-an-expandable-collapsable-section-widget-in-qt
 
         # Title
         # Concantenate type list and exclude those start with "ui_"
         title = "/".join(filter(lambda t: not t.startswith("ui_"),
-                                component_type)) if is_sequence(component_type) else component_type
+                                self._component_type)) if is_sequence(self._component_type) else self._component_type
         self._btnFold = QtWidgets.QToolButton()
         self._btnFold.setStyleSheet("QToolButton { border: none; }")
         self._btnFold.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
@@ -58,11 +61,11 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         lytIcons = QtWidgets.QHBoxLayout()
         lytIcons.setSpacing(0)
         lytIcons.setContentsMargins(0, 0, 0, 0)
-        if is_sequence(component_type):
-            for component in component_type:
+        if is_sequence(self._component_type):
+            for component in self._component_type:
                 create_icon(component, lytIcons)
         else:
-            create_icon(component_type, lytIcons)
+            create_icon(self._component_type, lytIcons)
 
         lytTitle = QtWidgets.QHBoxLayout()
         lytTitle.setSpacing(0)
@@ -175,6 +178,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         # standard event processing
         return QtCore.QObject.eventFilter(self, obj, event)
 
+    def resizeEvent(self, event):
+        """Detect a resize event only when an exiting item has been changed in length.
+        """
+        if not event.oldSize().isEmpty() and event.oldSize().width() == event.size().width() and event.oldSize().height() != event.size().height():
+            component_height_dict[self._component_type] = event.size().height()
+
 
 # Component for each zGeo node
 component_type_dict = {
@@ -246,6 +255,7 @@ class ComponentWidget(QtWidgets.QWidget):
         place_holder.setSizePolicy(
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self._splitter.addWidget(place_holder)
+        self._splitter.setSizes(self._map_widget_to_height())
         self._lytAllSections.addWidget(self._splitter)
 
     def on_section_toggled(self):
@@ -264,3 +274,21 @@ class ComponentWidget(QtWidgets.QWidget):
         place_holder_height = self.height() - sum(new_widget_heights)
         new_widget_heights.append(place_holder_height)
         self._splitter.setSizes(new_widget_heights)
+
+    def _map_widget_to_height(self):
+        """ Maps height of widget in 'self._splitter' to the stored height in global
+        'component_height_dict'.
+        """
+        heights = self._splitter.sizes()
+
+        # the size of 'self._component_nodes_dict' should match with the length of items
+        # in the splitter minus one (tail splitter). If not, something went wrong. But we
+        # don't report an error because QtWidgets.QSplitter.setSizes() can robustly tackle
+        # such case.
+        if len(heights) == 0 or len(self._component_nodes_dict) != len(heights) - 1:
+            return heights
+
+        for idx, key in enumerate(self._component_nodes_dict):
+            if key in component_height_dict:
+                heights[idx] = component_height_dict[key]
+        return heights
