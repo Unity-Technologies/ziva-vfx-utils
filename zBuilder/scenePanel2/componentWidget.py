@@ -14,21 +14,25 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
+# global dictionary for storing component widget heights
+component_height_dict = {}
+
 
 class ComponentSectionWidget(QtWidgets.QWidget):
     """ Widget contains component tree view and affiliated title bar
     """
+
     def __init__(self, component_type, tree_model, parent=None):
         super(ComponentSectionWidget, self).__init__(parent)
         self._parent = parent
-
+        self._component_type = component_type
         # The following UI layout refer to
         # https://stackoverflow.com/questions/32476006/how-to-make-an-expandable-collapsable-section-widget-in-qt
 
         # Title
         # Concantenate type list and exclude those start with "ui_"
         title = "/".join(filter(lambda t: not t.startswith("ui_"),
-                                component_type)) if is_sequence(component_type) else component_type
+                                self._component_type)) if is_sequence(self._component_type) else self._component_type
         self._btnFold = QtWidgets.QToolButton()
         self._btnFold.setStyleSheet("QToolButton { border: none; }")
         self._btnFold.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
@@ -40,7 +44,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         headerLine = QtWidgets.QFrame()
         headerLine.setFrameShape(QtWidgets.QFrame.HLine)
         headerLine.setFrameShadow(QtWidgets.QFrame.Sunken)
-        headerLine.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
+        headerLine.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
 
         # Icons
         def create_icon(component_name, parent_layout):
@@ -48,18 +53,19 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             comp_img = QtGui.QPixmap(get_icon_path_from_name(component_name)).scaled(
                 16, 16, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             lblIcon.setPixmap(comp_img)
-            lblIcon.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+            lblIcon.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
             parent_layout.addWidget(lblIcon)
             parent_layout.setAlignment(lblIcon, QtCore.Qt.AlignRight)
 
         lytIcons = QtWidgets.QHBoxLayout()
         lytIcons.setSpacing(0)
         lytIcons.setContentsMargins(0, 0, 0, 0)
-        if is_sequence(component_type):
-            for component in component_type:
+        if is_sequence(self._component_type):
+            for component in self._component_type:
                 create_icon(component, lytIcons)
         else:
-            create_icon(component_type, lytIcons)
+            create_icon(self._component_type, lytIcons)
 
         lytTitle = QtWidgets.QHBoxLayout()
         lytTitle.setSpacing(0)
@@ -71,10 +77,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         # Tree view
         self._tvComponent = zTreeView()
         self._tvComponent.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._tvComponent.customContextMenuRequested.connect(self._create_context_menu)
+        self._tvComponent.customContextMenuRequested.connect(
+            self._create_context_menu)
         self._tvComponent.setModel(tree_model)
         self._tvComponent.expandAll()
-        self._tvComponent.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._tvComponent.setSelectionMode(
+            QtWidgets.QAbstractItemView.ExtendedSelection)
 
         lytSection = QtWidgets.QVBoxLayout()
         lytSection.setSpacing(0)
@@ -122,7 +130,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             if scene_nodes:
                 cmds.select(scene_nodes)
 
-            not_found_nodes = [name for name in node_names if name not in scene_nodes]
+            not_found_nodes = [
+                name for name in node_names if name not in scene_nodes]
             if not_found_nodes:
                 cmds.warning(
                     "Nodes {} not found. Try to press refresh button.".format(not_found_nodes))
@@ -136,7 +145,8 @@ class ComponentSectionWidget(QtWidgets.QWidget):
     def _on_btnFold_toggled(self, checked):
         """ Hide the tree view widget when checked is False, True otherwise.
         """
-        self._btnFold.setArrowType(QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
+        self._btnFold.setArrowType(
+            QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
         self._tvComponent.setVisible(not checked)
         # Ask parent to update the whole layout height
         self._parent.on_section_toggled()
@@ -168,6 +178,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         # standard event processing
         return QtCore.QObject.eventFilter(self, obj, event)
 
+    def resizeEvent(self, event):
+        """Detect a resize event only when an exiting item has been changed in length.
+        """
+        if not event.oldSize().isEmpty() and event.oldSize().width() == event.size().width() and event.oldSize().height() != event.size().height():
+            component_height_dict[self._component_type] = event.size().height()
+
 
 # Component for each zGeo node
 component_type_dict = {
@@ -186,6 +202,7 @@ class ComponentWidget(QtWidgets.QWidget):
     """ The Component tree view widget.
     It contains a ComponentSectionWidget list, which include each component of current selected nodes.
     """
+
     def __init__(self, parent=None):
         super(ComponentWidget, self).__init__(parent)
         # setup data
@@ -207,7 +224,8 @@ class ComponentWidget(QtWidgets.QWidget):
 
         for node in new_selection:
             for component in component_type_dict[node.type]:
-                self._component_nodes_dict.setdefault(component, []).append(node)
+                self._component_nodes_dict.setdefault(
+                    component, []).append(node)
 
         for component_type, node_list in self._component_nodes_dict.items():
             root_node = TreeItem()
@@ -226,15 +244,18 @@ class ComponentWidget(QtWidgets.QWidget):
         self._splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self._splitter.setChildrenCollapsible(False)
         for component_type, tree_model in self._component_tree_model_dict.items():
-            wgtSection = ComponentSectionWidget(component_type, tree_model, self)
+            wgtSection = ComponentSectionWidget(
+                component_type, tree_model, self)
             self._splitter.addWidget(wgtSection)
 
         # Append the extra place holder control at the end to compact free space
         # when ComponentSectionWidget are folded.
         place_holder = QtWidgets.QFrame()
         place_holder.setFrameShape(QtWidgets.QFrame.NoFrame)
-        place_holder.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        place_holder.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self._splitter.addWidget(place_holder)
+        self._splitter.setSizes(self._map_widget_to_height())
         self._lytAllSections.addWidget(self._splitter)
 
     def on_section_toggled(self):
@@ -246,9 +267,28 @@ class ComponentWidget(QtWidgets.QWidget):
             # Add extra padding to prevent section widget height creeping
             # when clicking the fold button repeatedly.
             # This is an empirical value by trial-and-error.
-            new_height = self._splitter.widget(i).get_height() + self._splitter.handleWidth() * 2
+            new_height = self._splitter.widget(
+                i).get_height() + self._splitter.handleWidth() * 2
             new_widget_heights.append(new_height)
 
         place_holder_height = self.height() - sum(new_widget_heights)
         new_widget_heights.append(place_holder_height)
         self._splitter.setSizes(new_widget_heights)
+
+    def _map_widget_to_height(self):
+        """ Maps height of widget in 'self._splitter' to the stored height in global
+        'component_height_dict'.
+        """
+        heights = self._splitter.sizes()
+
+        # the size of 'self._component_nodes_dict' should match with the length of items
+        # in the splitter minus one (tail splitter). If not, something went wrong. But we
+        # don't report an error because QtWidgets.QSplitter.setSizes() can robustly tackle
+        # such case.
+        if len(heights) == 0 or len(self._component_nodes_dict) != len(heights) - 1:
+            return heights
+
+        for idx, key in enumerate(self._component_nodes_dict):
+            if key in component_height_dict:
+                heights[idx] = component_height_dict[key]
+        return heights
