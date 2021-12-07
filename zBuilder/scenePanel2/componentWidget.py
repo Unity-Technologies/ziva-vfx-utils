@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 # global dictionary for storing component widget heights
 component_height_dict = {}
 
+# global dictionary for storing component folding state
+component_fold_state_dict = {}
+
 
 class ComponentSectionWidget(QtWidgets.QWidget):
     """ Widget contains component tree view and affiliated title bar
@@ -39,7 +42,12 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self._btnFold.setArrowType(QtCore.Qt.DownArrow)
         self._btnFold.setText(title)
         self._btnFold.setCheckable(True)
-        self._btnFold.setChecked(False)  # expanded by default
+        # set fold value according to saved value, if any
+        if self._component_type in component_fold_state_dict:
+            self._btnFold.setChecked(
+                component_fold_state_dict[self._component_type])
+        else:
+            self._btnFold.setChecked(False)  # expanded by default
 
         headerLine = QtWidgets.QFrame()
         headerLine.setFrameShape(QtWidgets.QFrame.HLine)
@@ -143,13 +151,19 @@ class ComponentSectionWidget(QtWidgets.QWidget):
         self._tvComponent.installEventFilter(self)
 
     def _on_btnFold_toggled(self, checked):
+        """ Hide the tree view widget when checked is False, True otherwise
+        and adjusts widget heights.
+        """
+        self.update_widget_visibility(checked)
+        # Ask parent to update the whole layout height
+        self._parent.on_section_toggled()
+
+    def update_widget_visibility(self, checked):
         """ Hide the tree view widget when checked is False, True otherwise.
         """
         self._btnFold.setArrowType(
             QtCore.Qt.RightArrow if checked else QtCore.Qt.DownArrow)
         self._tvComponent.setVisible(not checked)
-        # Ask parent to update the whole layout height
-        self._parent.on_section_toggled()
 
     # Public functions
     def select_source_and_target(self):
@@ -243,6 +257,7 @@ class ComponentWidget(QtWidgets.QWidget):
 
         self._splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self._splitter.setChildrenCollapsible(False)
+        self._splitter.setHandleWidth(2)
         for component_type, tree_model in self._component_tree_model_dict.items():
             wgtSection = ComponentSectionWidget(
                 component_type, tree_model, self)
@@ -255,6 +270,14 @@ class ComponentWidget(QtWidgets.QWidget):
         place_holder.setSizePolicy(
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self._splitter.addWidget(place_holder)
+
+        # update fold states based on user's previous actions stored in 'component_fold_state_dict'
+        for idx, key in enumerate(self._component_nodes_dict):
+            if isinstance(self._splitter.widget(idx), ComponentSectionWidget):
+                if key in component_fold_state_dict:
+                    self._splitter.widget(idx).update_widget_visibility(
+                        component_fold_state_dict[key])
+
         self._splitter.setSizes(self._map_widget_to_height())
         self._lytAllSections.addWidget(self._splitter)
 
@@ -268,12 +291,13 @@ class ComponentWidget(QtWidgets.QWidget):
             # when clicking the fold button repeatedly.
             # This is an empirical value by trial-and-error.
             new_height = self._splitter.widget(
-                i).get_height() + self._splitter.handleWidth() * 2
+                i).get_height() + self._splitter.handleWidth()
             new_widget_heights.append(new_height)
 
         place_holder_height = self.height() - sum(new_widget_heights)
         new_widget_heights.append(place_holder_height)
         self._splitter.setSizes(new_widget_heights)
+        self._update_fold_state()
 
     def _map_widget_to_height(self):
         """ Maps height of widget in 'self._splitter' to the stored height in global
@@ -289,6 +313,21 @@ class ComponentWidget(QtWidgets.QWidget):
             return heights
 
         for idx, key in enumerate(self._component_nodes_dict):
-            if key in component_height_dict:
+            if isinstance(self._splitter.widget(idx), ComponentSectionWidget) and key in component_height_dict:
                 heights[idx] = component_height_dict[key]
+        # suggest end splitter height based on rest of the widgets
+        place_holder_height = self.height() - sum(heights)
+        heights.append(place_holder_height)
         return heights
+
+    def _update_fold_state(self):
+        """ Update global fold state dictionary -'component_fold_state_dict'
+        """
+        for i in range(self._splitter.count() - 1):
+            component_fold_state_dict[self._splitter.widget(
+                i)._component_type] = self._splitter.widget(i)._btnFold.isChecked()
+            # update height after fold
+            if self._splitter.widget(i)._btnFold.isChecked():
+                component_height_dict[self._splitter.widget(
+                    i)._component_type] = self._splitter.widget(
+                    i).get_height()
