@@ -61,8 +61,8 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         builder.retrieve_connections()
         self.check_retrieve_ztissue_looks_good(builder, {})
 
-    def test_retrieve_connections1(self):
-        # this was failing, fix for this in VFXACT-645
+    def test_VFXACT_645_regression(self):
+        # ACT
         cmds.select('r_subtissue_1')
         builder = zva.Ziva()
         builder.retrieve_connections()
