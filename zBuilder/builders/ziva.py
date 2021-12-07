@@ -315,7 +315,7 @@ class Ziva(Builder):
                 try:
                     return ZNODES.index(get_type(node))
                 except ValueError:
-                    # For unlist node types, return a big enough index value
+                    # For node types not in the list, return a big enough index value
                     # to make them append at the end of the list.
                     return 1000
 
