@@ -325,12 +325,11 @@ class zGeoWidget(QtWidgets.QWidget):
         Args:
             load_plug_data(bool): Whether to load json data from solverTM plug.
         """
-        # Reset component view unconditionally
-        self._wgtComponent_ref.reset_model(None, [])
 
         solverTM_nodes = cmds.ls(type="zSolverTransform", l=True)
         # Clear the TreeView and do early return if there's no solver node in the scene
         if not solverTM_nodes:
+            self._wgtComponent_ref.reset_model(None, [])
             self._tmGeo.reset_model(None, None, False)
             self._builder = None
             self._whole_scene_tree = None
@@ -350,6 +349,8 @@ class zGeoWidget(QtWidgets.QWidget):
             self._tmGeo.reset_model(self._builder, self._cur_selection_tree,
                                     self._is_partial_tree_view)
         else:
+            # Reset component view
+            self._wgtComponent_ref.reset_model(None, [])
             merged_tree = TreeItem(None, Base())
             # Merge each zBuilder solver tree with zGeo view tree
             for solverTM in solverTM_nodes:
