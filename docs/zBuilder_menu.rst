@@ -15,5 +15,3 @@ If the new geometry's topology (ie: triangles, number of vertices) is different 
 
 	zBuilder_tutorials
 	zBuilder_api_reference
-	zBuilder_extensions
-	whats_changed
