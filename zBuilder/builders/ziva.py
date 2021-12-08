@@ -1,10 +1,10 @@
 import zBuilder.zMaya as mz
 import logging
 
-from ..builder import Builder
-from ..mayaUtils import get_type, is_type
-from ..commonUtils import none_to_empty, time_this
-from ..nodes.utils.fields import Field
+from zBuilder.builder import Builder
+from zBuilder.mayaUtils import get_type, is_type
+from zBuilder.commonUtils import none_to_empty, time_this
+from zBuilder.nodes.utils.fields import Field
 from maya import cmds
 from maya import mel
 from collections import defaultdict, OrderedDict
@@ -209,14 +209,14 @@ class Ziva(Builder):
 
         if nodes:
             # find zFiber---------------------------------------------
-            fiber_names = [x for x in nodes if get_type(x) == 'zFiber']
+            fiber_names = [x for x in nodes if is_type(x, 'zFiber')]
             if fiber_names:
                 # find line of action----------------------------------------
                 line_of_actions = cmds.listHistory(fiber_names)
                 line_of_actions = cmds.ls(line_of_actions, type='zLineOfAction')
                 nodes.extend(line_of_actions)
 
-            tet_names = [x for x in nodes if get_type(x) == 'zTet']
+            tet_names = [x for x in nodes if is_type(x, 'zTet')]
             for tet_name in tet_names:
                 # find the rest shape--------------------------------------
                 rest_shape = cmds.listConnections('{}.oGeo'.format(tet_name), type='zRestShape')
@@ -256,7 +256,7 @@ class Ziva(Builder):
         nodes.extend(self.__add_bodies(selection))
 
         # find attahment source and or targets to add to nodes.................
-        attachment_names = [x for x in nodes if get_type(x) == 'zAttachment']
+        attachment_names = [x for x in nodes if is_type(x, 'zAttachment')]
         meshes = []
         if attachment_names:
             for attachment in attachment_names:
@@ -267,7 +267,7 @@ class Ziva(Builder):
             nodes.extend(self.__add_bodies(meshes))
 
         # # find attahment source and or targets to add to nodes.................
-        tissue_names = [x for x in nodes if get_type(x) == 'zTissue']
+        tissue_names = [x for x in nodes if is_type(x, 'zTissue')]
 
         children = []
         for tissue in tissue_names:

@@ -1,6 +1,6 @@
-from ..builder import Builder
-from ..mayaUtils import parse_maya_node_for_selection, get_type
-from ..commonUtils import time_this
+from zBuilder.builder import Builder
+from zBuilder.mayaUtils import parse_maya_node_for_selection, get_type
+from zBuilder.commonUtils import time_this
 from maya import cmds
 import logging
 

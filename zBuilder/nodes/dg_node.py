@@ -1,6 +1,6 @@
-from ..commonUtils import get_first_element
-from ..mayaUtils import get_short_name, build_attr_list, build_attr_key_values, get_type
-from ..nodes.base import Base
+from zBuilder.commonUtils import get_first_element
+from zBuilder.mayaUtils import get_short_name, build_attr_list, build_attr_key_values, get_type
+from zBuilder.nodes.base import Base
 from maya import cmds
 import logging
 

@@ -1,5 +1,5 @@
-from ...mayaUtils import get_short_name, get_type
-from ...nodes.dg_node import DGNode
+from zBuilder.mayaUtils import get_short_name, get_type
+from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
 
 

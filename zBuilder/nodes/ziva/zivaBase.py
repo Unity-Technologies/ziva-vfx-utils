@@ -1,8 +1,8 @@
 import zBuilder.zMaya as mz
 
-from ...commonUtils import get_first_element
-from ...mayaUtils import build_attr_list, build_attr_key_values, get_type
-from ..deformer import Deformer
+from zBuilder.commonUtils import get_first_element
+from zBuilder.mayaUtils import build_attr_list, build_attr_key_values, get_type
+from zBuilder.nodes.deformer import Deformer
 from maya import cmds
 from maya import mel
 

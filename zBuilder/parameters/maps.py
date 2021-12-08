@@ -1,6 +1,6 @@
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
-from ..mayaUtils import get_short_name, get_mdagpath_from_mesh, get_type
-from ..nodes.base import Base
+from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh, get_type
+from zBuilder.nodes.base import Base
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
