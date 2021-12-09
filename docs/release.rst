@@ -12,13 +12,19 @@ Release Notes
 
 2.0.0
 ------
+
 Functionality
 +++++++++++++
+- **Scene Panel:** Add :ref:`sec-ScenePanel2`.
+- **Scene Panel:** Show source/target attachment with different icon.
 - Removed 'Select' option from Ziva menu.
 
 Bug Fixes
 +++++++++
-- **zBuilder:** VFXACT-1107	Mirror operation creates extra attachment copy
+- **zBuilder:** VFXACT-955 zBuilder load workflow broken before any zBuilder save operation
+- **zBuilder:** VFXACT-975 zBuilder update command reports error when applying to tissue object
+- **zBuilder:** VFXACT-1067 Rename zRivetToBoneLocator node when run rename_ziva_nodes() command.
+- **zBuilder:** VFXACT-1107 Mirror operation creates extra attachment copy
 
 
 1.1.1

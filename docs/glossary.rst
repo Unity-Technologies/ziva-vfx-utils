@@ -4,8 +4,12 @@ Glossary
 .. glossary::
     :sorted:
 
-    zUi
-        A Maya UI to help you navigate scenes containing Ziva rigs. Currently in Beta.
+    Scene Panel 2
+        Replacement of Scene Panel.
+        It provides a better user experience widget with split view and integrates Ziva VFX menu and shelf features.
+
+    Scene Panel
+        A Maya UI to help you navigate scenes containing Ziva rigs.
 
     parameter
         A specific piece of data in the Maya scene, for example a mesh or an attribute of a node. These are the secondary type of :term:`scene item` managed by a :term:`builder`, and are always associated in some way with the :term:`nodes<node>` in the scene.

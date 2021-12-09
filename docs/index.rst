@@ -7,6 +7,8 @@
     introduction
     installation
     zBuilder_menu
+    scenepanel
+    scenepanel2
     release
     glossary
     modules
