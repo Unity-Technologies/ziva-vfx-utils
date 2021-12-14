@@ -141,10 +141,12 @@ class zGeoWidget(QtWidgets.QWidget):
         # Update the pinned tree items
         pinned_zGeo_nodes = [item.data for item in pinned_zGeo_treeItems]
         unpinned_nodes = [item.data for item in unpinned_zGeo_treeItems]
-        # Be careful about set operator precedence, the "-" has higher precedence than "|".
-        # Refer to https://stackoverflow.com/questions/54735175/set-operator-precedence
-        self._pinned_nodes = list((set(self._pinned_nodes) | set(pinned_zGeo_nodes)) -
-                                  set(unpinned_nodes))
+        # only include unique pinned items from previously pinned and current pinned items.
+        # since we switch between full view and partial view, there can be duplicate items
+        self._pinned_nodes = self._get_unique_node_items(
+            self._pinned_nodes, pinned_zGeo_nodes)
+        # exclude items that have been unpinned
+        self._pinned_nodes = self._get_nodes_to_pin(unpinned_nodes)
 
         # create a list of unique maya dag node to view on the component widget
         self._wgtComponent_ref.reset_model(
@@ -192,6 +194,13 @@ class zGeoWidget(QtWidgets.QWidget):
         """
         node_long_name_dict = {
             node.long_name: node for node in node_list_1 + node_list_2}
+        return node_long_name_dict.values()
+
+    def _get_nodes_to_pin(self, exclude_nodes):
+        """ returns nodes that are pinned but not in 'exclude_nodes'
+        """
+        node_long_name_dict = {
+            node.long_name: node for node in self._pinned_nodes if node not in exclude_nodes}
         return node_long_name_dict.values()
 
     def _expand_item_by_name(self, name_list):
@@ -348,6 +357,7 @@ class zGeoWidget(QtWidgets.QWidget):
                 self._builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
             self._tmGeo.reset_model(self._builder, self._cur_selection_tree,
                                     self._is_partial_tree_view)
+            self._sync_pin_state_full_to_partial_view()
         else:
             # Reset component view
             self._wgtComponent_ref.reset_model(None, [])
@@ -371,6 +381,9 @@ class zGeoWidget(QtWidgets.QWidget):
                         if solverTM_item.data.long_name == solverTM:
                             entry_list = flatten_tree(solverTM_item)
                             break
+                # update pin state to match with partial view
+                if entry_list:
+                    self._sync_pin_state_partial_to_full_view(entry_list)
                 # Merge current zBuilder nodes with tree view
                 resolved_tree = merge_tree_data(get_zGeo_nodes_by_solverTM(self._builder, solverTM),
                                                 entry_list)
@@ -439,3 +452,36 @@ class zGeoWidget(QtWidgets.QWidget):
         zGeo_indices = get_all_zGeo_indices(group_index)
         for index in zGeo_indices:
             self._tvGeo.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
+
+    def _sync_pin_state_full_to_partial_view(self):
+        """ update pin state of partial tree based on whole tree view
+        """
+        selected_nodes = [
+            item.data for item in self._cur_selection_tree.children[0].children]
+        nodes_to_pin_item = [
+            TreeItem(None, node) for node in self._get_nodes_to_pin(selected_nodes)]
+        self._cur_selection_tree.children[0].append_children(
+            nodes_to_pin_item)
+
+        # update node pin states
+        for node in self._cur_selection_tree.children[0].children:
+            if node.data in self._pinned_nodes:
+                node.pin_state = TreeItem.Pinned
+            else:
+                node.pin_state = TreeItem.Unpinned
+
+    def _sync_pin_state_partial_to_full_view(self, node_list):
+        """ update pin state of whole tree based on partial tree view
+        Args:
+            node_list: partial tree node list
+        """
+        pinned_node_long_names = [
+            pinned_node.long_name for pinned_node in self._pinned_nodes]
+
+        for node in node_list:
+            # skip if it's a group node
+            if node.node_type != "group":
+                if node.long_name in pinned_node_long_names:
+                    node._node_data["pin_state"] = TreeItem.Pinned
+                else:
+                    node._node_data["pin_state"] = TreeItem.Unpinned
