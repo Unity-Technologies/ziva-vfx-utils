@@ -9,7 +9,7 @@ from .menuBar import setup_menubar
 from .toolbar import setup_toolbar
 from ..uiUtils import dock_window, get_icon_path_from_name
 from maya import cmds
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,12 @@ class ScenePanel2(QtWidgets.QWidget):
         logger.debug("Register Scene Panel callbacks.")
         cmds.scriptJob(event=["PostSceneRead", self.on_post_scene_read])
         cmds.scriptJob(event=["NewSceneOpened", self.on_new_scene_opened])
-        self._scene_presave_callback_id = om.MSceneMessage.addCallback(
-            om.MSceneMessage.kBeforeSave, self.on_scene_presave)
+        self._callback_id_list = []
+        self._callback_id_list.append(
+            om.MSceneMessage.addCallback(om.MSceneMessage.kBeforeSave, self.on_scene_presave))
+        self._callback_id_list.append(
+            om.MSceneMessage.addStringArrayCallback(om.MSceneMessage.kBeforePluginUnload,
+                                                    self.on_scene_prePluginUnload))
 
         # member variable declaration and initialization
         self._wgtGeo = zGeoWidget(self)
@@ -57,7 +61,12 @@ class ScenePanel2(QtWidgets.QWidget):
 
         self._setup_ui(parent)
         self._wgtGeo.set_component_widget(self._wgtComponent)
-        self._wgtGeo.reset_builder(True)
+        self._is_ziva_vfx_loaded = "ziva" in cmds.pluginInfo(query=True, listPlugins=True)
+        if self._is_ziva_vfx_loaded:
+            self._wgtGeo.reset_builder(True)
+        else:
+            logger.warning(
+                "Ziva VFX plugin is not loaded. The Scene Panel 2 will not work normally.")
 
     def _setup_ui(self, parent):
         lytMenuBar = setup_menubar(self._wgtGeo)
@@ -112,22 +121,35 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def remove_callbacks(self):
         logger.debug("Remove Scene Panel callbacks.")
-        om.MMessage.removeCallback(self._scene_presave_callback_id)
+        for callback_id in reversed(self._callback_id_list):
+            om.MMessage.removeCallback(callback_id)
+        self._callback_id_list = []
 
     def on_post_scene_read(self):
         """ Callback invoked after Maya load the scene
         """
-        self._wgtGeo.reset_builder(True)
+        if self._is_ziva_vfx_loaded:
+            self._wgtGeo.reset_builder(True)
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
         """
-        self._wgtGeo.reset_builder(False)
+        if self._is_ziva_vfx_loaded:
+            self._wgtGeo.reset_builder(False)
 
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
         """
-        self._wgtGeo.save()
+        if self._is_ziva_vfx_loaded:
+            self._wgtGeo.save()
+
+    def on_scene_prePluginUnload(self, unload_plugin_list, client_data):
+        """ Callback invoked before Maya unload the plugin
+        """
+        if "ziva" in unload_plugin_list:
+            # The Ziva VFX plugin is going to be unloaded,
+            # set the flag to stop any further VFX function invocation.
+            self._is_ziva_vfx_loaded = False
 
 
 # Show window with docking ability
