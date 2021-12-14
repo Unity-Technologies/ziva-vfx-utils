@@ -129,13 +129,37 @@ class ScenePanel2(QtWidgets.QWidget):
         """ Callback invoked after Maya load the scene
         """
         if self._is_ziva_vfx_loaded:
-            self._wgtGeo.reset_builder(True)
+            try:
+                self._wgtGeo.reset_builder(True)
+            except RuntimeError:
+                # This try-except block is to fix following Maya PySide2 bug:
+                # When re-create the Scene Panel instance,
+                # call reset_builder() triggers weird error:
+                # RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
+                # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
+                # No actual error happens, this is a false alarm.
+                # Catch and silence this unexpect exception to avoid confusing users.
+                # If later we find root cause,
+                # search all places where invoke reset_builder and remove them.
+                pass
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
         """
         if self._is_ziva_vfx_loaded:
-            self._wgtGeo.reset_builder(False)
+            try:
+                self._wgtGeo.reset_builder(False)
+            except RuntimeError:
+                # This try-except block is to fix following Maya PySide2 bug:
+                # When re-create the Scene Panel instance,
+                # call reset_builder() triggers weird error:
+                # RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
+                # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
+                # No actual error happens, this is a false alarm.
+                # Catch and silence this unexpect exception to avoid confusing users.
+                # If later we find root cause,
+                # search all places where invoke reset_builder and remove them.
+                pass
 
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
