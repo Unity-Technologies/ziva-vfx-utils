@@ -350,7 +350,8 @@ class zGeoWidget(QtWidgets.QWidget):
                                     self._is_partial_tree_view)
         else:
             # Reset component view
-            self._wgtComponent_ref.reset_model(None, [])
+            if not self._pinned_nodes:
+                self._wgtComponent_ref.reset_model(None, [])
             merged_tree = TreeItem(None, Base())
             # Merge each zBuilder solver tree with zGeo view tree
             for solverTM in solverTM_nodes:
