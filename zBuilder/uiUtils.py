@@ -27,11 +27,10 @@ SCENE_PANEL_DATA_ATTR_NAME = "scenePanelSerializedData"
 def dock_window(dialog_class, *args, **kwargs):
     """ Create dock window for Maya
     """
-    try:
+    if mui.MQtUtil.findControl(dialog_class.CONTROL_NAME):
+        # Delete existing control
         cmds.deleteUI(dialog_class.CONTROL_NAME)
         logger.info("removed workspace {}".format(dialog_class.CONTROL_NAME))
-    except:
-        pass
 
     # building the workspace control with maya.cmds
     main_control = cmds.workspaceControl(dialog_class.CONTROL_NAME,

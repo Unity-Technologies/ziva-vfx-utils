@@ -48,7 +48,7 @@ class ScenePanel2(QtWidgets.QWidget):
         logger.debug("Register Scene Panel callbacks.")
         cmds.scriptJob(event=["PostSceneRead", self.on_post_scene_read])
         cmds.scriptJob(event=["NewSceneOpened", self.on_new_scene_opened])
-        self._callback_id_list = []
+        self._callback_id_list = om.MCallbackIdArray()
         self._callback_id_list.append(
             om.MSceneMessage.addCallback(om.MSceneMessage.kBeforeSave, self.on_scene_presave))
         self._callback_id_list.append(
@@ -121,45 +121,60 @@ class ScenePanel2(QtWidgets.QWidget):
 
     def remove_callbacks(self):
         logger.debug("Remove Scene Panel callbacks.")
-        for callback_id in reversed(self._callback_id_list):
-            om.MMessage.removeCallback(callback_id)
-        self._callback_id_list = []
+        om.MMessage.removeCallbacks(self._callback_id_list)
+        self._callback_id_list.clear()
 
     def on_post_scene_read(self):
         """ Callback invoked after Maya load the scene
         """
-        if self._is_ziva_vfx_loaded:
-            try:
-                self._wgtGeo.reset_builder(True)
-            except RuntimeError:
-                # This try-except block is to fix following Maya PySide2 bug:
-                # When re-create the Scene Panel instance,
-                # call reset_builder() triggers weird error:
-                # RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
-                # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
-                # No actual error happens, this is a false alarm.
-                # Catch and silence this unexpect exception to avoid confusing users.
-                # If later we find root cause,
-                # search all places where invoke reset_builder and remove them.
-                pass
+        # This try-except block is to fix following Maya issue:
+        # When click Scene Panel button, Maya creates new instance to replace the old one.
+        # But the registered callbacks seems not unregsitered even we already did so.
+        # These zombie callbacks will get invoked when related events happen, like this one.
+        # It calls reset_builder() then triggers weird error:
+        #   RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
+        # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
+        # No actual error happens, this is a false alarm.
+        # A final call will be made on the current Scene Panel instance and finish the job.
+        # But a bunch of error msg have shown, that is annoying and misleading users.
+        # To silence this unexpect exception, use print() to trigger the exception
+        # before the actual logic gets run so as to avoid the error.
+        # Note: Search and replace all occurrence of this piece of code if we find better solution in the future.
+        proceed = True
+        try:
+            print(self)
+        except RuntimeError:
+            proceed = False
+            pass
+
+        if proceed and self._is_ziva_vfx_loaded:
+            self._wgtGeo.reset_builder(True)
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
         """
-        if self._is_ziva_vfx_loaded:
-            try:
-                self._wgtGeo.reset_builder(False)
-            except RuntimeError:
-                # This try-except block is to fix following Maya PySide2 bug:
-                # When re-create the Scene Panel instance,
-                # call reset_builder() triggers weird error:
-                # RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
-                # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
-                # No actual error happens, this is a false alarm.
-                # Catch and silence this unexpect exception to avoid confusing users.
-                # If later we find root cause,
-                # search all places where invoke reset_builder and remove them.
-                pass
+        # This try-except block is to fix following Maya issue:
+        # When click Scene Panel button, Maya creates new instance to replace the old one.
+        # But the registered callbacks seems not unregsitered even we already did so.
+        # These zombie callbacks will get invoked when related events happen, like this one.
+        # It calls reset_builder() then triggers weird error:
+        #   RuntimeError: Internal C++ object (zGeoTreeModel) already deleted.
+        # It happens on zGeoTreeModel, zTreeView or any other zGeoWidget members.
+        # No actual error happens, this is a false alarm.
+        # A final call will be made on the current Scene Panel instance and finish the job.
+        # But a bunch of error msg have shown, that is annoying and misleading users.
+        # To silence this unexpect exception, use print() to trigger the exception
+        # before the actual logic gets run so as to avoid the error.
+        # Note: Search and replace all occurrence of this piece of code if we find better solution in the future.
+        proceed = True
+        try:
+            print(self)
+        except RuntimeError:
+            proceed = False
+            pass
+
+        if proceed and self._is_ziva_vfx_loaded:
+            self._wgtGeo.reset_builder(False)
 
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene
@@ -171,6 +186,7 @@ class ScenePanel2(QtWidgets.QWidget):
         """ Callback invoked before Maya unload the plugin
         """
         if "ziva" in unload_plugin_list:
+            self.remove_callbacks()
             # The Ziva VFX plugin is going to be unloaded,
             # set the flag to stop any further VFX function invocation.
             self._is_ziva_vfx_loaded = False
