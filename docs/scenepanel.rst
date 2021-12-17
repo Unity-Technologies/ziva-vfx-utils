@@ -9,8 +9,7 @@ Scene Panel
 
 Scene Panel is an object-viewing tool to inspect the Ziva setup,
 which bases on zBuilder retrieve operation results.
-
-Launches a new object-viewing panel that can be used to inspect the current Ziva setup.
+It launches a new object-viewing panel that can be used to inspect the current Ziva setup.
 
 .. image:: images/scene_panel1.png
     :alt: Screenshot of the Ziva panel
@@ -56,7 +55,9 @@ Paste
 """""
 This pastes the attribute values onto the selected node.
 
-.. note::  The paste button is disabled if there is nothing in the clipboard OR if what is in the clipboard is not same type with current selection.
+.. note::
+    The paste button is disabled if there is nothing in the clipboard OR
+    if what is in the clipboard is not same type as current selection.
 
 
 Maps Sub-Menu
@@ -66,8 +67,8 @@ Maps Sub-Menu
     :alt: The Maps section.
 
 If a node has any weight maps associated with it, a sub-menu for each map appears on the right click Menu.
-In the case of the image above it is showing a sub-menu for 'Weight' and 'EndPoints' which are maps 
-for a zFiber.
+In the case of the image above it is showing a sub-menu for 'Weight' and 'EndPoints'
+which are weight and end point maps of a zFiber node.
 
 Paint
 """""

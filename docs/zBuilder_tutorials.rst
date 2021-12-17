@@ -14,7 +14,7 @@ Let's explore some example usage of zBuilder by trying it out on the
 anatomical arm demo that ships with the ZivaVFX Maya plugin:
 
 First, set the Python path to zBuilder as explained in the :doc:`installation` section.
-Next, run the anatomical arm demo, by choosing **Ziva Tool** |rarr| **Run Demo** |rarr| **Anatomical Arm**.
+Next, run the anatomical arm demo, by choosing **Ziva Tools** |rarr| **Run Demo** |rarr| **Anatomical Arm**.
 Now that you have the arm :term:`setup` in your scene, let's start playing with zBuilder.
 
 Retrieving the Ziva rig from the Maya scene
@@ -60,7 +60,7 @@ When you run this command, you should see output that looks something like this 
     # zBuilder.bundle : zFiber 6 #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.087000 #
 
-These are the stats about which :term:`scene items<scene item>` were retrieved by the builder.
+These :term:`scene items<scene item>` stats were retrieved by the builder.
 In this case you can see there are 7 zTissues, 4 zBones, etc.
 Scene items typically fall into two categories:
 
