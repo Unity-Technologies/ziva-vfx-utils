@@ -42,7 +42,8 @@ class DGNode(Base):
                 name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 try:
-                    output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
+                    output += '\t{} - {}\n'.format(key,
+                                                   self.__dict__[key].__repr__())
                 except:
                     output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
@@ -153,7 +154,8 @@ class DGNode(Base):
         node_attrs = self.attrs.keys()
         if attr_filter:
             if attr_filter.get(type_, None):
-                node_attrs = list(set(node_attrs).intersection(attr_filter[type_]))
+                node_attrs = list(
+                    set(node_attrs).intersection(attr_filter[type_]))
 
         for attr in node_attrs:
             if self.attrs[attr]['type'] == 'doubleArray':
@@ -163,7 +165,8 @@ class DGNode(Base):
                                      self.attrs[attr]['value'],
                                      type='doubleArray')
                 else:
-                    text = '{}.{} not found, skipping.'.format(scene_name, attr)
+                    text = '{}.{} not found, skipping.'.format(
+                        scene_name, attr)
                     logger.info(text)
             else:
                 if cmds.objExists('{}.{}'.format(scene_name, attr)):
@@ -174,7 +177,8 @@ class DGNode(Base):
                         except:
                             pass
                 else:
-                    text = '{}.{} not found, skipping.'.format(scene_name, attr)
+                    text = '{}.{} not found, skipping.'.format(
+                        scene_name, attr)
                     logger.info(text)
 
             # check the alias
