@@ -495,9 +495,9 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
 
     The specific naming convention is defined via a regular expression
     and a string with which to replace any regular expression matches.
-    For example, if regular expression is "^l_" and string to substitute with is "r_",
-    then all instances of geometry that begin with "r_" will be rigged in the same way
-    as the corresponding geometry that begins with "l_".
+    For example, if regular expression is "^l_" and string to substitute with is "r\_",
+    then all instances of geometry that begin with "r\_" will be rigged in the same way
+    as the corresponding geometry that begins with "l\_".
     The selected objects should come from exactly one solver.
     Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
     for better visual feedback to the user.
