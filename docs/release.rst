@@ -52,7 +52,7 @@ Bug Fixes
 - **zBuilder:** zRivet locator group node now stored and re-parented if group node exists
 - **zBuilder:** Scene Panel refresh and Copy-Paste did not work in some cases with sub-tissues.
 - **zBuilder:** Trying to paint a map from scene panel would fail due to an AttributeError.
-- **zBuilder:** Can now open zBuilder files created in ZivaVFX 1.7 or older.
+- **zBuilder:** Can now open zBuilder files created in Ziva VFX 1.7 or older.
 - **zBuilder:** Workaround breakage of MFnGeometryFilter.deformerSet() in Maya 2022. This API breakage is related to the new "component tag" feature of Geometry Filters in Maya 2022. Performance may be reduced when serializing large scenes in Maya 2022.
 
 1.0.11
@@ -104,7 +104,7 @@ Benchmark Runtimes (in seconds, lower is better):
 Bug Fixes
 +++++++++
 - **Scene Panel:** Opening Node Editor clears Scene Panel content while detached from the dock.
-- **Scene Panel:** Some maps in Scene Panel right click menu did not work.
+- **Scene Panel:** Some maps in Scene Panel right-click menu did not work.
 - **zBuilder:** When detecting a zRestShape node on tissue it is now name agnostic.
 - **zBuilder:** Copy and Paste from menu did not work on objects with multiple rest shapes.
 - **zBuilder:** zMaya.rename_ziva_nodes() didn't work on zRestShapes.

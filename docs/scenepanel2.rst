@@ -4,16 +4,16 @@
 Scene Panel 2
 **************
 
-Scene Panel 2 is a tool to view and organize the Ziva VFX nodes and edit their attributes.
-It allows you to quickly browse and edit a subset of the Ziva VFX nodes in your scene.
-It bases on zBuilder's retrieve operation results and intends to supersede the :ref:`sec-ScenePanel`.
+Scene Panel 2 is a tool to view and organize Ziva VFX nodes and edit their attributes.
+It allows you to quickly browse and edit a subset of Ziva VFX nodes in your scene.
+It bases on **zBuilder** retrieve operation results and intends to supersede the :ref:`sec-ScenePanel`.
 
 To launch it, click the **Scene Panel** |sp_shelf_button| shelf button,
 or choose the **Ziva** |rarr| **Launch Scene Panel** menu.
 
 .. |sp_shelf_button| image:: images/scene_panel.png
 
-The Scene Panel 2 can also be launched from following python script:
+The Scene Panel 2 can also be launched from the following python script:
 
 .. code-block:: python
 
@@ -21,7 +21,7 @@ The Scene Panel 2 can also be launched from following python script:
   main.run()
 
 If you prefer to use previous Scene Panel,
-define the **ZIVA_ZBUILDER_USE_SCENE_PANEL1** environment variable and restart Maya,
+define the **ZIVA_ZBUILDER_USE_SCENE_PANEL1** environment variable with any value and restart Maya,
 then you can launch it through preceding methods.
 
 **Interface overview**
@@ -33,22 +33,22 @@ Numbered headings below refer to the numbered interface elements in the figure.
 
 1. **Menubar**
 
-   The Menubar contains the most functionality to work in your Ziva VFX scene.
+   Menubar contains most of the functionalities to work with your Ziva VFX scene.
 
 2. **Toolbar**
 
-   The toolbar contains the frequently used features organized by sections.
-   Some toolbar button has submenu to access related features easier.
+   Toolbar contains frequently used features organized by sections.
+   Some toolbar buttons have submenus to access related features.
 
 3. **Scene View**
 
-   The Scene View shows the Ziva VFX scene objects: Solver, Bone, Tissue and Cloth.
-   You can manage them by creating Group node and reorder them through drag&drop.
+   Scene View shows Ziva VFX scene objects: Solver, Bone, Tissue and Cloth.
+   You can manage them by creating Group nodes and reorder them through drag&drop.
 
 4. **Component View**
 
-   The Component View shows each component according to your current selected scene object(s).
-   Uses can apply attribute, maps copy paste operations through popup menu.
+   Component View shows each component according to your current scene selected object(s).
+   Users can apply attribute, maps copy paste operations through popup menu.
 
 .. toctree::
     sp2_menuBar.rst

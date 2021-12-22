@@ -28,9 +28,7 @@ it to the specified solver.
   import zBuilder.utils as utils
   utils.load_rig(file_name, solver_name=None)
 
-Saves a Ziva rig in the select solver to a disk file.
-Only the Ziva rig in the selected solver is saved;
-rigs tied to other solvers are not saved.
+Saves the Ziva rig present only in the selected solver to a disk file.
 
 **Python commands**::
 
@@ -47,13 +45,12 @@ rigs tied to other solvers are not saved.
 Cut/Copy/Paste
 """""""""""""""
 
-These commands make it possible to cut, copy and paste Ziva rigs.
-You can cut, copy and paste individual simulation bodies, or an entire solver.
-You can cut/copy/paste Ziva rigs from within the same creature,
-or from a creature onto a new creature.
-For example, suppose you have already rigged a part of the creature.
-Suppose you want to rig additional geometry that has the same number of mesh vertices and
-triangle connectivity(but not same vertex positions) as the already rigged objects.
+These commands make it possible to cut, copy, and paste Ziva rigs.
+Targets can be individual simulation bodies or entire solvers,
+and the rigs can be transferred within a creature, or from one creature onto another.
+For example, suppose that part of the creature is already rigged,
+and an additional rig is needed that has the same number of mesh vertices and triangle connectivity
+(but not the same vertex positions).
 Then you can select those already rigged objects, copy them,
 and paste their Ziva rigs onto this previously un-rigged additional geometry.
 Note that for copying an entire Ziva rig of a creature onto a "clean" un-rigged creature,
@@ -102,21 +99,23 @@ and a string with which to replace any regular expression matches (stringToSubst
 For example, if regularExpression is ``^l_`` and stringToSubstituteMatchesWith is ``r_``, 
 then all instances of geometry that begin with ``r_`` 
 will be rigged in the same way as the corresponding geometry that begins with ``l_``.
-The newly added Ziva rig elements are added to the same solver as the source.
+The new Ziva rig elements are added to the same solver as the source.
 For example, ``r_biceps`` will be rigged in the same way as ``l_biceps``.
 In order for all the elements of the Ziva rig to be transferred properly
 (such as painted attachments, or other painted properties),
 the geometries of ``r_biceps`` and ``l_biceps`` must be mirror images of one another.
-Note that this regular expression tool is more general than just for mirroring;
-arbitrary Python regular expressions are supported.
-Examples of useful pairs are:
 
-- ``(^|_)l($|_)`` and ``r``
-- ``^l_`` and ``r_``
-- ``_l_`` and ``_r_``
-- ``_l$`` and ``_r`` .
+.. note::
+    This regular expression tool is more general than just for mirroring;
+    arbitrary Python regular expressions are supported.
+    Examples of useful pairs are:
 
-You can learn more about regular expressions at the `Regex101 website <https://regex101.com/>`_.
+    - ``(^|_)l($|_)`` and ``r``
+    - ``^l_`` and ``r_``
+    - ``_l_`` and ``_r_``
+    - ``_l$`` and ``_r``
+
+    You can learn more about regular expressions at the `Regex101 website <https://regex101.com/>`_.
 
 **Python command**::
 

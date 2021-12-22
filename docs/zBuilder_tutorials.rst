@@ -11,7 +11,7 @@ Basics
 ~~~~~~
 
 Let's explore some example usage of zBuilder by trying it out on the
-anatomical arm demo that ships with the ZivaVFX Maya plugin:
+anatomical arm demo that ships with the Ziva VFX Maya plugin:
 
 First, set the Python path to zBuilder as explained in the :doc:`installation` section.
 Next, run the anatomical arm demo, by choosing **Ziva Tools** |rarr| **Run Demo** |rarr| **Anatomical Arm**.
