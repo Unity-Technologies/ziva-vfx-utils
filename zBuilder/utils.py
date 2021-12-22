@@ -486,21 +486,22 @@ def save_rig(file_name):
 
 
 def copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with):
-    # Copy/Pastes the Ziva rig of the selected objects, onto non-Ziva-rigged objects
-    # whose names are defined using regular expressions.
-    # This is useful, for example, for mirroring a Ziva rig: rig one side of the character first,
-    # then use this command to automatically "copy" the rig to the other side.
-    # Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or
-    # similar.
-    # The specific naming convention is defined via a regular expression (regularExpression),
-    # and a string with which to replace any regular expression matches
-    # (stringToSubstituteMatchesWith).
-    # For example, if regularExpression is "^l_" and stringToSubstituteMatchesWith is "r_", then all
-    # instances of geometry that begin with "r_" will be rigged in the same way as the corresponding
-    # geometry that begins with "l_".
-    # The selected objects should come from exactly one solver.
-    # Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
-    # for better visual feedback to the user.
+    """ Copy/Pastes the Ziva rig of the selected objects,
+    onto non-Ziva-rigged objects whose names are defined using regular expressions.
+
+    This is useful, for example, for mirroring a Ziva rig, rig one side of the character first,
+    then use this command to automatically "copy" the rig to the other side.
+    Of course, objects must follow a proper naming convention, such as l_humerus, r_humerus, or similar.
+
+    The specific naming convention is defined via a regular expression
+    and a string with which to replace any regular expression matches.
+    For example, if regular expression is "^l_" and string to substitute with is "r_",
+    then all instances of geometry that begin with "r_" will be rigged in the same way
+    as the corresponding geometry that begins with "l_".
+    The selected objects should come from exactly one solver.
+    Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
+    for better visual feedback to the user.
+    """
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection()
     builder.string_replace(regular_expression, string_to_substitute_matches_with)

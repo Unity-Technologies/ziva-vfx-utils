@@ -74,8 +74,7 @@ Maps Sub-Menu
     :alt: The Maps section.
 
 If a node has any weight maps associated with it, a sub-menu for each map appears on the right-click menu.
-In the case of the image above it is showing a sub-menu for 'Weight' and 'EndPoints'
-which are weight and end point maps of a zFiber node.
+In the image above, sub-menus for 'Weight' and 'EndPoints' (which are attribute maps of a zFiber node) are shown.
 
 Paint
 """""

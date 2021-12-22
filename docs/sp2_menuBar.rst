@@ -92,11 +92,11 @@ Copy/Paste with Name Substitution
 
 Suppose you have already modeled the geometry of a creature,
 and a Ziva rig on one half (say, the left side) of a creature.
+The name of left side meshes starts with ``l_`` and right side meshes starts wtih ``r_``.
 This tool makes it possible to copy the rig onto the other side of the creature.
 This is achieved through regular expression replacements.
-The method requires a regular expression (regularExpression),
-and a string with which to replace any regular expression matches (stringToSubstituteMatchesWith).
-For example, if regularExpression is ``^l_`` and stringToSubstituteMatchesWith is ``r_``, 
+The method requires a regular expression and a string with which to replace any regular expression matches.
+For example, if regular expression is ``^l_`` and string to substitute with is ``r_``,
 then all instances of geometry that begin with ``r_`` 
 will be rigged in the same way as the corresponding geometry that begins with ``l_``.
 The new Ziva rig elements are added to the same solver as the source.

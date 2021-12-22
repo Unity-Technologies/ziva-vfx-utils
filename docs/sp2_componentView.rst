@@ -63,8 +63,7 @@ Maps Sub-Menu
     :alt: The Maps section.
 
 If a node has any weight maps associated with it, a sub-menu for each map appears on the right-click Menu.
-In the case of the image above it is showing a sub-menu for 'Weight' and 'EndPoints'
-which are weight and end point maps of a zFiber node.
+In the image above, sub-menus for 'Weight' and 'EndPoints' (which are attribute maps of a zFiber node) are shown.
 
 **Paint**
 
@@ -101,7 +100,7 @@ zAttachment Sub-Menu
 
 **Select Source and Target**
 
-This item appears on a zAttachment node.
+This item appears on a **zAttachment** node.
 It selects both the source and target mesh for convenience.
 
 **Paint by Proximity Sub-Menu**
