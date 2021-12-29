@@ -10,12 +10,12 @@ Tutorials
 Basics
 ~~~~~~
 
-Let's explore some example usage of zBuilder by trying it out on the
-anatomical arm demo that ships with the Ziva VFX Maya plugin:
+Let's explore zBuilder by applying it to the
+anatomical arm demo that ships with the Ziva VFX Maya plugin.
 
 First, set the Python path to zBuilder as explained in the :doc:`installation` section.
-Next, run the anatomical arm demo, by choosing **Ziva Tools** |rarr| **Run Demo** |rarr| **Anatomical Arm**.
-Now that you have the arm :term:`setup` in your scene, let's start playing with zBuilder.
+Next, run the anatomical arm demo in Maya by navigating to **Ziva Tools** |rarr| **Run Demo** |rarr| **Anatomical Arm**.
+Now that the arm :term:`setup` is in the scene, let's start playing with zBuilder.
 
 Retrieving the Ziva rig from the Maya scene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -31,19 +31,19 @@ we first need to create a Ziva :term:`builder` object:
     import zBuilder.builders.ziva as zva
     z = zva.Ziva()
 
-You can use the help command to get some information about the Ziva builder.
+The help command can be called to get some information about the Ziva builder.
 
 .. code-block:: python
 
     help(z)
 
-We can use our builder to capture the Ziva arm rig by running a method to retrieve the current state of the Ziva Maya scene:
+The builder can capture the Ziva arm rig by running a method to retrieve the current state of the Ziva Maya scene:
 
 .. code-block:: python
 
     z.retrieve_from_scene()
 
-When you run this command, you should see output that looks something like this in your script editor:
+There should be an output in the script editor that looks something like this:
 
 .. code-block:: python
 
@@ -60,15 +60,14 @@ When you run this command, you should see output that looks something like this 
     # zBuilder.bundle : zFiber 6 #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.087000 #
 
-These :term:`scene items<scene item>` stats were retrieved by the builder.
-In this case you can see there are 7 zTissues, 4 zBones, etc.
+These :term:`scene item<scene item>` stats were retrieved by the builder.
+In this case, there are 7 zTissues, 4 zBones, etc.
 Scene items typically fall into two categories:
 
 * :term:`Nodes<node>`, which are the Maya dependency graph nodes in the scene.
 * :term:`Parameters<node>`, which are the relevant pieces of data associated with nodes, like meshes and :term:`maps<map>`.
 
-To give you a sense of the complexity that zBuilder is handling for you here, 
-the scene items captured in this case are:
+The scene items captured in this case are:
 
 * All the Ziva nodes. (zTissue, zTet, zAttachment, etc..)
 * Order of the nodes so we can re-create material layers reliably.
@@ -80,18 +79,19 @@ the scene items captured in this case are:
 * Relevant zSolver for each node.
 * Mesh information used for world space lookup to interpolate maps if needed.
 
-Fortunately, zBuilder handles all this data for you, allowing you to treat all the complexity of a Ziva :term:`rig` as a single logical object.
-You can then save it out to a text file, and/or restore the rig to the captured state at a later time.
-You can also manipulate the information in the builder before re-applying it.
-This is useful for mirroring, for example, which we'll describe later.
+Fortunately, zBuilder handles all of this data, allowing for the treatment of a complex Ziva :term:`rig` as a single logical object.
+This object can be saved as a text file, from which the rig  can be restored to the captured state at a later time.
+It is possible to manipulate the information in the builder before re-applying it.
+This is useful for mirroring, for example, which will be described later.
 
 Retrieving parts of a Ziva rig
 ******************************
 
-Above, we retrieved Ziva builder data from the entire Maya scene.
-However, if you only want to capture a part of the scene, you can select the items
-you are interested in and call retrieve_from_scene_selection().
-This comes in handy if you want to mirror the setup, for example:
+Above, the Ziva builder data was retrieved from the entire Maya scene.
+However, if only a part of the scene needs to be captured, one can select the items
+of interest and call retrieve_from_scene_selection().
+This comes in handy when mirroring the setup. 
+For example:
 
 .. code-block:: python
 
@@ -101,9 +101,9 @@ This comes in handy if you want to mirror the setup, for example:
     z = zva.Ziva()
     z.retrieve_from_scene_selection()
 
-By default **retrieve_from_scene_selection()** grabs all items that are connected to the selected items. 
+By default, **retrieve_from_scene_selection()** grabs all items that are connected to the selected items. 
 In this example, therefore, it grabs the fibers and attachments connected to the muscle in addition to the muscle itself.
-Your script editor output should have looked something like this:
+The script editor output should look something like this:
 
 .. code-block:: python
 
@@ -120,7 +120,7 @@ Your script editor output should have looked something like this:
     # zBuilder.bundle : zFiber 1 #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.166000 #
 
-Notice now we are only retrieving 1 tissue.
+Notice that only one tissue is being retrieved.
 
 
 Building
@@ -137,7 +137,7 @@ equipping it with the Ziva rig stored in the builder object.
     It's fine if the geometry is already being used in a Ziva rig,
     just as long as the geometry is already in scene.
 
-With the exception of geometry, building restores the state of all the nodes and parameters in the builder.
+With the exception of geometry, building restores the state of all nodes and parameters in the builder.
 Each scene item is first checked to see if it exists in the Maya scene. 
 If it doesn't exist, it is created.
 If it does exist, its data values are set to what is stored in the builder.
@@ -145,9 +145,9 @@ If it does exist, its data values are set to what is stored in the builder.
 Restoring a Ziva rig to a previous state
 ****************************************
 
-This simple example demonstrates how to revert the Ziva rig to a previous state.
+This simple example demonstrates how to revert a Ziva rig to a previous state.
 First, load the Anatomical Arm Demo.
-Then, let's capture the whole scene, so that we can later restore it.
+Then, capture the whole scene (to be used as a restoration point later).
 
 .. code-block:: python
 
@@ -159,14 +159,14 @@ Now, the builder object **z** contains the Ziva rig.
 Let's make a change to the arm. 
 For example, paint a muscle attachment to all white,
 something that is easy to identify in viewport.
-Now let's apply our builder to it, to revert the rig to the previous state.
+Now let's apply the builder to it.
 
 .. code-block:: python
 
     z.build()
 
-In the viewport, you should see that the state of the arm rig jumped back to the way it was 
-when you retrieved it, as well as this output in the script editor:
+It should be clearly visible in the viewport that the state of the arm rig jumped back to the way it was 
+when the scene was retrieved. There should also be an output in the script editor:
 
 .. code-block:: python
 
@@ -178,7 +178,7 @@ Building a Ziva rig from scratch
 ********************************
 
 It is also possible to build a Ziva rig into a Maya scene that doesn't contain any Ziva nodes or data.
-The command is exactly the same as before, but we'll start from a "clean" scene containing only geometry.
+The command is exactly the same as before, applied to a "clean" scene containing only geometry.
 
 First, clean out the entire Ziva rig with the following command:
 
@@ -187,42 +187,43 @@ First, clean out the entire Ziva rig with the following command:
     import zBuilder.utils as utils
     utils.clean_scene()
 
-**clean_scene()** is a utility function to remove all of the Ziva footprint in the scene.
-The scene should now be clear of Ziva solver nodes.
+.. note::
+    **clean_scene()** is a utility function to remove all of the Ziva footprint in the scene.
+    The scene should now be clear of Ziva solver nodes.
 
-Now that we have a scene with just geometry in it,
-let's see what happens when we apply that same builder.
+Now that the scene has only geometry in it,
+let's see what happens when the same builder is applied.
 
 .. code-block:: python
 
     z.build()
 
 The full Ziva rig should now be restored and acting on the scene's geometry.
-zBuilder built all of the Ziva maya nodes for us.
+zBuilder rebuilt all of the Ziva maya nodes.
 
 Building with differing topologies
 **********************************
 
-In production a common occurrence (unfortunately) is the geometry that goes into your rig
-will change and you will be the one who has to deal with it.
+In production, it is common (unfortunately) for the geometry that goes into a rig
+to change.
 
 Let's show how zBuilder can accommodate changes to geometry.
-First thing, let's clean the scene to represent brand new geometry coming in:
+First, let's clean the scene:
 
 .. code-block:: python
 
     import zBuilder.utils as utils
     utils.clean_scene()
 
-Now change the bicep for example.
+As an example of changing geometry, let's change the bicep.
 A quick way is to apply a mesh smooth.
-Once the bicep has a different topology simply build the same way as before again:
+Once the bicep has a different topology, simply build the same way as before again:
 
 .. code-block:: python
 
     z.build()
 
-This time your script editor output will be slightly different.
+This time the script editor output will be slightly different.
 It should be as below:
 
 .. code-block:: python
@@ -242,7 +243,7 @@ It should be as below:
     # zBuilder.parameters.maps : interpolating map:  r_bicep_muscle_zFiber.endPoints #
     # zBuilder.builder : Finished: ---Elapsed Time = 0:00:03.585000 #
 
-You will notice above that it listed out a bunch of maps that got interpolated.
+Notice that it listed out maps that were interpolated.
 This shows that zBuilder noticed the change in topology between the mesh in the
 original rig and the new rig.
 Furthermore, the call to **build()** modified all the maps painted onto the old mesh
@@ -250,17 +251,17 @@ and re-applied them to the new mesh by interpolation.
 
 .. note::
 
-    When the maps get interpolated it is currently done in world space of the stored geometry.
-    So, if a muscle's new geometry is in a significantly different position in world space,
+    The maps are currently interpolated in world space of the stored geometry.
+    Consequently, if a muscle's new geometry is in a significantly different position in world space,
     the interpolation may not work very well.
     However, it should be fine in cases where the position and shape of the muscle
-    only make relatively small changes.
+    only differ slightly.
 
-With this feature, you can manage bringing in any new geometry and building a
+With this feature, it is possible to bring in any new geometry and build a
 previously-captured Ziva scene on it.
-Typically you will import the desired geometry into a scene from an external
+Typically the desired geometry will be imported into a scene from an external
 source instead of editing it directly in Maya
-(also ensure that it's given the same name as the original mesh it's replacing in the rig).
+(ensure that the new mesh is given the same name as the original mesh it's replacing).
 
 
 Reading/Writing Files

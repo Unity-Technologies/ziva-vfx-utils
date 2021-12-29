@@ -8,7 +8,7 @@ to help leverage the benefits of the Ziva Character Simulation paradigm.
 that's easy to manipulate, save to disk, and re-apply to a Maya scene.
 It has lots of support for manipulating Ziva creatures and can be easily extended.
 It's designed to be used by Technical Directors who are rigging characters with Ziva VFX.
-It supports use cases such as updating a rig when new geometry is published and
+It supports use cases such as updating a rig when new geometry is published, and
 transferring a Ziva rig from one character to another.
 
-Besides that, this repo contains Ziva VFX Python/MEL scripts, demo assets and Maya module resources.
+This repo also contains Ziva VFX Python/MEL scripts, demo assets and Maya module resources.

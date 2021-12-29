@@ -11,16 +11,16 @@ Installation
 Minor changes are released periodically.
 Users should check for the latest version of ziva-vfx-utils, and update when needed.
 
-Either download a zip of the repository
-|br|
-https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads
-|br|
-or clone it
-|br|
-https://bitbucket.org/zivadynamics/ziva-vfx-utils.git
+There are two ways to retrieve the ziva-vfx-utils package:
 
-Then, replace the following folders and files in the Ziva VFX Maya module folder:
+#. `Download <https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads>`_ a zip of the repository.
 
-- Replace the **zBuilder** and **utility** folders in the  **scripts** folder with the new ones.
-- Replace all files in the **scripts** folder with the new ones in the counterpart folder in the ziva-vfx-utils repo.
+#. Clone the `git repo <https://bitbucket.org/zivadynamics/ziva-vfx-utils.git>`_
+
+
+
+To install, replace the following folders and files in the Ziva VFX Maya module folder with the new ones in the counterpart folder in the ziva-vfx-utils repo:
+
+- The **zBuilder** and **utility** folders in the  **scripts** folder.
+- All files in the **scripts** folder.
 - Replace the **demos** and **icons** folder with the new ones.
