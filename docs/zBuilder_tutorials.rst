@@ -188,7 +188,7 @@ First, clean out the entire Ziva rig with the following command:
     utils.clean_scene()
 
 **clean_scene()** is a utility function to remove all of the Ziva footprint in the scene.
-If you look in the scene the Ziva solver nodes should now be gone.
+The scene should now be clear of Ziva solver nodes.
 
 Now that we have a scene with just geometry in it,
 let's see what happens when we apply that same builder.
