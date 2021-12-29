@@ -5,24 +5,24 @@ Scene Panel 2
 **************
 
 Scene Panel 2 is a tool to view and organize Ziva VFX nodes and edit their attributes.
-It allows you to quickly browse and edit a subset of Ziva VFX nodes in your scene.
-It bases on **zBuilder** retrieve operation results and intends to supersede the :ref:`sec-ScenePanel`.
+It allows for quick browsing and editing of a subset of Ziva VFX nodes in the scene.
+It is based on the **zBuilder** retrieve operation results, and intends to supersede the :ref:`sec-ScenePanel`.
 
 To launch it, click the **Scene Panel** |sp_shelf_button| shelf button,
-or choose the **Ziva** |rarr| **Launch Scene Panel** menu.
+or navigate to **Ziva** |rarr| **Launch Scene Panel**.
 
 .. |sp_shelf_button| image:: images/scene_panel.png
 
-The Scene Panel 2 can also be launched from the following python script:
+The Scene Panel 2 can also be launched using python:
 
 .. code-block:: python
 
   from zBuilder.scenePanel2 import main
   main.run()
 
-If you prefer to use previous Scene Panel,
-define the **ZIVA_ZBUILDER_USE_SCENE_PANEL1** environment variable with any value and restart Maya,
-then you can launch it through preceding methods.
+If the previous Scene Panel is preferred,
+define the **ZIVA_ZBUILDER_USE_SCENE_PANEL1** environment variable with any value and restart Maya.
+Scene Panel 1 can then be launched as described above.
 
 **Interface overview**
 
@@ -33,7 +33,7 @@ Numbered headings below refer to the numbered interface elements in the figure.
 
 1. **Menubar**
 
-   Menubar contains most of the functionalities to work with your Ziva VFX scene.
+   Menubar contains most of the functionalities to work with the Ziva VFX scene.
 
 2. **Toolbar**
 
@@ -43,12 +43,12 @@ Numbered headings below refer to the numbered interface elements in the figure.
 3. **Scene View**
 
    Scene View shows Ziva VFX scene objects: Solver, Bone, Tissue and Cloth.
-   You can manage them by creating Group nodes and reorder them through drag&drop.
+   They can be managed by creating Group nodes and reordering them through drag&drop.
 
 4. **Component View**
 
-   Component View shows each component according to your current scene selected object(s).
-   Users can apply attribute, maps copy paste operations through popup menu.
+   Component View shows each component according to the current scene's selected object(s).
+   Users can apply attributes, maps, or copy/paste operations through the popup menu.
 
 .. toctree::
     sp2_menuBar.rst

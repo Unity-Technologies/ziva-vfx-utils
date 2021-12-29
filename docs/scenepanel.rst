@@ -15,9 +15,9 @@ and is based on the **zBuilder** retrieve operation.
 
 .. |refresh_icon| image:: images/out_refresh.png
 
-The Ziva Scene Panel allows you to quickly browse a subset of the Ziva objects in your scene.
+The Ziva Scene Panel allows quick browsing of a subset of the Ziva objects in the scene.
 The selected Ziva objects and their immediate connections are shown in a tree,
-allowing you to focus on specific parts of your scene.
+focusing on those specific parts of the scene.
 To display the full scene in the panel, select the solver and launch the scene panel,
 or click the **Refresh** |refresh_icon| button if the scene panel is already open.
 
@@ -29,11 +29,11 @@ and to minimize the amount of items one has to sort through.
 
 Selecting an item in the panel selects the corresponding item in the Maya scene.
 
-.. note:: If you update the Maya scene, the panel is not automatically updated.
-          You can update it by closing the Scene Panel and re-opening it via **Ziva** |rarr| **Launch Scene Panel**.
+.. note:: If the Maya scene is changed, the panel is not automatically updated.
+          Update it by closing the Scene Panel and re-opening it via **Ziva** |rarr| **Launch Scene Panel**.
           Another approach is to press the **Refresh** |refresh_icon| button on the Scene Panel toolbar.
 
-The Scene Panel can also be launched from python by the following:
+The Scene Panel can also be launched from python:
 
 .. code-block:: python
 
@@ -51,12 +51,12 @@ Attributes Sub-Menu
 .. image:: images/scene_panel2.png
     :alt: The Attributes section.
 
-If a node has attributes to manipulate an **Attributes** sub-menu will appear on the right-click menu.
+If a node has attributes to manipulate, an **Attributes** sub-menu will appear on the right-click menu.
 
 Copy
 """"
-This will copy all attributes values and allow you to paste onto a node of same type,
-i.e., **zAttachment** |rarr| **zAttachment**.
+This will copy all attributes values which can then be pasted onto a node of same type
+(i.e., **zAttachment** |rarr| **zAttachment**).
 
 Paste
 """""
@@ -79,7 +79,7 @@ In the image above, sub-menus for 'Weight' and 'EndPoints' (which are attribute 
 Paint
 """""
 This sets up the viewport with the painting context so you can paint the map.
-This is the same as right click in viewport and choosing **Paint** |rarr| **zFiber**.
+This is the same as right-clicking in viewport and choosing **Paint** |rarr| **zFiber**.
 
 Invert
 """"""
@@ -96,8 +96,8 @@ Paste
 """""
 Pastes the map values in the clipboard onto the selected map.
 This is handy if you want to copy a map from one node type to another.
-A good example is if you have a fiber weight map
-and you want the same map to be applied to a material for example.
+A good example is if there is a fiber weight map
+and the same map is to be applied to a material.
 
 .. note::
     When attempting to copy a map onto a mesh with different topology,

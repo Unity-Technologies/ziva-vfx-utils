@@ -43,7 +43,7 @@ The builder can capture the Ziva arm rig by running a method to retrieve the cur
 
     z.retrieve_from_scene()
 
-There should be an output in the script editor that looks something like this:
+There should be an output in the Maya Script Editor that looks something like this:
 
 .. code-block:: python
 
@@ -80,7 +80,7 @@ The scene items captured in this case are:
 * Mesh information used for world space lookup to interpolate maps if needed.
 
 Fortunately, zBuilder handles all of this data, allowing for the treatment of a complex Ziva :term:`rig` as a single logical object.
-This object can be saved as a text file, from which the rig  can be restored to the captured state at a later time.
+This object can be saved as a text file, from which the rig can be restored to the captured state at a later time.
 It is possible to manipulate the information in the builder before re-applying it.
 This is useful for mirroring, for example, which will be described later.
 
@@ -270,8 +270,7 @@ Reading/Writing Files
 Writing to disk
 ***************
 
-Once we have the arm Ziva rig saved into a builder object in memory, we can write it out to disk.
-All we need to do is:
+Once the arm Ziva rig saved into a builder object in memory, it can be written out to disk:
 
 .. code-block:: python
 
@@ -292,7 +291,7 @@ Run the Anatomical Arm demo again, then run:
     import zBuilder.utils as utils
     utils.clean_scene()
 
-Once we have a scene with just the arm geometry, let's retrieve the Ziva rig from the file on disk.
+Once the scene has just the arm geometry, retrieve the Ziva rig from the file on disk:
 
 .. code-block:: python
 
@@ -301,7 +300,7 @@ Once we have a scene with just the arm geometry, let's retrieve the Ziva rig fro
     # Use the same path here that you used above.
     z.retrieve_from_file('C:\\Temp\\test.zBuilder')
 
-You should see something like this in your script editor:
+The script editor should output something like:
 
 .. code-block:: python
 
@@ -321,14 +320,14 @@ You should see something like this in your script editor:
     # zBuilder.bundle : zFiber 6 #
     # zBuilder.builder : Read File: C:\Temp\test.zBuilder in 0:00:00.052000 #
 
-Like before, this is a simple printout to give you a hint of what has been loaded from the file.
-Now we can build:
+Like before, this is a simple printout that hints at what has been loaded from the file.
+Now to build:
 
 .. code-block:: python
 
     z.build()
 
-If you have been following along the output should look like this again as there would have been no map interpolation.
+Because there was no map interpolation, the output should look as follows:
 
 .. code-block:: python
 
@@ -341,12 +340,12 @@ The Anatomical Arm rig should now be completely restored back to its original st
 String Replacing
 ^^^^^^^^^^^^^^^^
 
-You can do basic string replace operations on the information stored in a builder.
-This is very useful if you have name changes of the geometry you are dealing with, 
-or even to create a basic mirroring of the rig.
+Basic string replace operations can be done on the information stored in a builder.
+This is very useful if there are name changes in the geometry, 
+or to create a basic mirroring of the rig.
 
-When you do a string replace you provide a search term and a replace term.
-In the context of the Ziva builder it will search and replace:
+When doing a string replace, a search term and a replace term must be provided.
+In the context of the Ziva builder, it will search and replace:
 
 * node names
 * map names (zAttachment1.weights for example)
@@ -367,7 +366,7 @@ As before, let's build the Anatomical Arm demo from the Ziva menu and retrieve t
     z = zva.Ziva()
     z.retrieve_from_scene()
 
-To represent a model name change let's clean the scene and change the name of one of the muscles:
+To represent a model name change, let's clean the scene and change the name of one of the muscles:
 
 .. code-block:: python
 
@@ -377,14 +376,14 @@ To represent a model name change let's clean the scene and change the name of on
     cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
 
 Now the information in the builder is out of sync with the geometry in the scene.
-We can update it by doing the following:
+The builder can be updated:
 
 .. code-block:: python
 
     z.string_replace('r_bicep_muscle','r_biceps_muscle')
 
-Now when we build you see that the newly-named muscle is correctly integrated into the rig,
-and all the maps painted on that mesh have had their names corrected as well.
+When building, the newly-named muscle will be correctly integrated into the rig,
+and all the maps painted on that mesh will have their names corrected as well.
 
 .. code-block:: python
 
@@ -393,16 +392,16 @@ and all the maps painted on that mesh have had their names corrected as well.
 Mirroring a setup
 *****************
 
-We can also use string replace to mirror half of a Ziva rig into a full symmetric Ziva rig.
+String replacing can be used to mirror half of a Ziva rig into a full symmetric Ziva rig.
 
-In order for this to work the geometry needs to be already-mirrored,
+In order for this to work, the geometry needs to be already-mirrored,
 with **r_*** and **l_*** prefixes used to distinguish between each pair of mirrored meshes.
 Assuming you have already created a rig on the right-side of the character,
 you will then tell the builder to replace **r_muscle** with **l_muscle**
 (note that all zBuilder will be doing here is changing names, 
 so it expects all of the **l_muscle** meshes to already be in the scene).
 
-Let's run a little test scene that sets up 2 spheres and a cube with 1 attachment.
+Let's run a little test scene that sets up two spheres and a cube with one attachment.
 
 .. code-block:: python
 
@@ -411,11 +410,11 @@ Let's run a little test scene that sets up 2 spheres and a cube with 1 attachmen
     utl.build_mirror_sample_geo()
     utl.ziva_mirror_sample_geo()
 
-You should see a cube and 2 spheres in your scene.
-The right-side sphere **r_muscle** is a tissue and the cube is a bone,
+There should be a cube and two spheres in the scene.
+The right-side sphere **r_muscle** is a tissue, and the cube is a bone,
 and they are connected by a single attachment.
-We want to mirror this so the **l_muscle** gets a tissue and attachment as well.
-To do this we can just create and initialize a builder, perform a string replace, and then rebuild:
+Let's mirror this so the **l_muscle** gets a tissue and attachment as well.
+To do this, just create and initialize a builder, perform a string replace, and then rebuild:
 
 .. code-block:: python
 
@@ -426,9 +425,9 @@ To do this we can just create and initialize a builder, perform a string replace
     z.string_replace('^r_','l_')
 
 Notice the *^* in the search field.
-This is a regular expression to tell it to search just for an ``r_`` at the beginning of a name.
+This is a regular expression that enforces an ``r_`` at the beginning of a name.
 
-Now when you build you should have a mirrored setup:
+Now when build is called, it should result in a mirrored setup:
 
 .. code-block:: python
 
@@ -439,14 +438,14 @@ Now when you build you should have a mirrored setup:
 Advanced
 ~~~~~~~~
 
-Here we'll cover some of the more involved concepts.
+Here some of the more involved concepts are covered.
 
 Changing values before building
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It's possible to inspect and modify the contents of the builder before you actually build.
-For example, maybe you are in a specific shot and want to build a Ziva rig with
-a value different than what was saved on disk.
+It's possible to inspect and modify the contents of the builder before building.
+For example, maybe in a specific shot, a Ziva rig with
+a value different than what was saved on disk needs to be built.
 A common use case is to change the start frame of the Ziva solver based on the shot environment.
 Let's try doing that.
 
@@ -459,16 +458,16 @@ Build the Anatomical Arm demo again and retrieve the scene:
     z = zva.Ziva()
     z.retrieve_from_scene()
 
-Now we need to find the scene item we want to modify, in this case the solver.
-You can do that with the following code:
+The scene item that needs to be modified must be found; in this case, the solver has to be changed.
+The following code pulls the solver:
 
 .. code-block:: python
 
     scene_items = z.get_scene_items(name_filter='zSolver1')
     print scene_items[0]
 
-Here we're using the name filter to search for the specific item we're interested in.
-You should see something like this in the script editor:
+Here the name filter is being used to search for the specific item of interest.
+The Maya Script Editor should show something like this:
 
 .. code-block:: python
 
@@ -483,7 +482,7 @@ You should see something like this in the script editor:
         builder - <zBuilder.builders.ziva.Ziva object at 0x000001E90FDB97B8>
 
 That's all the information that the builder has stored for the solver scene item.
-To query and change the attributes you go through the ``attrs`` dictionary like so:
+To query and change the attributes, go through the ``attrs`` dictionary like so:
 
 .. code-block:: python
 
@@ -492,9 +491,9 @@ To query and change the attributes you go through the ``attrs`` dictionary like 
     scene_items[0].attrs['startFrame']['value'] = 10
     print 'After:', scene_items[0].attrs['startFrame']['value']
 
-In the above example we're printing the value of start frame before and after we change it.
+In the above example, the value of start frame is being printed before and after it is changed.
 
-Now if you apply the builder, the startFrame of the **zSolver1** node will be given the new value you set.
+Now if the builder is applied, the startFrame attribute of the **zSolver1** node will be given the new value.
 As before, the new value is applied whether or not the **zSolver1** node already existed in the scene before the call to **build()**.
 
 .. code-block:: python
