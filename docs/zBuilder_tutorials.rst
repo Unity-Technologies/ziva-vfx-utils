@@ -184,8 +184,8 @@ First, clean out the entire Ziva rig with the following command:
 
 .. code-block:: python
 
-    import zBuilder.zMaya as mz
-    mz.clean_scene()
+    import zBuilder.utils as utils
+    utils.clean_scene()
 
 **clean_scene()** is a utility function to remove all of the Ziva footprint in the scene.
 If you look in the scene the Ziva solver nodes should now be gone.
@@ -211,8 +211,8 @@ First thing, let's clean the scene to represent brand new geometry coming in:
 
 .. code-block:: python
 
-    import zBuilder.zMaya as mz
-    mz.clean_scene()
+    import zBuilder.utils as utils
+    utils.clean_scene()
 
 Now change the bicep for example.
 A quick way is to apply a mesh smooth.
@@ -284,7 +284,12 @@ Reading from disk
 *****************
 
 To test that writing worked properly let's setup the scene with just the geometry again.
-Run the Anatomical Arm demo again, then run **mz.clean_scene()**.
+Run the Anatomical Arm demo again, then run:
+
+.. code-block:: python
+
+    import zBuilder.utils as utils
+    utils.clean_scene()
 
 Once we have a scene with just the arm geometry, let's retrieve the Ziva rig from the file on disk.
 
@@ -365,8 +370,8 @@ To represent a model name change let's clean the scene and change the name of on
 
 .. code-block:: python
 
-    import zBuilder.zMaya as mz
-    mz.clean_scene()
+    import zBuilder.utils as utils
+    utils.clean_scene()
 
     cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
 
@@ -494,4 +499,3 @@ As before, the new value is applied whether or not the **zSolver1** node already
 .. code-block:: python
 
     z.build()
-
