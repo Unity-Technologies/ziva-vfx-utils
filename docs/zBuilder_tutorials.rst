@@ -89,7 +89,7 @@ Retrieving parts of a Ziva rig
 
 Above, the Ziva builder data was retrieved from the entire Maya scene.
 However, if only a part of the scene needs to be captured, one can select the items
-of interest and call retrieve_from_scene_selection().
+of interest and call **retrieve_from_scene_selection()**.
 This comes in handy when mirroring the setup. 
 For example:
 
