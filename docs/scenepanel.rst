@@ -1,9 +1,8 @@
 .. include:: <isonum.txt>
 .. _sec-ScenePanel:
 
-##############
 Scene Panel
-##############
+============
 
 .. note:: Scene Panel will be superseded by :ref:`sec-ScenePanel2`.
 
@@ -21,9 +20,10 @@ focusing on those specific parts of the scene.
 To display the full scene in the panel, select the solver and launch the scene panel,
 or click the **Refresh** |refresh_icon| button if the scene panel is already open.
 
-By selecting muscle or bone geometry before launching the Scene Panel,
+By selecting muscle or bone geometry and launching the Scene Panel,
 all related attachments will be traced, and any connected objects will be displayed in a tree view.
-If instead an attachment is selected, the source and destination of the attachment will be added to the panel.
+By launching the scene panel while an attachment is selected,
+the source and destination of the attachment are added to the tree view.
 This is done in order to grant the user control over what is viewed,
 and to minimize the amount of items one has to sort through.
 

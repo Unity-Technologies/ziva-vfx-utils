@@ -2,7 +2,7 @@
 .. _sec-ScenePanel2:
 
 Scene Panel 2
-**************
+===============
 
 Scene Panel 2 is a tool to view and organize Ziva VFX nodes and edit their attributes.
 It allows for quick browsing and editing of a subset of Ziva VFX nodes in the scene.
