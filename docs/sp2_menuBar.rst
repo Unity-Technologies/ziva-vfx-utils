@@ -16,21 +16,24 @@ File Menu
 Load.../Save...
 """"""""""""""""
 
-Loads a Ziva rig from a disk file, and applies
-it to the specified solver.
+Loads a Ziva rig from a disk file, and applies it to the specified solver.
 
-**Python commands**::
+**Python commands**:
 
-  # Load a Ziva rig from a file. Geometry must already be in the scene.
-  # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
-  # If solverName is provided, replace the name of the solver stored in the zBuilder file with a given solverName,
-  # and apply the rig to that solver.
-  import zBuilder.utils as utils
-  utils.load_rig(file_name, solver_name=None)
+.. code-block:: python
+
+    # Load a Ziva rig from a file. Geometry must already be in the scene.
+    # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
+    # If solverName is provided, replace the name of the solver stored in the zBuilder file with a given solverName,
+    # and apply the rig to that solver.
+    import zBuilder.utils as utils
+    utils.load_rig(file_name, solver_name=None)
 
 Saves the Ziva rig present only in the selected solver to a disk file.
 
-**Python commands**::
+**Python commands**:
+
+.. code-block:: python
 
   # Save a Ziva rig to a file.
   # If there is only one solver in the scene, it is saved.
@@ -40,12 +43,10 @@ Saves the Ziva rig present only in the selected solver to a disk file.
   utils.save_rig(file_name, solver_name=None)
 
 
-.. _sec-zRigCutCopyPaste:
-
 Cut/Copy/Paste
 """""""""""""""
 
-These commands make it possible to cut, copy, and paste Ziva rigs.
+These commands make it possible to cut/copy/paste Ziva rigs.
 Targets can be individual simulation bodies or entire solvers,
 and the rigs can be transferred within a creature, or from one creature onto another.
 For example, suppose that part of the creature is already rigged,
@@ -53,11 +54,15 @@ and an additional rig is needed that has the same number of mesh vertices and tr
 (but not the same vertex positions).
 Then you can select those already rigged objects, copy them,
 and paste their Ziva rigs onto this previously un-rigged additional geometry.
-Note that for copying an entire Ziva rig of a creature onto a "clean" un-rigged creature,
-either into the same solver or into a separate solver,
-you can also use the zRigTransfer script (:ref:`sec-zRigTransfer`).
 
-**Python commands**::
+.. note::
+    For copying an entire Ziva rig of a creature onto
+    a "clean" un-rigged creature (either into the same solver or into a separate solver),
+    you can also use the zRigTransfer script (:ref:`sec-zRigTransfer`).
+
+**Python commands**:
+
+.. code-block:: python
 
   # Cut the Ziva rig available on currently selected objects into the Ziva clipboard.
   # Selection cannot be empty; otherwise an error is reported.
@@ -84,8 +89,6 @@ you can also use the zRigTransfer script (:ref:`sec-zRigTransfer`).
   import zBuilder.utils as utils
   utils.rig_paste()
 
-
-.. _sec-zRigCopyPasteWithNameSubstitution:
 
 Copy/Paste with Name Substitution
 """"""""""""""""""""""""""""""""""
@@ -117,15 +120,15 @@ the geometries of ``r_biceps`` and ``l_biceps`` must be mirror images of one ano
 
     You can learn more about regular expressions at the `Regex101 website <https://regex101.com/>`_.
 
-**Python command**::
+**Python commands**:
+
+.. code-block:: python
 
   # Copy/Pastes Ziva rig for the selected solver, using regular expressions.
   # If multiple solvers are selected, only the first solver is processed.
   import zBuilder.utils as utils
   utils.copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with)
 
-
-.. _sec-zRigUpdate:
 
 Update
 """""""
@@ -137,7 +140,9 @@ if the current geometry was originally used to make the Ziva simulation bodies d
 This feature is also useful if you warped a creature using one of our warping tools
 and you want to update the Ziva rig to use the newly warped geometry.
 
-**Python command**::
+**Python commands**:
+
+.. code-block:: python
 
   # Updates the Ziva rig in the solver(s).
   # This command can be used if you made geometry modifications and you'd like to re-use a previously
@@ -164,14 +169,16 @@ In this case, this feature makes it possible to transfer the Ziva rig from the s
 The transferred rig is made available in whatever solver chosen by the user.
 A common choice is to make it available in its own separate solver,
 so that the target creature is completely independent of the source creature.
-After transferring the rig, the new Ziva rig on the target creature can be saved to disk using :ref:`sec-zLoadSaveRig`.
+After transferring the rig, the new Ziva rig on the target creature can be saved to disk using :ref:`sec-zLoadSaveRig` menu item.
 Optionally, the source creature and its solver can also be removed from the scene, 
 using the **Ziva** |rarr| **Remove** |rarr| **Selected Solver(s)** command,
 leaving a scene that has just the target creature in it.
 
 In order to warp the Ziva rig, you will need to provide the source and target solvers (in the dialog box).
 
-**Python command**::
+**Python commands**:
+
+.. code-block:: python
 
   # Transfers the Ziva rig from 'sourceSolver' to another solver (targetSolver).
   # This command does not transfer the geometry.
@@ -187,7 +194,6 @@ In order to warp the Ziva rig, you will need to provide the source and target so
   # in which case the rig on the 'warped_*' geometry is added into the sourceSolver.
   import zBuilder.utils as utils
   utils.rig_transfer(sourceSolver, prefix, targetSolver="")
-
 
 
 Edit Menu
