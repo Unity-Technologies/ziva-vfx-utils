@@ -73,7 +73,7 @@ _menubar_dict["File"] = (
         "Update Ziva rig in the selected solver to use the current geometry. "
         "Useful if you modified geometry after converting it to Ziva bodies. "
         "This updates the solver to use the new geometry.",
-        rig_update,
+        lambda: rig_update(None),
     ),
     (
         "Transfer Ziva Rig...",
