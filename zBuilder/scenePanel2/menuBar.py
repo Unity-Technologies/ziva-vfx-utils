@@ -26,33 +26,34 @@ _menubar_dict = OrderedDict()
 
 _menubar_dict["File"] = (
     (
-        "Load...",
+        "Load Ziva Rig...",
         "Load a Ziva rig from a file, into a new solver, or a specified existing solver. "
         "Geometry must already be present in the scene.",
         lambda: mel.eval("zLoadRigOptions"),
     ),
     (
-        "Save...",
+        "Save Ziva Rig...",
         "Save a Ziva rig for the selected solver to a file. "
         "If multiple solvers are selected, only the first solver is saved",
         lambda: mel.eval("zSaveRigOptions"),
     ),
+    (),  # separator
     (
-        "Cut",
+        "Cut Ziva Rig",
         "Cut the Ziva rig in selected objects to the Ziva clipboard. "
         "Selected objects must come from exactly one solver. "
         "Selected objects may contain a solver node.",
         rig_cut,
     ),
     (
-        "Copy",
+        "Copy Ziva Rig",
         "Copy the Ziva rig in selected objects to the Ziva clipboard. "
         "Selected objects must come from exactly one solver. "
         "Selected objects may contain a solver node.",
         rig_copy,
     ),
     (
-        "Paste",
+        "Paste Ziva Rig",
         "Paste the Ziva rig from the Ziva clipboard onto scene geometry, "
         "into the solver stored in the Ziva clipboard. "
         "If such a solver does not exist in the scene, it is created.",
@@ -60,7 +61,7 @@ _menubar_dict["File"] = (
     ),
     (),  # separator
     (
-        "Copy/Paste With Name Substitution...",
+        "Copy/Paste Ziva Rig With Name Substitution...",
         "Copy/pastes Ziva rig items using a name substitution (defined via regular expressions). "
         "Useful for mirroring the Ziva rig from one side of a character onto the other. "
         "Select the objects whose Ziva rig is to be copy/pasted. "
@@ -68,14 +69,14 @@ _menubar_dict["File"] = (
         lambda: mel.eval("zRigCopyPasteWithNameSubstitutionOptions()"),
     ),
     (
-        "Update",
+        "Update Ziva Rig",
         "Update Ziva rig in the selected solver to use the current geometry. "
         "Useful if you modified geometry after converting it to Ziva bodies. "
         "This updates the solver to use the new geometry.",
         rig_update,
     ),
     (
-        "Transfer...",
+        "Transfer Ziva Rig...",
         "Transfer Ziva rig from one solver into another. "
         "Two copies of geometries must exist in the scene; "
         "the target copies must be prefixed with a specified prefix.",

@@ -13,8 +13,8 @@ File Menu
 
 .. _sec-zLoadSaveRig:
 
-Load.../Save...
-""""""""""""""""
+Load/Save Ziva Rig
+"""""""""""""""""""
 
 Loads a Ziva rig from a disk file, and applies it to the specified solver.
 
@@ -43,8 +43,8 @@ Saves the Ziva rig present only in the selected solver to a disk file.
   utils.save_rig(file_name, solver_name=None)
 
 
-Cut/Copy/Paste
-"""""""""""""""
+Cut/Copy/Paste Ziva Rig
+""""""""""""""""""""""""
 
 These commands make it possible to cut/copy/paste Ziva rigs.
 Targets can be individual simulation bodies or entire solvers,
@@ -90,8 +90,8 @@ and paste their Ziva rigs onto this previously un-rigged additional geometry.
   utils.rig_paste()
 
 
-Copy/Paste with Name Substitution
-""""""""""""""""""""""""""""""""""
+Copy/Paste Ziva Rig With Name Substitution
+"""""""""""""""""""""""""""""""""""""""""""
 
 Suppose you have already modeled the geometry of a creature,
 and a Ziva rig on one half (say, the left side) of a creature.
@@ -130,8 +130,8 @@ the geometries of ``r_biceps`` and ``l_biceps`` must be mirror images of one ano
   utils.copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with)
 
 
-Update
-"""""""
+Update Ziva Rig
+""""""""""""""""
 
 This command updates the Ziva rig in the selected solver to use the current geometry.
 This is useful if you made modifications to creature's geometry *after* you converted it into Ziva simulation bodies.
@@ -154,8 +154,8 @@ and you want to update the Ziva rig to use the newly warped geometry.
 
 .. _sec-zRigTransfer:
 
-Transfer...
-""""""""""""
+Transfer Ziva Rig...
+"""""""""""""""""""""
 
 Suppose you have a fully set up source Ziva creature with both the geometry and Ziva rig,
 and a target creature for which you have the geometry,
