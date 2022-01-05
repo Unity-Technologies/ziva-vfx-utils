@@ -193,7 +193,7 @@ class zGeoWidget(QtWidgets.QWidget):
             node_list_2 (list): list of nodes
         """
         node_long_name_dict = {
-            node.long_name: node for node in node_list_1 + node_list_2}
+            node.long_name: node for node in list(node_list_1) + list(node_list_2)}
         return node_long_name_dict.values()
 
     def _get_nodes_to_pin(self, exclude_nodes):
