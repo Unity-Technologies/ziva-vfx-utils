@@ -2,7 +2,7 @@ import os
 import zBuilder.builders.ziva as zva
 
 from zBuilder.zMaya import rename_ziva_nodes
-from zBuilder.utils import copy_paste_with_substitution
+from zBuilder.utils import copy_paste_with_substitution, remove_solver
 from tests.utils import load_scene
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase
 from vfx_test_case import ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
@@ -123,11 +123,29 @@ class ZivaTissueGenericTestCase(VfxTestCase):
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zTissue")), 1)
 
-    def test_builder_can_retrieve_collision_set_attr(self):
-        """ Check if the non-keyable collision set attr is retrieved.
+    def test_roundtrip_collision_set_attr(self):
+        """ Retrieve and build the collision set attr.
+        It is a non-keyable string type attr.
         """
-        tissue_node = self.builder.get_scene_items(name_filter="l_tissue_1_zTissue")[0]
+        # Setup, create a tissue
+        cmds.file(new=True, force=True)
+        cmds.polySphere()
+        cmds.ziva("pSphere1", t=True)
+        # Set collision set value and retrieve
+        cmds.setAttr("zTissue1.collisionSets", "1, 2", type="string")
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # Action
+        tissue_node = builder.get_scene_items(name_filter="zTissue1")[0]
+        # Verify
         self.assertIn("collisionSets", tissue_node.attrs)
+
+        # Action
+        remove_solver()
+        builder.build()
+        # Verify
+        self.assertEqual(cmds.getAttr("zTissue1.collisionSets"), "1, 2")
 
 
 class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):

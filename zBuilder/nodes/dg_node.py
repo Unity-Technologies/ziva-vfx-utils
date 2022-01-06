@@ -42,8 +42,7 @@ class DGNode(Base):
                 name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 try:
-                    output += '\t{} - {}\n'.format(key,
-                                                   self.__dict__[key].__repr__())
+                    output += '\t{} - {}\n'.format(key, self.__dict__[key].__repr__())
                 except:
                     output += '\t{} - {}\n'.format(key, self.__dict__[key])
 
@@ -148,44 +147,38 @@ class DGNode(Base):
         Returns:
             nothing.
         """
-        scene_name = self.name
-
-        type_ = self.type
         node_attrs = self.attrs.keys()
-        if attr_filter:
-            if attr_filter.get(type_, None):
-                node_attrs = list(
-                    set(node_attrs).intersection(attr_filter[type_]))
+        if attr_filter and attr_filter.get(self.type, None):
+            node_attrs = list(set(node_attrs).intersection(attr_filter[self.type]))
 
         for attr in node_attrs:
-            if self.attrs[attr]['type'] == 'doubleArray':
-                if cmds.objExists('{}.{}'.format(scene_name, attr)):
-                    if not cmds.getAttr('{}.{}'.format(scene_name, attr), l=True):
-                        cmds.setAttr('{}.{}'.format(scene_name, attr),
-                                     self.attrs[attr]['value'],
-                                     type='doubleArray')
-                else:
-                    text = '{}.{} not found, skipping.'.format(
-                        scene_name, attr)
-                    logger.info(text)
-            else:
-                if cmds.objExists('{}.{}'.format(scene_name, attr)):
-                    if not cmds.getAttr('{}.{}'.format(scene_name, attr), l=True):
-                        try:
-                            cmds.setAttr('{}.{}'.format(scene_name, attr),
-                                         self.attrs[attr]['value'])
-                        except:
-                            pass
-                else:
-                    text = '{}.{} not found, skipping.'.format(
-                        scene_name, attr)
-                    logger.info(text)
+            node_dot_attr = '{}.{}'.format(self.name, attr)
+            if not cmds.objExists(node_dot_attr):
+                logger.info('{} not found, skipping.'.format(node_dot_attr))
+                continue
+
+            # Skip locked or connected attributes
+            if cmds.getAttr(node_dot_attr, settable=True):
+                try:
+                    cmds.setAttr(node_dot_attr,
+                                 self.attrs[attr]['value'],
+                                 type=self.attrs[attr]['type'])
+                except RuntimeError:
+                    # setAttr() throws when attr type is bool or double.
+                    # For such case, call setAttr() again w/o specifying type.
+                    try:
+                        cmds.setAttr(node_dot_attr, self.attrs[attr]['value'])
+                    except RuntimeError:
+                        # When setting "dragField1.maxDistance" attr,
+                        # It first throws exception:
+                        # RuntimeError: setAttr: The type 'doubleLinear' is not the name of a recognized type.
+                        # After invoke setAttr() again, it throw another exception:
+                        # RuntimeError: setAttr: Cannot set the attribute 'dragField1.maxDistance' below its minimum value of 0.
+                        # This time the value retrieved is -1.0.
+                        # We can do nothing but ignore it.
+                        pass
 
             # check the alias
-            if cmds.objExists('{}.{}'.format(scene_name, attr)):
-                alias = self.attrs[attr].get('alias', None)
-                if alias:
-                    try:
-                        cmds.aliasAttr(alias, '{}.{}'.format(scene_name, attr))
-                    except RuntimeError:
-                        pass
+            alias = self.attrs[attr].get('alias', None)
+            if alias:
+                cmds.aliasAttr(alias, node_dot_attr)
