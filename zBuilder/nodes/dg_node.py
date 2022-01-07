@@ -164,18 +164,25 @@ class DGNode(Base):
                                  self.attrs[attr]['value'],
                                  type=self.attrs[attr]['type'])
                 except RuntimeError:
-                    # setAttr() throws when attr type is bool or double.
-                    # For such case, call setAttr() again w/o specifying type.
+                    # setAttr() throws when attr type is bool, double, or other types.
+                    # For such case, call setAttr() again w/o specifying type should make it work.
                     try:
                         cmds.setAttr(node_dot_attr, self.attrs[attr]['value'])
                     except RuntimeError:
-                        # When setting "dragField1.maxDistance" attr,
-                        # It first throws exception:
+                        # Unfortunately, in the Maya field nodes unit test,
+                        # when retrieving Maya DragField node attr list,
+                        # its maxDistance attr returns -1.0, not minimum value 0.
+                        # When setting "dragField1.maxDistance" attr during build() operation,
+                        # it first throws exception:
                         # RuntimeError: setAttr: The type 'doubleLinear' is not the name of a recognized type.
-                        # After invoke setAttr() again, it throw another exception:
+                        # This makes sense. But after invoking setAttr() again with -1.0 value,
+                        # it throw another exception:
                         # RuntimeError: setAttr: Cannot set the attribute 'dragField1.maxDistance' below its minimum value of 0.
-                        # This time the value retrieved is -1.0.
-                        # We can do nothing but ignore it.
+                        # If we want to prevent this problem, we need to verify attr type and its min/max range,
+                        # in the build_attr_key_values() function.
+                        # That imposes extra work in our code for Maya's bug.
+                        # The easiest solution is mute this error and skip setting this attr value.
+                        # The downside is it also mutes any our errors.
                         pass
 
             # check the alias
