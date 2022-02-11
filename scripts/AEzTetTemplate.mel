@@ -3,6 +3,7 @@ global proc AEzTetTemplate( string $nodeName )
   editorTemplate -beginScrollLayout;
 
   // Add our controls
+  editorTemplate -addControl "cacheTetMesh";
   editorTemplate -addControl "tetSize";
   editorTemplate -addControl "surfaceRefinement";
   editorTemplate -addControl "refinementPropagation";
