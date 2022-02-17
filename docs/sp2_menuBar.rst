@@ -195,6 +195,40 @@ In order to warp the Ziva rig, you will need to provide the source and target so
   import zBuilder.utils as utils
   utils.rig_transfer(sourceSolver, prefix, targetSolver="")
 
+Transfer Skin Cluster...
+"""""""""""""""""""""""""
+
+Suppose there is a fully set up Ziva creature with some Maya skin clusters
+that are used to drive the bone meshes based on the joint hierarchy motion.
+
+To perform skin cluster transfer, the source and target meshes and joints
+must be in the scene with the same name (a configurable prefix is required).
+The target meshes have two requirements:
+
+1. No warper deformers (such as zBoneWarp) can be applied.
+2. The meshes must be in an equivalent state (and are so if Maya's Delete History function has been applied).
+
+The bone meshes and the joint hierarchy are transferred onto a new (target) creature
+by copying the skin cluster weights from source meshes to the target meshes,
+and by connecting the target meshes to the target joint hierarchy.
+
+To execute the skin cluster transfer:
+
+1. Select the source meshes and the **Transfer Skin Cluster...** menu item.
+2. In the popup dialog, click the **Transfer** button.
+
+**Python command**:
+
+.. code-block:: python
+
+  # Transfer the skin clusters for some selected meshes onto their warped counterparts 
+  # and to connect the warped joint hierarchy.
+  # This requires both geometries (selected and warped) have the same topology.
+  # Also, the names of the warped meshes must be prefixed with "prefix".
+  # Note: Warp the source meshes and the corresponding joint hierarchy before running the command.
+  import zBuilder.utils as utils
+  utils.skincluster_transfer(prefix="")
+
 
 Edit Menu
 ^^^^^^^^^^^^

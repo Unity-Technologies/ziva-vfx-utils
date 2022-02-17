@@ -441,13 +441,12 @@ def rig_transfer(source_solver, prefix, target_solver=""):
 
 
 def skincluster_transfer(prefix=""):
-    # Transfer the skin clusters for the selected mesh(es) onto their warped counterpart(s),
-    # and connect the warped mesh(es) to the warped joint hierarchy.
-    # Both geometries must have the same topology. The names of the warped meshes must be prefixed
-    # with prefix.
-    # This command assumes that both the source mesh(es) and the joint hierarchy driving it via the
-    # skin cluster(s), have already been warped, and are prefixed with "prefix" (without the
-    # quotes).
+    """ Transfer the skin clusters for some selected meshes onto their warped counterparts
+        and to connect the warped joint hierarchy.
+        This requires both geometries (selected and warped) have the same topology.
+        Also, the names of the warped meshes must be prefixed with "prefix".
+        Note: Warp the source meshes and the corresponding joint hierarchy before running the command.
+    """
     selected_nodes = cmds.ls(sl=True)
     if len(selected_nodes) == 0:
         cmds.error("Must select at least one mesh.\n")

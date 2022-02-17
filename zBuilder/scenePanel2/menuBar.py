@@ -82,6 +82,13 @@ _menubar_dict["File"] = (
         "the target copies must be prefixed with a specified prefix.",
         lambda: mel.eval("zRigTransferOptions()"),
     ),
+    (),  # separator
+    (
+        "Transfer Skin Cluster...",
+        "Transfer a Maya skin cluster from a mesh onto a warped mesh."
+        "Select a Maya mesh that contains a skin cluster that you want to warp.",
+        lambda: mel.eval("zSkinClusterTransferOptions()"),
+    ),
 )
 
 _menubar_dict["Edit"] = (
