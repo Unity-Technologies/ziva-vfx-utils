@@ -140,12 +140,17 @@ def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     deformerSetFn = om.MFnSet(deformerSetObj)
     deformerSetSel = om.MSelectionList()
     deformerSetFn.getMembers(deformerSetSel, False)
+    node_dot_attr = '{}.{}'.format(node_name, attr_name)
+    assert deformerSetSel.length() > 0, "{} has no deformer set.".format(node_dot_attr)
+
     deformerSetPath = om.MDagPath()
     deformerSetComp = om.MObject()
     for i in range(deformerSetSel.length()):
         deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
         if deformerSetPath == dagPath:
             break
+
+    assert deformerSetPath.isValid(), "Can't find deformer set in {}".format(node_dot_attr)
     assert (deformerSetPath == dagPath)  # This shouldn't be possible.
 
     weightList = om.MFloatArray()
@@ -330,12 +335,17 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
     deformerSetFn = om.MFnSet(deformerSetObj)
     deformerSetSel = om.MSelectionList()
     deformerSetFn.getMembers(deformerSetSel, False)
+    node_dot_attr = '{}.{}'.format(node_name, attr_name)
+    assert deformerSetSel.length() > 0, "{} has no deformer set.".format(node_dot_attr)
+
     deformerSetPath = om.MDagPath()
     deformerSetComp = om.MObject()
     for i in range(deformerSetSel.length()):
         deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
         if deformerSetPath == dagPath:
             break
+
+    assert deformerSetPath.isValid(), "Can't find deformer set in {}".format(node_dot_attr)
     assert (deformerSetPath == dagPath)  # This shouldn't be possible.
 
     deformerFn.setWeight(deformerSetPath, index, deformerSetComp, weightList)
