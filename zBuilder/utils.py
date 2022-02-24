@@ -485,8 +485,8 @@ def save_rig(file_name):
 
 
 def copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with):
-    """ Copy/Pastes the Ziva rig of the selected objects,
-    onto non-Ziva-rigged objects whose names are defined using regular expressions.
+    """ Copy/Pastes the Ziva objects of the selected objects onto non-Ziva-rigged objects
+    whose names are defined using regular expressions.
 
     This is useful, for example, for mirroring a Ziva rig, rig one side of the character first,
     then use this command to automatically "copy" the rig to the other side.

@@ -43,17 +43,17 @@ Saves the Ziva rig present only in the selected solver to a disk file.
   utils.save_rig(file_name, solver_name=None)
 
 
-Cut/Copy/Paste Ziva Rig
+Cut/Copy/Paste Selection
 """"""""""""""""""""""""
 
-These commands make it possible to cut/copy/paste Ziva rigs.
-Targets can be individual simulation bodies or entire solvers,
+Here are the commands to cut/copy/paste selected Ziva objects.
+To apply such commands, targets can be individual simulation bodies or entire solvers,
 and the rigs can be transferred within a creature, or from one creature onto another.
-For example, suppose that part of the creature is already rigged,
+For example, if part of a creature is already rigged,
 and an additional rig is needed that has the same number of mesh vertices and triangle connectivity
-(but not the same vertex positions).
-Then you can select those already rigged objects, copy them,
-and paste their Ziva rigs onto this previously un-rigged additional geometry.
+(but not the same vertex positions),
+then one can select those already rigged objects,
+cut/copy and paste their Ziva rigs onto previously un-rigged additional geometry.
 
 .. note::
     For copying an entire Ziva rig of a creature onto
@@ -157,15 +157,12 @@ and you want to update the Ziva rig to use the newly warped geometry.
 Transfer Ziva Rig...
 """""""""""""""""""""
 
-Suppose you have a fully set up source Ziva creature with both the geometry and Ziva rig,
-and a target creature for which you have the geometry,
-but no Ziva rig.
-Suppose the target geometry has the same triangle connectivity 
-but different vertex positions than the source geometry.
-This is the case, for example,
-when the target creature geometry was obtained by warping the source creature geometry using ZAT.
+Suppose there is a fully set up source Ziva creature with both geometry and Ziva rig,
+and a target creature geometry without a Ziva rig.
+If the target geometry has same triangle connectivity but different vertex positions than the source geometry
+(e.g. a target creature geometry obtained by warping the source creature geometry using ZAT),
+this feature can transfer the Ziva rig from the source geometry onto the target geometry.
 
-In this case, this feature makes it possible to transfer the Ziva rig from the source geometry onto the target geometry.
 The transferred rig is made available in whatever solver chosen by the user.
 A common choice is to make it available in its own separate solver,
 so that the target creature is completely independent of the source creature.

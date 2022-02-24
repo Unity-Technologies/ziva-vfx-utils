@@ -39,21 +39,21 @@ _menubar_dict["File"] = (
     ),
     (),  # separator
     (
-        "Cut Ziva Rig",
-        "Cut the Ziva rig in selected objects to the Ziva clipboard. "
+        "Cut Selection",
+        "Cut the Ziva components from selected objects to the Ziva clipboard. "
         "Selected objects must come from exactly one solver. "
         "Selected objects may contain a solver node.",
         rig_cut,
     ),
     (
-        "Copy Ziva Rig",
-        "Copy the Ziva rig in selected objects to the Ziva clipboard. "
+        "Copy Selection",
+        "Copy the Ziva components from selected objects to the Ziva clipboard. "
         "Selected objects must come from exactly one solver. "
         "Selected objects may contain a solver node.",
         rig_copy,
     ),
     (
-        "Paste Ziva Rig",
+        "Paste Selection",
         "Paste the Ziva rig from the Ziva clipboard onto scene geometry, "
         "into the solver stored in the Ziva clipboard. "
         "If such a solver does not exist in the scene, it is created.",
@@ -61,9 +61,9 @@ _menubar_dict["File"] = (
     ),
     (),  # separator
     (
-        "Copy/Paste Ziva Rig With Name Substitution...",
-        "Copy/pastes Ziva rig items using a name substitution (defined via regular expressions). "
-        "Useful for mirroring the Ziva rig from one side of a character onto the other. "
+        "Copy/Paste Ziva objects With Name Substitution...",
+        "Copy/pastes Ziva objects items using a name substitution (defined via regular expressions)."
+        "Useful for mirroring the Ziva objects from one side of a character onto the other."
         "Select the objects whose Ziva rig is to be copy/pasted. "
         "Selected objects should come from exactly one solver.",
         lambda: mel.eval("zRigCopyPasteWithNameSubstitutionOptions()"),
