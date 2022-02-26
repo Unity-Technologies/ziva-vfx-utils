@@ -62,7 +62,7 @@ _menubar_dict["File"] = (
     (),  # separator
     (
         "Copy/Paste Ziva objects With Name Substitution...",
-        "Copy/pastes Ziva objects items using a name substitution (defined via regular expressions)."
+        "Copy/pastes Ziva objects using a name substitution (defined via regular expressions)."
         "Useful for mirroring the Ziva objects from one side of a character onto the other."
         "Select the objects whose Ziva rig is to be copy/pasted. "
         "Selected objects should come from exactly one solver.",

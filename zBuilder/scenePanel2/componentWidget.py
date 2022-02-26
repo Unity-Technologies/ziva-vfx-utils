@@ -150,11 +150,11 @@ class ComponentSectionWidget(QtWidgets.QWidget):
             self._on_tvComponent_selectionChanged)
         self._tvComponent.installEventFilter(self)
 
-    def _on_btnFold_toggled(self, checked):
+    def _on_btnFold_toggled(self):
         """ Hide the tree view widget when checked is False, True otherwise
         and adjusts widget heights.
         """
-        self.update_widget_visibility(checked)
+        self.update_widget_visibility(self._btnFold.isChecked())
         # Ask parent to update the whole layout height
         self._parent.on_section_toggled()
 

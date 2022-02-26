@@ -357,6 +357,7 @@ class zGeoWidget(QtWidgets.QWidget):
                 self._builder, zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
             self._tmGeo.reset_model(self._builder, self._cur_selection_tree,
                                     self._is_partial_tree_view)
+            self._wgtComponent_ref.reset_model(None, [])
             self._sync_pin_state_full_to_partial_view()
         else:
             # Reset component view
@@ -457,8 +458,10 @@ class zGeoWidget(QtWidgets.QWidget):
     def _sync_pin_state_full_to_partial_view(self):
         """ update pin state of partial tree based on whole tree view
         """
-        selected_nodes = [
-            item.data for item in self._cur_selection_tree.children[0].children]
+        if not self._cur_selection_tree.children:
+            return
+
+        selected_nodes = [item.data for item in self._cur_selection_tree.children[0].children]
         nodes_to_pin_item = [
             TreeItem(None, node) for node in self._get_nodes_to_pin(selected_nodes)]
         self._cur_selection_tree.children[0].append_children(
