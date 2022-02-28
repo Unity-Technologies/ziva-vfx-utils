@@ -63,7 +63,7 @@ class ScenePanel2(QtWidgets.QWidget):
         self._wgtGeo.set_component_widget(self._wgtComponent)
         self._is_ziva_vfx_loaded = "ziva" in cmds.pluginInfo(query=True, listPlugins=True)
         if self._is_ziva_vfx_loaded:
-            self._wgtGeo.reset_builder(True)
+            self._wgtGeo.reset_builder(True, False)
         else:
             logger.warning(
                 "Ziva VFX plugin is not loaded. The Scene Panel 2 will not work normally.")
@@ -148,7 +148,7 @@ class ScenePanel2(QtWidgets.QWidget):
             pass
 
         if proceed and self._is_ziva_vfx_loaded:
-            self._wgtGeo.reset_builder(True)
+            self._wgtGeo.reset_builder(True, True)
 
     def on_new_scene_opened(self):
         """ Callback invoked after Maya create the empty scene
@@ -174,7 +174,7 @@ class ScenePanel2(QtWidgets.QWidget):
             pass
 
         if proceed and self._is_ziva_vfx_loaded:
-            self._wgtGeo.reset_builder(False)
+            self._wgtGeo.reset_builder(False, True)
 
     def on_scene_presave(self, client_data):
         """ Callback invoked before Maya save the scene

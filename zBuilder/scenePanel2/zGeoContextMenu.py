@@ -10,7 +10,7 @@ def create_general_context_menu(parent):
     # Currently it only contains the Refresh action
     icon = QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_name("refresh")))
     action = QtWidgets.QAction(icon, "Refresh", parent)
-    action.triggered.connect(partial(parent.reset_builder, False))
+    action.triggered.connect(partial(parent.reset_builder, False, False))
     menu = QtWidgets.QMenu(parent)
     menu.addAction(action)
     return menu

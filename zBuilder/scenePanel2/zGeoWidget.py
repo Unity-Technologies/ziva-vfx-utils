@@ -69,7 +69,7 @@ class zGeoWidget(QtWidgets.QWidget):
         self.setLayout(self._lytGeo)
 
     def _setup_actions(self):
-        self._btnRefresh.clicked.connect(partial(self.reset_builder, False))
+        self._btnRefresh.clicked.connect(partial(self.reset_builder, False, False))
         self._tvGeo.selectionModel().selectionChanged.connect(
             self._on_tvGeo_selectionChanged)
         self._tvGeo.installEventFilter(self)
@@ -327,12 +327,13 @@ class zGeoWidget(QtWidgets.QWidget):
     def set_component_widget(self, wgtComponent):
         self._wgtComponent_ref = weakref.proxy(wgtComponent)
 
-    def reset_builder(self, load_plug_data):
+    def reset_builder(self, load_plug_data, clear_state):
         """ Update and merge zBuilder parse result with zGeo Tree View then set the zGeo TreeView.
         This forces a complete redraw of the zGeo TreeView.
 
         Args:
             load_plug_data(bool): Whether to load json data from solverTM plug.
+            clear_state(bool): Whether to clear the existing selected and pinned nodes.
         """
 
         solverTM_nodes = cmds.ls(type="zSolverTransform", l=True)
@@ -347,6 +348,10 @@ class zGeoWidget(QtWidgets.QWidget):
             self._selected_nodes = list()
             self._pinned_nodes = list()
             return
+
+        if clear_state:
+            self._selected_nodes = list()
+            self._pinned_nodes = list()
 
         self._builder = zva.Ziva()
         self._builder.retrieve_connections()
