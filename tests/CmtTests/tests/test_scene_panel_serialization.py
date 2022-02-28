@@ -95,7 +95,7 @@ class ScenePanelSerializationTestCase(VfxTestCase):
 
     def test_construct_tree_function(self):
         # Action
-        solverTM = construct_tree(
+        solverTM, pinned_item_list = construct_tree(
             to_tree_entry_list(ScenePanelSerializationTestCase.test_tree_data, _version), True)
 
         # Verify: return value constructs the test_tree_data tree structure.
@@ -139,6 +139,9 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(tissue1.pin_state, TreeItem.Pinned)
         self.assertEqual(tissue1.child_count(), 0)
 
+        # Verify pinned item list
+        self.assertEqual(pinned_item_list, [tissue1])
+
     def test_construct_tree_function2(self):
         """ Test if construct_tree() can handle consecutive tree items
         """
@@ -167,7 +170,8 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         ]
 
         # Action
-        solverTM = construct_tree(to_tree_entry_list(serialized_data, _version), True)
+        solverTM, pinned_item_list = construct_tree(to_tree_entry_list(serialized_data, _version),
+                                                    True)
 
         # Verify above data returns a tree structure as follows:
         # zSolver1
@@ -206,6 +210,9 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(tissue1_node.pin_state, TreeItem.Pinned)
         self.assertEqual(tissue1_node.child_count(), 0)
 
+        # Verify pinned item list
+        self.assertEqual(pinned_item_list, [tissue1_node])
+
     def test_round_trip_of_json_tree_data(self):
         """ Test the functions that do the conversion between json string and TreeItem tree.
         """
@@ -214,7 +221,8 @@ class ScenePanelSerializationTestCase(VfxTestCase):
 
         # Action
         json_string = to_json_string(flatten_tree(root_node))
-        deserialized_solverTM = construct_tree(to_tree_entry_list(json_string), True)
+        deserialized_solverTM, pinned_item_list = construct_tree(to_tree_entry_list(json_string),
+                                                                 True)
 
         # Verify: compare results with original tree items
         self.assertIsNone(deserialized_solverTM.parent)
@@ -256,6 +264,9 @@ class ScenePanelSerializationTestCase(VfxTestCase):
         self.assertEqual(deserialized_tissue2_node.data.name, "tissue2")
         self.assertEqual(deserialized_tissue2_node.pin_state, TreeItem.Unpinned)
         self.assertEqual(deserialized_tissue2_node.child_count(), 0)
+
+        # Verify pinned item list
+        self.assertEqual(pinned_item_list, [deserialized_tissue1_node])
 
     def test_construct_multiple_solvers(self):
         """ Test construct of multiple solvers separately.

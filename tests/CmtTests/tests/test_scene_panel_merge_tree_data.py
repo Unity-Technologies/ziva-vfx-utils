@@ -140,7 +140,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         _, _, solverTM, _, _, _, tissue1, tissue2 = setup_scene()
 
         # Action
-        new_solverTM = merge_tree_data([solverTM.data], None)
+        new_solverTM, pinned_node_list = merge_tree_data([solverTM.data], None)
 
         # Verify
         self.assertIsNot(new_solverTM, solverTM)
@@ -168,6 +168,10 @@ class MergeTreeDataTestCase(VfxTestCase):
         self.assertIs(new_tissue2.data, tissue2.data)
         self.assertEqual(len(new_tissue2.children), 0)
 
+        # Verify
+        # pinned node list is empty because scene panel data is not loaded.
+        self.assertEqual(pinned_node_list, [])
+
     def test_no_conflict_merge(self):
         """ Test merge zBuilder result and tree entry list without conflict.
         """
@@ -177,7 +181,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         # Action
         tree_entry_list = flatten_tree(solverTM)
         zGeo_node_list = get_zGeo_nodes_by_solverTM(builder, solverTM_maya_node)
-        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+        new_solverTM, pinned_node_list = merge_tree_data(zGeo_node_list, tree_entry_list)
 
         # Verify
         self.assertIsNot(new_solverTM, solverTM)
@@ -214,6 +218,9 @@ class MergeTreeDataTestCase(VfxTestCase):
         self.assertIs(new_tissue2.data, tissue2.data)
         self.assertEqual(len(new_tissue2.children), 0)
 
+        # Verify pinned node list
+        self.assertEqual(pinned_node_list, [new_tissue2.data])
+
     def test_merge_on_new_node_added(self):
         """ Test merge zBuilder w/ new node added with tree entry list.
         """
@@ -244,7 +251,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         tissue3_node = get_mesh_node_by_zGeo_node(new_builder, "tissue3")
 
         zGeo_node_list = get_zGeo_nodes_by_solverTM(new_builder, solverTM_maya_node)
-        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+        new_solverTM, pinned_node_list = merge_tree_data(zGeo_node_list, tree_entry_list)
 
         # Verify: new node should append at the end of solverTM child list
         self.assertIsNot(new_solverTM, solverTM)
@@ -288,6 +295,9 @@ class MergeTreeDataTestCase(VfxTestCase):
         self.assertIs(new_tissue3.data, tissue3_node)
         self.assertEqual(len(new_tissue3.children), 0)
 
+        # Verify pinned node list
+        self.assertEqual(pinned_node_list, [new_tissue2.data])
+
     def test_merge_on_node_deleted(self):
         """ Test merge zBuilder w/ existing node deleted with tree entry list.
         """
@@ -315,7 +325,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         tissue2_node = get_mesh_node_by_zGeo_node(new_builder, "tissue2")
 
         zGeo_node_list = get_zGeo_nodes_by_solverTM(new_builder, solverTM_maya_node)
-        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+        new_solverTM, pinned_node_list = merge_tree_data(zGeo_node_list, tree_entry_list)
 
         # Verify: new node should append at the end of solverTM child list
         self.assertIsNot(new_solverTM, solverTM)
@@ -344,6 +354,9 @@ class MergeTreeDataTestCase(VfxTestCase):
         # The new merge tree item refer to the input zBuilder nodes
         self.assertIs(new_tissue2.data, tissue2_node)
         self.assertEqual(len(new_tissue2.children), 0)
+
+        # Verify pinned node list
+        self.assertEqual(pinned_node_list, [new_tissue2.data])
 
     def test_merge_on_node_renamed(self):
         """ Test merge zBuilder w/ existing node renamed with tree entry list.
@@ -382,7 +395,7 @@ class MergeTreeDataTestCase(VfxTestCase):
         tissue2_node = get_mesh_node_by_zGeo_node(new_builder, "tissue2")
 
         zGeo_node_list = get_zGeo_nodes_by_solverTM(new_builder, new_solverTM_name)
-        new_solverTM = merge_tree_data(zGeo_node_list, tree_entry_list)
+        new_solverTM, pinned_node_list = merge_tree_data(zGeo_node_list, tree_entry_list)
 
         # Verify: new node should append at the end of solverTM child list
         self.assertIsNot(new_solverTM, solverTM)
@@ -418,3 +431,6 @@ class MergeTreeDataTestCase(VfxTestCase):
         # The new merge tree item refer to the input zBuilder nodes
         self.assertIs(new_tissue1.data, tissue1_node)
         self.assertEqual(len(new_tissue1.children), 0)
+
+        # Verify pinned node list
+        self.assertEqual(pinned_node_list, [new_tissue2.data])

@@ -199,7 +199,7 @@ def construct_tree(tree_entry_list, mock_zBuilder_node):
         mock_zBuilder_node(bool): Create a mock zBuilder node for unit test, if True.
 
     Returns:
-        TreeItem tree.
+        TreeItem tree, and a pinned item list.
     """
     def create_tree_item(parent, entry):
         """ Helper function to create TreeItem instance.
@@ -229,6 +229,7 @@ def construct_tree(tree_entry_list, mock_zBuilder_node):
         return cur_item
 
     assert tree_entry_list
+    pinned_item_list = []
     root_item = None  # the return value
     last_entry = None  # last processed tree entry
     last_item = None  # TreeItem created based on last_entry
@@ -251,8 +252,12 @@ def construct_tree(tree_entry_list, mock_zBuilder_node):
         else:  # depth_diff < 0
             last_item = create_tree_item(get_parent_item(last_item, -depth_diff + 1), entry)
         last_entry = entry
-
-    return root_item
+        # Add pinned item to the list for future use
+        is_pinned_item = (entry.node_type != "group") and (entry.node_data["pin_state"]
+                                                           == TreeItem.Pinned)
+        if is_pinned_item:
+            pinned_item_list.append(last_item)
+    return root_item, pinned_item_list
 
 
 def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
@@ -268,15 +273,16 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
             or deserialized from solverTM plug.
 
     Return:
-        Merged TreeItem tree.
+        Pair of merged TreeItem tree, and the pinned zBuilder node list.
         The root TreeItem data type must be zSolverTransform.
+        The pinned zBuilder node list is used for the Scene Panel internal data structure.
     """
     assert zBuilder_node_list
     if not tree_view_entry_list:
         # zGeo Tree View has no data, create the tree from zBuilder node list
         solverTM = list(filter(lambda node: node.type == "zSolverTransform", zBuilder_node_list))[0]
         return build_scene_panel_tree(solverTM,
-                                      zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+                                      zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0], []
 
     # Merge zBuilder node list and tree view entry list
     # 1. Create lookup table
@@ -329,7 +335,7 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
                 entry.zBuilder_node = node_dict[entry.long_name]
 
     # 4. Construct new TreeItem tree
-    merged_tree = construct_tree(valid_tree_view_entry_list, False)
+    merged_tree, pinned_item_list = construct_tree(valid_tree_view_entry_list, False)
     assert merged_tree.data.type == "zSolverTransform"
 
     # 5. Append newly added item at the end of solverTM child list
@@ -339,4 +345,4 @@ def merge_tree_data(zBuilder_node_list, tree_view_entry_list):
             # We don't want to append them here.
             continue
         merged_tree.append_children(TreeItem(None, node_dict[node_name]))
-    return merged_tree
+    return merged_tree, [item.data for item in pinned_item_list]

@@ -194,14 +194,14 @@ class zGeoWidget(QtWidgets.QWidget):
         """
         node_long_name_dict = {
             node.long_name: node for node in list(node_list_1) + list(node_list_2)}
-        return node_long_name_dict.values()
+        return list(node_long_name_dict.values())
 
     def _get_nodes_to_pin(self, exclude_nodes):
         """ returns nodes that are pinned but not in 'exclude_nodes'
         """
         node_long_name_dict = {
             node.long_name: node for node in self._pinned_nodes if node not in exclude_nodes}
-        return node_long_name_dict.values()
+        return list(node_long_name_dict.values())
 
     def _expand_item_by_name(self, name_list):
         """
@@ -388,13 +388,34 @@ class zGeoWidget(QtWidgets.QWidget):
                         if solverTM_item.data.long_name == solverTM:
                             entry_list = flatten_tree(solverTM_item)
                             break
-                # update pin state to match with partial view
-                if entry_list:
+                else:
+                    # Edge case handling:
+                    # Scene Panel launches with Ziva objects selected, which enters partial view.
+                    # Then user pin some nodes, deselect and refresh.
+                    # Now enter the full view, and the self._whole_scene_tree is None.
+                    # We need to create a tree view temporarily,
+                    # flatten it for the follow-up sync operation.
+                    # By doing this, the pinned nodes info are carried to the zGeo tree view.
+                    zBuilder_solverTM_nodes = self._builder.get_scene_items(
+                        type_filter='zSolverTransform')
+                    for zBuilder_node in zBuilder_solverTM_nodes:
+                        if zBuilder_node.long_name == solverTM:
+                            temp_solverTM_item = build_scene_panel_tree(
+                                zBuilder_node,
+                                zGeo_UI_node_types + ["zSolver", "zSolverTransform"])[0]
+                            entry_list = flatten_tree(temp_solverTM_item)
+                            break
+
+                # update pin state to match with partial view when not load plug data,
+                # otherwise it clears self._pinned_nodes.
+                if entry_list and not load_plug_data:
                     self._sync_pin_state_partial_to_full_view(entry_list)
                 # Merge current zBuilder nodes with tree view
-                resolved_tree = merge_tree_data(get_zGeo_nodes_by_solverTM(self._builder, solverTM),
-                                                entry_list)
+                resolved_tree, pinned_node_list = merge_tree_data(
+                    get_zGeo_nodes_by_solverTM(self._builder, solverTM), entry_list)
                 merged_tree.append_children(resolved_tree)
+                self._pinned_nodes.extend(pinned_node_list)
+
             self._whole_scene_tree = merged_tree
             self._tmGeo.reset_model(self._builder, self._whole_scene_tree,
                                     self._is_partial_tree_view)
