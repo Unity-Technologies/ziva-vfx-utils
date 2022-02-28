@@ -172,17 +172,22 @@ class TreeItem(object):
         """ Generates path from root to the current node TreeItem,
         adding intermediate node names and separating each by "|".
         """
-        parent = self.parent
-        if not parent:
-            return "|"
+        cur_item = self
+        parent = cur_item.parent
+        tree_path = cur_item.data.name
+        while cur_item:
+            if not parent:
+                if type(cur_item.data) is Base:
+                    return "|"
+                return "|" + tree_path
 
-        tree_path = self.data.name
-        while parent:
             if type(parent.data) is Base:
                 return "|" + tree_path
 
             tree_path = parent.data.name + "|" + tree_path
-            parent = parent.parent
+            cur_item = parent
+            parent = cur_item.parent
+
         return tree_path
 
     @property

@@ -398,7 +398,7 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertIs(group2_node.children[0], tissue_nodes[2])
         self.assertIs(group2_node.children[1], tissue_nodes[0])
 
-    def test_tree_path(self):
+    def test_tree_path_from_builder(self):
         """ Test tree path generates correct result when moved around
         """
         # Verify get_tree_path() returns correct paths for the tree below
@@ -444,6 +444,35 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
         self.assertEqual(new_group1_node.get_tree_path(), "|zSolver1|Group1")
         self.assertEqual(group1_node.get_tree_path(), "|zSolver1|Group1|Group1")
         self.assertEqual(tissue1_node.get_tree_path(), "|zSolver1|Group1|tissue1")
+
+    def test_tree_path_from_solverTM(self):
+        """ Test tree path from partial retrieve result
+        """
+        # Verify get_tree_path() returns correct paths for the tree below
+        # ROOT
+        #   `- zSolverTransform   <-- Provide TM node as root
+        #     |- zSolver
+        #     |- Group1
+        #     |- tissue1
+
+        # generate above tree model
+        cmds.polyCube(n="tissue1")
+        cmds.ziva("tissue1", t=True)
+        # Clear last created nodes so zBuilder can retrieve all nodes
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+        solverTM_node = builder.get_scene_items(type_filter="zSolverTransform")[0]
+        solver_node = build_scene_panel_tree(solverTM_node)[0]
+        self.assertEqual(solver_node.get_tree_path(), "|zSolver1")
+        solverShape_node = solver_node.children[0]
+        self.assertEqual(solverShape_node.get_tree_path(), "|zSolver1|zSolver1Shape")
+        tissue1_node = solver_node.children[1]
+        self.assertEqual(tissue1_node.get_tree_path(), "|zSolver1|tissue1")
+
+        # Add group and test path
+        group1_node = TreeItem(solver_node, GroupNode("Group1"))
+        self.assertEqual(group1_node.get_tree_path(), "|zSolver1|Group1")
 
 
 class ScenePanelPinStateTestCase(VfxTestCase):
