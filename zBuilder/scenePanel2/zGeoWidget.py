@@ -337,8 +337,8 @@ class zGeoWidget(QtWidgets.QWidget):
         """
 
         solverTM_nodes = cmds.ls(type="zSolverTransform", l=True)
-        # Clear the TreeView and do early return if there's no solver node in the scene
-        if not solverTM_nodes:
+        # Clear all the TreeView variables
+        if not solverTM_nodes or clear_state:
             self._wgtComponent_ref.reset_model(None, [])
             self._tmGeo.reset_model(None, None, False)
             self._builder = None
@@ -347,11 +347,9 @@ class zGeoWidget(QtWidgets.QWidget):
             self._is_partial_tree_view = False
             self._selected_nodes = list()
             self._pinned_nodes = list()
-            return
-
-        if clear_state:
-            self._selected_nodes = list()
-            self._pinned_nodes = list()
+            # Do early return if there's no solver node in the scene
+            if not solverTM_nodes:
+                return
 
         self._builder = zva.Ziva()
         self._builder.retrieve_connections()
