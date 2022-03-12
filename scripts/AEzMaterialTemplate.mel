@@ -16,6 +16,8 @@ global proc AEzMaterialTemplate( string $nodeName )
   editorTemplate -addControl "shearStiffnessExp";
   editorTemplate -addControl "bendStiffness";
   editorTemplate -addControl "bendStiffnessExp";
+  editorTemplate -addControl "curvatureStiffness";
+  editorTemplate -addControl "curvatureStiffnessExp";
   editorTemplate -addControl "clothMassDensity";
   editorTemplate -addControl "restScale";
   editorTemplate -addControl "pressure";
