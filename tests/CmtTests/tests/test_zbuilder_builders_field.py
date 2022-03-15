@@ -4,15 +4,14 @@ from maya import cmds
 from maya import mel
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene
-from zBuilder.builders.fields import Fields
+from zBuilder.mayaUtils import FIELD_TYPES
 
 
 class ZivaFieldGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.field_types = Fields.MAYA_FIELD_TYPE
         cls.field_names = []
-        for field in cls.field_types:
+        for field in FIELD_TYPES:
             cls.field_names.append(field + "1")
         cls.field_attrs = ["magnitude", "attenuation", "useMaxDistance"]
 
@@ -23,7 +22,7 @@ class ZivaFieldGenericTestCase(VfxTestCase):
         cmds.select(obj)
         cmds.ziva(t=True)
         mel.eval('source zivaMenuFunctions;')
-        for field in self.field_types:
+        for field in FIELD_TYPES:
             mel.eval('ziva_attachField("{}");'.format(field.replace("Field", "")))
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -37,7 +36,7 @@ class ZivaFieldGenericTestCase(VfxTestCase):
         """Args:
             builder (builders.fields.Fields()): builder object
         """
-        self.check_retrieve_looks_good(builder, {}, self.field_names, self.field_types)
+        self.check_retrieve_looks_good(builder, {}, self.field_names, FIELD_TYPES)
 
     def test_retrieve(self):
         self.check_retrieve_field_looks_good(self.builder)

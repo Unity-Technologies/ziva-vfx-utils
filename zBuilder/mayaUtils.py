@@ -6,6 +6,17 @@ import re
 The module contains helper functions depends on Maya Python API.
 '''
 
+FIELD_TYPES = (
+    'airField',
+    'dragField',
+    'gravityField',
+    'newtonField',
+    'radialField',
+    'turbulenceField',
+    'uniformField',
+    'vortexField',
+)
+
 
 def get_maya_api_version():
     """ Return Maya API version.

@@ -1,19 +1,18 @@
 from maya import cmds
 from zBuilder.nodes.dg_node import DGNode
-import zBuilder.zMaya as mz
+from zBuilder.mayaUtils import FIELD_TYPES
 
 
 class Field(DGNode):
-    """ The base node for the node functionality of all nodes
-    """
+
     type = None
-    TYPES = [
-        'airField', 'dragField', 'gravityField', 'newtonField', 'radialField', 'turbulenceField',
-        'uniformField', 'vortexField'
-    ]
-    """ The type of node. """
+
+    # The TYPES is required by find_class() function,
+    # to correctly build Field node instances.
+    TYPES = FIELD_TYPES
+
     def build(self, *args, **kwargs):
-        """ Builds the zCloth in maya scene.
+        """ Builds the Maya field nodes in the scene.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to get.
@@ -21,7 +20,6 @@ class Field(DGNode):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
 

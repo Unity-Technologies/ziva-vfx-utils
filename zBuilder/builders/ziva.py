@@ -2,9 +2,8 @@ import zBuilder.zMaya as mz
 import logging
 
 from zBuilder.builder import Builder
-from zBuilder.mayaUtils import get_type, is_type
+from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
 from zBuilder.commonUtils import none_to_empty, time_this
-from zBuilder.nodes.utils.fields import Field
 from maya import cmds
 from maya import mel
 from collections import defaultdict, OrderedDict
@@ -31,6 +30,7 @@ ZNODES = [
 
 
 class SolverDisabler:
+
     def __init__(self, solver_name):
         """SolverDisabler is a context manager object that disables a solver for the duration of
         the context and then restores its initial state. This is useful for improving the
@@ -60,6 +60,7 @@ class SolverDisabler:
 class Ziva(Builder):
     """To capture a Ziva rig.
     """
+
     def __init__(self):
         super(Ziva, self).__init__()
 
@@ -184,7 +185,7 @@ class Ziva(Builder):
                         grp.add_child(rivet)
                 self.geo[item.nice_association[0]] = grp
 
-        for item in self.get_scene_items(type_filter=Field.TYPES):
+        for item in self.get_scene_items(type_filter=FIELD_TYPES):
             self.root_node.add_child(item)
 
         # assign zFieldAdapter to solver
@@ -281,7 +282,7 @@ class Ziva(Builder):
             history = cmds.listHistory(body_names)
             types = []
             types.append('zFieldAdaptor')
-            types.extend(Field.TYPES)
+            types.extend(FIELD_TYPES)
             fields = cmds.ls(history, type=types)
             nodes.extend(fields)
 
@@ -399,7 +400,7 @@ class Ziva(Builder):
             'zRestShape',
         ]
 
-        node_types.extend(Field.TYPES)
+        node_types.extend(FIELD_TYPES)
         nodes = zQuery(node_types, solver)
         if nodes:
             self._populate_nodes(nodes, get_parameters)
@@ -629,7 +630,7 @@ class Ziva(Builder):
             if embedder:
                 node_types_to_build.append('zEmbedder')
             if fields:
-                node_types_to_build.extend(Field.TYPES)
+                node_types_to_build.extend(FIELD_TYPES)
                 node_types_to_build.append('zFieldAdaptor')
 
             # build the nodes by calling build method on each one
