@@ -1,4 +1,4 @@
-from zBuilder.builder import Builder
+from .builder import Builder
 from zBuilder.mayaUtils import parse_maya_node_for_selection, get_type
 from zBuilder.commonUtils import time_this
 from maya import cmds
@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 class Constraints(Builder):
     """To capture Maya constraints.  Supports point, orient and parent constraints.
     """
+
     def __init__(self):
         Builder.__init__(self)
 

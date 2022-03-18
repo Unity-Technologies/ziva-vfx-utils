@@ -6,13 +6,14 @@ from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree, crea
 from zBuilder.scenePanel2.treeItem import pick_out_node, is_node_name_duplicate, fix_node_name_duplication
 from zBuilder.nodes import SolverTransformNode, SolverNode, DGNode, MaterialNode
 from zBuilder.nodes.base import Base
-from zBuilder.builder import Builder
+from zBuilder.builders.builder import Builder
 from maya import cmds
 
 
 class ScenePanelTreeNodeTestCase(VfxTestCase):
     """ Test TreeItem class used for Scene Panel tree view
     """
+
     def test_basic_tree_node_behavior(self):
         """ Test some basic tree data structure operations
         """
@@ -157,6 +158,7 @@ class ScenePanelTreeNodeTestCase(VfxTestCase):
 class ScenePanelGroupNodeTestCase(VfxTestCase):
     """ Test group node related operations
     """
+
     def test_group_selected_nodes(self):
         """ Setup some nested group nodes,
         create a new group node that includes some of them.
@@ -478,6 +480,7 @@ class ScenePanelGroupNodeTestCase(VfxTestCase):
 class ScenePanelPinStateTestCase(VfxTestCase):
     """ Test TreeItem pin state logic
     """
+
     def test_treeitem_pin_state(self):
         """ Test all kinds of pin state changes on different TreeItem structure
         """

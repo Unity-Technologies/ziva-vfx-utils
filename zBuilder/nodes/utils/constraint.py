@@ -1,4 +1,4 @@
-from zBuilder.mayaUtils import get_short_name, get_type
+from zBuilder.mayaUtils import get_short_name
 from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
 
@@ -14,6 +14,7 @@ class Constraint(DGNode):
     """ List of attributes to exclude with a string_replace"""
     EXTEND_ATTR_LIST = list()
     """ List of maya attributes to add to attribute list when capturing."""
+
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 

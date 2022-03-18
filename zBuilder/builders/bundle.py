@@ -9,6 +9,7 @@ class Bundle(object):
     """Mixin class to deal with storing node data and component data.  meant to
     be inherited by main.
     """
+
     def __init__(self):
         self.scene_items = list()
 

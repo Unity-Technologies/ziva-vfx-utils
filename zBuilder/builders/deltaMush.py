@@ -1,4 +1,4 @@
-from zBuilder.builder import Builder
+from .builder import Builder
 from zBuilder.mayaUtils import parse_maya_node_for_selection
 from zBuilder.commonUtils import time_this
 from maya import cmds
@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 class DeltaMush(Builder):
     """To capture a deltaMush
     """
+
     @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------

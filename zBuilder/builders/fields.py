@@ -1,4 +1,4 @@
-from zBuilder.builder import Builder
+from .builder import Builder
 from zBuilder.mayaUtils import parse_maya_node_for_selection, FIELD_TYPES
 from zBuilder.commonUtils import time_this
 from maya import cmds

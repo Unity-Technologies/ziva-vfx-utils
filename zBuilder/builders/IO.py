@@ -1,13 +1,14 @@
-import zBuilder
-import zBuilder.builder
-import zBuilder.updates as updates
 import json
 import logging
+
+from zBuilder.updates import update_json_pre_1_0_11
+from .builder import find_class
 
 logger = logging.getLogger(__name__)
 
 
 class BaseNodeEncoder(json.JSONEncoder):
+
     def default(self, obj):
         if hasattr(obj, '_class'):
             if hasattr(obj, 'serialize'):
@@ -70,7 +71,7 @@ def load_base_node(json_object):
     if '_class' in json_object:
         type_ = json_object.get('type', 'Base')
         builder_type = json_object['_builder_type']
-        obj = zBuilder.builder.find_class(builder_type, type_)
+        obj = find_class(builder_type, type_)
         check_disk_version(json_object)
 
         # this catches the scene items for ui that slip in.
@@ -100,4 +101,4 @@ def check_disk_version(json_object):
     json_version = [int(v) for v in json_version]
 
     if json_version <= one_ten:
-        updates.update_json_pre_1_0_11(json_object)
+        update_json_pre_1_0_11(json_object)

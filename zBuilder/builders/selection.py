@@ -1,4 +1,4 @@
-from zBuilder.builder import Builder
+from .builder import Builder
 from zBuilder.commonUtils import time_this
 from maya import cmds
 
@@ -6,6 +6,7 @@ from maya import cmds
 class Selection(Builder):
     """Storing maya selection.
     """
+
     @time_this
     def retrieve_from_scene(self):
         selection = cmds.ls(sl=True, l=True)

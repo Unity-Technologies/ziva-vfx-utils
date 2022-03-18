@@ -1,4 +1,4 @@
-from zBuilder.bundle import Bundle
+from .bundle import Bundle
 from zBuilder.commonUtils import is_sequence, is_string, time_this
 from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
 from maya import cmds
@@ -17,6 +17,7 @@ class Builder(object):
     """ The main entry point for using zBuilder.
 
     """
+
     def __init__(self):
         self.bundle = Bundle()
         import zBuilder
@@ -140,8 +141,8 @@ class Builder(object):
                     index = scene_item_names.index(parameter_name)
                     return scene_item_nodes[index]
                 except ValueError:
-                    # When valueerror there is no existing scene item with that name
-                    # so lets create one and return that.
+                    # No scene item with given parameter_name,
+                    # create one and return that.
                     return obj(*parameter_args, builder=self)
 
     def make_node_connections(self):
@@ -179,7 +180,7 @@ class Builder(object):
                 Defaults to ``False``
         """
 
-        from zBuilder.IO import pack_zbuilder_contents, BaseNodeEncoder
+        from .IO import pack_zbuilder_contents, BaseNodeEncoder
         json_data = pack_zbuilder_contents(self, type_filter, invert_match)
         with open(file_path, 'w') as outfile:
             json.dump(json_data,
@@ -210,7 +211,7 @@ class Builder(object):
 
         """
 
-        from zBuilder.IO import load_base_node, unpack_zbuilder_contents
+        from .IO import load_base_node, unpack_zbuilder_contents
         with open(file_path, 'rb') as handle:
             json_data = json.load(handle, object_hook=load_base_node)
             unpack_zbuilder_contents(self, json_data)

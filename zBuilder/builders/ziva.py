@@ -1,7 +1,7 @@
 import zBuilder.zMaya as mz
 import logging
 
-from zBuilder.builder import Builder
+from .builder import Builder
 from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
 from zBuilder.commonUtils import none_to_empty, time_this
 from maya import cmds
