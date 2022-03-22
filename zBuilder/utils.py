@@ -4,11 +4,11 @@ import copy
 import logging
 import re
 
-from .builders.skinClusters import SkinCluster
-from .commonUtils import is_string, is_sequence, none_to_empty
-from .mayaUtils import get_short_name, get_type
 from maya import cmds
 from maya import mel
+from .commonUtils import is_string, is_sequence, none_to_empty
+from .mayaUtils import get_short_name, get_type
+from .builders.skinClusters import SkinCluster
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,42 @@ ALL_ZIVA_NODES = [
     'zRivetToBone',
     'zRestShape',
 ]
+
+
+def parse_version_info(version_string):
+    """ Parse version info string to 4 element tuple.
+    The first three are integer, the last one is string.
+    The version info string format can be one of following form:
+    1. major.minor.patch-tag
+    2. major.minor.patch
+    3. major.minor-tag
+    4. major.minor
+    """
+    major = 0
+    minor = 0
+    patch = 0
+    tag = ""
+    match_result = re.search(r"^(\d+)\.(\d+)?(\.(\d+))?(-(.*))?$", version_string)
+    assert match_result, "Invalid zBuilder version info format, should be major.minor[.patch][-tag] form."
+
+    try:
+        major = int(match_result.group(1))
+        assert major >= 0, "Major number ({}) must be integer.".format(major)
+
+        assert match_result.group(2), "Minor number must be integer."
+        minor = int(match_result.group(2))
+        assert minor >= 0, "Minor number ({}) must be integer.".format(minor)
+
+        if match_result.group(4):
+            patch = int(match_result.group(4))
+        assert patch >= 0, "Patch number ({}) must be integer.".format(patch)
+
+        if match_result.group(6):
+            tag = match_result.group(6)
+    except ValueError:
+        logger.error("Major/minor/patch strings can't cast to integer.")
+
+    return major, minor, patch, tag
 
 
 def return_copy_buffer():

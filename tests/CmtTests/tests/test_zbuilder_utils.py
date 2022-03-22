@@ -1,15 +1,16 @@
+import os
 import tests.utils as test_utils
-from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
-import zBuilder.zMaya as mz
-from zBuilder.mayaUtils import replace_long_name
 import zBuilder.utils as utils
 import zBuilder.builders.ziva as zva
+import zBuilder.zMaya as mz
+
 from maya import cmds
-from maya import mel
-import os
+from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
+from zBuilder.mayaUtils import replace_long_name
 
 
 class BuilderMayaTestCase(VfxTestCase):
+
     def test_replace_long_name_usecase1(self):
         # searching and replacing r_ at begining of string
         # check long name use case
@@ -109,7 +110,7 @@ class BuilderMayaTestCase(VfxTestCase):
         # For this test lets add a bone without an attachment.  Previously
         # it was not able to pick this case up.
         cmds.select('hand_bone')
-        mel.eval('ziva -b')
+        cmds.ziva(b=True)
 
         # testing command
         cmds.select('bone_grp', hi=True)
@@ -129,6 +130,7 @@ class BuilderMayaTestCase(VfxTestCase):
 
 
 class BuilderUtilsTestCaseArm(VfxTestCase):
+
     def setUp(self):
         super(BuilderUtilsTestCaseArm, self).setUp()
         test_utils.build_anatomical_arm_with_no_popup()
@@ -193,18 +195,18 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         sph = cmds.polySphere()
         cmds.select(sph[0])
-        mel.eval('ziva -c')
+        cmds.ziva(c=True)
 
         for type_ in types:
             cmds.select(cmds.ls(type=type_))
 
             # select the body geo
-            cmds.select(mel.eval('zQuery -m'))
+            cmds.select(cmds.zQuery(m=True))
 
             # delete all
             utils.remove(cmds.ls(sl=True))
         cmds.select(cl=True)
-        self.assertIsNone(mel.eval('zQuery -bt'))
+        self.assertIsNone(cmds.zQuery(bt=True))
 
     def test_rig_copy_without_selection_should_raise(self):
         cmds.select(cl=True)
@@ -256,7 +258,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         utils.rig_update()
 
         ## VERIFY
-        geoNode = mel.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        geoNode = cmds.zQuery('r_bicep_muscle', t='zGeo')[0]
         cmds.polySphere(n='mesh')
         cmds.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
         observed_pos = get_mesh_vertex_positions('mesh')
@@ -276,7 +278,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         utils.rig_update()
 
         ## VERIFY
-        geoNode = mel.eval('zQuery -t zGeo r_bicep_muscle')[0]
+        geoNode = cmds.zQuery('r_bicep_muscle', t='zGeo')[0]
         cmds.polySphere(n='mesh')
         cmds.connectAttr('{}.iNeutralMesh'.format(geoNode), 'mesh.inMesh', force=True)
         observed_pos = get_mesh_vertex_positions('mesh')
@@ -284,16 +286,68 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
 
 class BuilderUtilsTestCase(VfxTestCase):
+
+    def test_version_parse_function(self):
+        # Valid cases
+        # major.minor.patch-tag
+        major, minor, patch, tag = utils.parse_version_info("1.2.30-alpha")
+        self.assertEqual(major, 1)
+        self.assertEqual(minor, 2)
+        self.assertEqual(patch, 30)
+        self.assertEqual(tag, "alpha")
+
+        # major.minor.patch
+        major, minor, patch, tag = utils.parse_version_info("1.20.3")
+        self.assertEqual(major, 1)
+        self.assertEqual(minor, 20)
+        self.assertEqual(patch, 3)
+        self.assertEqual(tag, "")
+
+        # major.minor-tag
+        major, minor, patch, tag = utils.parse_version_info("1.33-beta")
+        self.assertEqual(major, 1)
+        self.assertEqual(minor, 33)
+        self.assertEqual(patch, 0)
+        self.assertEqual(tag, "beta")
+
+        # major.minor
+        major, minor, patch, tag = utils.parse_version_info("10.2")
+        self.assertEqual(major, 10)
+        self.assertEqual(minor, 2)
+        self.assertEqual(patch, 0)
+        self.assertEqual(tag, "")
+
+        # Invalid cases
+        # major-tag
+        with self.assertRaises(AssertionError):
+            utils.parse_version_info("1-gammar")
+
+        # major only
+        with self.assertRaises(AssertionError):
+            utils.parse_version_info("1")
+
+        # non-integer version number
+        with self.assertRaises(AssertionError):
+            utils.parse_version_info("1.0c")
+
+        # missing major version
+        with self.assertRaises(AssertionError):
+            utils.parse_version_info(".1.2")
+
+        # negative version number
+        with self.assertRaises(AssertionError):
+            utils.parse_version_info("1.-2")
+
     def test_remove_all_solvers(self):
-        mel.eval('ziva -s')
-        mel.eval('ziva -s')
+        cmds.ziva(s=True)
+        cmds.ziva(s=True)
 
         utils.remove_all_solvers()
 
         self.assertEqual(cmds.ls(type='zSolver'), [])
 
     def test_remove_referenced_solver(self):
-        mel.eval('ziva -s')
+        cmds.ziva(s=True)
         cmds.file(rename='tempfile')
         filepath = cmds.file(force=True, save=True)
         cmds.file(force=True, new=True)
@@ -305,8 +359,8 @@ class BuilderUtilsTestCase(VfxTestCase):
         self.assertEqual(cmds.ls(type='zSolverTransform'), ['ns:zSolver1'])
 
     def test_remove_single_solver(self):
-        mel.eval('ziva -s')
-        mel.eval('ziva -s')
+        cmds.ziva(s=True)
+        cmds.ziva(s=True)
 
         utils.remove_solver(solvers=['zSolver1'])
         self.assertListEqual(cmds.ls(type='zSolver'), ['zSolver2Shape'])
@@ -345,6 +399,7 @@ class BuilderUtilsTestCase(VfxTestCase):
 
 
 class BuilderUtilsMirrorTestCase(VfxTestCase):
+
     def test_copy_paste_with_substitution(self):
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
@@ -364,6 +419,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(BuilderUtilsMirrorTestCase_part2, self).setUp()
         test_utils.load_scene(scene_name='copy_paste_bug2.ma')
@@ -405,7 +461,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
 
         # the map is on a new node now lets check what happens when we change a value
         # on pasted item the paste again.
-        mel.eval('setAttr "zAttachment1.stiffness" 10;')
+        cmds.setAttr("zAttachment1.stiffness", 10)
 
         cmds.select('pSphere3')
 
@@ -435,6 +491,7 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
     """
     This Class tests a specific type of "mirroring" so there are some assumptions made
     """
+
     def setUp(self):
         super(ZivaCopyBuffer, self).setUp()
         test_utils.load_scene(scene_name='copy_paste_bug2.ma')

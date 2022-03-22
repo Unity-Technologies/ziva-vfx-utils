@@ -2,6 +2,7 @@ import json
 import logging
 
 from zBuilder.updates import update_json_pre_1_0_11
+from zBuilder.utils import parse_version_info
 from .builder import find_class
 
 logger = logging.getLogger(__name__)
@@ -69,36 +70,18 @@ def load_base_node(json_object):
         obj:  Result of operation
     """
     if '_class' in json_object:
-        type_ = json_object.get('type', 'Base')
-        builder_type = json_object['_builder_type']
-        obj = find_class(builder_type, type_)
-        check_disk_version(json_object)
+        major, minor, patch, _ = parse_version_info(json_object['info']['version'])
+        # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
+        if (major, minor, patch) < (1, 0, 11):
+            update_json_pre_1_0_11(json_object)
 
-        # this catches the scene items for ui that slip in.
+        obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
         try:
             scene_item = obj()
             scene_item.deserialize(json_object)
-
             return scene_item
         except TypeError:
+            # Catches the scene items for ui that slip in.
             return json_object
-    else:
-        return json_object
 
-
-def check_disk_version(json_object):
-    """This checks the library version of the passed builder object to check if 
-    it needs to be updated.
-
-    Args:
-        builder (obj): The builder object to check version.
-    """
-    # pre 1.0.11 we need to parameter reference to each node
-    one_ten = '1.0.10'.split('.')
-    one_ten = [int(v) for v in one_ten]
-
-    json_version = json_object['info']['version'].split('.')
-    json_version = [int(v) for v in json_version]
-
-    if json_version <= one_ten:
-        update_json_pre_1_0_11(json_object)
+    return json_object
