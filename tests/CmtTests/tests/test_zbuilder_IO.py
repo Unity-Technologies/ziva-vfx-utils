@@ -1,16 +1,21 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene, load_rig
-from vfx_test_case import VfxTestCase
-import tests.utils as test_utils
-from maya import cmds
 import os
+import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
 
+from maya import cmds
+from vfx_test_case import VfxTestCase
+from zBuilder.utils import clean_scene, load_rig
 
 
 class IOTestCase(VfxTestCase):
+
     def setUp(self):
         super(IOTestCase, self).setUp()
         self.temp_files = []
+        # NOTE: Leave setup() function not running any zBuilder class registration code
+        # to make test_0load_zBuilder_file() unit test work.
+        # The test_0load_zBuilder_file() verifies the zBuilder node types have been registered
+        # before loading zBuilder setup. It happens implicitly in the __init__.py, zBuilder.nodes package.
 
     def tearDown(self):
         # delete temp files
