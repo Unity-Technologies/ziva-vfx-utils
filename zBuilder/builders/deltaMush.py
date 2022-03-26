@@ -15,16 +15,9 @@ class DeltaMush(Builder):
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args------------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
-
-        # kwargs----------------------------------------------------------------
-        get_mesh = kwargs.get('get_mesh', True)
-        get_maps = kwargs.get('construct_map_names', True)
-
         hist = cmds.listHistory(selection)
         delta_mushes = cmds.ls(hist, type='deltaMush')[::-1]
-
-        if not delta_mushes:
-            raise Exception('No delta mushes found, aborting!')
+        assert delta_mushes, "No delta mushes found, aborting!"
 
         for delta_mush in delta_mushes:
             parameter = self.node_factory(delta_mush)

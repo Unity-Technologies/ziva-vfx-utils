@@ -1,7 +1,7 @@
 import logging
 
-from zBuilder.mayaUtils import safe_rename
 from maya import cmds
+from zBuilder.mayaUtils import safe_rename, construct_map_names
 from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class FiberNode(Ziva):
             objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
-        map_names = self.construct_map_names()
+        map_names = construct_map_names(self.name, self.MAP_LIST)
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):

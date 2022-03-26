@@ -1,11 +1,57 @@
+import inspect
 import json
 import logging
+import sys
 
-from zBuilder.updates import update_json_pre_1_0_11
+from collections import defaultdict
 from zBuilder.commonUtils import parse_version_info
+from zBuilder.mayaUtils import get_short_name, construct_map_names
 from .builder import find_class
 
 logger = logging.getLogger(__name__)
+
+
+def _get_node_types_with_maps():
+    """ Searches through the modules for existing node type objects and 
+    returns the ones that have maps associated with it.
+    Useful for performing actions on node types with maps.
+    MAP_LIST is a class attr so it is not being instantiated here.
+    """
+    map_class_type_list = []
+    for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
+        if inspect.isclass(obj) and hasattr(obj, 'MAP_LIST') and obj.MAP_LIST:
+            map_class_type_list.append(obj.type)
+    return map_class_type_list
+
+
+def _update_json_pre_1_0_11(json_object):
+    class_type_name = json_object.get('type', 'Base')
+    class_type = find_class(json_object['_builder_type'], class_type_name)
+
+    if class_type_name in _get_node_types_with_maps():
+        json_object['parameters'] = defaultdict(list)
+        map_names = construct_map_names(json_object['_name'], class_type.MAP_LIST)
+        json_object['parameters']['map'].extend(map_names)
+
+        # the association holds the mesh name associated with node.  Currently the only
+        # use for meshes in zBuilder is for interpolating weight maps if needed.
+        # this means that a mesh is only stored for a node if it has a map.
+
+        # first we need to use short name for mesh
+        meshes = [get_short_name(x) for x in json_object['_association']]
+        json_object['parameters']['mesh'] = meshes
+
+    # pre 1.0.11 the attribute was called fiber on a zLineOfAction.
+    # As of 1.0.11 it is called fiber_item
+    if class_type_name == 'zLineOfAction':
+        json_object['fiber_item'] = json_object['fiber']
+        json_object.pop('fiber', None)
+    elif class_type_name == 'zRivetToBone':
+        json_object['rivet_locator'] = []
+        json_object['rivet_locator_parent'] = []
+    elif class_type_name == 'zRestShape':
+        json_object['tissue_item'] = json_object['tissue_name']
+        json_object.pop('tissue_name', None)
 
 
 class BaseNodeEncoder(json.JSONEncoder):
@@ -14,10 +60,9 @@ class BaseNodeEncoder(json.JSONEncoder):
         if hasattr(obj, '_class'):
             if hasattr(obj, 'serialize'):
                 return obj.serialize()
-            else:
-                return obj.__dict__
-        else:
-            return super(BaseNodeEncoder, self).default(obj)
+            return obj.__dict__
+
+        return super(BaseNodeEncoder, self).default(obj)
 
 
 def pack_zbuilder_contents(builder, type_filter, invert_match):
@@ -73,7 +118,7 @@ def load_base_node(json_object):
         major, minor, patch, _ = parse_version_info(json_object['info']['version'])
         # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
         if (major, minor, patch) < (1, 0, 11):
-            update_json_pre_1_0_11(json_object)
+            _update_json_pre_1_0_11(json_object)
 
         obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
         try:

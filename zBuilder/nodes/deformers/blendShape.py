@@ -1,5 +1,5 @@
 from maya import cmds
-from zBuilder.mayaUtils import get_short_name, build_attr_key_values
+from zBuilder.mayaUtils import get_short_name, build_attr_key_values, construct_map_names
 from ..deformer import Deformer
 
 
@@ -24,7 +24,7 @@ class BlendShape(Deformer):
         Returns:
             list(): of long mesh names.
         """
-        return [self.association[0]] * len(self.construct_map_names())
+        return [self.association[0]] * len(construct_map_names(self.name, self.MAP_LIST))
 
     def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')

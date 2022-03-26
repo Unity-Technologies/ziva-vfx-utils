@@ -265,3 +265,16 @@ def get_name_from_m_object(m_object, long_name=True):
     else:
         name = om.MFnDependencyNode(m_object).name()
     return name
+
+
+def construct_map_names(name, map_list):
+    """ This builds the map names.
+    maps from map_list with the object name in front.
+
+    For this we want to get the .name and not scene name.
+    """
+    map_names = []
+    for map_ in map_list:
+        map_names.append('{}.{}'.format(name, map_))
+
+    return map_names

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from maya import cmds
+from zBuilder.mayaUtils import construct_map_names
 from .dg_node import DGNode
 
 
@@ -24,7 +25,7 @@ class Deformer(DGNode):
             objs['mesh'] = self.nice_association
 
         mesh_names = self.get_map_meshes()
-        map_names = self.construct_map_names()
+        map_names = construct_map_names(self.name, self.MAP_LIST)
         if map_names and mesh_names:
             objs['map'] = []
             for map_name, mesh_name in zip(map_names, mesh_names):
@@ -42,7 +43,8 @@ class Deformer(DGNode):
             maya_node (str): The maya node to populate parameter with.
         """
         super(Deformer, self).populate(maya_node=maya_node)
-        self.association = self.get_meshes(maya_node)
+        meshes = cmds.deformer(maya_node, query=True, g=True)
+        self.association = cmds.listRelatives(meshes, p=True, fullPath=True)
 
     def get_map_meshes(self):
         """ This is the mesh associated with each map in obj.map_list.
@@ -54,28 +56,6 @@ class Deformer(DGNode):
             list: List of long mesh names.
         """
         return self.nice_association
-
-    def construct_map_names(self):
-        """ This builds the map names.
-        maps from map_list with the object name in front
-
-        For this we want to get the .name and not scene name.
-        """
-        return construct_map_names(self.name, self.MAP_LIST)
-
-    @staticmethod
-    def get_meshes(node):
-        """ Queries the deformer and returns the meshes associated with it.
-
-        Args:
-            node: Maya node to query.
-
-        Returns:
-            list od strings: list of strings of mesh names.
-        """
-        meshes = cmds.deformer(node, query=True, g=True)
-        parent = cmds.listRelatives(meshes, p=True, fullPath=True)
-        return parent
 
     def set_maya_weights(self, interp_maps=False):
         """ This loops through and internal map on a node stored in 
@@ -109,16 +89,3 @@ class Deformer(DGNode):
         if interp_maps in [True, 'True', 'true']:
             for map_object in map_objects:
                 map_object.interpolate()
-
-
-def construct_map_names(name, map_list):
-    """ This builds the map names.  maps from map_list with the object name
-    in front
-
-    For this we want to get the .name and not scene name.
-    """
-    map_names = []
-    for map_ in map_list:
-        map_names.append('{}.{}'.format(name, map_))
-
-    return map_names
