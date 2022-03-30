@@ -1,11 +1,12 @@
+import os
 import zBuilder.builders.ziva as zva
 import zBuilder.utils as utils
+
+from maya import cmds
+from cmt.test import TestCase
+from tests.utils import get_tmp_file_location
 from zBuilder.commonUtils import is_sequence
 from utility.paintable_maps import split_map_name, get_paintable_map
-import tests.utils as test_utils
-from cmt.test import TestCase
-from maya import cmds
-import os
 
 
 def isApprox(a, b, eps=1e-6):
@@ -56,8 +57,9 @@ def attr_values_from_scene(plug_names):
 
 
 class VfxTestCase(TestCase):
-    temp_file_path = test_utils.get_tmp_file_location()
+    temp_file_path = get_tmp_file_location()
     """Base class for unit test cases run for ZivaVFX plugin."""
+
     def assertSceneHasNodes(self, expected_nodes):
         """Fail iff a node in expected_nodes is not in the Maya scene."""
         expected_nodes = dict.fromkeys(expected_nodes)
@@ -326,6 +328,7 @@ class ZivaMirrorTestCase(VfxTestCase):
     - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
 
     """
+
     def builder_change_with_string_replace(self):
         # VERIFY
         self.compare_builder_nodes_with_scene_nodes(self.builder)
@@ -368,6 +371,7 @@ class ZivaUpdateNiceNameTestCase(VfxTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def builder_change_with_string_replace(self):
         # VERIFY
         self.compare_builder_nodes_with_scene_nodes(self.builder)
@@ -409,6 +413,7 @@ class ZivaUpdateTestCase(VfxTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def builder_change_with_string_replace(self):
 
         self.check_node_association_amount_equal(self.scene_items_retrieved, 'r_', 0)
@@ -445,6 +450,7 @@ class ZivaMirrorNiceNameTestCase(VfxTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def builder_change_with_string_replace(self):
         # VERIFY
         self.compare_builder_nodes_with_scene_nodes(self.builder)

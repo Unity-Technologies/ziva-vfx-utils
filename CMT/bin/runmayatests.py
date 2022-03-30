@@ -67,7 +67,8 @@ def create_clean_maya_app_dir(directory=None):
     temp_dir = tempfile.gettempdir()
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(str(uuid.uuid4())))
+    dst = directory if directory else os.path.join(temp_dir, 'maya_app_dir{0}'.format(
+        str(uuid.uuid4())))
     if os.path.exists(dst):
         shutil.rmtree(dst, ignore_errors=False, onerror=remove_read_only)
     shutil.copytree(app_dir, dst)
@@ -87,6 +88,7 @@ def remove_read_only(func, path, exc):
         func(path)
     else:
         raise RuntimeError('Could not remove {0}'.format(path))
+
 
 def test_output_looks_okay(output, maya_version):
     """
@@ -139,23 +141,23 @@ def test_output_looks_okay(output, maya_version):
     okay_pattern = "^OK"
     return re.search(okay_pattern, summary, flags=re.MULTILINE)
 
+
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('-m', '--maya',
-                        help='Maya version',
-                        default='2018')
-    parser.add_argument('-mad', '--maya-app-dir',
-                        help='Just create a clean MAYA_APP_DIR and exit')
-    parser.add_argument('-p', '--path',
-                        help='Path to a folder with tests')
-    parser.add_argument('-msp', '--maya-script-path',
+    parser.add_argument('-m', '--maya', help='Maya version', default='2018')
+    parser.add_argument('-mad', '--maya-app-dir', help='Just create a clean MAYA_APP_DIR and exit')
+    parser.add_argument('-p', '--path', help='Path to a folder with tests')
+    parser.add_argument('-msp',
+                        '--maya-script-path',
                         help='Path append to MAYA_SCRIPT_PATH environment variable')
-    parser.add_argument('-mmp', '--maya-module-path',
+    parser.add_argument('-mmp',
+                        '--maya-module-path',
                         help='Path append to MAYA_MODULE_PATH environment variable')
-    parser.add_argument('--plugin',
-                        help='Path to a maya plugin')
-    parser.add_argument('--py2', action='store_true',
-                        help='Launch mayapy in Python 2 environment. Works only starts from Maya 2022.')
+    parser.add_argument('--plugin', help='Path to a maya plugin')
+    parser.add_argument(
+        '--py2',
+        action='store_true',
+        help='Launch mayapy in Python 2 environment. Works only starts from Maya 2022.')
     pargs = parser.parse_args()
     mayaunittest = os.path.join(CMT_ROOT_DIR, 'scripts', 'cmt', 'test', 'mayaunittest.py')
     cmd = []
@@ -173,7 +175,8 @@ def main():
         cmd.append(pargs.plugin)
 
     if not os.path.exists(cmd[0]):
-        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(pargs.maya, cmd[0]))
+        raise RuntimeError('Maya {0} is not installed on this system. Location examined {1}'.format(
+            pargs.maya, cmd[0]))
 
     app_directory = pargs.maya_app_dir
     maya_app_dir = create_clean_maya_app_dir(app_directory)
@@ -192,10 +195,10 @@ def main():
     os.environ['MAYA_MODULE_PATH'] = CMT_ROOT_DIR
     mayaModulePath = pargs.maya_module_path
     if mayaModulePath:
-        os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaScriptPath)
+        os.environ['MAYA_MODULE_PATH'] += (os.pathsep + mayaModulePath)
 
     module_dir = os.path.dirname(os.path.abspath(__file__))
-    python_path = os.path.abspath(os.path.join(module_dir, r'..\..'))
+    python_path = os.path.abspath(os.path.join(module_dir, r'../..'))
 
     if "PYTHONPATH" not in os.environ:
         os.environ["PYTHONPATH"] = python_path
@@ -203,14 +206,16 @@ def main():
         os.environ["PYTHONPATH"] = python_path + os.pathsep + os.environ["PYTHONPATH"]
 
     exitCode = 0
-    output = ''
     try:
         # TODO: use subprocess.check_output(cmd) when we have Python 2.7 available.
         # This code is lifted from the cpython implementaion of check_output
         # https://github.com/python/cpython/blob/2.7/Lib/subprocess.py#L194
 
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-        stdout, stderr = process.communicate()
+        process = subprocess.Popen(cmd,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   universal_newlines=True)
+        _, stderr = process.communicate()
         exitCode = process.poll()
 
         # mayapy is a monster. As hard as we try, we cannot stop it from exiting
@@ -231,13 +236,15 @@ def main():
             # Make this unusual case phenomenal
             for i in range(5):
                 print('@' * 80)
-            print("WARNING mayapy runs well but stderr does not look okay.\n Error message: {0}\n\n".format(stderr))
+            print(
+                "WARNING mayapy runs well but stderr does not look okay.\n Error message: {0}\n\n".
+                format(stderr))
             sys.exit(1)
 
         # print stderr as diagnose info
         print(stderr)
 
-    except subprocess.CalledProcessError as error:
+    except subprocess.CalledProcessError:
         pass
         # TODO: use this when we switch to subprocess.check_output
         # output = error.output
@@ -246,6 +253,7 @@ def main():
         shutil.rmtree(maya_app_dir, ignore_errors=True)
 
     sys.exit(exitCode)
+
 
 if __name__ == '__main__':
     main()
