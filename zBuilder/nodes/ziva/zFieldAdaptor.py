@@ -1,16 +1,13 @@
-from zBuilder.mayaUtils import get_short_name, safe_rename
-from zBuilder.nodes import Ziva
 from maya import cmds
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.mayaUtils import get_short_name, safe_rename
+from .zivaBase import Ziva
 
 
 class FieldAdaptorNode(Ziva):
     """ This node for storing information related to fields.
     """
     type = 'zFieldAdaptor'
-    """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(FieldAdaptorNode, self).__init__(parent=parent, builder=builder)
         self.output_bodies = []
@@ -22,8 +19,14 @@ class FieldAdaptorNode(Ziva):
             maya_node: Maya node to populate with.
         """
         super(FieldAdaptorNode, self).populate(maya_node=maya_node)
-        self.input_field = get_field(self.name)
-        self.output_bodies = get_bodies(self.name)
+
+        if cmds.objExists('{}.field'.format(self.name)):
+            field = cmds.listConnections('{}.field'.format(self.name))[0]
+            self.input_field = cmds.ls(field, l=True)[0]
+
+        if cmds.objExists('{}.outField'.format(self.name)):
+            body = cmds.listConnections('{}.outField'.format(self.name))
+            self.output_bodies = cmds.ls(body, l=True)
 
     @property
     def input_field(self):
@@ -97,29 +100,3 @@ class FieldAdaptorNode(Ziva):
 
         # set maya attributes
         self.set_maya_attrs(attr_filter=attr_filter)
-
-
-def get_bodies(zFieldAdaptor):
-    """This gets the output bodies associated with a zFieldAdaptor.
-
-    Args:
-        zNode (string): [description]
-    """
-    if cmds.objExists('{}.outField'.format(zFieldAdaptor)):
-        body = cmds.listConnections('{}.outField'.format(zFieldAdaptor))
-
-    convert_to_long = cmds.ls(body, l=True)
-    return convert_to_long
-
-
-def get_field(zFieldAdaptor):
-    """This gets the field associated with a zFieldAdaptor.
-
-    Args:
-        zNode (string): [description]
-    """
-    if cmds.objExists('{}.field'.format(zFieldAdaptor)):
-        field = cmds.listConnections('{}.field'.format(zFieldAdaptor))[0]
-
-    convert_to_long = cmds.ls(field, l=True)[0]
-    return convert_to_long

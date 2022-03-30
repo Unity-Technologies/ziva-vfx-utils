@@ -1,8 +1,10 @@
-from zBuilder.mayaUtils import get_short_name, safe_rename
-from zBuilder.nodes import Ziva
-from maya import cmds
-from maya import mel
 import logging
+
+from maya import cmds
+from zBuilder.mayaUtils import get_short_name, safe_rename
+from .zivaBase import Ziva
+
+from maya import mel
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +13,10 @@ class TetNode(Ziva):
     """ This node for storing information related to zTets.
     """
     type = 'zTet'
-    """ The type of node. """
 
+    # List of maps to store
     MAP_LIST = ['weightList[0].weights']
-    """ List of maps to store. """
+
     def __init__(self, parent=None, builder=None):
         super(TetNode, self).__init__(parent=parent, builder=builder)
         self._user_tet_mesh = None
@@ -38,8 +40,7 @@ class TetNode(Ziva):
         if self._user_tet_mesh:
             if long_name:
                 return self._user_tet_mesh
-            else:
-                return get_short_name(self._user_tet_mesh)
+            return get_short_name(self._user_tet_mesh)
         return None
 
     def apply_user_tet_mesh(self):
@@ -67,15 +68,13 @@ class TetNode(Ziva):
         Args:
             permissive (bool): Pass on errors. Defaults to ``True``
         """
-
         permissive = kwargs.get('permissive', True)
-
         name = self.name
         if not cmds.objExists(name):
             mesh = self.nice_association[0]
             if cmds.objExists(mesh):
                 if permissive:
-                    name = mel.eval('zQuery -t zTet ' + mesh)
+                    name = cmds.zQuery(mesh, t='zTet')
                     if name:
                         name = name[0]
                 else:

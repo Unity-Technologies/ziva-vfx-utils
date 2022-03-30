@@ -1,19 +1,13 @@
-from zBuilder.mayaUtils import get_short_name, safe_rename
-from zBuilder.nodes import Ziva
 from maya import cmds
-from maya import mel
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.mayaUtils import get_short_name, safe_rename
+from .zivaBase import Ziva
 
 
 class SolverNode(Ziva):
+    """ This node is for storing information related to zSolver.
     """
-    This node is for storing information related to zSolver.
-    """
-
     type = 'zSolver'
-    """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 
@@ -26,11 +20,9 @@ class SolverNode(Ziva):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-
         solver_name = self.name
-
         if not cmds.objExists(solver_name):
-            results = mel.eval('ziva -s')
+            results = cmds.ziva(s=True)
 
             # we need to rename the transform before the shape or maya may
             # rename shape after.
@@ -44,5 +36,4 @@ class SolverNode(Ziva):
             new_name = safe_rename(solver_name, self.name)
 
         cmds.ziva(new_name, defaultSolver=True)
-
         self.set_maya_attrs(attr_filter=attr_filter)

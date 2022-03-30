@@ -1,18 +1,14 @@
-from zBuilder.mayaUtils import safe_rename
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
 from maya import cmds
-from maya import mel
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.mayaUtils import safe_rename
+from zBuilder.zMaya import get_lineOfAction_fiber
+from .zivaBase import Ziva
 
 
 class LineOfActionNode(Ziva):
     """ This node for storing information related to zLineOfAction.
     """
     type = 'zLineOfAction'
-    """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(LineOfActionNode, self).__init__(parent=parent, builder=builder)
         self.fiber_item = None
@@ -28,7 +24,7 @@ class LineOfActionNode(Ziva):
         """
         super(LineOfActionNode, self).populate(maya_node=maya_node)
 
-        fiber_name = mz.get_lineOfAction_fiber(self.name)
+        fiber_name = get_lineOfAction_fiber(self.name)
 
         scene_item = self.builder.get_scene_items(name_filter=fiber_name)
         if scene_item:
@@ -64,7 +60,7 @@ class LineOfActionNode(Ziva):
             existing = cmds.listConnections(self.fiber_item.name, type='zLineOfAction')
             if not existing:
                 cmds.select(self.fiber_item.name, loas)
-                results_ = mel.eval('ziva -lineOfAction')
+                results_ = cmds.ziva(lineOfAction=True)
                 clt = cmds.ls(results_, type='zLineOfAction')[0]
                 self.name = safe_rename(clt, self.name)
         else:

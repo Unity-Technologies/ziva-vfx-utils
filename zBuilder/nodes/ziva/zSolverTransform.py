@@ -1,17 +1,12 @@
-import logging
-
 from maya import cmds
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
-
-logger = logging.getLogger(__name__)
+from .zivaBase import Ziva
 
 
 class SolverTransformNode(Ziva):
     """ This node for storing information related to zSolverTransform.
     """
     type = 'zSolverTransform'
-    """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zSolverTransform in maya scene.
 

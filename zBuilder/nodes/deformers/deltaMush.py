@@ -1,9 +1,5 @@
-import logging
-
 from maya import cmds
-from zBuilder.nodes.deformer import Deformer
-
-logger = logging.getLogger(__name__)
+from ..deformer import Deformer
 
 
 class DeltaMush(Deformer):

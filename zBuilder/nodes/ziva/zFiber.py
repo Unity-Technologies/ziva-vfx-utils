@@ -1,8 +1,8 @@
-from zBuilder.nodes import Ziva
+import logging
+
 from zBuilder.mayaUtils import safe_rename
 from maya import cmds
-from maya import mel
-import logging
+from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)
 
@@ -11,15 +11,11 @@ class FiberNode(Ziva):
     """ This node for storing information related to zFibers.
     """
     type = 'zFiber'
-    """ The type of node. """
+
+    # List of maps to store
     MAP_LIST = ['weightList[0].weights', 'endPoints']
-    """ List of maps to store. """
+
     def spawn_parameters(self):
-        """
-
-        Returns:
-
-        """
         objs = {}
         if self.nice_association:
             objs['mesh'] = self.nice_association
@@ -57,17 +53,15 @@ class FiberNode(Ziva):
 
                 tmp = {'zSolver':['substeps']}
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
-            permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-        permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         mesh = self.nice_association[0]
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_fibers = mel.eval('zQuery -t zFiber {}'.format(mesh))
+            existing_fibers = cmds.zQuery(mesh, t='zFiber')
             data_fibers = self.builder.get_scene_items(type_filter='zFiber',
                                                        association_filter=mesh)
 
@@ -81,11 +75,11 @@ class FiberNode(Ziva):
                     self.name = safe_rename(existing_fibers[d_index], self.name)
                 else:
                     cmds.select(mesh, r=True)
-                    results = mel.eval('ziva -f')
+                    results = cmds.ziva(f=True)
                     self.name = safe_rename(results[0], self.name)
             else:
                 cmds.select(mesh, r=True)
-                results = mel.eval('ziva -f')
+                results = cmds.ziva(f=True)
                 self.name = safe_rename(results[0], self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zFiber creation')

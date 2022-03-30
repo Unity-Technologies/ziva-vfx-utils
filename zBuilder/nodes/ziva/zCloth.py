@@ -1,18 +1,15 @@
-import logging
 from maya import cmds
 from maya import mel
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+from zBuilder.zMaya import cull_creation_nodes
 from zBuilder.mayaUtils import safe_rename
-
-logger = logging.getLogger(__name__)
+from .zivaBase import Ziva
 
 
 class ClothNode(Ziva):
     """ This node for storing information related to zCloth.
     """
     type = 'zCloth'
-    """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
@@ -58,7 +55,7 @@ def build_multiple(scene_items):
     """
     sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
-    culled = mz.cull_creation_nodes(scene_items)
+    culled = cull_creation_nodes(scene_items)
 
     # build all cloth at once--------------------------------------------------
     results = None

@@ -1,14 +1,17 @@
-from .bundle import Bundle
-from zBuilder.commonUtils import is_sequence, is_string, time_this
-from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
-from maya import cmds
-# For parameter_factory() and find_class(), though not use directly,
-import zBuilder.parameters
 import inspect
 import json
 import logging
 import sys
 import time
+# For parameter_factory() and find_class(), though not use directly,
+import zBuilder.nodes.parameters
+
+from maya import cmds
+from zBuilder.commonUtils import is_sequence, is_string, time_this
+from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
+from zBuilder.commonUtils import parse_version_info
+from zBuilder import __version__
+from .bundle import Bundle
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +23,12 @@ class Builder(object):
 
     def __init__(self):
         self.bundle = Bundle()
-        import zBuilder
         from zBuilder.nodes.base import Base
         self.root_node = Base()
         self.root_node.name = 'ROOT'
 
         self.info = dict()
-        self.info['version'] = zBuilder.__version__
+        self.info['version'] = __version__
         self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
         self.info['maya_version'] = cmds.about(v=True)
         self.info['operating_system'] = cmds.about(os=True)
@@ -128,7 +130,7 @@ class Builder(object):
         if not is_sequence(parameter_args):
             parameter_args = [parameter_args]
 
-        for _, obj in inspect.getmembers(sys.modules['zBuilder.parameters']):
+        for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj) and parameter_type == obj.type:
                 scene_item_nodes = self.get_scene_items(type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
@@ -343,6 +345,12 @@ def find_class(module, obj_type):
     Returns:
         obj: class object.
     """
+    # The parameters module is moved to zBuilder.nodes since version 2.1,
+    # patch the module path to compatible old setups.
+    major, minor, patch, _ = parse_version_info(__version__)
+    if module == 'zBuilder.parameters' and (major, minor, patch) >= (2, 1, 0):
+        module = 'zBuilder.nodes'
+
     for _, obj in inspect.getmembers(sys.modules[module]):
         if inspect.isclass(obj):
             if obj_type in obj.TYPES or obj_type == obj.type:
@@ -351,17 +359,3 @@ def find_class(module, obj_type):
     # if class object is not found lets return a DG node object
     from zBuilder.nodes.dg_node import DGNode
     return DGNode
-
-
-def get_node_types_with_maps():
-    """
-    This searches through the modules for existing node type objects and returns 
-    the ones that have maps associated with it.  Useful for performing actions on 
-    node types with maps.  MAP_LIST is a class attr so it is not being instantiated here.
-    """
-    returns = []
-    for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
-        if inspect.isclass(obj):
-            if obj.MAP_LIST:
-                returns.append(obj.type)
-    return returns

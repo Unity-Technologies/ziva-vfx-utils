@@ -1,8 +1,8 @@
-from zBuilder.nodes import Ziva
-from zBuilder.mayaUtils import safe_rename
-from maya import cmds
-from maya import mel
 import logging
+
+from maya import cmds
+from zBuilder.mayaUtils import safe_rename
+from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +11,10 @@ class MaterialNode(Ziva):
     """ This node for storing information related to zMaterials.
     """
     type = 'zMaterial'
-    """ The type of node. """
 
+    # List of maps to store
     MAP_LIST = ['weightList[0].weights']
-    """ List of maps to store. """
+
     def build(self, *args, **kwargs):
         """ Builds the zMaterial in maya scene.
 
@@ -42,7 +42,7 @@ class MaterialNode(Ziva):
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_materials = mel.eval('zQuery -t zMaterial {}'.format(mesh))
+            existing_materials = cmds.zQuery(mesh, t='zMaterial')
             if not existing_materials:
                 existing_materials = []
             data_materials = self.builder.get_scene_items(type_filter='zMaterial',
@@ -59,7 +59,7 @@ class MaterialNode(Ziva):
                 self.name = safe_rename(existing_materials[d_index], self.name)
             else:
                 cmds.select(mesh, r=True)
-                results = mel.eval('ziva -m')
+                results = cmds.ziva(m=True)
                 self.name = safe_rename(results[0], self.name)
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zMaterial creation')

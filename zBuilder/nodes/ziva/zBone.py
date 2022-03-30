@@ -1,18 +1,15 @@
 from maya import cmds
 from maya import mel
-from zBuilder.nodes import Ziva
 from zBuilder.mayaUtils import safe_rename
-import zBuilder.zMaya as mz
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.zMaya import cull_creation_nodes
+from .zivaBase import Ziva
 
 
 class BoneNode(Ziva):
     """ This node for storing information related to zBones.
     """
     type = 'zBone'
-    """ The type of node. """
+
     def build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 
@@ -22,12 +19,9 @@ class BoneNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            permissive (bool): Pass on errors. Defaults to ``True``
-
         """
         attr_filter = kwargs.get('attr_filter', list())
         name_filter = kwargs.get('name_filter', list())
-        permissive = kwargs.get('permissive', True)
 
         scene_items = self.builder.get_scene_items(type_filter='zBone', name_filter=name_filter)
 
@@ -37,26 +31,23 @@ class BoneNode(Ziva):
         if self is scene_items[0]:
             build_multiple(scene_items)
 
-            # set the attributes.  This needs to run even if there are no zBone to build. This case happens during a copy paste.
+            # Set the attributes.
+            # This needs to run even if there are no zBone to build.
+            # This case happens during a copy paste.
             # any time you 'build' when the zBone is in scene.
             for scene_item in scene_items:
                 scene_item.set_maya_attrs(attr_filter=attr_filter)
 
 
 def build_multiple(scene_items):
-    """ Each node can deal with it's own building.  Though, with zBones it is much
+    """ Builds all the zBones at once.
+    Each node can deal with it's own building.  Though, with zBones it is much
     faster to build them all at once with one command instead of looping
-    through them.  This function builds all the zBones at once.
-
-    Args:
-        scene_items:
-
-    Returns:
-        None
+    through them.
     """
     sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
-    culled = mz.cull_creation_nodes(scene_items)
+    culled = cull_creation_nodes(scene_items)
 
     # build bones all at once--------------------------------------------------
     results = None

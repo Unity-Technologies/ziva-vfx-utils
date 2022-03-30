@@ -1,6 +1,6 @@
-from zBuilder.mayaUtils import get_short_name
-from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
+from zBuilder.mayaUtils import get_short_name
+from ..dg_node import DGNode
 
 
 class Constraint(DGNode):
@@ -8,12 +8,12 @@ class Constraint(DGNode):
     """
     type = None
     TYPES = ['pointConstraint', 'orientConstraint', 'parentConstraint']
-    """ The type of node. """
 
+    # List of attributes to exclude with a string_replace
     SEARCH_EXCLUDE = ['_class', '_attrs']
-    """ List of attributes to exclude with a string_replace"""
+
+    # List of maya attributes to add to attribute list when capturing
     EXTEND_ATTR_LIST = list()
-    """ List of maya attributes to add to attribute list when capturing."""
 
     def build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
@@ -27,9 +27,7 @@ class Constraint(DGNode):
             permissive (bool): Pass on errors. Defaults to ``True``
         """
         attr_filter = kwargs.get('attr_filter', list())
-
         if not cmds.objExists(self.name):
-
             cmds.select(self.association)
             constraint = None
             if self.type == 'parentConstraint':
@@ -42,7 +40,7 @@ class Constraint(DGNode):
                 results = cmds.orientConstraint(mo=True)
                 constraint = cmds.ls(results, type='orientConstraint')[0]
 
-            cmds.rename(constraint, name)
+            cmds.rename(constraint, self.name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
 
@@ -61,7 +59,6 @@ class Constraint(DGNode):
 
         targets = get_targets(self.name)
         constrained = get_constrained(self.name)
-
         association = targets
         association.extend(constrained)
         self.association = association
@@ -94,10 +91,14 @@ def get_targets(constraint_name):
 
 
 def get_constrained(constraint_name):
-    con = [
-        'constraintTranslateX', 'constraintTranslateY', 'constraintTranslateZ', 'constraintRotateX',
-        'constraintRotateY', 'constraintRotateZ'
-    ]
+    con = (
+        'constraintTranslateX',
+        'constraintTranslateY',
+        'constraintTranslateZ',
+        'constraintRotateX',
+        'constraintRotateY',
+        'constraintRotateZ',
+    )
 
     constrained = [
         cmds.listConnections('{}.{}'.format(constraint_name, c))[0] for c in con

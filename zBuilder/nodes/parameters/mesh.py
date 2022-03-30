@@ -1,15 +1,16 @@
-from zBuilder.mayaUtils import get_mdagpath_from_mesh, get_name_from_m_object
-from zBuilder.nodes.base import Base
+import logging
+
 from maya import cmds
 from maya import OpenMaya as om
-import logging
+from zBuilder.mayaUtils import get_mdagpath_from_mesh, get_name_from_m_object
+from ..base import Base
 
 logger = logging.getLogger(__name__)
 
 
 class Mesh(Base):
     type = 'mesh'
-    """ Type of node. """
+
     def __init__(self, *args, **kwargs):
         super(Mesh, self).__init__(*args, **kwargs)
 

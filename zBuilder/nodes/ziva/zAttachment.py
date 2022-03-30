@@ -1,10 +1,9 @@
 import logging
 
 from maya import cmds
-from maya import mel
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
+from zBuilder.zMaya import check_body_type
 from zBuilder.mayaUtils import safe_rename
+from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +12,10 @@ class AttachmentNode(Ziva):
     """ This node for storing information related to zAttachments.
     """
     type = 'zAttachment'
-    """ The type of node. """
+
+    # List of maps to store
     MAP_LIST = ['weightList[0].weights', 'weightList[1].weights']
-    """ List of maps to store. """
+
     def build(self, *args, **kwargs):
         """ Builds the zAttachment in maya scene.
 
@@ -35,15 +35,14 @@ class AttachmentNode(Ziva):
         source_mesh = self.nice_association[0]
         target_mesh = self.nice_association[1]
         # check if both meshes exist
-        if mz.check_body_type([source_mesh, target_mesh]):
+        if check_body_type([source_mesh, target_mesh]):
             # check existing attachments in scene
-            cmd = 'zQuery -t zAttachment {}'.format(source_mesh)
-            existing_attachments = mel.eval(cmd)
+            existing_attachments = cmds.zQuery(source_mesh, t='zAttachment')
             existing = []
             if existing_attachments:
                 for existing_attachment in existing_attachments:
-                    att_s = mel.eval('zQuery -as -l ' + existing_attachment)[0]
-                    att_t = mel.eval('zQuery -at -l ' + existing_attachment)[0]
+                    att_s = cmds.zQuery(existing_attachment, attachmentSource=True, l=True)[0]
+                    att_t = cmds.zQuery(existing_attachment, attachmentTarget=True, l=True)[0]
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
@@ -65,12 +64,12 @@ class AttachmentNode(Ziva):
                 else:
                     cmds.select(source_mesh, r=True)
                     cmds.select(target_mesh, add=True)
-                    new_att = mel.eval('ziva -a')
+                    new_att = cmds.ziva(a=True)
                     self.name = safe_rename(new_att[0], self.name)
             else:
                 cmds.select(source_mesh, r=True)
                 cmds.select(target_mesh, add=True)
-                new_att = mel.eval('ziva -a')
+                new_att = cmds.ziva(a=True)
                 self.name = safe_rename(new_att[0], self.name)
 
             self.check_parameter_name()

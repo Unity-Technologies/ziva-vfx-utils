@@ -47,18 +47,18 @@ There should be an output in the Maya Script Editor that looks something like th
 
 .. code-block:: python
 
-    # zBuilder.bundle : zTissue 7 #
-    # zBuilder.bundle : map 68 #
-    # zBuilder.bundle : zAttachment 21 #
-    # zBuilder.bundle : zMaterial 7 #
-    # zBuilder.bundle : zEmbedder 1 #
-    # zBuilder.bundle : zBone 4 #
-    # zBuilder.bundle : zTet 7 #
-    # zBuilder.bundle : mesh 11 #
-    # zBuilder.bundle : zSolver 1 #
-    # zBuilder.bundle : zSolverTransform 1 #
-    # zBuilder.bundle : zFiber 6 #
-    # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.087000 #
+    # zBuilder.builders.bundle : zTissue 7 #
+    # zBuilder.builders.bundle : map 68 #
+    # zBuilder.builders.bundle : zAttachment 21 #
+    # zBuilder.builders.bundle : zMaterial 7 #
+    # zBuilder.builders.bundle : zEmbedder 1 #
+    # zBuilder.builders.bundle : zBone 4 #
+    # zBuilder.builders.bundle : zTet 7 #
+    # zBuilder.builders.bundle : mesh 11 #
+    # zBuilder.builders.bundle : zSolver 1 #
+    # zBuilder.builders.bundle : zSolverTransform 1 #
+    # zBuilder.builders.bundle : zFiber 6 #
+    # zBuilder.commonUtils : Executing retrieve_from_scene() took 0.223s # 
 
 These :term:`scene item<scene item>` stats were retrieved by the builder.
 In this case, there are 7 zTissues, 4 zBones, etc.
@@ -107,18 +107,18 @@ The script editor output should look something like this:
 
 .. code-block:: python
 
-    # zBuilder.bundle : zTissue 1 #
-    # zBuilder.bundle : map 12 #
-    # zBuilder.bundle : zAttachment 4 #
-    # zBuilder.bundle : zMaterial 1 #
-    # zBuilder.bundle : zEmbedder 1 #
-    # zBuilder.bundle : zBone 3 #
-    # zBuilder.bundle : zTet 1 #
-    # zBuilder.bundle : mesh 5 #
-    # zBuilder.bundle : zSolver 1 #
-    # zBuilder.bundle : zSolverTransform 1 #
-    # zBuilder.bundle : zFiber 1 #
-    # zBuilder.builder : Finished: ---Elapsed Time = 0:00:00.166000 #
+    # zBuilder.builders.bundle : zTissue 1 # 
+    # zBuilder.builders.bundle : map 12 # 
+    # zBuilder.builders.bundle : zAttachment 4 # 
+    # zBuilder.builders.bundle : zMaterial 1 # 
+    # zBuilder.builders.bundle : zEmbedder 1 # 
+    # zBuilder.builders.bundle : zBone 3 # 
+    # zBuilder.builders.bundle : zTet 1 # 
+    # zBuilder.builders.bundle : mesh 5 # 
+    # zBuilder.builders.bundle : zSolver 1 # 
+    # zBuilder.builders.bundle : zSolverTransform 1 # 
+    # zBuilder.builders.bundle : zFiber 1 # 
+    # zBuilder.commonUtils : Executing retrieve_from_scene_selection() took 0.080s # 
 
 Notice that only one tissue is being retrieved.
 
@@ -170,8 +170,17 @@ when the scene was retrieved. There should also be an output in the script edito
 
 .. code-block:: python
 
-    # zBuilder.builders.ziva : Building.... #
-    # zBuilder.builder : Finished: ---Elapsed Time = 0:00:01.139000 #
+    # zBuilder.builders.ziva : Building Ziva Rig. # 
+    # zBuilder.builders.ziva : Building: zSolver # 
+    # zBuilder.builders.ziva : Building: zSolverTransform # 
+    # zBuilder.builders.ziva : Building: zBone # 
+    # zBuilder.builders.ziva : Building: zTissue # 
+    # zBuilder.builders.ziva : Building: zTet # 
+    # zBuilder.builders.ziva : Building: zMaterial # 
+    # zBuilder.builders.ziva : Building: zAttachment # 
+    # zBuilder.builders.ziva : Building: zFiber # 
+    # zBuilder.builders.ziva : Building: zEmbedder # 
+    # zBuilder.commonUtils : Executing build() took 0.624s # 
 
 
 Building a Ziva rig from scratch
@@ -275,7 +284,7 @@ Once the arm Ziva rig saved into a builder object in memory, it can be written o
 .. code-block:: python
 
         # replace path with a working temp directory on your system
-        z.write('C:\\Temp\\test.ziva')
+        z.write('C:\\Temp\\test.zBuilder')
 
 This writes out a json file of all the information so it can be retrieved later.
 
@@ -304,21 +313,21 @@ The script editor should output something like:
 
 .. code-block:: python
 
-    z.retrieve_from_file('C:\\Temp\\test.zBuilder')
-    # zBuilder.builder : reading parameters. 134 nodes #
-    # zBuilder.builder : reading info #
-    # zBuilder.bundle : zTissue 7 #
-    # zBuilder.bundle : map 68 #
-    # zBuilder.bundle : zAttachment 21 #
-    # zBuilder.bundle : zMaterial 7 #
-    # zBuilder.bundle : zEmbedder 1 #
-    # zBuilder.bundle : zBone 4 #
-    # zBuilder.bundle : zTet 7 #
-    # zBuilder.bundle : mesh 11 #
-    # zBuilder.bundle : zSolver 1 #
-    # zBuilder.bundle : zSolverTransform 1 #
-    # zBuilder.bundle : zFiber 6 #
-    # zBuilder.builder : Read File: C:\Temp\test.zBuilder in 0:00:00.052000 #
+    # zBuilder.builders.IO : Reading scene items. 134 nodes # 
+    # zBuilder.builders.IO : Reading info. # 
+    # zBuilder.builders.IO : Assigning builder. # 
+    # zBuilder.builders.bundle : zTissue 7 # 
+    # zBuilder.builders.bundle : map 68 # 
+    # zBuilder.builders.bundle : zAttachment 21 # 
+    # zBuilder.builders.bundle : zMaterial 7 # 
+    # zBuilder.builders.bundle : zEmbedder 1 # 
+    # zBuilder.builders.bundle : zBone 4 # 
+    # zBuilder.builders.bundle : zTet 7 # 
+    # zBuilder.builders.bundle : mesh 11 # 
+    # zBuilder.builders.bundle : zSolver 1 # 
+    # zBuilder.builders.bundle : zSolverTransform 1 # 
+    # zBuilder.builders.bundle : zFiber 6 # 
+    # zBuilder.commonUtils : Executing retrieve_from_file() took 0.057s # 
 
 Like before, this is a simple printout that hints at what has been loaded from the file.
 Now to build:
@@ -331,8 +340,17 @@ Because there was no map interpolation, the output should look as follows:
 
 .. code-block:: python
 
-    # zBuilder.builders.zBuilder : Building.... #
-    # zBuilder.builder : Finished: ---Elapsed Time = 0:00:03.578000 #
+    # zBuilder.builders.ziva : Building Ziva Rig. # 
+    # zBuilder.builders.ziva : Building: zSolver # 
+    # zBuilder.builders.ziva : Building: zSolverTransform # 
+    # zBuilder.builders.ziva : Building: zBone # 
+    # zBuilder.builders.ziva : Building: zTissue # 
+    # zBuilder.builders.ziva : Building: zTet # 
+    # zBuilder.builders.ziva : Building: zMaterial # 
+    # zBuilder.builders.ziva : Building: zAttachment # 
+    # zBuilder.builders.ziva : Building: zFiber # 
+    # zBuilder.builders.ziva : Building: zEmbedder # 
+    # zBuilder.commonUtils : Executing build() took 0.648s # 
 
 The Anatomical Arm rig should now be completely restored back to its original state.
 

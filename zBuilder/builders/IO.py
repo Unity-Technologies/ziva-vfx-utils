@@ -2,7 +2,7 @@ import json
 import logging
 
 from zBuilder.updates import update_json_pre_1_0_11
-from zBuilder.utils import parse_version_info
+from zBuilder.commonUtils import parse_version_info
 from .builder import find_class
 
 logger = logging.getLogger(__name__)

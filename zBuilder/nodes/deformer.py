@@ -1,34 +1,24 @@
 from collections import defaultdict
-
 from maya import cmds
-
-from zBuilder.nodes.dg_node import DGNode
-import logging
-
-logger = logging.getLogger(__name__)
+from .dg_node import DGNode
 
 
 class Deformer(DGNode):
+
     def __init__(self, parent=None, builder=None):
         super(Deformer, self).__init__(parent=parent, builder=builder)
-
         self.parameters = defaultdict(list)
 
     def add_parameter(self, parameter):
-        """ This takes a zBuilder parameter and adds it to the node.  This is effectively
-        a pointer to original parameter for later retrieval
+        """ This takes a zBuilder parameter and adds it to the node.
+        This is effectively a pointer to original parameter for later retrieval.
 
-        args:
+        Args:
             parameter: obj the parameter to add to node
         """
         self.parameters[parameter.type].append(parameter)
 
     def spawn_parameters(self):
-        """
-
-        Returns:
-
-        """
         objs = {}
         if self.nice_association:
             objs['mesh'] = self.nice_association
@@ -41,32 +31,24 @@ class Deformer(DGNode):
                 objs['map'].append([map_name, mesh_name, "barycentric"])
         return objs
 
-    def build(self, *args, **kwargs):
-        """ Builds the node in maya.  mean to be overwritten.
-        """
-        raise NotImplementedError
-
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
-        This is deals with basic stuff including attributes.  For other things it
-        is meant to be overridden in inherited node.
-
+        This is deals with basic stuff including attributes.
+        For other things it is meant to be overridden in inherited node.
         This is inherited from Base and extended to deal with maps and meshes.
+
         Args:
             maya_node (str): The maya node to populate parameter with.
-
         """
-
         super(Deformer, self).populate(maya_node=maya_node)
-
         self.association = self.get_meshes(maya_node)
 
     def get_map_meshes(self):
-        """ This is the mesh associated with each map in obj.map_list.  Typically
-        it seems to coincide with mesh store in get_association.  Sometimes
-        it deviates, so you can override this method to define your own
-        list of meshes against the map list.
+        """ This is the mesh associated with each map in obj.map_list.
+        Typically it seems to coincide with mesh store in get_association.
+        Sometimes it deviates, so you can override this method 
+        to define your own list of meshes against the map list.
 
         Returns:
             list: List of long mesh names.
@@ -74,8 +56,8 @@ class Deformer(DGNode):
         return self.nice_association
 
     def construct_map_names(self):
-        """ This builds the map names.  maps from map_list with the object name
-        in front
+        """ This builds the map names.
+        maps from map_list with the object name in front
 
         For this we want to get the .name and not scene name.
         """
@@ -104,7 +86,6 @@ class Deformer(DGNode):
                 True forces interpolation.
                 False cancels it.
                 auto checks if it needs to.  Default = "auto"
-
         """
         self.check_map_interpolation(interp_maps)
         for map_ in self.parameters['map']:
@@ -118,9 +99,7 @@ class Deformer(DGNode):
 
         Args:
             interp_maps (bool): Do you want to do it?
-
         """
-
         map_objects = self.parameters['map']
         if interp_maps == 'auto':
             for map_object in map_objects:

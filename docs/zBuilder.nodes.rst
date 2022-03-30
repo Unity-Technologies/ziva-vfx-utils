@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    zBuilder.nodes.deformers
+   zBuilder.nodes.parameters
    zBuilder.nodes.utils
    zBuilder.nodes.ziva
 

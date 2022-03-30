@@ -1,10 +1,9 @@
 import zBuilder.zMaya as mz
 
+from maya import cmds
 from zBuilder.commonUtils import get_first_element
 from zBuilder.mayaUtils import build_attr_list, build_attr_key_values, get_type
-from zBuilder.nodes.deformer import Deformer
-from maya import cmds
-from maya import mel
+from ..deformer import Deformer
 
 
 class Ziva(Deformer):
@@ -52,7 +51,7 @@ class Ziva(Deformer):
         if self.type == 'zSolver':
             self.solver = self
         else:
-            solver = mel.eval('zQuery -t zSolver {}'.format(self.long_name))
+            solver = cmds.zQuery(self.long_name, t='zSolver')
             if solver:
                 self.solver = self.builder.get_scene_items(name_filter=solver[0])[0]
 
@@ -75,7 +74,7 @@ class Ziva(Deformer):
         # this is all the required checks for a body.  If any of these fail the
         # check it will not create body.
         cmds.select(meshes, r=True)
-        bad_meshes = mel.eval('zMeshCheck -iso -vb -me -mv -st -la -oe')
+        bad_meshes = cmds.zMeshCheck(iso=True, vb=True, me=True, mv=True, st=True, la=True, oe=True)
         if bad_meshes:
             bad_meshes = [x.split('.')[0] for x in bad_meshes]
             bad_meshes = list(set(bad_meshes))

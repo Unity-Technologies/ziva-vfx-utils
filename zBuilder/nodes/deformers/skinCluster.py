@@ -1,7 +1,7 @@
-from zBuilder.nodes.dg_node import DGNode
 from maya import cmds
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
+from ..dg_node import DGNode
 
 
 class SkinCluster(DGNode):
@@ -9,27 +9,26 @@ class SkinCluster(DGNode):
     """
     type = 'skinCluster'
     TYPES = []
-    """ The type of node. """
 
+    # List of attributes to exclude with a string_replace
     SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'weights']
-    """ List of attributes to exclude with a string_replace"""
+
+    # List of maya attributes to add to attribute list when capturing
     EXTEND_ATTR_LIST = list()
-    """ List of maya attributes to add to attribute list when capturing."""
+
     def __init__(self, parent=None, builder=None):
         super(SkinCluster, self).__init__(parent=parent, builder=builder)
         self.influences = list()
         self.weights = dict()
 
     def populate(self, maya_node=None):
-        """ This extends ZivaBase.populate()
-
+        """ This extends ZivaBase.populate().
         Adds parent and child storage.
 
         Args:
             maya_node: Maya node to populate with.
         """
         super(SkinCluster, self).populate(maya_node=maya_node)
-
         self.weights = get_weights(self.name)
         self.influences = get_influences(self.name)
         self.association = get_associations(self.name)

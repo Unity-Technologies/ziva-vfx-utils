@@ -1,6 +1,6 @@
 from maya import cmds
-from zBuilder.nodes.dg_node import DGNode
 from zBuilder.mayaUtils import FIELD_TYPES
+from ..dg_node import DGNode
 
 
 class Field(DGNode):

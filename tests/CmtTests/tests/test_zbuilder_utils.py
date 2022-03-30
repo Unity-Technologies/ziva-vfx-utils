@@ -6,6 +6,7 @@ import zBuilder.zMaya as mz
 
 from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
+from zBuilder.commonUtils import parse_version_info
 from zBuilder.mayaUtils import replace_long_name
 
 
@@ -290,28 +291,28 @@ class BuilderUtilsTestCase(VfxTestCase):
     def test_version_parse_function(self):
         # Valid cases
         # major.minor.patch-tag
-        major, minor, patch, tag = utils.parse_version_info("1.2.30-alpha")
+        major, minor, patch, tag = parse_version_info("1.2.30-alpha")
         self.assertEqual(major, 1)
         self.assertEqual(minor, 2)
         self.assertEqual(patch, 30)
         self.assertEqual(tag, "alpha")
 
         # major.minor.patch
-        major, minor, patch, tag = utils.parse_version_info("1.20.3")
+        major, minor, patch, tag = parse_version_info("1.20.3")
         self.assertEqual(major, 1)
         self.assertEqual(minor, 20)
         self.assertEqual(patch, 3)
         self.assertEqual(tag, "")
 
         # major.minor-tag
-        major, minor, patch, tag = utils.parse_version_info("1.33-beta")
+        major, minor, patch, tag = parse_version_info("1.33-beta")
         self.assertEqual(major, 1)
         self.assertEqual(minor, 33)
         self.assertEqual(patch, 0)
         self.assertEqual(tag, "beta")
 
         # major.minor
-        major, minor, patch, tag = utils.parse_version_info("10.2")
+        major, minor, patch, tag = parse_version_info("10.2")
         self.assertEqual(major, 10)
         self.assertEqual(minor, 2)
         self.assertEqual(patch, 0)
@@ -320,23 +321,23 @@ class BuilderUtilsTestCase(VfxTestCase):
         # Invalid cases
         # major-tag
         with self.assertRaises(AssertionError):
-            utils.parse_version_info("1-gammar")
+            parse_version_info("1-gammar")
 
         # major only
         with self.assertRaises(AssertionError):
-            utils.parse_version_info("1")
+            parse_version_info("1")
 
         # non-integer version number
         with self.assertRaises(AssertionError):
-            utils.parse_version_info("1.0c")
+            parse_version_info("1.0c")
 
         # missing major version
         with self.assertRaises(AssertionError):
-            utils.parse_version_info(".1.2")
+            parse_version_info(".1.2")
 
         # negative version number
         with self.assertRaises(AssertionError):
-            utils.parse_version_info("1.-2")
+            parse_version_info("1.-2")
 
     def test_remove_all_solvers(self):
         cmds.ziva(s=True)

@@ -4,10 +4,34 @@ zBuilder.builders package
 Submodules
 ----------
 
+zBuilder.builders.IO module
+---------------------------
+
+.. automodule:: zBuilder.builders.IO
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 zBuilder.builders.attributes module
 -----------------------------------
 
 .. automodule:: zBuilder.builders.attributes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zBuilder.builders.builder module
+--------------------------------
+
+.. automodule:: zBuilder.builders.builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zBuilder.builders.bundle module
+-------------------------------
+
+.. automodule:: zBuilder.builders.bundle
    :members:
    :undoc-members:
    :show-inheritance:

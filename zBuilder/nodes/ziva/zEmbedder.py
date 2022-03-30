@@ -1,17 +1,14 @@
 from maya import cmds
 from maya import mel
 from zBuilder.mayaUtils import get_short_name, safe_rename
-from zBuilder.nodes import Ziva
-import logging
-
-logger = logging.getLogger(__name__)
+from .zivaBase import Ziva
 
 
 class EmbedderNode(Ziva):
     """ This node for storing information related to zEmebedder.
     """
     type = 'zEmbedder'
-    """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(EmbedderNode, self).__init__(parent=parent, builder=builder)
         self.__embedded_meshes = None

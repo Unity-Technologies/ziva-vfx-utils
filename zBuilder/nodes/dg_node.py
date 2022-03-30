@@ -1,8 +1,9 @@
+import logging
+
+from maya import cmds
 from zBuilder.commonUtils import get_first_element
 from zBuilder.mayaUtils import get_short_name, build_attr_list, build_attr_key_values, get_type
-from zBuilder.nodes.base import Base
-from maya import cmds
-import logging
+from .base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,6 @@ class DGNode(Base):
 
     def __init__(self, parent=None, builder=None):
         super(DGNode, self).__init__(parent=parent, builder=builder)
-
         self.attrs = {}
         self._association = []
 
@@ -56,19 +56,18 @@ class DGNode(Base):
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.
 
-        This is deals with basic stuff including attributes.  For other things it
-        is meant to be overridden in inherited node.
+        This deals with basic stuff including attributes.
+        For other things it is meant to be overridden in inherited node.
 
         Args:
             maya_node (str): The maya node to populate parameter with.
-
         """
         self.name = get_first_element(maya_node)
         self.type = get_type(self.long_name)
         self.get_maya_attrs()
 
     def build(self, *args, **kwargs):
-        """ Builds the node in maya.  meant to be overwritten.
+        """ Builds the node in maya.
         """
         raise NotImplementedError
 
@@ -86,12 +85,7 @@ class DGNode(Base):
 
     @property
     def association(self):
-        """ associations of node.
-        """
-        tmp = []
-        for item in self._association:
-            tmp.append(get_short_name(item))
-        return tmp
+        return [get_short_name(item) for item in self._association]
 
     @association.setter
     def association(self, association):
@@ -105,12 +99,9 @@ class DGNode(Base):
 
     def compare(self):
         """ Compares populated parameter with that which is in maya scene.
-
-        Returns:
-            prints out items that are different.
+            Prints out items that are different.
         """
         name = self.long_name
-
         attr_list = self.attrs.keys()
         if cmds.objExists(name):
             if attr_list:
@@ -124,7 +115,6 @@ class DGNode(Base):
     def get_maya_attrs(self):
         """ Get attribute values from maya and update self.
         """
-
         # build the attribute list to aquire from scene
         attr_list = build_attr_list(self.long_name)
         if self.EXTEND_ATTR_LIST:
@@ -134,8 +124,7 @@ class DGNode(Base):
         self.attrs = build_attr_key_values(self.long_name, attr_list)
 
     def set_maya_attrs(self, attr_filter=None):
-        """Given a Builder node this set the attributes of the object in the maya
-        scene. 
+        """ Given a Builder node this set the attributes of the object in the maya scene.
 
         Args:
             attr_filter (dict):  Attribute filter on what attributes to set.
@@ -143,9 +132,6 @@ class DGNode(Base):
                 list of attributes to use.
 
                 af = {'zSolver':['substeps']}
-
-        Returns:
-            nothing.
         """
         node_attrs = self.attrs.keys()
         if attr_filter and attr_filter.get(self.type, None):

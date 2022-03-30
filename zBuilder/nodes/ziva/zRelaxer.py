@@ -1,10 +1,6 @@
-from zBuilder.mayaUtils import safe_rename
-from zBuilder.nodes.deformer import Deformer
 from maya import cmds
-from maya import mel
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.mayaUtils import safe_rename
+from ..deformer import Deformer
 
 
 class ZRelaxerNode(Deformer):
@@ -17,7 +13,7 @@ class ZRelaxerNode(Deformer):
 
         if not cmds.objExists(self.name):
             cmds.select(self.association, r=True)
-            results = mel.eval('zRelaxer')
+            results = cmds.zRelaxer()
             safe_rename(results[0], self.name)
 
         self.check_parameter_name()

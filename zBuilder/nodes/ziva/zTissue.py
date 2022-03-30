@@ -1,30 +1,27 @@
-from zBuilder.mayaUtils import safe_rename
-from zBuilder.nodes import Ziva
-import zBuilder.zMaya as mz
 from maya import cmds
-from maya import mel
-import logging
-
-logger = logging.getLogger(__name__)
+from zBuilder.mayaUtils import safe_rename
+from zBuilder.zMaya import cull_creation_nodes
+from .zivaBase import Ziva
 
 
 class TissueNode(Ziva):
     """ This node for storing information related to zTissues.
     """
     type = 'zTissue'
-    """ The type of node. """
+
     def __init__(self, parent=None, builder=None):
         super(TissueNode, self).__init__(parent=parent, builder=builder)
         self.children_tissues = None
         self.parent_tissue = None
-        """ parent_tissues and children_tissues are used to define sub-tissues.  This is storing
-        the scene_item for the respective tissue.  The parent tissue is the one that gets filled
-        and the children_tissues are unused.  The reason for this is because at time of retrieval
-        the children tissues are not processed so their are no children scene items to get.
-        """
+        # parent_tissues and children_tissues are used to define sub-tissues.
+        # This is storing the scene_item for the respective tissue.
+        # The parent tissue is the one that gets filled and the children_tissues are unused.
+        # The reason for this is because at time of retrieval
+        # the children tissues are not processed so their are no children scene items to get.
 
     def make_node_connections(self):
-        """Adding connections for zTissue.  This is assiging any parent_tissues to this scene item.
+        """ Adding connections for zTissue.
+        This is assiging any parent_tissues to this scene item.
         parent_tissues are its parent sub-tissue.
         """
         parent_name = get_tissue_parent(self.name)
@@ -48,7 +45,7 @@ class TissueNode(Ziva):
         """
         solver = None
         if args:
-            solver = mel.eval('zQuery -t zSolver -l {}'.format(args[0]))
+            solver = cmds.zQuery(args[0], t='zSolver', l=True)
 
         if not solver:
             solver = self.solver
@@ -92,22 +89,18 @@ def build_multiple(tissue_items, tet_items, permissive=True):
         tissue_items:
         tet_items:
         permissive (bool):
-
-    Returns:
-        None
     """
     sel = cmds.ls(sl=True)
     # cull none buildable------------------------------------------------------
-    tet_results = mz.cull_creation_nodes(tet_items, permissive=permissive)
-    tissue_results = mz.cull_creation_nodes(tissue_items, permissive=permissive)
+    tet_results = cull_creation_nodes(tet_items, permissive=permissive)
+    tissue_results = cull_creation_nodes(tissue_items, permissive=permissive)
 
     # build tissues all at once---------------------------------------------
     if tissue_results['meshes']:
-
         Ziva.check_meshes(tissue_results['meshes'])
 
         cmds.select(tissue_results['meshes'], r=True)
-        outs = mel.eval('ziva -t')
+        outs = cmds.ziva(t=True)
 
         # rename zTissues and zTets-----------------------------------------
         for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
@@ -120,21 +113,19 @@ def build_multiple(tissue_items, tet_items, permissive=True):
 
         for ztet, ztissue in zip(tet_items, tissue_items):
             ztet.apply_user_tet_mesh()
-
             if ztissue.parent_tissue:
                 parent_name = ztissue.parent_tissue.name
                 parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
-
                 if parent_scene_item:
                     parent = [x.nice_association[0] for x in parent_scene_item]
                 else:
                     cmds.select(ztissue.parent_tissue.long_name, r=True)
-                    parent = mel.eval('zQuery -type zTissue -m ')
+                    parent = cmds.zQuery(type='zTissue', mesh=True)
 
                 cmds.select(parent)
                 tissue_mesh = ztissue.nice_association[0]
                 cmds.select(tissue_mesh, add=True)
-                mel.eval('ziva -ast')
+                cmds.ziva(addSubtissue=True)
 
     cmds.select(sel)
 
