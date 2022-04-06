@@ -3,7 +3,6 @@ import zBuilder.vfxUtils as vfx_util
 
 from collections import defaultdict, OrderedDict
 from maya import cmds
-from maya import mel
 from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
 from zBuilder.commonUtils import none_to_empty, time_this
 from .builder import Builder
@@ -27,6 +26,99 @@ ZNODES = [
     'zFiber',
     'zEmbedder',
 ]
+
+
+def _check_map_validity(map_parameters):
+    """ Validite maps for zAttachments and zFibers.
+    For zAttachments it checks if all the values are zero.
+    If so it failed and turns off the associated zTissue node.
+    For zFibers it checks to make sure there are at least 1 value of 
+    0 and 1 value of .5 within a .1 threshold.
+    If not that fails and turns off the zTissue.
+
+    Args:
+        map_parameters: map parameters to check.
+
+    Returns:
+        list of offending maps
+    """
+    sel = cmds.ls(sl=True)
+
+    report = []
+    for parameter in map_parameters:
+        if cmds.objExists(parameter.name):
+            map_type = get_type(parameter.name)
+            if map_type == 'zAttachment':
+                values = parameter.values
+                if all(v == 0 for v in values):
+                    report.append(parameter.name)
+                    dg_node = parameter.name.split('.')[0]
+                    tissue = cmds.zQuery(dg_node, type='zTissue')
+                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
+
+            if map_type == 'zFiber' and 'endPoints' in parameter.name:
+                values = parameter.values
+                upper = False
+                lower = False
+
+                if any(0 <= v <= .1 for v in values):
+                    lower = True
+                if any(.9 <= v <= 1 for v in values):
+                    upper = True
+
+                if not upper or not lower:
+                    report.append(parameter.name)
+                    dg_node = parameter.name.split('.')[0]
+                    tissue = cmds.zQuery(dg_node, type='zTissue')
+                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
+
+    if report:
+        logger.info('Check these maps: {}'.format(report))
+    cmds.select(sel)
+    return report
+
+
+def _zQuery(types, solver):
+    """ This is a wrapper around Ziva VFX zQuery as currently 
+    it does not handle all the queries needed.
+    This will sort through the types and if given a type that
+    zQuery is unfamiliar with it searches solver for it by history instead.
+
+    Args:
+        types (list() of str()): The types of nodes to get information about
+        solver (str()): The solver to query.
+
+    Returns:
+        list of str
+    """
+    return_value = []
+
+    # Full history of solver
+    solver_history = cmds.listHistory(solver)
+
+    # Types that are not in ZNODES.  This means that zQuery will not know what to do with it.
+    types_not_in_znodes = set(types) - set(ZNODES)
+    types_in_znodes = list(set(ZNODES).intersection(set(types)))
+
+    # Dictionary to hold used types not in ZNODES (The actual ones we currently cannot zQuery)
+    solver_history_dict = defaultdict(list)
+
+    # Go through the full solver history and put items in a dictionary with type as key.
+    for item in solver_history:
+        item_type = get_type(item)
+        if item_type in types_not_in_znodes:
+            solver_history_dict[item_type].append(item)
+
+    # go through ordered 'types' list and fill up the return_value in a nice ordered manner
+    for type_ in types:
+        if type_ in types_in_znodes:
+            tmp = cmds.zQuery(solver, t=type_, l=True)
+            if tmp:
+                return_value.extend(tmp)
+        else:
+            return_value.extend(solver_history_dict[type_])
+
+    return return_value
 
 
 class SolverDisabler:
@@ -206,7 +298,7 @@ class Ziva(Builder):
 
         # query all the ziva nodes---------------------------------------------
         cmds.select(bodies)
-        nodes = mel.eval('zQuery -a -l')
+        nodes = cmds.zQuery(a=True, l=True)
 
         if nodes:
             # find zFiber---------------------------------------------
@@ -261,8 +353,8 @@ class Ziva(Builder):
         meshes = []
         if attachment_names:
             for attachment in attachment_names:
-                meshes.extend(mel.eval('zQuery -as -l {}'.format(attachment)))
-                meshes.extend(mel.eval('zQuery -at -l {}'.format(attachment)))
+                meshes.extend(cmds.zQuery(attachment, attachmentSource=True, l=True))
+                meshes.extend(cmds.zQuery(attachment, attachmentSource=True, l=True))
 
         if meshes:
             nodes.extend(self.__add_bodies(meshes))
@@ -369,9 +461,9 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         solver = None
         if args:
-            solver = mel.eval('zQuery -t "zSolver" -l {}'.format(args[0]))
+            solver = cmds.zQuery(args[0], t="zSolver", l=True)
         else:
-            solver = mel.eval('zQuery -t "zSolver" -l')
+            solver = cmds.zQuery(t="zSolver", l=True)
 
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
@@ -401,7 +493,7 @@ class Ziva(Builder):
         ]
 
         node_types.extend(FIELD_TYPES)
-        nodes = zQuery(node_types, solver)
+        nodes = _zQuery(node_types, solver)
         if nodes:
             self._populate_nodes(nodes, get_parameters)
             self.setup_tree_hierarchy()
@@ -506,12 +598,12 @@ class Ziva(Builder):
                         nodes.append(loas)
             if restShape:
                 cmds.select(selection)
-                rest_shapes = mel.eval('zQuery -t zRestShape')
+                rest_shapes = cmds.zQuery(t='zRestShape')
                 if rest_shapes:
                     nodes.extend(rest_shapes)
             if embedder:
                 cmds.select(selection)
-                embedder = mel.eval('zQuery -t "zEmbedder"')
+                embedder = cmds.zQuery(t='zEmbedder')
                 if embedder:
                     nodes.extend(embedder)
         else:
@@ -647,7 +739,7 @@ class Ziva(Builder):
         cmds.select(sel, r=True)
 
         # last ditch check of map validity for zAttachments and zFibers
-        vfx_util.check_map_validity(self.get_scene_items(type_filter='map'))
+        _check_map_validity(self.get_scene_items(type_filter='map'))
 
 
 def transform_rivet_and_LoA_into_tissue_meshes(selection):
@@ -672,51 +764,8 @@ def transform_rivet_and_LoA_into_tissue_meshes(selection):
             history = cmds.listHistory(item, future=True)
             fiber = cmds.ls(history, type='zFiber')
             cmds.select(fiber)
-            meshes = mel.eval('zQuery -t zTissue -m -l')
+            meshes = cmds.zQuery(t='zTissue', m=True, l=True)
             output.append(meshes[0])
         else:
             output.append(item)
     return output
-
-
-def zQuery(types, solver):
-    """ This is a wrapper around Ziva VFX zQuery as currently 
-    it does not handle all the queries needed.
-    This will sort through the types and if given a type that
-    zQuery is unfamiliar with it searches solver for it by history instead.
-
-    Args:
-        types (list() of str()): The types of nodes to get information about
-        solver (str()): The solver to query.
-
-    Returns:
-        list of str
-    """
-    return_value = []
-
-    # Full history of solver
-    solver_history = cmds.listHistory(solver)
-
-    # Types that are not in ZNODES.  This means that zQuery will not know what to do with it.
-    types_not_in_znodes = set(types) - set(ZNODES)
-    types_in_znodes = list(set(ZNODES).intersection(set(types)))
-
-    # Dictionary to hold used types not in ZNODES (The actual ones we currently cannot zQuery)
-    solver_history_dict = defaultdict(list)
-
-    # Go through the full solver history and put items in a dictionary with type as key.
-    for item in solver_history:
-        item_type = get_type(item)
-        if item_type in types_not_in_znodes:
-            solver_history_dict[item_type].append(item)
-
-    # go through ordered 'types' list and fill up the return_value in a nice ordered manner
-    for type_ in types:
-        if type_ in types_in_znodes:
-            tmp = mel.eval('zQuery -t "{}" -l {}'.format(type_, solver))
-            if tmp:
-                return_value.extend(tmp)
-        else:
-            return_value.extend(solver_history_dict[type_])
-
-    return return_value

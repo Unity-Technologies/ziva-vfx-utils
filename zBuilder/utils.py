@@ -7,7 +7,7 @@ from maya import cmds
 from maya import mel
 from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
 from zBuilder.mayaUtils import get_short_name, get_type, safe_rename
-from zBuilder.vfxUtils import check_map_validity, get_zSolver, isSolver, check_body_type
+from zBuilder.vfxUtils import get_zSolver, isSolver, check_body_type
 from zBuilder.builders.skinClusters import SkinCluster
 
 logger = logging.getLogger(__name__)
@@ -38,58 +38,6 @@ ALL_ZIVA_NODES = [
     'zRivetToBone',
     'zRestShape',
 ]
-
-
-def return_copy_buffer():
-    """This returns a deep copy of the buffer contents simply for comparisons.
-    """
-    deep = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
-    return deep
-
-
-def copy_paste(*args, **kwargs):
-    '''
-    A utility wrapper for copying and pasting a tissue
-    '''
-    sel = cmds.ls(sl=True)
-
-    selection = None
-    if args:
-        selection = cmds.ls(args[0], l=True)
-    else:
-        selection = cmds.ls(sl=True, l=True)
-
-    builder = zva.Ziva()
-    builder.retrieve_from_scene_selection(selection[0])
-    builder.string_replace(get_short_name(selection[0]), get_short_name(selection[1]))
-    builder.stats()
-    builder.build(**kwargs)
-
-    cmds.select(sel)
-
-
-def check_map_validity():
-    """
-    This checks the map validity for zAttachments and zFibers.  For zAttachments
-    it checks if all the values are zero.  If so it failed and turns off the
-    associated zTissue node.  For zFibers it checks to make sure there are at least
-    1 value of 0 and 1 value of .5 within a .1 threshold.  If not that fails and
-    turns off the zTissue
-
-    Returns:
-        list of offending maps
-    """
-    sel = cmds.ls(sl=True)
-
-    # we are going to check fibers and attachments
-    cmds.select(cmds.ls(type=['zAttachment', 'zFiber']), r=True)
-
-    builder = zva.Ziva()
-    builder.retrieve_from_scene_selection(connections=False)
-
-    check_map_validity(builder.get_scene_items(type_filter='map'))
-
-    cmds.select(sel, r=True)
 
 
 def remove(nodes):
@@ -519,7 +467,8 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
             cmds.select(item.nice_association, add=True)
 
 
-def next_free_plug_in_array(dst_plug):
+# Begin merge_two_solvers() section
+def _next_free_plug_in_array(dst_plug):
     # type: (str) -> str
     """ Use this to work around the fact that zSolver.iGeo (and other attrs)
     have indexMatters=True even though the index does n't matter. As a result,
@@ -529,8 +478,8 @@ def next_free_plug_in_array(dst_plug):
     This function takes a plug name, and if it's an element of an array,
     sets the index to a free index. Else, it's the identity function.
     
-    next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
-    next_free_plug_in_array('foo.bar') --> 'foo.bar'
+    _next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
+    _next_free_plug_in_array('foo.bar') --> 'foo.bar'
     """
 
     array_match = re.search(r"(.*)\[\d+\]$", dst_plug)
@@ -543,7 +492,7 @@ def next_free_plug_in_array(dst_plug):
     return dst_plug
 
 
-def listConnectionPlugs(node, destination=True, source=True):
+def _list_connection_plugs(node, destination=True, source=True):
     # type: (str, bool, bool) -> List[Tuple[basestring,basestring]]
     """ Get all of the connections with 'node' as a list of pairs of plugs.
     The first plug in each pair is a plug on 'node'. The second plug in each
@@ -595,7 +544,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
     with zva.SolverDisabler(solver_transform1):
         ####################################################################
         # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
-        for src, dst in listConnectionPlugs(solver2, source=False):
+        for src, dst in _list_connection_plugs(solver2, source=False):
             cmds.disconnectAttr(src, dst)
             new_src = src.replace(solver2, solver1, 1)
             try:
@@ -605,10 +554,10 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 
         ####################################################################
         # logger.info('Re-wiring inputs of {} to go to {}'.format(solver2, solver1))
-        for dst, src in listConnectionPlugs(solver2, destination=False):
+        for dst, src in _list_connection_plugs(solver2, destination=False):
             cmds.disconnectAttr(src, dst)
             new_dst = dst.replace(solver2, solver1, 1)
-            new_dst = next_free_plug_in_array(new_dst)
+            new_dst = _next_free_plug_in_array(new_dst)
             try:
                 cmds.connectAttr(src, new_dst)
             except:
@@ -617,7 +566,7 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 
         ####################################################################
         # logger.info('Re-wiring outputs of {} to come from {}'.format(solver_transform2, solver_transform1))
-        for src, dst in listConnectionPlugs(solver_transform2, source=False):
+        for src, dst in _list_connection_plugs(solver_transform2, source=False):
             cmds.disconnectAttr(src, dst)
             new_src = src.replace(solver_transform2, solver_transform1, 1)
             try:
@@ -655,6 +604,9 @@ def merge_two_solvers(solver_transform1, solver_transform2):
             # Referenced nodes are 'readOnly; and cannot be deleted or renamed - leave them alone.
             if not cmds.ls(node, readOnly=True):
                 cmds.delete(node)
+
+
+# End merge_two_solvers() section
 
 
 def merge_solvers(solver_transforms):

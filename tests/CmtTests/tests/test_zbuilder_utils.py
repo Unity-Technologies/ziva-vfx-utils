@@ -1,3 +1,4 @@
+import copy
 import os
 import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
@@ -5,11 +6,10 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
 from zBuilder.commonUtils import parse_version_info
-from zBuilder.mayaUtils import replace_long_name
-from zBuilder.utils import (clean_scene, copy_paste, copy_paste_with_substitution, remove,
-                            remove_solver, remove_all_solvers, rename_ziva_nodes,
-                            return_copy_buffer, rig_cut, rig_copy, rig_paste, rig_transfer,
-                            rig_update, load_rig, save_rig)
+from zBuilder.mayaUtils import replace_long_name, get_short_name
+from zBuilder.utils import (ZIVA_CLIPBOARD_ZBUILDER, clean_scene, copy_paste_with_substitution,
+                            remove, remove_solver, remove_all_solvers, rename_ziva_nodes, rig_cut,
+                            rig_copy, rig_paste, rig_transfer, rig_update, load_rig, save_rig)
 from zBuilder.vfxUtils import get_zBones
 
 
@@ -140,13 +140,35 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         test_utils.build_anatomical_arm_with_no_popup()
 
     def test_copy_paste(self):
-        cmds.select(cl=True)
 
+        def copy_paste(*args, **kwargs):
+            '''
+            A utility wrapper for copying and pasting a tissue
+            '''
+            sel = cmds.ls(sl=True)
+            selection = None
+            if args:
+                selection = cmds.ls(args[0], l=True)
+            else:
+                selection = cmds.ls(sl=True, l=True)
+
+            builder = zva.Ziva()
+            builder.retrieve_from_scene_selection(selection[0])
+            builder.string_replace(get_short_name(selection[0]), get_short_name(selection[1]))
+            builder.stats()
+            builder.build(**kwargs)
+            cmds.select(sel)
+
+        # Setup
+        cmds.select(cl=True)
         cmds.duplicate('r_bicep_muscle', name='dupe')
         cmds.polySmooth('dupe')
         cmds.select('r_bicep_muscle', 'dupe')
 
+        # Action
         copy_paste()
+
+        # Verify
         self.assertSceneHasNodes(['dupe_r_radius_bone'])
 
     def test_utils_rig_copy_paste_clean(self):
@@ -415,6 +437,13 @@ class BuilderUtilsMirrorTestCase(VfxTestCase):
         self.assertSceneHasNodes(['l_zMaterial1', 'l_zTissue'])
 
 
+def _return_copy_buffer():
+    """ Helper function that returns a deep copy of the buffer contents simply for comparisons.
+    """
+    deep = copy.deepcopy(ZIVA_CLIPBOARD_ZBUILDER)
+    return deep
+
+
 class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
@@ -434,7 +463,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
         cmds.select('pSphere2')
         rig_cut()
 
-        self.stored_buffer = return_copy_buffer()
+        self.stored_buffer = _return_copy_buffer()
 
         cmds.select('pSphere1')
         rig_paste()
@@ -485,7 +514,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
         # this gets interpolate so scene builder should be different then buffer
         self.assertNotEquals(self.stored_buffer, build)
 
-        current_buffer = return_copy_buffer()
+        current_buffer = _return_copy_buffer()
 
         # these should be same
         self.assertEquals(self.stored_buffer, current_buffer)
@@ -506,7 +535,7 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
         cmds.select('pSphere2')
         rig_cut()
 
-        self.stored_buffer = return_copy_buffer()
+        self.stored_buffer = _return_copy_buffer()
 
         cmds.select('pSphere3')
         rig_paste()
@@ -515,7 +544,7 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
         # it has been pasted in setup.  Now the buffer should remain unchanged
         # get buffer again and compare
 
-        current_buffer = return_copy_buffer()
+        current_buffer = _return_copy_buffer()
 
         # these should be same
         self.assertEquals(self.stored_buffer, current_buffer)
@@ -530,4 +559,4 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
         # not equal to scene
         self.assertNotEquals(self.stored_buffer, builder)
         # equal to existing buffer
-        self.assertEquals(self.stored_buffer, return_copy_buffer())
+        self.assertEquals(self.stored_buffer, _return_copy_buffer())

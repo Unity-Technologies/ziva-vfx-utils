@@ -448,55 +448,6 @@ def cull_creation_nodes(scene_items, permissive=True):
     return results
 
 
-def check_map_validity(map_parameters):
-    """
-    This checks the map validity for zAttachments and zFibers.  For zAttachments
-    it checks if all the values are zero.  If so it failed and turns off the
-    associated zTissue node.  For zFibers it checks to make sure there are at least
-    1 value of 0 and 1 value of .5 within a .1 threshold.  If not that fails and
-    turns off the zTissue
-
-    Args:
-        map_parameters: map parameters to check.
-    Returns:
-        list of offending maps
-    """
-    sel = cmds.ls(sl=True)
-
-    report = []
-    for parameter in map_parameters:
-        if cmds.objExists(parameter.name):
-            map_type = get_type(parameter.name)
-            if map_type == 'zAttachment':
-                values = parameter.values
-                if all(v == 0 for v in values):
-                    report.append(parameter.name)
-                    dg_node = parameter.name.split('.')[0]
-                    tissue = mel.eval('zQuery -type zTissue {}'.format(dg_node))
-                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
-
-            if map_type == 'zFiber' and 'endPoints' in parameter.name:
-                values = parameter.values
-                upper = False
-                lower = False
-
-                if any(0 <= v <= .1 for v in values):
-                    lower = True
-                if any(.9 <= v <= 1 for v in values):
-                    upper = True
-
-                if not upper or not lower:
-                    report.append(parameter.name)
-                    dg_node = parameter.name.split('.')[0]
-                    tissue = mel.eval('zQuery -type zTissue {}'.format(dg_node))
-                    cmds.setAttr('{}.enable'.format(tissue[0]), 0)
-
-    if report:
-        logger.info('Check these maps: {}'.format(report))
-    cmds.select(sel)
-    return report
-
-
 def get_zGeo_nodes_by_solverTM(ziva_builder, solverTM):
     """ Return solver and zGeo nodes by given ziva builder and solverTransform node.
     This helpfer function is for rebuilding Scene Panel 2 zGeo tree view.
