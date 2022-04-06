@@ -1,7 +1,7 @@
 import logging
 
 from maya import cmds
-from zBuilder.zMaya import check_body_type
+from zBuilder.vfxUtils import check_body_type
 from zBuilder.mayaUtils import safe_rename
 from .zivaBase import Ziva
 

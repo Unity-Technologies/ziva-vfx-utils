@@ -1,6 +1,6 @@
 from maya import cmds
 from zBuilder.mayaUtils import safe_rename
-from zBuilder.zMaya import get_lineOfAction_fiber
+from zBuilder.vfxUtils import get_lineOfAction_fiber
 from .zivaBase import Ziva
 
 

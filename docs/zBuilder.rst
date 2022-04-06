@@ -29,14 +29,6 @@ zBuilder.mayaUtils module
    :undoc-members:
    :show-inheritance:
 
-zBuilder.updates module
------------------------
-
-.. automodule:: zBuilder.updates
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 zBuilder.utils module
 ---------------------
 
@@ -45,10 +37,10 @@ zBuilder.utils module
    :undoc-members:
    :show-inheritance:
 
-zBuilder.zMaya module
----------------------
+zBuilder.vfxUtils module
+------------------------
 
-.. automodule:: zBuilder.zMaya
+.. automodule:: zBuilder.vfxUtils
    :members:
    :undoc-members:
    :show-inheritance:

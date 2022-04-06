@@ -1,12 +1,12 @@
-import zBuilder.zMaya as mz
 import logging
+import zBuilder.vfxUtils as vfx_util
 
-from .builder import Builder
-from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
-from zBuilder.commonUtils import none_to_empty, time_this
+from collections import defaultdict, OrderedDict
 from maya import cmds
 from maya import mel
-from collections import defaultdict, OrderedDict
+from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
+from zBuilder.commonUtils import none_to_empty, time_this
+from .builder import Builder
 
 logger = logging.getLogger(__name__)
 
@@ -286,7 +286,7 @@ class Ziva(Builder):
             fields = cmds.ls(history, type=types)
             nodes.extend(fields)
 
-        fibers = mz.get_zFibers(selection)
+        fibers = vfx_util.get_zFibers(selection)
         if fibers:
             hist = cmds.listHistory(fibers)
             nodes.extend(cmds.ls(hist, type='zRivetToBone'))
@@ -469,39 +469,39 @@ class Ziva(Builder):
 
         if connections and selection:
             if solver:
-                sol = mz.get_zSolver(selection[0])
+                sol = vfx_util.get_zSolver(selection[0])
                 if sol:
                     nodes.extend(sol)
-                    nodes.extend(mz.get_zSolverTransform(selection[0]))
+                    nodes.extend(vfx_util.get_zSolverTransform(selection[0]))
             if bones:
-                nodes.extend(mz.get_zBones(selection))
+                nodes.extend(vfx_util.get_zBones(selection))
             if tissues:
-                nodes.extend(mz.get_zTissues(selection))
-                nodes.extend(mz.get_zTets(selection))
+                nodes.extend(vfx_util.get_zTissues(selection))
+                nodes.extend(vfx_util.get_zTets(selection))
             if attachments:
-                nodes.extend(mz.get_zAttachments(selection))
+                nodes.extend(vfx_util.get_zAttachments(selection))
             if materials:
-                nodes.extend(mz.get_zMaterials(selection))
+                nodes.extend(vfx_util.get_zMaterials(selection))
             if fibers:
-                nodes.extend(mz.get_zFibers(selection))
+                nodes.extend(vfx_util.get_zFibers(selection))
             if cloth:
-                nodes.extend(mz.get_zCloth(selection))
+                nodes.extend(vfx_util.get_zCloth(selection))
             if fields:
-                soft_bodies = mz.get_soft_bodies(selection)
-                adaptors = mz.get_zFieldAdaptors(soft_bodies)
-                fields = mz.get_fields_on_zFieldAdaptors(adaptors)
+                soft_bodies = vfx_util.get_soft_bodies(selection)
+                adaptors = vfx_util.get_zFieldAdaptors(soft_bodies)
+                fields = vfx_util.get_fields_on_zFieldAdaptors(adaptors)
                 # fields needs to come before adaptors, so that
                 # they are created first when applying to scene.
                 nodes.extend(fields)
                 nodes.extend(adaptors)
             if rivetToBone:
-                fibers = mz.get_zFibers(selection)
+                fibers = vfx_util.get_zFibers(selection)
                 if fibers:
                     hist = cmds.listHistory(fibers)
                     nodes.extend(cmds.ls(hist, type='zRivetToBone'))
             if lineOfAction:
-                for fiber in mz.get_zFibers(selection):
-                    loas = mz.get_fiber_lineofaction(fiber)
+                for fiber in vfx_util.get_zFibers(selection):
+                    loas = vfx_util.get_fiber_lineofaction(fiber)
                     if loas:
                         nodes.append(loas)
             if restShape:
@@ -647,7 +647,7 @@ class Ziva(Builder):
         cmds.select(sel, r=True)
 
         # last ditch check of map validity for zAttachments and zFibers
-        mz.check_map_validity(self.get_scene_items(type_filter='map'))
+        vfx_util.check_map_validity(self.get_scene_items(type_filter='map'))
 
 
 def transform_rivet_and_LoA_into_tissue_meshes(selection):

@@ -1,8 +1,7 @@
-import zBuilder.zMaya as mz
-
 from maya import cmds
 from zBuilder.commonUtils import get_first_element
 from zBuilder.mayaUtils import build_attr_list, build_attr_key_values, get_type
+from zBuilder.vfxUtils import get_association
 from ..deformer import Deformer
 
 
@@ -45,7 +44,7 @@ class Ziva(Deformer):
         attrs = build_attr_key_values(maya_node, attr_list)
         self.attrs = attrs
 
-        mesh = mz.get_association(maya_node)
+        mesh = get_association(maya_node)
         self.association = mesh
 
         if self.type == 'zSolver':

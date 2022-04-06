@@ -1,7 +1,7 @@
 import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
-from zBuilder.zMaya import get_zGeo_nodes_by_solverTM
+from zBuilder.vfxUtils import get_zGeo_nodes_by_solverTM
 from zBuilder.mayaUtils import safe_rename
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
@@ -57,6 +57,7 @@ def get_mesh_node_by_zGeo_node(builder, node_name):
 class PendingTreeEntryTestCase(VfxTestCase):
     """ Test PendingTreeEntry class
     """
+
     def test_treeitem_and_json_constructor(self):
         """ Test PendingTreeEntry overload ctor
         """
@@ -132,6 +133,7 @@ class PendingTreeEntryTestCase(VfxTestCase):
 class MergeTreeDataTestCase(VfxTestCase):
     """ Test merge_tree_data logic
     """
+
     def test_no_serialize_data(self):
         """ Test merge with no tree view data case.
         This happens when loading ZivaVFX setup whose solver node has no scene panel data.

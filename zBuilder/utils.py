@@ -1,13 +1,13 @@
-import zBuilder.builders.ziva as zva
-import zBuilder.zMaya as mz
 import copy
 import logging
 import re
+import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
 from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
 from zBuilder.mayaUtils import get_short_name, get_type, safe_rename
+from zBuilder.vfxUtils import check_map_validity, get_zSolver, isSolver, check_body_type
 from zBuilder.builders.skinClusters import SkinCluster
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ def check_map_validity():
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection(connections=False)
 
-    mz.check_map_validity(builder.get_scene_items(type_filter='map'))
+    check_map_validity(builder.get_scene_items(type_filter='map'))
 
     cmds.select(sel, r=True)
 
@@ -105,7 +105,7 @@ def remove(nodes):
             continue
 
         # Check if node is a solver, and if so, remove it first.
-        if mz.isSolver([node]):
+        if isSolver([node]):
             remove_solver(solvers=[node])
 
         # Check if node still exists.
@@ -114,7 +114,7 @@ def remove(nodes):
 
         # Check if node is a body, and if so, remove it.
         # We do this first as this will remove other items.
-        if mz.check_body_type([node]):
+        if check_body_type([node]):
             # If this is a zTissue of zTet, we need to select the mesh before we remove it:
             cmds.select(mel.eval('zQuery -m -l'))
             mel.eval('ziva -rm')
@@ -217,7 +217,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
     for node in ALL_ZIVA_NODES:
         nodes_in_scene = cmds.ls(type=node)
         for item in nodes_in_scene:
-            solver_of_this_item = mz.get_zSolver(item)
+            solver_of_this_item = get_zSolver(item)
             if solver_of_this_item:
                 solver_of_this_item = solver_of_this_item[0]
             if solver_of_this_item in solvers:
@@ -304,7 +304,7 @@ def rig_cut_copy(cut=False):
     # Also check if selection contains two or more solver nodes. This is an error.
     num_solver_nodes = 0
     for item in selection:
-        if mz.isSolver([item]):
+        if isSolver([item]):
             num_solver_nodes = num_solver_nodes + 1
     if num_solver_nodes == 0:
         ZIVA_CLIPBOARD_CONTAINS_SOLVER_NODE = False

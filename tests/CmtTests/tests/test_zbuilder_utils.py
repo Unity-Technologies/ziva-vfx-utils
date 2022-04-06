@@ -10,7 +10,7 @@ from zBuilder.utils import (clean_scene, copy_paste, copy_paste_with_substitutio
                             remove_solver, remove_all_solvers, rename_ziva_nodes,
                             return_copy_buffer, rig_cut, rig_copy, rig_paste, rig_transfer,
                             rig_update, load_rig, save_rig)
-from zBuilder.zMaya import get_zBones
+from zBuilder.vfxUtils import get_zBones
 
 
 class BuilderMayaTestCase(VfxTestCase):

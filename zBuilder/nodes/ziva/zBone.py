@@ -1,7 +1,7 @@
 from maya import cmds
 from maya import mel
 from zBuilder.mayaUtils import safe_rename
-from zBuilder.zMaya import cull_creation_nodes
+from zBuilder.vfxUtils import cull_creation_nodes
 from .zivaBase import Ziva
 
 
