@@ -1,17 +1,16 @@
-from maya import cmds
-from maya import mel
 import os
-import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
 
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-
-NODE_TYPE = 'zCloth'
+from maya import cmds
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.nodes.ziva.zCloth import ClothNode
 
 
 class ZivaClothTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.cloth_names = ["c_cloth_1_zCloth", "l_cloth_1_zCloth"]
@@ -81,7 +80,7 @@ class ZivaClothTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_cloth_1_zCloth"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_cloth_1_zCloth")), 1)
@@ -114,7 +113,7 @@ class ZivaClothTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_cloth_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_cloth_1_zCloth")), 1)
@@ -131,7 +130,7 @@ class ZivaClothTestCase(VfxTestCase):
         b_cloth = cmds.polySphere(n='r_arm')[0]
         cmds.setAttr(b_cloth + '.translateX', -10)
         cmds.select('l_arm')
-        mel.eval('ziva -c')
+        cmds.ziva(c=True)
 
         cmds.select('l_arm')
 
@@ -153,6 +152,7 @@ class ZivaClothMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zCloth1, zCloth2, zCloth3
 
     """
+
     def setUp(self):
         super(ZivaClothMirrorTestCase, self).setUp()
 
@@ -160,7 +160,7 @@ class ZivaClothMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=ClothNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -181,12 +181,13 @@ class ZivaClothUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaClothUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -199,7 +200,7 @@ class ZivaClothUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=ClothNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -219,6 +220,7 @@ class ZivaClothMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaClothMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -227,12 +229,12 @@ class ZivaClothMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=ClothNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -252,6 +254,7 @@ class ZivaClothUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaClothUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -263,7 +266,7 @@ class ZivaClothUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=ClothNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

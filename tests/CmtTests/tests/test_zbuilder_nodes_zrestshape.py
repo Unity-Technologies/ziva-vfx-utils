@@ -1,17 +1,16 @@
 import os
-import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
-from maya import mel
-
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-
-NODE_TYPE = 'zRestShape'
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution, rig_copy
+from zBuilder.nodes.ziva.zRestShape import RestShapeNode
 
 
 class ZivaRestShapeTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaRestShapeTestCase, self).setUp()
 
@@ -22,9 +21,9 @@ class ZivaRestShapeTestCase(VfxTestCase):
         target_b = cmds.polySphere(name='b')[0]
 
         cmds.select(self.tissue_mesh)
-        mel.eval('ziva -t')
+        cmds.ziva(t=True)
         cmds.select(self.tissue_mesh, target_a, target_b)
-        mel.eval('zRestShape -a')
+        cmds.zRestShape(a=True)
 
     def test_retrieve_selection(self):
 
@@ -44,11 +43,11 @@ class ZivaRestShapeTestCase(VfxTestCase):
         # create a tissue with no restShapes then select that and copy
         non_rest_tissue = cmds.polySphere(name='c')[0]
         cmds.select(non_rest_tissue)
-        mel.eval('ziva -t')
+        cmds.ziva(t=True)
 
         cmds.select(non_rest_tissue)
 
-        self.assertTrue(utils.rig_copy())
+        self.assertTrue(rig_copy())
 
     def test_restshape_selected_with_unwanted_restshapes(self):
         # make sure VFXACT-358 stays functional
@@ -56,9 +55,9 @@ class ZivaRestShapeTestCase(VfxTestCase):
         target_c = cmds.polySphere(name='c')[0]
 
         cmds.select(tis2)
-        mel.eval('ziva -t')
+        cmds.ziva(t=True)
         cmds.select(tis2, target_c)
-        mel.eval('zRestShape -a')
+        cmds.zRestShape(a=True)
 
         # now we have 2 tissue and 2 restShapes.
         # select one and check contents of zBuilder.
@@ -74,6 +73,7 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
 
 class ZivaRestShapeGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.rest_shape_names = ['l_tissue_1_zRestShape']
@@ -141,7 +141,7 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_tissue_1_zRestShape"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zRestShape")), 1)
@@ -174,7 +174,7 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zRestShape")), 1)
@@ -189,6 +189,7 @@ class ZivaRestShapeMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zRestShape1, zRestShape2, zRestShape3
 
     """
+
     def setUp(self):
         super(ZivaRestShapeMirrorTestCase, self).setUp()
 
@@ -196,7 +197,7 @@ class ZivaRestShapeMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RestShapeNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -217,12 +218,13 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -235,7 +237,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RestShapeNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -255,6 +257,7 @@ class ZivaRestShapeMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaRestShapeMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -263,12 +266,12 @@ class ZivaRestShapeMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RestShapeNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -288,6 +291,7 @@ class ZivaRestShapeUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaRestShapeUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -299,7 +303,7 @@ class ZivaRestShapeUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RestShapeNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

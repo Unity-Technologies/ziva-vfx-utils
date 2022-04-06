@@ -1,17 +1,16 @@
-import zBuilder.builders.ziva as zva
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
-from zBuilder.utils import clean_scene
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+import os
 import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
 from maya import mel
-import os
-
-NODE_TYPE = 'zLineOfAction'
+from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from zBuilder.utils import clean_scene, rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.nodes.ziva.zLineOfAction import LineOfActionNode
 
 
 class ZivaLineOfActionGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.loa_names = ["l_tissue_1_zLineOfAction", "r_subtissue_1_zLineOfAction"]
@@ -80,7 +79,7 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_tissue_2_zLineOfAction1"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_2_zLineOfAction1")), 1)
@@ -113,13 +112,14 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zLineOfAction")), 1)
 
 
 class ZivaMultiCurveLoaTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaMultiCurveLoaTestCase, self).setUp()
         # setup a scene with 2 curves on 1 zLineOfAction
@@ -213,6 +213,7 @@ class ZivaLineOfActionMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zLineOfAction1, zLineOfAction2, zLineOfAction3
 
     """
+
     def setUp(self):
         super(ZivaLineOfActionMirrorTestCase, self).setUp()
 
@@ -220,7 +221,7 @@ class ZivaLineOfActionMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=LineOfActionNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -241,12 +242,13 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaLineOfActionUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -259,7 +261,7 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=LineOfActionNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -279,6 +281,7 @@ class ZivaLineOfActionUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaLineOfActionUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
@@ -290,7 +293,7 @@ class ZivaLineOfActionUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=LineOfActionNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

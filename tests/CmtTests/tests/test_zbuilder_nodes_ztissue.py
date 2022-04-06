@@ -1,17 +1,16 @@
 import os
+import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
-from zBuilder.zMaya import rename_ziva_nodes
-from zBuilder.utils import copy_paste_with_substitution, remove_solver
-from tests.utils import load_scene
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase
-from vfx_test_case import ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
 from maya import cmds
-
-NODE_TYPE = 'zTissue'
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution, remove_solver
+from zBuilder.nodes.ziva.zTissue import TissueNode
 
 
 class ZivaTissueGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.tissue_names = [
@@ -22,7 +21,7 @@ class ZivaTissueGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaTissueGenericTestCase, self).setUp()
-        load_scene(scene_name="generic_tissue.ma")
+        test_utils.load_scene(scene_name="generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -157,14 +156,15 @@ class ZivaTissueMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zTissue1, zTissue2, zTissue3
 
     """
+
     def setUp(self):
         super(ZivaTissueMirrorTestCase, self).setUp()
 
-        load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=TissueNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -185,9 +185,10 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
-        load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -203,7 +204,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=TissueNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -223,12 +224,13 @@ class ZivaTissueMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaTissueMirrorNiceNameTestCase, self).setUp()
         # gather info
 
         # Bring in scene
-        load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -236,7 +238,7 @@ class ZivaTissueMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=TissueNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -256,9 +258,10 @@ class ZivaTissueUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaTissueUpdateTestCase, self).setUp()
-        load_scene(scene_name='mirror_example.ma')
+        test_utils.load_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -267,7 +270,7 @@ class ZivaTissueUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=TissueNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

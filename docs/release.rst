@@ -10,6 +10,17 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
+2.1.0
+------
+
+Functionality
++++++++++++++
+- **zBuilder:** Move **rename_ziva_nodes()** from zBuilder.zMaya to zBuilder.utils.
+
+Bug Fixes
++++++++++
+
+
 2.0.0
 ------
 

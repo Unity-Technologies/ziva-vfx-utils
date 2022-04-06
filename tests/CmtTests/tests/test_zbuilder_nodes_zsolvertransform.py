@@ -1,11 +1,10 @@
-import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
-
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-
-NODE_TYPE = 'zSolverTransform'
+from vfx_test_case import ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from zBuilder.utils import rename_ziva_nodes
+from zBuilder.nodes.ziva.zSolverTransform import SolverTransformNode
 
 
 class ZivaSolverTransformMirrorTestCase(ZivaMirrorTestCase):
@@ -17,6 +16,7 @@ class ZivaSolverTransformMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zSolverTransform1, zSolverTransform2, zSolverTransform3
 
     """
+
     def setUp(self):
         super(ZivaSolverTransformMirrorTestCase, self).setUp()
 
@@ -24,7 +24,8 @@ class ZivaSolverTransformMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(
+            type_filter=SolverTransformNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -43,12 +44,13 @@ class ZivaSolverTransformUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaSolverTransformUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -61,7 +63,8 @@ class ZivaSolverTransformUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(
+            type_filter=SolverTransformNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -79,6 +82,7 @@ class ZivaSolverTransformMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaSolverTransformMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -87,12 +91,13 @@ class ZivaSolverTransformMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(
+            type_filter=SolverTransformNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -110,6 +115,7 @@ class ZivaSolverTransformUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaSolverTransformUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -121,7 +127,8 @@ class ZivaSolverTransformUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(
+            type_filter=SolverTransformNode.type)
         self.l_item_geo = []
 
         new_builder = zva.Ziva()

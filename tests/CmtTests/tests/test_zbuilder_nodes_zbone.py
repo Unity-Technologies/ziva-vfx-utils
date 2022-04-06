@@ -1,16 +1,16 @@
 import os
-import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
-
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-
-NODE_TYPE = 'zBone'
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.nodes.ziva.zBone import BoneNode
 
 
 class ZivaBoneGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.bone_names = ["c_bone_1_zBone", "c_bone_2_zBone", "l_bone_1_zBone"]
@@ -75,7 +75,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_bone_1_zBone"), [])
 
         ## ACT
-        mz.rename_ziva_nodes([])
+        rename_ziva_nodes([])
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_bone_1_zBone")), 1)
@@ -108,7 +108,7 @@ class ZivaBoneGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_bone_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_bone_1_zBone")), 1)
@@ -123,6 +123,7 @@ class ZivaBoneMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zBone1, zBone2, zBone3
 
     """
+
     def setUp(self):
         super(ZivaBoneMirrorTestCase, self).setUp()
 
@@ -130,7 +131,7 @@ class ZivaBoneMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=BoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -151,12 +152,13 @@ class ZivaBoneUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaBoneUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -169,7 +171,7 @@ class ZivaBoneUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=BoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -189,6 +191,7 @@ class ZivaBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaBoneMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -197,12 +200,12 @@ class ZivaBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=BoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -222,6 +225,7 @@ class ZivaBoneUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaBoneUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -233,7 +237,7 @@ class ZivaBoneUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=BoneNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

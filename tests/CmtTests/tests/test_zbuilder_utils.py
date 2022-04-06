@@ -1,13 +1,16 @@
 import os
 import tests.utils as test_utils
-import zBuilder.utils as utils
 import zBuilder.builders.ziva as zva
-import zBuilder.zMaya as mz
 
 from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
 from zBuilder.commonUtils import parse_version_info
 from zBuilder.mayaUtils import replace_long_name
+from zBuilder.utils import (clean_scene, copy_paste, copy_paste_with_substitution, remove,
+                            remove_solver, remove_all_solvers, rename_ziva_nodes,
+                            return_copy_buffer, rig_cut, rig_copy, rig_paste, rig_transfer,
+                            rig_update, load_rig, save_rig)
+from zBuilder.zMaya import get_zBones
 
 
 class BuilderMayaTestCase(VfxTestCase):
@@ -115,7 +118,7 @@ class BuilderMayaTestCase(VfxTestCase):
 
         # testing command
         cmds.select('bone_grp', hi=True)
-        bones = mz.get_zBones(cmds.ls(sl=True))
+        bones = get_zBones(cmds.ls(sl=True))
 
         self.assertEqual(len(bones), 5)
 
@@ -124,7 +127,7 @@ class BuilderMayaTestCase(VfxTestCase):
 
         # testing command
         cmds.select('r_humerus_bone', 'r_radius_bone', 'hand_bone')
-        bones = mz.get_zBones(cmds.ls(sl=True))
+        bones = get_zBones(cmds.ls(sl=True))
 
         # we should have 2 as the hand bone is not a zBone in this case
         self.assertEqual(len(bones), 2)
@@ -143,23 +146,23 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         cmds.polySmooth('dupe')
         cmds.select('r_bicep_muscle', 'dupe')
 
-        utils.copy_paste()
+        copy_paste()
         self.assertSceneHasNodes(['dupe_r_radius_bone'])
 
     def test_utils_rig_copy_paste_clean(self):
         # testing menu command to copy and paste on ziva that has been cleaned
         cmds.select('zSolver1')
-        utils.rig_copy()
+        rig_copy()
 
-        utils.clean_scene()
+        clean_scene()
 
-        utils.rig_paste()
+        rig_paste()
         self.assertSceneHasNodes(['zSolver1'])
 
     def test_utils_rig_cut(self):
         # testing the cut feature, removing ziva setup after copy
         cmds.select('zSolver1')
-        utils.rig_cut()
+        rig_cut()
 
         # there should be no attachments in scene
         self.assertTrue(len(cmds.ls(type='zAttachment')) is 0)
@@ -170,7 +173,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         result = []
 
         all_items = cmds.ls(type=types)
-        utils.remove(all_items)
+        remove(all_items)
 
         result.extend(cmds.ls(type=types))
 
@@ -185,7 +188,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             all_items = cmds.ls(type=type_)
 
             # delete all attachments
-            utils.remove(all_items)
+            remove(all_items)
             result.append(cmds.ls(type=type_))
 
         self.assertTrue(all(x == [] for x in result))
@@ -205,14 +208,14 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
             cmds.select(cmds.zQuery(m=True))
 
             # delete all
-            utils.remove(cmds.ls(sl=True))
+            remove(cmds.ls(sl=True))
         cmds.select(cl=True)
         self.assertIsNone(cmds.zQuery(bt=True))
 
     def test_rig_copy_without_selection_should_raise(self):
         cmds.select(cl=True)
         with self.assertRaises(Exception):
-            utils.rig_copy()
+            rig_copy()
 
     def test_save_rig(self):
         # Setup
@@ -220,7 +223,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         cmds.select('zSolver1')
 
         # Action
-        utils.save_rig(file_name)
+        save_rig(file_name)
 
         # Verify
         # simply check if file exists
@@ -233,12 +236,12 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
         # Setup
         file_name = test_utils.get_tmp_file_location('.zBuilder')
         cmds.select('zSolver1')
-        utils.save_rig(file_name)
+        save_rig(file_name)
         # clean scene so we just have geo
-        utils.clean_scene()
+        clean_scene()
 
         # Action
-        utils.load_rig(file_name)
+        load_rig(file_name)
 
         # Verify
         self.assertSceneHasNodes(['zSolver1'])
@@ -256,7 +259,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         ## ACT
         cmds.select(cl=True)
-        utils.rig_update()
+        rig_update()
 
         ## VERIFY
         geoNode = cmds.zQuery('r_bicep_muscle', t='zGeo')[0]
@@ -276,7 +279,7 @@ class BuilderUtilsTestCaseArm(VfxTestCase):
 
         ## ACT
         cmds.select('zSolver1')
-        utils.rig_update()
+        rig_update()
 
         ## VERIFY
         geoNode = cmds.zQuery('r_bicep_muscle', t='zGeo')[0]
@@ -343,7 +346,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         cmds.ziva(s=True)
         cmds.ziva(s=True)
 
-        utils.remove_all_solvers()
+        remove_all_solvers()
 
         self.assertEqual(cmds.ls(type='zSolver'), [])
 
@@ -355,7 +358,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         cmds.file(filepath, r=True, namespace='ns')
 
         with self.assertRaisesRegexp(Exception, 'reference'):
-            utils.remove_solver(solvers=['ns:zSolver1'])
+            remove_solver(solvers=['ns:zSolver1'])
 
         self.assertEqual(cmds.ls(type='zSolverTransform'), ['ns:zSolver1'])
 
@@ -363,13 +366,13 @@ class BuilderUtilsTestCase(VfxTestCase):
         cmds.ziva(s=True)
         cmds.ziva(s=True)
 
-        utils.remove_solver(solvers=['zSolver1'])
+        remove_solver(solvers=['zSolver1'])
         self.assertListEqual(cmds.ls(type='zSolver'), ['zSolver2Shape'])
 
     def test_update_no_solvers(self):
         # scene is empty with no solvers, this should raise an error with update
         with self.assertRaises(Exception):
-            utils.rig_update()
+            rig_update()
 
     def test_rig_transfer_warped_prefix(self):
         # get demo arm geo to add prefix
@@ -389,7 +392,7 @@ class BuilderUtilsTestCase(VfxTestCase):
         test_utils.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
 
         # now do the trasnfer
-        utils.rig_transfer('zSolver1', 'warped_', '')
+        rig_transfer('zSolver1', 'warped_', '')
 
         # when done we should have some ziva nodes with a 'warped_' prefix
         nodes_in_scene = [
@@ -404,10 +407,10 @@ class BuilderUtilsMirrorTestCase(VfxTestCase):
     def test_copy_paste_with_substitution(self):
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         cmds.select('r_muscle')
-        utils.copy_paste_with_substitution('^r', 'l')
+        copy_paste_with_substitution('^r', 'l')
 
         self.assertSceneHasNodes(['l_zMaterial1', 'l_zTissue'])
 
@@ -429,12 +432,12 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
         self.builder.retrieve_from_scene()
 
         cmds.select('pSphere2')
-        utils.rig_cut()
+        rig_cut()
 
-        self.stored_buffer = utils.return_copy_buffer()
+        self.stored_buffer = return_copy_buffer()
 
         cmds.select('pSphere1')
-        utils.rig_paste()
+        rig_paste()
 
     def test_menu_paste(self):
 
@@ -466,7 +469,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
 
         cmds.select('pSphere3')
 
-        utils.rig_paste()
+        rig_paste()
         # New attachment gets named zAttachment2, this stiffness should equal 20
         self.assertEquals(cmds.getAttr("zAttachment2.stiffness"), 20)
         # make sure att1 is still 20 as well.
@@ -482,7 +485,7 @@ class BuilderUtilsMirrorTestCase_part2(ZivaUpdateTestCase):
         # this gets interpolate so scene builder should be different then buffer
         self.assertNotEquals(self.stored_buffer, build)
 
-        current_buffer = utils.return_copy_buffer()
+        current_buffer = return_copy_buffer()
 
         # these should be same
         self.assertEquals(self.stored_buffer, current_buffer)
@@ -501,18 +504,18 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
         self.builder.retrieve_from_scene()
 
         cmds.select('pSphere2')
-        utils.rig_cut()
+        rig_cut()
 
-        self.stored_buffer = utils.return_copy_buffer()
+        self.stored_buffer = return_copy_buffer()
 
         cmds.select('pSphere3')
-        utils.rig_paste()
+        rig_paste()
 
     def test_copy_buffer(self):
         # it has been pasted in setup.  Now the buffer should remain unchanged
         # get buffer again and compare
 
-        current_buffer = utils.return_copy_buffer()
+        current_buffer = return_copy_buffer()
 
         # these should be same
         self.assertEquals(self.stored_buffer, current_buffer)
@@ -527,4 +530,4 @@ class ZivaCopyBuffer(ZivaUpdateTestCase):
         # not equal to scene
         self.assertNotEquals(self.stored_buffer, builder)
         # equal to existing buffer
-        self.assertEquals(self.stored_buffer, utils.return_copy_buffer())
+        self.assertEquals(self.stored_buffer, return_copy_buffer())

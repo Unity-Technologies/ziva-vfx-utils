@@ -1,17 +1,16 @@
 import os
-import zBuilder.builders.ziva as zva
 import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
+import zBuilder.builders.ziva as zva
 
 from maya import cmds
-
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-
-NODE_TYPE = 'zMaterial'
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.nodes.ziva.zMaterial import MaterialNode
 
 
 class ZivaMaterialGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.material_names = [
@@ -81,7 +80,7 @@ class ZivaMaterialGenericTestCase(VfxTestCase):
         self.assertEqual(cmds.ls("r_tissue_1_zMaterial1"), [])
 
         ## ACT
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zMaterial1")), 1)
@@ -114,7 +113,7 @@ class ZivaMaterialGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zMaterial")), 1)
@@ -179,6 +178,7 @@ class ZivaMaterialMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zMaterial1, zMaterial2, zMaterial3
 
     """
+
     def setUp(self):
         super(ZivaMaterialMirrorTestCase, self).setUp()
 
@@ -186,7 +186,7 @@ class ZivaMaterialMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=MaterialNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -207,12 +207,13 @@ class ZivaMaterialUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaMaterialUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -225,7 +226,7 @@ class ZivaMaterialUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=MaterialNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -245,6 +246,7 @@ class ZivaMaterialMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaMaterialMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -253,12 +255,12 @@ class ZivaMaterialMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=MaterialNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -278,6 +280,7 @@ class ZivaMaterialUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaMaterialUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -289,7 +292,7 @@ class ZivaMaterialUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=MaterialNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]

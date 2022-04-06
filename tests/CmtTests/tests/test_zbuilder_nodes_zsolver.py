@@ -1,16 +1,18 @@
-import zBuilder.builders.ziva as zva
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
+import os
 import tests.utils as test_utils
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
 from maya import mel
-import os
-
-NODE_TYPE = 'zSolver'
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import (rename_ziva_nodes, clean_scene, remove_solver, remove_all_solvers,
+                            rig_cut, rig_copy, rig_paste, rig_transfer)
+from zBuilder.nodes.ziva.zSolver import SolverNode
 
 
 class ZivaSolverGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.temp_file_path = test_utils.get_tmp_file_location()
@@ -129,7 +131,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
-        utils.clean_scene()
+        clean_scene()
         self.builder.build()
 
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
@@ -141,19 +143,19 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        utils.clean_scene()
+        clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_remove_solver(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
         cmds.select("zSolver1")
-        utils.remove_solver(askForConfirmation=False)
+        remove_solver(askForConfirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_remove_all_solvers(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
-        utils.remove_all_solvers(confirmation=False)
+        remove_all_solvers(confirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_string_replace(self):
@@ -161,7 +163,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
         self.assertEqual(len(solver_nodes), 1)
 
-        utils.clean_scene()
+        clean_scene()
         self.builder.build()
         self.builder.retrieve_from_scene()
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
@@ -173,13 +175,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
     def test_cut_paste(self):
         # Act
         cmds.select('zSolver1')
-        utils.rig_cut()
+        rig_cut()
 
         # Verify
         self.assertEqual(cmds.ls("zSolver1"), [])
 
         # Act
-        utils.rig_paste()
+        rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
@@ -190,14 +192,14 @@ class ZivaSolverGenericTestCase(VfxTestCase):
     def test_copy_paste(self):
         # Act
         cmds.select('zSolver1')
-        utils.rig_copy()
+        rig_copy()
 
         # Verify
         self.assertSceneHasNodes(["zSolver1"])
 
         # Act
-        utils.clean_scene()
-        utils.rig_paste()
+        clean_scene()
+        rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
@@ -215,13 +217,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         for item in meshes_transforms:
             cmds.rename(item, 'warped_{}'.format(item))
 
-        utils.clean_scene()
+        clean_scene()
 
         test_utils.load_scene(new_scene=False)
 
         # Act
         # now do the trasnfer
-        utils.rig_transfer('zSolver1', 'warped_', '')
+        rig_transfer('zSolver1', 'warped_', '')
 
         # Verify
         # when done we should have some ziva nodes with a 'warped_' prefix
@@ -230,6 +232,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
 
 class ZivaSolverTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaSolverTestCase, self).setUp()
         self.results = mel.eval('ziva -s')
@@ -262,6 +265,7 @@ class ZivaSolverMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zSolver1, zSolver2, zSolver3
 
     """
+
     def setUp(self):
         super(ZivaSolverMirrorTestCase, self).setUp()
 
@@ -269,7 +273,7 @@ class ZivaSolverMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=SolverNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -288,12 +292,13 @@ class ZivaSolverUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaSolverUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -306,7 +311,7 @@ class ZivaSolverUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=SolverNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -324,6 +329,7 @@ class ZivaSolverMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaSolverMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -332,12 +338,12 @@ class ZivaSolverMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=SolverNode.type)
         self.l_item_geo = []
 
     def test_builder_change_with_string_replace(self):
@@ -355,6 +361,7 @@ class ZivaSolverUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaSolverUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example.ma')
@@ -366,7 +373,7 @@ class ZivaSolverUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=SolverNode.type)
         self.l_item_geo = []
 
         new_builder = zva.Ziva()
@@ -382,6 +389,7 @@ class ZivaSolverUpdateTestCase(ZivaUpdateTestCase):
 
 
 class ZivaSolverDuplicateTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.temp_file_path = test_utils.get_tmp_file_location()
@@ -502,7 +510,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
             solver_transform_values.append(value)
 
         # remove all Ziva nodes from the scene and build them
-        utils.clean_scene()
+        clean_scene()
         self.builder.build()
 
         self.check_retrieve_zsolver_looks_good(self.builder, "zSolver1Shape", solver_values)
@@ -514,19 +522,19 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
         builder = zva.Ziva()
         builder.retrieve_from_file(self.temp_file_path)
-        utils.clean_scene()
+        clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_remove_solver(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder, long=True)
         cmds.select("zSolver1")
-        utils.remove_solver(askForConfirmation=False)
+        remove_solver(askForConfirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_remove_all_solvers(self):
         node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
-        utils.remove_all_solvers(confirmation=False)
+        remove_all_solvers(confirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_string_replace(self):
@@ -534,7 +542,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
         self.assertEqual(len(solver_nodes), 1)
 
-        utils.clean_scene()
+        clean_scene()
         self.builder.build()
         self.builder.retrieve_from_scene()
         solver_nodes = self.builder.get_scene_items(name_filter=["zSolver2"])
@@ -546,13 +554,13 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
     def test_cut_paste(self):
         # Act
         cmds.select("zSolver1")
-        utils.rig_cut()
+        rig_cut()
 
         # Verify
         self.assertEqual(cmds.ls("zSolver1"), [])
 
         # Act
-        utils.rig_paste()
+        rig_paste()
         builder = zva.Ziva()
         cmds.select("zSolver1")
         builder.retrieve_from_scene()
@@ -564,14 +572,14 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
     def test_copy_paste(self):
         # Act
         cmds.select("zSolver1")
-        utils.rig_copy()
+        rig_copy()
 
         # Verify
         self.assertSceneHasNodes(["zSolver1"])
 
         # Act
-        utils.clean_scene()
-        utils.rig_paste()
+        clean_scene()
+        rig_paste()
         builder = zva.Ziva()
         builder.retrieve_from_scene()
 
@@ -589,13 +597,13 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         for item in meshes_transforms:
             cmds.rename('group1|' + item, 'warped_{}'.format(item))
 
-        utils.clean_scene()
+        clean_scene()
 
         test_utils.load_scene(scene_name='generic_duplicate.ma', new_scene=False)
 
         # Act
         # now do the trasnfer
-        utils.rig_transfer('zSolver1', 'warped_', '')
+        rig_transfer('zSolver1', 'warped_', '')
 
         # Verify
         # when done we should have some ziva nodes with a 'warped_' prefix

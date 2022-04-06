@@ -1,15 +1,16 @@
-import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
-import zBuilder.utils as utils
-import zBuilder.zMaya as mz
-from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-from maya import cmds
 import os
+import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
 
-NODE_TYPE = 'zRivetToBone'
+from maya import cmds
+from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
+                           ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from zBuilder.utils import rename_ziva_nodes, clean_scene, rig_copy, rig_paste, copy_paste_with_substitution
+from zBuilder.nodes.ziva.zRivetToBone import RivetToBoneNode
 
 
 class ZivaRivetToBoneGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.rivet_to_bone_names = ["l_loa_curve_zRivetToBone1", "l_loa_curve_zRivetToBone2"]
@@ -59,7 +60,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
     def test_remove(self):
         ## ACT
-        utils.clean_scene()
+        clean_scene()
 
         ## VERIFY
         rivet_to_bone = cmds.zQuery(rtb=True)
@@ -88,7 +89,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select(cl=True)
-        mz.rename_ziva_nodes([])
+        rename_ziva_nodes([])
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_loa_curve_zRivetToBone1")), 1)
@@ -112,18 +113,18 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
         self.assertEqual(len(cmds.ls("l_loa_curve_zRivetToBone1")), 1)
         ## ACT
         cmds.select("l_tissue_1")
-        utils.rig_copy()
+        rig_copy()
 
         ## VERIFY
         # check that node was not removed
         self.assertEqual(len(cmds.ls("l_loa_curve_zRivetToBone1")), 1)
 
         ## SETUP
-        utils.clean_scene()
+        clean_scene()
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.rig_paste()
+        rig_paste()
 
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -136,13 +137,14 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
         ## ACT
         cmds.select("l_tissue_1")
-        utils.copy_paste_with_substitution("(^|_)l($|_)", "r")
+        copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_loa_curve_zRivetToBone1")), 1)
 
 
 class ZivaRivetToBoneRenameGroupTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaRivetToBoneRenameGroupTestCase, self).setUp()
         test_utils.load_scene(scene_name="generic_tissue.ma")
@@ -174,6 +176,7 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
     - Ziva nodes are named default like so: zRivetToBone1, zRivetToBone2, zRivetToBone3
 
     """
+
     def setUp(self):
         super(ZivaRivetToBoneMirrorTestCase, self).setUp()
 
@@ -181,7 +184,7 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RivetToBoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -202,12 +205,13 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
     - The Ziva Nodes have a side identifier same as geo
 
     """
+
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
 
         # NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         # make FULL setup based on left
         builder = zva.Ziva()
@@ -220,7 +224,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene_selection()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RivetToBoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -240,6 +244,7 @@ class ZivaRivetToBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaRivetToBoneMirrorNiceNameTestCase, self).setUp()
         # gather info
@@ -248,12 +253,12 @@ class ZivaRivetToBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
 
         # force NICE NAMES
-        mz.rename_ziva_nodes()
+        rename_ziva_nodes()
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RivetToBoneNode.type)
         self.l_item_geo = [
             x for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
@@ -273,6 +278,7 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
     - Both sides have Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaRivetToBoneUpdateTestCase, self).setUp()
         test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
@@ -284,7 +290,7 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
         self.compare_builder_attrs_with_scene_attrs(self.builder)
 
         # gather info
-        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=NODE_TYPE)
+        self.scene_items_retrieved = self.builder.get_scene_items(type_filter=RivetToBoneNode.type)
         self.l_item_geo = [
             x.name for x in self.scene_items_retrieved if x.association[0].startswith('l_')
         ]
