@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-from zBuilder.utils import clean_scene, rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.commands import clean_scene, rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zLineOfAction import LineOfActionNode
 
 

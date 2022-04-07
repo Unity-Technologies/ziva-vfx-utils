@@ -1,11 +1,13 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene
-import tests.utils as test_utils
-from vfx_test_case import VfxTestCase
 import os
+import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
+
+from vfx_test_case import VfxTestCase
+from zBuilder.commands import clean_scene
 
 
 class Builder1_7_to_1_9TestCase(VfxTestCase):
+
     def setUp(self):
         super(Builder1_7_to_1_9TestCase, self).setUp()
         self.builders_1_7 = test_utils.get_1_7_builder_files()

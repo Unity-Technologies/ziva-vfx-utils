@@ -1,11 +1,11 @@
 import os
 import zBuilder.builders.ziva as zva
-import zBuilder.utils as utils
 
 from maya import cmds
 from cmt.test import TestCase
 from tests.utils import get_tmp_file_location
 from zBuilder.commonUtils import is_sequence
+from zBuilder.commands import clean_scene, rig_cut, rig_paste, rig_copy
 from utility.paintable_maps import split_map_name, get_paintable_map
 
 
@@ -182,7 +182,7 @@ class VfxTestCase(TestCase):
         attrs_before = attr_values_from_scene(plug_names)
 
         # remove all Ziva nodes from the scene and build them
-        utils.clean_scene()
+        clean_scene()
         builder.build()
 
         attrs_after = attr_values_from_scene(plug_names)
@@ -244,7 +244,7 @@ class VfxTestCase(TestCase):
 
     def get_builder_after_clean_and_build(self, builder):
         ## SETUP
-        utils.clean_scene()
+        clean_scene()
 
         ## ACT
         builder.build()
@@ -257,7 +257,7 @@ class VfxTestCase(TestCase):
         ## SETUP
         builder.write(self.temp_file_path)
         self.assertTrue(os.path.exists(self.temp_file_path))
-        utils.clean_scene()
+        clean_scene()
 
         ## ACT
         builder = zva.Ziva()
@@ -277,14 +277,14 @@ class VfxTestCase(TestCase):
         """
         ## ACT
         cmds.select(mesh_name)
-        utils.rig_cut()
+        rig_cut()
 
         ## VERIFY
         self.assertEqual(cmds.ls(node_name), [])
 
         ## ACT
         cmds.select(mesh_name)
-        utils.rig_paste()
+        rig_paste()
 
         builder = zva.Ziva()
         builder.retrieve_from_scene()
@@ -301,7 +301,7 @@ class VfxTestCase(TestCase):
         # check if node exists
         self.assertEqual(len(cmds.ls(node_name)), 1)
         cmds.select(mesh_name)
-        utils.rig_copy()
+        rig_copy()
 
         ## VERIFY
         # check that node was not removed
@@ -312,7 +312,7 @@ class VfxTestCase(TestCase):
 
         ## ACT
         cmds.select(mesh_name)
-        utils.rig_paste()
+        rig_paste()
 
         builder = zva.Ziva()
         builder.retrieve_from_scene()

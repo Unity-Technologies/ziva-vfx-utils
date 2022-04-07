@@ -1,6 +1,6 @@
 from maya import cmds
 from vfx_test_case import VfxTestCase
-from zBuilder.utils import remove_zRivetToBone_nodes
+from zBuilder.commands import remove_zRivetToBone_nodes
 
 
 def create_bone(name, solver=None):
@@ -33,6 +33,7 @@ class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
     '''
     Test delete_zRivetToBone command
     '''
+
     def bone_rivet_setup(self):
         create_bone('bone1')
         create_curve('curve1')

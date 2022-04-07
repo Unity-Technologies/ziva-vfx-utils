@@ -1,13 +1,15 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.builders.ziva import SolverDisabler
-from zBuilder.utils import clean_scene
 import tests.utils as test_utils
-from vfx_test_case import VfxTestCase
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
 from maya import mel
+from vfx_test_case import VfxTestCase
+from zBuilder.commands import clean_scene
+from zBuilder.builders.ziva import SolverDisabler
 
 
 class ZivaMirrorTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaMirrorTestCase, self).setUp()
         # Build a basic setup
@@ -32,6 +34,7 @@ class ZivaMirrorTestCase(VfxTestCase):
 
 
 class ZivaBuildTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaBuildTestCase, self).setUp()
 
@@ -167,6 +170,7 @@ class ZivaBuildTestCase(VfxTestCase):
 
 
 class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
+
     def test_order_retrieved(self):
         desired_type_order = zva.ZNODES
         test_utils.load_scene(scene_name="generic_tissue.ma")
@@ -193,6 +197,7 @@ class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
 
 
 class ZivaSolverDisableTestCase(VfxTestCase):
+
     def test_enable_connected(self):
         # build scene and connect the enable to something
         test_utils.load_scene()

@@ -4,7 +4,7 @@ import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
-from zBuilder.utils import clean_scene, load_rig
+from zBuilder.commands import clean_scene, load_rig
 
 
 class IOTestCase(VfxTestCase):

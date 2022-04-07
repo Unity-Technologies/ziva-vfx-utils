@@ -3,7 +3,7 @@ import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
-from zBuilder.utils import rename_ziva_nodes
+from zBuilder.commands import rename_ziva_nodes
 from zBuilder.nodes.ziva.zSolverTransform import SolverTransformNode
 
 

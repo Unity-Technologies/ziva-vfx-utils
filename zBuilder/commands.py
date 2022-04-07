@@ -1,3 +1,5 @@
+''' Modules contains public commands for Ziva VFX operations.
+'''
 import copy
 import logging
 import re

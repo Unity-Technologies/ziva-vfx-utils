@@ -1,37 +1,37 @@
-from maya import cmds
-from maya import mel
-from zBuilder.utils import merge_two_solvers, merge_solvers
 import vfx_test_case
+
+from maya import cmds
+from zBuilder.commands import merge_two_solvers, merge_solvers
 
 
 def make_a_simple_test_scene():
     """ return [solver_transform, a_tissue_mesh]"""
-    solver = mel.eval('ziva -solver')[1]
+    solver = cmds.ziva(solver=True)[1]
     solver = cmds.rename(solver, 'bob_solver')  # to make sure we're not depending on names
     bone1 = cmds.polyCube(name='bone1_1', sx=1, sy=2, sz=1)[0]
     tissue1 = cmds.polyCube(name='tissue1_1', sx=1, sy=3, sz=1)[0]
-    mel.eval('ziva -b {} {}'.format(solver, bone1))
-    mel.eval('ziva -t {} {}'.format(solver, tissue1))
-    mel.eval('ziva -a {} {} {}'.format(solver, tissue1, bone1))
-    fiber = mel.eval('ziva -f {} {}'.format(solver, tissue1))[0]
+    cmds.ziva(solver, bone1, b=True)
+    cmds.ziva(solver, tissue1, t=True)
+    cmds.ziva(solver, tissue1, bone1, a=True)
+    fiber = cmds.ziva(solver, tissue1, f=True)[0]
     cmds.setAttr('{}.excitation'.format(fiber), 0.7)
     return [solver, tissue1]
 
 
 def make_another_simple_test_scene():
     """ return [solver_transform, a_tissue_mesh]"""
-    solver = mel.eval('ziva -solver')[1]
+    solver = cmds.ziva(solver=True)[1]
     solver = cmds.rename(solver, 'bob_solver')  # to make sure we're not depending on names
     bone1 = cmds.polySphere(name='bone1_1', sx=4, sy=4)[0]
     bone2 = cmds.polySphere(name='bone2_1', sx=4, sy=4)[0]
     tissue1 = cmds.polySphere(name='tissue1_1', sx=4, sy=4)[0]
     tissue2 = cmds.polySphere(name='tissue2_1', sx=4, sy=3)[0]
     embedd1 = cmds.polySphere(name='embedded1_1', sx=3, sy=2)[0]
-    mel.eval('ziva -b {} {} {}'.format(solver, bone1, bone2))
-    mel.eval('ziva -t {} {} {}'.format(solver, tissue1, tissue2))
-    mel.eval('ziva -e {} {} {}'.format(solver, tissue1, embedd1))
-    mel.eval('ziva -a {} {} {}'.format(solver, tissue1, bone1))
-    fiber = mel.eval('ziva -f {} {}'.format(solver, tissue1))[0]
+    cmds.ziva(solver, bone1, bone2, b=True)
+    cmds.ziva(solver, tissue1, tissue2, t=True)
+    cmds.ziva(solver, tissue1, embedd1, e=True)
+    cmds.ziva(solver, tissue1, bone1, a=True)
+    fiber = cmds.ziva(solver, tissue1, f=True)[0]
     cmds.setAttr('{}.excitation'.format(fiber), 0.7)
     return [solver, tissue1]
 
@@ -59,6 +59,7 @@ def get_simulated_positions():
 
 
 class MergeSolversTestCase(vfx_test_case.VfxTestCase):
+
     def test_merge_solvers_will_not_merge_gibberish_arguments(self):
         # Act & Verify
         with self.assertRaises(Exception):
@@ -66,7 +67,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
     def test_merge_solvers_will_not_merge_solver_with_itself(self):
         # Setup
-        mel.eval('ziva -solver')
+        cmds.ziva(solver=True)
 
         # Act & Verify
         with self.assertRaises(Exception):
@@ -74,8 +75,8 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
     def test_merge_solvers_will_not_merge_solver_shapes(self):
         # Setup
-        mel.eval('ziva -solver')
-        mel.eval('ziva -solver')
+        cmds.ziva(solver=True)
+        cmds.ziva(solver=True)
 
         # Act & Verify
         with self.assertRaises(Exception):
@@ -83,8 +84,8 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
     def test_merge_solvers_can_merge_two_empty_solvers(self):
         # Setup
-        solver1 = cmds.rename(mel.eval('ziva -solver')[1], 'foo_solver')
-        solver2 = cmds.rename(mel.eval('ziva -solver')[1], 'bar_solver')
+        solver1 = cmds.rename(cmds.ziva(solver=True)[1], 'foo_solver')
+        solver2 = cmds.rename(cmds.ziva(solver=True)[1], 'bar_solver')
 
         # Act
         merge_two_solvers(solver1, solver2)
@@ -118,7 +119,7 @@ class MergeSolversTestCase(vfx_test_case.VfxTestCase):
 
         # Act
         merge_two_solvers(solver1, solver2)
-        attachment_new = mel.eval('ziva -a {} {} {}'.format(solver1, tissue1, tissue2))[0]
+        attachment_new = cmds.ziva(solver1, tissue1, tissue2, a=True)[0]
 
         # Verify
         attachments_expected = attachments_orig.union({attachment_new})

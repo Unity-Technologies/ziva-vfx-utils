@@ -1,12 +1,14 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene
-import tests.utils as test_utils
-from vfx_test_case import VfxTestCase
-from maya import cmds
 import unittest
+import tests.utils as test_utils
+import zBuilder.builders.ziva as zva
+
+from maya import cmds
+from vfx_test_case import VfxTestCase
+from zBuilder.commands import clean_scene
 
 
 class ZivaReferenceGenericTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaReferenceGenericTestCase, self).setUp()
         test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
@@ -101,6 +103,7 @@ class ZivaReferenceMirrorTestCase(VfxTestCase):
     - One side has Ziva VFX nodes and other side does not, in this case l_ has Ziva nodes
 
     """
+
     def setUp(self):
         super(ZivaReferenceMirrorTestCase, self).setUp()
         test_utils.reference_scene(scene_name='mirror_example.ma')

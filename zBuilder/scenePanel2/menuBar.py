@@ -2,15 +2,15 @@
 """
 import logging
 
-from .zGeoWidget import zGeoWidget
-from ..uiUtils import get_icon_path_from_name
-from ..utils import rig_cut, rig_copy, rig_paste, rig_update, merge_solvers
-from ..utils import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
-from utility.licenseRegister import licenseRegisterWidget
-from PySide2 import QtWidgets, QtGui, QtCore
-from maya import cmds, mel
 from collections import OrderedDict
 from functools import partial
+from PySide2 import QtWidgets, QtGui, QtCore
+from maya import cmds, mel
+from utility.licenseRegister import licenseRegisterWidget
+from zBuilder.uiUtils import get_icon_path_from_name
+from zBuilder.commands import (rig_cut, rig_copy, rig_paste, rig_update, merge_solvers,
+                               remove_zRivetToBone_nodes, remove_solver, remove_all_solvers)
+from .zGeoWidget import zGeoWidget
 
 logger = logging.getLogger(__name__)
 

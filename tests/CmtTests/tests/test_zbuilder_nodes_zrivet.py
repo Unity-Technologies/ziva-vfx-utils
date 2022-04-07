@@ -1,12 +1,14 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene, remove_solver
 import tests.utils as test_utils
-from vfx_test_case import VfxTestCase
+import zBuilder.builders.ziva as zva
+
 from maya import cmds
 from maya import mel
+from vfx_test_case import VfxTestCase
+from zBuilder.commands import clean_scene, remove_solver
 
 
 class ZivaRivetTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaRivetTestCase, self).setUp()
 

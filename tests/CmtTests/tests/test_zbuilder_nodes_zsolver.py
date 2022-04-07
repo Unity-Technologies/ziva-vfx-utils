@@ -6,8 +6,8 @@ from maya import cmds
 from maya import mel
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
-from zBuilder.utils import (rename_ziva_nodes, clean_scene, remove_solver, remove_all_solvers,
-                            rig_cut, rig_copy, rig_paste, rig_transfer)
+from zBuilder.commands import (rename_ziva_nodes, clean_scene, remove_solver, remove_all_solvers,
+                               rig_cut, rig_copy, rig_paste, rig_transfer)
 from zBuilder.nodes.ziva.zSolver import SolverNode
 
 

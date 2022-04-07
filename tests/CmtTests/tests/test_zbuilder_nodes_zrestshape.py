@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
-from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution, rig_copy
+from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution, rig_copy
 from zBuilder.nodes.ziva.zRestShape import RestShapeNode
 
 

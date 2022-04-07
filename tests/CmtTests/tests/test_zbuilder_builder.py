@@ -1,5 +1,5 @@
 import zBuilder.builders.ziva as zva
-from zBuilder.utils import clean_scene
+from zBuilder.commands import clean_scene
 from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 import tests.utils as test_utils
 from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
@@ -9,6 +9,7 @@ import os
 
 
 class ZivaBuilderTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaBuilderTestCase, self).setUp()
         test_utils.load_scene()

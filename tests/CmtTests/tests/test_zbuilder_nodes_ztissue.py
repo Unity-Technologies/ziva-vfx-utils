@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
-from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution, remove_solver
+from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution, remove_solver
 from zBuilder.nodes.ziva.zTissue import TissueNode
 
 

@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
-from zBuilder.utils import rename_ziva_nodes, copy_paste_with_substitution
+from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zAttachment import AttachmentNode
 
 
@@ -14,10 +14,13 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.attachment_names = [
-            'r_tissue_2__c_bone_1_zAttachment', 'c_tissue_3__c_bone_2_zAttachment',
-            'c_cloth_1__c_bone_1_zAttachment', 'l_tissue_1__c_bone_1_zAttachment',
-            'l_tissue_1__l_bone_1_zAttachment', 'l_cloth_1__c_bone_1_zAttachment',
-            'l_cloth_1__c_tissue_3_zAttachment'
+            'r_tissue_2__c_bone_1_zAttachment',
+            'c_tissue_3__c_bone_2_zAttachment',
+            'c_cloth_1__c_bone_1_zAttachment',
+            'l_tissue_1__c_bone_1_zAttachment',
+            'l_tissue_1__l_bone_1_zAttachment',
+            'l_cloth_1__c_bone_1_zAttachment',
+            'l_cloth_1__c_tissue_3_zAttachment',
         ]
 
         cls.attachment_attrs = ["attachmentMode", "stiffness", "show"]

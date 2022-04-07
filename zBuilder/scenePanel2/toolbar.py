@@ -1,12 +1,12 @@
 """ Helper functions to setup Scene Panel 2 toolbar widget.
 """
-from .zGeoWidget import zGeoWidget
-from ..uiUtils import get_icon_path_from_name
-from ..commonUtils import is_string
-from ..utils import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
+from functools import partial
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
-from functools import partial
+from zBuilder.commonUtils import is_string
+from zBuilder.uiUtils import get_icon_path_from_name
+from zBuilder.commands import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
+from .zGeoWidget import zGeoWidget
 
 # Toolbar action data structure, it can be a single QAction item with following items:
 # - Icon name

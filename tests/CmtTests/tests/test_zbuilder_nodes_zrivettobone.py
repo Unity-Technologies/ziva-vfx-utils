@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
-from zBuilder.utils import rename_ziva_nodes, clean_scene, rig_copy, rig_paste, copy_paste_with_substitution
+from zBuilder.commands import rename_ziva_nodes, clean_scene, rig_copy, rig_paste, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zRivetToBone import RivetToBoneNode
 
 

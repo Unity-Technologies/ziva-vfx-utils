@@ -7,9 +7,10 @@ from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase, get_mesh_vertex_positions
 from zBuilder.commonUtils import parse_version_info
 from zBuilder.mayaUtils import replace_long_name, get_short_name
-from zBuilder.utils import (ZIVA_CLIPBOARD_ZBUILDER, clean_scene, copy_paste_with_substitution,
-                            remove, remove_solver, remove_all_solvers, rename_ziva_nodes, rig_cut,
-                            rig_copy, rig_paste, rig_transfer, rig_update, load_rig, save_rig)
+from zBuilder.commands import (ZIVA_CLIPBOARD_ZBUILDER, clean_scene, copy_paste_with_substitution,
+                               remove, remove_solver, remove_all_solvers, rename_ziva_nodes,
+                               rig_cut, rig_copy, rig_paste, rig_transfer, rig_update, load_rig,
+                               save_rig)
 from zBuilder.vfxUtils import get_zBones
 
 
