@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+zBuilder.commands module
+------------------------
+
+.. automodule:: zBuilder.commands
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 zBuilder.commonUtils module
 ---------------------------
 
@@ -25,14 +33,6 @@ zBuilder.mayaUtils module
 -------------------------
 
 .. automodule:: zBuilder.mayaUtils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.utils module
----------------------
-
-.. automodule:: zBuilder.utils
    :members:
    :undoc-members:
    :show-inheritance:

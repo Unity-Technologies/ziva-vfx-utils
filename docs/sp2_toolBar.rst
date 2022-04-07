@@ -302,7 +302,7 @@ Remove the zRivetToBone and zRivetToBoneLocator nodes from the selected mesh, bo
 
 This is the same as executing following script: ::
   
-  from zBuilder.utils import remove_zRivetToBone_nodes; 
+  from zBuilder.commands import remove_zRivetToBone_nodes; 
   from maya import cmds; 
   remove_zRivetToBone_nodes(cmds.ls(sl=True));
 

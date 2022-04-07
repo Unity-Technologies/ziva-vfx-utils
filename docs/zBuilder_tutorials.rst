@@ -193,8 +193,8 @@ First, clean out the entire Ziva rig with the following command:
 
 .. code-block:: python
 
-    import zBuilder.utils as utils
-    utils.clean_scene()
+    import zBuilder.commands as vfx_cmds
+    vfx_cmds.clean_scene()
 
 .. note::
     **clean_scene()** is a utility function to remove all of the Ziva footprint in the scene.
@@ -221,8 +221,8 @@ First, let's clean the scene:
 
 .. code-block:: python
 
-    import zBuilder.utils as utils
-    utils.clean_scene()
+    import zBuilder.commands as vfx_cmds
+    vfx_cmds.clean_scene()
 
 As an example of changing geometry, let's change the bicep.
 A quick way is to apply a mesh smooth.
@@ -297,8 +297,8 @@ Run the Anatomical Arm demo again, then run:
 
 .. code-block:: python
 
-    import zBuilder.utils as utils
-    utils.clean_scene()
+    import zBuilder.commands as vfx_cmds
+    vfx_cmds.clean_scene()
 
 Once the scene has just the arm geometry, retrieve the Ziva rig from the file on disk:
 
@@ -388,8 +388,8 @@ To represent a model name change, let's clean the scene and change the name of o
 
 .. code-block:: python
 
-    import zBuilder.utils as utils
-    utils.clean_scene()
+    import zBuilder.commands as vfx_cmds
+    vfx_cmds.clean_scene()
 
     cmds.rename('r_bicep_muscle', 'r_biceps_muscle')
 

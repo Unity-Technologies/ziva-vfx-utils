@@ -16,6 +16,9 @@ Release Notes
 Functionality
 +++++++++++++
 - **zBuilder:** Move **rename_ziva_nodes()** from zBuilder.zMaya to zBuilder.utils.
+- **zBuilder:** Rename **zBuilder.utils** to **zBuilder.commands**.
+- **zBuilder:** Rename **zBuilder.zMaya** to **zBuilder.vfxUtils**.
+- **zBuilder:** Cleanup zBuilder files.
 
 Bug Fixes
 +++++++++

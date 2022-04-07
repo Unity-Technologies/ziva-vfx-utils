@@ -26,8 +26,8 @@ Loads a Ziva rig from a disk file, and applies it to the specified solver.
     # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
     # If solverName is provided, replace the name of the solver stored in the zBuilder file with a given solverName,
     # and apply the rig to that solver.
-    import zBuilder.utils as utils
-    utils.load_rig(file_name, solver_name=None)
+    import zBuilder.commands as vfx_cmds
+    vfx_cmds.load_rig(file_name, solver_name=None)
 
 Saves the Ziva rig present only in the selected solver to a disk file.
 
@@ -39,8 +39,8 @@ Saves the Ziva rig present only in the selected solver to a disk file.
   # If there is only one solver in the scene, it is saved.
   # If there is multiple solvers, save the first solver in the union
   # of selected solvers and the default solver.
-  import zBuilder.utils as utils
-  utils.save_rig(file_name, solver_name=None)
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.save_rig(file_name, solver_name=None)
 
 
 Cut/Copy/Paste Selection
@@ -69,13 +69,13 @@ cut/copy and paste their Ziva rigs onto previously un-rigged additional geometry
   # Selection can contain zero or one solver node; otherwise an error is reported
   # (it does not matter if the solver node is a solver transform node, or solver shape node).
   # The selected objects must all come from exactly one solver; otherwise an error is reported.
-  import zBuilder.utils as utils
-  utils.rig_cut()
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.rig_cut()
 
   # Copy the Ziva rig available on currently selected objects, into the Ziva clipboard.
   # Same usage notes as with rig_cut.
-  import zBuilder.utils as utils
-  utils.rig_copy()
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.rig_copy()
 
   # Paste the Ziva rig from the Ziva clipboard onto scene geometry.
   # If nothing is selected, or the Ziva clipboard contains an explicit solver node,
@@ -86,8 +86,8 @@ cut/copy and paste their Ziva rigs onto previously un-rigged additional geometry
   # The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
   # If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
   # it is created.
-  import zBuilder.utils as utils
-  utils.rig_paste()
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.rig_paste()
 
 
 Copy/Paste Ziva Rig With Name Substitution
@@ -126,8 +126,8 @@ the geometries of ``r_biceps`` and ``l_biceps`` must be mirror images of one ano
 
   # Copy/Pastes Ziva rig for the selected solver, using regular expressions.
   # If multiple solvers are selected, only the first solver is processed.
-  import zBuilder.utils as utils
-  utils.copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with)
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with)
 
 
 Update Ziva Rig
@@ -148,8 +148,8 @@ and you want to update the Ziva rig to use the newly warped geometry.
   # This command can be used if you made geometry modifications and you'd like to re-use a previously
   # built Ziva rig on the modified geometry.
   # If no "solvers" are provided, they are inferred from selection.
-  import zBuilder.utils as utils
-  utils.rig_update(solvers=None)
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.rig_update(solvers=None)
 
 
 .. _sec-zRigTransfer:
@@ -189,8 +189,8 @@ In order to warp the Ziva rig, you will need to provide the source and target so
   # If targetSolver does not exist yet, the command generates it.
   # Note that the targetSolver may be the same as the sourceSolver, 
   # in which case the rig on the 'warped_*' geometry is added into the sourceSolver.
-  import zBuilder.utils as utils
-  utils.rig_transfer(sourceSolver, prefix, targetSolver="")
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.rig_transfer(sourceSolver, prefix, targetSolver="")
 
 Transfer Skin Cluster...
 """""""""""""""""""""""""
@@ -223,8 +223,8 @@ To execute the skin cluster transfer:
   # This requires both geometries (selected and warped) have the same topology.
   # Also, the names of the warped meshes must be prefixed with "prefix".
   # Note: Warp the source meshes and the corresponding joint hierarchy before running the command.
-  import zBuilder.utils as utils
-  utils.skincluster_transfer(prefix="")
+  import zBuilder.commands as vfx_cmds
+  vfx_cmds.skincluster_transfer(prefix="")
 
 
 Edit Menu

@@ -1,4 +1,4 @@
-''' Modules contains public commands for Ziva VFX operations.
+''' Module contains public commands for Ziva VFX operations.
 '''
 import copy
 import logging
