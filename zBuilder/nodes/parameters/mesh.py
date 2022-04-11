@@ -1,8 +1,8 @@
 import logging
 
 from maya import cmds
-from maya import OpenMaya as om
-from zBuilder.mayaUtils import get_mdagpath_from_mesh, get_name_from_m_object
+from maya.api import OpenMaya as om2
+from zBuilder.mayaUtils import get_DAG_path_from_mesh, get_name_from_m_object, get_maya_api_version
 from ..base import Base
 
 logger = logging.getLogger(__name__)
@@ -138,12 +138,12 @@ def get_intermediate(dagPath):
         mObject: mObject of intermediate shape or None if none found.
     '''
 
-    dag_node = om.MFnDagNode(dagPath)
+    dag_node = om2.MFnDagNode(dagPath)
     for i in range(dag_node.childCount()):
         child = dag_node.child(i)
-        if child.apiType() == om.MFn.kMesh:
-            node = om.MFnDependencyNode(child)
-            intermediate_plug = om.MPlug(node.findPlug("intermediateObject"))
+        if child.apiType() == om2.MFn.kMesh:
+            node = om2.MFnDependencyNode(child)
+            intermediate_plug = node.findPlug("intermediateObject", False)
             if intermediate_plug.asBool():
                 return child
     return None
@@ -158,34 +158,28 @@ def get_mesh_info(mesh_name):
     Returns:
         tuple: tuple of polygonCounts, polygonConnects, and points.
     """
-    space = om.MSpace.kWorld
-    mesh_to_rebuild_m_dag_path = get_mdagpath_from_mesh(mesh_name)
+    mesh_to_rebuild_m_dag_path = get_DAG_path_from_mesh(mesh_name)
     intermediate_shape = get_intermediate(mesh_to_rebuild_m_dag_path)
     if intermediate_shape:
-        om.MDagPath.getAPathTo(intermediate_shape, mesh_to_rebuild_m_dag_path)
+        mesh_to_rebuild_m_dag_path = om2.MDagPath.getAPathTo(intermediate_shape)
     else:
         mesh_to_rebuild_m_dag_path.extendToShape()
 
-    mesh_to_rebuild_poly_iter = om.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
-
-    num_polygons = 0
-
+    mesh_to_rebuild_poly_iter = om2.MItMeshPolygon(mesh_to_rebuild_m_dag_path)
     polygon_counts_list = list()
     polygon_connects_list = list()
-
-    point_list = get_mesh_vertex_positions(get_name_from_m_object(mesh_to_rebuild_m_dag_path))
-
     while not mesh_to_rebuild_poly_iter.isDone():
-        num_polygons += 1
-        polygon_vertices_m_int_array = om.MIntArray()
-        mesh_to_rebuild_poly_iter.getVertices(polygon_vertices_m_int_array)
+        polygon_vertices_m_int_array = mesh_to_rebuild_poly_iter.getVertices()
         for vertexIndex in polygon_vertices_m_int_array:
             polygon_connects_list.append(vertexIndex)
 
-        polygon_counts_list.append(polygon_vertices_m_int_array.length())
+        polygon_counts_list.append(len(polygon_vertices_m_int_array))
+        if get_maya_api_version() < 20200000:
+            mesh_to_rebuild_poly_iter.next(mesh_to_rebuild_poly_iter)
+        else:
+            mesh_to_rebuild_poly_iter.next()
 
-        mesh_to_rebuild_poly_iter.next()
-
+    point_list = get_mesh_vertex_positions(get_name_from_m_object(mesh_to_rebuild_m_dag_path))
     return polygon_counts_list, polygon_connects_list, point_list
 
 
@@ -226,8 +220,8 @@ def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
         Name of newly built mesh.
 
     """
-    polygonCounts_mIntArray = om.MIntArray()
-    polygonConnects_mIntArray = om.MIntArray()
+    polygonCounts_mIntArray = om2.MIntArray()
+    polygonConnects_mIntArray = om2.MIntArray()
     vertexArray_mFloatPointArray = vertexArray
 
     for i in polygonCounts:
@@ -236,24 +230,14 @@ def build_mesh(name, polygonCounts, polygonConnects, vertexArray):
     for i in polygonConnects:
         polygonConnects_mIntArray.append(i)
 
-    # back
-    newPointArray = om.MPointArray()
+    newPointArray = om2.MPointArray()
     for point in vertexArray_mFloatPointArray:
-        newPoint = om.MPoint(point[0], point[1], point[2], 1.0)
+        newPoint = om2.MPoint(point[0], point[1], point[2], 1.0)
         newPointArray.append(newPoint)
 
-    newMesh_mfnMesh = om.MFnMesh()
-    returned = newMesh_mfnMesh.create(newPointArray.length(), polygonCounts_mIntArray.length(),
-                                      newPointArray, polygonCounts_mIntArray,
-                                      polygonConnects_mIntArray)
-
-    returned_mfnDependencyNode = om.MFnDependencyNode(returned)
-
+    mesh_fn = om2.MFnMesh()
+    newMesh = mesh_fn.create(newPointArray, polygonCounts, polygonConnects)
     # do housekeeping.
-    returnedName = returned_mfnDependencyNode.name()
-
-    rebuiltMesh = cmds.rename(returnedName, name + '_rebuilt')
-
-    # cmds.sets( rebuiltMesh, e=True, addElement='initialShadingGroup' )
-
-    return rebuiltMesh
+    mesh_dep_node = om2.MFnDependencyNode(newMesh)
+    new_mesh_name = cmds.rename(mesh_dep_node.name(), name + '_rebuilt')
+    return new_mesh_name

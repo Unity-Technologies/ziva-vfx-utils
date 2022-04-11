@@ -1,6 +1,7 @@
 from maya import cmds
-from maya import OpenMaya as om
-from maya import OpenMayaAnim as oma
+from maya.api import OpenMaya as om2
+from maya.api import OpenMayaAnim as oma2
+from zBuilder.mayaUtils import get_MObject
 from ..dg_node import DGNode
 
 
@@ -34,7 +35,6 @@ class SkinCluster(DGNode):
         self.association = get_associations(self.name)
 
     def build(self, *args, **kwargs):
-        interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
         name = self.name
@@ -77,33 +77,25 @@ def apply_weights(skin_cluster, mesh, influences, weights):
 
 
 def get_weights(skin_cluster):
-    # get the MFnSkinCluster for skinCluster
-    selList = om.MSelectionList()
-    selList.add(skin_cluster)
-    clusterNode = om.MObject()
-    selList.getDependNode(0, clusterNode)
-    skinFn = oma.MFnSkinCluster(clusterNode)
-
     # get the MDagPath for all influence
-    infDags = om.MDagPathArray()
-    skinFn.influenceObjects(infDags)
+    clusterNode = get_MObject(skin_cluster)
+    skinFn = oma2.MFnSkinCluster(clusterNode)
+    dag_path_array = skinFn.influenceObjects()
 
     # create a dictionary whose key is the MPlug indice id and
     # whose value is the influence list id
     infIds = {}
     infs = []
-    for x in range(infDags.length()):
-        infPath = infDags[x].fullPathName()
-        infId = int(skinFn.indexForInfluenceObject(infDags[x]))
-        infIds[infId] = x
-        infs.append(infPath)
+    for idx, cur_path in enumerate(dag_path_array):
+        infId = int(skinFn.indexForInfluenceObject(cur_path))
+        infIds[infId] = idx
+        infs.append(cur_path.fullPathName())
 
     # get the MPlug for the weightList and weights attributes
-    wlPlug = skinFn.findPlug('weightList')
-    wPlug = skinFn.findPlug('weights')
+    wlPlug = skinFn.findPlug('weightList', False)
+    wPlug = skinFn.findPlug('weights', False)
     wlAttr = wlPlug.attribute()
     wAttr = wPlug.attribute()
-    wInfIds = om.MIntArray()
 
     # the weights are stored in dictionary, the key is the vertId,
     # the value is another dictionary whose key is the influence id and
@@ -115,10 +107,10 @@ def get_weights(skin_cluster):
         wPlug.selectAncestorLogicalIndex(vId, wlAttr)
 
         # get the indice of all non-zero weights for this vert
-        wPlug.getExistingArrayAttributeIndices(wInfIds)
+        wInfIds = wPlug.getExistingArrayAttributeIndices()
 
         # create a copy of the current wPlug
-        infPlug = om.MPlug(wPlug)
+        infPlug = om2.MPlug(wPlug)
         for infId in wInfIds:
             # tell the infPlug it represents the current influence id
             infPlug.selectAncestorLogicalIndex(infId, wAttr)

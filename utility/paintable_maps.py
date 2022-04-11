@@ -1,9 +1,10 @@
-from zBuilder.mayaUtils import get_maya_api_version
+import re
+
 from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
-import re
+from zBuilder.mayaUtils import get_maya_api_version
 
 
 def split_map_name(map_name):
@@ -53,7 +54,7 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
 
 
 def get_paintable_map(node_name, attr_name, mesh_name=None):
-    # type: (str, str) -> List[float]
+    # type: (str, str, str) -> list[float]
     """
     Get an array of paintable weights on some node.
     This will work for array plugs (e.g. Deformer.weightList[7].weights),

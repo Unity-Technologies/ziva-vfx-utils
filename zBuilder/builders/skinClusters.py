@@ -1,26 +1,23 @@
-from .builder import Builder
-from zBuilder.mayaUtils import parse_maya_node_for_selection
-from zBuilder.commonUtils import time_this
-from maya import cmds
 import logging
+
+from maya import cmds
+from zBuilder.commonUtils import time_this
+from zBuilder.mayaUtils import parse_maya_node_for_selection
+from .builder import Builder
 
 logger = logging.getLogger(__name__)
 
 
 class SkinCluster(Builder):
-    """Capturing Maya skinClusters
+    """ Capturing Maya skinClusters
     """
 
     @time_this
     def retrieve_from_scene(self, *args, **kwargs):
-        # parse args------------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
-
         history = cmds.listHistory(selection)
         skin_clusters = cmds.ls(history, type='skinCluster')[::-1]
-
-        if not skin_clusters:
-            raise Exception('No skinClusters found, aborting!')
+        assert skin_clusters, 'No skinClusters found, aborting!'
 
         for skin_cluster in skin_clusters:
             scene_item = self.node_factory(skin_cluster)

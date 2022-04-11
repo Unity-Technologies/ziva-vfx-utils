@@ -1,10 +1,11 @@
 import logging
 from maya import cmds
 from maya import mel
-from maya import OpenMaya as om
+from maya.api import OpenMaya as om2
 
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
-from zBuilder.mayaUtils import get_short_name, get_mdagpath_from_mesh, get_type
+from zBuilder.commonUtils import clamp
+from zBuilder.mayaUtils import get_short_name, get_DAG_path_from_mesh, get_type
 from ..base import Base
 
 logger = logging.getLogger(__name__)
@@ -188,7 +189,7 @@ def get_weights(map_name, mesh_name=None):
     return get_paintable_map(split_map[0], split_map[1], mesh_name)
 
 
-def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1]):
+def interpolate_values(source_mesh, destination_mesh, weight_list, clamp_range=[0, 1]):
     """
     Description:
         Will transfer values between similar meshes with differing topology.
@@ -200,68 +201,51 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp=[0, 1])
     Returns:
         list(float)
     """
-    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
-    destination_mesh_m_dag_path = get_mdagpath_from_mesh(destination_mesh)
-    source_mesh_shape_m_dag_path = om.MDagPath(source_mesh_m_dag_path)
-    source_mesh_shape_m_dag_path.extendToShape()
+    src_mesh_dag_path = get_DAG_path_from_mesh(source_mesh)
+    src_shape_dag_path = om2.MDagPath(src_mesh_dag_path)
+    src_shape_dag_path.extendToShape()
 
-    source_mesh_m_mesh_intersector = om.MMeshIntersector()
-    source_mesh_m_mesh_intersector.create(source_mesh_shape_m_dag_path.node(),
-                                          source_mesh_m_dag_path.inclusiveMatrix())
+    src_mesh_intersector = om2.MMeshIntersector()
+    src_mesh_intersector.create(src_shape_dag_path.node(), src_mesh_dag_path.inclusiveMatrix())
 
-    destination_mesh_m_it_mesh_vertex = om.MItMeshVertex(destination_mesh_m_dag_path)
-    source_mesh_m_it_mesh_polygon = om.MItMeshPolygon(source_mesh_m_dag_path)
-
-    u_util = om.MScriptUtil()
-    v_util = om.MScriptUtil()
-    u_util_ptr = u_util.asFloatPtr()
-    v_util_ptr = v_util.asFloatPtr()
-
-    int_util = om.MScriptUtil()
+    dst_mesh_dag_path = get_DAG_path_from_mesh(destination_mesh)
+    dst_mesh_vtx_iter = om2.MItMeshVertex(dst_mesh_dag_path)
+    src_mesh_poly_iter = om2.MItMeshPolygon(src_mesh_dag_path)
 
     interpolated_weights = list()
-
-    while not destination_mesh_m_it_mesh_vertex.isDone():
-
-        closest_m_point_on_mesh = om.MPointOnMesh()
-        source_mesh_m_mesh_intersector.getClosestPoint(
-            destination_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld), closest_m_point_on_mesh)
-
-        source_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
-                                               int_util.asIntPtr())
-        triangle_m_point_array = om.MPointArray()
-        triangle_m_int_array = om.MIntArray()
-
-        source_mesh_m_it_mesh_polygon.getTriangle(closest_m_point_on_mesh.triangleIndex(),
-                                                  triangle_m_point_array, triangle_m_int_array,
-                                                  om.MSpace.kWorld)
-
-        closest_m_point_on_mesh.getBarycentricCoords(u_util_ptr, v_util_ptr)
+    while not dst_mesh_vtx_iter.isDone():
+        closest_point_on_src_mesh = src_mesh_intersector.getClosestPoint(
+            dst_mesh_vtx_iter.position(om2.MSpace.kWorld))
+        src_mesh_poly_iter.setIndex(closest_point_on_src_mesh.face)
+        _, triangle_m_int_array = src_mesh_poly_iter.getTriangle(closest_point_on_src_mesh.triangle,
+                                                                 om2.MSpace.kWorld)
 
         weights = list()
         for i in range(3):
             vertex_id_int = triangle_m_int_array[i]
             weights.append(weight_list[vertex_id_int])
 
-        bary_u = u_util.getFloat(u_util_ptr)
-        bary_v = v_util.getFloat(v_util_ptr)
+        bary_u, bary_v = closest_point_on_src_mesh.barycentricCoords
         bary_w = 1 - bary_u - bary_v
 
         interp_weight = (bary_u * weights[0]) + (bary_v * weights[1]) + (bary_w * weights[2])
         interpolated_weights.append(interp_weight)
 
-        destination_mesh_m_it_mesh_vertex.next()
+        dst_mesh_vtx_iter.next()
 
     # clamp the values if needed
-    if clamp:
-        interpolated_weights = [max(min(x, clamp[1]), clamp[0]) for x in interpolated_weights]
+    if clamp_range:
+        interpolated_weights = [
+            clamp(x, clamp_range[0], clamp_range[1]) for x in interpolated_weights
+        ]
 
     return interpolated_weights
 
 
 def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
-    """ Will transfer values between similar meshes with differing topology. \
+    """ Will transfer values between similar meshes with differing topology.
         Takes value from the closest point on mesh. Works only for zFiber.endPoints map.
+        
     Args:
         source_mesh(string): name on the mesh transform to interpolate from
         target_mesh(string): name of the mesh transform to interpolate to
@@ -270,69 +254,60 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
     Returns:
         list(float)
     """
-    target_mesh_m_dag_path = get_mdagpath_from_mesh(target_mesh)
-    source_mesh_m_dag_path = get_mdagpath_from_mesh(source_mesh)
-    target_mesh_shape_m_dag_path = om.MDagPath(target_mesh_m_dag_path)
-    target_mesh_shape_m_dag_path.extendToShape()
+    tgt_mesh_dag_path = get_DAG_path_from_mesh(target_mesh)
+    tgt_shape_dag_path = om2.MDagPath(tgt_mesh_dag_path)
+    tgt_shape_dag_path.extendToShape()
 
-    target_mesh_m_mesh_intersector = om.MMeshIntersector()
-    target_mesh_m_mesh_intersector.create(target_mesh_shape_m_dag_path.node(),
-                                          target_mesh_m_dag_path.inclusiveMatrix())
+    tgt_mesh_intersector = om2.MMeshIntersector()
+    tgt_mesh_intersector.create(tgt_shape_dag_path.node(), tgt_mesh_dag_path.inclusiveMatrix())
 
-    source_mesh_m_it_mesh_vertex = om.MItMeshVertex(source_mesh_m_dag_path)
-    target_mesh_m_it_mesh_vertex = om.MItMeshVertex(target_mesh_m_dag_path)
-    target_mesh_m_it_mesh_polygon = om.MItMeshPolygon(target_mesh_m_dag_path)
+    src_mesh_dag_path = get_DAG_path_from_mesh(source_mesh)
+    src_mesh_vtx_iter = om2.MItMeshVertex(src_mesh_dag_path)
+    tgt_mesh_vtx_iter = om2.MItMeshVertex(tgt_mesh_dag_path)
+    tgt_mesh_poly_iter = om2.MItMeshPolygon(tgt_mesh_dag_path)
 
-    int_util = om.MScriptUtil()
+    # Fill the map with 0.5 values
+    interpolated_weights = [0.5] * tgt_mesh_vtx_iter.count()
 
-    # fill the map with 0.5 values
-    interpolated_weights = [0.5] * target_mesh_m_it_mesh_vertex.count()
-    while not source_mesh_m_it_mesh_vertex.isDone():
-        current_weight = weight_list[source_mesh_m_it_mesh_vertex.index()]
-        # in case that weight is in ( 0.99 ... 0.9 ) or ( 0.01 .. 0.1 ) need to round it
+    while not src_mesh_vtx_iter.isDone():
+        current_weight = weight_list[src_mesh_vtx_iter.index()]
+        # Round the weight value in [0.9, 1) and [0, 0.1] range
         if current_weight >= 0.9:
             current_weight = 1.0
         elif current_weight <= 0.1:
             current_weight = 0.0
 
-        if current_weight in [0, 1]:
-            closest_m_point_on_mesh = om.MPointOnMesh()
-            pos = source_mesh_m_it_mesh_vertex.position(om.MSpace.kWorld)
-            target_mesh_m_mesh_intersector.getClosestPoint(pos, closest_m_point_on_mesh)
-
+        # Process the weight value is either 0 or 1
+        if current_weight in (0, 1):
             # closest polygon
-            target_mesh_m_it_mesh_polygon.setIndex(closest_m_point_on_mesh.faceIndex(),
-                                                   int_util.asIntPtr())
+            pos = src_mesh_vtx_iter.position(om2.MSpace.kWorld)
+            closest_point_on_src_mesh = tgt_mesh_intersector.getClosestPoint(pos)
+            tgt_mesh_poly_iter.setIndex(closest_point_on_src_mesh.face)
+            closest_polygon_vtx_array = tgt_mesh_poly_iter.getPoints(om2.MSpace.kWorld)
+            closest_polygon_idx_array = tgt_mesh_poly_iter.getVertices()
 
-            closest_polygon_point_array = om.MPointArray()
-            closest_polygon_vtx_id_array = om.MIntArray()
-
-            target_mesh_m_it_mesh_polygon.getPoints(closest_polygon_point_array, om.MSpace.kWorld)
-            target_mesh_m_it_mesh_polygon.getVertices(closest_polygon_vtx_id_array)
-
-            distance_sum = pos.distanceTo(closest_polygon_point_array[0])
-            distance_array = [distance_sum]
-            # iterate through vertices on the polygon and get sum distance and distance to
-            # each vertex
-            for i in range(1, closest_polygon_point_array.length()):
-                distance = pos.distanceTo(closest_polygon_point_array[i])
+            # Iterate through vertices on the polygon to get distance sum
+            # and distance list to each vertex
+            distance_sum = 0
+            distance_array = []
+            for cur_point in closest_polygon_vtx_array:
+                distance = pos.distanceTo(cur_point)
                 distance_sum += distance
                 distance_array.append(distance)
+            average_distance = distance_sum / len(closest_polygon_vtx_array)
 
-            average_distance = distance_sum / closest_polygon_point_array.length()
-
-            # if distance from projected point to face vertex is less or equal then average
-            # distance, then set corresponding weight value
+            # If distance from projected point to face vertex is
+            # equal or less than average distance, set corresponding weight value
             found = False
-            for i in range(closest_polygon_point_array.length()):
-                if distance_array[i] <= average_distance:
-                    interpolated_weights[closest_polygon_vtx_id_array[i]] = current_weight
+            for idx, dist in enumerate(distance_array):
+                if dist <= average_distance:
+                    interpolated_weights[closest_polygon_idx_array[idx]] = current_weight
                     found = True
             # make sure that at least one vertex has a new value
             if not found:
                 closest_index = distance_array.index(min(distance_array))
-                interpolated_weights[closest_polygon_vtx_id_array[closest_index]] = current_weight
+                interpolated_weights[closest_polygon_idx_array[closest_index]] = current_weight
 
-        source_mesh_m_it_mesh_vertex.next()
+        src_mesh_vtx_iter.next()
 
     return interpolated_weights

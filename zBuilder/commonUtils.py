@@ -47,11 +47,9 @@ def none_to_empty(x):
 
 def is_string(var):
     # type: (str|unicode) -> bool
-    '''
-    Return True if input variable is string type, return False otherwise.
-
+    """ Return True if input variable is string type, return False otherwise.
     TODO: Retire this function when type hints is introduced.
-    '''
+    """
     if sys.version_info[0] < 3:
         return isinstance(var, basestring)
     return isinstance(var, str)
@@ -64,6 +62,21 @@ def is_sequence(var):
     False otherwise.
     """
     return isinstance(var, (list, tuple)) and not is_string(var)
+
+
+def clamp(val, min_val, max_val):
+    """ Return value in [min_val, max_val] range.
+    """
+    # TODO: add type hint to check inputs are not None and are numeric types.
+    assert val is not None
+    assert min_val is not None
+    assert max_val is not None
+    assert isinstance(val, (int, float))
+    assert isinstance(min_val, (int, float))
+    assert isinstance(max_val, (int, float))
+    assert min_val <= max_val
+
+    return max(min(val, max_val), min_val)
 
 
 def get_first_element(maya_node):

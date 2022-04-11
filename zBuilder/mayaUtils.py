@@ -1,10 +1,11 @@
-from zBuilder.commonUtils import is_sequence
-from maya import cmds
-from maya import OpenMaya as om
-import re
 '''
 The module contains helper functions depends on Maya Python API.
 '''
+import re
+
+from maya import cmds
+from maya.api import OpenMaya as om2
+from zBuilder.commonUtils import is_sequence
 
 FIELD_TYPES = (
     'airField',
@@ -231,18 +232,15 @@ def safe_rename(old_name, new_name):
     return old_name
 
 
-def get_mdagpath_from_mesh(mesh_name):
-    """ Maya stuff, getting the dagpath from a mesh name
+def get_DAG_path_from_mesh(mesh_name):
+    """ Return the DAG path of the given mesh name
 
     Args:
-        mesh_name: The mesh to get dagpath from.
+        mesh_name: The mesh to get DAG path from.
     """
-    mesh_m_dag_path = om.MDagPath()
-    sel_list = om.MSelectionList()
+    sel_list = om2.MSelectionList()
     sel_list.add(mesh_name)
-    sel_list.getDagPath(0, mesh_m_dag_path)
-
-    return mesh_m_dag_path
+    return sel_list.getDagPath(0)
 
 
 def get_name_from_m_object(m_object, long_name=True):
@@ -255,16 +253,20 @@ def get_name_from_m_object(m_object, long_name=True):
         str: Maya object name.
 
     """
-    if m_object.hasFn(om.MFn.kDagNode):
-        dagpath = om.MDagPath()
-        om.MFnDagNode(m_object).getPath(dagpath)
-        if long_name:
-            name = dagpath.fullPathName()
-        else:
-            name = dagpath.partialPathName()
+    if m_object.hasFn(om2.MFn.kDagNode):
+        dagpath = om2.MFnDagNode(m_object).getPath()
+        name = dagpath.fullPathName() if long_name else dagpath.partialPathName()
     else:
-        name = om.MFnDependencyNode(m_object).name()
+        name = om2.MFnDependencyNode(m_object).name()
     return name
+
+
+def get_MObject(node_name):
+    """ Given node name, returns MObject
+    """
+    sel = om2.MSelectionList()
+    sel.add(node_name)
+    return sel.getDependNode(0)
 
 
 def construct_map_names(name, map_list):

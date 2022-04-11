@@ -1,12 +1,13 @@
 import os
-import zBuilder.builders.skinClusters as skn
+
 from maya import cmds
 from maya import mel
-
 from vfx_test_case import VfxTestCase, attr_values_from_scene
+from zBuilder.builders.skinClusters import SkinCluster
 
 
 class ZivaSkinClusterGenericTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.skincluster_names = ["skinCluster1"]
@@ -25,7 +26,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
         cmds.select(cl=True)
         jt = cmds.joint(n="r_skin_mesh_joint")
         cmds.move(2, [obj, jt], x=True)
-        self.builder = skn.SkinCluster()
+        self.builder = SkinCluster()
         cmds.select("l_skin_mesh")
         self.builder.retrieve_from_scene()
 
@@ -46,8 +47,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
     def test_build_restores_attr_values(self):
         plug_names = {
             "{}.{}".format(geo, attr)
-            for geo in self.skincluster_names
-                for attr in self.skincluster_attrs
+            for geo in self.skincluster_names for attr in self.skincluster_attrs
         }
         attrs_before = attr_values_from_scene(plug_names)
 
@@ -67,7 +67,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         ## ACT
-        builder = skn.SkinCluster()
+        builder = SkinCluster()
         builder.retrieve_from_file(self.temp_file_path)
 
         ## VERIFY
@@ -80,7 +80,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
 
         ## ACT
         self.builder.build()
-        builder = skn.SkinCluster()
+        builder = SkinCluster()
         cmds.select("l_skin_mesh")
         builder.retrieve_from_scene()
 
@@ -95,11 +95,11 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
         mel.eval("doDelete;")
 
         ## ACT
-        builder = skn.SkinCluster()
+        builder = SkinCluster()
         builder.retrieve_from_file(self.temp_file_path)
         builder.build()
 
-        builder = skn.SkinCluster()
+        builder = SkinCluster()
         cmds.select("l_skin_mesh")
         builder.retrieve_from_scene()
         self.check_retrieve_skincluster_looks_good(builder)
