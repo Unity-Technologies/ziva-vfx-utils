@@ -36,7 +36,7 @@ pipeline {
                 stage('windows') {
                     agent { label 'win && vfx && nogpu' }
                     environment {
-                        mayaVersion = "2018" // variations: 2018, 2019, 2020, 2022
+                        mayaVersion = "2019" // variations: 2019, 2020, 2022
                     }
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {

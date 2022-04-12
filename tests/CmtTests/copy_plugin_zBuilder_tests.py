@@ -1,6 +1,6 @@
 # Copy plugin for zBuilder tests
-# with specified maya version as a first argument ( default is 2018 )
-# Usage: python  tests/CmtTests/copy_plugin_zBuilder_tests.py --maya 2018
+# with specified maya version as a first argument ( default is 2022 )
+# Usage: python  tests/CmtTests/copy_plugin_zBuilder_tests.py --maya 2022
 
 import os
 import sys
@@ -11,7 +11,7 @@ import json
 current_directory_path = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-parser.add_argument('--maya', help='Maya version', default='2018')
+parser.add_argument('--maya', help='Maya version', default='2022')
 
 pargs = parser.parse_args()
 
