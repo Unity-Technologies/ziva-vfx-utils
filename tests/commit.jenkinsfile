@@ -7,6 +7,7 @@ pipeline {
         timestamps()
         timeout(time: 2, unit: 'HOURS') // long in case it needs to wait for machines
     }
+
     stages {
         stage('get sources') {
             agent { label 'git' && 'linux' }  // must checkout to a linux machine to avoid line ending issue
@@ -30,64 +31,82 @@ pipeline {
                 cleanup { cleanWs() }
             }
         }
-        stage('run tests for ziva-vfx-utils') {
-            failFast true
-            parallel {
-                stage('windows') {
-                    agent { label 'win && vfx && nogpu' }
-                    environment {
-                        mayaVersion = "2019" // variations: 2019, 2020, 2022
-                    }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            runWindowsTestStage()
-                        }
-                    }
-                    post { cleanup { cleanWs() } }
-                }
 
-                stage('centos7-py2') {
-                    agent { label 'cent7 && vfx && nogpu' }
-                    environment {
-                        mayaVersion = "2022" // variations: 2019, 2020, 2022
+        stage("Parallel Run Test") {
+            matrix {
+                axes {
+                    axis {
+                        name 'platform'
+                        values 'windows', 'linux'
                     }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            runLinuxTestStage(true)
-                        }
+                    axis {
+                        name 'mayaVersion'
+                        values '2019', '2020', '2022'
                     }
-                    post { cleanup { cleanWs() } }
+                    axis {
+                        name 'pythonVersion'
+                        values 'py', 'py2'
+                    }
                 }
-
-                stage('centos7-py3') {
-                    agent { label 'cent7 && vfx && nogpu' }
-                    environment {
-                        mayaVersion = "2022" // variations: 2019, 2020, 2022
-                    }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            runLinuxTestStage(false)
+                excludes {  // 'py2' parameter is only for Maya 2022
+                    exclude {
+                        axis {
+                            name 'platform'
+                            values 'windows', 'linux'
+                        }
+                        axis {
+                            name 'mayaVersion'
+                            values '2019', '2020'
+                        }
+                        axis {
+                            name 'pythonVersion'
+                            values 'py2'
                         }
                     }
-                    post { cleanup { cleanWs() } }
                 }
-
-                stage('doc generation') {
-                    agent { label 'cent7 && vfx && nogpu' }
-                    steps {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            unstash 'main'
-                            sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                stages {
+                    stage("Run tests") {
+                        agent { label "${platform} && vfx && nogpu" }
+                        environment {
+                            mayaVersion = "${mayaVersion}"
                         }
+                        steps {
+                            echo "======== Platform - ${platform}, Maya ${mayaVersion}, ${pythonVersion} ========"
+
+                            timeout(time: 15, unit: 'MINUTES') {
+                                unstash 'main'
+                                script {
+                                    if ("${platform}" == 'windows') {
+                                        runWindowsTestStage()
+                                    }
+                                    else if ("${platform}" == 'linux') {
+                                        if ("${mayaVersion}" == '2022' && "${pythonVersion}" == 'py2') {
+                                            runLinuxTestStage(true)
+                                        } else {
+                                            runLinuxTestStage(false)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        post { cleanup { cleanWs() } }
                     }
-                    post { cleanup { cleanWs() } }
                 }
             }
         }
+
+        stage('doc generation') {
+            agent { label 'cent7 && vfx && nogpu' }
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    unstash 'main'
+                    sh "ziva-vfx-utils/docs/build_the_docs.sh"
+                }
+            }
+            post { cleanup { cleanWs() } }
+        }
     }
+
     post{
         unsuccessful {
             node ('git' && 'linux') {
