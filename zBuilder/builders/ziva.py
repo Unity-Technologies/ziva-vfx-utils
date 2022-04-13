@@ -557,52 +557,53 @@ class Ziva(Builder):
 
         nodes = list()
 
-        if solver:
-            sol = vfx_util.get_zSolver(selection[0])
-            if sol:
-                nodes.extend(sol)
-                nodes.extend(vfx_util.get_zSolverTransform(selection[0]))
-        if bones:
-            nodes.extend(vfx_util.get_zBones(selection))
-        if tissues:
-            nodes.extend(vfx_util.get_zTissues(selection))
-            nodes.extend(vfx_util.get_zTets(selection))
-        if attachments:
-            nodes.extend(vfx_util.get_zAttachments(selection))
-        if materials:
-            nodes.extend(vfx_util.get_zMaterials(selection))
-        if fibers:
-            nodes.extend(vfx_util.get_zFibers(selection))
-        if cloth:
-            nodes.extend(vfx_util.get_zCloth(selection))
-        if fields:
-            soft_bodies = vfx_util.get_soft_bodies(selection)
-            adaptors = vfx_util.get_zFieldAdaptors(soft_bodies)
-            fields = vfx_util.get_fields_on_zFieldAdaptors(adaptors)
-            # fields needs to come before adaptors, so that
-            # they are created first when applying to scene.
-            nodes.extend(fields)
-            nodes.extend(adaptors)
-        if rivetToBone:
-            fibers = vfx_util.get_zFibers(selection)
+        if selection:
+            if solver:
+                sol = vfx_util.get_zSolver(selection[0])
+                if sol:
+                    nodes.extend(sol)
+                    nodes.extend(vfx_util.get_zSolverTransform(selection[0]))
+            if bones:
+                nodes.extend(vfx_util.get_zBones(selection))
+            if tissues:
+                nodes.extend(vfx_util.get_zTissues(selection))
+                nodes.extend(vfx_util.get_zTets(selection))
+            if attachments:
+                nodes.extend(vfx_util.get_zAttachments(selection))
+            if materials:
+                nodes.extend(vfx_util.get_zMaterials(selection))
             if fibers:
-                hist = cmds.listHistory(fibers)
-                nodes.extend(cmds.ls(hist, type='zRivetToBone'))
-        if lineOfAction:
-            for fiber in vfx_util.get_zFibers(selection):
-                loas = vfx_util.get_fiber_lineofaction(fiber)
-                if loas:
-                    nodes.append(loas)
-        if restShape:
-            cmds.select(selection)
-            rest_shapes = cmds.zQuery(t='zRestShape')
-            if rest_shapes:
-                nodes.extend(rest_shapes)
-        if embedder:
-            cmds.select(selection)
-            embedder = cmds.zQuery(t='zEmbedder')
+                nodes.extend(vfx_util.get_zFibers(selection))
+            if cloth:
+                nodes.extend(vfx_util.get_zCloth(selection))
+            if fields:
+                soft_bodies = vfx_util.get_soft_bodies(selection)
+                adaptors = vfx_util.get_zFieldAdaptors(soft_bodies)
+                fields = vfx_util.get_fields_on_zFieldAdaptors(adaptors)
+                # fields needs to come before adaptors, so that
+                # they are created first when applying to scene.
+                nodes.extend(fields)
+                nodes.extend(adaptors)
+            if rivetToBone:
+                fibers = vfx_util.get_zFibers(selection)
+                if fibers:
+                    hist = cmds.listHistory(fibers)
+                    nodes.extend(cmds.ls(hist, type='zRivetToBone'))
+            if lineOfAction:
+                for fiber in vfx_util.get_zFibers(selection):
+                    loas = vfx_util.get_fiber_lineofaction(fiber)
+                    if loas:
+                        nodes.append(loas)
+            if restShape:
+                cmds.select(selection)
+                rest_shapes = cmds.zQuery(t='zRestShape')
+                if rest_shapes:
+                    nodes.extend(rest_shapes)
             if embedder:
-                nodes.extend(embedder)
+                cmds.select(selection)
+                embedder = cmds.zQuery(t='zEmbedder')
+                if embedder:
+                    nodes.extend(embedder)
 
         if nodes:
             self._populate_nodes(nodes, get_parameters)
