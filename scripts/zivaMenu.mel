@@ -16,7 +16,7 @@ menuItem -label "Solver" -divider true;
 menuItem -label "Create" -ec true -ecr true -c "ziva -s" -ann "Creates an empty solver." -i "out_zSolver.png";
 menuItem -label "Set Default" -ec true -ecr true -c "ziva -defaultSolver" -ann "Set the default solver to the solver inferred from selection. The default solver is used in case of solver ambiguity when there are 2 or more solvers in the scene.";
 menuItem -ob yes -ann "options" -c "ziva_selectSolver(1)";
-menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"from zBuilder import utils;from maya import cmds;utils.merge_solvers(cmds.ls(sl=True));\")" -ann "Merges selected solvers into one.";
+menuItem -label "Merge Solvers" -ec true -ecr true -c "python(\"import zBuilder.commands as vfx_cmds; from maya import cmds; vfx_cmds.merge_solvers(cmds.ls(sl=True));\")" -ann "Merges selected solvers into one.";
 
 menuItem -label "Add Simulation Component" -divider true;
 menuItem -label "Tissue" -ec true -ecr true -c "ziva -t" -ann "Converts the selected Maya mesh(es) to tissue(s). Tissues are solid deformable objects (examples: muscles, fat, skin)." -i "out_zTissue.png";

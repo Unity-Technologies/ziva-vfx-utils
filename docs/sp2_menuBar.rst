@@ -255,9 +255,9 @@ Useful if you have objects that you want to simulate under the same solver so th
 
 This is the same as executing::
 
-    from zBuilder import utils
+    import zBuilder.commands as vfx_cmds
     from maya import cmds
-    utils.merge_solvers(cmds.ls(sl=True))
+    vfx_cmds.merge_solvers(cmds.ls(sl=True))
 
 Given a selection list of zSolverTransform nodes, merge them all into the first solver.
 
