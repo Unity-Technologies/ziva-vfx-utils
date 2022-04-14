@@ -243,7 +243,7 @@ def get_DAG_path_from_mesh(mesh_name):
     return sel_list.getDagPath(0)
 
 
-def get_name_from_m_object(m_object, long_name=True):
+def get_name_from_MObject(m_object, long_name=True):
     """ Gets Maya scene name from given mObject.
     Args:
         m_object: The m_object to get name from.
