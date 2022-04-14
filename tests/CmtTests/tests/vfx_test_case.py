@@ -18,10 +18,10 @@ def isApprox(a, b, eps=1e-6):
         return abs(a - b) <= eps
 
 
-def get_mesh_vertex_positions(mesh):
+def get_mesh_vertex_positions(mesh, index_range='*'):
     """ Given the name of a mesh, return a flat list of its world-space vertex positions."""
     # See comments here: http://www.fevrierdorian.com/blog/post/2011/09/27/Quickly-retrieve-vertex-positions-of-a-Maya-mesh-%28English-Translation%29
-    return cmds.xform(mesh + '.vtx[*]', q=True, ws=True, t=True)
+    return cmds.xform("{}.vtx[{}]".format(mesh, index_range), q=True, ws=True, t=True)
 
 
 def get_all_mesh_vertex_positions():

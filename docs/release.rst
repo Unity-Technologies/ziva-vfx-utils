@@ -22,7 +22,7 @@ Functionality
 
 Bug Fixes
 +++++++++
-
+- **zBuilder:** VFXACT-1288 Fix the regression of building mesh with different topologies.
 
 2.0.0
 ------

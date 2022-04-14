@@ -40,9 +40,6 @@ class Mesh(Base):
         self.name = mesh_name
         self.type = 'mesh'
 
-    def get_point_list(self):
-        return self._pointList
-
     def build_mesh(self):
         """ Builds mesh in maya scene.
 
@@ -82,27 +79,6 @@ class Mesh(Base):
         return len(pt_list) == len(self._pointList)
 
 
-def get_intermediate(dagPath):
-    '''finds the intermediate shape given a dagpath for mesh transform
-
-    Args:
-        dagPath (MFnDagPath): dag path for mesh to search for intermediate shape
-
-    Returns:
-        mObject: mObject of intermediate shape or None if none found.
-    '''
-
-    dag_node = om2.MFnDagNode(dagPath)
-    for i in range(dag_node.childCount()):
-        child = dag_node.child(i)
-        if child.apiType() == om2.MFn.kMesh:
-            node = om2.MFnDependencyNode(child)
-            intermediate_plug = node.findPlug("intermediateObject", False)
-            if intermediate_plug.asBool():
-                return child
-    return None
-
-
 def get_mesh_info(mesh_name):
     """ Gets mesh connectivity for given mesh.
 
@@ -113,11 +89,7 @@ def get_mesh_info(mesh_name):
         tuple: tuple of polygon counts, polygon connects, and points.
     """
     mesh_dag_path = get_dag_path_from_mesh(mesh_name)
-    intermediate_shape = get_intermediate(mesh_dag_path)
-    if intermediate_shape:
-        mesh_dag_path = om2.MDagPath.getAPathTo(intermediate_shape)
-    else:
-        mesh_dag_path.extendToShape()
+    mesh_dag_path.extendToShape()
 
     poly_count_list = []
     poly_connect_list = []

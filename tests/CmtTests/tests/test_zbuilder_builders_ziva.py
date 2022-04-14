@@ -126,32 +126,6 @@ class ZivaBuildTestCase(VfxTestCase):
         # if the attribute is 0 we know it worked
         self.assertTrue(cmds.getAttr("r_bicep_muscle_zTissue.inertialDamping") == 0)
 
-    def test_getting_intermediate_shape(self):
-        # this tests getting intermediate shape if there is one instead
-        # of deformed shape
-
-        # This builds the Zivas anatomical arm demo with no pop up dialog.
-        test_utils.build_anatomical_arm_with_no_popup()
-
-        # capture point position of first vert at rest
-        rest_point_position = cmds.pointPosition('r_bicep_muscle.vtx[0]')
-
-        # advance a few frames to change it
-        cmds.currentTime(2)
-        cmds.currentTime(3)
-
-        # retrrieve from scene
-        cmds.select('zSolver1')
-        z = zva.Ziva()
-        z.retrieve_from_scene()
-
-        # now check value of vert position.  Should be saem as rest
-        mesh = z.get_scene_items(type_filter='mesh', name_filter='r_bicep_muscle')[0]
-
-        print(mesh.get_point_list()[0], rest_point_position)
-
-        self.assertTrue(mesh.get_point_list()[0] == rest_point_position)
-
     def test_retrieve_connections_single(self):
         # this tests retrieve_connections on a a full setup where you have 1 tissue
         # selected with no attachments.  This was a bug fix.  The expected result
