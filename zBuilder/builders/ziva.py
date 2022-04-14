@@ -512,7 +512,6 @@ class Ziva(Builder):
                 list of attributes to use.
 
                 af = {'zSolver':['substeps']}
-            connections (bool): Gets the ziva nodes connected to selection as well. Defaults to True
             solver (bool): Gets solver data.  Defaults to True
             bones (bool): Gets bone data.  Defaults to True
             tissue (bool): Gets tissue data.  Defaults to True
@@ -536,7 +535,6 @@ class Ziva(Builder):
             selection = cmds.ls(sl=True, l=True)
 
         # kwargs
-        connections = kwargs.get('connections', True)
         attr_filter = kwargs.get('attr_filter', None)
         solver = kwargs.get('solver', True)
         bones = kwargs.get('bones', True)
@@ -559,7 +557,7 @@ class Ziva(Builder):
 
         nodes = list()
 
-        if connections and selection:
+        if selection:
             if solver:
                 sol = vfx_util.get_zSolver(selection[0])
                 if sol:
@@ -606,8 +604,6 @@ class Ziva(Builder):
                 embedder = cmds.zQuery(t='zEmbedder')
                 if embedder:
                     nodes.extend(embedder)
-        else:
-            nodes = selection
 
         if nodes:
             self._populate_nodes(nodes, get_parameters)
