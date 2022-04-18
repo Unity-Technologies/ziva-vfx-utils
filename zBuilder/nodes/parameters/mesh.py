@@ -2,7 +2,7 @@ import logging
 
 from maya import cmds
 from maya.api import OpenMaya as om2
-from zBuilder.mayaUtils import get_DAG_path_from_mesh, get_name_from_MObject, get_maya_api_version
+from zBuilder.mayaUtils import get_dag_path_from_mesh, get_name_from_mobject, get_maya_api_version
 from ..base import Base
 
 logger = logging.getLogger(__name__)
@@ -112,16 +112,16 @@ def get_mesh_info(mesh_name):
     Returns:
         tuple: tuple of polygon counts, polygon connects, and points.
     """
-    mesh_DAG_path = get_DAG_path_from_mesh(mesh_name)
-    intermediate_shape = get_intermediate(mesh_DAG_path)
+    mesh_dag_path = get_dag_path_from_mesh(mesh_name)
+    intermediate_shape = get_intermediate(mesh_dag_path)
     if intermediate_shape:
-        mesh_DAG_path = om2.MDagPath.getAPathTo(intermediate_shape)
+        mesh_dag_path = om2.MDagPath.getAPathTo(intermediate_shape)
     else:
-        mesh_DAG_path.extendToShape()
+        mesh_dag_path.extendToShape()
 
     poly_count_list = []
     poly_connect_list = []
-    mesh_poly_iter = om2.MItMeshPolygon(mesh_DAG_path)
+    mesh_poly_iter = om2.MItMeshPolygon(mesh_dag_path)
     while not mesh_poly_iter.isDone():
         poly_connect_array = mesh_poly_iter.getVertices()
         for elem in poly_connect_array:
@@ -135,7 +135,7 @@ def get_mesh_info(mesh_name):
             mesh_poly_iter.next()
 
     # Get mesh vertex position
-    mesh_name = get_name_from_MObject(mesh_DAG_path)
+    mesh_name = get_name_from_mobject(mesh_dag_path)
     poly_vertex_list = cmds.xform(mesh_name + '.vtx[*]', q=True, ws=True, t=True)
     assert len(
         poly_vertex_list) % 3 == 0, "Mesh vertex position list size is not a multiplier of 3."

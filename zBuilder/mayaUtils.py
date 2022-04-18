@@ -232,7 +232,7 @@ def safe_rename(old_name, new_name):
     return old_name
 
 
-def get_DAG_path_from_mesh(mesh_name):
+def get_dag_path_from_mesh(mesh_name):
     """ Return the DAG path of the given mesh name
 
     Args:
@@ -243,7 +243,7 @@ def get_DAG_path_from_mesh(mesh_name):
     return sel_list.getDagPath(0)
 
 
-def get_name_from_MObject(m_object, long_name=True):
+def get_name_from_mobject(m_object, long_name=True):
     """ Gets Maya scene name from given mObject.
     Args:
         m_object: The m_object to get name from.
@@ -261,7 +261,7 @@ def get_name_from_MObject(m_object, long_name=True):
     return name
 
 
-def get_MObject(node_name):
+def get_mobject(node_name):
     """ Given node name, returns MObject
     """
     sel = om2.MSelectionList()

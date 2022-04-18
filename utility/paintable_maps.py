@@ -129,7 +129,7 @@ def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     index = int(m.group(1))  # group(0) is the whole match. group(1) is the index
 
     # Which DagPath of the thing we're _supposed_ to be getting weights for
-    deformerObj = _get_MObject(node_name)
+    deformerObj = _get_mobject(node_name)
     deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
     dagPath = om.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
@@ -324,7 +324,7 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
         weightList[i] = w
 
     # Which DagPath of the thing we're _supposed_ to be setting weights for
-    deformerObj = _get_MObject(node_name)
+    deformerObj = _get_mobject(node_name)
     deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
     dagPath = om.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
@@ -400,7 +400,7 @@ def set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
     cmds.setAttr(node_dot_attr, new_weights, type=datatype)
 
 
-def _get_MObject(node_name):
+def _get_mobject(node_name):
     sel = om.MSelectionList()
     sel.add(node_name)
     node_obj = om.MObject()

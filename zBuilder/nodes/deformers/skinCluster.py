@@ -1,7 +1,7 @@
 from maya import cmds
 from maya.api import OpenMaya as om2
 from maya.api import OpenMayaAnim as oma2
-from zBuilder.mayaUtils import get_MObject
+from zBuilder.mayaUtils import get_mobject
 from ..dg_node import DGNode
 
 
@@ -78,7 +78,7 @@ def apply_weights(skin_cluster, mesh, influences, weights):
 
 def get_weights(skin_cluster):
     # get the MDagPath for all influence
-    clusterNode = get_MObject(skin_cluster)
+    clusterNode = get_mobject(skin_cluster)
     skinFn = oma2.MFnSkinCluster(clusterNode)
     dag_path_array = skinFn.influenceObjects()
 

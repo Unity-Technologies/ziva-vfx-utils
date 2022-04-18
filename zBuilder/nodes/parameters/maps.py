@@ -5,7 +5,7 @@ from maya.api import OpenMaya as om2
 
 from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
 from zBuilder.commonUtils import clamp
-from zBuilder.mayaUtils import get_short_name, get_DAG_path_from_mesh, get_type
+from zBuilder.mayaUtils import get_short_name, get_dag_path_from_mesh, get_type
 from ..base import Base
 
 logger = logging.getLogger(__name__)
@@ -201,14 +201,14 @@ def interpolate_values(source_mesh, destination_mesh, weight_list, clamp_range=[
     Returns:
         list(float)
     """
-    src_mesh_dag_path = get_DAG_path_from_mesh(source_mesh)
+    src_mesh_dag_path = get_dag_path_from_mesh(source_mesh)
     src_shape_dag_path = om2.MDagPath(src_mesh_dag_path)
     src_shape_dag_path.extendToShape()
 
     src_mesh_intersector = om2.MMeshIntersector()
     src_mesh_intersector.create(src_shape_dag_path.node(), src_mesh_dag_path.inclusiveMatrix())
 
-    dst_mesh_dag_path = get_DAG_path_from_mesh(destination_mesh)
+    dst_mesh_dag_path = get_dag_path_from_mesh(destination_mesh)
     dst_mesh_vtx_iter = om2.MItMeshVertex(dst_mesh_dag_path)
     src_mesh_poly_iter = om2.MItMeshPolygon(src_mesh_dag_path)
 
@@ -254,14 +254,14 @@ def interpolate_end_points_weights(source_mesh, target_mesh, weight_list):
     Returns:
         list(float)
     """
-    tgt_mesh_dag_path = get_DAG_path_from_mesh(target_mesh)
+    tgt_mesh_dag_path = get_dag_path_from_mesh(target_mesh)
     tgt_shape_dag_path = om2.MDagPath(tgt_mesh_dag_path)
     tgt_shape_dag_path.extendToShape()
 
     tgt_mesh_intersector = om2.MMeshIntersector()
     tgt_mesh_intersector.create(tgt_shape_dag_path.node(), tgt_mesh_dag_path.inclusiveMatrix())
 
-    src_mesh_dag_path = get_DAG_path_from_mesh(source_mesh)
+    src_mesh_dag_path = get_dag_path_from_mesh(source_mesh)
     src_mesh_vtx_iter = om2.MItMeshVertex(src_mesh_dag_path)
     tgt_mesh_vtx_iter = om2.MItMeshVertex(tgt_mesh_dag_path)
     tgt_mesh_poly_iter = om2.MItMeshPolygon(tgt_mesh_dag_path)
