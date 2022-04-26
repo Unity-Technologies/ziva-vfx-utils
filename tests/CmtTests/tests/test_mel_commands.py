@@ -1,14 +1,14 @@
-import maya.cmds as cmds
 import maya.mel as mel
 from vfx_test_case import VfxTestCase
 
 
-class ZivaCommandTestCase(VfxTestCase):
+class MelCommandTestCase(VfxTestCase):
+
     def setUp(self):
-        super(ZivaCommandTestCase, self).setUp()
+        super(MelCommandTestCase, self).setUp()
 
     def tearDown(self):
-        super(ZivaCommandTestCase, self).tearDown()
+        super(MelCommandTestCase, self).tearDown()
 
     def test_ziva_universal_commands_accessible(self):
         '''

@@ -1,6 +1,5 @@
-import vfx_test_case
-
 from maya import cmds
+from vfx_test_case import VfxTestCase, get_all_mesh_vertex_positions
 from zBuilder.commands import merge_two_solvers, merge_solvers
 
 
@@ -55,10 +54,10 @@ def get_simulated_positions():
         for s in solvers:
             # Pull on the solver each frame, to make sure it computes.
             cmds.getAttr(s + '.oSolved', silent=True)
-    return vfx_test_case.get_all_mesh_vertex_positions()
+    return get_all_mesh_vertex_positions()
 
 
-class MergeSolversTestCase(vfx_test_case.VfxTestCase):
+class MergeSolversTestCase(VfxTestCase):
 
     def test_merge_solvers_will_not_merge_gibberish_arguments(self):
         # Act & Verify

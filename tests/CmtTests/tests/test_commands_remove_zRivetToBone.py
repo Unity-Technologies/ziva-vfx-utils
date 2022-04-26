@@ -29,7 +29,7 @@ def get_rivet_name_triplet(index):
     return ('zRivet{}'.format(index), 'zRivet{}Shape'.format(index), 'zRivetToBone{}'.format(index))
 
 
-class ZivaCommand_DeleteRivetToBone_TestCase(VfxTestCase):
+class RemoveRivetToBoneTestCase(VfxTestCase):
     '''
     Test delete_zRivetToBone command
     '''
