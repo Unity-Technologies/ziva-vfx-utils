@@ -8,10 +8,10 @@ from zBuilder.commands import clean_scene
 from zBuilder.builders.ziva import SolverDisabler
 
 
-class ZivaMirrorTestCase(VfxTestCase):
+class ZivaBuilderMirrorTestCase(VfxTestCase):
 
     def setUp(self):
-        super(ZivaMirrorTestCase, self).setUp()
+        super(ZivaBuilderMirrorTestCase, self).setUp()
         # Build a basic setup
         test_utils.build_mirror_sample_geo()
         test_utils.ziva_mirror_sample_geo()
@@ -33,10 +33,10 @@ class ZivaMirrorTestCase(VfxTestCase):
         self.assertTrue(len(cmds.listConnections('l_muscle', type='zGeo')))
 
 
-class ZivaBuildTestCase(VfxTestCase):
+class ZivaBuilderTestCase(VfxTestCase):
 
     def setUp(self):
-        super(ZivaBuildTestCase, self).setUp()
+        super(ZivaBuilderTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
         test_utils.build_anatomical_arm_with_no_popup()
@@ -143,7 +143,7 @@ class ZivaBuildTestCase(VfxTestCase):
         self.assertEqual(1, len(z.get_scene_items(type_filter='zTissue')))
 
 
-class ZivaRetrieveConnectionsOrderTestCase(VfxTestCase):
+class RetrieveConnectionsOrderTestCase(VfxTestCase):
 
     def test_order_retrieved(self):
         desired_type_order = zva.ZNODES

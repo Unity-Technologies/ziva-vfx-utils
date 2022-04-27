@@ -1,12 +1,13 @@
 import os
-import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
+
+from tests.utils import load_scene
+from vfx_test_case import VfxTestCase
+from zBuilder.builders.ziva import Ziva
 from zBuilder.nodes.dg_node import DGNode
 
-from vfx_test_case import VfxTestCase
 
+class MayaGeoTestCase(VfxTestCase):
 
-class ZivaGeoTestCase(VfxTestCase):
     @classmethod
     def setUpClass(cls):
         cls.geo_names = [
@@ -16,15 +17,15 @@ class ZivaGeoTestCase(VfxTestCase):
         cls.geo_attrs = []
 
     def setUp(self):
-        super(ZivaGeoTestCase, self).setUp()
-        test_utils.load_scene()
-        self.builder = zva.Ziva()
+        super(MayaGeoTestCase, self).setUp()
+        load_scene()
+        self.builder = Ziva()
         self.builder.retrieve_from_scene()
 
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaGeoTestCase, self).tearDown()
+        super(MayaGeoTestCase, self).tearDown()
 
     def check_retrieve_geo_looks_good(self, builder):
         """Args:
@@ -43,6 +44,6 @@ class ZivaGeoTestCase(VfxTestCase):
         self.check_retrieve_geo_looks_good(self.builder)
 
     def test_retrieve_connections(self):
-        builder = zva.Ziva()
+        builder = Ziva()
         builder.retrieve_connections()
         self.check_retrieve_geo_looks_good(builder)

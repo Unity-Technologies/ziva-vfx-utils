@@ -7,7 +7,8 @@ from vfx_test_case import VfxTestCase, attr_values_from_scene
 from zBuilder.mayaUtils import FIELD_TYPES
 
 
-class ZivaFieldGenericTestCase(VfxTestCase):
+class MayaFieldTestCase(VfxTestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.field_names = []
@@ -16,7 +17,7 @@ class ZivaFieldGenericTestCase(VfxTestCase):
         cls.field_attrs = ["magnitude", "attenuation", "useMaxDistance"]
 
     def setUp(self):
-        super(ZivaFieldGenericTestCase, self).setUp()
+        super(MayaFieldTestCase, self).setUp()
         # Setup simple scene 1 tissue and all field types
         obj = cmds.polySphere(ch=False, n="field_mesh")
         cmds.select(obj)
@@ -30,11 +31,11 @@ class ZivaFieldGenericTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaFieldGenericTestCase, self).tearDown()
+        super(MayaFieldTestCase, self).tearDown()
 
     def check_retrieve_field_looks_good(self, builder):
         """Args:
-            builder (builders.fields.Fields()): builder object
+            builder (builders.Ziva): builder object
         """
         self.check_retrieve_looks_good(builder, {}, self.field_names, FIELD_TYPES)
 

@@ -1,17 +1,18 @@
-import zBuilder.builders.ziva as zva
-from zBuilder.commands import clean_scene
-from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
-import tests.utils as test_utils
-from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
-from maya import cmds
 import copy
 import os
+import zBuilder.builders.ziva as zva
+import tests.utils as test_utils
+
+from maya import cmds
+from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
+from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
+from zBuilder.commands import clean_scene
 
 
-class ZivaBuilderTestCase(VfxTestCase):
+class BuilderTestCase(VfxTestCase):
 
     def setUp(self):
-        super(ZivaBuilderTestCase, self).setUp()
+        super(BuilderTestCase, self).setUp()
         test_utils.load_scene()
 
     def test_builders_built_the_same_way_are_equal_until_modified(self):

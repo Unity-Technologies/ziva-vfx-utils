@@ -6,7 +6,7 @@ from vfx_test_case import VfxTestCase, attr_values_from_scene
 from zBuilder.builders.skinClusters import SkinCluster
 
 
-class ZivaSkinClusterGenericTestCase(VfxTestCase):
+class SkinClusterBuilderTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -14,7 +14,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
         cls.skincluster_attrs = ["skinningMethod", "useComponents", "normalizeWeights"]
 
     def setUp(self):
-        super(ZivaSkinClusterGenericTestCase, self).setUp()
+        super(SkinClusterBuilderTestCase, self).setUp()
         # Setup simple scene with 2 spheres and 2 joints
         obj = cmds.polySphere(ch=False, n="l_skin_mesh")[0]
         cmds.select(cl=True)
@@ -33,7 +33,7 @@ class ZivaSkinClusterGenericTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaSkinClusterGenericTestCase, self).tearDown()
+        super(SkinClusterBuilderTestCase, self).tearDown()
 
     def check_retrieve_skincluster_looks_good(self, builder):
         """Args:

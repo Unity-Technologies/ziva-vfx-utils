@@ -7,10 +7,10 @@ from vfx_test_case import VfxTestCase
 from zBuilder.commands import clean_scene
 
 
-class ZivaReferenceGenericTestCase(VfxTestCase):
+class ReferenceTestCase(VfxTestCase):
 
     def setUp(self):
-        super(ZivaReferenceGenericTestCase, self).setUp()
+        super(ReferenceTestCase, self).setUp()
         test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -95,7 +95,7 @@ class ZivaReferenceGenericTestCase(VfxTestCase):
         self.assertEquals(0, len(tissues_in_scene))
 
 
-class ZivaReferenceMirrorTestCase(VfxTestCase):
+class ReferenceMirrorTestCase(VfxTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
     - geometry has an identifiable qualifier, in this case it is l_ and r_
@@ -105,7 +105,7 @@ class ZivaReferenceMirrorTestCase(VfxTestCase):
     """
 
     def setUp(self):
-        super(ZivaReferenceMirrorTestCase, self).setUp()
+        super(ReferenceMirrorTestCase, self).setUp()
         test_utils.reference_scene(scene_name='mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
