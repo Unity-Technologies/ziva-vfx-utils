@@ -10,6 +10,7 @@ from maya import mel
 from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
 from zBuilder.mayaUtils import get_short_name, get_type, safe_rename
 from zBuilder.vfxUtils import get_zSolver, isSolver, check_body_type
+from zBuilder.solverDisabler import SolverDisabler
 from zBuilder.builders.skinClusters import SkinCluster
 
 logger = logging.getLogger(__name__)
@@ -541,9 +542,9 @@ def merge_two_solvers(solver_transform1, solver_transform2):
 
     # SolverDisabler's __enter__ will do what we want for solver2,
     # but we're going to delete solver2, so we do not want __exit__ to be called. Thus:
-    zva.SolverDisabler(solver_transform2).__enter__()
+    SolverDisabler(solver_transform2).__enter__()
 
-    with zva.SolverDisabler(solver_transform1):
+    with SolverDisabler(solver_transform1):
         ####################################################################
         # logger.info('Re-wiring outputs of {} to come from {}'.format(solver2, solver1))
         for src, dst in _list_connection_plugs(solver2, source=False):
@@ -636,7 +637,7 @@ def merge_solvers(solver_transforms):
         return
     solver1 = solver_transforms[0]
 
-    with zva.SolverDisabler(solver1):
+    with SolverDisabler(solver1):
         for solver2 in solver_transforms[1:]:
             merge_two_solvers(solver1, solver2)
 

@@ -5,7 +5,7 @@ from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase
 from zBuilder.commands import clean_scene
-from zBuilder.builders.ziva import SolverDisabler
+from zBuilder.solverDisabler import SolverDisabler
 
 
 class ZivaBuilderMirrorTestCase(VfxTestCase):
