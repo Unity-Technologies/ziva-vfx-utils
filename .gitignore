@@ -3,6 +3,8 @@
 *.pyc
 _build
 docs/_build/
+docs/zBuilder.rst
+docs/zBuilder.*.rst
 .idea
 .vscode/
 tests/CmtTests/env2/
