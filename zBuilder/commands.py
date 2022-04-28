@@ -7,10 +7,10 @@ import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
-from zBuilder.commonUtils import is_string, is_sequence, none_to_empty
-from zBuilder.mayaUtils import get_short_name, get_type, safe_rename
-from zBuilder.vfxUtils import get_zSolver, isSolver, check_body_type
-from zBuilder.solverDisabler import SolverDisabler
+from zBuilder.utils.commonUtils import is_string, is_sequence, none_to_empty
+from zBuilder.utils.mayaUtils import get_short_name, get_type, safe_rename
+from zBuilder.utils.vfxUtils import get_zSolver, isSolver, check_body_type
+from zBuilder.utils.solverDisabler import SolverDisabler
 from zBuilder.builders.skinClusters import SkinCluster
 
 logger = logging.getLogger(__name__)

@@ -7,9 +7,8 @@ import time
 import zBuilder.nodes.parameters
 
 from maya import cmds
-from zBuilder.commonUtils import is_sequence, is_string, time_this
-from zBuilder.mayaUtils import get_type, parse_maya_node_for_selection
-from zBuilder.commonUtils import parse_version_info
+from zBuilder.utils.commonUtils import is_sequence, is_string, time_this, parse_version_info
+from zBuilder.utils.mayaUtils import get_type, parse_maya_node_for_selection
 from zBuilder import __version__
 from .bundle import Bundle
 

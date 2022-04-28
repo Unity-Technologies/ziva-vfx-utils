@@ -1,7 +1,7 @@
 from . import model
 from maya import cmds
 from PySide2 import QtWidgets, QtCore
-from zBuilder.uiUtils import dock_window
+from zBuilder.utils.uiUtils import dock_window
 import weakref
 
 

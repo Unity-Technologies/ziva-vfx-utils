@@ -1,8 +1,8 @@
 import logging
 
 from maya import cmds
-from zBuilder.commonUtils import get_first_element
-from zBuilder.mayaUtils import get_short_name, build_attr_list, build_attr_key_values, get_type
+from zBuilder.utils.commonUtils import get_first_element
+from zBuilder.utils.mayaUtils import get_short_name, build_attr_list, build_attr_key_values, get_type
 from .base import Base
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,4 @@
-from zBuilder.commonUtils import is_string
+from zBuilder.utils.commonUtils import is_string
 import logging
 import re
 

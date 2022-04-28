@@ -2,8 +2,8 @@ import logging
 
 from zBuilder.nodes.base import Base
 from zBuilder.builders.builder import Builder
-from zBuilder.commonUtils import is_sequence
-from zBuilder.uiUtils import get_unique_name
+from zBuilder.utils.commonUtils import is_sequence
+from zBuilder.utils.uiUtils import get_unique_name
 
 logger = logging.getLogger(__name__)
 

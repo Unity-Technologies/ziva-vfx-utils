@@ -5,8 +5,8 @@ from zBuilder.ui.model import SceneGraphModel
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
 from zBuilder.nodes.dg_node import DGNode
-from zBuilder.uiUtils import *
-from zBuilder.commonUtils import is_string
+from zBuilder.utils.uiUtils import *
+from zBuilder.utils.commonUtils import is_string
 from tests.utils import load_scene
 from vfx_test_case import VfxTestCase
 from PySide2 import QtCore
@@ -14,6 +14,7 @@ from maya import cmds
 
 
 class ZivaScenePanelTestCase(VfxTestCase):
+
     def setUp(self):
         super(ZivaScenePanelTestCase, self).setUp()
         load_scene()
@@ -81,6 +82,7 @@ class ZivaScenePanelTestCase(VfxTestCase):
 class ScenePanel2UtilityTestCase(VfxTestCase):
     """ Test Scene Panel 2 helper functions
     """
+
     def test_group_name_validation(self):
         """ Check validate_group_node_name() function logic.
         Group node name only starts with alphabet,

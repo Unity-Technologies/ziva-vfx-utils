@@ -58,7 +58,7 @@ There should be an output in the Maya Script Editor that looks something like th
     # zBuilder.builders.bundle : zSolver 1 #
     # zBuilder.builders.bundle : zSolverTransform 1 #
     # zBuilder.builders.bundle : zFiber 6 #
-    # zBuilder.commonUtils : Executing retrieve_from_scene() took 0.223s # 
+    # zBuilder.utils.commonUtils : Executing retrieve_from_scene() took 0.223s # 
 
 These :term:`scene item<scene item>` stats were retrieved by the builder.
 In this case, there are 7 zTissues, 4 zBones, etc.
@@ -118,7 +118,7 @@ The script editor output should look something like this:
     # zBuilder.builders.bundle : zSolver 1 # 
     # zBuilder.builders.bundle : zSolverTransform 1 # 
     # zBuilder.builders.bundle : zFiber 1 # 
-    # zBuilder.commonUtils : Executing retrieve_from_scene_selection() took 0.080s # 
+    # zBuilder.utils.commonUtils : Executing retrieve_from_scene_selection() took 0.080s # 
 
 Notice that only one tissue is being retrieved.
 
@@ -180,7 +180,7 @@ when the scene was retrieved. There should also be an output in the script edito
     # zBuilder.builders.ziva : Building: zAttachment # 
     # zBuilder.builders.ziva : Building: zFiber # 
     # zBuilder.builders.ziva : Building: zEmbedder # 
-    # zBuilder.commonUtils : Executing build() took 0.624s # 
+    # zBuilder.utils.commonUtils : Executing build() took 0.624s # 
 
 
 Building a Ziva rig from scratch
@@ -327,7 +327,7 @@ The script editor should output something like:
     # zBuilder.builders.bundle : zSolver 1 # 
     # zBuilder.builders.bundle : zSolverTransform 1 # 
     # zBuilder.builders.bundle : zFiber 6 # 
-    # zBuilder.commonUtils : Executing retrieve_from_file() took 0.057s # 
+    # zBuilder.utils.commonUtils : Executing retrieve_from_file() took 0.057s # 
 
 Like before, this is a simple printout that hints at what has been loaded from the file.
 Now to build:
@@ -350,7 +350,7 @@ Because there was no map interpolation, the output should look as follows:
     # zBuilder.builders.ziva : Building: zAttachment # 
     # zBuilder.builders.ziva : Building: zFiber # 
     # zBuilder.builders.ziva : Building: zEmbedder # 
-    # zBuilder.commonUtils : Executing build() took 0.648s # 
+    # zBuilder.utils.commonUtils : Executing build() took 0.648s # 
 
 The Anatomical Arm rig should now be completely restored back to its original state.
 

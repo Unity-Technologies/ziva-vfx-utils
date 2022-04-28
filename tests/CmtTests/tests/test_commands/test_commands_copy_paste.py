@@ -5,7 +5,7 @@ import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.utils.mayaUtils import get_short_name
 from zBuilder.commands import (ZIVA_CLIPBOARD_ZBUILDER, clean_scene, copy_paste_with_substitution,
                                rename_ziva_nodes, rig_cut, rig_copy, rig_paste, load_rig, save_rig)
 

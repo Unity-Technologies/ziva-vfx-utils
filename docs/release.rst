@@ -17,8 +17,9 @@ Functionality
 +++++++++++++
 - **zBuilder:** Move **rename_ziva_nodes()** from zBuilder.zMaya to zBuilder.utils.
 - **zBuilder:** Rename **zBuilder.utils** to **zBuilder.commands**.
-- **zBuilder:** Rename **zBuilder.zMaya** to **zBuilder.vfxUtils**.
-- **zBuilder:** Cleanup zBuilder files.
+- **zBuilder:** Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.
+- **zBuilder:** Cleanup zBuilder files. Move utility files to **zBuilder.utils** folder.
+- **zBuilder:** Reorganize unit test files.
 
 Bug Fixes
 +++++++++

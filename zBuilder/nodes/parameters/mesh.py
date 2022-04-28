@@ -2,7 +2,7 @@ import logging
 
 from maya import cmds
 from maya.api import OpenMaya as om2
-from zBuilder.mayaUtils import get_dag_path_from_mesh, get_name_from_mobject, get_maya_api_version
+from zBuilder.utils.mayaUtils import get_dag_path_from_mesh, get_name_from_mobject, get_maya_api_version
 from ..base import Base
 
 logger = logging.getLogger(__name__)

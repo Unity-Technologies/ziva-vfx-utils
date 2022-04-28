@@ -1,5 +1,5 @@
 from vfx_test_case import VfxTestCase
-from zBuilder.mayaUtils import replace_long_name
+from zBuilder.utils.mayaUtils import replace_long_name
 
 
 class MayaUtilsTestCase(VfxTestCase):

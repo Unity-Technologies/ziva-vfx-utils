@@ -1,7 +1,7 @@
 from maya import cmds
-from zBuilder.commonUtils import get_first_element
-from zBuilder.mayaUtils import build_attr_list, build_attr_key_values, get_type
-from zBuilder.vfxUtils import get_association
+from zBuilder.utils.commonUtils import get_first_element
+from zBuilder.utils.mayaUtils import build_attr_list, build_attr_key_values, get_type
+from zBuilder.utils.vfxUtils import get_association
 from ..deformer import Deformer
 
 

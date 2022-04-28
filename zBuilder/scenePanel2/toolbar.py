@@ -3,8 +3,8 @@
 from functools import partial
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
-from zBuilder.commonUtils import is_string
-from zBuilder.uiUtils import get_icon_path_from_name
+from zBuilder.utils.commonUtils import is_string
+from zBuilder.utils.uiUtils import get_icon_path_from_name
 from zBuilder.commands import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
 from .zGeoWidget import zGeoWidget
 

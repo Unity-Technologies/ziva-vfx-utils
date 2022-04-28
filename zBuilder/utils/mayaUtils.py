@@ -5,7 +5,7 @@ import re
 
 from maya import cmds
 from maya.api import OpenMaya as om2
-from zBuilder.commonUtils import is_sequence
+from zBuilder.utils.commonUtils import is_sequence
 
 FIELD_TYPES = (
     'airField',

@@ -1,8 +1,8 @@
 import logging
 
 from maya import cmds
-from zBuilder.commonUtils import time_this
-from zBuilder.mayaUtils import parse_maya_node_for_selection
+from zBuilder.utils.commonUtils import time_this
+from zBuilder.utils.mayaUtils import parse_maya_node_for_selection
 from .builder import Builder
 
 logger = logging.getLogger(__name__)

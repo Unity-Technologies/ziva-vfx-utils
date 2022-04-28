@@ -1,6 +1,6 @@
 from collections import defaultdict
 from maya import cmds
-from zBuilder.mayaUtils import construct_map_names
+from zBuilder.utils.mayaUtils import construct_map_names
 from .dg_node import DGNode
 
 

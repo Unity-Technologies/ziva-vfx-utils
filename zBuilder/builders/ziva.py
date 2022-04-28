@@ -1,11 +1,11 @@
 import logging
-import zBuilder.vfxUtils as vfx_util
+import zBuilder.utils.vfxUtils as vfx_util
 
 from collections import defaultdict, OrderedDict
 from maya import cmds
-from zBuilder.mayaUtils import get_type, is_type, FIELD_TYPES
-from zBuilder.commonUtils import none_to_empty, time_this
-from zBuilder.solverDisabler import SolverDisabler
+from zBuilder.utils.mayaUtils import get_type, is_type, FIELD_TYPES
+from zBuilder.utils.commonUtils import none_to_empty, time_this
+from zBuilder.utils.solverDisabler import SolverDisabler
 from .builder import Builder
 
 logger = logging.getLogger(__name__)

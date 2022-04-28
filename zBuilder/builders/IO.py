@@ -4,8 +4,8 @@ import logging
 import sys
 
 from collections import defaultdict
-from zBuilder.commonUtils import parse_version_info
-from zBuilder.mayaUtils import get_short_name, construct_map_names
+from zBuilder.utils.commonUtils import parse_version_info
+from zBuilder.utils.mayaUtils import get_short_name, construct_map_names
 from .builder import find_class
 
 logger = logging.getLogger(__name__)

@@ -3,8 +3,8 @@ import logging
 import time
 from maya import cmds
 import zBuilder
-from zBuilder.mayaUtils import get_short_name, replace_long_name, replace_dict_keys
-from zBuilder.commonUtils import is_string, is_sequence
+from zBuilder.utils.mayaUtils import get_short_name, replace_long_name, replace_dict_keys
+from zBuilder.utils.commonUtils import is_string, is_sequence
 
 logger = logging.getLogger(__name__)
 

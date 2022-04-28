@@ -1,8 +1,8 @@
 import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
-from zBuilder.vfxUtils import get_zGeo_nodes_by_solverTM
-from zBuilder.mayaUtils import safe_rename
+from zBuilder.utils.vfxUtils import get_zGeo_nodes_by_solverTM
+from zBuilder.utils.mayaUtils import safe_rename
 from zBuilder.scenePanel2.groupNode import GroupNode
 from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
 from zBuilder.scenePanel2.serialize import PendingTreeEntry, flatten_tree, merge_tree_data, _version

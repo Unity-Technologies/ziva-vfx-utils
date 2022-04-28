@@ -1,10 +1,11 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-from zBuilder.uiUtils import get_icon_path_from_node
-from zBuilder.uiUtils import sortRole, nodeRole, longNameRole, enableRole
+from zBuilder.utils.uiUtils import get_icon_path_from_node
+from zBuilder.utils.uiUtils import sortRole, nodeRole, longNameRole, enableRole
 from maya import cmds
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):
+
     def __init__(self, builder, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         assert builder, "Missing builder parameter in SceneGraphModel"
@@ -52,7 +53,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DecorationRole:
             if hasattr(node, 'type'):
-                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node, self.current_parent)))
+                return QtGui.QIcon(QtGui.QPixmap(get_icon_path_from_node(node,
+                                                                         self.current_parent)))
 
         if role == sortRole:
             if hasattr(node, 'type'):
@@ -115,7 +117,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def set_current_parent(self, parent):
         self.current_parent = parent
 
+
 class TreeItemDelegate(QtWidgets.QStyledItemDelegate):
+
     def __init__(self, parent=None):
         super(TreeItemDelegate, self).__init__(parent)
 

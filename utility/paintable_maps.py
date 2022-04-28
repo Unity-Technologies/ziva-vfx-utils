@@ -4,7 +4,7 @@ from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
-from zBuilder.mayaUtils import get_maya_api_version
+from zBuilder.utils.mayaUtils import get_maya_api_version
 
 
 def split_map_name(map_name):

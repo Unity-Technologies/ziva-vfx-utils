@@ -2,7 +2,7 @@ import tests.utils as test_utils
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
-from zBuilder.vfxUtils import get_zBones
+from zBuilder.utils.vfxUtils import get_zBones
 
 
 class VfxUtilsTestCase(VfxTestCase):

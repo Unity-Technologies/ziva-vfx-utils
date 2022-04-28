@@ -2,8 +2,8 @@ import logging
 
 from maya import cmds
 from maya import mel
-from zBuilder.commonUtils import none_to_empty
-from zBuilder.mayaUtils import safe_rename, get_type, is_type
+from zBuilder.utils.commonUtils import none_to_empty
+from zBuilder.utils.mayaUtils import safe_rename, get_type, is_type
 '''
 The module contains helper functions for Ziva VFX node inspection and query.
 '''

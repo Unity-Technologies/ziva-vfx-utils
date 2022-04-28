@@ -1,5 +1,5 @@
 from vfx_test_case import VfxTestCase
-from zBuilder.commonUtils import parse_version_info
+from zBuilder.utils.commonUtils import parse_version_info
 
 
 class CommonUtilsTestCase(VfxTestCase):

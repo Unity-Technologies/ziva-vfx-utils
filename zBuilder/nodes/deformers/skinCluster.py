@@ -1,7 +1,7 @@
 from maya import cmds
 from maya.api import OpenMaya as om2
 from maya.api import OpenMayaAnim as oma2
-from zBuilder.mayaUtils import get_mobject
+from zBuilder.utils.mayaUtils import get_mobject
 from ..dg_node import DGNode
 
 

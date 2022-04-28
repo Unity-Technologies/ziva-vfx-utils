@@ -1,7 +1,7 @@
 import logging
 
 from maya import cmds
-from zBuilder.mayaUtils import get_short_name, safe_rename
+from zBuilder.utils.mayaUtils import get_short_name, safe_rename
 from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)

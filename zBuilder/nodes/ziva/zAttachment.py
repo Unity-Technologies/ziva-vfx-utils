@@ -1,8 +1,8 @@
 import logging
 
 from maya import cmds
-from zBuilder.vfxUtils import check_body_type
-from zBuilder.mayaUtils import safe_rename
+from zBuilder.utils.vfxUtils import check_body_type
+from zBuilder.utils.mayaUtils import safe_rename
 from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)

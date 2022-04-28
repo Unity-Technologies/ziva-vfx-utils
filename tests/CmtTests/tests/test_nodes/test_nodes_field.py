@@ -4,7 +4,7 @@ from maya import cmds
 from maya import mel
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene
-from zBuilder.mayaUtils import FIELD_TYPES
+from zBuilder.utils.mayaUtils import FIELD_TYPES
 
 
 class MayaFieldTestCase(VfxTestCase):

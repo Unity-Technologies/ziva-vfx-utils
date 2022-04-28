@@ -12,14 +12,6 @@ zBuilder.builders.IO module
    :undoc-members:
    :show-inheritance:
 
-zBuilder.builders.attributes module
------------------------------------
-
-.. automodule:: zBuilder.builders.attributes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 zBuilder.builders.builder module
 --------------------------------
 
@@ -32,46 +24,6 @@ zBuilder.builders.bundle module
 -------------------------------
 
 .. automodule:: zBuilder.builders.bundle
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.builders.constraints module
-------------------------------------
-
-.. automodule:: zBuilder.builders.constraints
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.builders.deformers module
-----------------------------------
-
-.. automodule:: zBuilder.builders.deformers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.builders.deltaMush module
-----------------------------------
-
-.. automodule:: zBuilder.builders.deltaMush
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.builders.fields module
--------------------------------
-
-.. automodule:: zBuilder.builders.fields
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-zBuilder.builders.selection module
-----------------------------------
-
-.. automodule:: zBuilder.builders.selection
    :members:
    :undoc-members:
    :show-inheritance:

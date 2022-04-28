@@ -1,5 +1,5 @@
 from maya import cmds
-from zBuilder.mayaUtils import FIELD_TYPES
+from zBuilder.utils.mayaUtils import FIELD_TYPES
 from ..dg_node import DGNode
 
 

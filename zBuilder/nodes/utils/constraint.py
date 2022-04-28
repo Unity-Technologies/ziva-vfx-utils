@@ -1,5 +1,5 @@
 from maya import cmds
-from zBuilder.mayaUtils import get_short_name
+from zBuilder.utils.mayaUtils import get_short_name
 from ..dg_node import DGNode
 
 

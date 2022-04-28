@@ -1,8 +1,8 @@
 from .model import SceneGraphModel, TreeItemDelegate
 from .view import SceneTreeView
-from zBuilder.uiUtils import dock_window, get_icon_path_from_name
-from zBuilder.uiUtils import sortRole, nodeRole, longNameRole
-from zBuilder.uiUtils import ProximityWidget, MenuLineEdit
+from zBuilder.utils.uiUtils import dock_window, get_icon_path_from_name
+from zBuilder.utils.uiUtils import sortRole, nodeRole, longNameRole
+from zBuilder.utils.uiUtils import ProximityWidget, MenuLineEdit
 from zBuilder.nodes.base import Base
 from maya import cmds
 from maya import mel
@@ -12,7 +12,6 @@ from functools import partial
 import os
 import weakref
 import zBuilder.builders.ziva as zva
-
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 
@@ -416,9 +415,9 @@ class MyDockingUI(QtWidgets.QWidget):
         if names_to_expand:
             self.expand(names_to_expand)
         else:
-            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              sortRole, "zSolverTransform",
-                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0), sortRole,
+                                              "zSolverTransform", -1,
+                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)
 
@@ -426,9 +425,8 @@ class MyDockingUI(QtWidgets.QWidget):
         # select item in treeview that is selected in maya to begin with and
         # expand item in view.
         if sel:
-            checked = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              longNameRole, sel[0], -1,
-                                              QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            checked = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, sel[0],
+                                              -1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in checked:
                 self.treeView.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
@@ -461,8 +459,7 @@ class MyDockingUI(QtWidgets.QWidget):
         # otherwise new items might not be displayed ( Qt bug )
         self.treeView.collapseAll()
         for name in names:
-            indexes = self._proxy_model.match(self._proxy_model.index(0, 0),
-                                              longNameRole, name, -1,
+            indexes = self._proxy_model.match(self._proxy_model.index(0, 0), longNameRole, name, -1,
                                               QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             for index in indexes:
                 self.treeView.expand(index)

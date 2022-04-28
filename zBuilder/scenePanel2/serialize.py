@@ -2,11 +2,11 @@ import os
 import json
 import logging
 
+from zBuilder.utils.uiUtils import zGeo_UI_node_types, is_zsolver_node
+from zBuilder.utils.commonUtils import is_string
+from zBuilder.nodes.base import Base
 from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
-from ..uiUtils import zGeo_UI_node_types, is_zsolver_node
-from ..nodes.base import Base
-from ..commonUtils import is_string
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ def is_serialize_data_to_zsolver_node():
 class PendingTreeEntry(object):
     """ Data structure for merging zBuilder node and tree view data.
     """
+
     def __init__(self, *args):
         """ Overloaded construtor for different data types.
         """
@@ -201,6 +202,7 @@ def construct_tree(tree_entry_list, mock_zBuilder_node):
     Returns:
         TreeItem tree, and a pinned item list.
     """
+
     def create_tree_item(parent, entry):
         """ Helper function to create TreeItem instance.
         """

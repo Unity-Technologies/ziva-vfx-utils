@@ -1,5 +1,5 @@
 from maya import cmds
-from zBuilder.mayaUtils import get_short_name, build_attr_key_values, construct_map_names
+from zBuilder.utils.mayaUtils import get_short_name, build_attr_key_values, construct_map_names
 from ..deformer import Deformer
 
 
