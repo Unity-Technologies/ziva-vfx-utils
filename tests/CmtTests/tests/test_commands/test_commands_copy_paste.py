@@ -1,10 +1,10 @@
 import copy
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase, ZivaUpdateTestCase
+from tests.utils import build_anatomical_arm_with_no_popup, get_tmp_file_location, build_mirror_sample_geo, load_scene
 from zBuilder.utils.mayaUtils import get_short_name
 from zBuilder.commands import (ZIVA_CLIPBOARD_ZBUILDER, clean_scene, copy_paste_with_substitution,
                                rename_ziva_nodes, rig_cut, rig_copy, rig_paste, load_rig, save_rig)
@@ -14,7 +14,7 @@ class CopyPasteWithArmAssetTestCase(VfxTestCase):
 
     def setUp(self):
         super(CopyPasteWithArmAssetTestCase, self).setUp()
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
 
     def test_copy_paste(self):
 
@@ -73,7 +73,7 @@ class CopyPasteWithArmAssetTestCase(VfxTestCase):
 
     def test_save_rig(self):
         # Setup
-        file_name = test_utils.get_tmp_file_location('.zBuilder')
+        file_name = get_tmp_file_location('.zBuilder')
         cmds.select('zSolver1')
 
         # Action
@@ -88,7 +88,7 @@ class CopyPasteWithArmAssetTestCase(VfxTestCase):
 
     def test_load_rig(self):
         # Setup
-        file_name = test_utils.get_tmp_file_location('.zBuilder')
+        file_name = get_tmp_file_location('.zBuilder')
         cmds.select('zSolver1')
         save_rig(file_name)
         # clean scene so we just have geo
@@ -106,8 +106,7 @@ class CopyPasteWithArmAssetTestCase(VfxTestCase):
 class CopyPasteWithMirrorAssetTestCase(VfxTestCase):
 
     def test_copy_paste_with_substitution(self):
-        test_utils.build_mirror_sample_geo()
-        test_utils.ziva_mirror_sample_geo()
+        build_mirror_sample_geo()
         rename_ziva_nodes()
 
         cmds.select('r_muscle')
@@ -134,7 +133,7 @@ class CopyPasteWithMirrorAsset2TestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(CopyPasteWithMirrorAsset2TestCase, self).setUp()
-        test_utils.load_scene(scene_name='copy_paste_bug2.ma')
+        load_scene('copy_paste_bug2.ma')
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -206,7 +205,7 @@ class CopyBufferTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(CopyBufferTestCase, self).setUp()
-        test_utils.load_scene(scene_name='copy_paste_bug2.ma')
+        load_scene('copy_paste_bug2.ma')
 
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()

@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zMaterial import MaterialNode
 
@@ -22,7 +22,7 @@ class ZivaMaterialGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaMaterialGenericTestCase, self).setUp()
-        test_utils.load_scene()
+        load_scene("generic.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -182,7 +182,7 @@ class ZivaMaterialMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaMaterialMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -210,7 +210,7 @@ class ZivaMaterialUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaMaterialUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -252,7 +252,7 @@ class ZivaMaterialMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -283,7 +283,7 @@ class ZivaMaterialUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaMaterialUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

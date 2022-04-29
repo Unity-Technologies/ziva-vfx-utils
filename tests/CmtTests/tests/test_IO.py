@@ -1,9 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
+from tests.utils import (build_mirror_sample_geo, get_tmp_file_location,
+                         build_anatomical_arm_with_no_popup, get_test_asset_path)
 from zBuilder.commands import clean_scene, load_rig
 
 
@@ -26,15 +27,14 @@ class IOTestCase(VfxTestCase):
 
     def test_builder_write(self):
         # Setup
-        test_utils.build_mirror_sample_geo()
-        test_utils.ziva_mirror_sample_geo()
+        build_mirror_sample_geo()
         cmds.select(cl=True)
         # use builder to retrieve from scene
         self.z = zva.Ziva()
         self.z.retrieve_from_scene()
 
         # Action
-        file_name = test_utils.get_tmp_file_location()
+        file_name = get_tmp_file_location()
         self.z.write(file_name)
         self.temp_files.append(file_name)
 
@@ -50,13 +50,13 @@ class IOTestCase(VfxTestCase):
 
         # Setup
         cmds.file(new=True, f=True)
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
         cmds.select('zSolver1')
         z = zva.Ziva()
         z.retrieve_from_scene()
 
         # Action
-        file_name = test_utils.get_tmp_file_location()
+        file_name = get_tmp_file_location()
         z.write(file_name)
         self.temp_files.append(file_name)
 
@@ -75,7 +75,7 @@ class IOTestCase(VfxTestCase):
         '''
         # Setup
         cmds.polySphere()
-        tissue_setup = test_utils.get_test_asset_path('tissue.zBuilder')
+        tissue_setup = get_test_asset_path('tissue.zBuilder')
 
         # Action
         load_rig(tissue_setup)

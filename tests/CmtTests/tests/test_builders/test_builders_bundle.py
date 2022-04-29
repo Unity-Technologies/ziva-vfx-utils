@@ -13,7 +13,7 @@ class BundleTestCase(VfxTestCase):
         We are going to compare builder from this setUp and a builder retrieved from the file.
         """
         # Setup
-        load_scene()
+        load_scene('generic.ma')
         file_name = get_tmp_file_location()
 
         cmds.select('zSolver1')

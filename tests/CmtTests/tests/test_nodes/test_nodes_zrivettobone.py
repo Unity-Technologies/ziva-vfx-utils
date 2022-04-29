@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes, clean_scene, rig_copy, rig_paste, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zRivetToBone import RivetToBoneNode
 
@@ -18,7 +18,7 @@ class ZivaRivetToBoneGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaRivetToBoneGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -147,7 +147,7 @@ class ZivaRivetToBoneRenameGroupTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaRivetToBoneRenameGroupTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
 
         # rename rivets to test
         riv1 = cmds.rename('zRivet1', 'zRivet1_NEW')
@@ -180,7 +180,7 @@ class ZivaRivetToBoneMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaRivetToBoneMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -208,7 +208,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -250,7 +250,7 @@ class ZivaRivetToBoneMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -281,7 +281,7 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaRivetToBoneUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

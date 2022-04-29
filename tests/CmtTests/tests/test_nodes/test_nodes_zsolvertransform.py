@@ -1,8 +1,8 @@
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes
 from zBuilder.nodes.ziva.zSolverTransform import SolverTransformNode
 
@@ -20,7 +20,7 @@ class ZivaSolverTransformMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaSolverTransformMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -47,7 +47,7 @@ class ZivaSolverTransformUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaSolverTransformUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -88,7 +88,7 @@ class ZivaSolverTransformMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -118,7 +118,7 @@ class ZivaSolverTransformUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaSolverTransformUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

@@ -18,7 +18,7 @@ class MayaGeoTestCase(VfxTestCase):
 
     def setUp(self):
         super(MayaGeoTestCase, self).setUp()
-        load_scene()
+        load_scene('generic.ma')
         self.builder = Ziva()
         self.builder.retrieve_from_scene()
 

@@ -1,8 +1,8 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from vfx_test_case import VfxTestCase
+from tests.utils import get_1_7_builder_files, load_scene
 from zBuilder.commands import clean_scene
 
 
@@ -10,7 +10,7 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
 
     def setUp(self):
         super(Builder1_7_to_1_9TestCase, self).setUp()
-        self.builders_1_7 = test_utils.get_1_7_builder_files()
+        self.builders_1_7 = get_1_7_builder_files()
 
     def test_build_1_7(self):
         # Act
@@ -20,7 +20,7 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
             maya_file = basename.replace('_1_7.zBuilder', '.ma')
 
             # open it and clean scene so we have just geo
-            test_utils.load_scene(scene_name=maya_file)
+            load_scene(maya_file)
             clean_scene()
 
             builder = zva.Ziva()

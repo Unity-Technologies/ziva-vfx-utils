@@ -1,10 +1,9 @@
 import copy
 import os
 import zBuilder.builders.ziva as zva
-import tests.utils as test_utils
 
 from maya import cmds
-from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file
+from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file, load_scene, get_tmp_file_location
 from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 from zBuilder.commands import clean_scene
 
@@ -13,7 +12,7 @@ class BuilderTestCase(VfxTestCase):
 
     def setUp(self):
         super(BuilderTestCase, self).setUp()
-        test_utils.load_scene()
+        load_scene('generic.ma')
 
     def test_builders_built_the_same_way_are_equal_until_modified(self):
         # Act
@@ -32,7 +31,7 @@ class BuilderTestCase(VfxTestCase):
     def test_builder_written_and_read_from_file_is_equal_to_original(self):
         # Setup
         builder_orig = retrieve_builder_from_scene()
-        file_name = test_utils.get_tmp_file_location()
+        file_name = get_tmp_file_location()
 
         # Act
         builder_orig.write(file_name)

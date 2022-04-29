@@ -1,9 +1,10 @@
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase
+from tests.utils import (build_mirror_sample_geo, build_anatomical_arm_with_no_popup, load_scene,
+                         retrieve_builder_from_scene)
 from zBuilder.commands import clean_scene
 from zBuilder.utils.solverDisabler import SolverDisabler
 
@@ -13,9 +14,7 @@ class ZivaBuilderMirrorTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaBuilderMirrorTestCase, self).setUp()
         # Build a basic setup
-        test_utils.build_mirror_sample_geo()
-        test_utils.ziva_mirror_sample_geo()
-
+        build_mirror_sample_geo()
         cmds.select(cl=True)
 
         # use builder to retrieve from scene
@@ -39,7 +38,7 @@ class ZivaBuilderTestCase(VfxTestCase):
         super(ZivaBuilderTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
 
         # clear selection.  It should retrieve whole scene
         cmds.select(cl=True)
@@ -50,7 +49,7 @@ class ZivaBuilderTestCase(VfxTestCase):
 
     def test_retrieve_selected(self):
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
 
         # select a muscle geo
         cmds.select('r_bicep_muscle')
@@ -147,7 +146,7 @@ class RetrieveConnectionsOrderTestCase(VfxTestCase):
 
     def test_order_retrieved(self):
         desired_type_order = zva.ZNODES
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
         builder = zva.Ziva()
         builder.retrieve_connections()
         retrieved = builder.get_scene_items(type_filter=['map', 'mesh'], invert_match=True)
@@ -174,11 +173,11 @@ class ZivaSolverDisableTestCase(VfxTestCase):
 
     def test_enable_connected(self):
         # build scene and connect the enable to something
-        test_utils.load_scene()
+        load_scene('generic.ma')
         loc = cmds.spaceLocator()[0]
         cmds.connectAttr('{}.translateX'.format(loc), 'zSolver1.enable')
 
-        retrieved_builder = test_utils.retrieve_builder_from_scene()
+        retrieved_builder = retrieve_builder_from_scene()
 
         retrieved_builder.build()
 

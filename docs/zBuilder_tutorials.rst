@@ -426,7 +426,6 @@ Let's run a little test scene that sets up two spheres and a cube with one attac
     import tests.utils as utl
 
     utl.build_mirror_sample_geo()
-    utl.ziva_mirror_sample_geo()
 
 There should be a cube and two spheres in the scene.
 The right-side sphere **r_muscle** is a tissue, and the cube is a bone,

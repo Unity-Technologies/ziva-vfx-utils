@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zTet import TetNode
 
@@ -20,7 +20,7 @@ class ZivaTetGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaTetGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -129,7 +129,7 @@ class ZivaTetMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaTetMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -157,7 +157,7 @@ class ZivaTetUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaTetUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -199,7 +199,7 @@ class ZivaTetMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -230,7 +230,7 @@ class ZivaTetUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaTetUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

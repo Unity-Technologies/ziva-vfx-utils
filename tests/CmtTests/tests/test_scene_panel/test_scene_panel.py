@@ -13,11 +13,11 @@ from PySide2 import QtCore
 from maya import cmds
 
 
-class ZivaScenePanelTestCase(VfxTestCase):
+class ScenePanelTestCase(VfxTestCase):
 
     def setUp(self):
-        super(ZivaScenePanelTestCase, self).setUp()
-        load_scene()
+        super(ScenePanelTestCase, self).setUp()
+        load_scene("generic.ma")
         builder = zva.Ziva()
         builder.retrieve_connections()
         self.model = SceneGraphModel(builder)
@@ -25,7 +25,7 @@ class ZivaScenePanelTestCase(VfxTestCase):
     def tearDown(self):
         if os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
-        super(ZivaScenePanelTestCase, self).tearDown()
+        super(ScenePanelTestCase, self).tearDown()
 
     def check_model_data_returns_right_types(self, index):
         name = self.model.data(index, QtCore.Qt.DisplayRole)

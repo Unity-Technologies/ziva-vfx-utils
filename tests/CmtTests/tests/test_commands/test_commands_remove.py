@@ -1,7 +1,6 @@
-import tests.utils as test_utils
-
 from maya import cmds
 from vfx_test_case import VfxTestCase, get_mesh_vertex_positions
+from tests.utils import build_anatomical_arm_with_no_popup
 from zBuilder.commands import remove, remove_solver, remove_all_solvers, rig_update, rig_transfer
 
 
@@ -9,7 +8,7 @@ class RemoveCommandsWithArmAsset(VfxTestCase):
 
     def setUp(self):
         super(RemoveCommandsWithArmAsset, self).setUp()
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
 
     def test_remove_single_items(self):
         # Action
@@ -128,7 +127,7 @@ class RemoveCommandTestCase(VfxTestCase):
 
     def test_rig_transfer_warped_prefix(self):
         # get demo arm geo to add prefix
-        test_utils.build_anatomical_arm_with_no_popup(ziva_setup=False)
+        build_anatomical_arm_with_no_popup(ziva_setup=False)
 
         # prefix all geometry transforms with warped_
         to_change = ['muscle_grp', 'bone_grp', 'rig_grp']
@@ -141,7 +140,7 @@ class RemoveCommandTestCase(VfxTestCase):
             cmds.rename(item, 'warped_{}'.format(item))
 
         # get full setup demo arm
-        test_utils.build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
+        build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=False)
 
         # now do the trasnfer
         rig_transfer('zSolver1', 'warped_', '')

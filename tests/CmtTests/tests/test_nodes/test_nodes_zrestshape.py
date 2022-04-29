@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution, rig_copy
 from zBuilder.nodes.ziva.zRestShape import RestShapeNode
 
@@ -81,7 +81,7 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaRestShapeGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -193,7 +193,7 @@ class ZivaRestShapeMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaRestShapeMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -221,7 +221,7 @@ class ZivaTissueUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaTissueUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -263,7 +263,7 @@ class ZivaRestShapeMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -294,7 +294,7 @@ class ZivaRestShapeUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaRestShapeUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

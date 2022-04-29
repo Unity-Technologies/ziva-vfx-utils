@@ -1,9 +1,9 @@
 import unittest
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
+from tests.utils import reference_scene
 from zBuilder.commands import clean_scene
 
 
@@ -11,7 +11,7 @@ class ReferenceTestCase(VfxTestCase):
 
     def setUp(self):
         super(ReferenceTestCase, self).setUp()
-        test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
+        reference_scene('mirror_example.ma', namespace="TEMP")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -41,7 +41,7 @@ class ReferenceTestCase(VfxTestCase):
             self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference full ziva setup
-        test_utils.reference_scene(scene_name='mirror_example.ma', namespace="TEMP")
+        reference_scene('mirror_example.ma', namespace="TEMP")
 
         builder.build()
 
@@ -58,7 +58,7 @@ class ReferenceTestCase(VfxTestCase):
             self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference geo only
-        test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
+        reference_scene('mirror_example-geo.ma', namespace="TEMP")
 
         builder.build()
 
@@ -77,7 +77,7 @@ class ReferenceTestCase(VfxTestCase):
             self.assertEquals(0.52, item.attrs['surfaceTensionEnvelope']['value'])
 
         # reference geo only
-        test_utils.reference_scene(scene_name='mirror_example-geo.ma', namespace="TEMP")
+        reference_scene('mirror_example-geo.ma', namespace="TEMP")
 
         builder.string_replace('TEMP:l_', 'TEMP:r_')
         builder.build()
@@ -106,7 +106,7 @@ class ReferenceMirrorTestCase(VfxTestCase):
 
     def setUp(self):
         super(ReferenceMirrorTestCase, self).setUp()
-        test_utils.reference_scene(scene_name='mirror_example.ma')
+        reference_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase, ZivaMirrorTestCase, ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase
+from tests.utils import load_scene
 from zBuilder.commands import clean_scene, rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zLineOfAction import LineOfActionNode
 
@@ -18,7 +18,7 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionGenericTestCase, self).setUp()
-        test_utils.load_scene(scene_name="generic_tissue.ma")
+        load_scene("generic_tissue.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -217,7 +217,7 @@ class ZivaLineOfActionMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaLineOfActionMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -245,7 +245,7 @@ class ZivaLineOfActionUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -284,7 +284,7 @@ class ZivaLineOfActionUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaLineOfActionUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example-lineofaction_rivet.ma')
+        load_scene('mirror_example-lineofaction_rivet.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 

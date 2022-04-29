@@ -1,14 +1,13 @@
 import tempfile
 import glob
 import os
+import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
-
-import zBuilder.builders.ziva as zva
 '''
-These are small utilities to help with testing zBuilder.  Probably no real value
-outside of testing. 
+These are small utilities to help with testing zBuilder.
+Probably no real value outside of testing.
 '''
 
 CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -34,7 +33,7 @@ def get_test_asset_path(scene_name):
 def build_mirror_sample_geo():
     """ Builds 2 sphere and a cube to test some basic mirroring stuff.
     """
-
+    # Create Maya meshes
     sph = cmds.polySphere(name='r_muscle')[0]
     cmds.setAttr(sph + '.t', -10, 5, 0)
     sph = cmds.polySphere(name='l_muscle')[0]
@@ -46,20 +45,22 @@ def build_mirror_sample_geo():
     cmds.delete('r_muscle', 'l_muscle', 'bone', ch=True)
     cmds.makeIdentity('r_muscle', 'l_muscle', 'bone', apply=True)
 
-
-def ziva_mirror_sample_geo():
-    """ sets up a bone and a tissue with constraint on the mirror geo sample
-    """
+    # Add VFX components
     cmds.select('bone')
-    mel.eval('ziva -b')
+    cmds.ziva(b=True)
     cmds.select('r_muscle')
-    mel.eval('ziva -t')
-
-    mel.eval(
-        'select -r r_muscle.vtx[60] r_muscle.vtx[78:81] r_muscle.vtx[97:101] r_muscle.vtx[117:122] r_muscle.vtx[137:142] r_muscle.vtx[157:162] r_muscle.vtx[177:179] r_muscle.vtx[197:199]'
-    )
+    cmds.ziva(t=True)
+    cmds.select("r_muscle.vtx[60]",
+                "r_muscle.vtx[78:81]",
+                "r_muscle.vtx[97:101]",
+                "r_muscle.vtx[117:122]",
+                "r_muscle.vtx[137:142]",
+                "r_muscle.vtx[157:162]",
+                "r_muscle.vtx[177:179]",
+                "r_muscle.vtx[197:199]",
+                r=True)
     cmds.select('bone', add=True)
-    mel.eval('ziva -a')
+    cmds.ziva(a=True)
 
 
 def get_ziva_node_names_from_builder(builder, long=False):
@@ -72,15 +73,15 @@ def get_ziva_node_names_from_builder(builder, long=False):
     return node_names
 
 
-def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
+def reference_scene(scene_name, new_scene=True, namespace="TEMP"):
     """Loading a maya test scene based on name.  These are maya files in the repo
     so it searches for proper file based on current directoy.
 
     Args:
+        scene_name (str): Name of the file to reference.
         new_scene (bool, optional): If True forces a new scene.. Defaults to True.
-        scene_name (str, optional): Name of the file to reference. Defaults to 'generic.ma'.
         namespace (str, optional): The namespace to use for referenced file.
-                                            ":" is equal to no namespace. Defaults to "TEMP".
+                                   ":" is equal to no namespace. Defaults to "TEMP".
     """
     path = get_test_asset_path(scene_name)
     if new_scene:
@@ -89,7 +90,7 @@ def reference_scene(new_scene=True, scene_name='generic.ma', namespace="TEMP"):
     cmds.file(path, reference=True, namespace=namespace, ignoreVersion=True)
 
 
-def load_scene(new_scene=True, scene_name='generic.ma'):
+def load_scene(scene_name, new_scene=True):
     path = get_test_asset_path(scene_name)
     if new_scene:
         cmds.file(new=True, force=True)
@@ -99,8 +100,9 @@ def load_scene(new_scene=True, scene_name='generic.ma'):
 
 
 def get_1_7_builder_files():
-    """Part of the test assets includes zBuilder files saved in 1_7.  This is to test 
-    backwards compatibility.  Building with these should still work after 1_9.
+    """ Part of the test assets includes zBuilder files saved in 1_7.
+    This is to test backwards compatibility.
+    Building with these should still work after 1_9.
 
     Returns:
         list of str: list of paths to 1_7 zBuilder files. 

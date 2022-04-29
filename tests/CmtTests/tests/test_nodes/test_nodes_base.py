@@ -1,20 +1,19 @@
-from maya import cmds
-
 import zBuilder.builders.ziva as zva
+
+from maya import cmds
 from vfx_test_case import VfxTestCase
-import tests.utils as test_utils
+from tests.utils import load_scene, get_tmp_file_location
 
 
-class ZivaBaseTestCase(VfxTestCase):
+class BaseNodeTestCase(VfxTestCase):
+
     def test_node_compares(self):
-        """ Getting the generic scene and writing out a zBuilder file.  This will
-        allow us to retrieve file and copmpare it against scene.
-
-        We are going to compare builder from this setUp and a builder retrieved from 
-        the file.
+        """ Getting the generic scene and writing out a zBuilder file.
+        This will allow us to retrieve file and copmpare it against scene.
+        We are going to compare builder from this setUp and a builder retrieved from the file.
         """
-        test_utils.load_scene()
-        file_name = test_utils.get_tmp_file_location()
+        load_scene('generic.ma')
+        file_name = get_tmp_file_location()
 
         cmds.select('zSolver1')
         builder_orig = zva.Ziva()

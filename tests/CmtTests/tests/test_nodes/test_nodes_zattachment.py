@@ -1,10 +1,10 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene
 from zBuilder.commands import rename_ziva_nodes, copy_paste_with_substitution
 from zBuilder.nodes.ziva.zAttachment import AttachmentNode
 
@@ -27,7 +27,7 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
 
     def setUp(self):
         super(ZivaAttachmentGenericTestCase, self).setUp()
-        test_utils.load_scene()
+        load_scene('generic.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -212,7 +212,7 @@ class ZivaAttachmentMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaAttachmentMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -242,7 +242,7 @@ class ZivaAttachmentMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -274,7 +274,7 @@ class ZivaAttachmentUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaAttachmentUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -313,7 +313,7 @@ class ZivaAttachmentUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaAttachmentUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -351,7 +351,7 @@ class ZivaAttachmentMirrorTestCaseB(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaAttachmentMirrorTestCaseB, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example-B.ma')
+        load_scene('mirror_example-B.ma')
         self.builder = zva.Ziva()
         cmds.select('l_Mus', 'l_bone')
 

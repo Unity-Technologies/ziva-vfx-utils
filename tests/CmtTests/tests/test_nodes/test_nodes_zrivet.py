@@ -1,9 +1,9 @@
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase
+from tests.utils import build_anatomical_arm_with_no_popup
 from zBuilder.commands import clean_scene, remove_solver
 
 
@@ -13,7 +13,7 @@ class ZivaRivetTestCase(VfxTestCase):
         super(ZivaRivetTestCase, self).setUp()
 
         # This builds the Zivas anatomical arm demo with no pop up dialog.
-        test_utils.build_anatomical_arm_with_no_popup()
+        build_anatomical_arm_with_no_popup()
 
         # create l
         cmds.select('r_tricepsLong_muscle')

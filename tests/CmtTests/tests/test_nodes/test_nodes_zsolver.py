@@ -1,11 +1,11 @@
 import os
-import tests.utils as test_utils
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
 from vfx_test_case import (VfxTestCase, ZivaMirrorTestCase, ZivaMirrorNiceNameTestCase,
                            ZivaUpdateTestCase, ZivaUpdateNiceNameTestCase)
+from tests.utils import load_scene, get_tmp_file_location, get_ziva_node_names_from_builder
 from zBuilder.commands import (rename_ziva_nodes, clean_scene, remove_solver, remove_all_solvers,
                                rig_cut, rig_copy, rig_paste, rig_transfer)
 from zBuilder.nodes.ziva.zSolver import SolverNode
@@ -15,11 +15,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.temp_file_path = test_utils.get_tmp_file_location()
+        cls.temp_file_path = get_tmp_file_location()
 
     def setUp(self):
         super(ZivaSolverGenericTestCase, self).setUp()
-        test_utils.load_scene()
+        load_scene("generic.ma")
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -148,13 +148,13 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_remove_solver(self):
-        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
+        node_names = get_ziva_node_names_from_builder(self.builder)
         cmds.select("zSolver1")
         remove_solver(askForConfirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_remove_all_solvers(self):
-        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
+        node_names = get_ziva_node_names_from_builder(self.builder)
         remove_all_solvers(confirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
@@ -219,7 +219,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         clean_scene()
 
-        test_utils.load_scene(new_scene=False)
+        load_scene("generic.ma", new_scene=False)
 
         # Act
         # now do the trasnfer
@@ -269,7 +269,7 @@ class ZivaSolverMirrorTestCase(ZivaMirrorTestCase):
     def setUp(self):
         super(ZivaSolverMirrorTestCase, self).setUp()
 
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
         # gather info
@@ -295,7 +295,7 @@ class ZivaSolverUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def setUp(self):
         super(ZivaSolverUpdateNiceNameTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # NICE NAMES
         rename_ziva_nodes()
@@ -335,7 +335,7 @@ class ZivaSolverMirrorNiceNameTestCase(ZivaMirrorNiceNameTestCase):
         # gather info
 
         # Bring in scene
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
 
         # force NICE NAMES
         rename_ziva_nodes()
@@ -364,7 +364,7 @@ class ZivaSolverUpdateTestCase(ZivaUpdateTestCase):
 
     def setUp(self):
         super(ZivaSolverUpdateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='mirror_example.ma')
+        load_scene('mirror_example.ma')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -392,11 +392,11 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.temp_file_path = test_utils.get_tmp_file_location()
+        cls.temp_file_path = get_tmp_file_location()
 
     def setUp(self):
         super(ZivaSolverDuplicateTestCase, self).setUp()
-        test_utils.load_scene(scene_name='generic_duplicate.ma')
+        load_scene('generic_duplicate.ma')
         cmds.select('zSolver1')
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
@@ -527,13 +527,13 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_remove_solver(self):
-        node_names = test_utils.get_ziva_node_names_from_builder(self.builder, long=True)
+        node_names = get_ziva_node_names_from_builder(self.builder, long=True)
         cmds.select("zSolver1")
         remove_solver(askForConfirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
     def test_remove_all_solvers(self):
-        node_names = test_utils.get_ziva_node_names_from_builder(self.builder)
+        node_names = get_ziva_node_names_from_builder(self.builder)
         remove_all_solvers(confirmation=False)
         self.assertEqual(cmds.ls(node_names), [])
 
@@ -599,7 +599,7 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
 
         clean_scene()
 
-        test_utils.load_scene(scene_name='generic_duplicate.ma', new_scene=False)
+        load_scene('generic_duplicate.ma', new_scene=False)
 
         # Act
         # now do the trasnfer
