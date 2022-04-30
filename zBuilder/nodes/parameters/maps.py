@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from maya.api import OpenMaya as om2
 
-from utility.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
+from zBuilder.utils.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
 from zBuilder.utils.commonUtils import clamp
 from zBuilder.utils.mayaUtils import get_short_name, get_dag_path_from_mesh, get_type
 from ..base import Base

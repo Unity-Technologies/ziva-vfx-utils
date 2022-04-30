@@ -5,8 +5,8 @@ from maya import cmds
 from cmt.test import TestCase
 from tests.utils import get_tmp_file_location
 from zBuilder.utils.commonUtils import is_sequence
+from zBuilder.utils.paintable_maps import split_map_name, get_paintable_map
 from zBuilder.commands import clean_scene, rig_cut, rig_paste, rig_copy
-from utility.paintable_maps import split_map_name, get_paintable_map
 
 
 def isApprox(a, b, eps=1e-6):

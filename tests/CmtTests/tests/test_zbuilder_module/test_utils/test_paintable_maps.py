@@ -1,7 +1,6 @@
-from utility.paintable_maps import get_paintable_map, set_paintable_map
-import vfx_test_case
 from maya import cmds
-from maya import mel
+from vfx_test_case import VfxTestCase
+from zBuilder.utils.paintable_maps import get_paintable_map, set_paintable_map
 
 
 def make_weights(num_weights, shift):
@@ -9,7 +8,8 @@ def make_weights(num_weights, shift):
     return [x % 10 + shift for x in range(num_weights)]
 
 
-class SetWeightsTestCase(vfx_test_case.VfxTestCase):
+class SetWeightsTestCase(VfxTestCase):
+
     def test_set_paintable_map_on_ziva_vfx_node(self):
         ## SETUP MAYA #############################################################################
 
@@ -17,17 +17,17 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         cmds.polyCube(name='Tissue')  # Make a test scene with zTet node and zAttachment node
         cmds.polyCube(name='Tissue2')  # Many tissues, so we have a long array
         cmds.polyCube(name='Tissue3')  # of weights on the embedder node.
-        cmds.polyCube(name='Tissue4')  # Letting us test that we handle those arrays well --
-        cmds.polyCube(
-            name='Tissue5')  # the code in set_paintable_map_by_MFnWeight... is kinda scary.
+        cmds.polyCube(name='Tissue4')  # Letting us test that we handle those arrays well
+        # the code in set_paintable_map_by_MFnWeight... is kinda scary.
+        cmds.polyCube(name='Tissue5')
         cmds.polyPlane(name='Bone')
-        mel.eval('ziva -s')  # makes zSolver1
+        cmds.ziva(s=True)  # makes zSolver1
         cmds.setAttr('zSolver1.enable', False)  # Go faster. We don't need to do sims.
-        mel.eval('ziva -t Tissue')  # makes zTet1
-        mel.eval('ziva -f Tissue')  # makes zFiber1
-        mel.eval('ziva -b Bone')
-        mel.eval('ziva -a Tissue Bone')  # makes zAttachment1
-        mel.eval('ziva -t Tissue2 Tissue3 Tissue4 Tissue5')
+        cmds.ziva('Tissue', t=True)  # makes zTet1
+        cmds.ziva('Tissue', f=True)  # makes zFiber1
+        cmds.ziva('Bone', b=True)
+        cmds.ziva('Tissue', 'Bone', a=True)  # makes zAttachment1
+        cmds.ziva('Tissue2', 'Tissue3', 'Tissue4', 'Tissue5', t=True)
 
         ## SETUP TEST DATA ########################################################################
 
@@ -54,7 +54,7 @@ class SetWeightsTestCase(vfx_test_case.VfxTestCase):
         cmds.polyCube(name='BoneWarpSource', sx=warp_res, sy=warp_res, sz=warp_res)
         cmds.polyCube(name='BoneWarpTarget', sx=warp_res, sy=warp_res, sz=warp_res)
         cmds.polyCube(name='BoneWarpThing', sx=warp_res, sy=warp_res, sz=warp_res)
-        mel.eval('zBoneWarp BoneWarpSource BoneWarpTarget BoneWarpThing')
+        cmds.zBoneWarp('BoneWarpSource', 'BoneWarpTarget', 'BoneWarpThing')
         warp_weights = make_weights(cmds.polyEvaluate('BoneWarpThing', vertex=True), 0.5)
 
         test_cases = [('zBoneWarp1', 'landmarkList[0].landmarks', warp_weights)]
