@@ -6,7 +6,7 @@
                 "help": "Open Scene Panel",
                 "image": "scene_panel.png",
                 "commandType": "python",
-                "command": "import os; from zBuilder.ui import zUI as sp1; from zBuilder.scenePanel2 import main as sp2; sp1.run() if 'ZIVA_ZBUILDER_USE_SCENE_PANEL1' in os.environ else sp2.run();"
+                "command": "import os; from scenePanel.ui import zUI as sp1; from scenePanel.scenePanel2 import main as sp2; sp1.run() if 'ZIVA_ZBUILDER_USE_SCENE_PANEL1' in os.environ else sp2.run();"
             },
             "shelfSep_1": {
                 "separator": true,

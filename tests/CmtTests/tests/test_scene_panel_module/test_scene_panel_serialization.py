@@ -1,11 +1,11 @@
 import zBuilder.builders.ziva as zva
 
-from vfx_test_case import VfxTestCase
-from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
-from zBuilder.scenePanel2.serialize import flatten_tree, to_tree_entry_list, construct_tree, to_json_string
-from zBuilder.scenePanel2.serialize import _version
 from maya import cmds
+from vfx_test_case import VfxTestCase
+from scenePanel.scenePanel2.groupNode import GroupNode
+from scenePanel.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
+from scenePanel.scenePanel2.serialize import (flatten_tree, to_tree_entry_list, construct_tree,
+                                              to_json_string, _version)
 
 
 class ScenePanelSerializationTestCase(VfxTestCase):

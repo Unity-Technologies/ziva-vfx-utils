@@ -1,7 +1,7 @@
-from ..nodes.base import Base
-from ..uiUtils import ProximityWidget
-from PySide2 import QtWidgets
 from functools import partial
+from PySide2 import QtWidgets
+from zBuilder.nodes.base import Base
+from ..uiUtils import ProximityWidget
 
 attrs_clipboard = {}  # clipboard for copied attributes
 maps_clipboard = None  # clipboard for the maps. This is either a zBuilder Map object or None.
@@ -13,6 +13,7 @@ def append_attr_actions(parent, menu, node):
         menu (QMenu): menu to add option to
         node (zBuilder object): zBuilder.nodes object
     """
+
     def copy_attrs(node):
         # update the model in case maya updated
         node.get_maya_attrs()

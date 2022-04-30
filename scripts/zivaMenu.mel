@@ -10,7 +10,7 @@ menu -label "Ziva" -tearOff true zivaMainMenu;
 setParent -menu zivaMainMenu;
 
 menuItem -label "Info" -ec true -ecr true -c "ziva -i" -ann "Outputs solver statistics.";
-menuItem -label "Launch Scene Panel" -ec true -ecr true -c "python(\"import os; from zBuilder.ui import zUI as sp1; from zBuilder.scenePanel2 import main as sp2; sp1.run() if 'ZIVA_ZBUILDER_USE_SCENE_PANEL1' in os.environ else sp2.run();\")" -ann "Launches a Scene Panel for inspecting the solver components." -i "scene_panel.png";
+menuItem -label "Launch Scene Panel" -ec true -ecr true -c "python(\"import os; from scenePanel.ui import zUI as sp1; from scenePanel.scenePanel2 import main as sp2; sp1.run() if 'ZIVA_ZBUILDER_USE_SCENE_PANEL1' in os.environ else sp2.run();\")" -ann "Launches a Scene Panel for inspecting the solver components." -i "scene_panel.png";
 
 menuItem -label "Solver" -divider true;
 menuItem -label "Create" -ec true -ecr true -c "ziva -s" -ann "Creates an empty solver." -i "out_zSolver.png";

@@ -21,6 +21,6 @@ There are two ways to retrieve the ziva-vfx-utils package:
 
 To install, replace the following folders and files in the Ziva VFX Maya module folder with the new ones in the counterpart folder in the ziva-vfx-utils repo:
 
-- The **zBuilder** and **utility** folders in the  **scripts** folder.
+- The **zBuilder**, **scenePanel** and **utility** folders in the  **scripts** folder.
 - All files in the **scripts** folder.
 - Replace the **demos** and **icons** folder with the new ones.

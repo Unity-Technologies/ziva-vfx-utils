@@ -1,17 +1,15 @@
-from .model import SceneGraphModel, TreeItemDelegate
-from .view import SceneTreeView
-from zBuilder.utils.uiUtils import dock_window, get_icon_path_from_name
-from zBuilder.utils.uiUtils import sortRole, nodeRole, longNameRole
-from zBuilder.utils.uiUtils import ProximityWidget, MenuLineEdit
-from zBuilder.nodes.base import Base
-from maya import cmds
-from maya import mel
-from PySide2 import QtGui, QtWidgets, QtCore
-from functools import partial
-
 import os
 import weakref
 import zBuilder.builders.ziva as zva
+
+from functools import partial
+from PySide2 import QtGui, QtWidgets, QtCore
+from maya import cmds
+from zBuilder.nodes.base import Base
+from .model import SceneGraphModel, TreeItemDelegate
+from .view import SceneTreeView
+from ..uiUtils import (ProximityWidget, dock_window, get_icon_path_from_name, sortRole, nodeRole,
+                       longNameRole)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
 

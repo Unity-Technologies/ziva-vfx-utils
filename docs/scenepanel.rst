@@ -37,7 +37,7 @@ The Scene Panel can also be launched from python:
 
 .. code-block:: python
 
-  from zBuilder.ui import zUI
+  from scenePanel.ui import zUI
   zUI.run()
 
 .. _sec-ScenePanelMenu:

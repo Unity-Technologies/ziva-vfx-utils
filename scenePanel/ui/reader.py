@@ -1,8 +1,9 @@
-from . import model
+import weakref
+
 from maya import cmds
 from PySide2 import QtWidgets, QtCore
-from zBuilder.utils.uiUtils import dock_window
-import weakref
+from ..uiUtils import dock_window
+from . import model
 
 
 class MyDockingUI(QtWidgets.QWidget):

@@ -4,8 +4,8 @@ from functools import partial
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
 from zBuilder.utils.commonUtils import is_string
-from zBuilder.utils.uiUtils import get_icon_path_from_name
 from zBuilder.commands import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
+from ..uiUtils import get_icon_path_from_name
 from .zGeoWidget import zGeoWidget
 
 # Toolbar action data structure, it can be a single QAction item with following items:

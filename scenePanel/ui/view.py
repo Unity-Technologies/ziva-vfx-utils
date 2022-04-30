@@ -1,5 +1,5 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-from zBuilder.utils.uiUtils import get_icon_path_from_name
+from ..uiUtils import get_icon_path_from_name
 
 
 class SceneTreeView(QtWidgets.QTreeView):

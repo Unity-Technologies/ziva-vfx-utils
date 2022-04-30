@@ -1,7 +1,6 @@
 from PySide2 import QtGui, QtWidgets, QtCore
-from zBuilder.utils.uiUtils import get_icon_path_from_node
-from zBuilder.utils.uiUtils import sortRole, nodeRole, longNameRole, enableRole
 from maya import cmds
+from ..uiUtils import get_icon_path_from_node, sortRole, nodeRole, longNameRole, enableRole
 
 
 class SceneGraphModel(QtCore.QAbstractItemModel):

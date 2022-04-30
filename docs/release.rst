@@ -20,6 +20,7 @@ Functionality
 - **zBuilder:** Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.
 - **zBuilder:** Cleanup zBuilder files. Move utility files to **zBuilder.utils** folder.
 - **zBuilder:** Reorganize unit test files.
+- **Scene Panel:** Extract it out of zBuilder folder and make it a standalone module.
 
 Bug Fixes
 +++++++++

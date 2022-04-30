@@ -1,7 +1,7 @@
-from ..uiUtils import get_icon_path_from_name
-from PySide2 import QtWidgets, QtGui
-from maya import cmds
 from functools import partial
+from maya import cmds
+from PySide2 import QtWidgets, QtGui
+from ..uiUtils import get_icon_path_from_name
 
 
 def create_general_context_menu(parent):
@@ -42,6 +42,7 @@ def create_solver_context_menu(parent, solverTM):
         return action
 
     def create_info_action(parent):
+
         def run_info_command():
             sel = cmds.ls(sl=True)
             print(cmds.ziva(sel[0], i=True))
@@ -53,6 +54,7 @@ def create_solver_context_menu(parent, solverTM):
         return action
 
     def create_set_default_action(parent):
+
         def run_set_default_command(sel):
             print(cmds.ziva(sel, defaultSolver=True))
 

@@ -17,7 +17,7 @@ The Scene Panel 2 can also be launched using python:
 
 .. code-block:: python
 
-  from zBuilder.scenePanel2 import main
+  from scenePanel.scenePanel2 import main
   main.run()
 
 If the previous Scene Panel is preferred,

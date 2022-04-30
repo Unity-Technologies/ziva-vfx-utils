@@ -2,9 +2,9 @@ import os
 import json
 import logging
 
-from zBuilder.utils.uiUtils import zGeo_UI_node_types, is_zsolver_node
 from zBuilder.utils.commonUtils import is_string
 from zBuilder.nodes.base import Base
+from ..uiUtils import zGeo_UI_node_types, is_zsolver_node
 from .treeItem import TreeItem, is_group_item, build_scene_panel_tree
 from .groupNode import GroupNode
 

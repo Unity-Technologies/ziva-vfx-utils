@@ -1,14 +1,14 @@
 import logging
-import pickle
 import weakref
 
-from ..uiUtils import *
-from ..mayaUtils import get_maya_api_version
-from .groupNode import GroupNode
-from .treeItem import *
-
-from PySide2 import QtGui, QtCore
 from maya import cmds
+from PySide2 import QtGui, QtCore
+from zBuilder.utils.mayaUtils import get_maya_api_version
+from ..uiUtils import (get_node_by_index, get_zSolverTransform_treeitem, validate_group_node_name,
+                       get_icon_path_from_node, is_zsolver_node, nodeRole, sortRole, longNameRole)
+from .treeItem import (TreeItem, is_group_item, is_node_name_duplicate, fix_node_name_duplication,
+                       prune_child_nodes, pick_out_node)
+from .groupNode import GroupNode
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +118,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
                         fix_node_name_duplication(node, sibling_nodes)
                 else:
                     name = cmds.rename(node.data.long_name, value)
-                    self._builder_ref.string_replace(
-                        "^{}$".format(short_name), name)
+                    self._builder_ref.string_replace("^{}$".format(short_name), name)
                     node.data.name = name
                 is_data_set = True
         elif role == nodeRole:
@@ -180,8 +179,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
     def insertRows(self, row, count, parent):
         parent_node = get_node_by_index(parent, None)
         if not parent_node:
-            logger.error(
-                "Can't get parent item through QModelIndex, failed to insert rows.")
+            logger.error("Can't get parent item through QModelIndex, failed to insert rows.")
             return False
 
         self.beginInsertRows(parent, row, row + count - 1)
@@ -201,8 +199,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         """
         parent_node = get_node_by_index(parent, None)
         if not parent_node:
-            logger.error(
-                "Can't get parent item through QModelIndex, failed to remove rows.")
+            logger.error("Can't get parent item through QModelIndex, failed to remove rows.")
             return False
 
         self.beginRemoveRows(parent, row, row + count - 1)
@@ -233,8 +230,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
     def dropMimeData(self, data, action, row, column, parent):
         assert not self._is_partial_view
 
-        drop_node_name = ",".join(
-            [item.data.name for item in self._drop_items])
+        drop_node_name = ",".join([item.data.name for item in self._drop_items])
         parent_node = parent.data(nodeRole)
         logger.debug("Dropping mimedata {} to parent {} at row {}".format(
             drop_node_name, parent_node.name, row))
@@ -271,14 +267,12 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             return False
         parent_node = get_node_by_index(parent, None)
         if not parent_node:
-            logger.error(
-                "Failed to get parent TreeItem through QModelIndex in canDropMimeData().")
+            logger.error("Failed to get parent TreeItem through QModelIndex in canDropMimeData().")
             return False
         if parent_node.data.type is None:
             # This is the ROOT node.
             # We don't allow inserting items before first zSolverTransform item.
-            logger.debug(
-                "Can't drop because it's above the first zSolverTransform.")
+            logger.debug("Can't drop because it's above the first zSolverTransform.")
             return False
         if parent_node.data.type == "zSolverTransform" and row == 0:
             # Special case: no node can insert before zSolver item
@@ -295,11 +289,9 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             return False
         # Make sure all select items come from same zSolverTransform node.
         # Otherwise, do early return.
-        solver_list = list(
-            set([get_zSolverTransform_treeitem(item) for item in self._drop_items]))
+        solver_list = list(set([get_zSolverTransform_treeitem(item) for item in self._drop_items]))
         if len(solver_list) != 1:
-            logger.debug(
-                "Can't drop data. Selected items come from different zSolver.")
+            logger.debug("Can't drop data. Selected items come from different zSolver.")
             return False
         assert solver_list[0], "Selected items belong to different zSolverTransform nodes."\
             "There's bug in the code logic."
@@ -309,8 +301,7 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
             return False
 
         # Valid drop, good to go
-        drop_node_name = ",".join(
-            [item.data.name for item in self._drop_items])
+        drop_node_name = ",".join([item.data.name for item in self._drop_items])
         logger.debug("Can drop data {} to parent node {} at row {}".format(
             drop_node_name, parent_node.data.name, row))
         return True
@@ -334,12 +325,10 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
 
         group_parent_item = get_node_by_index(group_parent_index, None)
         if not group_parent_item:
-            logger.error(
-                "Can't get group parent item through QModelIndex, failed to group items.")
+            logger.error("Can't get group parent item through QModelIndex, failed to group items.")
             return False
 
-        treeitems_to_move = [get_node_by_index(
-            index, None) for index in index_list_to_move]
+        treeitems_to_move = [get_node_by_index(index, None) for index in index_list_to_move]
         if any(item is None for item in treeitems_to_move):
             # Do nothing if there's invalid item in the move list
             logger.error(
@@ -362,18 +351,15 @@ class zGeoTreeModel(QtCore.QAbstractItemModel):
         """
         assert not self._is_partial_view
 
-        group_item_to_delete = [get_node_by_index(
-            index, None) for index in group_index_to_delete]
+        group_item_to_delete = [get_node_by_index(index, None) for index in group_index_to_delete]
         if any(item is None for item in group_item_to_delete):
             logger.error(
                 "Can't get group treeitem through QModelIndex, failed to delete group items.")
             return False
 
         self.beginResetModel()
-        items_to_delete = [
-            item for item in prune_child_nodes(group_item_to_delete)]
+        items_to_delete = [item for item in prune_child_nodes(group_item_to_delete)]
         for item in items_to_delete:
-            pick_out_node(item, is_node_name_duplicate,
-                          fix_node_name_duplication)
+            pick_out_node(item, is_node_name_duplicate, fix_node_name_duplication)
         self.endResetModel()
         return True

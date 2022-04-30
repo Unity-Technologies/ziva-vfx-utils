@@ -1,16 +1,17 @@
 import zBuilder.builders.ziva as zva
 import os
 
-from zBuilder.ui.model import SceneGraphModel
-from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
-from zBuilder.nodes.dg_node import DGNode
-from zBuilder.utils.uiUtils import *
-from zBuilder.utils.commonUtils import is_string
-from tests.utils import load_scene
-from vfx_test_case import VfxTestCase
-from PySide2 import QtCore
 from maya import cmds
+from PySide2 import QtCore
+from vfx_test_case import VfxTestCase
+from tests.utils import load_scene
+from zBuilder.utils.commonUtils import is_string
+from zBuilder.nodes.dg_node import DGNode
+from scenePanel.uiUtils import (validate_group_node_name, get_zSolverTransform_treeitem, sortRole,
+                                nodeRole, longNameRole, enableRole)
+from scenePanel.ui.model import SceneGraphModel
+from scenePanel.scenePanel2.groupNode import GroupNode
+from scenePanel.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
 
 
 class ScenePanelTestCase(VfxTestCase):

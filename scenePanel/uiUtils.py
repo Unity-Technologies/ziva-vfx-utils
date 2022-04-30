@@ -154,6 +154,7 @@ def validate_group_node_name(name):
 class ProximityWidget(QtWidgets.QWidget):
     """ Widget in right-click menu to change map weights for attachments
     """
+
     def __init__(self, parent=None):
         super(ProximityWidget, self).__init__(parent)
         h_layout = QtWidgets.QHBoxLayout(self)

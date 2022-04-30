@@ -13,8 +13,12 @@ cd ${SCRIPT_DIR}
 # --force        : Force overwriting of any existing generated files.
 # -o .           : Put output files in `pwd`
 # ../zBuilder    : The module to parse
-# ../zBuilder/ui : Skip this module, because shiboken and PySide break the doc gen.
-sphinx-apidoc --force -o . ../zBuilder ../zBuilder/ui* ../zBuilder/scenePanel2* ../zBuilder/utils/uiUtils.py
+# Note: Don't build scenePanel module, it causes error.
+sphinx-apidoc --force -o . ../zBuilder
 
+# To build the HTML documentation into a folder "_build"
+# -W           : Turn warnings into errors
+# --keep-going : With -W, Keep going when getting warnings
+# -b BUILDER   : Builder to use (default: html)
 rm -rf _build
 sphinx-build -W --keep-going -b html . _build

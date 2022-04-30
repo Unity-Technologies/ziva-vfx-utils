@@ -1,7 +1,8 @@
-icons     .
-scripts   .
-demos     .
-zBuilder  scripts
-utility   scripts
-LICENSE   scripts
-README.md scripts
+icons      .
+scripts    .
+demos      .
+zBuilder   scripts
+scenePanel scripts
+utility    scripts
+LICENSE    scripts
+README.md  scripts

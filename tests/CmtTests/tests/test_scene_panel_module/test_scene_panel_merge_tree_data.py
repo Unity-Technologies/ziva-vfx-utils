@@ -1,14 +1,14 @@
 import zBuilder.builders.ziva as zva
 
+from maya import cmds
 from vfx_test_case import VfxTestCase
 from zBuilder.utils.vfxUtils import get_zGeo_nodes_by_solverTM
 from zBuilder.utils.mayaUtils import safe_rename
-from zBuilder.scenePanel2.groupNode import GroupNode
-from zBuilder.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
-from zBuilder.scenePanel2.serialize import PendingTreeEntry, flatten_tree, merge_tree_data, _version
 from zBuilder.nodes.ziva.zSolverTransform import SolverTransformNode
 from zBuilder.nodes.ziva.zSolver import SolverNode
-from maya import cmds
+from scenePanel.scenePanel2.groupNode import GroupNode
+from scenePanel.scenePanel2.treeItem import TreeItem, build_scene_panel_tree
+from scenePanel.scenePanel2.serialize import PendingTreeEntry, flatten_tree, merge_tree_data, _version
 
 
 def setup_scene():

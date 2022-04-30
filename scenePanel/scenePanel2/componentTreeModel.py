@@ -1,13 +1,14 @@
-from .treeItem import TreeItem
-from ..uiUtils import get_icon_path_from_node, get_node_by_index, nodeRole
-from PySide2 import QtCore, QtGui
-from maya import cmds
 from collections import defaultdict
+from maya import cmds
+from PySide2 import QtCore, QtGui
+from ..uiUtils import get_icon_path_from_node, get_node_by_index, nodeRole
+from .treeItem import TreeItem
 
 
 class ComponentTreeModel(QtCore.QAbstractItemModel):
     """ Tree model for component
     """
+
     def __init__(self, builder, root_node=None, parent=None):
         super(ComponentTreeModel, self).__init__(parent)
         self._builder = builder

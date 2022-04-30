@@ -9,11 +9,10 @@ from maya import cmds
 from PySide2 import QtCore, QtWidgets, QtGui
 from zBuilder.utils.commonUtils import is_sequence
 from zBuilder.utils.vfxUtils import get_zGeo_nodes_by_solverTM
-from zBuilder.utils.uiUtils import (nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME,
-                                    zGeo_UI_node_types, get_unique_name,
-                                    get_zSolverTransform_treeitem, is_zsolver_node,
-                                    get_node_by_index, get_icon_path_from_name)
 from zBuilder.nodes.base import Base
+from ..uiUtils import (nodeRole, longNameRole, SCENE_PANEL_DATA_ATTR_NAME, zGeo_UI_node_types,
+                       get_unique_name, get_zSolverTransform_treeitem, is_zsolver_node,
+                       get_node_by_index, get_icon_path_from_name)
 from .groupNode import GroupNode
 from .serialize import is_serialize_data_to_zsolver_node, to_json_string, flatten_tree, to_tree_entry_list, merge_tree_data
 from .treeItem import TreeItem, build_scene_panel_tree

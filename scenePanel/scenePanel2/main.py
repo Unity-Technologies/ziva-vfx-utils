@@ -3,13 +3,13 @@ import os
 import logging
 import weakref
 
+from PySide2 import QtWidgets
+from maya import cmds
+from ..uiUtils import dock_window, get_icon_path_from_name
 from .zGeoWidget import zGeoWidget
 from .componentWidget import ComponentWidget
 from .menuBar import setup_menubar
 from .toolbar import setup_toolbar
-from ..uiUtils import dock_window, get_icon_path_from_name
-from maya import cmds
-from PySide2 import QtWidgets
 
 logger = logging.getLogger(__name__)
 
