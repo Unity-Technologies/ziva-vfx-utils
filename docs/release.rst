@@ -15,12 +15,14 @@ Release Notes
 
 Functionality
 +++++++++++++
-- **zBuilder:** Move **rename_ziva_nodes()** from zBuilder.zMaya to zBuilder.utils.
-- **zBuilder:** Rename **zBuilder.utils** to **zBuilder.commands**.
-- **zBuilder:** Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.
-- **zBuilder:** Cleanup zBuilder files. Move utility files to **zBuilder.utils** folder.
-- **zBuilder:** Reorganize unit test files.
-- **Scene Panel:** Extract it out of zBuilder folder and make it a standalone module.
+- **zBuilder:** Refactoring code structure:
+    - Move **rename_ziva_nodes()** from **zBuilder.zMaya** to **zBuilder.utils**.
+    - Rename **zBuilder.utils** to **zBuilder.commands**.
+    - Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.
+    - Move zBuilder utility files to **zBuilder.utils** folder.
+    - Cleanup unused builder and node types.
+    - Reorganize unit test files by modules.
+- **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
 
 Bug Fixes
 +++++++++
