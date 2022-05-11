@@ -611,7 +611,6 @@ class Ziva(Builder):
               lineOfActions=True,
               rivetToBone=True,
               restShape=True,
-              mirror=False,
               permissive=True):
         """
         This builds the Ziva rig into the Maya scene.
@@ -632,7 +631,6 @@ class Ziva(Builder):
                 True: Yes interpolate
                 False: No
                 auto: Interpolate if it needs it (vert check)
-            mirror (bool): This mirrors the geometry in bundle.
             permissive (bool): False raises errors if something is wrong. Defaults to True
             attr_filter (dict):  Attribute filter on what attributes to get.
                 dictionary is key value where key is node type and value is
@@ -641,10 +639,6 @@ class Ziva(Builder):
                 tmp = {'zSolver':['substeps']}
             association_filter (str): filter by node association.  Defaults to None
         """
-        # TODO: This mirror check needs to be removed or updated. See JIRA task VFXACT-1111.
-        if mirror:
-            for item in self.get_scene_items(type_filter='mesh'):
-                item.mirror()
 
         logger.info('Building Ziva Rig.')
         sel = cmds.ls(sl=True)
