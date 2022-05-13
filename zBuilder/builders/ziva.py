@@ -473,8 +473,10 @@ class Ziva(Builder):
             self.make_node_connections()
 
         else:
-            cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')
+            # this is being deferred so it prints out after time_this decorator results
+            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
 
+    @time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
         """
         Gets scene items based on selection.
@@ -581,7 +583,8 @@ class Ziva(Builder):
         if nodes:
             self._populate_nodes(nodes, get_parameters)
         else:
-            cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')
+            # this is being deferred so it prints out after time_this decorator results
+            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
