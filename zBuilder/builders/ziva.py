@@ -441,40 +441,40 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
         # ---------------------------------------------------------------------
-        if solver:
-            solver = solver[0]
-
-            b_solver = self.node_factory(solver, parent=None)
-            self.bundle.extend_scene_items(b_solver)
-
-            node_types = [
-                'zSolverTransform',
-                'zBone',
-                'zTet',
-                'zTissue',
-                'zCloth',
-                'zMaterial',
-                'zAttachment',
-                'zFiber',
-                'zEmbedder',
-                'zLineOfAction',
-                'zFieldAdaptor',
-                'zRivetToBone',
-                'zRestShape',
-            ]
-
-            node_types.extend(FIELD_TYPES)
-            nodes = _zQuery(node_types, solver)
-            if nodes:
-                self._populate_nodes(nodes, get_parameters)
-                self.setup_tree_hierarchy()
-
-            self.stats()
-            self.make_node_connections()
-
-        else:
+        if not solver:
             # this is being deferred so it prints out after time_this decorator results
             cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            return
+            
+        solver = solver[0]
+
+        b_solver = self.node_factory(solver, parent=None)
+        self.bundle.extend_scene_items(b_solver)
+
+        node_types = [
+            'zSolverTransform',
+            'zBone',
+            'zTet',
+            'zTissue',
+            'zCloth',
+            'zMaterial',
+            'zAttachment',
+            'zFiber',
+            'zEmbedder',
+            'zLineOfAction',
+            'zFieldAdaptor',
+            'zRivetToBone',
+            'zRestShape',
+        ]
+
+        node_types.extend(FIELD_TYPES)
+        nodes = _zQuery(node_types, solver)
+        if nodes:
+            self._populate_nodes(nodes, get_parameters)
+            self.setup_tree_hierarchy()
+
+        self.stats()
+        self.make_node_connections()
 
     @time_this
     def retrieve_from_scene_selection(self, *args, **kwargs):
@@ -580,11 +580,10 @@ class Ziva(Builder):
                 if embedder:
                     nodes.extend(embedder)
 
-        if nodes:
-            self._populate_nodes(nodes, get_parameters)
-        else:
+        if not nodes:
             # this is being deferred so it prints out after time_this decorator results
             cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            return
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
