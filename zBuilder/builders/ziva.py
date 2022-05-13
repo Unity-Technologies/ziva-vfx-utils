@@ -441,10 +441,12 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         # NODE STORING---------------------------------------------------------
         # ---------------------------------------------------------------------
-        if solver:
-            solver = solver[0]
-        else:
-            raise Exception('zSolver not connected to selection.  Please try again.')
+        if not solver:
+            # this is being deferred so it prints out after time_this decorator results
+            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            return
+            
+        solver = solver[0]
 
         b_solver = self.node_factory(solver, parent=None)
         self.bundle.extend_scene_items(b_solver)
@@ -578,8 +580,12 @@ class Ziva(Builder):
                 if embedder:
                     nodes.extend(embedder)
 
-        if nodes:
-            self._populate_nodes(nodes, get_parameters)
+        if not nodes:
+            # this is being deferred so it prints out after time_this decorator results
+            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            return
+
+        self._populate_nodes(nodes, get_parameters)
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
