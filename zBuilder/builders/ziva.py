@@ -579,12 +579,13 @@ class Ziva(Builder):
                 embedder = cmds.zQuery(t='zEmbedder')
                 if embedder:
                     nodes.extend(embedder)
-        if nodes:
-            self._populate_nodes(nodes, get_parameters)
-        else:
+
+        if not nodes:
             # this is being deferred so it prints out after time_this decorator results
             cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
             return
+
+        self._populate_nodes(nodes, get_parameters)
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
