@@ -397,6 +397,7 @@ class Ziva(Builder):
         self.stats()
         self.make_node_connections()
 
+    @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         """
         This gets the scene items from the scene for further manipulation or saving.
