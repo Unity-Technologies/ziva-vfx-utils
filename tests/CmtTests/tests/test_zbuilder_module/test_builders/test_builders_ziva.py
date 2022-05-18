@@ -7,6 +7,67 @@ from tests.utils import (build_mirror_sample_geo, build_anatomical_arm_with_no_p
                          retrieve_builder_from_scene)
 from zBuilder.commands import clean_scene
 from zBuilder.utils.solverDisabler import SolverDisabler
+from zBuilder.nodes.base import Base
+from zBuilder.nodes.dg_node import DGNode
+
+class ZivaBuilderSearchExclude(VfxTestCase):
+
+    def setUp(self):
+        super(ZivaBuilderSearchExclude, self).setUp()
+
+        # build 1 cube and make it a tissue
+        cube = cmds.polyCube()
+        cmds.select(cube)
+        cmds.ziva(t=True)
+
+        cmds.select(cl=True)
+
+        # use builder to retrieve from scene
+        self.z = zva.Ziva()
+        self.z.retrieve_from_scene()
+
+    def test_map_class_search_exclude_maps(self):
+        # This is testing a fix specific to VFXACT-1328
+        # in short, map_type and interp_method were not placed in SEARCH_EXCLUDE so string
+        # replacing could change them, breaking features.
+
+        # given that this is a single cube tissue, we should have 2 barycentric maps here. a zTet and zMaterial
+        barycentric_maps_pre = []
+        for item in self.z.get_scene_items(type_filter='map'):
+            if item.interp_method == 'barycentric':
+                barycentric_maps_pre.append(item)
+        self.assertTrue(len(barycentric_maps_pre) == 2)
+
+        # add a prefix to all seriliazed data
+        self.z.string_replace('^','oooooo')
+
+        # now lets check and make sure the values of interp_method method are as they should be.  
+        # There are no fibers in this test scene so lets check to make sure value of interp_method has not changed
+        # searching through scene_items to find the specific value I am looking for.
+        
+        # If interp_methd is not part of SEARCH_EXCLUDE, we would not find any barycentric maps
+        barycentric_maps_post = []
+        for item in self.z.get_scene_items(type_filter='map'):
+            if item.interp_method == 'barycentric':
+                barycentric_maps_post.append(item)
+
+        # compare pre and post
+        self.assertEqual(barycentric_maps_post, barycentric_maps_pre)
+
+    
+    def test_search_exclude_inheriting(self):
+        # searching through every scene item
+        # Check if inherited from Base.
+        # Check if ALL Base.SEARCH_EXCLUDE items are in item.SEARCH_EXCLUDE
+        # This broke previously when the inheritence was overridding instead of extending
+        # Any new nodes that do not inherit proprely will break here
+        for item in self.z.get_scene_items():
+            if isinstance(item,Base):
+                # This will assert if any scene item does not contain Base.SEARCH_EXCLUDE items
+                self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in Base.SEARCH_EXCLUDE))
+            if isinstance(item,DGNode):
+                # This will assert if any scene item does not contain DGNode.SEARCH_EXCLUDE items
+                self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in DGNode.SEARCH_EXCLUDE))
 
 
 class ZivaBuilderMirrorTestCase(VfxTestCase):

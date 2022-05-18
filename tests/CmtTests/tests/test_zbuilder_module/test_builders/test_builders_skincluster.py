@@ -4,7 +4,8 @@ from maya import cmds
 from maya import mel
 from vfx_test_case import VfxTestCase, attr_values_from_scene
 from zBuilder.builders.skinClusters import SkinCluster
-
+from zBuilder.nodes.base import Base
+from zBuilder.nodes.dg_node import DGNode
 
 class SkinClusterBuilderTestCase(VfxTestCase):
 
@@ -129,3 +130,17 @@ class SkinClusterBuilderTestCase(VfxTestCase):
         ## VERIFY
         # if built properly value should be False
         self.assertEqual(cmds.getAttr('skinCluster1.useComponents'), 0)
+
+    def test_skinCluster_search_exclude_inheriting(self):
+        # searching through every scene item
+        # Check if inherited from Base.
+        # Check if ALL Base.SEARCH_EXCLUDE items are in item.SEARCH_EXCLUDE
+        # This broke previously when the inheritence was overridding instead of extending
+        # Any new nodes that do not inherit proprely will break here
+        for item in self.builder.get_scene_items(type_filter='skinCluster'):
+            if isinstance(item,Base):
+                # This will assert if any scene item does not contain Base.SEARCH_EXCLUDE items
+                self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in Base.SEARCH_EXCLUDE))
+            if isinstance(item,DGNode):
+                # This will assert if any scene item does not contain DGNode.SEARCH_EXCLUDE items
+                self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in DGNode.SEARCH_EXCLUDE))

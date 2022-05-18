@@ -23,8 +23,8 @@ class DGNode(Base):
     # List of maya node attribute names that represent the paintable map.
     MAP_LIST = []
 
-    # A list of attribute names in __dict__ to exclude from the string_replace method.
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'parameters']
+    # This is an inherited class attribute.
+    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + ['parameters',]
 
     # List of maya node attribute names to add to the auto generated attribute list to include.
     EXTEND_ATTR_LIST = list()

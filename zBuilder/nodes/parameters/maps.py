@@ -14,14 +14,20 @@ logger = logging.getLogger(__name__)
 class Map(Base):
     type = 'map'
 
+    # This is an inherited class attribute.
+    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + ['map_type','interp_method']
+
     def __init__(self, *args, **kwargs):
         super(Map, self).__init__(*args, **kwargs)
+        
+        # Name of mesh associated with map
         self._mesh = None
-        #: list of str: Doc comment *before* attribute, with type specified
+        # a list of values for the map
         self.values = None
-        """str: Docstring *after* attribute, with type specified."""
-
+        # Type of Ziva VFX map  (zAttachment, zTet, zMaterial, zFiber)
         self.map_type = None
+        # The interpolation method for map (barycentric, endPoints)
+        self.interp_method = None
 
         if args:
             map_name = args[0]
@@ -128,6 +134,9 @@ class Map(Base):
             elif self.interp_method == "endPoints":
                 interp_weights = interpolate_end_points_weights(created_mesh, mesh_name,
                                                                 self.values)
+            else:
+                assert False, "Unknown interpolation method: {}.".format(self.interp_method)
+
             self.values = interp_weights
 
             cmds.delete(created_mesh)

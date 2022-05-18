@@ -11,8 +11,8 @@ class SkinCluster(DGNode):
     type = 'skinCluster'
     TYPES = []
 
-    # List of attributes to exclude with a string_replace
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'weights']
+    # This is an inherited class attribute.
+    SEARCH_EXCLUDE = DGNode.SEARCH_EXCLUDE + ['weights',]
 
     # List of maya attributes to add to attribute list when capturing
     EXTEND_ATTR_LIST = list()
