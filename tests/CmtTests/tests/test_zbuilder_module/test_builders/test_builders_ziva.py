@@ -26,6 +26,27 @@ class ZivaBuilderSearchExclude(VfxTestCase):
         self.z = zva.Ziva()
         self.z.retrieve_from_scene()
 
+    def test_search_exclude_info_attribute(self):
+        # This is testing a fix specific to VFXACT-1347
+        # in short, info was not placed in SEARCH_EXCLUDE so string replacing
+        # could change them, breaking features.
+
+        info_pre = []
+        for item in self.z.get_scene_items():
+            info_pre.append(item.info)
+
+        # add a prefix to all seriliazed data
+        self.z.string_replace('^','oooooo')
+
+        # now lets check and make sure the values of info are as they should be.  
+        info_post = []
+        for item in self.z.get_scene_items():
+            info_post.append(item.info)
+
+        # compare pre and post
+        self.assertEqual(info_pre, info_post)   
+        self.assertNotEqual(info_pre, None)
+
     def test_map_class_search_exclude_maps(self):
         # This is testing a fix specific to VFXACT-1328
         # in short, map_type and interp_method were not placed in SEARCH_EXCLUDE so string

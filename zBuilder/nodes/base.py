@@ -15,7 +15,7 @@ class Base(object):
     # The reason these are excluded is because we do not want these to be user changable.
     # If someone does a string_replace() and it happens to change the value of one of those attributes
     # unexpected results will happen.
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'info']
 
     TYPES = []
     type = None  # type of scene item
