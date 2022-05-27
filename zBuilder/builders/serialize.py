@@ -30,7 +30,8 @@ def _update_json_pre_1_0_11(json_object):
 
     if class_type_name in _get_node_types_with_maps():
         json_object['parameters'] = defaultdict(list)
-        map_names = construct_map_names(json_object['_name'], class_type.MAP_LIST)
+        map_names = construct_map_names(
+            json_object['_name'], class_type.MAP_LIST)
         json_object['parameters']['map'].extend(map_names)
 
         # the association holds the mesh name associated with node.  Currently the only
@@ -72,7 +73,8 @@ def pack_zbuilder_contents(builder, type_filter, invert_match):
 
     node_data = dict()
     node_data['d_type'] = 'node_data'
-    node_data['data'] = builder.get_scene_items(type_filter=type_filter, invert_match=invert_match)
+    node_data['data'] = builder.get_scene_items(
+        type_filter=type_filter, invert_match=invert_match)
 
     info = dict()
     info['d_type'] = 'info'
@@ -115,12 +117,14 @@ def load_base_node(json_object):
         obj:  Result of operation
     """
     if '_class' in json_object:
-        major, minor, patch, _ = parse_version_info(json_object['info']['version'])
+        major, minor, patch, _ = parse_version_info(
+            json_object['info']['version'])
         # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
         if (major, minor, patch) < (1, 0, 11):
             _update_json_pre_1_0_11(json_object)
 
-        obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
+        obj = find_class(json_object['_builder_type'],
+                         json_object.get('type', 'Base'))
         try:
             scene_item = obj()
             scene_item.deserialize(json_object)

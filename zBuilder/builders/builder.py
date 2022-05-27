@@ -70,7 +70,8 @@ class Builder(object):
         try:
             obb.populate(maya_node=node)
         except Exception:
-            logger.exception('Failed to populate node: {}, skipped.'.format(node))
+            logger.exception(
+                'Failed to populate node: {}, skipped.'.format(node))
             node_created = False
         if node_created:
             scene_items.append(obb)
@@ -104,7 +105,8 @@ class Builder(object):
         for parameter_type, parameter_args in node_parameter_info.items():
             for parameter_arg in parameter_args:
                 if parameter_type in types:
-                    parameter = self.parameter_factory(parameter_type, parameter_arg)
+                    parameter = self.parameter_factory(
+                        parameter_type, parameter_arg)
                     parameters.append(parameter)
 
         return parameters
@@ -131,7 +133,8 @@ class Builder(object):
 
         for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj) and parameter_type == obj.type:
-                scene_item_nodes = self.get_scene_items(type_filter=parameter_type)
+                scene_item_nodes = self.get_scene_items(
+                    type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
 
                 # the first element in parameter_args is the name.
@@ -200,7 +203,8 @@ class Builder(object):
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
                     if scene_item.__dict__[attr]:
-                        restored = self.restore_scene_items_from_string(scene_item.__dict__[attr])
+                        restored = self.restore_scene_items_from_string(
+                            scene_item.__dict__[attr])
                         scene_item.__dict__[attr] = restored
 
     @time_this
@@ -227,7 +231,8 @@ class Builder(object):
             for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
                 if attr in scene_item.__dict__:
                     if scene_item.__dict__[attr]:
-                        restored = self.restore_scene_items_from_string(scene_item.__dict__[attr])
+                        restored = self.restore_scene_items_from_string(
+                            scene_item.__dict__[attr])
                         scene_item.__dict__[attr] = restored
 
         self.stats()
@@ -300,11 +305,13 @@ class Builder(object):
         if not is_sequence(type_filter):
             type_filter = [type_filter] if type_filter else None
         if type_filter:
-            assert all(is_string(t) for t in type_filter), "type filter requires string type"
+            assert all(is_string(t)
+                       for t in type_filter), "type filter requires string type"
 
         # put association filter in a list if it isn't
         if not is_sequence(association_filter):
-            association_filter = [association_filter] if association_filter else None
+            association_filter = [
+                association_filter] if association_filter else None
         if association_filter:
             assert all(is_string(a)
                        for a in association_filter), "association filter requires string type"
@@ -313,7 +320,8 @@ class Builder(object):
         if not is_sequence(name_filter):
             name_filter = [name_filter] if name_filter else None
         if name_filter:
-            assert all(is_string(n) for n in name_filter), "name filter requires string type"
+            assert all(is_string(n)
+                       for n in name_filter), "name filter requires string type"
 
         return self.bundle.get_scene_items(type_filter, name_filter, name_regex, association_filter,
                                            association_regex, invert_match)
