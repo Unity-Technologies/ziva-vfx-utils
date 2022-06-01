@@ -126,7 +126,7 @@ class ZivaRestShapeGenericTestCase(VfxTestCase):
         self.check_retrieve_rest_shape_looks_good(builder, {})
 
     def test_build_from_file(self):
-        builder = self.get_builder_after_write_and_retrieve_from_file(self.builder)
+        builder = self.get_builder_after_write_and_read(self.builder)
         self.check_retrieve_rest_shape_looks_good(builder, {})
 
     def test_rename(self):

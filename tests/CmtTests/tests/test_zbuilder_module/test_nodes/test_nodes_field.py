@@ -5,6 +5,7 @@ from maya import mel
 
 from vfx_test_case import VfxTestCase, attr_values_from_scene
 from zBuilder.utils.mayaUtils import FIELD_TYPES
+from zBuilder.builders.serialize import read, write
 
 
 class MayaFieldTestCase(VfxTestCase):
@@ -59,14 +60,14 @@ class MayaFieldTestCase(VfxTestCase):
 
     def test_builder_has_same_field_nodes_after_writing_to_disk(self):
         ## ACT
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
 
         ## VERIFY
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         ## ACT
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
 
         ## VERIFY
         self.check_retrieve_field_looks_good(builder)
@@ -86,14 +87,14 @@ class MayaFieldTestCase(VfxTestCase):
 
     def test_build_from_file(self):
         ## SETUP
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
         cmds.select(cmds.ls(type="field"))
         mel.eval("doDelete;")
 
         ## ACT
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         builder.build()
 
         builder = zva.Ziva()

@@ -7,7 +7,7 @@ import time
 import zBuilder.nodes.parameters
 
 from maya import cmds
-from zBuilder.utils.commonUtils import is_sequence, is_string, time_this, parse_version_info
+from zBuilder.utils.commonUtils import is_sequence, is_string, parse_version_info
 from zBuilder.utils.mayaUtils import get_type, parse_maya_node_for_selection
 from zBuilder import __version__
 from .bundle import Bundle
@@ -70,8 +70,7 @@ class Builder(object):
         try:
             obb.populate(maya_node=node)
         except Exception:
-            logger.exception(
-                'Failed to populate node: {}, skipped.'.format(node))
+            logger.exception('Failed to populate node: {}, skipped.'.format(node))
             node_created = False
         if node_created:
             scene_items.append(obb)
@@ -105,8 +104,7 @@ class Builder(object):
         for parameter_type, parameter_args in node_parameter_info.items():
             for parameter_arg in parameter_args:
                 if parameter_type in types:
-                    parameter = self.parameter_factory(
-                        parameter_type, parameter_arg)
+                    parameter = self.parameter_factory(parameter_type, parameter_arg)
                     parameters.append(parameter)
 
         return parameters
@@ -133,8 +131,7 @@ class Builder(object):
 
         for _, obj in inspect.getmembers(sys.modules['zBuilder.nodes']):
             if inspect.isclass(obj) and parameter_type == obj.type:
-                scene_item_nodes = self.get_scene_items(
-                    type_filter=parameter_type)
+                scene_item_nodes = self.get_scene_items(type_filter=parameter_type)
                 scene_item_names = [y.long_name for y in scene_item_nodes]
 
                 # the first element in parameter_args is the name.
@@ -173,69 +170,21 @@ class Builder(object):
 
         self.stats()
 
-    @time_this
     def write(self, file_path, type_filter=None, invert_match=False):
-        """ Writes out the scene items to a json file given a file path.
-
-        Args:
-            file_path (str): The file path to write to disk.
-            type_filter (list, optional): Types of scene items to write.
-            invert_match (bool): Invert the sense of matching, to select non-matching items.
-                Defaults to ``False``
         """
+        Wraps 'write()' defined in serialize.py. This is used for backward compatibility.
+        """
+        logger.warning('This method will be deprecated. Use write() defined in zBuilder.builders.serialize instead.')
+        import zBuilder.builders.serialize as serialize
+        serialize.write(file_path, self, type_filter, invert_match)
 
-        from .serialize import pack_zbuilder_contents, BaseNodeEncoder
-        json_data = pack_zbuilder_contents(self, type_filter, invert_match)
-        with open(file_path, 'w') as outfile:
-            json.dump(json_data,
-                      outfile,
-                      cls=BaseNodeEncoder,
-                      sort_keys=True,
-                      indent=4,
-                      separators=(',', ': '))
-
-        self.stats()
-        logger.info('Wrote File: %s' % file_path)
-
-        # loop through the scene items
-        for scene_item in self.get_scene_items():
-            # loop through scene item attributes as defined by each scene item
-            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
-                if attr in scene_item.__dict__:
-                    if scene_item.__dict__[attr]:
-                        restored = self.restore_scene_items_from_string(
-                            scene_item.__dict__[attr])
-                        scene_item.__dict__[attr] = restored
-
-    @time_this
     def retrieve_from_file(self, file_path):
-        """ Reads scene items from a given file.  The items get placed in the bundle.
-
-        Args:
-            file_path (:obj:`str`): The file path to read from disk.
-
         """
-
-        from .serialize import load_base_node, unpack_zbuilder_contents
-        with open(file_path, 'rb') as handle:
-            json_data = json.load(handle, object_hook=load_base_node)
-            unpack_zbuilder_contents(self, json_data)
-
-        # The json data is now loaded.  We need to go through the defined scene item attributes
-        # (The attributes that hold un-serializable scene items) and replace the string name
-        # with the proper scene item.
-
-        # loop through the scene items
-        for scene_item in self.get_scene_items():
-            # loop through scene item attributes as defined by each scene item
-            for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
-                if attr in scene_item.__dict__:
-                    if scene_item.__dict__[attr]:
-                        restored = self.restore_scene_items_from_string(
-                            scene_item.__dict__[attr])
-                        scene_item.__dict__[attr] = restored
-
-        self.stats()
+        Wraps 'read()' defined in serialize.py. This is used for backward compatibility.
+        """
+        logger.warning('This method will be deprecated. Use read() defined in zBuilder.builders.serialize instead.')
+        import zBuilder.builders.serialize as serialize
+        serialize.read(file_path, self)
 
     def stats(self):
         """
@@ -305,13 +254,11 @@ class Builder(object):
         if not is_sequence(type_filter):
             type_filter = [type_filter] if type_filter else None
         if type_filter:
-            assert all(is_string(t)
-                       for t in type_filter), "type filter requires string type"
+            assert all(is_string(t) for t in type_filter), "type filter requires string type"
 
         # put association filter in a list if it isn't
         if not is_sequence(association_filter):
-            association_filter = [
-                association_filter] if association_filter else None
+            association_filter = [association_filter] if association_filter else None
         if association_filter:
             assert all(is_string(a)
                        for a in association_filter), "association filter requires string type"
@@ -320,8 +267,7 @@ class Builder(object):
         if not is_sequence(name_filter):
             name_filter = [name_filter] if name_filter else None
         if name_filter:
-            assert all(is_string(n)
-                       for n in name_filter), "name filter requires string type"
+            assert all(is_string(n) for n in name_filter), "name filter requires string type"
 
         return self.bundle.get_scene_items(type_filter, name_filter, name_regex, association_filter,
                                            association_regex, invert_match)

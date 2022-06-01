@@ -9,6 +9,7 @@ from tests.utils import load_scene, get_tmp_file_location, get_ziva_node_names_f
 from zBuilder.commands import (rename_ziva_nodes, clean_scene, remove_solver, remove_all_solvers,
                                rig_cut, rig_copy, rig_paste, rig_transfer)
 from zBuilder.nodes.ziva.zSolver import SolverNode
+from zBuilder.builders.serialize import read, write
 
 
 class ZivaSolverGenericTestCase(VfxTestCase):
@@ -108,11 +109,11 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.assertEqual(solver_transform.type, "zSolverTransform")
 
     def test_builder_has_same_solver_node_after_roundtrip_to_disk(self):
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_build(self):
@@ -139,10 +140,10 @@ class ZivaSolverGenericTestCase(VfxTestCase):
                                                          solver_transform_values)
 
     def test_build_from_file(self):
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
@@ -487,11 +488,11 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
         self.assertEqual(solver_transform.type, "zSolverTransform")
 
     def test_builder_has_same_solver_node_after_roundtrip_to_disk(self):
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_build(self):
@@ -518,10 +519,10 @@ class ZivaSolverDuplicateTestCase(VfxTestCase):
                                                          solver_transform_values)
 
     def test_build_from_file(self):
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         clean_scene()
         builder.build()
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
