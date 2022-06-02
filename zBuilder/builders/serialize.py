@@ -2,11 +2,14 @@ import inspect
 import json
 import logging
 import sys
+import time
 
+from maya import cmds
 from collections import defaultdict
 from zBuilder.utils.commonUtils import parse_version_info, time_this
 from zBuilder.utils.mayaUtils import get_short_name, construct_map_names
 from zBuilder.builders.builder import find_class
+from zBuilder import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +67,22 @@ class BaseNodeEncoder(json.JSONEncoder):
 
         return super(BaseNodeEncoder, self).default(obj)
 
+def get_meta_data():
+    """ Meta data for embedding with serialized data
+    """
+    meta_data = dict()
+    meta_data['version'] = __version__
+    meta_data['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
+    meta_data['operating_system'] = cmds.about(os=True)
+    meta_data['maya_version'] = cmds.about(v=True)
+
+    for plugin in cmds.pluginInfo(query=True, listPluginsPath=True):
+        commands = cmds.pluginInfo(plugin, q=True, c=True)
+        if commands and 'ziva' in commands:
+            meta_data['plugin_name'] = plugin
+            continue
+
+    return meta_data
 
 def pack_zbuilder_contents(builder, type_filter, invert_match):
     """ Utility to package the data in a dictionary.
@@ -76,7 +95,7 @@ def pack_zbuilder_contents(builder, type_filter, invert_match):
 
     info = dict()
     info['d_type'] = 'info'
-    info['data'] = builder.info
+    info['data'] = get_meta_data()
 
     return [node_data, info]
 
@@ -92,10 +111,6 @@ def unpack_zbuilder_contents(builder, json_data):
         if d['d_type'] == 'node_data':
             builder.bundle.extend_scene_items(d['data'])
             logger.info("Reading scene items. {} nodes".format(len(d['data'])))
-
-        if d['d_type'] == 'info':
-            builder.info = d['data']
-            logger.info("Reading info.")
 
     logger.info("Assigning builder.")
     for item in builder.bundle:
@@ -114,12 +129,13 @@ def load_base_node(json_object):
     Returns:
         obj:  Result of operation
     """
-    if '_class' in json_object:
-        major, minor, patch, _ = parse_version_info(json_object['info']['version'])
+    if 'version' in json_object:
+        major, minor, patch, _ = parse_version_info(json_object['version'])
         # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
-        if (major, minor, patch) < (1, 0, 11):
+        if (major, minor, patch) and (major, minor, patch) < (1, 0, 11):
             _update_json_pre_1_0_11(json_object)
 
+    if '_class' in json_object:
         obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
         try:
             scene_item = obj()

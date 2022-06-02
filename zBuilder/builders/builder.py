@@ -2,11 +2,9 @@ import inspect
 import json
 import logging
 import sys
-import time
 # For parameter_factory() and find_class(), though not use directly,
 import zBuilder.nodes.parameters
 
-from maya import cmds
 from zBuilder.utils.commonUtils import is_sequence, is_string, parse_version_info
 from zBuilder.utils.mayaUtils import get_type, parse_maya_node_for_selection
 from zBuilder import __version__
@@ -25,12 +23,6 @@ class Builder(object):
         from zBuilder.nodes.base import Base
         self.root_node = Base()
         self.root_node.name = 'ROOT'
-
-        self.info = dict()
-        self.info['version'] = __version__
-        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = cmds.about(v=True)
-        self.info['operating_system'] = cmds.about(os=True)
 
     def __eq__(self, other):
         """ Compares the builders.
