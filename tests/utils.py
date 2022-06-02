@@ -1,5 +1,4 @@
 import tempfile
-import glob
 import os
 import zBuilder.builders.ziva as zva
 
@@ -98,19 +97,6 @@ def load_scene(scene_name, new_scene=True):
 
     # import with no namespace
     cmds.file(path, i=True, ns=":", ignoreVersion=True)
-
-
-def get_1_7_builder_files():
-    """ Part of the test assets includes zBuilder files saved in 1_7.
-    This is to test backwards compatibility.
-    Building with these should still work after 1_9.
-
-    Returns:
-        list of str: list of paths to 1_7 zBuilder files. 
-    """
-    directory = "{}/assets".format(CURRENT_DIRECTORY_PATH)
-    builders = glob.glob(directory + '/*1_7.zBuilder')
-    return builders
 
 
 def build_anatomical_arm_with_no_popup(ziva_setup=True, new_scene=True):
