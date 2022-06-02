@@ -8,10 +8,10 @@ from tests.utils import (build_mirror_sample_geo, get_tmp_file_location,
 from zBuilder.commands import clean_scene, load_rig
 
 
-class IOTestCase(VfxTestCase):
+class SerializeTestCase(VfxTestCase):
 
     def setUp(self):
-        super(IOTestCase, self).setUp()
+        super(SerializeTestCase, self).setUp()
         self.temp_files = []
         # NOTE: Leave setup() function not running any zBuilder class registration code
         # to make test_0load_zBuilder_file() unit test work.
@@ -23,7 +23,7 @@ class IOTestCase(VfxTestCase):
         for temp_file in self.temp_files:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
-        super(IOTestCase, self).tearDown()
+        super(SerializeTestCase, self).tearDown()
 
     def test_builder_write(self):
         # Setup

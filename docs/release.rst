@@ -16,6 +16,7 @@ Release Notes
 Functionality
 +++++++++++++
 - **zBuilder:** Refactoring code structure:
+    - Renamed **zBuilder.builders.IO** to **zBuilder.builders.serialize**.
     - Move **rename_ziva_nodes()** from **zBuilder.zMaya** to **zBuilder.utils**.
     - Rename **zBuilder.utils** to **zBuilder.commands**.
     - Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.

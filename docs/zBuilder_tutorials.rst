@@ -115,9 +115,9 @@ The script editor output should look something like this:
     # zBuilder.builders.bundle : zBone 3 # 
     # zBuilder.builders.bundle : zTet 1 # 
     # zBuilder.builders.bundle : mesh 5 # 
-    # zBuilder.builders.bundle : zSolver 1 # 
-    # zBuilder.builders.bundle : zSolverTransform 1 # 
-    # zBuilder.builders.bundle : zFiber 1 # 
+    # zBuilder.builders.bundle : zSolver 1 #
+    # zBuilder.builders.bundle : zSolverTransform 1 #
+    # zBuilder.builders.bundle : zFiber 1 #
     # zBuilder.utils.commonUtils : Executing retrieve_from_scene_selection() took 0.080s # 
 
 Notice that only one tissue is being retrieved.
@@ -313,9 +313,9 @@ The script editor should output something like:
 
 .. code-block:: python
 
-    # zBuilder.builders.IO : Reading scene items. 134 nodes # 
-    # zBuilder.builders.IO : Reading info. # 
-    # zBuilder.builders.IO : Assigning builder. # 
+    # zBuilder.builders.serialize : Reading scene items. 134 nodes #
+    # zBuilder.builders.serialize : Reading info. #
+    # zBuilder.builders.serialize : Assigning builder. #
     # zBuilder.builders.bundle : zTissue 7 # 
     # zBuilder.builders.bundle : map 68 # 
     # zBuilder.builders.bundle : zAttachment 21 # 

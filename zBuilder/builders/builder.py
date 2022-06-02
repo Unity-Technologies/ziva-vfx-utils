@@ -181,7 +181,7 @@ class Builder(object):
                 Defaults to ``False``
         """
 
-        from .IO import pack_zbuilder_contents, BaseNodeEncoder
+        from .serialize import pack_zbuilder_contents, BaseNodeEncoder
         json_data = pack_zbuilder_contents(self, type_filter, invert_match)
         with open(file_path, 'w') as outfile:
             json.dump(json_data,
@@ -212,7 +212,7 @@ class Builder(object):
 
         """
 
-        from .IO import load_base_node, unpack_zbuilder_contents
+        from .serialize import load_base_node, unpack_zbuilder_contents
         with open(file_path, 'rb') as handle:
             json_data = json.load(handle, object_hook=load_base_node)
             unpack_zbuilder_contents(self, json_data)
