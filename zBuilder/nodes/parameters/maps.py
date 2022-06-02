@@ -15,11 +15,11 @@ class Map(Base):
     type = 'map'
 
     # This is an inherited class attribute.
-    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + ['map_type','interp_method']
+    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + ['map_type', 'interp_method']
 
     def __init__(self, *args, **kwargs):
         super(Map, self).__init__(*args, **kwargs)
-        
+
         # Name of mesh associated with map
         self._mesh = None
         # a list of values for the map
@@ -44,7 +44,10 @@ class Map(Base):
                 name, self.__class__.__module__, self.__class__.__name__)
             for key in self.__dict__:
                 if key == 'values':
-                    output += '\t{} - [{},....]\n'.format(key, self.__dict__[key][0])
+                    if self.values:
+                        output += '\t{} - [{},....]\n'.format(key, self.__dict__[key][0])
+                    else:
+                        output += '\t{} - Not retrieved yet\n'.format(key)
                 else:
                     output += '\t{} - {}\n'.format(key, self.__dict__[key])
             return output
@@ -71,10 +74,12 @@ class Map(Base):
         self.name = map_name
         self.set_mesh(mesh_name)
         self.type = 'map'
-
-        self.values = get_weights(map_name, mesh_name)
-
         self.map_type = get_type(map_name)
+        # Defer retrieve map value to retrieve_values() until it is needed.
+
+    def retrieve_values(self):
+        # get the values of the map from the scene and update the scene_item
+        self.values = get_weights(self.long_name, self.get_mesh(long_name=True))
 
     def set_mesh(self, mesh):
         """ Stores the mesh name.

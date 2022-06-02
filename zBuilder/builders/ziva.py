@@ -293,30 +293,14 @@ class Ziva(Builder):
         else:
             return []
 
-    def retrieve_connections(self, *args, **kwargs):
+    @time_this
+    def retrieve_connections(self):
         """ This retrieves the scene items from the scene based on connections to
         selection and does not get parameters for speed.  This is main call to 
         check scene for loading into a ui.
-
-        Args:
-            get_parameters (bool): To get parameters or not. Default True
         """
-        # ---------------------------------------------------------------------
-        # KWARG PARSING--------------------------------------------------------
-        # ---------------------------------------------------------------------
-        get_parameters = kwargs.get('get_parameters', True)
-
-        # ---------------------------------------------------------------------
-        # ARG PARSING----------------------------------------------------------
-        # ---------------------------------------------------------------------
         scene_selection = cmds.ls(sl=True, l=True)
-        if args:
-            selection = args[0]
-            cmds.select(selection)
-        else:
-            selection = scene_selection
-
-        selection = transform_rivet_and_LoA_into_tissue_meshes(selection)
+        selection = transform_rivet_and_LoA_into_tissue_meshes(scene_selection)
 
         nodes = []
         nodes.extend(self.__add_bodies(selection))
@@ -390,7 +374,7 @@ class Ziva(Builder):
 
         if nodes:
             nodes = sort_node_by_type(nodes)
-            self._populate_nodes(nodes, get_parameters)
+            self._populate_nodes(nodes, True)
             self.setup_tree_hierarchy()
 
         cmds.select(scene_selection)
@@ -420,15 +404,7 @@ class Ziva(Builder):
         Existing scene items are retained. If this retrieve finds a scene items
         with the same long name as an existing scene item, it replaces the old one.
 
-        Args:
-            get_parameters (bool): To get parameters or not.
-
         """
-        # ---------------------------------------------------------------------
-        # KWARG PARSING--------------------------------------------------------
-        # ---------------------------------------------------------------------
-        get_parameters = kwargs.get('get_parameters', True)
-
         # ---------------------------------------------------------------------
         # ARG PARSING----------------------------------------------------------
         # ---------------------------------------------------------------------
@@ -443,9 +419,11 @@ class Ziva(Builder):
         # ---------------------------------------------------------------------
         if not solver:
             # this is being deferred so it prints out after time_this decorator results
-            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            cmds.evalDeferred(
+                "cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')"
+            )
             return
-            
+
         solver = solver[0]
 
         b_solver = self.node_factory(solver, parent=None)
@@ -470,7 +448,7 @@ class Ziva(Builder):
         node_types.extend(FIELD_TYPES)
         nodes = _zQuery(node_types, solver)
         if nodes:
-            self._populate_nodes(nodes, get_parameters)
+            self._populate_nodes(nodes, True)
             self.setup_tree_hierarchy()
 
         self.stats()
@@ -497,7 +475,6 @@ class Ziva(Builder):
             fields (bool): Gets field data.  Defaults to True
             lineOfAction (bool): Gets line of action data.  Defaults to True
             embedder (bool): Gets embedder data.  Defaults to True
-            get_parameters (bool): get mesh info. Defaults to True
         """
 
         # get current selection to re-apply
@@ -523,7 +500,6 @@ class Ziva(Builder):
         rivetToBone = kwargs.get('rivetToBone', True)
         restShape = kwargs.get('restShape', True)
         embedder = kwargs.get('embedder', True)
-        get_parameters = kwargs.get('get_parameters', True)
 
         print('\ngetting ziva......')
 
@@ -582,23 +558,30 @@ class Ziva(Builder):
 
         if not nodes:
             # this is being deferred so it prints out after time_this decorator results
-            cmds.evalDeferred("cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')")
+            cmds.evalDeferred(
+                "cmds.warning('A zSolver not connected to selection.  Please select something connected to a solver and try again.')"
+            )
             return
 
-        self._populate_nodes(nodes, get_parameters)
+        self._populate_nodes(nodes, True)
 
         cmds.select(sel, r=True)
         self.setup_tree_hierarchy()
         self.stats()
         self.make_node_connections()
 
-    def _populate_nodes(self, nodes, get_parameters):
+    def _populate_nodes(self, nodes, update_map_mesh_values):
         """
         This instantiates a builder node and populates it with given maya node.
         """
         for node in nodes:
-            parameter = self.node_factory(node, parent=None, get_parameters=get_parameters)
+            parameter = self.node_factory(node, parent=None)
             self.bundle.extend_scene_items(parameter)
+
+        if update_map_mesh_values:
+            for item in self.get_scene_items(type_filter=['map', 'mesh']):
+
+                item.retrieve_values()
 
     @time_this
     def build(self,

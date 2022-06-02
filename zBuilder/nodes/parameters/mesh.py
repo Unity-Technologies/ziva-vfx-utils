@@ -24,8 +24,12 @@ class Mesh(Base):
                 self.populate(mesh_name)
 
     def __str__(self):
-        return "< MESH: {} -- Poly: {}  Vert: {} >".format(self.long_name, len(self._pCountList),
-                                                           len(self._pointList))
+        if self._pCountList and self._pointList:
+            return "< MESH: {} -- Poly: {}  Vert: {} >".format(self.long_name,
+                                                               len(self._pCountList),
+                                                               len(self._pointList))
+        else:
+            return "< MESH: {} -- Not retrieved yet. >".format(self.long_name)
 
     def __repr__(self):
         return self.__str__()
@@ -36,9 +40,13 @@ class Mesh(Base):
          Args:
              mesh_name: Name of mesh to populate it with.
         """
-        self._pCountList, self._pConnectList, self._pointList = get_mesh_info(mesh_name)
         self.name = mesh_name
         self.type = 'mesh'
+        # Defer retrieve mesh value to retrieve_values() until it is needed.
+
+    def retrieve_values(self):
+        # get the values of the mesh from the scene and update the scene_item
+        self._pCountList, self._pConnectList, self._pointList = get_mesh_info(self.long_name)
 
     def build_mesh(self):
         """ Builds mesh in maya scene.
@@ -110,7 +118,7 @@ def get_mesh_info(mesh_name):
     mesh_name = get_name_from_mobject(mesh_dag_path)
     poly_vertex_list = cmds.xform(mesh_name + '.vtx[*]', q=True, ws=True, t=True)
     assert len(
-        poly_vertex_list) % 3 == 0, "Mesh vertex position list size is not a multiplier of 3."
+        poly_vertex_list) % 3 == 0, 'Mesh vertex position list size is not a multiplier of 3.'
     # convert flat list of points to list containing 3 element lists.
     # Each 3 element list is x, y, z worldspace coordinate of vert.
     poly_vertex_list = [poly_vertex_list[x:x + 3] for x in range(0, len(poly_vertex_list), 3)]

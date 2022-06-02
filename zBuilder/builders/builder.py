@@ -49,7 +49,7 @@ class Builder(object):
         import zBuilder.ui.reader as reader
         reader.view(root_node=self.root_node)
 
-    def node_factory(self, node, parent=None, get_parameters=True):
+    def node_factory(self, node, parent=None):
         """Given a maya node, this checks objType and instantiates the proper
         zBuilder.node and populates it and returns it.
 
@@ -75,13 +75,12 @@ class Builder(object):
         if node_created:
             scene_items.append(obb)
 
-        if get_parameters:
-            for node in scene_items:
-                if hasattr(node, 'spawn_parameters'):
-                    parameters = self.get_node_parameters(node)
-                    for parameter in parameters:
-                        node.add_parameter(parameter)
-                        scene_items.append(parameter)
+        for node in scene_items:
+            if hasattr(node, 'spawn_parameters'):
+                parameters = self.get_node_parameters(node)
+                for parameter in parameters:
+                    node.add_parameter(parameter)
+                    scene_items.append(parameter)
 
         return scene_items
 
