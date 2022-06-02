@@ -300,14 +300,15 @@ Run the Anatomical Arm demo again, then run:
     import zBuilder.commands as vfx_cmds
     vfx_cmds.clean_scene()
 
-Once the scene has just the arm geometry, retrieve the Ziva rig from the file on disk:
+Once the scene has just the arm geometry, read the Ziva rig from the file on disk:
 
 .. code-block:: python
 
     import zBuilder.builders.ziva as zva
+    from zBuilder.builders.serialize import read
     z = zva.Ziva()
     # Use the same path here that you used above.
-    z.retrieve_from_file('C:\\Temp\\test.zBuilder')
+    read('C:\\Temp\\test.zBuilder', z)
 
 The script editor should output something like:
 
@@ -327,7 +328,7 @@ The script editor should output something like:
     # zBuilder.builders.bundle : zSolver 1 # 
     # zBuilder.builders.bundle : zSolverTransform 1 # 
     # zBuilder.builders.bundle : zFiber 6 # 
-    # zBuilder.utils.commonUtils : Executing retrieve_from_file() took 0.057s # 
+    # zBuilder.utils.commonUtils : Executing read() took 0.057s # 
 
 Like before, this is a simple printout that hints at what has been loaded from the file.
 Now to build:

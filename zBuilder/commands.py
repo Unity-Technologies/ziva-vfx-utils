@@ -12,6 +12,7 @@ from zBuilder.utils.mayaUtils import get_short_name, get_type, safe_rename
 from zBuilder.utils.vfxUtils import get_zSolver, isSolver, check_body_type
 from zBuilder.utils.solverDisabler import SolverDisabler
 from zBuilder.builders.skinClusters import SkinCluster
+from zBuilder.builders.serialize import read, write
 
 logger = logging.getLogger(__name__)
 
@@ -203,8 +204,7 @@ def remove_all_solvers(confirmation=False):
     if confirmation:
         response = cmds.confirmDialog(
             title='Remove all Ziva solvers',
-            message=
-            'This command will erase all Ziva nodes from the Maya scene. All Ziva nodes, including all solvers, will be erased. Proceed?',
+            message='This command will erase all Ziva nodes from the Maya scene. All Ziva nodes, including all solvers, will be erased. Proceed?',
             button=['Yes', 'Cancel'],
             defaultButton='Yes',
             cancelButton='Cancel')
@@ -278,7 +278,7 @@ def rig_cut_copy(cut=False):
 
 def rig_cut():
     """ Cut selected.
-    
+
     Returns:
         bool: True if successful
     """
@@ -289,7 +289,7 @@ def rig_cut():
 
 def rig_copy():
     """Copy selected.
-    
+
     Returns:
         bool: True if successful
     """
@@ -417,7 +417,7 @@ def load_rig(file_name, solver_name=None):
     # If solverName is provided, replace the name of the solver stored in the zBuilder file
     # with a given solverName, and apply the rig to that solver.
     builder = zva.Ziva()
-    builder.retrieve_from_file(file_name)
+    read(file_name, builder)
     if solver_name != None:
         # replace the solver name stored in the .zBuilder file with solverName
         solver_name_in_file = builder.get_scene_items(type_filter='zSolverTransform')[0].name
@@ -432,7 +432,7 @@ def save_rig(file_name):
     # of selected solvers and the default solver.
     builder = zva.Ziva()
     builder.retrieve_from_scene()
-    builder.write(file_name)
+    write(file_name, builder)
 
 
 def copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with):
@@ -477,10 +477,10 @@ def _next_free_plug_in_array(dst_plug):
     have indexMatters=True even though the index does n't matter. As a result,
     connectAttr(a,b,indexMatter=True) won't work on those attrs. We need to 
     find a specific array element to connect to instead.
-    
+
     This function takes a plug name, and if it's an element of an array,
     sets the index to a free index. Else, it's the identity function.
-    
+
     _next_free_plug_in_array('foo.bar[7]') --> 'foo.bar[42]'
     _next_free_plug_in_array('foo.bar') --> 'foo.bar'
     """

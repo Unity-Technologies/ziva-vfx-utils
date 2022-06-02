@@ -4,9 +4,9 @@ import logging
 import sys
 
 from collections import defaultdict
-from zBuilder.utils.commonUtils import parse_version_info
+from zBuilder.utils.commonUtils import parse_version_info, time_this
 from zBuilder.utils.mayaUtils import get_short_name, construct_map_names
-from .builder import find_class
+from zBuilder.builders.builder import find_class
 
 logger = logging.getLogger(__name__)
 
@@ -130,3 +130,64 @@ def load_base_node(json_object):
             return json_object
 
     return json_object
+
+
+@time_this
+def write(file_path, builder, type_filter=None, invert_match=False):
+    """ Writes out the scene items to a json file given a file path.
+
+    Args:
+        file_path (str): The file path to write to disk.
+        builder: builder object
+        type_filter (list, optional): Types of scene items to write.
+        invert_match (bool): Invert the sense of matching, to select non-matching items.
+            Defaults to ``False``
+    """
+
+    with open(file_path, 'w') as outfile:
+        json.dump(pack_zbuilder_contents(builder, type_filter, invert_match),
+                  outfile,
+                  cls=BaseNodeEncoder,
+                  sort_keys=True,
+                  indent=4,
+                  separators=(',', ': '))
+
+    builder.stats()
+    logger.info('Wrote File: %s' % file_path)
+
+    # loop through the scene items
+    for scene_item in builder.get_scene_items():
+        # loop through scene item attributes as defined by each scene item
+        for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+            if attr in scene_item.__dict__:
+                if scene_item.__dict__[attr]:
+                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
+                    scene_item.__dict__[attr] = restored
+
+
+@time_this
+def read(file_path, builder):
+    """ Reads scene items from a given file.  The items get placed in the bundle.
+
+    Args:
+        file_path (:obj:`str`): The file path to read from disk.
+        builder: builder object
+    """
+
+    with open(file_path, 'r') as handle:
+        unpack_zbuilder_contents(builder, json.load(handle, object_hook=load_base_node))
+
+    # The json data is now loaded.  We need to go through the defined scene item attributes
+    # (The attributes that hold un-serializable scene items) and replace the string name
+    # with the proper scene item.
+
+    # loop through the scene items
+    for scene_item in builder.get_scene_items():
+        # loop through scene item attributes as defined by each scene item
+        for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+            if attr in scene_item.__dict__:
+                if scene_item.__dict__[attr]:
+                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
+                    scene_item.__dict__[attr] = restored
+
+    builder.stats()

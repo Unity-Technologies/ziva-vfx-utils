@@ -4,6 +4,7 @@ import zBuilder.builders.ziva as zva
 from vfx_test_case import VfxTestCase
 from tests.utils import get_1_7_builder_files, load_scene
 from zBuilder.commands import clean_scene
+from zBuilder.builders.serialize import read
 
 
 class Builder1_7_to_1_9TestCase(VfxTestCase):
@@ -24,7 +25,7 @@ class Builder1_7_to_1_9TestCase(VfxTestCase):
             clean_scene()
 
             builder = zva.Ziva()
-            builder.retrieve_from_file(item)
+            read(item, builder)
 
             builder.build()
 

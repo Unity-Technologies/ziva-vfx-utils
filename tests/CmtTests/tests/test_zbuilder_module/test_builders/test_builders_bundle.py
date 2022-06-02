@@ -2,6 +2,7 @@ from maya import cmds
 from tests.utils import load_scene, get_tmp_file_location
 from vfx_test_case import VfxTestCase
 from zBuilder.builders.ziva import Ziva
+from zBuilder.builders.serialize import read, write
 
 
 class BundleTestCase(VfxTestCase):
@@ -19,12 +20,12 @@ class BundleTestCase(VfxTestCase):
         cmds.select('zSolver1')
         builder_orig = Ziva()
         builder_orig.retrieve_from_scene()
-        builder_orig.write(file_name)
+        write(file_name, builder_orig)
 
         # Action: compare against this one
         cmds.select('zSolver1')
         builder_from_file = Ziva()
-        builder_from_file.retrieve_from_file(file_name)
+        read(file_name, builder_from_file)
 
         # Verify: The bundles should be same
         self.assertEqual(builder_orig.bundle, builder_from_file.bundle)

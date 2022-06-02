@@ -7,6 +7,7 @@ from tests.utils import get_tmp_file_location
 from zBuilder.utils.commonUtils import is_sequence
 from zBuilder.utils.paintable_maps import split_map_name, get_paintable_map
 from zBuilder.commands import clean_scene, rig_cut, rig_paste, rig_copy
+from zBuilder.builders.serialize import read, write
 
 
 def isApprox(a, b, eps=1e-6):
@@ -235,11 +236,11 @@ class VfxTestCase(TestCase):
         self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values)
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
-        builder.write(self.temp_file_path)
+        write(self.temp_file_path, builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         return builder
 
     def get_builder_after_clean_and_build(self, builder):
@@ -253,15 +254,15 @@ class VfxTestCase(TestCase):
         builder.retrieve_from_scene()
         return builder
 
-    def get_builder_after_write_and_retrieve_from_file(self, builder):
+    def get_builder_after_write_and_read(self, builder):
         ## SETUP
-        builder.write(self.temp_file_path)
+        write(self.temp_file_path, builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
         clean_scene()
 
         ## ACT
         builder = zva.Ziva()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         builder.build()
 
         builder = zva.Ziva()

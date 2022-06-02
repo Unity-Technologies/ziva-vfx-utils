@@ -6,6 +6,7 @@ from maya import cmds
 from tests.utils import retrieve_builder_from_scene, retrieve_builder_from_file, load_scene, get_tmp_file_location
 from vfx_test_case import VfxTestCase, attr_values_from_zbuilder_nodes
 from zBuilder.commands import clean_scene
+from zBuilder.builders.serialize import read, write
 
 
 class BuilderTestCase(VfxTestCase):
@@ -34,7 +35,7 @@ class BuilderTestCase(VfxTestCase):
         file_name = get_tmp_file_location()
 
         # Act
-        builder_orig.write(file_name)
+        write(file_name, builder_orig)
         builder_from_file = retrieve_builder_from_file(file_name)
 
         # Verify

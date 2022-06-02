@@ -17,6 +17,8 @@ Functionality
 +++++++++++++
 - **zBuilder:** Refactoring code structure:
     - Renamed **zBuilder.builders.IO** to **zBuilder.builders.serialize**.
+    - Renamed **Builder.retrieve_from_file** to **read** and moved to **zBuilder.builders.serialize**. There is still **Builder.retrieve_from_file** for backward compatibility, but this method will be deprecated.
+    - Moved **Builder.write** to **zBuilder.builders.serialize**. There is still **Builder.write** for backward compatibility, but this method will be deprecated.
     - Move **rename_ziva_nodes()** from **zBuilder.zMaya** to **zBuilder.utils**.
     - Rename **zBuilder.utils** to **zBuilder.commands**.
     - Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.

@@ -3,6 +3,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from vfx_test_case import VfxTestCase
 from tests.utils import load_scene, get_tmp_file_location
+from zBuilder.builders.serialize import read, write
 
 
 class BaseNodeTestCase(VfxTestCase):
@@ -18,11 +19,11 @@ class BaseNodeTestCase(VfxTestCase):
         cmds.select('zSolver1')
         builder_orig = zva.Ziva()
         builder_orig.retrieve_from_scene()
-        builder_orig.write(file_name)
+        write(file_name, builder_orig)
         # compare against this one
         cmds.select('zSolver1')
         builder_from_file = zva.Ziva()
-        builder_from_file.retrieve_from_file(file_name)
+        read(file_name, builder_from_file)
 
         # get item from eachbuilder
         item1 = builder_orig.get_scene_items(type_filter='zMaterial')[0]

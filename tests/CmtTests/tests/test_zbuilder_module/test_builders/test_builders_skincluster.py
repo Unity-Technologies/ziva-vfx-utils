@@ -6,6 +6,9 @@ from vfx_test_case import VfxTestCase, attr_values_from_scene
 from zBuilder.builders.skinClusters import SkinCluster
 from zBuilder.nodes.base import Base
 from zBuilder.nodes.dg_node import DGNode
+from zBuilder.builders.serialize import read, write
+from zBuilder.nodes.base import Base
+from zBuilder.nodes.dg_node import DGNode
 
 class SkinClusterBuilderTestCase(VfxTestCase):
 
@@ -62,14 +65,14 @@ class SkinClusterBuilderTestCase(VfxTestCase):
 
     def test_builder_has_same_skincluster_nodes_after_writing_to_disk(self):
         ## ACT
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
 
         ## VERIFY
         self.assertTrue(os.path.exists(self.temp_file_path))
 
         ## ACT
         builder = SkinCluster()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
 
         ## VERIFY
         self.check_retrieve_skincluster_looks_good(builder)
@@ -90,14 +93,14 @@ class SkinClusterBuilderTestCase(VfxTestCase):
 
     def test_build_from_file(self):
         ## SETUP
-        self.builder.write(self.temp_file_path)
+        write(self.temp_file_path, self.builder)
         self.assertTrue(os.path.exists(self.temp_file_path))
         cmds.select(cmds.ls(type="skinCluster"))
         mel.eval("doDelete;")
 
         ## ACT
         builder = SkinCluster()
-        builder.retrieve_from_file(self.temp_file_path)
+        read(self.temp_file_path, builder)
         builder.build()
 
         builder = SkinCluster()
@@ -138,9 +141,9 @@ class SkinClusterBuilderTestCase(VfxTestCase):
         # This broke previously when the inheritence was overridding instead of extending
         # Any new nodes that do not inherit proprely will break here
         for item in self.builder.get_scene_items(type_filter='skinCluster'):
-            if isinstance(item,Base):
+            if isinstance(item, Base):
                 # This will assert if any scene item does not contain Base.SEARCH_EXCLUDE items
                 self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in Base.SEARCH_EXCLUDE))
-            if isinstance(item,DGNode):
+            if isinstance(item, DGNode):
                 # This will assert if any scene item does not contain DGNode.SEARCH_EXCLUDE items
                 self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in DGNode.SEARCH_EXCLUDE))

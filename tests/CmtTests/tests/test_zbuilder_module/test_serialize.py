@@ -6,6 +6,7 @@ from vfx_test_case import VfxTestCase
 from tests.utils import (build_mirror_sample_geo, get_tmp_file_location,
                          build_anatomical_arm_with_no_popup, get_test_asset_path)
 from zBuilder.commands import clean_scene, load_rig
+from zBuilder.builders.serialize import read, write
 
 
 class SerializeTestCase(VfxTestCase):
@@ -25,22 +26,30 @@ class SerializeTestCase(VfxTestCase):
                 os.remove(temp_file)
         super(SerializeTestCase, self).tearDown()
 
-    def test_builder_write(self):
+    def test_roundtrip_serialize(self):
         # Setup
         build_mirror_sample_geo()
         cmds.select(cl=True)
         # use builder to retrieve from scene
         self.z = zva.Ziva()
         self.z.retrieve_from_scene()
+        old_names = [item.name for item in self.z.get_scene_items()]
 
         # Action
         file_name = get_tmp_file_location()
-        self.z.write(file_name)
+        write(file_name, self.z)
         self.temp_files.append(file_name)
+
+        new_builder = zva.Ziva()
+        read(file_name, new_builder)
+        new_names = [item.name for item in new_builder.get_scene_items()]
 
         # Verify
         # simply check if file exists
         self.assertTrue(os.path.exists(file_name))
+
+        # check the read back data matches with the one we wrote
+        self.assertEqual(old_names, new_names)
 
     def test_builder_write_build(self):
         '''
@@ -57,7 +66,7 @@ class SerializeTestCase(VfxTestCase):
 
         # Action
         file_name = get_tmp_file_location()
-        z.write(file_name)
+        write(file_name, z)
         self.temp_files.append(file_name)
 
         clean_scene()
@@ -82,3 +91,20 @@ class SerializeTestCase(VfxTestCase):
 
         # Verify
         self.assertSceneHasNodes(['zSolver1'])
+
+    def test_read_write_backward_compatibility(self):
+        # Setup
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+        file_name = get_tmp_file_location()
+
+        # Act
+        builder.write(file_name)
+        old_names = [item.name for item in builder.get_scene_items()]
+
+        new_builder = zva.Ziva()
+        new_builder.retrieve_from_file(file_name)
+        new_names = [item.name for item in new_builder.get_scene_items()]
+
+        # Verify
+        self.assertEqual(old_names, new_names)

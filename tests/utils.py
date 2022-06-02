@@ -5,6 +5,7 @@ import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from maya import mel
+from zBuilder.builders.serialize import read
 '''
 These are small utilities to help with testing zBuilder.
 Probably no real value outside of testing.
@@ -16,7 +17,7 @@ CURRENT_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 def get_tmp_file_location(suffix="", prefix='tmp', dir=None):
     """Using the tempfile module this creates a tempfile and deletes it (os.close) and 
     returns the name/location which is all we need to deal with files.
-    
+
     Returns:
         string: file path 
     """
@@ -154,5 +155,5 @@ def retrieve_builder_from_scene():
 def retrieve_builder_from_file(file_name):
     """ Get a new zBuilder.builders.ziva.Ziva() retrieved from the given file. """
     builder = zva.Ziva()
-    builder.retrieve_from_file(file_name)
+    read(file_name, builder)
     return builder
