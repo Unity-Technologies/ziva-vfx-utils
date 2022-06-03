@@ -1,10 +1,12 @@
 import os
+import glob
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
 from tests.utils import (build_mirror_sample_geo, get_tmp_file_location,
-                         build_anatomical_arm_with_no_popup, get_test_asset_path)
+                         build_anatomical_arm_with_no_popup, get_test_asset_path,
+                         load_scene)
 from zBuilder.commands import clean_scene, load_rig
 from zBuilder.builders.serialize import read, write
 
@@ -108,3 +110,24 @@ class SerializeTestCase(VfxTestCase):
 
         # Verify
         self.assertEqual(old_names, new_names)
+
+    def test_build_1_7(self):
+        builders_1_7 = glob.glob(get_test_asset_path('*1_7.zBuilder'))
+        # Act
+        for item in builders_1_7:
+            # find corresponding maya file
+            basename = os.path.basename(item)
+            maya_file = basename.replace('_1_7.zBuilder', '.ma')
+
+            # open it and clean scene so we have just geo
+            load_scene(maya_file)
+            clean_scene()
+
+            builder = zva.Ziva()
+            read(item, builder)
+
+            builder.build()
+
+            self.compare_builder_nodes_with_scene_nodes(builder)
+            self.compare_builder_attrs_with_scene_attrs(builder)
+            self.compare_builder_maps_with_scene_maps(builder)
