@@ -106,14 +106,17 @@ class MyDockingUI(QtWidgets.QWidget):
         self.actionSelectST.triggered.connect(self.select_source_and_target)
 
     def invert_weights(self, node, map_index):
+        node.parameters['map'][map_index].retrieve_values()
         map_ = node.parameters['map'][map_index]
         map_.invert()
         map_.apply_weights()
 
     def copy_weights(self, node, map_index):
+        node.parameters['map'][map_index].retrieve_values()
         self.maps_clipboard = node.parameters['map'][map_index]
 
     def paste_weights(self, node, new_map_index):
+        node.parameters['map'][new_map_index].retrieve_values()
         new_map = node.parameters['map'][new_map_index]
         """
         Pasting the maps.  Terms used here

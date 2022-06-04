@@ -97,3 +97,47 @@ class ZivaMapTestCase(VfxTestCase):
         # Before the fix, the vertex pos diff is nearly 0 because it is locked by attachment;
         # After the fix, it's not included by the attachment so it can deform freely.
         self.assertGreater(sub_mesh_vtx_y_pos_abs_diff, 1)
+
+    def test_copy_paste_scene_panel_style(self):
+        ''' Tests the Scene Panel workflow for copy paste.  Namly it triggers a retrieve_value() on
+        map before a copy or paste as they are empty now to start with.  VFXACT-1264 enabled this feature
+        '''
+        # Setup
+        sphereA = cmds.polySphere()
+        resultsA = cmds.ziva(sphereA[0], t=True)
+        tet_nameA = resultsA[5]
+        print(resultsA)
+        sphereB = cmds.polySphere()
+        resultsB = cmds.ziva(sphereB[0], t=True)
+        tet_nameB = resultsB[2]
+
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_connections()
+
+        # Copy A to paste onto B
+        tet_nodeA = builder.get_scene_items(name_filter=tet_nameA)[0]
+        tet_mapA = tet_nodeA.parameters['map'][0]
+        tet_mapA.retrieve_values()
+        copy_buffer = [.2 for x in tet_mapA.values]
+        tet_mapA.values = copy_buffer
+
+        # Paste
+        tet_nodeB = builder.get_scene_items(name_filter=tet_nameB)[0]
+        tet_mapB = tet_nodeB.parameters['map'][0]
+        tet_mapB.retrieve_values()
+        tet_mapB.values = copy_buffer
+        tet_mapB.apply_weights()
+
+        # Verify
+        scene_weights = cmds.getAttr('{}[0:{}]'.format(tet_mapB.name, len(tet_mapB.values) - 1))
+        self.assertAllApproxEqual(scene_weights, copy_buffer)
+
+        # Paste onto itself
+        tet_mapA.retrieve_values()
+        tet_mapA.values = copy_buffer
+        tet_mapA.apply_weights()
+
+        # Verify
+        scene_weights = cmds.getAttr('{}[0:{}]'.format(tet_mapA.name, len(tet_mapA.values) - 1))
+        self.assertAllApproxEqual(scene_weights, copy_buffer)

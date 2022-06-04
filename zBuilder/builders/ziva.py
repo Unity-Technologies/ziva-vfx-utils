@@ -374,7 +374,9 @@ class Ziva(Builder):
 
         if nodes:
             nodes = sort_node_by_type(nodes)
-            self._populate_nodes(nodes, True)
+            # setting argument to False here to not get mesh and map values
+            # for performance reasons for Scene panel
+            self._populate_nodes(nodes, False)
             self.setup_tree_hierarchy()
 
         cmds.select(scene_selection)

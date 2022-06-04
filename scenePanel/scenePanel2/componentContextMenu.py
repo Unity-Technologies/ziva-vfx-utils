@@ -73,6 +73,7 @@ def append_map_actions(parent, menu, menu_name, node, map_index):
     map_menu.addAction(paint_action)
 
     def invert_weights(node, map_index):
+        node.parameters["map"][map_index].retrieve_values()
         map_ = node.parameters["map"][map_index]
         map_.invert()
         map_.apply_weights()
@@ -85,6 +86,7 @@ def append_map_actions(parent, menu, menu_name, node, map_index):
 
     def copy_weights(node, map_index):
         global maps_clipboard
+        node.parameters["map"][map_index].retrieve_values()
         maps_clipboard = node.parameters["map"][map_index]
 
     copy_action = QtWidgets.QAction(parent)
@@ -108,6 +110,7 @@ def append_map_actions(parent, menu, menu_name, node, map_index):
         # It will be simple for a user to paste the wrong map in wrong location
         # here we are comparing the length of the maps and if they are different we can bring up
         # a dialog to warn user unexpected results may happen,
+        node.parameters["map"][map_index].retrieve_values()
         new_map = node.parameters["map"][new_map_index]
         orig_map_length = len(orig_map.values)
         new_map_length = len(new_map.values)
