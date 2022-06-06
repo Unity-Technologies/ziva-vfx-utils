@@ -79,7 +79,8 @@ def get_meta_data():
     for plugin in cmds.pluginInfo(query=True, listPluginsPath=True):
         commands = cmds.pluginInfo(plugin, q=True, c=True)
         if commands and 'ziva' in commands:
-            meta_data['plugin_name'] = plugin
+            meta_data['plugin_path'] = cmds.pluginInfo(plugin, q=True, p=True)
+            meta_data['plugin_version'] = cmds.pluginInfo(plugin, q=True, v=True)
             continue
 
     return meta_data
@@ -129,13 +130,13 @@ def load_base_node(json_object):
     Returns:
         obj:  Result of operation
     """
-    if 'version' in json_object:
-        major, minor, patch, _ = parse_version_info(json_object['version'])
-        # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
-        if (major, minor, patch) and (major, minor, patch) < (1, 0, 11):
-            _update_json_pre_1_0_11(json_object)
-
     if '_class' in json_object:
+        # For pre zBuilder 1.0.11 file format, we need to parameter reference to each node
+        # Pre 2.1.0 contains version info per node
+        if 'info' in json_object:
+            major, minor, patch, _ = parse_version_info(json_object['info']['version'])
+            if (major, minor, patch) < (1, 0, 11):
+                _update_json_pre_1_0_11(json_object)
         obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
         try:
             scene_item = obj()
