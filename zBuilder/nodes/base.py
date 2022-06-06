@@ -15,14 +15,14 @@ class Base(object):
     # The reason these are excluded is because we do not want these to be user changable.
     # If someone does a string_replace() and it happens to change the value of one of those attributes
     # unexpected results will happen.
-    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type', 'info']
+    SEARCH_EXCLUDE = ['_class', 'attrs', '_builder_type', 'type']
 
     TYPES = []
     type = None  # type of scene item
 
     # A list of attribute names in __dict__ to exclude from any comparisons.
     # Anything using __eq__.
-    COMPARE_EXCLUDE = ['info', '_class', 'builder', 'depends_on', '_children', '_parent']
+    COMPARE_EXCLUDE = ['_class', 'builder', 'depends_on', '_children', '_parent']
 
     # The attributes that contain a scene item used as a pointer to the scene item in the bundle.
     # This will convert scene items to a string before serialization and
@@ -50,19 +50,12 @@ class Base(object):
         self.children = []
         self.parent = kwargs.get('parent', None)
 
-        self.info = dict()
-        self.info['version'] = zBuilder.__version__
-        self.info['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
-        self.info['maya_version'] = cmds.about(v=True)
-        self.info['operating_system'] = cmds.about(os=True)
-
         if self.parent is not None:
             self.parent.add_child(self)
 
     def __eq__(self, other):
         """ Comparing the dicts of two objects if they derived from same class.  We need
-        to exclude a few keys as they may or may not be equal and that doesn't matter.  For example .info
-        has a timestamp, username, maya version, os.  None of those are relevant in this case.
+        to exclude a few keys as they may or may not be equal and that doesn't matter.
         """
         ignore_list = self.COMPARE_EXCLUDE + self.SCENE_ITEM_ATTRIBUTES
         return type(other) == type(self) and equal_dicts(self.__dict__, other.__dict__, ignore_list)

@@ -131,14 +131,6 @@ class Ziva(Builder):
 
         self.geo = {}
 
-        for plugin in cmds.pluginInfo(query=True, listPluginsPath=True):
-            commands = cmds.pluginInfo(plugin, q=True, c=True)
-            if commands and 'ziva' in commands:
-                self.info['plugin_name'] = plugin
-                self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, v=True)
-                self.info['plugin_version'] = cmds.pluginInfo(plugin, q=True, p=True)
-                continue
-
     def setup_tree_hierarchy(self):
         """Sets up hierarchy for a tree view.  This will look at items and assign the proper 
         children, parent for QT.
