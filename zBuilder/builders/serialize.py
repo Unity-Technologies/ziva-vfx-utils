@@ -1,6 +1,8 @@
 import inspect
+import zipfile
 import json
 import logging
+import os
 import sys
 import time
 
@@ -12,6 +14,7 @@ from zBuilder.builders.builder import find_class
 from zBuilder import __version__
 
 logger = logging.getLogger(__name__)
+__file_version__ = 1
 
 
 def _get_node_types_with_maps():
@@ -71,7 +74,8 @@ def get_meta_data():
     """ Meta data for embedding with serialized data
     """
     meta_data = dict()
-    meta_data['version'] = __version__
+    meta_data['file_version'] = __file_version__
+    meta_data['z_builder_version'] = __version__
     meta_data['current_time'] = time.strftime("%d/%m/%Y  %H:%M:%S")
     meta_data['operating_system'] = cmds.about(os=True)
     meta_data['maya_version'] = cmds.about(v=True)
@@ -98,7 +102,7 @@ def pack_zbuilder_contents(builder, type_filter, invert_match):
     info['d_type'] = 'info'
     info['data'] = get_meta_data()
 
-    return [node_data, info]
+    return [info, node_data]
 
 
 def unpack_zbuilder_contents(builder, json_data):
@@ -110,6 +114,7 @@ def unpack_zbuilder_contents(builder, json_data):
     """
     for d in json_data:
         if d['d_type'] == 'node_data':
+            # TODO: Handle file version specific logic globally
             builder.bundle.extend_scene_items(d['data'])
             logger.info("Reading scene items. {} nodes".format(len(d['data'])))
 
@@ -140,6 +145,7 @@ def load_base_node(json_object):
         obj = find_class(json_object['_builder_type'], json_object.get('type', 'Base'))
         try:
             scene_item = obj()
+            #TODO: Pass file version to each node for respective handling.
             scene_item.deserialize(json_object)
             return scene_item
         except TypeError:
@@ -160,17 +166,19 @@ def write(file_path, builder, type_filter=None, invert_match=False):
         invert_match (bool): Invert the sense of matching, to select non-matching items.
             Defaults to ``False``
     """
-
-    with open(file_path, 'w') as outfile:
-        json.dump(pack_zbuilder_contents(builder, type_filter, invert_match),
+    tmp_path, _ = os.path.splitext(file_path)
+    json_file = tmp_path + ".json"
+    with zipfile.ZipFile(file_path, mode="w") as archive:
+        with open(json_file, 'w') as outfile:
+            json.dump(pack_zbuilder_contents(builder, type_filter, invert_match),
                   outfile,
                   cls=BaseNodeEncoder,
-                  sort_keys=True,
-                  indent=4,
-                  separators=(',', ': '))
+                  sort_keys=True)
+        archive.write(json_file, arcname=os.path.basename(json_file), compress_type=zipfile.ZIP_DEFLATED)
+        logger.info('Wrote File: %s' % file_path)
+    os.remove(json_file)
 
     builder.stats()
-    logger.info('Wrote File: %s' % file_path)
 
     # loop through the scene items
     for scene_item in builder.get_scene_items():
@@ -190,9 +198,16 @@ def read(file_path, builder):
         file_path (:obj:`str`): The file path to read from disk.
         builder: builder object
     """
-
-    with open(file_path, 'r') as handle:
-        unpack_zbuilder_contents(builder, json.load(handle, object_hook=load_base_node))
+    logger.info('Reading from file: %s' % file_path)
+    if zipfile.is_zipfile(file_path):
+        with zipfile.ZipFile(file_path, "r") as archive:
+            tmp_path, _ = os.path.splitext(file_path)
+            json_file = tmp_path + ".json"
+            with archive.open(os.path.basename(json_file)) as file:
+                unpack_zbuilder_contents(builder, json.loads(file.read(), object_hook=load_base_node))
+    else:
+        with open(file_path, 'r') as handle:
+            unpack_zbuilder_contents(builder, json.load(handle, object_hook=load_base_node))
 
     # The json data is now loaded.  We need to go through the defined scene item attributes
     # (The attributes that hold un-serializable scene items) and replace the string name

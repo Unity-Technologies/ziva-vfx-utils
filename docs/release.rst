@@ -16,6 +16,8 @@ Release Notes
 Functionality
 +++++++++++++
 - **zBuilder:** Refactoring code structure:
+    - **zBuilder.builders.write** zips a JSON file into the '.zbuilder' file.
+    - **zBuilder.builders.read** can read both a zipped file and an unzipped JSON file.
     - Renamed **zBuilder.builders.IO** to **zBuilder.builders.serialize**.
     - Renamed **Builder.retrieve_from_file** to **read** and moved to **zBuilder.builders.serialize**. There is still **Builder.retrieve_from_file** for backward compatibility, but this method will be deprecated.
     - Moved **Builder.write** to **zBuilder.builders.serialize**. There is still **Builder.write** for backward compatibility, but this method will be deprecated.
