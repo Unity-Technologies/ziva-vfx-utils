@@ -159,7 +159,18 @@ class Base(object):
         Returns:
             dict: of serializable items
         """
-        output = serialize_object(self)
+        output = dict()
+
+        for key in self.__dict__:
+            if key in Base.SCENE_ITEM_ATTRIBUTES:
+                self.__dict__[key] = replace_scene_items_with_string(self.__dict__[key])
+
+            try:
+                json.dumps(self.__dict__[key])
+                output[key] = self.__dict__[key]
+
+            except TypeError:
+                pass
         return output
 
     def deserialize(self, dictionary):
@@ -235,33 +246,6 @@ def replace_scene_items_with_string(item):
             item = item.name
 
     return item
-
-
-def serialize_object(obj):
-    """ Takes in a python obj and scrubs through the __dict__ and returns a serializable
-    dictionary.
-
-    Args:
-        obj (object): Python object to inspect.
-
-    Returns:
-        dict: Of serializable obj
-    """
-    output = dict()
-
-    if hasattr(obj, 'serialize'):
-        for key in obj.__dict__:
-            if key in Base.SCENE_ITEM_ATTRIBUTES:
-                obj.__dict__[key] = replace_scene_items_with_string(obj.__dict__[key])
-
-            try:
-                json.dumps(obj.__dict__[key])
-                output[key] = obj.__dict__[key]
-
-            except TypeError:
-                pass
-
-    return output
 
 
 def equal_dicts(dict_1, dict_2, ignore_keys):
