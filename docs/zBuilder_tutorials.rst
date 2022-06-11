@@ -286,7 +286,7 @@ Once the arm Ziva rig saved into a builder object in memory, it can be written o
         # replace path with a working temp directory on your system
         z.write('C:\\Temp\\test.zBuilder')
 
-This writes out a json file of all the information so it can be retrieved later.
+This writes out a zipped JSON file of all the information, so it can be retrieved later.
 
 
 Reading from disk
