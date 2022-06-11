@@ -155,6 +155,22 @@ def load_base_node(json_object):
     return json_object
 
 
+def _restore_scene_attributes(builder):
+    """This method loops through the scene item attributes with un-serializable
+    scene items and replace the string name with the proper scene item.
+
+    Args:
+        builder: builder object
+    """
+    for scene_item in builder.get_scene_items():
+        # loop through scene item attributes as defined by each scene item
+        for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
+            if attr in scene_item.__dict__:
+                if scene_item.__dict__[attr]:
+                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
+                    scene_item.__dict__[attr] = restored
+
+
 @time_this
 def write(file_path, builder, type_filter=None, invert_match=False):
     """ Writes out the scene items to a json file given a file path.
@@ -179,15 +195,8 @@ def write(file_path, builder, type_filter=None, invert_match=False):
     os.remove(json_file)
 
     builder.stats()
-
     # loop through the scene items
-    for scene_item in builder.get_scene_items():
-        # loop through scene item attributes as defined by each scene item
-        for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
-            if attr in scene_item.__dict__:
-                if scene_item.__dict__[attr]:
-                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
-                    scene_item.__dict__[attr] = restored
+    _restore_scene_attributes(builder)
 
 
 @time_this
@@ -209,17 +218,8 @@ def read(file_path, builder):
         with open(file_path, 'r') as handle:
             unpack_zbuilder_contents(builder, json.load(handle, object_hook=load_base_node))
 
-    # The json data is now loaded.  We need to go through the defined scene item attributes
-    # (The attributes that hold un-serializable scene items) and replace the string name
-    # with the proper scene item.
-
-    # loop through the scene items
-    for scene_item in builder.get_scene_items():
-        # loop through scene item attributes as defined by each scene item
-        for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
-            if attr in scene_item.__dict__:
-                if scene_item.__dict__[attr]:
-                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
-                    scene_item.__dict__[attr] = restored
+    # The json data is now loaded.  We need to loop through the defined scene item attributes
+    # and replace the string name with the proper scene item.
+    _restore_scene_attributes(builder)
 
     builder.stats()
