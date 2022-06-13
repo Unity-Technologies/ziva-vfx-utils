@@ -1,5 +1,4 @@
 import inspect
-import json
 import logging
 import sys
 # For parameter_factory() and find_class(), though not use directly,
@@ -36,10 +35,6 @@ class Builder(object):
 
     def log(self):
         self.root_node.log()
-
-    def view(self):
-        import zBuilder.ui.reader as reader
-        reader.view(root_node=self.root_node)
 
     def node_factory(self, node, parent=None):
         """Given a maya node, this checks objType and instantiates the proper
