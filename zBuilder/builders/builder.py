@@ -258,20 +258,8 @@ class Builder(object):
         return self.bundle.get_scene_items(type_filter, name_filter, name_regex, association_filter,
                                            association_regex, invert_match)
 
-    def restore_scene_items_from_string(self, item):
-        if is_sequence(item):
-            if item:
-                item = self.get_scene_items(name_filter=item)
-        elif isinstance(item, dict):
-            for parm in item:
-                item[parm] = self.get_scene_items(name_filter=item[parm])
-        else:
-            item = self.get_scene_items(name_filter=item)
-            if item:
-                item = item[0]
-        return item
-
-
+# TODO: Move node registration and type introspection methods such as, find_class,
+# node_factory, parameter_factory functions out of builder.py
 def find_class(module, obj_type):
     """
     Given a module and a type returns class object. If no class objects are

@@ -8,7 +8,7 @@ import time
 
 from maya import cmds
 from collections import defaultdict
-from zBuilder.utils.commonUtils import parse_version_info, time_this
+from zBuilder.utils.commonUtils import is_sequence, parse_version_info, time_this
 from zBuilder.utils.mayaUtils import get_short_name, construct_map_names
 from zBuilder.builders.builder import find_class
 from zBuilder import __version__
@@ -167,7 +167,7 @@ def _restore_scene_attributes(builder):
         for attr in scene_item.SCENE_ITEM_ATTRIBUTES:
             if attr in scene_item.__dict__:
                 if scene_item.__dict__[attr]:
-                    restored = builder.restore_scene_items_from_string(scene_item.__dict__[attr])
+                    restored = _replace_string_with_scene_items(builder, scene_item.__dict__[attr])
                     scene_item.__dict__[attr] = restored
 
 
@@ -223,3 +223,42 @@ def read(file_path, builder):
     _restore_scene_attributes(builder)
 
     builder.stats()
+
+
+def _replace_string_with_scene_items(builder, item):
+    """ This method taked a zBuilder object and a scene item. For each scene item
+    attribute it replaces the string name with the proper scene item.
+    Args:
+        builder: builder object
+        item: scene item
+    """
+    if is_sequence(item):
+        if item:
+            item = builder.get_scene_items(name_filter=item)
+    elif isinstance(item, dict):
+        for parm in item:
+            item[parm] = builder.get_scene_items(name_filter=item[parm])
+    else:
+        item = builder.get_scene_items(name_filter=item)
+        if item:
+            item = item[0]
+    return item
+
+def replace_scene_items_with_string(item):
+    """ This method takes a scene item, and replaces each instance with an embedded scene item
+    with the scene item's name. The reason for this is, scene items are not serializable by
+    themselves. This enables us to "re-apply" the item after it has been loaded from disk.
+
+    Args:
+         item: scene item
+    """
+    if is_sequence(item):
+        item = [x.name for x in item]
+    elif isinstance(item, dict):
+        for key in item:
+            item[key] = [x.name for x in item[key]]
+    else:
+        if item:
+            item = item.name
+
+    return item
