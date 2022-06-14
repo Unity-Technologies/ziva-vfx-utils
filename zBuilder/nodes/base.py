@@ -1,8 +1,6 @@
 import json
 import logging
-import time
 from maya import cmds
-import zBuilder
 from zBuilder.utils.mayaUtils import get_short_name, replace_long_name, replace_dict_keys
 from zBuilder.utils.commonUtils import is_string, is_sequence
 
@@ -159,6 +157,8 @@ class Base(object):
         Returns:
             dict: of serializable items
         """
+        from zBuilder.builders.serialize import replace_scene_items_with_string
+
         output = dict()
 
         for key in self.__dict__:
@@ -230,22 +230,6 @@ class Base(object):
                                 new_name = replace_long_name(search, replace, name)
                                 new_names.append(new_name)
                                 self.__dict__[item][key] = new_names
-
-
-def replace_scene_items_with_string(item):
-    # This takes a scene item, and replaces each instance with an embedded scene item
-    # with the scene items name. The reason for this is scene items are not serializable
-    # by themselves.  This enables is to "re-apply" them after it is loaded from disk
-    if is_sequence(item):
-        item = [x.name for x in item]
-    elif isinstance(item, dict):
-        for key in item:
-            item[key] = [x.name for x in item[key]]
-    else:
-        if item:
-            item = item.name
-
-    return item
 
 
 def equal_dicts(dict_1, dict_2, ignore_keys):
