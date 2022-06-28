@@ -3,6 +3,7 @@
 from functools import partial
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
+from utility.scriptCommands.zCacheCommands import clear_zcache
 from zBuilder.utils.commonUtils import is_string
 from zBuilder.commands import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
 from ..uiUtils import get_icon_path_from_name
@@ -60,7 +61,7 @@ _create_section_tuple = (
             "Clear",
             "Clears the solver's simulation cache. "
             "Do this each time before re-running a simulation that was previously cached.",
-            lambda: cmds.zCache(c=True),
+            lambda: clear_zcache(),
         ),
         (
             None,

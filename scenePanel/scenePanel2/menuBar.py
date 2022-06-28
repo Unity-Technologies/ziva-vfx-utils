@@ -7,6 +7,7 @@ from functools import partial
 from PySide2 import QtWidgets, QtGui, QtCore
 from maya import cmds, mel
 from utility.licenseRegister import licenseRegisterWidget
+from utility.scriptCommands.zCacheCommands import clear_zcache
 from zBuilder.commands import (rig_cut, rig_copy, rig_paste, rig_update, merge_solvers,
                                remove_zRivetToBone_nodes, remove_solver, remove_all_solvers)
 from ..uiUtils import get_icon_path_from_name
@@ -282,7 +283,7 @@ _menubar_dict["Create"] = (
                 "Clear",
                 "Clears the solver's simulation cache. "
                 "Do this each time before re-running a simulation that was previously cached.",
-                lambda: cmds.zCache(c=True),
+                lambda: clear_zcache(),
                 "clear_zCache",
             ),
             (

@@ -107,8 +107,8 @@
             "clearCache": {
                 "help": "Clear zCache",
                 "image": "clear_zCache.png",
-                "commandType": "mel",
-                "command": "zCache -c;"
+                "commandType": "python",
+                "command": "from utility.scriptCommands.zCacheCommands import clear_zcache; clear_zcache();"
             },
             "shelfSep_4": {
                 "separator": true,

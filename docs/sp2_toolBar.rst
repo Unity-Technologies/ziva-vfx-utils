@@ -147,10 +147,12 @@ This is the same as executing **ziva -acn;**
 """"""""""""""""""""""""""
 Clear the Ziva cache.
 If more than one cache node exists in the scene, the selected cache will be cleared.
+If no cache node is selected, cached nodes of all solver nodes in the scene will be cleared.
 
-Once you add a cache, you need to call this command each time you want to generate a new simulation; otherwise, the old simulation will simply be played back from the cache.
+Once you add a cache, you need to call this command each time you want to generate a new simulation;
+otherwise, the old simulation will simply be played back from the cache.
 
-This is the same as executing **zCache -c;**
+This is the same as executing **from utility.scriptCommands.zCacheCommands import clear_zcache; clear_zcache();**
 
 Save zCache
 """"""""""""

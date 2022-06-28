@@ -28,6 +28,9 @@ Functionality
     - Cleanup unused builder and node types.
     - Reorganize unit test files by modules.
 - **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
+- **Utility Commands:** Clear zCache command supports multiple selection clearance.
+
+
 
 Bug Fixes
 +++++++++
