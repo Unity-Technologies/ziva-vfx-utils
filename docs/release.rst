@@ -29,6 +29,7 @@ Functionality
     - Reorganize unit test files by modules.
 - **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
 
+- **Demo:** Update 'One of Each Attachment' demo, replace soft and hard deprecated attributes by zero and non-zero damping attributes.
 Bug Fixes
 +++++++++
 - **zBuilder:** VFXACT-1288 Fix the regression of building mesh with different topologies.
