@@ -23,11 +23,14 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
             'l_cloth_1__c_tissue_3_zAttachment',
         ]
 
-        cls.attachment_attrs = ["attachmentMode", "stiffness", "show"]
+        cls.attachment_attrs = ["attachmentMode", "stiffness", "show", "damping"]
 
     def setUp(self):
         super(ZivaAttachmentGenericTestCase, self).setUp()
         load_scene('generic.ma')
+        # set damping for each attachment
+        for i in range(len(self.attachment_names)):
+          cmds.setAttr(self.attachment_names[i] + ".damping", i * 0.1)
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
