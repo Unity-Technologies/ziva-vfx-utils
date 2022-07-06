@@ -83,31 +83,13 @@ proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachment
   setAttr ($attachment1[0] + ".attachmentMode") $attachmentMode;
   setAttr ($attachment1[0] + ".damping") $damping;
   setAttr ($attachment1[0] + ".stiffness") 5.0;
-  // for fixed attachment
-  if ($attachmentMode == 1)
-  {
-    setAttr ($attachment1[0] + ".stiffnessExp") 6;
-  }
-  // for sliding attachment
-  if ($attachmentMode == 2)
-  {
-    setAttr ($attachment1[0] + ".stiffnessExp") 7;
-  }
+  setAttr ($attachment1[0] + ".stiffnessExp") 6;
 
   // set attachment mode and damping for the second attachment
   setAttr ($attachment2[0] + ".attachmentMode") $attachmentMode;
   setAttr ($attachment2[0] + ".damping") $damping;
   setAttr ($attachment2[0] + ".stiffness") 5.0;
-  // for fixed attachment
-  if ($attachmentMode == 1)
-  {
-    setAttr ($attachment2[0] + ".stiffnessExp") 6;
-  }
-  // for sliding attachment
-  if ($attachmentMode == 2)
-  {
-    setAttr ($attachment2[0] + ".stiffnessExp") 7;
-  }
+  setAttr ($attachment2[0] + ".stiffnessExp") 6;
 }
 
 proc ziva_makeColumn_oneOfEachAttachments(float $dx, int $attachmentMode, float $damping)
@@ -147,11 +129,23 @@ global proc ziva_main_oneOfEachAttachments(int $newScene)
   for ($attachmentMode = 1; $attachmentMode <= 2; $attachmentMode++)
   {
     // attachmentMode: 1=fixed, 2=sliding
-    float $dampingArray[] = {0.0, 50.0};
-    for ($damping in $dampingArray)
+    float $dampingArrayFixed[] = {0.0, 50.0};
+    float $dampingArraySliding[] = {0.0, 25.0};
+    if ($attachmentMode == 1)
     {
-      ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $damping);
-      $dx = $dx + 3.0; // position the next column three units to the right in x
+      for ($damping in $dampingArrayFixed)
+      {
+        ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $damping);
+        $dx = $dx + 3.0; // position the next column three units to the right in x
+      }
+    }
+    if ($attachmentMode == 2)
+    {
+      for ($damping in $dampingArraySliding)
+      {
+        ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $damping);
+        $dx = $dx + 3.0; // position the next column three units to the right in x
+      }
     }
   }
 
