@@ -8,10 +8,10 @@ Makes four sphere columns of three spheres each.
 The top sphere is a bone, and the other two are tissues.
 The spheres are attached to each other.
 Each column uses a different attachment type:
-  fixed soft
-  fixed hard
-  sliding soft
-  sliding hard
+  fixed noDamping
+  fixed damping
+  sliding noDamping
+  sliding damping
 
 Copyright (C) Ziva Dynamics 2017
 Permission is hereby granted for anybody with a valid Ziva
@@ -51,7 +51,7 @@ proc ziva_makeGeometry_oneOfEachAttachments(string $meshes[], float $dx)
   setAttr "zSolver1.enable" 1; // re-enable the solving
 }
 
-proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachmentMode, int $isHard)
+proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachmentMode, float $damping)
 {
   // select the first sphere
   select -r $meshes[0];
@@ -59,11 +59,15 @@ proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachment
 
   // select the second sphere
   select -r $meshes[1];
-  ziva -t; // make it into a tissue (soft object, simulated using our solver)
+  string $tissue1[] = `ziva -t`; // make it into a tissue (soft object, simulated using our solver)
+  setAttr ($tissue1[3] + ".youngsModulus") 12.0;
+  setAttr ($tissue1[3] + ".youngsModulusExp") 4;
 
   // select the third sphere
   select -r $meshes[2];
-  ziva -t; // make it into a tissue (soft object, simulated using our solver)
+  string $tissue2[] = `ziva -t`; // make it into a tissue (soft object, simulated using our solver)
+  setAttr ($tissue2[3] + ".youngsModulus") 12.0;
+  setAttr ($tissue2[3] + ".youngsModulusExp") 4;
 
   // select some vertices on the tissue sphere 1, and select the bone sphere
   select -r ($meshes[1] + ".vtx[320:379]") $meshes[0];
@@ -75,20 +79,24 @@ proc ziva_makeAttachments_oneOfEachAttachments(string $meshes[], int $attachment
   // make an attachment constraining the selected vertices of tissue sphere 2 to the tissue sphere 1
   string $attachment2[] = `ziva -a`;
 
-  // set attachment mode and hardness for the first attachment
+  // set attachment mode and damping for the first attachment
   setAttr ($attachment1[0] + ".attachmentMode") $attachmentMode;
-  setAttr ($attachment1[0] + ".isHard") $isHard;
+  setAttr ($attachment1[0] + ".damping") $damping;
+  setAttr ($attachment1[0] + ".stiffness") 5.0;
+  setAttr ($attachment1[0] + ".stiffnessExp") 6;
 
-  // set attachment mode and hardness for the second attachment
+  // set attachment mode and damping for the second attachment
   setAttr ($attachment2[0] + ".attachmentMode") $attachmentMode;
-  setAttr ($attachment2[0] + ".isHard") $isHard;
+  setAttr ($attachment2[0] + ".damping") $damping;
+  setAttr ($attachment2[0] + ".stiffness") 5.0;
+  setAttr ($attachment2[0] + ".stiffnessExp") 6;
 }
 
-proc ziva_makeColumn_oneOfEachAttachments(float $dx, int $attachmentMode, int $isHard)
+proc ziva_makeColumn_oneOfEachAttachments(float $dx, int $attachmentMode, float $damping)
 {
   string $meshes[];
   ziva_makeGeometry_oneOfEachAttachments($meshes, $dx);
-  ziva_makeAttachments_oneOfEachAttachments($meshes, $attachmentMode, $isHard);
+  ziva_makeAttachments_oneOfEachAttachments($meshes, $attachmentMode, $damping);
 }
 
 // the main function
@@ -121,10 +129,23 @@ global proc ziva_main_oneOfEachAttachments(int $newScene)
   for ($attachmentMode = 1; $attachmentMode <= 2; $attachmentMode++)
   {
     // attachmentMode: 1=fixed, 2=sliding
-    for ($isHard = 0; $isHard <= 1; $isHard++)
+    float $dampingArrayFixed[] = {0.0, 50.0};
+    float $dampingArraySliding[] = {0.0, 25.0};
+    if ($attachmentMode == 1)
     {
-      ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $isHard);
-      $dx = $dx + 3.0; // position the next column three units to the right in x
+      for ($damping in $dampingArrayFixed)
+      {
+        ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $damping);
+        $dx = $dx + 3.0; // position the next column three units to the right in x
+      }
+    }
+    if ($attachmentMode == 2)
+    {
+      for ($damping in $dampingArraySliding)
+      {
+        ziva_makeColumn_oneOfEachAttachments($dx, $attachmentMode, $damping);
+        $dx = $dx + 3.0; // position the next column three units to the right in x
+      }
     }
   }
 

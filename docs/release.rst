@@ -32,6 +32,10 @@ Functionality
 
 
 
+- **Demo:** Update 'One of Each Attachment' demo:
+    - Remove deprecated `isHard` attribute.
+    - Add damping attributes with zero and non-zero values for effect comparison.
+
 Bug Fixes
 +++++++++
 - **zBuilder:** VFXACT-1288 Fix the regression of building mesh with different topologies.
