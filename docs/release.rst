@@ -30,7 +30,7 @@ Functionality
 - **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
 
 - **Demo:** Update 'One of Each Attachment' demo:
-    - Remove deprecated '$isHard' attribute.
+    - Remove deprecated `isHard` attribute.
     - Add damping attributes with zero and non-zero values for effect comparison.
 
 Bug Fixes
