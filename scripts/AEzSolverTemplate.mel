@@ -25,6 +25,7 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "solverToleranceFactor";
     editorTemplate -addControl "substeps";
     editorTemplate -addControl "framesPerSecond";
+    editorTemplate -addControl "contactDamping";
     editorTemplate -addControl "stiffnessDamping";
     editorTemplate -addControl "massDamping";
     editorTemplate -addControl "gravity";
