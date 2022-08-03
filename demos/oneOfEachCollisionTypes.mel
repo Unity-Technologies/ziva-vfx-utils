@@ -35,23 +35,22 @@ proc ziva_makeGeometry_oneOfEachCollisionTypes(string $meshes[], float $dx, floa
   xform -a -ws -t $dx 5.0 $dz $meshes[1];
 }
 
-proc ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes(string $boneNode, int $enableVolume, int $isHard, int $isSliding, int $contactStiffnessExp)
+proc ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes(string $boneNode, int $enableVolume, int $isSliding, int $contactStiffnessExp)
 {
   setAttr($boneNode + ".collisionVolume") $enableVolume; // whether this object is volumetric and should thus be collided against
-  setAttr($boneNode + ".hardContact") (1 - $isHard); // whether to use hard or soft contacts
   setAttr($boneNode + ".contactSliding") $isSliding; // whether the contacts slide or are fixed
   setAttr($boneNode + ".contactStiffnessExp") $contactStiffnessExp; // set the stiffness of contact
 }
 
-proc ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes(string $tissueNode, int $enableVolume, int $enableSelfCollisions, int $isHard, int $isSliding, int $contactStiffnessExp)
+proc ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes(string $tissueNode, int $enableVolume, int $enableSelfCollisions, int $isSliding, int $contactStiffnessExp)
 {
-  ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes($tissueNode, $enableVolume, $isHard, $isSliding, $contactStiffnessExp);
+  ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes($tissueNode, $enableVolume, $isSliding, $contactStiffnessExp);
   setAttr($tissueNode + ".selfCollisions") $enableSelfCollisions; // whether to enable self-collisions for this tissue
   setAttr($tissueNode + ".contactStiffnessExp") $contactStiffnessExp; // set the stiffness of contact
 }
 
 proc ziva_makeTissueBone_oneOfEachCollisionTypes(string $tissueMesh, string $boneMesh, float $tissueYoungsModulus, int $tissueYoungsModulusExp,
-                                                 int $enableTissueCollisions, int $enableBoneCollisions, int $isHard, int $isSliding, int $contactStiffnessExp)
+                                                 int $enableTissueCollisions, int $enableBoneCollisions, int $isSliding, int $contactStiffnessExp)
 {
   // make a tissue and a bone
 
@@ -61,17 +60,17 @@ proc ziva_makeTissueBone_oneOfEachCollisionTypes(string $tissueMesh, string $bon
   setAttr ($tissueNodes[3] + ".youngsModulusExp") $tissueYoungsModulusExp; // set the Young's modulus stiffness exponent to the zMaterial node
 
   int $enableSelfCollisions = 0; // disable self-collisions
-  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes[1], $enableTissueCollisions, $enableSelfCollisions, $isHard, $isSliding, $contactStiffnessExp);
+  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes[1], $enableTissueCollisions, $enableSelfCollisions, $isSliding, $contactStiffnessExp);
 
   select -r $boneMesh;
   string $boneNodes[] = `ziva -b`; // make the bone
 
-  ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes($boneNodes[1], $enableBoneCollisions, $isHard, $isSliding, $contactStiffnessExp);
+  ziva_setBoneCollisionAttrs_oneOfEachCollisionTypes($boneNodes[1], $enableBoneCollisions, $isSliding, $contactStiffnessExp);
 }
 
 proc ziva_makeTissueTissue_oneOfEachCollisionTypes(string $topTissue, string $bottomTissue, string $boneMesh,
                                                    float $tissueYoungsModulus, int $tissueYoungsModulusExp,
-                                                   int $isHard, int $isSliding, int $contactStiffnessExp)
+                                                   int $isSliding, int $contactStiffnessExp)
 {
   // make two tissues, enable collisions, disable self-collisions, and attach the bottom tissue to the bone
 
@@ -87,8 +86,8 @@ proc ziva_makeTissueTissue_oneOfEachCollisionTypes(string $topTissue, string $bo
 
   int $enableVolume = 1; // enable collisions
   int $enableSelfCollisions = 0; // disable self-collisions
-  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes1[1], $enableVolume, $enableSelfCollisions, $isHard, $isSliding, $contactStiffnessExp);
-  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes2[1], $enableVolume, $enableSelfCollisions, $isHard, $isSliding, $contactStiffnessExp);
+  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes1[1], $enableVolume, $enableSelfCollisions, $isSliding, $contactStiffnessExp);
+  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes2[1], $enableVolume, $enableSelfCollisions, $isSliding, $contactStiffnessExp);
 
   select -r $bottomTissue $boneMesh;
 
@@ -98,7 +97,7 @@ proc ziva_makeTissueTissue_oneOfEachCollisionTypes(string $topTissue, string $bo
 
 proc ziva_makeTissueSelfCollision_oneOfEachCollisionTypes(string $topTissue, string $bottomTissue, string $boneMesh,
                                                           float $tissueYoungsModulus, int $tissueYoungsModulusExp,
-                                                          int $isHard, int $isSliding, int $contactStiffnessExp)
+                                                          int $isSliding, int $contactStiffnessExp)
 {
   // make a union of top tissue and bottom tissue, enable its self-collisions, and attach it to the bone
 
@@ -112,7 +111,7 @@ proc ziva_makeTissueSelfCollision_oneOfEachCollisionTypes(string $topTissue, str
   setAttr ($tissueNodes[2] + ".tetSize") 2.0; // adjust the size of the mesh tetrahedra to the zTet node
   int $enableVolume = 1; // enable collisions
   int $enableSelfCollisions = 1; // enable self-collisions
-  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes[1], $enableVolume, $enableSelfCollisions, $isHard, $isSliding, $contactStiffnessExp);
+  ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes[1], $enableVolume, $enableSelfCollisions, $isSliding, $contactStiffnessExp);
 
   // attach it to the bone
   select -r ($mergedTissue + ".vtx[0:241]") $boneMesh; // attach it to the bone, using vertices [0:241]
@@ -121,7 +120,7 @@ proc ziva_makeTissueSelfCollision_oneOfEachCollisionTypes(string $topTissue, str
 }
 
 proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoungsModulus, int $tissueYoungsModulusExp,
-                                              int $isHard, int $isSliding, int $contactStiffnessExp)
+                                              int $isSliding, int $contactStiffnessExp)
 {
   // create five different collision cases (described below)
 
@@ -134,7 +133,7 @@ proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoung
   int $enableTissueCollisions = 1;
   int $enableBoneCollisions = 0;
   ziva_makeTissueBone_oneOfEachCollisionTypes($meshes0[1], $meshes0[0], $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                              $enableTissueCollisions, $enableBoneCollisions, $isHard, $isSliding, $contactStiffnessExp);
+                                              $enableTissueCollisions, $enableBoneCollisions, $isSliding, $contactStiffnessExp);
   $xOffset += $dx;
 
   // 2. tissue colliding with a bone; enable bone collisions only
@@ -143,7 +142,7 @@ proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoung
   $enableTissueCollisions = 0;
   $enableBoneCollisions = 1;
   ziva_makeTissueBone_oneOfEachCollisionTypes($meshes1[1], $meshes1[0], $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                              $enableTissueCollisions, $enableBoneCollisions, $isHard, $isSliding, $contactStiffnessExp);
+                                              $enableTissueCollisions, $enableBoneCollisions, $isSliding, $contactStiffnessExp);
   $xOffset += $dx;
 
   // 3. tissue colliding with a bone; enable tissue and bone collisions
@@ -152,7 +151,7 @@ proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoung
   $enableTissueCollisions = 1;
   $enableBoneCollisions = 1;
   ziva_makeTissueBone_oneOfEachCollisionTypes($meshes1b[1], $meshes1b[0], $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                              $enableTissueCollisions, $enableBoneCollisions, $isHard, $isSliding, $contactStiffnessExp);
+                                              $enableTissueCollisions, $enableBoneCollisions, $isSliding, $contactStiffnessExp);
   $xOffset += $dx;
 
   // 4. tissue colliding with a tissue: collisions enabled, self-collision disabled
@@ -160,7 +159,7 @@ proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoung
   string $meshes2[];
   ziva_makeGeometry_oneOfEachCollisionTypes($meshes2, $xOffset, $zOffset);
   ziva_makeTissueTissue_oneOfEachCollisionTypes($meshes2[1], $meshes2[0], $meshes1[0], $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                                $isHard, $isSliding, $contactStiffnessExp);
+                                                $isSliding, $contactStiffnessExp);
   $xOffset += $dx;
 
   // 5. tissue self-colliding with itself
@@ -168,7 +167,7 @@ proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoung
   string $meshes3[];
   ziva_makeGeometry_oneOfEachCollisionTypes($meshes3, $xOffset, $zOffset);
   ziva_makeTissueSelfCollision_oneOfEachCollisionTypes($meshes3[1], $meshes3[0], $meshes1[0], $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                                       $isHard, $isSliding, $contactStiffnessExp);
+                                                       $isSliding, $contactStiffnessExp);
   $xOffset += $dx;
 }
 
@@ -220,15 +219,14 @@ global proc ziva_main_oneOfEachCollisionTypes(int $newScene)
   float $dx = 0;
   for ($isSliding = 0; $isSliding <= 1; $isSliding++)
   {
-    for ($isHard = 0; $isHard <= 1; $isHard++)
-    {
-      float $tissueYoungsModulus = 12.0;
-      int $tissueYoungsModulusExp = 4;
-      int $contactStiffnessExp = 6;
-      ziva_createStack_oneOfEachCollisionTypes($dx, $tissueYoungsModulus, $tissueYoungsModulusExp,
-                                               $isHard, $isSliding, $contactStiffnessExp);
-      $dx = $dx + 6.0;
-    }
+    
+    float $tissueYoungsModulus = 12.0;
+    int $tissueYoungsModulusExp = 4;
+    int $contactStiffnessExp = 6;
+    ziva_createStack_oneOfEachCollisionTypes($dx, $tissueYoungsModulus, $tissueYoungsModulusExp,
+                                               $isSliding, $contactStiffnessExp);
+    $dx = $dx + 6.0;
+    
   }
 
   // select the solver node
