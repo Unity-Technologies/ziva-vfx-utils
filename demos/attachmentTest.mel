@@ -74,38 +74,38 @@ proc ziva_addAttachments_attachmentTest(string $meshes[])
   select -r ($meshes[3] + ".vtx[110:228]") $meshes[0];
   string $attach[] = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 1;
-  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".damping") 0.0;
 
   select -r ($meshes[4] + ".vtx[120:139]") $meshes[2];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 2;
-  setAttr ($attach[0] + ".isHard") 1;
+  setAttr ($attach[0] + ".damping") 0.05;
 
   select -r ($meshes[1] + ".vtx[320:379]") $meshes[4];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 2;
-  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".damping") 0.0;
 
   select -r ($meshes[5] + ".vtx[120:139]") $meshes[0];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 2;
-  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".damping") 0.05;
   setAttr ($attach[0] + ".stiffnessExp") 6;
 
   select -r ($meshes[5] + ".vtx[179:180]") ($meshes[5] + ".vtx[198:200]") ($meshes[5] + ".vtx[218:220]") $meshes[1];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 2;
-  setAttr ($attach[0] + ".isHard") 1;
+  setAttr ($attach[0] + ".damping") 0.05;
 
   select -r ($meshes[1] + ".vtx[0:39]") $meshes[3];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 1;
-  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".damping") 0.0;
 
   select -r ($meshes[6] + ".vtx[140:219]") $meshes[7];
   $attach = `ziva -a`;
   setAttr ($attach[0] + ".attachmentMode") 1;
-  setAttr ($attach[0] + ".isHard") 0;
+  setAttr ($attach[0] + ".damping") 0.0;
 
   // adjust Young's modulus (stiffness)
   select -r $meshes[3];
