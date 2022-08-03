@@ -90,7 +90,6 @@ proc ziva_makeTissueTissue_oneOfEachCollisionTypes(string $topTissue, string $bo
   ziva_setTissueCollisionAttrs_oneOfEachCollisionTypes($tissueNodes2[1], $enableVolume, $enableSelfCollisions, $isSliding, $contactStiffnessExp);
 
   select -r $bottomTissue $boneMesh;
-
   string $attachment[] = `ziva -a`; // attach the bottom tissue to the bone
   setAttr ($attachment[0] + ".damping") 0.05;
 }
