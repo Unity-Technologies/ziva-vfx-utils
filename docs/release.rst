@@ -32,9 +32,10 @@ Functionality
 
 
 
-- **Demo:** Update 'One of Each Attachment' demo:
+- **Demo:** Update 'One of Each Attachment', 'One of Each Collision', 'Attachments' demo:
     - Remove deprecated `isHard` attribute.
     - Add damping attributes with zero and non-zero values for effect comparison.
+    - Add non-zero contact damping for 'One of Each Collision' demo.
 
 Bug Fixes
 +++++++++
