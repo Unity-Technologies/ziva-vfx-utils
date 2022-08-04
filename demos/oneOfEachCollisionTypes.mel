@@ -91,7 +91,7 @@ proc ziva_makeTissueTissue_oneOfEachCollisionTypes(string $topTissue, string $bo
 
   select -r $bottomTissue $boneMesh;
   string $attachment[] = `ziva -a`; // attach the bottom tissue to the bone
-  setAttr ($attachment[0] + ".damping") 0.05;
+  setAttr ($attachment[0] + ".damping") 0.1;
 }
 
 proc ziva_makeTissueSelfCollision_oneOfEachCollisionTypes(string $topTissue, string $bottomTissue, string $boneMesh,
@@ -115,7 +115,7 @@ proc ziva_makeTissueSelfCollision_oneOfEachCollisionTypes(string $topTissue, str
   // attach it to the bone
   select -r ($mergedTissue + ".vtx[0:241]") $boneMesh; // attach it to the bone, using vertices [0:241]
   string $attachment[] = `ziva -a`; // attach the bottom tissue to the bone
-  setAttr ($attachment[0] + ".damping") 0.05;
+  setAttr ($attachment[0] + ".damping") 0.1;
 }
 
 proc ziva_createStack_oneOfEachCollisionTypes(float $zOffset, float $tissueYoungsModulus, int $tissueYoungsModulusExp,
