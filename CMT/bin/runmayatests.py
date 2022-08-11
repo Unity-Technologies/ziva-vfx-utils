@@ -48,7 +48,7 @@ def mayapy(maya_version, launch_py2):
     @return: The mayapy executable path.
     """
     if launch_py2:
-        assert int(maya_version) >= 2022, "'-py2' flag is not needed for Maya {}." \
+        assert int(maya_version) == 2022, "'-py2' flag is not needed for Maya {}." \
         "It uses Python 2 environment by default.".format(maya_version)
 
     exec_name = 'mayapy2' if launch_py2 else 'mayapy'
@@ -144,7 +144,7 @@ def test_output_looks_okay(output, maya_version):
 
 def main():
     parser = argparse.ArgumentParser(description='Runs unit tests for a Maya module')
-    parser.add_argument('-m', '--maya', help='Maya version', default='2018')
+    parser.add_argument('-m', '--maya', help='Maya version', default='2023')
     parser.add_argument('-mad', '--maya-app-dir', help='Just create a clean MAYA_APP_DIR and exit')
     parser.add_argument('-p', '--path', help='Path to a folder with tests')
     parser.add_argument('-msp',
