@@ -30,7 +30,7 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
         load_scene('generic.ma')
         # set damping for each attachment
         for i in range(len(self.attachment_names)):
-          cmds.setAttr(self.attachment_names[i] + ".damping", i * 0.1)
+            cmds.setAttr(self.attachment_names[i] + ".damping", i * 0.1)
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -303,6 +303,42 @@ class ZivaAttachmentUpdateNiceNameTestCase(ZivaUpdateNiceNameTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaAttachmentUpdateNiceNameTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaAttachmentCenterTestCase(ZivaUpdateTestCase):
+
+    def setUp(self):
+        super(ZivaAttachmentCenterTestCase, self).setUp()
+        cmds.polySphere(n='c_muscle')
+        cmds.polySphere(n='c_bone')
+
+        cmds.select('c_muscle')
+        cmds.ziva(t=True)
+        cmds.select('c_bone')
+        cmds.ziva(b=True)
+
+        cmds.select('c_muscle', 'c_bone')
+        results = cmds.ziva(a=True)
+        cmds.rename(results[0], 'l_attachment1')
+        results = cmds.ziva(a=True)
+        cmds.rename(results[0], 'l_attachment2')
+
+        cmds.select('zSolver1')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+    def test_builder_center_attachments(self):
+        # this test is for VFXACT-1110 as this test passes with the fix for it
+        # Without the fix for this no new attachments would get created on center
+        self.builder.string_replace('^l_', 'r_')
+        self.builder.build()
+
+        cmds.select('c_muscle')
+
+        self.assertEqual(len(cmds.zQuery(t='zAttachment')), 4)
 
 
 class ZivaAttachmentUpdateTestCase(ZivaUpdateTestCase):

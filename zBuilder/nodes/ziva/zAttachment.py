@@ -46,27 +46,7 @@ class AttachmentNode(Ziva):
                     if att_s == source_mesh and att_t == target_mesh:
                         existing.append(existing_attachment)
 
-            data_attachments = self.builder.get_scene_items(type_filter='zAttachment',
-                                                            association_filter=source_mesh)
-            data = []
-            for data_attachment in data_attachments:
-                data_s = data_attachment.nice_association[0]
-                data_t = data_attachment.nice_association[1]
-                if data_s == source_mesh and data_t == target_mesh:
-                    data.append(data_attachment)
-
-            d_index = data.index(self)
-
-            if existing:
-                # TODO: Update following logic. Check JIRA issue VFXACT-1110
-                if d_index < len(existing):
-                    self.name = safe_rename(existing[d_index], self.name)
-                else:
-                    cmds.select(source_mesh, r=True)
-                    cmds.select(target_mesh, add=True)
-                    new_att = cmds.ziva(a=True)
-                    self.name = safe_rename(new_att[0], self.name)
-            else:
+            if self.name not in existing:
                 cmds.select(source_mesh, r=True)
                 cmds.select(target_mesh, add=True)
                 new_att = cmds.ziva(a=True)
