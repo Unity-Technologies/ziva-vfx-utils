@@ -21,8 +21,6 @@ class ZivaSolverGenericTestCase(VfxTestCase):
     def setUp(self):
         super(ZivaSolverGenericTestCase, self).setUp()
         load_scene("generic.ma")
-        # set contact damping
-        cmds.setAttr("zSolver1" + ".contactDamping", 0.2)
         self.builder = zva.Ziva()
         self.builder.retrieve_from_scene()
 
@@ -45,7 +43,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
 
         solver = solver_nodes[0]
 
-        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond', 'contactDamping']
+        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond']
 
         self.assertEqual(solver.name, name)
         self.assertEqual(solver.type, "zSolver")
@@ -119,7 +117,7 @@ class ZivaSolverGenericTestCase(VfxTestCase):
         self.check_solver_and_transform_looks_good(builder, "zSolver1Shape", "zSolver1")
 
     def test_build(self):
-        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond', 'contactDamping']
+        solver_attrs = ['substeps', 'gravityY', 'framesPerSecond']
 
         solver_transform_attrs = ['enable', 'startFrame']
 
