@@ -15,9 +15,10 @@ Release Notes
 
 Functionality
 +++++++++++++
+- **zBuilder:** **zBuilder.builders.write** zips a JSON file into the '.zbuilder' file.
+  It decreased the .zBuilder file size for large scenes.
+- **zBuilder:** **zBuilder.builders.read** can read both a zipped file and an unzipped JSON file.
 - **zBuilder:** Refactoring code structure:
-    - **zBuilder.builders.write** zips a JSON file into the '.zbuilder' file.
-    - **zBuilder.builders.read** can read both a zipped file and an unzipped JSON file.
     - Renamed **zBuilder.builders.IO** to **zBuilder.builders.serialize**.
     - Renamed **Builder.retrieve_from_file** to **read** and moved to **zBuilder.builders.serialize**. There is still **Builder.retrieve_from_file** for backward compatibility, but this method will be deprecated.
     - Moved **Builder.write** to **zBuilder.builders.serialize**. There is still **Builder.write** for backward compatibility, but this method will be deprecated.
@@ -27,11 +28,10 @@ Functionality
     - Move zBuilder utility files to **zBuilder.utils** folder.
     - Cleanup unused builder and node types.
     - Reorganize unit test files by modules.
+- **Scene Panel:** Improved scene refresh speed by deferring mesh/map data retrival until they are actually needed.
+  The refresh time for a test character scene changes from 7.5s to 1.5s.
 - **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
 - **Utility Commands:** Clear zCache command supports multiple selection clearance.
-
-
-
 - **Demo:** Update 'One of Each Attachment', 'One of Each Collision', 'Attachments' demo:
     - Remove deprecated `isHard` attribute.
     - Add damping attributes with zero and non-zero values for effect comparison.
@@ -40,6 +40,9 @@ Functionality
 Bug Fixes
 +++++++++
 - **zBuilder:** VFXACT-1288 Fix the regression of building mesh with different topologies.
+- **zBuilder:** VFXACT-1328 Add `map_type` and `interp_method` attribute to base.SEARCH_EXCLUDE.
+- **zBuilder:** VFXACT-1347 Add `info` attribute to base.SEARCH_EXCLUDE.
+
 
 2.0.0
 ------
