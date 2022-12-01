@@ -7,15 +7,15 @@
 Installation
 ============
 
-`ziva-vfx-utils <https://bitbucket.org/zivadynamics/ziva-vfx-utils>`_ comes bundled with the Ziva VFX product.
+`ziva-vfx-utils <https://github.com/Unity-Technologies/ziva-vfx-utils>`_ comes bundled with the Ziva VFX product.
 Minor changes are released periodically.
 Users should check for the latest version of ziva-vfx-utils, and update when needed.
 
 There are two ways to retrieve the ziva-vfx-utils package:
 
-#. `Download <https://bitbucket.org/zivadynamics/ziva-vfx-utils/downloads>`_ a zip of the repository.
+#. `Download <https://github.com/Unity-Technologies/ziva-vfx-utils/downloads>`_ a zip of the repository.
 
-#. Clone the `git repo <https://bitbucket.org/zivadynamics/ziva-vfx-utils.git>`_
+#. Clone the `git repo <https://github.com/Unity-Technologies/ziva-vfx-utils.git>`_
 
 
 
