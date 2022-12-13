@@ -94,10 +94,11 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
 
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
+        is_deltamush = (cmds.objectType(node_name) == 'deltaMush')
         # case 2
 
         # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-        if _use_paintable_map_fallback_impl():
+        if _use_paintable_map_fallback_impl() or is_deltamush:
             return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
                 mesh_name, node_name, attr_name)
         # End of TODO
@@ -281,8 +282,9 @@ def set_paintable_map(node_name, attr_name, new_weights):
     if is_multi:
         is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
         if is_deformer and child_attr == 'weights':
+            is_deltamush = (cmds.objectType(node_name) == 'deltaMush')
             # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-            if _use_paintable_map_fallback_impl():
+            if _use_paintable_map_fallback_impl() or is_deltamush:
                 _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
                     node_name, attr_name, new_weights)
                 return

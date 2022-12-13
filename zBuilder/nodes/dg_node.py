@@ -170,8 +170,3 @@ class DGNode(Base):
                         # The easiest solution is mute this error and skip setting this attr value.
                         # The downside is it also mutes any our errors.
                         pass
-
-            # check the alias
-            alias = self.attrs[attr].get('alias', None)
-            if alias:
-                cmds.aliasAttr(alias, node_dot_attr)

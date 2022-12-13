@@ -28,3 +28,6 @@ from .utils.fields import Field
 
 # deformer----------------------------------------------------------------------
 from .deformers.skinCluster import SkinCluster
+from .deformers.blendShape import BlendShape
+from .deformers.deltaMush import DeltaMush
+from .deformers.wrap import Wrap
