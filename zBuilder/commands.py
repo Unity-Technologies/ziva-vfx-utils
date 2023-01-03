@@ -786,10 +786,11 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     * zRestShape: <meshName>_zRestShape
     * zAttachment: <sourceMesh>__<destinationMesh>_zAttachment
     """
+    sel = cmds.ls(sl=True)
+    cmds.select(cl=True)
     solver = mel.eval('zQuery -t "zSolver"')
 
     if not solver:
-        logger.error("No solver found for current selection !")
         return
 
     zNodes = ['zTissue', 'zTet', 'zMaterial', 'zFiber', 'zBone', 'zCloth', 'zRestShape']
@@ -845,6 +846,9 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             if new_name:
                 logger.info('rename: {} to {}'.format(attachment, new_name))
 
+    for s in sel:
+        if cmds.objExists(s):
+            cmds.select(s,add=True)
     logger.info('finished renaming.... ')
 
 
