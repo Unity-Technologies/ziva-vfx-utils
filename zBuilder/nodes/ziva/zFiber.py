@@ -2,6 +2,7 @@ import logging
 
 from maya import cmds
 from zBuilder.utils.mayaUtils import safe_rename, construct_map_names
+from zBuilder.utils.commonUtils import none_to_empty
 from .zivaBase import Ziva
 
 logger = logging.getLogger(__name__)
@@ -61,23 +62,9 @@ class FiberNode(Ziva):
 
         if cmds.objExists(mesh):
             # get exsisting node names in scene on specific mesh and in data
-            existing_fibers = cmds.zQuery(mesh, t='zFiber')
-            data_fibers = self.builder.get_scene_items(type_filter='zFiber',
-                                                       association_filter=mesh)
+            existing_fibers = none_to_empty(cmds.zQuery(mesh, t='zFiber'))
 
-            try:
-                d_index = data_fibers.index(self)
-            except ValueError:
-                d_index = 0
-
-            if existing_fibers:
-                if d_index < len(existing_fibers):
-                    self.name = safe_rename(existing_fibers[d_index], self.name)
-                else:
-                    cmds.select(mesh, r=True)
-                    results = cmds.ziva(f=True)
-                    self.name = safe_rename(results[0], self.name)
-            else:
+            if self.name not in existing_fibers:
                 cmds.select(mesh, r=True)
                 results = cmds.ziva(f=True)
                 self.name = safe_rename(results[0], self.name)

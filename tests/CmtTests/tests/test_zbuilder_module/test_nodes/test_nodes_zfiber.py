@@ -366,3 +366,35 @@ class ZivaFiberUpdateTestCase(ZivaUpdateTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaFiberUpdateTestCase, self).builder_build_with_string_replace()
+
+class ZivaFiberCenterTestCase(ZivaUpdateTestCase):
+
+    def setUp(self):
+        super(ZivaFiberCenterTestCase, self).setUp()
+        cmds.polySphere(n='c_muscle')
+
+        cmds.select('c_muscle')
+        cmds.ziva(t=True)
+
+        cmds.select('c_muscle')
+        results = cmds.ziva(f=True)
+        cmds.rename(results[0], 'l_zFiber1')
+        results = cmds.ziva(f=True)
+        cmds.rename(results[0], 'l_zFiber2')
+
+        cmds.select('zSolver1')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+    def test_builder_center_fibers(self):
+        # this test is for VFXACT-1482 as this test passes with the fix for it
+        # Without the fix for this no new fibers would get created on center
+        self.builder.string_replace('^l_', 'r_')
+        self.builder.build()
+
+        cmds.select('c_muscle')
+
+        self.assertEqual(len(cmds.zQuery(t='zFiber')), 4)

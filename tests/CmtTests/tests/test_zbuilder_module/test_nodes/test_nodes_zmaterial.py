@@ -308,3 +308,36 @@ class ZivaMaterialUpdateTestCase(ZivaUpdateTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaMaterialUpdateTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaMaterialCenterTestCase(ZivaUpdateTestCase):
+
+    def setUp(self):
+        super(ZivaMaterialCenterTestCase, self).setUp()
+        cmds.polySphere(n='c_muscle')
+
+        cmds.select('c_muscle')
+        cmds.ziva(t=True)
+
+        cmds.select('c_muscle')
+        results = cmds.ziva(m=True)
+        cmds.rename(results[0], 'l_zMaterial1')
+        results = cmds.ziva(m=True)
+        cmds.rename(results[0], 'l_zMaterial2')
+
+        cmds.select('zSolver1')
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene_selection()
+        # VERIFY
+        self.compare_builder_nodes_with_scene_nodes(self.builder)
+        self.compare_builder_attrs_with_scene_attrs(self.builder)
+
+    def test_builder_center_materials(self):
+        # this test is for VFXACT-1482 as this test passes with the fix for it
+        # Without the fix for this no new materials would get created on center
+        self.builder.string_replace('^l_', 'r_')
+        self.builder.build()
+
+        cmds.select('c_muscle')
+
+        self.assertEqual(len(cmds.zQuery(t='zMaterial')), 5)

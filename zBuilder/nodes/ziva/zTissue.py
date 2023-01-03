@@ -67,7 +67,7 @@ class TissueNode(Ziva):
             assert (len(tissue_items) == len(tet_items)
                     ), 'zTet and zTissue have a different amount.  Not building.'
 
-            build_multiple(tissue_items, tet_items, permissive=permissive)
+            self.build_multiple()
 
             # we only want to execute this if tissue_items is empty or self is the first tissue.
             # set the attributes in maya
@@ -78,56 +78,65 @@ class TissueNode(Ziva):
                 ztissue.set_maya_attrs(attr_filter=attr_filter)
                 ztet.set_maya_weights(interp_maps=interp_maps)
 
+    def build_multiple(self):
+        """
+        Each node can deal with it's own building. Though, with zTissues it is much
+        faster to build them all at once with one command instead of looping
+        through them.  This function builds all the zTissue at once.
+        """
+        sel = cmds.ls(sl=True)
+        tissue_items = self.builder.get_scene_items(type_filter='zTissue')
+        tet_items = self.builder.get_scene_items(type_filter='zTet')
 
-def build_multiple(tissue_items, tet_items, permissive=True):
-    """
-    Each node can deal with it's own building. Though, with zTissues it is much
-    faster to build them all at once with one command instead of looping
-    through them.  This function builds all the zTissue at once.
+        # cull none buildable------------------------------------------------------
+        tet_results = cull_creation_nodes(tet_items)
+        tissue_results = cull_creation_nodes(tissue_items)
 
-    Args:
-        tissue_items:
-        tet_items:
-        permissive (bool):
-    """
-    sel = cmds.ls(sl=True)
-    # cull none buildable------------------------------------------------------
-    tet_results = cull_creation_nodes(tet_items, permissive=permissive)
-    tissue_results = cull_creation_nodes(tissue_items, permissive=permissive)
+        # build tissues all at once---------------------------------------------
+        if tissue_results['meshes']:
+            Ziva.check_meshes(tissue_results['meshes'])
 
-    # build tissues all at once---------------------------------------------
-    if tissue_results['meshes']:
-        Ziva.check_meshes(tissue_results['meshes'])
+            cmds.select(tissue_results['meshes'], r=True)
+            outs = cmds.ziva(t=True)
+            # when creating a zTissue here we are using the ziva(t=True) command.  This
+            # creates a zTissue, zTet and zMaterial.  We need to make sure that they
+            # are named based on zBuilder data right after.  It is easier changing it here
+            # when needed then to check and deal with it later.
+            # rename zTissue
+            for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
+                                                    tissue_results['scene_items']):
+                safe_rename(new_name, builder_name)
 
-        cmds.select(tissue_results['meshes'], r=True)
-        outs = cmds.ziva(t=True)
+            # rename zTet
+            for new_name, builder_name, node in zip(outs[2::4], tet_results['names'],
+                                                    tet_results['scene_items']):
+                safe_rename(new_name, builder_name)
 
-        # rename zTissues and zTets-----------------------------------------
-        for new_name, builder_name, node in zip(outs[1::4], tissue_results['names'],
-                                                tissue_results['scene_items']):
-            node.name = safe_rename(new_name, builder_name)
+            # rename zMaterial
+            for new_name, node in zip(outs[3::4], tissue_results['scene_items']):
+                mesh = node.association
+                for material in self.builder.get_scene_items(type_filter='zMaterial'):
+                    if material.association == mesh:
+                        safe_rename(new_name, material.name)
+                        break
 
-        for new_name, builder_name, node in zip(outs[2::4], tet_results['names'],
-                                                tet_results['scene_items']):
-            node.name = safe_rename(new_name, builder_name)
+            for ztet, ztissue in zip(tet_items, tissue_items):
+                ztet.apply_user_tet_mesh()
+                if ztissue.parent_tissue:
+                    parent_name = ztissue.parent_tissue.name
+                    parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
+                    if parent_scene_item:
+                        parent = [x.nice_association[0] for x in parent_scene_item]
+                    else:
+                        cmds.select(ztissue.parent_tissue.long_name, r=True)
+                        parent = cmds.zQuery(type='zTissue', mesh=True)
 
-        for ztet, ztissue in zip(tet_items, tissue_items):
-            ztet.apply_user_tet_mesh()
-            if ztissue.parent_tissue:
-                parent_name = ztissue.parent_tissue.name
-                parent_scene_item = ztissue.builder.get_scene_items(name_filter=parent_name)
-                if parent_scene_item:
-                    parent = [x.nice_association[0] for x in parent_scene_item]
-                else:
-                    cmds.select(ztissue.parent_tissue.long_name, r=True)
-                    parent = cmds.zQuery(type='zTissue', mesh=True)
+                    cmds.select(parent)
+                    tissue_mesh = ztissue.nice_association[0]
+                    cmds.select(tissue_mesh, add=True)
+                    cmds.ziva(addSubtissue=True)
 
-                cmds.select(parent)
-                tissue_mesh = ztissue.nice_association[0]
-                cmds.select(tissue_mesh, add=True)
-                cmds.ziva(addSubtissue=True)
-
-    cmds.select(sel)
+        cmds.select(sel)
 
 
 def get_tissue_children(ztissue):
