@@ -810,7 +810,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             crv = cmds.listConnections(loa + '.oLineOfActionData')
             if crv:
                 crv = _strip_namespace(crv[0])
-                new_name = crv.replace('_zFiber', '_zLineOfAction')
+                new_name = crv + '_zLineOfAction'
                 new_name = safe_rename(loa, new_name)
                 if new_name:
                     logger.info('rename: {} to {}'.format(loa, new_name))
