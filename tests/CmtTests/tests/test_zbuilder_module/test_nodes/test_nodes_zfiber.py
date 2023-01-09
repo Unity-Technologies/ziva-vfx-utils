@@ -227,6 +227,32 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber", weights, 1)
 
 
+class ZivaSequenceNamingTestCase(VfxTestCase):
+    """ This test case is for a specific issue with naming sequentially.  Found in VFXACT-1464
+    Maya is looking how to number nodes sequentially by looking up base node names in scene.
+    What this means is if we have a node connected to a node we want to rename that 
+    has the same base name, maya will use that to determine sequence number.
+
+    In the example below I am hooking up a locator to the excitation of a fiber where 
+    the base name is the same and I numbered it 3.  Maya will rename the fiber as a 4
+    when it needs to be a 2.
+    """
+
+    def test_fiber_sequence_naming(self):
+        cmds.polySphere(name='ball')
+        cmds.ziva(t=True)
+        results = cmds.ziva(f=True)
+        cmds.rename(results[0], 'ball_zFiber1')
+        cmds.ziva(f=True)
+        cmds.rename(results[0], 'ball_zFiber7')
+
+        cmds.spaceLocator(n='ball_zFiber3_test')
+        cmds.connectAttr('ball_zFiber3_test.translateX', 'ball_zFiber7.excitation')
+        cmds.select('zSolver1')
+        rename_ziva_nodes()
+        self.assertSceneHasNodes(['ball_zFiber1', 'ball_zFiber2'])
+
+
 class ZivaFiberMirrorTestCase(ZivaMirrorTestCase):
     """This Class tests a specific type of "mirroring" so there are some assumptions made
 
