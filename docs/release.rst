@@ -1,5 +1,8 @@
 Release Notes
 =============
+.. |br| raw:: html
+
+   <br>
 
 .. == STYLE ==
 .. For consistency, prefer to use an imperative style, like:
@@ -15,31 +18,40 @@ Release Notes
 
 Functionality
 +++++++++++++
+- **zBuilder:** **zBuilder.builders.write** zips a JSON file into the ".zbuilder" file.
+  |br|
+  The ".zBuilder" file size is decreased for large scenes.
+- **zBuilder:** **zBuilder.builders.read** can read both a zipped file and an unzipped JSON file.
 - **zBuilder:** Refactoring code structure:
-    - **zBuilder.builders.write** zips a JSON file into the '.zbuilder' file.
-    - **zBuilder.builders.read** can read both a zipped file and an unzipped JSON file.
     - Renamed **zBuilder.builders.IO** to **zBuilder.builders.serialize**.
-    - Renamed **Builder.retrieve_from_file** to **read** and moved to **zBuilder.builders.serialize**. There is still **Builder.retrieve_from_file** for backward compatibility, but this method will be deprecated.
-    - Moved **Builder.write** to **zBuilder.builders.serialize**. There is still **Builder.write** for backward compatibility, but this method will be deprecated.
+    - Renamed **Builder.retrieve_from_file** to **read** and moved to **zBuilder.builders.serialize**.
+      |br|
+      There is still **Builder.retrieve_from_file** for backward compatibility, but this method will be deprecated.
+    - Moved **Builder.write** to **zBuilder.builders.serialize**.
+      |br|
+      There is still **Builder.write** for backward compatibility, but this method will be deprecated.
     - Move **rename_ziva_nodes()** from **zBuilder.zMaya** to **zBuilder.utils**.
     - Rename **zBuilder.utils** to **zBuilder.commands**.
     - Rename **zBuilder.zMaya** to **zBuilder.utils.vfxUtils**.
     - Move zBuilder utility files to **zBuilder.utils** folder.
     - Cleanup unused builder and node types.
     - Reorganize unit test files by modules.
+- **Scene Panel:** The scene refresh speed is improved by deferring mesh/map data retrieval until they are actually needed.
+  |br|
+  The refresh time for a test character scene was reduced from 7.5s to 1.5s.
 - **Scene Panel:** Extract scene panel folders out of zBuilder folder and make these standalone modules.
 - **Utility Commands:** Clear zCache command supports multiple selection clearance.
-
-
-
-- **Demo:** Update 'One of Each Attachment', 'One of Each Collision', 'Attachments' demo:
+- **Demo:** Update "One of Each Attachment", "One of Each Collision", "Attachments" demo:
     - Remove deprecated `isHard` attribute.
     - Add damping attributes with zero and non-zero values for effect comparison.
-    - Add non-zero contact damping for 'One of Each Collision' demo.
+    - Add non-zero attachment damping for "One of Each Collision" demo.
 
 Bug Fixes
 +++++++++
 - **zBuilder:** VFXACT-1288 Fix the regression of building mesh with different topologies.
+- **zBuilder:** VFXACT-1328 Add `map_type` and `interp_method` attribute to `base.SEARCH_EXCLUDE`.
+- **zBuilder:** VFXACT-1347 Add `info` attribute to `base.SEARCH_EXCLUDE`.
+
 
 2.0.0
 ------
@@ -48,7 +60,7 @@ Functionality
 +++++++++++++
 - **Scene Panel:** Newly added :ref:`sec-ScenePanel2`.
 - **Scene Panel:** Show source/target attachments with different icons.
-- Removed 'Select' option from Ziva menu.
+- Removed "Select" option from Ziva menu.
 
 Bug Fixes
 +++++++++
