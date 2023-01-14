@@ -820,12 +820,20 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 t = t.replace(r, '')
             # remove namespace from target mesh
             t = _strip_namespace(t)
+            record = dict()
             new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
-            new_name = safe_rename(attachment, new_name)
+            if not new_name in record:
+                record[new_name] = []
+                record[new_name].append(new_name)
+            else:
+                record[new_name].append(new_name)
+
+            new_name = '{}__{}_{}{}'.format(s, t, 'zAttachment', len(record[new_name]))
+            safe_rename(attachment, new_name)
 
     for s in sel:
         if cmds.objExists(s):
-            cmds.select(s,add=True)
+            cmds.select(s, add=True)
     logger.info('finished renaming.... ')
 
 
