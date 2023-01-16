@@ -61,12 +61,20 @@ class Mesh(Base):
         new_mesh_dep_node = om2.MFnDependencyNode(new_mesh)
         return cmds.rename(new_mesh_dep_node.name(), self.name + '_rebuilt')
 
-    def mirror(self):
-        """ Negate mesh position in place along YZ plane.
+    def mirror(self, mirror_axis='X'):
+        """ Mirrors the mesh
+
+        Args:
+            mirror_axis: Axis to mirror the mesh on.  Accepts X, Y or Z.  Default: X
         """
-        logger.info('Mirroring mesh {} along YZ plane'.format(self.name))
+        logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
         for pos in self._pointList:
-            pos.x = -pos.x
+            if mirror_axis == 'X':
+                pos[0] = -pos[0]
+            if mirror_axis == 'Y':
+                pos[1] = -pos[1]
+            if mirror_axis == 'Z':
+                pos[2] = -pos[2]
 
     def is_topologically_corresponding(self):
         """ Compare an in scene mesh, with the one saved in this node.
