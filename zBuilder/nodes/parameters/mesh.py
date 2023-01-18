@@ -69,12 +69,14 @@ class Mesh(Base):
         """
         assert mirror_axis in ['X', 'Y', 'Z'], "Expected values X, Y or Z"
         logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
-        for pos in self._pointList:
-            if mirror_axis == 'X':
+        if mirror_axis == 'X':
+            for pos in self._pointList:
                 pos[0] = -pos[0]
-            if mirror_axis == 'Y':
+        elif mirror_axis == 'Y':
+            for pos in self._pointList:
                 pos[1] = -pos[1]
-            if mirror_axis == 'Z':
+        elif mirror_axis == 'Z':
+            for pos in self._pointList:
                 pos[2] = -pos[2]
 
     def is_topologically_corresponding(self):
