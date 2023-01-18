@@ -1,9 +1,7 @@
 import zBuilder.builders.ziva as zva
 
 from maya import cmds
-from vfx_test_case import VfxTestCase, get_mesh_vertex_positions
-from zBuilder.commands import clean_scene
-from zBuilder.nodes.parameters.maps import invert_weights
+from vfx_test_case import VfxTestCase
 
 
 class ZivaMeshTestCase(VfxTestCase):
