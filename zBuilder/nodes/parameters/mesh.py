@@ -67,8 +67,8 @@ class Mesh(Base):
         Args:
             mirror_axis: Axis to mirror the mesh on.  Accepts X, Y or Z.  Default: X
         """
-        logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
         if mirror_axis in ['X', 'Y', 'Z']:
+            logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
             for pos in self._pointList:
                 if mirror_axis == 'X':
                     pos[0] = -pos[0]
