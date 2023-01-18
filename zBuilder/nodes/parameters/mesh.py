@@ -67,17 +67,15 @@ class Mesh(Base):
         Args:
             mirror_axis: Axis to mirror the mesh on.  Accepts X, Y or Z.  Default: X
         """
-        if mirror_axis in ['X', 'Y', 'Z']:
-            logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
-            for pos in self._pointList:
-                if mirror_axis == 'X':
-                    pos[0] = -pos[0]
-                if mirror_axis == 'Y':
-                    pos[1] = -pos[1]
-                if mirror_axis == 'Z':
-                    pos[2] = -pos[2]
-        else:
-            raise ValueError('A value of X, Y or Z accepted.')
+        assert mirror_axis in ['X', 'Y', 'Z'], "Expected values X, Y or Z"
+        logger.info('Mirroring mesh {} along {} axis'.format(self.name, mirror_axis))
+        for pos in self._pointList:
+            if mirror_axis == 'X':
+                pos[0] = -pos[0]
+            if mirror_axis == 'Y':
+                pos[1] = -pos[1]
+            if mirror_axis == 'Z':
+                pos[2] = -pos[2]
 
     def is_topologically_corresponding(self):
         """ Compare an in scene mesh, with the one saved in this node.
