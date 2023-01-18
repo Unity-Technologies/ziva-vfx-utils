@@ -94,7 +94,7 @@ class ZivaAttachmentGenericTestCase(VfxTestCase):
         rename_ziva_nodes([])
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_1__c_bone_1_zAttachment")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_1__c_bone_1_zAttachment1")), 1)
 
     def test_string_replace(self):
         ## VERIFY
