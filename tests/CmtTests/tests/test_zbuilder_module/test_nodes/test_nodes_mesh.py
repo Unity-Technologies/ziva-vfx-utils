@@ -17,7 +17,7 @@ class ZivaMeshTestCase(VfxTestCase):
     def test_mesh_mirror_assert(self):
         ball = self.builder.get_scene_items(name_filter='cube')[0]
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(AssertionError):
             ball.mirror(mirror_axis='DD')
 
     def test_mesh_mirror_axist(self):
