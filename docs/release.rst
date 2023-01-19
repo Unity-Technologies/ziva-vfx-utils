@@ -12,6 +12,7 @@ Release Notes
 .. For bug fixes, just say what the bug was. e.g.
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
+
 2.2.0
 ------
 
