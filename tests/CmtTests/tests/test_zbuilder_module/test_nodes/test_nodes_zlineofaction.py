@@ -13,7 +13,7 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.loa_names = ["l_tissue_1_zLineOfAction", "r_subtissue_1_zLineOfAction"]
+        cls.loa_names = ["l_tissue_1_zFiber1_zLineOfAction", "r_subtissue_1_zFiber1_zLineOfAction"]
         cls.loa_attrs = ["maxExcitation", "stretchBias", "posSensitivity"]
 
     def setUp(self):
@@ -76,46 +76,47 @@ class ZivaLineOfActionGenericTestCase(VfxTestCase):
 
         ## VERIFY
         # check if an item exists before renaming
-        self.assertEqual(cmds.ls("r_tissue_2_zLineOfAction1"), [])
+        self.assertEqual(cmds.ls("r_tissue_2_zFiber1_zLineOfAction"), [])
 
         ## ACT
         rename_ziva_nodes()
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_2_zLineOfAction1")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_2_zFiber1_zLineOfAction")), 1)
 
     def test_string_replace(self):
         ## VERIFY
         # check if an item exists before string_replace
-        r_loa = self.builder.get_scene_items(name_filter="l_tissue_1_zLineOfAction")
+        r_loa = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber1_zLineOfAction")
         self.assertGreaterEqual(len(r_loa), 1)
 
         ## ACT
         self.builder.string_replace("^l_", "r_")
 
         ## VERIFY
-        r_loa = self.builder.get_scene_items(name_filter="l_tissue_1_zLineOfAction")
+        r_loa = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber1_zLineOfAction")
         self.assertEqual(r_loa, [])
 
     def test_cut_paste(self):
-        builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zLineOfAction")
+        builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zFiber1_zLineOfAction")
         self.check_retrieve_loa_looks_good(builder, {})
 
     def test_copy_paste(self):
-        builder = self.get_builder_after_copy_paste("l_tissue_1", "l_tissue_1_zLineOfAction")
+        builder = self.get_builder_after_copy_paste("l_tissue_1",
+                                                    "l_tissue_1_zFiber1_zLineOfAction")
         self.check_retrieve_loa_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
         # check if zLineOfAction does not exist before making it
-        self.assertEqual(cmds.ls("r_tissue_1_zLineOfAction"), [])
+        self.assertEqual(cmds.ls("r_tissue_1_zFiber1_zLineOfAction"), [])
 
         ## ACT
         cmds.select("l_tissue_1")
         copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_1_zLineOfAction")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_1_zFiber1_zLineOfAction")), 1)
 
 
 class ZivaMultiCurveLoaTestCase(VfxTestCase):

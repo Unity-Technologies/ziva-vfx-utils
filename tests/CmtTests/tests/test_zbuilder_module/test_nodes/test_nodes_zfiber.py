@@ -13,7 +13,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.fiber_names = ['r_subtissue_1_zFiber', 'l_tissue_1_zFiber']
+        cls.fiber_names = ['r_subtissue_1_zFiber1', 'l_tissue_1_zFiber1']
         cls.fiber_attrs = ["strength", "contractionLimit", "excitation"]
 
     def setUp(self):
@@ -83,35 +83,35 @@ class ZivaFiberGenericTestCase(VfxTestCase):
     def test_string_replace(self):
         ## VERIFY
         # check if an item exists before string_replace
-        r_fiber = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber")
+        r_fiber = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber1")
         self.assertGreaterEqual(len(r_fiber), 1)
 
         ## ACT
         self.builder.string_replace("^l_", "r_")
 
         ## VERIFY
-        r_fiber = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber")
+        r_fiber = self.builder.get_scene_items(name_filter="l_tissue_1_zFiber1")
         self.assertEqual(r_fiber, [])
 
     def test_cut_paste(self):
-        builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zFiber")
+        builder = self.get_builder_after_cut_paste("l_tissue_1", "l_tissue_1_zFiber1")
         self.check_retrieve_zfiber_looks_good(builder, {})
 
     def test_copy_paste(self):
-        builder = self.get_builder_after_copy_paste("l_tissue_1", "l_tissue_1_zFiber")
+        builder = self.get_builder_after_copy_paste("l_tissue_1", "l_tissue_1_zFiber1")
         self.check_retrieve_zfiber_looks_good(builder, {})
 
     def test_copy_paste_with_name_substitution(self):
         ## VERIFY
         # check if zFiber does not exist before making it
-        self.assertEqual(cmds.ls("r_tissue_1_zFiber"), [])
+        self.assertEqual(cmds.ls("r_tissue_1_zFiber1"), [])
 
         ## ACT
         cmds.select("l_tissue_1")
         copy_paste_with_substitution("(^|_)l($|_)", "r")
 
         ## VERIFY
-        self.assertEqual(len(cmds.ls("r_tissue_1_zFiber")), 1)
+        self.assertEqual(len(cmds.ls("r_tissue_1_zFiber1")), 1)
 
     def test_weight_interpolation(self):
         ## SETUP
@@ -160,7 +160,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
-        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber", weights, 0)
+        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber1", weights, 0)
 
     def test_weight_closest_interpolation_with_low_res_mesh(self):
         ## SETUP
@@ -176,7 +176,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         self.builder.string_replace("l_tissue_1_low_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
-        self.check_map_interpolation(self.builder, "l_tissue_1_low_zFiber", weights, 1)
+        self.check_map_interpolation(self.builder, "l_tissue_1_low_zFiber1", weights, 1)
 
     def test_weight_closest_interpolation_with_high_res_mesh(self):
         ## SETUP
@@ -224,7 +224,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
-        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber", weights, 1)
+        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber1", weights, 1)
 
 
 class ZivaSequenceNamingTestCase(VfxTestCase):
@@ -392,6 +392,7 @@ class ZivaFiberUpdateTestCase(ZivaUpdateTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaFiberUpdateTestCase, self).builder_build_with_string_replace()
+
 
 class ZivaFiberCenterTestCase(ZivaUpdateTestCase):
 
