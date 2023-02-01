@@ -20,12 +20,12 @@ pipeline {
                     }
                 }
                 stash(name: 'main', includes: 'ziva-vfx-utils/**')
-                stash(name: 'tools', includes: 'ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py')
             }
             post {
                 success {
                     script {
-                        notifyBitbucket('INPROGRESS')
+                        // TODO: notify repo PR build is in progress
+                        print("Build started")
                     }
                 }
                 cleanup { cleanWs() }
@@ -110,17 +110,17 @@ pipeline {
     post{
         unsuccessful {
             node ('git && linux') {
-                unstash 'tools'
                 script {
-                    notifyBitbucket('FAILED')
+                    // TODO: notify repo PR build failed
+                    print("Build failed")
                 }
             }
         }
         success {
             node ('git && linux') {
-                unstash 'tools'
                 script {
-                    notifyBitbucket('SUCCESSFUL')
+                    // TODO: notify repo PR build finish successfully
+                    print("Build success")
                 }
             }
         }
@@ -154,18 +154,5 @@ def runLinuxTestStage(runInPython2Env) {
                 sh "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
             }
         }
-    }
-}
-
-// Call our Bitbucket notification script to tell Bitbucket to update the status of the branch being built.
-// status should be "SUCCESSFUL", "INPROGRESS", or "FAILED"
-def notifyBitbucket(String status) {
-    withCredentials([usernamePassword( credentialsId: 'ZivaBuild', usernameVariable: 'USR', passwordVariable: 'PWS' )]) {
-        // String interpoloation in Jenkins-Groovy is garbage. Single-quotes do NOT interpolate $-strings
-        // so we use them for variables that shouldn't be expanded until shell execution-time.
-        // Double-quotes DO interpolate $-strings, so we use them for variables we want to eagerly
-        // expand right now during Jenkins script evaluation. Then we concatenate together the
-        // single-quote and double-quote strings to build the final shell command we want executed.
-        sh 'python ${WORKSPACE}/ziva-vfx-utils/tests/CmtTests/bitbucket-notify.py "zBuilder" ' + "\"${status}\" \"${scmVars.GIT_COMMIT}\"" + ' $BUILD_NUMBER $BUILD_URL ${USR} ${PWS}'
     }
 }
