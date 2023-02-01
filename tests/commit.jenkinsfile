@@ -10,7 +10,7 @@ pipeline {
 
     stages {
         stage('get sources') {
-            agent { label 'git' && 'linux' }  // must checkout to a linux machine to avoid line ending issue
+            agent { label 'git && linux' }  // must checkout to a linux machine to avoid line ending issue
             steps {
                 echo 'running checkout ziva-vfx-utils stage'
 
@@ -109,7 +109,7 @@ pipeline {
 
     post{
         unsuccessful {
-            node ('git' && 'linux') {
+            node ('git && linux') {
                 unstash 'tools'
                 script {
                     notifyBitbucket('FAILED')
@@ -117,7 +117,7 @@ pipeline {
             }
         }
         success {
-            node ('git' && 'linux') {
+            node ('git && linux') {
                 unstash 'tools'
                 script {
                     notifyBitbucket('SUCCESSFUL')
