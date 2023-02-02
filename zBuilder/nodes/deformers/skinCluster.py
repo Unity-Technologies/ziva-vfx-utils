@@ -2,17 +2,19 @@ from maya import cmds
 from maya.api import OpenMaya as om2
 from maya.api import OpenMayaAnim as oma2
 from zBuilder.utils.mayaUtils import get_mobject
-from ..dg_node import DGNode
+from ..deformer import Deformer
 
 
-class SkinCluster(DGNode):
+class SkinCluster(Deformer):
     """ The base node for the node functionality of all nodes
     """
     type = 'skinCluster'
     TYPES = []
 
     # This is an inherited class attribute.
-    SEARCH_EXCLUDE = DGNode.SEARCH_EXCLUDE + ['weights',]
+    SEARCH_EXCLUDE = Deformer.SEARCH_EXCLUDE + [
+        'weights',
+    ]
 
     # List of maya attributes to add to attribute list when capturing
     EXTEND_ATTR_LIST = list()
@@ -43,7 +45,34 @@ class SkinCluster(DGNode):
             skin_cluster = cmds.skinCluster(tsb=True, n=name)
 
         self.set_maya_attrs(attr_filter=attr_filter)
-        apply_weights(self.name, self.association, self.influences, self.weights)
+
+        mesh = self.parameters['mesh'][0]
+        if not mesh.is_topologically_corresponding():
+            self.copy_weights_from_internal_mesh()
+        else:
+            apply_weights(self.name, self.association, self.influences, self.weights)
+
+    def copy_weights_from_internal_mesh(self):
+        """ This is invoked if the topology is different between mesh in scene and mesh in builder.
+        It creates a mesh from its internal storage, then it applies the skinCluster to that mesh.
+        Then it copySkinWeights from that mesh to desired mesh.
+        """
+        mesh = self.parameters['mesh'][0]
+
+        tmp_mesh = mesh.build_mesh()
+        cmds.select(self.influences, tmp_mesh, r=True)
+
+        if cmds.objExists('tmp_skinCluster'):
+            cmds.delete('tmp_skinCluster')
+        cmds.skinCluster(toSelectedBones=True, name='tmp_skinCluster')
+
+        apply_weights('tmp_skinCluster', tmp_mesh, self.influences, self.weights)
+        cmds.select(tmp_mesh, self.association[0])
+        cmds.copySkinWeights(noMirror=True,
+                             surfaceAssociation='closestPoint',
+                             influenceAssociation='closestJoint')
+
+        cmds.delete(tmp_mesh)
 
 
 def get_associations(skin_cluster):

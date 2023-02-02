@@ -22,6 +22,9 @@ class SkinCluster(Builder):
         for skin_cluster in skin_clusters:
             scene_item = self.node_factory(skin_cluster)
             self.bundle.extend_scene_items(scene_item)
+
+            for item in self.get_scene_items(type_filter=['mesh']):
+                item.retrieve_values()
         self.stats()
 
     @time_this

@@ -10,6 +10,7 @@ from zBuilder.builders.serialize import read, write
 from zBuilder.nodes.base import Base
 from zBuilder.nodes.dg_node import DGNode
 
+
 class SkinClusterBuilderTestCase(VfxTestCase):
 
     @classmethod
@@ -147,3 +148,24 @@ class SkinClusterBuilderTestCase(VfxTestCase):
             if isinstance(item, DGNode):
                 # This will assert if any scene item does not contain DGNode.SEARCH_EXCLUDE items
                 self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in DGNode.SEARCH_EXCLUDE))
+
+    def test_skinCluster_copySkinWeights(self):
+
+        ## SETUP
+        cmds.delete('l_skin_mesh', constructionHistory=True)
+        cmds.polySmooth('l_skin_mesh')
+
+        ## ACT
+        self.builder.build()
+
+        ## VERIFY
+        # I picked a vert outside of the original (the sphere originally had 382 verts so 392 will be at 0,0,0)
+        val = cmds.xform('l_skin_mesh.vtx[392]', query=True, translation=True, worldSpace=True)
+
+        # we are going to test to make sure copySkinWeights is doing what it needs to during a build.
+        # Mainly it should effectively interpolate the weights if the topology changes.
+        # If you apply a wrong size map to a skinCluster maya throws every extra vert at 0,0,0
+        # we can use this to determine if it worked or not.
+        # x is at -2 due to the transformation applied to sphere transform
+        fail_value = [-2.0, 0.0, 0.0]
+        self.assertNotEqual(val, fail_value)
