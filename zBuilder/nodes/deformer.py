@@ -20,6 +20,14 @@ class Deformer(DGNode):
         self.parameters[parameter.type].append(parameter)
 
     def spawn_parameters(self):
+        """
+        This outputs a dictionary formatted to feed to the parameter factory so
+        the parameter factory knows what parameters to build.  The third value in maps 
+        is either 'endPoints' or 'barycentric'.  endPoints is an interpolation method 
+        exclusive for endPoint fiber maps.
+        dict['map'] = [node_name_dot_attr, mesh_name, 'barycentric']
+        dict['mesh'] = [mesh_name]
+        """
         objs = {}
         if self.nice_association:
             objs['mesh'] = self.nice_association

@@ -8,12 +8,40 @@ logger = logging.getLogger(__name__)
 
 class BlendShape(Deformer):
     type = 'blendShape'
-    MAP_LIST = ['inputTarget[*].inputTargetGroup[*].targetWeights', 'inputTarget[*].baseWeights']
-    EXTEND_ATTR_LIST = ['origin']
+    MAP_LIST = ['inputTarget[0].inputTargetGroup[*].targetWeights', 'inputTarget[0].baseWeights']
+    EXTEND_ATTR_LIST = ['origin', 'supportNegativeWeights']
 
     def __init__(self, parent=None, builder=None):
         super(BlendShape, self).__init__(parent=parent, builder=builder)
         self._target = None
+
+    def spawn_parameters(self):
+        """
+        This outputs a dictionary formatted to feed to the parameter factory so
+        the parameter factory knows what parameters to build.  The third value in maps 
+        is either 'endPoints' or 'barycentric'.  endPoints is an interpolation method 
+        exclusive for endPoint fiber maps.
+        dict['map'] = [node_name_dot_attr, mesh_name, 'barycentric']
+        dict['mesh'] = [mesh_name]
+        """
+        objs = {}
+        if self.nice_association:
+            objs['mesh'] = self.nice_association
+
+        # The amount of maps for a blendShape depends on how many targets the blendshape has.
+        # So we need to resolve the maps in MAP_LIST by adding node name and replace any * with
+        # proper number.
+        objs['map'] = []
+        num_targets = len(cmds.blendShape(self.name, q=True, target=True))
+        mesh_name = self.association[0]
+        # append target weights
+        for i in range(0, num_targets):
+            map_name = '{}.inputTarget[0].inputTargetGroup[{}].targetWeights'.format(self.name, i)
+            objs['map'].append([map_name, mesh_name, "barycentric"])
+        # append base weights
+        objs['map'].append(
+            ["{}.inputTarget[0].baseWeights".format(self.name), mesh_name, "barycentric"])
+        return objs
 
     def get_map_meshes(self):
         """
@@ -26,38 +54,48 @@ class BlendShape(Deformer):
         Returns:
             list(): of long mesh names.
         """
-        return [
-            self.association[0] for i in range(len(construct_map_names(self.name, self.MAP_LIST)))
-        ]
+        return [self.association[0]] * (len(cmds.blendShape(self.name, q=True, target=True)) + 1)
 
     def build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
-        if not cmds.objExists(self.name):
-            cmds.select(self.target, r=True)
-            cmds.select(self.association, add=True)
-            cmds.blendShape(name=self.name)
+        meshes = self.target
+        meshes.append(self.association[0])
 
-        self.set_maya_attrs(attr_filter=attr_filter)
-        self.set_maya_weights(interp_maps=interp_maps)
+        if all([cmds.objExists(x) for x in meshes]):
+            if not cmds.objExists(self.name):
+                cmds.select(self.target, r=True)
+                cmds.select(self.association, add=True)
+                cmds.blendShape(name=self.name)
+
+            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_weights(interp_maps=interp_maps)
+        else:
+            for mesh in meshes:
+                if not cmds.objExists(mesh):
+                    logger.warning(
+                        'Missing items from scene: check for existence of {}'.format(mesh))
 
     def populate(self, maya_node=None):
         super(BlendShape, self).populate(maya_node=maya_node)
         self.target = get_target(self.name)
 
-        # add aliased attr
-        attr_list = [self.target]
+        # we need to add the blendShape targets to the attr_list.
+        # These are the aliased attrs in channel box for zBuilder to store.
+        # We need to remove any namespace here
+        attr_list = [x.split(':')[-1] for x in self.target]
+
         attrs = build_attr_key_values(self.name, attr_list)
         self.attrs.update(attrs)
 
     @property
     def target(self):
-        return get_short_name(self._target)
+        return [get_short_name(item) for item in self._target]
 
     @target.setter
     def target(self, target_mesh):
-        self._target = cmds.ls(target_mesh, long=True)[0]
+        self._target = cmds.ls(target_mesh, long=True)
 
     @property
     def long_target(self):

@@ -13,20 +13,20 @@ class Deformers(Builder):
     """Test setup to play with deformers and how they are ordered on a mesh.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(Deformers, self).__init__(*args, **kwargs)
+
+        self.acquire = ['deltaMush', 'blendShape', 'wrap']
+
     @time_this
     def retrieve_from_scene(self, *args, **kwargs):
         # parse args-----------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
 
-        self.acquire = ['deltaMush', 'blendShape', 'wrap']
         tmp = list()
-        history = cmds.listHistory(selection)
-
-        # We are looping through the history in reverse order.  The order you add
-        # items into zBuilder is the order in which they get created, first in first out.
-        # By reversing the history here we are ensuring we place them in zBuilder in the
-        # proper order
-        for hist in history[::-1]:
+        # we are traversing through the history breadth first because we need to make sure we are
+        # adding these to zBuilder in the proper order.  zBuilder is first in first out.
+        for hist in cmds.listHistory(selection, breadthFirst=True, allFuture=True):
             if get_type(hist) in self.acquire:
                 tmp.append(hist)
 
