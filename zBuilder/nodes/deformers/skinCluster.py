@@ -1,8 +1,12 @@
+import logging
+
 from maya import cmds
 from maya.api import OpenMaya as om2
 from maya.api import OpenMayaAnim as oma2
 from zBuilder.utils.mayaUtils import get_mobject
 from ..deformer import Deformer
+
+logger = logging.getLogger(__name__)
 
 
 class SkinCluster(Deformer):
@@ -39,18 +43,22 @@ class SkinCluster(Deformer):
     def build(self, *args, **kwargs):
         attr_filter = kwargs.get('attr_filter', None)
 
-        name = self.name
-        if not cmds.objExists(name):
-            cmds.select(self.influences, self.association, r=True)
-            skin_cluster = cmds.skinCluster(tsb=True, n=name)
+        if cmds.objExists(self.association[0]):
+            name = self.name
+            if not cmds.objExists(name):
+                cmds.select(self.influences, self.association, r=True)
+                skin_cluster = cmds.skinCluster(tsb=True, n=name)
 
-        self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_attrs(attr_filter=attr_filter)
 
-        mesh = self.parameters['mesh'][0]
-        if not mesh.is_topologically_corresponding():
-            self.copy_weights_from_internal_mesh()
+            mesh = self.parameters['mesh'][0]
+            if not mesh.is_topologically_corresponding():
+                self.copy_weights_from_internal_mesh()
+            else:
+                apply_weights(self.name, self.association, self.influences, self.weights)
         else:
-            apply_weights(self.name, self.association, self.influences, self.weights)
+            logger.warning('Missing items from scene: check for existence of {} '.format(
+                self.association[0]))
 
     def copy_weights_from_internal_mesh(self):
         """ This is invoked if the topology is different between mesh in scene and mesh in builder.

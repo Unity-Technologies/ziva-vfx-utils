@@ -169,3 +169,14 @@ class SkinClusterBuilderTestCase(VfxTestCase):
         # x is at -2 due to the transformation applied to sphere transform
         fail_value = [-2.0, 0.0, 0.0]
         self.assertNotEqual(val, fail_value)
+
+    def test_missing_mesh(self):
+        ## SETUP
+        cmds.rename("l_skin_mesh", "l_skin_meshOLD")
+
+        ## VERIFY
+        try:
+            ## ACT
+            self.builder.build()
+        except ValueError:  # the Exception you receive before
+            assert False, "This is not a warning!"
