@@ -127,6 +127,17 @@ class WrapBuilderTestCase(VfxTestCase):
         ## VERIFY
         self.assertEqual(cmds.getAttr('wrap1.maxDistance'), 1)
 
+    def test_missing_mesh(self):
+        ## SETUP
+        cmds.rename("l_skin_mesh", "l_skin_meshOLD")
+
+        ## VERIFY
+        try:
+            ## ACT
+            self.builder.build()
+        except ValueError:  # the Exception you receive before
+            assert False, "This is not a warning!"
+
     def test_wrap_search_exclude_inheriting(self):
         # searching through every scene item
         # Check if inherited from Base.
