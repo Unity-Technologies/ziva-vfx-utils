@@ -65,6 +65,7 @@ class SkinCluster(Deformer):
         It creates a mesh from its internal storage, then it applies the skinCluster to that mesh.
         Then it copySkinWeights from that mesh to desired mesh.
         """
+        logger.info('interpolating map:  {}.weightList[*].weights'.format(self.name))
         mesh = self.parameters['mesh'][0]
 
         tmp_mesh = mesh.build_mesh()
