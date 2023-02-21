@@ -23,7 +23,7 @@ class Wrap(Deformer):
 
         if all([cmds.objExists(x) for x in self.association]):
             if not cmds.objExists(self.name):
-                cmds.select(self.nice_association, add=True)
+                cmds.select(self.nice_association, replace=True)
 
                 version = 7  # internal maya
                 operation = 1  # create mode
