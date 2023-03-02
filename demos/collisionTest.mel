@@ -86,6 +86,10 @@ global proc ziva_main_collisionTest(int $newScene)
     file -f -new;
   }
 
+  // force to start at frame 1 as usual, otherwise in later 2023 Maya any sence starts at a negative frame by default,
+  // this is a workaround for the above issue, the long-term solution should come from Autodesk.
+  currentTime 1;
+
   // make a solver node
   ziva -s;
 
@@ -121,6 +125,7 @@ global proc ziva_main_collisionTest(int $newScene)
     viewFit -all;
   }
 
+  playbackOptions -e -minTime 1; // adjust playback to start from frame 1
   playbackOptions -e -maxTime 500; // adjust playback to give 500 frames
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 

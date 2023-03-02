@@ -39,6 +39,10 @@ global proc ziva_main_selfCollisionsCacheAndDelaunayTetMesherDemo(int $newScene)
     file -f -new;
   }
 
+  // force to start at frame 1 as usual, otherwise in later 2023 Maya any sence starts at a negative frame by default,
+  // this is a workaround for the above issue, the long-term solution should come from Autodesk.
+  currentTime 1;
+
   // make a solver node
   ziva -s;
 

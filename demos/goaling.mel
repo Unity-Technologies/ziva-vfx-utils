@@ -318,6 +318,10 @@ global proc ziva_main_goalingDemo(int $newScene)
     file -f -new;
   }
 
+  // force to start at frame 1 as usual, otherwise in later 2023 Maya any sence starts at a negative frame by default,
+  // this is a workaround for the above issue, the long-term solution should come from Autodesk.
+  currentTime 1;
+
   // load the geometry of the fish (two identical copies), setup the skeleton rig and animation of the first fish
   $goalingSceneFilePath = getDemoAssetPath("fishGeometry.ma");
   file -import -type "mayaAscii" -ignoreVersion -ra true -mergeNamespacesOnClash false -defaultNamespace -options "v=0;p=17;f=0" -pr $goalingSceneFilePath;
@@ -450,6 +454,7 @@ global proc ziva_main_goalingDemo(int $newScene)
   // the simulation will be automatically cached
   ziva -acn;
 
+  playbackOptions -e -minTime 1; // adjust playback to start from frame 1
   playbackOptions -e -maxTime 160; // adjust playback to give 160 frames
   playbackOptions -e -playbackSpeed 0; // set the playback to every frame
 
