@@ -217,13 +217,14 @@ class VfxTestCase(TestCase):
         nodes = builder.get_scene_items(type_filter=node_type)
         self.assertEqual(nodes, [])
 
-    def check_map_interpolation(self, builder, node_name, expected_weights, map_index):
+    def check_map_interpolation(self, builder, node_name, expected_weights, map_index, eps=1e-6):
         """Args:
             builder (builders.ziva.Ziva()): builder object
             node_name (string): name of the Ziva node with a map
             expected_weights (list): list if expected weights for the map
             map_index (int): map index, 0 or 1, to choose between source/target, source/endPoints
                              weights
+            eps (float): Epsilon for approximation.
         """
         ## ACT
         builder.build(interp_maps=True)
@@ -233,7 +234,7 @@ class VfxTestCase(TestCase):
         builder = zva.Ziva()
         builder.retrieve_from_scene()
         node = builder.get_scene_items(name_filter=node_name)[0]
-        self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values)
+        self.assertAllApproxEqual(expected_weights, node.parameters["map"][map_index].values, eps)
 
     def get_builder_after_writing_and_reading_from_disk(self, builder):
         write(self.temp_file_path, builder)

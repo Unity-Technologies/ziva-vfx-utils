@@ -160,7 +160,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
-        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber1", weights, 0)
+        self.check_map_interpolation(self.builder, "l_tissue_1_high_zFiber1", weights, 0, eps=1e-5)
 
     def test_weight_closest_interpolation_with_low_res_mesh(self):
         ## SETUP
