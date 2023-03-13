@@ -20,6 +20,10 @@ Functionality
 +++++++++++++
 - **zBuilder:** **zBuilder.nodes.parameters.mesh** Added ability to mirror mesh on X, Y or Z
 
+Bug Fixes
++++++++++
+- **zBuilder:** VFXACT-1525 Fix for zRivetToBoneLocator naming issue.
+
 2.1.0
 ------
 

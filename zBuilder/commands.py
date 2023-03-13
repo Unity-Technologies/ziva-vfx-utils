@@ -699,7 +699,6 @@ def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove):
     """
     old_names = []
     new_names = []
-    rtbs_curves_tuple = []
     for rtb in rtbs:
         crv = cmds.listConnections(rtb + '.outputGeometry', shapes=True)
         # If curve has multiple zRivetToBone nodes, need to search zRivetToBone connections
@@ -721,40 +720,20 @@ def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove):
                 if new_name_rtb:
                     old_names.append(rtb)
                     new_names.append(new_name_rtb)
-                    # curve names needed for locator renaming
-                    rtbs_curves_tuple.append((new_name_rtb, crv))
 
-    return old_names, new_names, rtbs_curves_tuple
+    return old_names, new_names
 
 
-def _rivet_to_bone_locator_rename_helper(rtbs, rtbs_curves_tuple):
+def _rivet_to_bone_locator_rename_helper(rtbs, postfix):
     """
     Rename 'zRivetToBone' locator nodes.
     Args:
         rtbs (list): list of zRivetToBone nodes to rename
-        tbs_curves_tuple (list): list of (rivetToBone, curve) tuple
-    Returns:
-        tuple of lists: old names, new names
+        postfix (string): postfix to use for renaming
     """
-    old_names = []
-    new_names = []
-
     for rtb in rtbs:
         rtb_locator = cmds.listConnections('{}.segments'.format(rtb))
-        if rtb_locator:
-            rtb_locator = rtb_locator[0]
-            curve = [item[1] for item in rtbs_curves_tuple if rtb in item[0]]
-            if curve:
-                new_name_locator = '{}_{}'.format(curve[0], rtb_locator)
-            else:
-                new_name_locator = rtb_locator
-            if rtb_locator != new_name_locator:
-                new_name_locator = safe_rename(rtb_locator, new_name_locator)
-                if new_name_locator:
-                    old_names.append(rtb_locator)
-                    new_names.append(new_name_locator)
-
-    return old_names, new_names
+        cmds.rename(rtb_locator, '{}{}'.format(rtb.replace('zRivetToBone', 'zRivet'), postfix))
 
 
 def rename_ziva_nodes(replace=['_muscle', '_bone']):
@@ -801,12 +780,17 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
     # rename zRivetToBone nodes
     rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
     if rtbs:
-        # TODO: renaming is done in two steps in this code which is not necessary.
-        old_names, new_names, tbs_curves_tuple = _rivet_to_bone_rename_helper(rtbs, '_tmp', replace)
-        _, new_names, tbs_curves_tuple = _rivet_to_bone_rename_helper(new_names, '', replace)
+        old_names, new_names = _rivet_to_bone_rename_helper(rtbs, '_tmp', replace)
+        _, new_names = _rivet_to_bone_rename_helper(new_names, '', replace)
 
+        # zRivetToBones names have changed so we need to re-query.
         rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
-        old_names, new_names = _rivet_to_bone_locator_rename_helper(rtbs, tbs_curves_tuple)
+        # We need to run through the _rivet_to_bone_locator_rename_helper twice here.
+        # If you have muscleA, muscleB and muscleC and want to rename muscleA to muscleC
+        # there will be a name collision and renaming will not work.
+        # By appending a '_tmp' to name first, as below, we get around this name collision.
+        _rivet_to_bone_locator_rename_helper(rtbs, '_tmp')
+        _rivet_to_bone_locator_rename_helper(rtbs, '')
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:

@@ -308,3 +308,22 @@ class ZivaRivetToBoneUpdateTestCase(ZivaUpdateTestCase):
 
     def test_builder_build_with_string_replace(self):
         super(ZivaRivetToBoneUpdateTestCase, self).builder_build_with_string_replace()
+
+
+class ZivaRivetToBoneRenameBugTestCase(ZivaUpdateTestCase):
+    """This is a bug fixed by VFXACT-1525 that affects zRivetToBoneLocators
+    When rename_ziva_nodes was ran multiple times the name would add another
+    instance of the curve to the name, growing everytime.  To check this fix worked
+    we simply run rename_ziva_nodes multple times and check scene.
+
+    """
+
+    def setUp(self):
+        super(ZivaRivetToBoneRenameBugTestCase, self).setUp()
+        load_scene('mirror_example-lineofaction_rivet.ma')
+
+    def test_rename_multiple_times(self):
+        rename_ziva_nodes()
+        rename_ziva_nodes()
+
+        self.assertSceneHasNodes(['l_fiber1_curve_zRivet1', 'l_fiber1_curve_zRivet2'])
