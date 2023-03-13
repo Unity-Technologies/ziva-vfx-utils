@@ -152,3 +152,52 @@ class BlendshapeBuilderTestCase(VfxTestCase):
             if isinstance(item, DGNode):
                 # This will assert if any scene item does not contain DGNode.SEARCH_EXCLUDE items
                 self.assertTrue(all(x in item.SEARCH_EXCLUDE for x in DGNode.SEARCH_EXCLUDE))
+
+
+class BlendshapeAliasAttrTestCase(VfxTestCase):
+
+    def setUp(self):
+        super(BlendshapeAliasAttrTestCase, self).setUp()
+        obj = cmds.polySphere(ch=False, n="l_skin_mesh")[0]
+        obj2 = cmds.polySphere(ch=False, n="l_target1")[0]
+        obj3 = cmds.polySphere(ch=False, n="l_target2")[0]
+        cmds.select(obj3, obj2, obj)
+        cmds.blendShape()
+
+        self.builder = Deformers()
+        cmds.select("l_skin_mesh")
+        self.builder.retrieve_from_scene()
+
+    def test_string_replace_on_attribute(self):
+        ## ACT
+        self.builder.string_replace('^l_', 'r_')
+
+        bs = self.builder.get_scene_items(type_filter='blendShape')[0]
+
+        ## VERIFY
+        # check if attrs dict has been updated
+        # before string replace they would have been 'l_target1' and 'l_target2'
+        self.assertIn('r_target1', bs.attrs)
+        self.assertIn('r_target2', bs.attrs)
+
+    def test_retrieve_build_on_aliased_attributes(self):
+        ## SETUP
+        # change alias attributes
+        cmds.setAttr("blendShape1.l_target1", 3)
+        cmds.setAttr("blendShape1.l_target2", 3)
+
+        ## ACT
+        # store values
+        cmds.select('l_skin_mesh')
+        builder = Deformers()
+        builder.retrieve_from_scene()
+
+        # change values and re-build
+        cmds.setAttr("blendShape1.l_target1", 10)
+        cmds.setAttr("blendShape1.l_target2", 10)
+        builder.build()
+
+        ## VERIFY
+
+        self.assertEqual(cmds.getAttr("blendShape1.l_target1"), 3)
+        self.assertEqual(cmds.getAttr("blendShape1.l_target2"), 3)

@@ -1,3 +1,5 @@
+import re
+
 from maya import cmds
 from zBuilder.utils.mayaUtils import get_short_name, build_attr_key_values, construct_map_names
 from zBuilder.nodes.deformer import Deformer
@@ -100,6 +102,29 @@ class BlendShape(Deformer):
     @property
     def long_target(self):
         return self._target
+
+    def string_replace(self, search, replace):
+        """ Here we are searching through the stored attributes with the intent of performing a string replace
+        on attribute names if it is an aliased attribute.  Aliased attributes are used in blendShape's and our own 
+        zRestShape.
+
+        This implementation is the same as the one used in zRestShape.  When updating this, please update the that 
+        one as well.
+        """
+        super(BlendShape, self).string_replace(search=search, replace=replace)
+
+        # to find what attributes are aliased we check the attrs dictionary and see if the 'alias'
+        # key is not an empty string.  Furthermore the value of this key will need a string replace on it as well
+        tmp_dict = {}
+        for item in self.attrs.keys():
+            if self.attrs[item]['alias']:
+                tmp_dict[item] = re.sub(search, replace, item)
+    
+        for item in tmp_dict.keys():
+            new_item = tmp_dict[item]
+            self.attrs[new_item] = self.attrs.pop(item)    
+            self.attrs[new_item]['alias'] = re.sub(search, replace,
+                                               self.attrs[new_item]['alias'])
 
 
 def get_target(blend_shape):

@@ -86,6 +86,9 @@ class RestShapeNode(Ziva):
         """ Here we are searching through the stored attributes with the intent of performing a string replace
         on attribute names if it is an aliased attribute.  Aliased attributes are used in blendShape's and our own 
         zRestShape.
+
+        This implementation is the same as the one used in blendShape.  When updating this, please update the that 
+        one as well.
         """
         super(RestShapeNode, self).string_replace(search=search, replace=replace)
 
