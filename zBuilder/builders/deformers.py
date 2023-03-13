@@ -23,21 +23,18 @@ class Deformers(Builder):
         # parse args-----------------------------------------------------------
         selection = parse_maya_node_for_selection(args)
 
-        tmp = list()
-        # we are traversing through the history breadth first because we need to make sure we are
-        # adding these to zBuilder in the proper order.  zBuilder is first in first out.
-        for hist in cmds.listHistory(selection, breadthFirst=True, allFuture=True):
+        # I have tried many variation of listHistory command and the way I found works is to
+        # get the list with default arguments and reverse it.  Setting future to true will
+        # return list in proper order but will end up analysing almost everything and hang maya
+        # on large scenes.  Slicing the output of the listHistory seems to be fastest way.
+        for hist in cmds.listHistory(selection)[::-1]:
             if get_type(hist) in self.acquire:
-                tmp.append(hist)
+                parameter = self.node_factory(hist)
 
-        for item in tmp:
-
-            parameter = self.node_factory(item)
-
-            self.bundle.extend_scene_items(parameter)
-            for parm in parameter:
-                if parm.type in ['mesh', 'map']:
-                    parm.retrieve_values()
+                self.bundle.extend_scene_items(parameter)
+                for parm in parameter:
+                    if parm.type in ['mesh', 'map']:
+                        parm.retrieve_values()
         self.stats()
 
     @time_this
