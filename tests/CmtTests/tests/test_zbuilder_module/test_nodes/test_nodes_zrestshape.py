@@ -71,6 +71,28 @@ class ZivaRestShapeTestCase(VfxTestCase):
 
         self.assertEqual(len(items), 1)
 
+    def test_retrieve_build_on_aliased_attributes(self):
+        ## SETUP
+        # change alias attributes
+        cmds.setAttr("zRestShape1.a", 2)
+        cmds.setAttr("zRestShape1.b", 0)
+
+        ## ACT
+        # store values
+        cmds.select(cl=True)
+        builder = zva.Ziva()
+        builder.retrieve_from_scene()
+
+        # change values and re-build
+        cmds.setAttr("zRestShape1.a", 1)
+        cmds.setAttr("zRestShape1.b", 1)
+        builder.build()
+
+        ## VERIFY
+
+        self.assertEqual(cmds.getAttr("zRestShape1.a"), 2)
+        self.assertEqual(cmds.getAttr("zRestShape1.b"), 0)
+
 
 class ZivaRestShapeGenericTestCase(VfxTestCase):
 

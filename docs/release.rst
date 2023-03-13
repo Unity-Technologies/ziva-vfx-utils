@@ -22,6 +22,7 @@ Functionality
 
 Bug Fixes
 +++++++++
+- **zBuilder:** VFXACT-1651 add zBuilder support for zRestShape alias attributes.
 - **zBuilder:** VFXACT-1525 Fix for zRivetToBoneLocator naming issue.
 
 2.1.0
