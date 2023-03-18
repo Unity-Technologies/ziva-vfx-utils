@@ -47,17 +47,17 @@ There should be an output in the Maya Script Editor that looks something like th
 
 .. code-block:: python
 
-    # zBuilder.builders.bundle : zTissue 7 #
-    # zBuilder.builders.bundle : map 68 #
-    # zBuilder.builders.bundle : zAttachment 21 #
-    # zBuilder.builders.bundle : zMaterial 7 #
-    # zBuilder.builders.bundle : zEmbedder 1 #
-    # zBuilder.builders.bundle : zBone 4 #
-    # zBuilder.builders.bundle : zTet 7 #
-    # zBuilder.builders.bundle : mesh 11 #
-    # zBuilder.builders.bundle : zSolver 1 #
-    # zBuilder.builders.bundle : zSolverTransform 1 #
-    # zBuilder.builders.bundle : zFiber 6 #
+    # zBuilder.builders.builder : zTissue 7 #
+    # zBuilder.builders.builder : map 68 #
+    # zBuilder.builders.builder : zAttachment 21 #
+    # zBuilder.builders.builder : zMaterial 7 #
+    # zBuilder.builders.builder : zEmbedder 1 #
+    # zBuilder.builders.builder : zBone 4 #
+    # zBuilder.builders.builder : zTet 7 #
+    # zBuilder.builders.builder : mesh 11 #
+    # zBuilder.builders.builder : zSolver 1 #
+    # zBuilder.builders.builder : zSolverTransform 1 #
+    # zBuilder.builders.builder : zFiber 6 #
     # zBuilder.utils.commonUtils : Executing retrieve_from_scene() took 0.223s # 
 
 These :term:`scene item<scene item>` stats were retrieved by the builder.
@@ -107,17 +107,17 @@ The script editor output should look something like this:
 
 .. code-block:: python
 
-    # zBuilder.builders.bundle : zTissue 1 # 
-    # zBuilder.builders.bundle : map 12 # 
-    # zBuilder.builders.bundle : zAttachment 4 # 
-    # zBuilder.builders.bundle : zMaterial 1 # 
-    # zBuilder.builders.bundle : zEmbedder 1 # 
-    # zBuilder.builders.bundle : zBone 3 # 
-    # zBuilder.builders.bundle : zTet 1 # 
-    # zBuilder.builders.bundle : mesh 5 # 
-    # zBuilder.builders.bundle : zSolver 1 #
-    # zBuilder.builders.bundle : zSolverTransform 1 #
-    # zBuilder.builders.bundle : zFiber 1 #
+    # zBuilder.builders.builder : zTissue 1 # 
+    # zBuilder.builders.builder : map 12 # 
+    # zBuilder.builders.builder : zAttachment 4 # 
+    # zBuilder.builders.builder : zMaterial 1 # 
+    # zBuilder.builders.builder : zEmbedder 1 # 
+    # zBuilder.builders.builder : zBone 3 # 
+    # zBuilder.builders.builder : zTet 1 # 
+    # zBuilder.builders.builder : mesh 5 # 
+    # zBuilder.builders.builder : zSolver 1 #
+    # zBuilder.builders.builder : zSolverTransform 1 #
+    # zBuilder.builders.builder : zFiber 1 #
     # zBuilder.utils.commonUtils : Executing retrieve_from_scene_selection() took 0.080s # 
 
 Notice that only one tissue is being retrieved.
@@ -317,17 +317,17 @@ The script editor should output something like:
     # zBuilder.builders.serialize : Reading scene items. 134 nodes #
     # zBuilder.builders.serialize : Reading info. #
     # zBuilder.builders.serialize : Assigning builder. #
-    # zBuilder.builders.bundle : zTissue 7 # 
-    # zBuilder.builders.bundle : map 68 # 
-    # zBuilder.builders.bundle : zAttachment 21 # 
-    # zBuilder.builders.bundle : zMaterial 7 # 
-    # zBuilder.builders.bundle : zEmbedder 1 # 
-    # zBuilder.builders.bundle : zBone 4 # 
-    # zBuilder.builders.bundle : zTet 7 # 
-    # zBuilder.builders.bundle : mesh 11 # 
-    # zBuilder.builders.bundle : zSolver 1 # 
-    # zBuilder.builders.bundle : zSolverTransform 1 # 
-    # zBuilder.builders.bundle : zFiber 6 # 
+    # zBuilder.builders.builder : zTissue 7 # 
+    # zBuilder.builders.builder : map 68 # 
+    # zBuilder.builders.builder : zAttachment 21 # 
+    # zBuilder.builders.builder : zMaterial 7 # 
+    # zBuilder.builders.builder : zEmbedder 1 # 
+    # zBuilder.builders.builder : zBone 4 # 
+    # zBuilder.builders.builder : zTet 7 # 
+    # zBuilder.builders.builder : mesh 11 # 
+    # zBuilder.builders.builder : zSolver 1 # 
+    # zBuilder.builders.builder : zSolverTransform 1 # 
+    # zBuilder.builders.builder : zFiber 6 # 
     # zBuilder.utils.commonUtils : Executing read() took 0.057s # 
 
 Like before, this is a simple printout that hints at what has been loaded from the file.

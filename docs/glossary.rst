@@ -15,7 +15,7 @@ Glossary
         A specific piece of data in the Maya scene, for example a mesh or an attribute of a node. These are the secondary type of :term:`scene item` managed by a :term:`builder`, and are always associated in some way with the :term:`nodes<node>` in the scene.
 
     builder
-        The main entry point into using zBuilder. A builder object manages a bundle of :term:`scene items<scene item>`.
+        The main entry point into using zBuilder. A builder object manages a list of :term:`scene items<scene item>`.
         There are different types of specialized builders, each one defining what types of :term:`nodes<node>` and
         :term:`parameters<parameter>` they allow you to inspect, modify and build in the Maya scene.
 

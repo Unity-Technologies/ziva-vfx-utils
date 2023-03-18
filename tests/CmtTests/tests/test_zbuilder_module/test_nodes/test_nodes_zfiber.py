@@ -156,7 +156,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         # Rest shape has to be removed from the build list because there is no rest shape for
         # l_tissue_1_high mesh in the scene
         rest_shape_item = self.builder.get_scene_items(name_filter="l_tissue_1_high_zRestShape")[0]
-        self.builder.bundle.remove_scene_item(rest_shape_item)
+        self.builder.remove_scene_item(rest_shape_item)
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
@@ -172,7 +172,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         # Rest shape has to be removed from the build list because there is no rest shape for
         # l_tissue_1_low mesh in the scene
         rest_shape_item = self.builder.get_scene_items(name_filter="l_tissue_1_low_zRestShape")[0]
-        self.builder.bundle.remove_scene_item(rest_shape_item)
+        self.builder.remove_scene_item(rest_shape_item)
         self.builder.string_replace("l_tissue_1_low_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY
@@ -220,7 +220,7 @@ class ZivaFiberGenericTestCase(VfxTestCase):
         # Rest shape has to be removed from the build list because there is no rest shape for
         # l_tissue_1_high mesh in the scene
         rest_shape_item = self.builder.get_scene_items(name_filter="l_tissue_1_high_zRestShape")[0]
-        self.builder.bundle.remove_scene_item(rest_shape_item)
+        self.builder.remove_scene_item(rest_shape_item)
         self.builder.string_replace("l_tissue_1_high_embedded_cube", "l_tissue_1_embedded_cube")
 
         ## VERIFY

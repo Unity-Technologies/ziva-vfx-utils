@@ -22,7 +22,7 @@ class Base(object):
     # Anything using __eq__.
     COMPARE_EXCLUDE = ['_class', 'builder', 'depends_on', '_children', '_parent']
 
-    # The attributes that contain a scene item used as a pointer to the scene item in the bundle.
+    # The attributes that contain a scene item used as a pointer to the scene item in the builder.
     # This will convert scene items to a string before serialization and
     # resetup the pointer upon deserilization,
     # Note that this attribute values gets added to COMPARE_EXCLUDE for excluding purposes,

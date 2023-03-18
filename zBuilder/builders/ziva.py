@@ -421,7 +421,7 @@ class Ziva(Builder):
         solver = solver[0]
 
         b_solver = self.node_factory(solver, parent=None)
-        self.bundle.extend_scene_items(b_solver)
+        self._extend_scene_items(b_solver)
 
         node_types = [
             'zSolverTransform',
@@ -570,7 +570,7 @@ class Ziva(Builder):
         """
         for node in nodes:
             parameter = self.node_factory(node, parent=None)
-            self.bundle.extend_scene_items(parameter)
+            self._extend_scene_items(parameter)
 
         if update_map_mesh_values:
             for item in self.get_scene_items(type_filter=['map', 'mesh']):

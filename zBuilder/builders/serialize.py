@@ -70,6 +70,7 @@ class BaseNodeEncoder(json.JSONEncoder):
 
         return super(BaseNodeEncoder, self).default(obj)
 
+
 def get_meta_data():
     """ Meta data for embedding with serialized data
     """
@@ -88,6 +89,7 @@ def get_meta_data():
             continue
 
     return meta_data
+
 
 def pack_zbuilder_contents(builder, type_filter, invert_match):
     """ Utility to package the data in a dictionary.
@@ -115,11 +117,11 @@ def unpack_zbuilder_contents(builder, json_data):
     for d in json_data:
         if d['d_type'] == 'node_data':
             # TODO: Handle file version specific logic globally
-            builder.bundle.extend_scene_items(d['data'])
+            builder._extend_scene_items(d['data'])
             logger.info("Reading scene items. {} nodes".format(len(d['data'])))
 
     logger.info("Assigning builder.")
-    for item in builder.bundle:
+    for item in builder.scene_items:
         if item:
             item.builder = builder
 
@@ -187,10 +189,12 @@ def write(file_path, builder, type_filter=None, invert_match=False):
     with zipfile.ZipFile(file_path, mode="w") as archive:
         with open(json_file, 'w') as outfile:
             json.dump(pack_zbuilder_contents(builder, type_filter, invert_match),
-                  outfile,
-                  cls=BaseNodeEncoder,
-                  sort_keys=True)
-        archive.write(json_file, arcname=os.path.basename(json_file), compress_type=zipfile.ZIP_DEFLATED)
+                      outfile,
+                      cls=BaseNodeEncoder,
+                      sort_keys=True)
+        archive.write(json_file,
+                      arcname=os.path.basename(json_file),
+                      compress_type=zipfile.ZIP_DEFLATED)
         logger.info('Wrote File: %s' % file_path)
     os.remove(json_file)
 
@@ -201,7 +205,7 @@ def write(file_path, builder, type_filter=None, invert_match=False):
 
 @time_this
 def read(file_path, builder):
-    """ Reads scene items from a given file.  The items get placed in the bundle.
+    """ Reads scene items from a given file.
 
     Args:
         file_path (:obj:`str`): The file path to read from disk.
@@ -213,7 +217,8 @@ def read(file_path, builder):
             tmp_path, _ = os.path.splitext(file_path)
             json_file = tmp_path + ".json"
             with archive.open(os.path.basename(json_file)) as file:
-                unpack_zbuilder_contents(builder, json.loads(file.read(), object_hook=load_base_node))
+                unpack_zbuilder_contents(builder, json.loads(file.read(),
+                                                             object_hook=load_base_node))
     else:
         with open(file_path, 'r') as handle:
             unpack_zbuilder_contents(builder, json.load(handle, object_hook=load_base_node))
@@ -243,6 +248,7 @@ def _replace_string_with_scene_items(builder, item):
         if item:
             item = item[0]
     return item
+
 
 def replace_scene_items_with_string(item):
     """ This method takes a scene item, and replaces each instance with an embedded scene item

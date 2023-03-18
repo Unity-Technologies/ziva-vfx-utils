@@ -54,7 +54,7 @@ class BuilderTestCase(VfxTestCase):
 
     def test_deepcopy_of_builder_break_sceneitem_connection(self):
         # Helper function to check that ziva node contains same map node that
-        # stored in builder.bundle.scene_items
+        # stored in builder.scene_items
         def check_ziva_node_has_same_map_node_as_sceneitems(test_case, builder, node_name,
                                                             map_name):
             ziva_node = builder.get_scene_items(name_filter=node_name)

@@ -29,6 +29,17 @@ Bug Fixes
 - **zBuilder:** VFXACT-1528 **rename_ziva_nodes()** Name zLineOfAction off of zFiber.
 - **zBuilder:** VFXACT-1499 **rename_ziva_nodes()** Number suffix for all zAttachments.
 
+2.1.1
+------
+
+Functionality
++++++++++++++
+- **zBuilder:** `Bundle` class is deleted to simplify class hierarchy.
+
+Bug Fixes
++++++++++
+
+
 2.1.0
 ------
 
