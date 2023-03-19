@@ -24,6 +24,8 @@ Bug Fixes
 +++++++++
 - **zBuilder:** VFXACT-1651 add zBuilder support for zRestShape alias attributes.
 - **zBuilder:** VFXACT-1525 Fix for zRivetToBoneLocator naming issue.
+- **zBuilder:** VFXACT-1528 **rename_ziva_nodes()** Name zLineOfAction off of zFiber.
+- **zBuilder:** VFXACT-1499 **rename_ziva_nodes()** Number suffix for all zAttachments.
 
 2.1.0
 ------
