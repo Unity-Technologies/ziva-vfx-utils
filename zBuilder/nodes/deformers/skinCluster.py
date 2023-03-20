@@ -51,9 +51,12 @@ class SkinCluster(Deformer):
 
             self.set_maya_attrs(attr_filter=attr_filter)
 
-            mesh = self.parameters['mesh'][0]
-            if not mesh.is_topologically_corresponding():
-                self.copy_weights_from_internal_mesh()
+            if hasattr(self, 'parameters'):
+                mesh = self.parameters['mesh'][0]
+                if not mesh.is_topologically_corresponding():
+                    self.copy_weights_from_internal_mesh()
+                else:
+                    apply_weights(self.name, self.association, self.influences, self.weights)
             else:
                 apply_weights(self.name, self.association, self.influences, self.weights)
         else:

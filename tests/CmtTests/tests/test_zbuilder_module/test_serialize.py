@@ -1,6 +1,7 @@
 import os
 import glob
 import zBuilder.builders.ziva as zva
+import zBuilder.builders.skinClusters as skn
 
 from maya import cmds
 from vfx_test_case import VfxTestCase
@@ -124,6 +125,33 @@ class SerializeTestCase(VfxTestCase):
             clean_scene()
 
             builder = zva.Ziva()
+            read(item, builder)
+
+            builder.build()
+
+            self.compare_builder_nodes_with_scene_nodes(builder)
+            self.compare_builder_attrs_with_scene_attrs(builder)
+            self.compare_builder_maps_with_scene_maps(builder)
+
+    def test_skincluster_build_pre_version_2_2_0(self):
+        """ This is added to test a backwards compatibility issue illustrated here:
+        VFXACT-1687
+
+        This is error message
+        Error: AttributeError: file C:\git\ziva-vfx-utils-internal\zBuilder\nodes\deformers\skinCluster.py line 54: 'SkinCluster' object has no attribute 'parameters' # 
+        """
+        builders_2_1_0 = glob.glob(get_test_asset_path('*2_1_0.zBuilder'))
+        # Act
+        for item in builders_2_1_0:
+            # find corresponding maya file
+            basename = os.path.basename(item)
+            maya_file = basename.replace('_2_1_0.zBuilder', '.ma')
+
+            # open it and clean scene so we have just geo
+            load_scene(maya_file)
+            clean_scene()
+
+            builder = skn.SkinCluster()
             read(item, builder)
 
             builder.build()
