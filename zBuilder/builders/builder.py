@@ -173,24 +173,12 @@ class Builder(object):
         import zBuilder.builders.serialize as serialize
         serialize.read(file_path, self)
 
-    def stats(self, type_filter=None):
+    def stats(self):
         """
         Print scene item types and their counts.
-
-        Args:
-            type_filter (:obj:`str`): filter by scene_item type.
         """
-        # put type filter in a list if it isn't
-        if not is_sequence(type_filter):
-            type_filter = [type_filter] if type_filter else None
-        if type_filter:
-            assert all(is_string(t) for t in type_filter), "type filter requires string type"
-
-        filtered_node_types = [item.type for item in self.scene_items]
-        if type_filter:
-            filtered_node_types = filter(lambda node_type: node_type in type_filter,
-                                         filtered_node_types)
-        type_counter = Counter(filtered_node_types)
+        node_types = [item.type for item in self.scene_items]
+        type_counter = Counter(node_types)
         for k, v in type_counter.items():
             logger.info('{} {}'.format(k, v))
 
