@@ -40,6 +40,11 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "showCollisions";
     editorTemplate -addControl "showMaterials";
 
+    editorTemplate -addSeparator;
+
+    editorTemplate -addControl "strainRange";
+    editorTemplate -addControl "absoluteStrainMax";
+
     AEaddRampControl( $nodeName + ".attachmentColorRamp" );
     AEaddRampControl( $nodeName + ".collisionColorRamp" );
     AEaddRampControl( $nodeName + ".materialColorRamp" );
