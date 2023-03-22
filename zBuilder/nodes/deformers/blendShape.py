@@ -58,7 +58,7 @@ class BlendShape(Deformer):
         """
         return [self.association[0]] * (len(cmds.blendShape(self.name, q=True, target=True)) + 1)
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')
         attr_filter = kwargs.get('attr_filter', None)
 
@@ -119,12 +119,11 @@ class BlendShape(Deformer):
         for item in self.attrs.keys():
             if self.attrs[item]['alias']:
                 tmp_dict[item] = re.sub(search, replace, item)
-    
+
         for item in tmp_dict.keys():
             new_item = tmp_dict[item]
-            self.attrs[new_item] = self.attrs.pop(item)    
-            self.attrs[new_item]['alias'] = re.sub(search, replace,
-                                               self.attrs[new_item]['alias'])
+            self.attrs[new_item] = self.attrs.pop(item)
+            self.attrs[new_item]['alias'] = re.sub(search, replace, self.attrs[new_item]['alias'])
 
 
 def get_target(blend_shape):

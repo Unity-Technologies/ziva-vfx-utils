@@ -30,7 +30,7 @@ class TissueNode(Ziva):
             if temp:
                 self.parent_tissue = temp[0]
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zTissue in maya scene.
 
         Kwargs:

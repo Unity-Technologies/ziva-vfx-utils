@@ -78,8 +78,10 @@ class DGNode(Base):
         self.type = get_type(self.long_name)
         self.get_maya_attrs()
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the node in maya.
+        This is a virtual function that must be overriden by derive node class.
+        It will be called by each Builder's build() method to set attribte values to the node.
         """
         raise NotImplementedError
 
@@ -170,7 +172,7 @@ class DGNode(Base):
                         # Unfortunately, in the Maya field nodes unit test,
                         # when retrieving Maya DragField node attr list,
                         # its maxDistance attr returns -1.0, not minimum value 0.
-                        # When setting "dragField1.maxDistance" attr during build() operation,
+                        # When setting "dragField1.maxDistance" attr during do_build() operation,
                         # it first throws exception:
                         # RuntimeError: setAttr: The type 'doubleLinear' is not the name of a recognized type.
                         # This makes sense. But after invoking setAttr() again with -1.0 value,

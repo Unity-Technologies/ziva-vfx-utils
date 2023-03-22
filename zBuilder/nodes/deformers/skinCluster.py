@@ -40,7 +40,7 @@ class SkinCluster(Deformer):
         self.influences = get_influences(self.name)
         self.association = get_associations(self.name)
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         attr_filter = kwargs.get('attr_filter', None)
 
         if cmds.objExists(self.association[0]):

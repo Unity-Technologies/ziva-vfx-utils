@@ -8,7 +8,7 @@ class SolverNode(Ziva):
     """
     type = 'zSolver'
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zSolver in maya scene.
 
         Args:

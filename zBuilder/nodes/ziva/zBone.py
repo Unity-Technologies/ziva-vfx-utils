@@ -10,7 +10,7 @@ class BoneNode(Ziva):
     """
     type = 'zBone'
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zBones in maya scene.
 
         Args:

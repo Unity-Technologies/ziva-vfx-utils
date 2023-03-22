@@ -44,7 +44,7 @@ class FiberNode(Ziva):
         """
         return [self.nice_association[0], self.nice_association[0]]
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zFiber in maya scene.
 
         Args:

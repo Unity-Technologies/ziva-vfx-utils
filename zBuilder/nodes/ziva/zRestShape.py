@@ -35,7 +35,7 @@ class RestShapeNode(Ziva):
         attrs = build_attr_key_values(self.name, attr_list)
         self.attrs.update(attrs)
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the node in maya.
         """
         attr_filter = kwargs.get('attr_filter', list())
@@ -98,9 +98,8 @@ class RestShapeNode(Ziva):
         for item in self.attrs.keys():
             if self.attrs[item]['alias']:
                 tmp_dict[item] = re.sub(search, replace, item)
-    
+
         for item in tmp_dict.keys():
             new_item = tmp_dict[item]
-            self.attrs[new_item] = self.attrs.pop(item)    
-            self.attrs[new_item]['alias'] = re.sub(search, replace,
-                                               self.attrs[new_item]['alias'])
+            self.attrs[new_item] = self.attrs.pop(item)
+            self.attrs[new_item]['alias'] = re.sub(search, replace, self.attrs[new_item]['alias'])

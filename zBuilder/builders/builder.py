@@ -141,12 +141,6 @@ class Builder(object):
         for item in self.get_scene_items():
             item.make_node_connections()
 
-    def build(self, *args, **kwargs):
-        logger.info('Building....')
-
-        for scene_item in self.get_scene_items():
-            scene_item.build(*args, **kwargs)
-
     def retrieve_from_scene(self, *args, **kwargs):
         """
         must create a method to inherit this class

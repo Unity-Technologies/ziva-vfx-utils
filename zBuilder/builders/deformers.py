@@ -69,4 +69,4 @@ class Deformers(Builder):
 
         for scene_item in self.get_scene_items(type_filter=self.deformers):
             logger.info('Building: {}'.format(scene_item.name))
-            scene_item.build(interp_maps=interp_maps)
+            scene_item.do_build(interp_maps=interp_maps)

@@ -52,7 +52,7 @@ class FieldAdaptorNode(Ziva):
         """
         return self._input_field
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zFieldAdaptor in maya scene.
 
         This keeps track of inputs and outputs of zFieldadaptor (field nodes and

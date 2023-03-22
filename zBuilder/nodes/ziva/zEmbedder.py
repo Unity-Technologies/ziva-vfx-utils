@@ -83,7 +83,7 @@ class EmbedderNode(Ziva):
                 tmp[get_short_name(name)] = msh
             return tmp
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zEmbedder in maya scene.
 
         Args:

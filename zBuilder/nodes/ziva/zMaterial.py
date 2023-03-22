@@ -15,7 +15,7 @@ class MaterialNode(Ziva):
     # List of maps to store
     MAP_LIST = ['weightList[0].weights']
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zMaterial in maya scene.
 
         Args:

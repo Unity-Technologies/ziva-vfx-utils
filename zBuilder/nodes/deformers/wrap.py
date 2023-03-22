@@ -18,7 +18,7 @@ class Wrap(Deformer):
         super(Wrap, self).populate(maya_node=maya_node)
         self.association = self.get_meshes(self.name)
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         attr_filter = kwargs.get('attr_filter', None)
 
         if all([cmds.objExists(x) for x in self.association]):

@@ -54,7 +54,7 @@ class RivetToBoneNode(Ziva):
         else:
             self._curve = curve_name
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zRivetToBone in maya scene.
 
         Kwargs:

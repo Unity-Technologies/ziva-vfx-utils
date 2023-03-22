@@ -7,7 +7,7 @@ class SolverTransformNode(Ziva):
     """
     type = 'zSolverTransform'
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zSolverTransform in maya scene.
 
         Args:

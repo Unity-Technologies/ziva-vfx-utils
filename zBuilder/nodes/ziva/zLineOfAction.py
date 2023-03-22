@@ -30,7 +30,7 @@ class LineOfActionNode(Ziva):
         if scene_item:
             self.fiber_item = scene_item[0]
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the Line of Actions in maya scene.
 
         Args:

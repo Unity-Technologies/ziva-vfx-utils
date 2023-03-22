@@ -10,7 +10,7 @@ class ClothNode(Ziva):
     """
     type = 'zCloth'
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
 
         Args:

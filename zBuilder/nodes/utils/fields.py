@@ -11,7 +11,7 @@ class Field(DGNode):
     # to correctly build Field node instances.
     TYPES = FIELD_TYPES
 
-    def build(self, *args, **kwargs):
+    def do_build(self, *args, **kwargs):
         """ Builds the Maya field nodes in the scene.
 
         Args:

@@ -36,4 +36,4 @@ class SkinCluster(Builder):
 
         scene_items = self.get_scene_items(name_filter=name_filter, type_filter='skinCluster')
         for scene_item in scene_items:
-            scene_item.build(attr_filter=attr_filter, interp_maps=interp_maps)
+            scene_item.do_build(attr_filter=attr_filter, interp_maps=interp_maps)
