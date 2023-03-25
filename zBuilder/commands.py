@@ -8,7 +8,7 @@ import zBuilder.builders.ziva as zva
 from maya import cmds
 from maya import mel
 from zBuilder.utils.commonUtils import is_string, is_sequence, none_to_empty
-from zBuilder.utils.mayaUtils import get_short_name, get_type, safe_rename
+from zBuilder.utils.mayaUtils import get_short_name, get_type, safe_rename, build_attr_list
 from zBuilder.utils.vfxUtils import get_zSolver, isSolver, check_body_type
 from zBuilder.utils.solverDisabler import SolverDisabler
 from zBuilder.builders.skinClusters import SkinCluster
@@ -73,6 +73,7 @@ def remove(nodes):
         # Check again if node exists after the body has been removed.
         if cmds.objExists(node):
             if get_type(node) in safe_to_delete:
+                _disconnect_node([node])
                 cmds.delete(node)
 
 
@@ -124,6 +125,7 @@ def remove_zRivetToBone_nodes(nodes):
                 set_rivet_locator(shape_node)
 
     if nodes_to_delete:
+        _disconnect_node(nodes_to_delete)
         cmds.select(nodes_to_delete, r=True)
         mel.eval('doDelete')
 
@@ -194,6 +196,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
     remove_zRivetToBone_nodes(solvers)
     mel.eval('select -cl;')  # needed to avoid Maya error messages
     if len(to_erase) > 0:
+        _disconnect_node(to_erase)
         cmds.delete(to_erase)
 
 
@@ -653,7 +656,29 @@ def clean_scene():
     for node in ALL_ZIVA_NODES:
         in_scene = cmds.ls(type=node)
         if in_scene:
+            _disconnect_node(in_scene)
             cmds.delete(in_scene)
+
+
+def _disconnect_node(nodes):
+    """
+    if you have a utility node hooked up to the ziva rig, like a remap
+
+    remap.outputX -> fiber1.excitation
+
+    And the fiber is removed, maya tries to be efficient and it will delete the remap node.
+    The solution is to disconnect any node connected to a ziva rig before we remove items.
+    """
+    for node in nodes:
+        attrs = build_attr_list(node)
+        # zRestShape attribute being used for zRBF connections
+        attrs.append('targetWeight[0]')
+        for attr in attrs:
+            if cmds.objExists(node + '.' + attr):
+                connection = cmds.listConnections(node + '.' + attr, p=True, c=True)
+                if connection:
+                    cmds.disconnectAttr(connection[1], connection[0])
+                    logger.info('disconnecting {} -> {}'.format(connection[1], connection[0]))
 
 
 # Begin rename_ziva_nodes() section

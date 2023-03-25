@@ -677,10 +677,11 @@ class Ziva(Builder):
                                                    association_filter=association_filter)
                 if scene_items:
                     logger.info('Building: {}'.format(node_type))
-                for scene_item in scene_items:
-                    scene_item.build(attr_filter=attr_filter,
-                                     permissive=permissive,
-                                     interp_maps=interp_maps)
+                    for scene_item in scene_items:
+                        scene_item.build(attr_filter=attr_filter,
+                                         permissive=permissive,
+                                         interp_maps=interp_maps)
+                        scene_item.do_post_build()
 
         cmds.select(sel, r=True)
 

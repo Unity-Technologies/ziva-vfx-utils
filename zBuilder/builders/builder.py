@@ -56,10 +56,12 @@ class Builder(object):
         obb = obj(parent=parent, builder=self)
         try:
             obb.populate(maya_node=node)
+
         except Exception:
             logger.exception('Failed to populate node: {}, skipped.'.format(node))
             node_created = False
         if node_created:
+            obb.post_populate()
             scene_items.append(obb)
 
         for node in scene_items:
@@ -160,7 +162,9 @@ class Builder(object):
         """
         Wraps 'write()' defined in serialize.py. This is used for backward compatibility.
         """
-        logger.warning('This method will be deprecated. Use write() defined in zBuilder.builders.serialize instead.')
+        logger.warning(
+            'This method will be deprecated. Use write() defined in zBuilder.builders.serialize instead.'
+        )
         import zBuilder.builders.serialize as serialize
         serialize.write(file_path, self, type_filter, invert_match)
 
@@ -168,7 +172,9 @@ class Builder(object):
         """
         Wraps 'read()' defined in serialize.py. This is used for backward compatibility.
         """
-        logger.warning('This method will be deprecated. Use read() defined in zBuilder.builders.serialize instead.')
+        logger.warning(
+            'This method will be deprecated. Use read() defined in zBuilder.builders.serialize instead.'
+        )
         import zBuilder.builders.serialize as serialize
         serialize.read(file_path, self)
 
@@ -257,6 +263,7 @@ class Builder(object):
 
         return self.bundle.get_scene_items(type_filter, name_filter, name_regex, association_filter,
                                            association_regex, invert_match)
+
 
 # TODO: Move node registration and type introspection methods such as, find_class,
 # node_factory, parameter_factory functions out of builder.py

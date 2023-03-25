@@ -24,7 +24,9 @@ class DGNode(Base):
     MAP_LIST = []
 
     # This is an inherited class attribute.
-    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + ['parameters',]
+    SEARCH_EXCLUDE = Base.SEARCH_EXCLUDE + [
+        'parameters',
+    ]
 
     # List of maya node attribute names to add to the auto generated attribute list to include.
     EXTEND_ATTR_LIST = list()
@@ -52,6 +54,16 @@ class DGNode(Base):
     def __repr__(self):
         output = '{}("{}")'.format(self.__class__.__name__, self.name)
         return output
+
+    def post_populate(self):
+        """ Callback function that is called after populate() function returns successfully.
+        """
+        pass
+
+    def do_post_build(self):
+        """ Callback function that is called after the build() function.  
+        """
+        pass
 
     def populate(self, maya_node=None):
         """ Populates the node with the info from the passed maya node in args.

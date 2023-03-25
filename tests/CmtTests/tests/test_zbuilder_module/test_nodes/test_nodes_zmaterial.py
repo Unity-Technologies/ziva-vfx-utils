@@ -341,3 +341,26 @@ class ZivaMaterialCenterTestCase(ZivaUpdateTestCase):
         cmds.select('c_muscle')
 
         self.assertEqual(len(cmds.zQuery(t='zMaterial')), 5)
+
+
+class ZivaMaterialConnectionsTestCase(VfxTestCase):
+
+    def setUp(self):
+        super(ZivaMaterialConnectionsTestCase, self).setUp()
+
+        cmds.polySphere(n='ball')
+        cmds.ziva(t=True)
+        cmds.spaceLocator(name='loc')
+        cmds.connectAttr('loc.translateX', 'zMaterial1.volumeConservation')
+
+        cmds.select(cl=True)
+        self.builder = zva.Ziva()
+        self.builder.retrieve_from_scene()
+
+    def test_restore_connection(self):
+        ## ACT
+        cmds.disconnectAttr('loc.translateX', 'zMaterial1.volumeConservation')
+        self.builder.build()
+
+        ## VERIFY
+        self.assertTrue(cmds.isConnected('loc.translateX', 'zMaterial1.volumeConservation'))

@@ -1,8 +1,13 @@
+import logging
+
+from collections import defaultdict
 from maya import cmds
 from zBuilder.utils.commonUtils import get_first_element
 from zBuilder.utils.mayaUtils import build_attr_list, build_attr_key_values, get_type
 from zBuilder.utils.vfxUtils import get_association
 from ..deformer import Deformer
+
+logger = logging.getLogger(__name__)
 
 
 class Ziva(Deformer):
@@ -20,6 +25,7 @@ class Ziva(Deformer):
     def __init__(self, parent=None, builder=None):
         super(Ziva, self).__init__(parent=parent, builder=builder)
         self.solver = None
+        self.connections = defaultdict(list)
 
     def populate(self, maya_node=None):
         """ This populates the node given a selection.
@@ -53,6 +59,55 @@ class Ziva(Deformer):
             solver = cmds.zQuery(self.long_name, t='zSolver')
             if solver:
                 self.solver = self.builder.get_scene_items(name_filter=solver[0])[0]
+
+    def post_populate(self):
+        '''
+        This is a callback function that can be customized by each Ziva ZVX node.
+        It is called right after the the populate() function returns successfully.
+        This overrides DGNode post_populate function.
+        '''
+        self.retrieve_connections()
+
+    def do_post_build(self):
+        '''
+        This is a callback function that can be customized by each Ziva ZVX node.
+        It is called right after the build() function.
+        This overrides DGNode do_post_build function.
+        '''
+        self.build_connections()
+
+    def retrieve_connections(self):
+        """
+        The ziva rig is connected to non-ziva nodes in the scene.  This will collect them and store them 
+        in the object for later retrieval.  It stores them as a list like so
+
+        ['obj1.translateX', 'fiber1.excitation']
+        
+        This function requires calling mayaUtils.build_attr_key_values() in advance.
+        """
+        for attr in self.attrs.keys():
+            connections = cmds.listConnections(self.name + '.' + attr,
+                                               destination=False,
+                                               skipConversionNodes=True,
+                                               plugs=True,
+                                               connections=True)
+            if connections:
+                self.connections[connections[0]].append(connections[1])
+
+    def build_connections(self):
+        """
+        Restoring previously saved connections.
+        """
+        if not hasattr(self, 'connections'):
+            return
+
+        for item in self.connections:
+            if cmds.objExists(item) and cmds.objExists(self.connections[item][0]):
+                if not cmds.isConnected(self.connections[item][0], item):
+                    cmds.connectAttr(self.connections[item][0], item, f=True)
+            else:
+                logger.info("Missing object for connection {} connection not restored to {}".format(
+                    self.connections[item], item))
 
     @staticmethod
     def check_meshes(meshes):

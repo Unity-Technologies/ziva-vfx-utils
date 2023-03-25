@@ -6,8 +6,7 @@ import zBuilder.builders.skinClusters as skn
 from maya import cmds
 from vfx_test_case import VfxTestCase
 from tests.utils import (build_mirror_sample_geo, get_tmp_file_location,
-                         build_anatomical_arm_with_no_popup, get_test_asset_path,
-                         load_scene)
+                         build_anatomical_arm_with_no_popup, get_test_asset_path, load_scene)
 from zBuilder.commands import clean_scene, load_rig
 from zBuilder.builders.serialize import read, write
 
@@ -77,6 +76,9 @@ class SerializeTestCase(VfxTestCase):
 
         # Verify
         self.assertSceneHasNodes(['r_bicep_muscle_zTissue'])
+        # verify build_connections worked
+        self.assertTrue(cmds.isConnected('remapValue1.outValue',
+                                         'r_bicep_muscle_zFiber.excitation'))
 
     def test_0load_zBuilder_file(self):
         '''
