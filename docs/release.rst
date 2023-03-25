@@ -18,7 +18,9 @@ Release Notes
 
 Functionality
 +++++++++++++
-- **zBuilder:** **zBuilder.nodes.parameters.mesh** Added ability to mirror mesh on X, Y or Z
+- **zBuilder:** Robust Mirror Operation:
+    - **zBuilder.nodes.parameters.mesh** Added ability to mirror mesh on X, Y or Z.
+    - **zBuilder.commands** Added mirror command.
 
 Bug Fixes
 +++++++++

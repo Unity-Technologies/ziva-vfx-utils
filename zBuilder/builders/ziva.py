@@ -594,7 +594,9 @@ class Ziva(Builder):
               lineOfActions=True,
               rivetToBone=True,
               restShape=True,
-              permissive=True):
+              permissive=True,
+              target_prefix=None,
+              center_prefix=None):
         """
         This builds the Ziva rig into the Maya scene.
         It does not build geometry as the expectation is that the geometry is in the scene.
@@ -621,6 +623,8 @@ class Ziva(Builder):
 
                 tmp = {'zSolver':['substeps']}
             association_filter (str): filter by node association.  Defaults to None
+            target_prefix (str): Target prefix used for mirroring. Defaults to None
+            center_prefix (str): Center prefix used for mirroring. Defaults to None
         """
 
         logger.info('Building Ziva Rig.')
@@ -677,11 +681,13 @@ class Ziva(Builder):
                                                    association_filter=association_filter)
                 if scene_items:
                     logger.info('Building: {}'.format(node_type))
-                    for scene_item in scene_items:
-                        scene_item.build(attr_filter=attr_filter,
-                                         permissive=permissive,
-                                         interp_maps=interp_maps)
-                        scene_item.do_post_build()
+                for scene_item in scene_items:
+                    scene_item.build(attr_filter=attr_filter,
+                                     permissive=permissive,
+                                     interp_maps=interp_maps,
+                                     target_prefix=target_prefix,
+                                     center_prefix=center_prefix)
+                    scene_item.do_post_build()
 
         cmds.select(sel, r=True)
 

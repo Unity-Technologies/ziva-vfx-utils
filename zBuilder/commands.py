@@ -844,3 +844,94 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
 
 
 # End rename_ziva_nodes() section
+
+
+def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_axis='X'):
+    """ Mirrors a Ziva VFX setup.  Select the solver and run the command to mirror whole setup. Select a part of the rig
+    to mirror a subset of the whole setup.
+
+    Args:
+        source_prefix (str): Prefix of geometry on the source side. Defaults to '^l_'
+        target_prefix (str): Prefix of geometry on the target side. Defaults to 'r\_'
+        center_prefix (str): Prefix of the geometry of the center. Defaults to 'c\_'
+        mirror_axis (str): Axis to mirror on. Defaults to 'x'
+    Usage:
+    import zBuilder.commands as com
+    com.mirror()
+    """
+
+    builder = zva.Ziva()
+    builder.retrieve_from_scene_selection()
+
+    # remove target side from zBuilder by filtering by target_prefix
+    items_to_delete = []
+    for item in builder.get_scene_items():
+        if item.name.startswith(target_prefix):
+            items_to_delete.append(item)
+            continue
+
+        # Some item names wont start with target_prefix.  This can happen if user
+        # is not using a naming convention or default names are being used.
+        # We need to remove these as well and we are going to use the mesh for that.
+
+        if item.type not in ['mesh', 'map']:
+            for mesh in item.association:
+                if mesh.startswith(target_prefix):
+                    items_to_delete.append(item)
+                    continue
+
+    for item in items_to_delete:
+        builder.bundle.scene_items.remove(item)
+
+    # perform the mirror.  That is replace source_prefix with target_prefix in the internal scene items.
+    builder.string_replace(source_prefix, target_prefix)
+
+    # We need to mirror the internally stored mesh on the mirror axis.
+    for mesh_node in builder.get_scene_items(type_filter='mesh'):
+        if mesh_node.name.startswith(center_prefix):
+            mesh_node.mirror(mirror_axis=mirror_axis)
+
+    # Once mirrored we can interpolate the maps.
+    # This accomplishes flipping the map on the opposite side of the mesh once applied.
+    for map_node in builder.get_scene_items(type_filter='map'):
+        if map_node.get_mesh().startswith(center_prefix):
+            if map_node.name.startswith(target_prefix):
+                map_node.interpolate()
+
+    # before we build we need to clean the maya scene of any target nodes.
+    # So lets look for any meshes of a zTissue, zCloth or zBone.  From there
+    # we can delete nodes in the maya scene.
+    for item in builder.get_scene_items(type_filter=['zTissue', 'zCloth', 'zBone']):
+        if item.association[0].startswith(target_prefix):
+            cmds.select(item.association[0])
+            to_delete = none_to_empty(cmds.zQuery(type='zAttachment'))
+            to_delete.extend(none_to_empty(cmds.zQuery(type='zFiber')))
+            to_delete.extend(none_to_empty(cmds.zQuery(type='zRestShape')))
+            materials = none_to_empty(cmds.zQuery(type='zMaterial'))
+            # We are removing extra nodes from scene to create a place to build our setup.
+            # we are leaving a single zMaterial node as by default thats what happens when
+            # you create a zTissue.
+            to_delete.extend(materials[1:])
+
+            if to_delete:
+                cmds.delete(to_delete)
+
+        # To mirror collision sets we want them to be in a different group so
+        # we use the multiplier.  I set the default to this as 100 thinking it
+        # is a large enough number where there should be a big enough gap.
+        # If the user has goups like so
+        # 1 100 200
+        # and use default mult they would get groups
+        # 100 10000 20000
+        # so the 100's here overlap and are now in same group.  I think this would be a rare
+        # occurance.
+        collision_set_mult = 100
+        collision_sets = item.attrs['collisionSets']['value']
+        new_collision_set = re.split(r',| ', collision_sets)
+        new_collision_set = filter(lambda s: s.isdigit(), new_collision_set)
+        new_collision_set = [str(int(x) * collision_set_mult) for x in new_collision_set]
+        item.attrs['collisionSets']['value'] = ' '.join(new_collision_set)
+
+    # now we build, though we need to turn OFF interpolation so we dont accidently
+    # interpolate twice
+    builder.build(interp_maps=False, target_prefix=target_prefix, center_prefix=center_prefix)
