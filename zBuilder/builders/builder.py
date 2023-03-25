@@ -216,7 +216,7 @@ class Builder(object):
         """
         for item in self.get_scene_items(type_filter, name_filter, [], [], None, False):
             logger.debug(item)
-        logger.debug('----------------------------------------------------------------')
+        logger.debug('-' * 80)
 
     def get_scene_items(self,
                         type_filter=None,
@@ -321,7 +321,6 @@ class Builder(object):
                 self.scene_items[index] = item
             else:
                 self.scene_items.append(item)
-
 
 
 # TODO: Move node registration and type introspection methods such as, find_class,

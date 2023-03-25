@@ -1,7 +1,6 @@
 import logging
 
 from maya import cmds
-
 from zBuilder.utils.commonUtils import time_this
 from .builder import Builder
 
@@ -25,10 +24,9 @@ class Deformers(Builder):
         deltaMush, wrap and blendShape.  By default it will retrieve all of them.
 
         Args:
-            deformers (list()): List of supported deformers to retrieve from scene. 
+            deformers (list): List of supported deformers to retrieve from scene. 
                     Defaults to `None` which in turn gets all supported deformers.
         """
-        selection = cmds.ls(sl=True, l=True)
 
         if deformers:
             self.deformers = list(set(self.deformers).intersection(deformers))
@@ -45,11 +43,11 @@ class Deformers(Builder):
         # get the list with default arguments and reverse it.  Setting future to true will
         # return list in proper order but will end up analysing almost everything and hang maya
         # on large scenes.  Slicing the output of the listHistory seems to be fastest way.
+        selection = cmds.ls(sl=True, l=True)
         for hist in cmds.listHistory(selection)[::-1]:
             if cmds.objectType(hist) in self.deformers:
                 parameter = self.node_factory(hist)
-
-                self.bundle.extend_scene_items(parameter)
+                self._extend_scene_items(parameter)
                 for parm in parameter:
                     if parm.type in ['mesh', 'map']:
                         parm.retrieve_values()

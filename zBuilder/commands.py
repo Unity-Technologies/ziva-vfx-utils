@@ -881,7 +881,7 @@ def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_a
                     continue
 
     for item in items_to_delete:
-        builder.bundle.scene_items.remove(item)
+        builder.remove_scene_item(item)
 
     # perform the mirror.  That is replace source_prefix with target_prefix in the internal scene items.
     builder.string_replace(source_prefix, target_prefix)
