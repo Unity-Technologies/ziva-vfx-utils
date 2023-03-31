@@ -1,7 +1,11 @@
+import logging
+
 from collections import defaultdict
 from maya import cmds
 from zBuilder.utils.mayaUtils import construct_map_names
 from .dg_node import DGNode
+
+logger = logging.getLogger(__name__)
 
 
 class Deformer(DGNode):
@@ -77,7 +81,10 @@ class Deformer(DGNode):
         """
         self.check_map_interpolation(interp_maps)
         for map_ in self.parameters['map']:
-            map_.apply_weights()
+            if cmds.objExists(self.name):
+                map_.apply_weights()
+            else:
+                logger.warning('Missing {} from scene. Not applying map.'.format(self.name))
 
     def check_map_interpolation(self, interp_maps):
         """ For each map it checks if it is topologically corresponding and if
