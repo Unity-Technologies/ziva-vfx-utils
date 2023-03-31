@@ -51,12 +51,11 @@ class TissueNode(Ziva):
             solver = self.solver
 
         attr_filter = kwargs.get('attr_filter', list())
-        name_filter = kwargs.get('name_filter', list())
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
-        tissue_items = self.builder.get_scene_items(type_filter='zTissue', name_filter=name_filter)
-        tet_items = self.builder.get_scene_items(type_filter='zTet', name_filter=name_filter)
+        tissue_items = self.builder.get_scene_items(type_filter='zTissue')
+        tet_items = self.builder.get_scene_items(type_filter='zTet')
 
         if self is tissue_items[0]:
 

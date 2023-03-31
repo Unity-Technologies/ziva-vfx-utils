@@ -19,13 +19,10 @@ class ClothNode(Ziva):
                 list of attributes to use.
 
                 tmp = {'zSolver':['substeps']}
-            name_filter (string OR list): name of zCloth objects to work with.  Defaults to all avaliable
-            
         """
         attr_filter = kwargs.get('attr_filter', list())
-        name_filter = kwargs.get('name_filter', list())
 
-        scene_items = self.builder.get_scene_items(type_filter='zCloth', name_filter=name_filter)
+        scene_items = self.builder.get_scene_items(type_filter='zCloth')
 
         # checking if the node is the first one in list.  If it is I get
         # all the zCloth and build them together for speed reasons.
