@@ -454,11 +454,6 @@ class Ziva(Builder):
         Gets scene items based on selection.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                af = {'zSolver':['substeps']}
             solver (bool): Gets solver data.  Defaults to True
             bones (bool): Gets bone data.  Defaults to True
             tissue (bool): Gets tissue data.  Defaults to True
@@ -481,7 +476,6 @@ class Ziva(Builder):
             selection = cmds.ls(sl=True, l=True)
 
         # kwargs
-        attr_filter = kwargs.get('attr_filter', None)
         solver = kwargs.get('solver', True)
         bones = kwargs.get('bones', True)
         tissues = kwargs.get('tissues', True)
@@ -496,9 +490,6 @@ class Ziva(Builder):
         embedder = kwargs.get('embedder', True)
 
         print('\ngetting ziva......')
-
-        if not attr_filter:
-            attr_filter = {}
 
         nodes = list()
 
@@ -580,7 +571,6 @@ class Ziva(Builder):
     @time_this
     def build(self,
               association_filter=None,
-              attr_filter=None,
               interp_maps='auto',
               solver=True,
               bones=True,
@@ -603,11 +593,6 @@ class Ziva(Builder):
 
         Args:
             association_filter (str): filter by node association.  Defaults to None
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             interp_maps (str): Option to interpolate maps.
                 True: Yes interpolate
                 False: No
@@ -644,8 +629,7 @@ class Ziva(Builder):
             for scene_item in self.get_scene_items(type_filter=solvers,
                                                    association_filter=association_filter):
                 logger.info('Building: {}'.format(scene_item.type))
-                scene_item.do_build(attr_filter=attr_filter,
-                                    permissive=permissive,
+                scene_item.do_build(permissive=permissive,
                                     interp_maps=interp_maps)
 
         with SolverDisabler(solver_transform[0].name):
@@ -684,8 +668,7 @@ class Ziva(Builder):
                 if scene_items:
                     logger.info('Building: {}'.format(node_type))
                 for scene_item in scene_items:
-                    scene_item.do_build(attr_filter=attr_filter,
-                                        permissive=permissive,
+                    scene_item.do_build(permissive=permissive,
                                         interp_maps=interp_maps,
                                         target_prefix=target_prefix,
                                         center_prefix=center_prefix)

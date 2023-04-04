@@ -34,14 +34,8 @@ class LineOfActionNode(Ziva):
         """ Builds the Line of Actions in maya scene.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             permissive (bool): Pass on errors. Defaults to ``True``
         """
-        attr_filter = kwargs.get('attr_filter', list())
 
         loas = []
         for loa in self.nice_association:
@@ -68,4 +62,4 @@ class LineOfActionNode(Ziva):
                          ' fiber does not exists in scene, skipping line of action')
 
         # set maya attributes
-        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_attrs()

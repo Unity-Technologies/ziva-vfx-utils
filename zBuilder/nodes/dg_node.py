@@ -137,21 +137,10 @@ class DGNode(Base):
         # with attribute list, get values in dictionary format and update node.
         self.attrs = build_attr_key_values(self.long_name, attr_list)
 
-    def set_maya_attrs(self, attr_filter=None):
+    def set_maya_attrs(self):
         """ Given a Builder node this set the attributes of the object in the maya scene.
-
-        Args:
-            attr_filter (dict):  Attribute filter on what attributes to set.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                af = {'zSolver':['substeps']}
         """
-        node_attrs = self.attrs.keys()
-        if attr_filter and attr_filter.get(self.type, None):
-            node_attrs = list(set(node_attrs).intersection(attr_filter[self.type]))
-
-        for attr in node_attrs:
+        for attr in self.attrs.keys():
             node_dot_attr = '{}.{}'.format(self.name, attr)
             if not cmds.objExists(node_dot_attr):
                 logger.info('{} not found, skipping.'.format(node_dot_attr))

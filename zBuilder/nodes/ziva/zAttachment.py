@@ -20,15 +20,9 @@ class AttachmentNode(Ziva):
         """ Builds the zAttachment in maya scene.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
-        attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
         permissive = kwargs.get('permissive', True)
 
@@ -55,7 +49,7 @@ class AttachmentNode(Ziva):
             self.check_parameter_name()
 
             # set the attributes
-            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_attrs()
             self.set_maya_weights(interp_maps=interp_maps)
 
         else:

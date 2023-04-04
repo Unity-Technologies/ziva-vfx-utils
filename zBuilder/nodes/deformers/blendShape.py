@@ -60,7 +60,6 @@ class BlendShape(Deformer):
 
     def do_build(self, *args, **kwargs):
         interp_maps = kwargs.get('interp_maps', 'auto')
-        attr_filter = kwargs.get('attr_filter', None)
 
         meshes = self.target
         meshes.append(self.association[0])
@@ -71,7 +70,7 @@ class BlendShape(Deformer):
                 cmds.select(self.association, add=True)
                 cmds.blendShape(name=self.name)
 
-            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_attrs()
             self.set_maya_weights(interp_maps=interp_maps)
         else:
             for mesh in meshes:

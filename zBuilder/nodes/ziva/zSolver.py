@@ -12,14 +12,8 @@ class SolverNode(Ziva):
         """ Builds the zSolver in maya scene.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             permissive (bool): Pass on errors. Defaults to ``True``
         """
-        attr_filter = kwargs.get('attr_filter', list())
         solver_name = self.name
         if not cmds.objExists(solver_name):
             results = cmds.ziva(s=True)
@@ -36,4 +30,4 @@ class SolverNode(Ziva):
             new_name = safe_rename(solver_name, self.name)
 
         cmds.ziva(new_name, defaultSolver=True)
-        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_attrs()

@@ -34,12 +34,6 @@ class TissueNode(Ziva):
         """ Builds the zTissue in maya scene.
 
         Kwargs:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
-
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
             permissive (bool): Pass on errors. Defaults to ``True``
         """
@@ -50,7 +44,6 @@ class TissueNode(Ziva):
         if not solver:
             solver = self.solver
 
-        attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
@@ -73,8 +66,8 @@ class TissueNode(Ziva):
             for ztet, ztissue in zip(tet_items, tissue_items):
                 ztet.check_parameter_name()
 
-                ztet.set_maya_attrs(attr_filter=attr_filter)
-                ztissue.set_maya_attrs(attr_filter=attr_filter)
+                ztet.set_maya_attrs()
+                ztissue.set_maya_attrs()
                 ztet.set_maya_weights(interp_maps=interp_maps)
 
     def build_multiple(self):

@@ -41,7 +41,6 @@ class SkinCluster(Deformer):
         self.association = get_associations(self.name)
 
     def do_build(self, *args, **kwargs):
-        attr_filter = kwargs.get('attr_filter', None)
 
         if cmds.objExists(self.association[0]):
             name = self.name
@@ -49,7 +48,7 @@ class SkinCluster(Deformer):
                 cmds.select(self.influences, self.association, r=True)
                 skin_cluster = cmds.skinCluster(tsb=True, n=name)
 
-            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_attrs()
 
             if hasattr(self, 'parameters'):
                 mesh = self.parameters['mesh'][0]

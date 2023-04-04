@@ -12,15 +12,7 @@ class ClothNode(Ziva):
 
     def do_build(self, *args, **kwargs):
         """ Builds the zCloth in maya scene.
-
-        Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
         """
-        attr_filter = kwargs.get('attr_filter', list())
 
         scene_items = self.builder.get_scene_items(type_filter='zCloth')
 
@@ -34,7 +26,7 @@ class ClothNode(Ziva):
             # set the attributes.  This needs to run even if there are no zCloth to build. This case happens during a copy paste.
             # any time you 'build' when the zCloth is in scene.
             for item in scene_items:
-                item.set_maya_attrs(attr_filter=attr_filter)
+                item.set_maya_attrs()
 
     def build_multiple(self):
         """ Each node can deal with it's own building.  Though, with zCLoth it is much

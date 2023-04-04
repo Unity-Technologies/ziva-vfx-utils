@@ -19,16 +19,10 @@ class MaterialNode(Ziva):
         """ Builds the zMaterial in maya scene.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             interp_maps (str): Interpolating maps.  Defaults to ``auto``
             target_prefix (str): Target prefix used for mirroring. Defaults to None
             center_prefix (str): Center prefix used for mirroring. Defaults to None
         """
-        attr_filter = kwargs.get('attr_filter', {})
         interp_maps = kwargs.get('interp_maps', 'auto')
         target_prefix = kwargs.get('target_prefix', None)
         center_prefix = kwargs.get('center_prefix', None)
@@ -78,5 +72,5 @@ class MaterialNode(Ziva):
         # Set/Update newly created or existing node attributes
         self.check_parameter_name()
         # set the attributes
-        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_attrs()
         self.set_maya_weights(interp_maps=interp_maps)

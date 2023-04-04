@@ -87,11 +87,6 @@ class EmbedderNode(Ziva):
         """ Builds the zEmbedder in maya scene.
 
         Args:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
             permissive (bool): Pass on errors. Defaults to ``True``
         """
 

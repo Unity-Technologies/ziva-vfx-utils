@@ -19,7 +19,6 @@ class Wrap(Deformer):
         self.association = self.get_meshes(self.name)
 
     def do_build(self, *args, **kwargs):
-        attr_filter = kwargs.get('attr_filter', None)
 
         if all([cmds.objExists(x) for x in self.association]):
             if not cmds.objExists(self.name):
@@ -43,7 +42,7 @@ class Wrap(Deformer):
                 results = mel.eval(cmd)
                 cmds.rename(results[0], self.name)
 
-            self.set_maya_attrs(attr_filter=attr_filter)
+            self.set_maya_attrs()
         else:
             for item in self.association:
                 if not cmds.objExists(item):

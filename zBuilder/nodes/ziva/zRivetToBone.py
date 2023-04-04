@@ -58,15 +58,8 @@ class RivetToBoneNode(Ziva):
         """ Builds the zRivetToBone in maya scene.
 
         Kwargs:
-            attr_filter (dict):  Attribute filter on what attributes to get.
-                dictionary is key value where key is node type and value is
-                list of attributes to use.
-
-                tmp = {'zSolver':['substeps']}
-
             permissive (bool): Pass on errors. Defaults to ``True``
         """
-        attr_filter = kwargs.get('attr_filter', list())
         permissive = kwargs.get('permissive', True)
 
         crv = self.long_curve_name
@@ -98,7 +91,7 @@ class RivetToBoneNode(Ziva):
             else:
                 raise Exception(message)
 
-        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_attrs()
 
 
 def is_cv_connected_to_rivet(crv, cv):

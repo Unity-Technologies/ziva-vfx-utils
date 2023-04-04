@@ -38,7 +38,6 @@ class RestShapeNode(Ziva):
     def do_build(self, *args, **kwargs):
         """ Builds the node in maya.
         """
-        attr_filter = kwargs.get('attr_filter', list())
 
         # this is the mesh with zTissue that will have the zRestShape node
         mesh = self.nice_association[0]
@@ -80,7 +79,7 @@ class RestShapeNode(Ziva):
         else:
             logger.warning(mesh + ' does not exist in scene, skipping zRestShape creation')
 
-        self.set_maya_attrs(attr_filter=attr_filter)
+        self.set_maya_attrs()
 
     def string_replace(self, search, replace):
         """ Here we are searching through the stored attributes with the intent of performing a string replace

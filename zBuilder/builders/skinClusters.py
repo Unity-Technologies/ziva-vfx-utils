@@ -30,9 +30,8 @@ class SkinCluster(Builder):
     @time_this
     def build(self, *args, **kwargs):
         logger.info('Applying skinCluster....')
-        attr_filter = kwargs.get('attr_filter', None)
         interp_maps = kwargs.get('interp_maps', 'auto')
 
         scene_items = self.get_scene_items(type_filter='skinCluster')
         for scene_item in scene_items:
-            scene_item.do_build(attr_filter=attr_filter, interp_maps=interp_maps)
+            scene_item.do_build(interp_maps=interp_maps)
