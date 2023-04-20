@@ -456,6 +456,9 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
     Upon exiting, the command selects a few common Ziva node types (zTissue, zBone, zCloth),
     for better visual feedback to the user.
     """
+    logger.warning(
+        'This method is deprecated and will be removed in future. Use mirror() defined in zBuilder.commands instead.'
+    )
     builder = zva.Ziva()
     builder.retrieve_from_scene_selection()
     builder.string_replace(regular_expression, string_to_substitute_matches_with)

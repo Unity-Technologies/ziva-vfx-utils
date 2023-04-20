@@ -5,7 +5,7 @@ global string $zBoneWarpWindowName = "zBoneWarpOptions";
 global string $zRBFWarpWindowName = "zRBFWarpOptions";
 global string $zRigTransferWindowName = "zRigTransferOptions";
 global string $zSkinClusterTransferWindowName = "zSkinClusterTransferOptions";
-global string $zRigCopyPasteWithNameSubstitutionWindowName = "zRigCopyPasteWithNameSubstitutionOptions";
+global string $zMirrorWindowName = "zMirrorOptions";
 
 global string $zivaTransfer_tetSizeString_default = "default";
 global int $zivaTransfer_maxResolution_default = 150;
@@ -13,8 +13,10 @@ global float $zivaTransfer_surfacePenalty_default = 2.0;
 global int $zivaTransfer_boneTetMeshResolution_default = 10;
 global int $zivaTransfer_maxIterations_default = 10;
 global int $zivaTransfer_maxKernelCenters_default = 50;
-global string $zivaTransfer_regularExpression_default = "(^|_)l($|_)";
-global string $zivaTransfer_substituteMatchesWith_default = "r";
+global string $zivaTransfer_sourcePrefix_default = "^l_";
+global string $zivaTransfer_targetPrefix_default = "r_";
+global string $zivaTransfer_centerPrefix_default = "c_";
+global string $zivaTransfer_mirrorAxis_default = "X";
 
 global string $zivaTransfer_tetSizeString;
 global int $zivaTransfer_maxResolution;
@@ -22,8 +24,10 @@ global float $zivaTransfer_surfacePenalty;
 global int $zivaTransfer_boneTetMeshResolution;
 global int $zivaTransfer_maxIterations;
 global int $zivaTransfer_maxKernelCenters;
-global string $zivaTransfer_regularExpression;
-global string $zivaTransfer_substituteMatchesWith;
+global string $zivaTransfer_sourcePrefix;
+global string $zivaTransfer_targetPrefix;
+global string $zivaTransfer_centerPrefix;
+global string $zivaTransfer_mirrorAxis;
 
 // Closes the specified window.
 global proc zWindowClose(string $windowName)
@@ -68,12 +72,18 @@ zSetRBFWarpDefaults(); // Set the global variables to their default values (one-
 // Sets the parameters for cloning a Ziva (using regular expressions) to their default values.
 global proc zSetCloneRigDefaults()
 {
-  global string $zivaTransfer_regularExpression_default;
-  global string $zivaTransfer_substituteMatchesWith_default;
-  global string $zivaTransfer_regularExpression;
-  global string $zivaTransfer_substituteMatchesWith;
-  $zivaTransfer_regularExpression = $zivaTransfer_regularExpression_default;
-  $zivaTransfer_substituteMatchesWith = $zivaTransfer_substituteMatchesWith_default;
+  global string $zivaTransfer_sourcePrefix_default;
+  global string $zivaTransfer_targetPrefix_default;
+  global string $zivaTransfer_centerPrefix_default;
+  global string $zivaTransfer_mirrorAxis_default;
+  global string $zivaTransfer_sourcePrefix;
+  global string $zivaTransfer_targetPrefix;
+  global string $zivaTransfer_centerPrefix;
+  global string $zivaTransfer_mirrorAxis;
+  $zivaTransfer_sourcePrefix = $zivaTransfer_sourcePrefix_default;
+  $zivaTransfer_targetPrefix = $zivaTransfer_targetPrefix_default;
+  $zivaTransfer_centerPrefix = $zivaTransfer_centerPrefix_default;
+  $zivaTransfer_mirrorAxis = $zivaTransfer_mirrorAxis_default;
 }
 zSetCloneRigDefaults(); // Set the global variables to their default values (one-time call, during initialization).
 
