@@ -85,6 +85,20 @@ class ZivaMaterialGenericTestCase(VfxTestCase):
         ## VERIFY
         self.assertEqual(len(cmds.ls("r_tissue_1_zMaterial1")), 1)
 
+    def test_safe_rename(self):
+        # testing to make sure ziva_rename_nodes doesn't rename nodes user has already renamed
+        ## SETUP
+        cmds.select("r_tissue_1")
+        cmds.ziva(t=True)
+        cmds.rename('zMaterial1', 'my_material')
+        cmds.rename('zRivet1', 'my_rivet')
+        ## ACT
+        rename_ziva_nodes()
+
+        ## VERIFY
+        self.assertEqual(len(cmds.ls("my_material")), 1)
+        self.assertEqual(len(cmds.ls("my_rivet")), 1)
+
     def test_string_replace(self):
         ## VERIFY
         # check if an item exists before string_replace
