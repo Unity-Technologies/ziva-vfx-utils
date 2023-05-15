@@ -25,6 +25,10 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
     But it causes deformerSet() constructor to throw exception and following Maya releases haven't fix this issue.
     This helper function fallbacks to a slower version.
     """
+    Maya 2022 introduces the "component Tag" feature.
+    But it causes deformerSet() constructor throws exception and following Maya releases don't fix it.
+    This helper function fallback to a slower version.
+    """
     map_name = '{}.{}'.format(node_name, attr_name)
     if mesh_name:
         try:
