@@ -4,7 +4,6 @@ from maya import cmds
 from maya import mel
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
-from zBuilder.utils.mayaUtils import get_maya_api_version
 
 
 def split_map_name(map_name):
@@ -21,22 +20,10 @@ def split_map_name(map_name):
     return map_name.split('.', 1)
 
 
-# TODO: Delete this workaround once Maya 2022/2023 retires or fixes the regression
-def _use_paintable_map_fallback_impl():
-    """
-    The Maya 2022 introduces the "component Tag" feature.
-    It causes deformerSet() call throws exception.
-    This helper function decides whether to use the fallback implementation
-    of set/get_paintable_map_by_MFnWeightGeometryFilter().
-    """
-    # Refine Maya version range when new Maya is available.
-    return 20220000 <= get_maya_api_version() < 20240000
-
-
 def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name):
-    """
-    Fallback implementation of get paintable map by MFnWeightGeometryFilter variant.
-    This is a work around to the Maya 2022 Python API regression.
+    """ Maya 2022 introduced the "component Tag" feature.
+    But it causes deformerSet() constructor to throw exception and following Maya releases haven't fix this issue.
+    This helper function fallbacks to a slower version.
     """
     map_name = '{}.{}'.format(node_name, attr_name)
     if mesh_name:
@@ -48,9 +35,6 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
     else:
         value = cmds.getAttr(map_name)
     return value
-
-
-# End of TODO
 
 
 def get_paintable_map(node_name, attr_name, mesh_name=None):
@@ -74,11 +58,10 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
-    if (cmds.objectType(node_name) in ['blendShape', 'deltaMush']):
+    if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
         return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
             mesh_name, node_name, attr_name)
-    # TODO: Delete mesh_name parameter once Maya 2022 retires or fixes the regression
-
+    
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
     # 2) attribute is deformer weightList[i].weights
@@ -98,13 +81,14 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
-
-        # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-        if _use_paintable_map_fallback_impl():
+        try:
+            return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
+        except RuntimeError:
+            # From Maya 2022, the fast method using deformerSet API is broken.
+            # It throws at the deformerSet constructor.
+            # We have to use other method for the deformers that derive from weightGeometryFilter classes.
             return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
                 mesh_name, node_name, attr_name)
-        # End of TODO
-        return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
     # case 3
     return get_paintable_map_by_ArrayDataBuilder(node_name, attr_name)
 
@@ -216,11 +200,10 @@ def get_paintable_map_by_getAttr_numericArray(node_name, attr_name):
     return cmds.getAttr(node_dot_attr)
 
 
-# TODO: Delete this workaround once Maya 2022 retires or fixes the regression
 def _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, map_value):
-    """
-    Fallback implementation of set paintable map by MFnWeightGeometryFilter variant.
-    This is a work around to the Maya 2022 Python API regression.
+    """ Maya 2022 introduced the "component Tag" feature.
+    But it causes deformerSet() constructor to throw exception and following Maya releases haven't fix this issue.
+    This helper function fallbacks to a slower version.
     """
     map_name = '{}.{}'.format(node_name, attr_name)
     weight_map = '{}[0]'.format(map_name)
@@ -236,9 +219,6 @@ def _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_
         # applying doubleArray maps
         if cmds.objExists(map_name):
             cmds.setAttr(map_name, map_value, type='doubleArray')
-
-
-# End of TODO
 
 
 def set_paintable_map(node_name, attr_name, new_weights):
@@ -267,7 +247,11 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
-
+    if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
+        _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
+            node_name, attr_name, new_weights)
+        return
+    
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
     # 2) attribute is deformer weightList[i].weights
@@ -280,24 +264,26 @@ def set_paintable_map(node_name, attr_name, new_weights):
     # So we need to pull out the child-most part.
     child_attr = attr_name.split('.')[-1]  # 'weightList[0].weights' --> 'weights'
     is_multi = cmds.attributeQuery(child_attr, node=node_name, multi=True)
-
-    if is_multi:
-        is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
-        if is_deformer and child_attr == 'weights':
-            is_deltamush = (cmds.objectType(node_name) == 'deltaMush')
-            # TODO: Delete this workaround once Maya 2022 retires or fixes the regression
-            if _use_paintable_map_fallback_impl() or is_deltamush:
-                _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
-                    node_name, attr_name, new_weights)
-                return
-            # End of TODO
-            else:
-                set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
-        else:
-            set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights)
-    else:
+    if not is_multi:
+        # case 1
         set_paintable_map_by_setAttr_numericArray(node_name, attr_name, new_weights)
+        return
+    
+    is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
+    if is_deformer and child_attr == 'weights':
+        # case 2
+        try:
+            set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
+        except RuntimeError:
+            # From Maya 2022, the fast method using deformerSet API is broken.
+            # It throws at the deformerSet constructor.
+            # We have to use other method for the deformers that derive from weightGeometryFilter classes.            
+            _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
+                node_name, attr_name, new_weights)
+        return
 
+    set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights)
+    
 
 def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
     """ 
