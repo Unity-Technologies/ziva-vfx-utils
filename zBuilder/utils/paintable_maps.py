@@ -1,3 +1,4 @@
+import os
 import re
 
 from maya import cmds
@@ -24,10 +25,6 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
     """ Maya 2022 introduced the "component Tag" feature.
     But it causes deformerSet() constructor to throw exception and following Maya releases haven't fix this issue.
     This helper function fallbacks to a slower version.
-    """
-    Maya 2022 introduces the "component Tag" feature.
-    But it causes deformerSet() constructor throws exception and following Maya releases don't fix it.
-    This helper function fallback to a slower version.
     """
     map_name = '{}.{}'.format(node_name, attr_name)
     if mesh_name:
@@ -62,6 +59,9 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
+    # TODO: After testing, DeltaMush is confirmed to work with 
+    # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
+    # Move it to logic below after Maya 2022 is retired.    
     if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
         return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
             mesh_name, node_name, attr_name)
@@ -85,6 +85,9 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
+        if "ZIVA_ZBUILDER_TEST_DEFORMER_WEIGHTS" in os.environ:
+            return _get_paintable_map_by_deformerWeights(mesh_name, node_name, attr_name)
+
         try:
             return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
         except RuntimeError:
@@ -149,6 +152,13 @@ def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     deformerFn.getWeights(deformerSetPath, deformerSetComp, weightList)
     # Convert and return Python list type data to align with other get weightmap methods.
     return list(weightList)
+
+
+def _get_paintable_map_by_deformerWeights(mesh_name, node_name, attr_name):
+    """ Get Maya deformer weight map values through deformerWeights() function
+    """
+    # TODO: implement it's own logic
+    raise NotImplemented
 
 
 def get_paintable_map_by_ArrayDataBuilder(node_name, attr_name):
@@ -251,6 +261,9 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
+    # TODO: After testing, DeltaMush is confirmed to work with 
+    # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
+    # Move it to logic below after Maya 2022 is retired.
     if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
         _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
             node_name, attr_name, new_weights)
@@ -276,6 +289,10 @@ def set_paintable_map(node_name, attr_name, new_weights):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
+        if "ZIVA_ZBUILDER_TEST_DEFORMER_WEIGHTS" in os.environ:
+            _set_paintable_map_by_deformerWeights(node_name, attr_name, new_weights)
+            return
+                
         try:
             set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         except RuntimeError:
@@ -344,6 +361,13 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
     assert (deformerSetPath == dagPath)  # This shouldn't be possible.
 
     deformerFn.setWeight(deformerSetPath, index, deformerSetComp, weightList)
+
+
+def _set_paintable_map_by_deformerWeights(node_name, attr_name, new_eights):
+    """ Set Maya deformer weight map values through deformerWeights() function
+    """
+    # TODO: implement it's own logic
+    raise NotImplemented
 
 
 def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
