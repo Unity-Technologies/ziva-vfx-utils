@@ -280,3 +280,16 @@ def construct_map_names(name, map_list):
         map_names.append('{}.{}'.format(name, map_))
 
     return map_names
+
+def invert_weights(weights):
+    """ Invert map values through minus them by one.
+    E.g., [1, 0.4] -> [0, 0.6]
+
+    Args:
+        weights (list): Weight list, a list of floats or ints.
+
+    Returns:
+        list: A new list of inverted values.
+    """
+    weights = [1.0 - x for x in weights]
+    return weights

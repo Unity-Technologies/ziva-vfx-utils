@@ -5,7 +5,7 @@ from maya.api import OpenMaya as om2
 
 from zBuilder.utils.paintable_maps import get_paintable_map, set_paintable_map, split_map_name
 from zBuilder.utils.commonUtils import clamp
-from zBuilder.utils.mayaUtils import get_short_name, get_dag_path_from_mesh, get_type
+from zBuilder.utils.mayaUtils import get_short_name, get_dag_path_from_mesh, get_type, invert_weights
 from ..base import Base
 
 logger = logging.getLogger(__name__)
@@ -78,8 +78,10 @@ class Map(Base):
         # Defer retrieve map value to retrieve_values() until it is needed.
 
     def retrieve_values(self):
-        # get the values of the map from the scene and update the scene_item
-        self.values = get_weights(self.long_name, self.get_mesh(long_name=True))
+        """ get the values of the map from the scene and update the scene_item
+        """
+        split_map = split_map_name(self.long_name)
+        self.values = get_paintable_map(split_map[0], split_map[1], self.get_mesh(long_name=True))
 
     def set_mesh(self, mesh):
         """ Stores the mesh name.
@@ -147,7 +149,7 @@ class Map(Base):
             cmds.delete(created_mesh)
 
     def invert(self):
-        """Invert the map.
+        """ Invert the map.
         """
         self.values = invert_weights(self.values)
 
@@ -176,31 +178,6 @@ class Map(Base):
         mel.eval(cmd)
 
 
-def invert_weights(weights):
-    """This inverts maps so a 1 becomes a 0 and a .4 becomes a .6 for example.
-
-    Args:
-        weights (list): Weight list, a list of floats or ints.
-
-    Returns:
-        list: list of floats
-    """
-    weights = [1.0 - x for x in weights]
-    return weights
-
-
-def get_weights(map_name, mesh_name=None):
-    """ Gets the weights for the map.
-
-    Args:
-        map_name: Map to get weights from.
-        mesh_name: Mesh that the weights are painted on.
-            Needed as a workaround for a Maya 2022 regression.
-    Returns:
-        list(float)
-    """
-    split_map = split_map_name(map_name)
-    return get_paintable_map(split_map[0], split_map[1], mesh_name)
 
 
 def interpolate_values(source_mesh, destination_mesh, weight_list, clamp_range=[0, 1]):
