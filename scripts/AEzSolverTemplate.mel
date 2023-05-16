@@ -37,7 +37,6 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "showMuscleFibers";
     editorTemplate -addControl "showAxes";
     editorTemplate -addControl "showAttachments";
-    editorTemplate -addControl "showCollisions";
     editorTemplate -addControl "showMaterials";
 
     editorTemplate -addSeparator;
@@ -46,9 +45,16 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "absoluteStrainMax";
 
     AEaddRampControl( $nodeName + ".attachmentColorRamp" );
-    AEaddRampControl( $nodeName + ".collisionColorRamp" );
     AEaddRampControl( $nodeName + ".materialColorRamp" );
     AEaddRampControl( $nodeName + ".muscleFiberColorRamp" );
+
+    editorTemplate -addSeparator;
+
+    editorTemplate -beginLayout "Collision Visualization Settings" -collapse false;
+    editorTemplate -addControl "showCollisions";
+    AEaddRampControl( $nodeName + ".collisionColorRamp" );
+    editorTemplate -addControl "contactLineWidth";
+    editorTemplate -endLayout;
 
     // suppressed attributes
     editorTemplate -suppress "localPosition";
