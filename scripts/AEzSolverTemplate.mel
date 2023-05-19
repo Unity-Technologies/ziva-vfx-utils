@@ -41,8 +41,7 @@ global proc AEzSolverTemplate( string $nodeName )
 
     editorTemplate -addSeparator;
 
-    editorTemplate -addControl "strainRange";
-    editorTemplate -addControl "absoluteStrainMax";
+    editorTemplate -addControl "maxVisualStretch";
 
     AEaddRampControl( $nodeName + ".attachmentColorRamp" );
     AEaddRampControl( $nodeName + ".materialColorRamp" );
