@@ -73,4 +73,9 @@ class MaterialNode(Ziva):
         self.check_parameter_name()
         # set the attributes
         self.set_maya_attrs()
-        self.set_maya_weights(interp_maps=interp_maps)
+        # NOTE: On base material node weight attribute 'MATERIAL_NODE.weightList' is locked by zivaVFX.
+        # Though it is locked, before Maya 2022.5, we could apply setAttr() on 'MATERIAL_NODE.weightList[0].weight'.
+        # Since that behaviour changed, we need to explicitly check if parent is locked before calling setAttr().
+        parent_weight_node = self.name + ".weightList"
+        if not cmds.getAttr(parent_weight_node, l=True):
+            self.set_maya_weights(interp_maps=interp_maps)

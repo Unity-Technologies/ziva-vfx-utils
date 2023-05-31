@@ -28,6 +28,7 @@ Bug Fixes
 - **zBuilder:** VFXACT-1525 Fix for zRivetToBoneLocator naming issue.
 - **zBuilder:** VFXACT-1528 **rename_ziva_nodes()** Name zLineOfAction off of zFiber.
 - **zBuilder:** VFXACT-1499 **rename_ziva_nodes()** Number suffix for all zAttachments.
+- **zBuilder:** VFXACT-1749 Fix for locked/connected attribute when stAttr() called for 'zMaretial.weightList[0].weight'.
 
 2.1.1
 ------
