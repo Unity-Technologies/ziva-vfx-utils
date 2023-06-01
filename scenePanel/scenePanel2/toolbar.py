@@ -3,7 +3,7 @@
 from functools import partial
 from PySide2 import QtGui, QtWidgets, QtCore
 from maya import cmds, mel
-from utility.scriptCommands.zCacheCommands import clear_zcache
+from utility.scriptCommands.zCacheCommands import clear_zcache, save_zcache, load_zcache
 from zBuilder.utils.commonUtils import is_string
 from zBuilder.commands import remove_zRivetToBone_nodes, remove_solver, remove_all_solvers
 from ..uiUtils import get_icon_path_from_name
@@ -67,13 +67,13 @@ _create_section_tuple = (
             None,
             "Load",
             "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
-            lambda: mel.eval("ZivaLoadCache"),
+            lambda: load_zcache(),
         ),
         (
             None,
             "Save",
             "Saves the solver's simulation cache to a .zcache file.",
-            lambda: mel.eval("ZivaSaveCache"),
+            lambda: save_zcache(),
         ),
         (
             None,

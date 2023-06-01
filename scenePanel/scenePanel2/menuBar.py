@@ -288,12 +288,14 @@ _menubar_dict["Create"] = (
             (
                 "Load",
                 "Loads a simulation cache from a .zcache disk file and applies it to the current solver.",
-                lambda: mel.eval("ZivaLoadCache"),
+                lambda: load_zcache(),
+                "load_zcache"
             ),
             (
                 "Save",
                 "Saves the solver's simulation cache to a .zcache file.",
-                lambda: mel.eval("ZivaSaveCache"),
+                lambda: save_zcache(),
+                "save_zcache"
             ),
             (
                 "Select",

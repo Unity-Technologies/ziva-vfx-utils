@@ -68,8 +68,8 @@ menuItem -label "Delete selection" -ec true -ecr true -c "ZivaDeleteSelection" -
 menuItem -label "Simulation RAM Cache" -divider true;
 menuItem -label "Add" -ec true -ecr true -c "ziva -acn" -ann "Adds a cache node to the selected solver. Once a cache node is added, simulations are cached automatically." -i "out_zCache.png";
 menuItem -label "Clear" -ec true -ecr true -c "python(\"from utility.scriptCommands.zCacheCommands import clear_zcache; clear_zcache();\")" -ann "Clears the solver's simulation cache. Do this each time before re-running a simulation that was previously cached." -i "clear_zCache.png";
-menuItem -label "Load..." -ec true -ecr true -c "ZivaLoadCache" -ann "Loads a simulation cache from a .zcache disk file and applies it to the current solver.";
-menuItem -label "Save..." -ec true -ecr true -c "ZivaSaveCache" -ann "Saves the solver's simulation cache to a .zcache file.";
+menuItem -label "Load..." -ec true -ecr true -c "python(\"from utility.scriptCommands.zCacheCommands import load_zcache; load_zcache();\")" -ann "Loads a simulation cache from a .zcache disk file and applies it to the current solver.";
+menuItem -label "Save..." -ec true -ecr true -c "python(\"from utility.scriptCommands.zCacheCommands import save_zcache; save_zcache();\")" -ann "Saves the solver's simulation cache to a .zcache file.";
 
 menuItem -label "Select" -ec true -ecr true -c "select -r `zQuery -t zCacheTransform`" -ann "Select the solver's simulation cache node.";
 
