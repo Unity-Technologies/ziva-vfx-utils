@@ -33,7 +33,7 @@ def save_zcache():
         return
 
     multipleFilters = "zCache (*.zCache);;All Files (*.*)"
-    result = cmds.fileDialog2(fileFilter=multipleFilters,selectFileFilter="zCache", dialogStyle=2, cap="Save Cache", fm=1)
+    result = cmds.fileDialog2(fileFilter=multipleFilters,selectFileFilter="zCache", dialogStyle=2, cap="Save Cache", fm=0)
     if not result:
         logger.error("No cache file found.")
         return
