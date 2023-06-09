@@ -705,7 +705,7 @@ def _is_default_name(node, node_type):
     return re.search(_type + '\d+$', node)
 
 
-def _znode_rename_helper(zNode, postfix, solver, suffix_to_remove):
+def _znode_rename_helper(zNode, postfix, solver, suffix_to_remove, force=False):
     """ Renames all the zNodes of a zSolver.
     Args:
         zNode (string): node type
@@ -722,7 +722,7 @@ def _znode_rename_helper(zNode, postfix, solver, suffix_to_remove):
                 mesh = mesh.replace(r, '')
 
             for i, node in enumerate(nodes):
-                if _is_default_name(node, cmds.objectType(node)):
+                if _is_default_name(node, cmds.objectType(node)) or force:
                     if zNode in ['zMaterial', 'zFiber']:
                         new_name = '{}_{}{}'.format(mesh, zNode, str(i + 1))
                     else:
@@ -730,7 +730,7 @@ def _znode_rename_helper(zNode, postfix, solver, suffix_to_remove):
                     safe_rename(node, '{}{}'.format(new_name, postfix))
 
 
-def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove):
+def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove, force=False):
     """
     The same idea as for _znode_rename_helper but for zRivetToBone
     Args:
@@ -760,7 +760,7 @@ def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove):
             crv = _strip_namespace(crv)
             new_name_rtb = '{}_{}'.format(crv, 'zRivetToBone1')
             if rtb != new_name_rtb:
-                if _is_default_name(rtb, 'zRivetToBone'):
+                if _is_default_name(rtb, 'zRivetToBone') or force:
                     new_name_rtb = safe_rename(rtb, '{}{}'.format(new_name_rtb, postfix))
                     if new_name_rtb:
                         old_names.append(rtb)
@@ -769,7 +769,7 @@ def _rivet_to_bone_rename_helper(rtbs, postfix, suffix_to_remove):
     return old_names, new_names
 
 
-def _rivet_to_bone_locator_rename_helper(rtbs, postfix):
+def _rivet_to_bone_locator_rename_helper(rtbs, postfix, force=False):
     """
     Rename 'zRivetToBone' locator nodes.
     Args:
@@ -778,11 +778,11 @@ def _rivet_to_bone_locator_rename_helper(rtbs, postfix):
     """
     for rtb in rtbs:
         rtb_locator = cmds.listConnections('{}.segments'.format(rtb))
-        if _is_default_name(rtb_locator[0], 'zRiveToBoneLocator'):
+        if _is_default_name(rtb_locator[0], 'zRiveToBoneLocator')  or force:
             cmds.rename(rtb_locator, '{}{}'.format(rtb.replace('zRivetToBone', 'zRivet'), postfix))
 
 
-def rename_ziva_nodes(replace=['_muscle', '_bone']):
+def rename_ziva_nodes(replace=['_muscle', '_bone'], force=False):
     """ Renames zNodes based on mesh it's connected to.
 
     args:
@@ -810,8 +810,8 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         # If you have multiple zMaterials on a mesh and it tries to name a material
         # same name as an existing material it will fail.  This is why we name in 2
         # passes to get rid of any potential name collisions.
-        _znode_rename_helper(zNode, '00', solver[0], replace)
-        _znode_rename_helper(zNode, '', solver[0], replace)
+        _znode_rename_helper(zNode, '00', solver[0], replace, force=force)
+        _znode_rename_helper(zNode, '', solver[0], replace, force=force)
 
     # rename zLineOfAction nodes
     loas = mel.eval('zQuery -loa {}'.format(solver[0]))
@@ -821,14 +821,14 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
             if crv:
                 crv = _strip_namespace(crv[0])
                 new_name = crv + '_zLineOfAction'
-                if _is_default_name(loa, 'zLineOfAction'):
+                if _is_default_name(loa, 'zLineOfAction') or force:
                     new_name = safe_rename(loa, new_name)
 
     # rename zRivetToBone nodes
     rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
     if rtbs:
-        old_names, new_names = _rivet_to_bone_rename_helper(rtbs, '00', replace)
-        _, new_names = _rivet_to_bone_rename_helper(new_names, '', replace)
+        old_names, new_names = _rivet_to_bone_rename_helper(rtbs, '00', replace, force=force)
+        _, new_names = _rivet_to_bone_rename_helper(new_names, '', replace, force=force)
 
         # zRivetToBones names have changed so we need to re-query.
         rtbs = mel.eval('zQuery -rtb {}'.format(solver[0]))
@@ -836,8 +836,8 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
         # If you have muscleA, muscleB and muscleC and want to rename muscleA to muscleC
         # there will be a name collision and renaming will not work.
         # By appending a '00' to name first, as below, we get around this name collision.
-        _rivet_to_bone_locator_rename_helper(rtbs, '00')
-        _rivet_to_bone_locator_rename_helper(rtbs, '')
+        _rivet_to_bone_locator_rename_helper(rtbs, '00', force=force)
+        _rivet_to_bone_locator_rename_helper(rtbs, '', force=force)
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
@@ -857,7 +857,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone']):
                 record.append(new_name)
 
             new_name = '{}__{}_{}{}'.format(s, t, 'zAttachment', len(record))
-            if _is_default_name(attachment, 'zAttachment'):
+            if _is_default_name(attachment, 'zAttachment') or force:
                 safe_rename(attachment, new_name)
 
     for s in sel:
