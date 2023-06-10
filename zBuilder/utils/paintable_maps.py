@@ -1,11 +1,11 @@
-import os
 import re
 
 from maya import cmds
 from maya import mel
+# TODO: Use Maya Python API 2.0 after Maya 2020 retires
 from maya import OpenMaya as om
 from maya import OpenMayaAnim as oma
-
+from zBuilder.utils.mayaUtils import get_maya_api_version
 
 def split_map_name(map_name):
     ''' Split map_name to node and attr, e.g.,
@@ -20,7 +20,32 @@ def split_map_name(map_name):
     '''
     return map_name.split('.', 1)
 
-
+# TODO: Delete this helper function once Maya 2020 retires.
+def _get_component(node_name, attr_name, index, deformerFn):
+    if get_maya_api_version() >= 20220000:
+        return deformerFn.getComponentAtIndex(index)
+    
+    dagPath = om.MDagPath()
+    deformerFn.getPathAtIndex(index, dagPath)
+    # Now find the components for that mesh.
+    # This assumes that each mesh is in the deformer only once.
+    # All this DagPath stuff is also assuming that the mesh is in the Dag.
+    deformerSetObj = deformerFn.deformerSet()
+    deformerSetFn = om.MFnSet(deformerSetObj)
+    deformerSetSel = om.MSelectionList()
+    deformerSetFn.getMembers(deformerSetSel, False)
+    node_dot_attr = '{}.{}'.format(node_name, attr_name)
+    assert deformerSetSel.length() > 0, "{} has no deformer set.".format(node_dot_attr)
+    deformerSetPath = om.MDagPath()
+    component = om.MObject()
+    for i in range(deformerSetSel.length()):
+        deformerSetSel.getDagPath(i, deformerSetPath, component)
+        if deformerSetPath == dagPath:
+            break
+    assert deformerSetPath.isValid(), "Can't find deformer set in {}".format(node_dot_attr)
+    assert (deformerSetPath == dagPath)  # This shouldn't be possible.
+    return component
+    
 def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name):
     """ Maya 2022 introduced the "component Tag" feature.
     But it causes deformerSet() constructor to throw exception and following Maya releases haven't fix this issue.
@@ -36,7 +61,6 @@ def _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_
     else:
         value = cmds.getAttr(map_name)
     return value
-
 
 def get_paintable_map(node_name, attr_name, mesh_name=None):
     # type: (str, str, str) -> list[float]
@@ -63,8 +87,7 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
     # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
     # Move it to logic below after Maya 2022 is retired.    
     if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
-        return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
-            mesh_name, node_name, attr_name)
+        return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
     
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
@@ -85,20 +108,12 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
-        if "ZIVA_ZBUILDER_TEST_DEFORMER_WEIGHTS" in os.environ:
-            return _get_paintable_map_by_deformerWeights(mesh_name, node_name, attr_name)
-
         try:
             return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
         except RuntimeError:
-            # From Maya 2022, the fast method using deformerSet API is broken.
-            # It throws at the deformerSet constructor.
-            # We have to use other method for the deformers that derive from weightGeometryFilter classes.
-            return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
-                mesh_name, node_name, attr_name)
+            return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
     # case 3
     return get_paintable_map_by_ArrayDataBuilder(node_name, attr_name)
-
 
 def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     """ 
@@ -125,40 +140,12 @@ def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     # Which DagPath of the thing we're _supposed_ to be getting weights for
     deformerObj = _get_mobject(node_name)
     deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
-    dagPath = om.MDagPath()
-    deformerFn.getPathAtIndex(index, dagPath)
-
-    # Now find the components for that mesh.
-    # This assumes that each mesh is in the deformer only once.
-    # All this DagPath stuff is also assuming that the mesh is in the Dag.
-    deformerSetObj = deformerFn.deformerSet()
-    deformerSetFn = om.MFnSet(deformerSetObj)
-    deformerSetSel = om.MSelectionList()
-    deformerSetFn.getMembers(deformerSetSel, False)
-    node_dot_attr = '{}.{}'.format(node_name, attr_name)
-    assert deformerSetSel.length() > 0, "{} has no deformer set.".format(node_dot_attr)
-
-    deformerSetPath = om.MDagPath()
-    deformerSetComp = om.MObject()
-    for i in range(deformerSetSel.length()):
-        deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
-        if deformerSetPath == dagPath:
-            break
-
-    assert deformerSetPath.isValid(), "Can't find deformer set in {}".format(node_dot_attr)
-    assert (deformerSetPath == dagPath)  # This shouldn't be possible.
-
-    weightList = om.MFloatArray()
-    deformerFn.getWeights(deformerSetPath, deformerSetComp, weightList)
+    comp = _get_component(node_name, attr_name, index, deformerFn)
+    
+    weightList = om.MFloatArray()    
+    deformerFn.getWeights(index, comp, weightList)
     # Convert and return Python list type data to align with other get weightmap methods.
     return list(weightList)
-
-
-def _get_paintable_map_by_deformerWeights(mesh_name, node_name, attr_name):
-    """ Get Maya deformer weight map values through deformerWeights() function
-    """
-    # TODO: implement it's own logic
-    raise NotImplemented
 
 
 def get_paintable_map_by_ArrayDataBuilder(node_name, attr_name):
@@ -265,8 +252,7 @@ def set_paintable_map(node_name, attr_name, new_weights):
     # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
     # Move it to logic below after Maya 2022 is retired.
     if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
-        _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
-            node_name, attr_name, new_weights)
+        _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
         return
     
     # There are 3 cases we need to distinguish between:
@@ -289,23 +275,15 @@ def set_paintable_map(node_name, attr_name, new_weights):
     is_deformer = 'weightGeometryFilter' in cmds.nodeType(node_name, inherited=True)
     if is_deformer and child_attr == 'weights':
         # case 2
-        if "ZIVA_ZBUILDER_TEST_DEFORMER_WEIGHTS" in os.environ:
-            _set_paintable_map_by_deformerWeights(node_name, attr_name, new_weights)
-            return
-                
         try:
             set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         except RuntimeError:
-            # From Maya 2022, the fast method using deformerSet API is broken.
-            # It throws at the deformerSet constructor.
-            # We have to use other method for the deformers that derive from weightGeometryFilter classes.            
-            _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(
-                node_name, attr_name, new_weights)
+            _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
         return
-
+    
+    # case 3
     set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights)
     
-
 def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights):
     """ 
     This only works for deformer weightList attributes,
@@ -339,35 +317,8 @@ def set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weigh
     deformerFn = oma.MFnWeightGeometryFilter(deformerObj)
     dagPath = om.MDagPath()
     deformerFn.getPathAtIndex(index, dagPath)
-
-    # Now find the components for that mesh.
-    # This assumes that each mesh is in the deformer only once.
-    # All this DagPath stuff is also assuming that the mesh is in the Dag.
-    deformerSetObj = deformerFn.deformerSet()
-    deformerSetFn = om.MFnSet(deformerSetObj)
-    deformerSetSel = om.MSelectionList()
-    deformerSetFn.getMembers(deformerSetSel, False)
-    node_dot_attr = '{}.{}'.format(node_name, attr_name)
-    assert deformerSetSel.length() > 0, "{} has no deformer set.".format(node_dot_attr)
-
-    deformerSetPath = om.MDagPath()
-    deformerSetComp = om.MObject()
-    for i in range(deformerSetSel.length()):
-        deformerSetSel.getDagPath(i, deformerSetPath, deformerSetComp)
-        if deformerSetPath == dagPath:
-            break
-
-    assert deformerSetPath.isValid(), "Can't find deformer set in {}".format(node_dot_attr)
-    assert (deformerSetPath == dagPath)  # This shouldn't be possible.
-
-    deformerFn.setWeight(deformerSetPath, index, deformerSetComp, weightList)
-
-
-def _set_paintable_map_by_deformerWeights(node_name, attr_name, new_eights):
-    """ Set Maya deformer weight map values through deformerWeights() function
-    """
-    # TODO: implement it's own logic
-    raise NotImplemented
+    comp = _get_component(node_name, attr_name, index, deformerFn)
+    deformerFn.setWeight(dagPath, index, comp, weightList)
 
 
 def set_paintable_map_by_ArrayDataBuilder(node_name, attr_name, new_weights):
