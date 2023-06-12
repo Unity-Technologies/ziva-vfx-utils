@@ -57,11 +57,17 @@ class RenameAttachmentCommand(VfxTestCase):
         cmds.ziva(b=True)
         cmds.select('tissueMesh', 'boneMesh')
         cmds.ziva(a=True)
+        cmds.select('tissueMesh', 'boneMesh')
+        cmds.ziva(a=True)
+        cmds.select('tissueMesh', 'boneMesh')
+        cmds.ziva(a=True)
 
     def test_rename_single_attachment_reentry(self):
         for i in range(2):
             com.rename_ziva_nodes()
             self.assertTrue(cmds.objExists('tissueMesh__boneMesh_zAttachment1'))
+            self.assertTrue(cmds.objExists('tissueMesh__boneMesh_zAttachment2'))
+            self.assertTrue(cmds.objExists('tissueMesh__boneMesh_zAttachment3'))
 
 
 class RenameFiberCommand(VfxTestCase):
