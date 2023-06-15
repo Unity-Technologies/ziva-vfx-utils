@@ -83,12 +83,6 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
-    # TODO: After testing, DeltaMush is confirmed to work with 
-    # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
-    # Move it to logic below after Maya 2022 is retired.    
-    if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
-        return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
-    
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
     # 2) attribute is deformer weightList[i].weights
@@ -111,6 +105,7 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
         try:
             return get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name)
         except RuntimeError:
+            # TODO: revisit after Maya 2022 retires
             return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
     # case 3
     return get_paintable_map_by_ArrayDataBuilder(node_name, attr_name)
@@ -248,13 +243,6 @@ def set_paintable_map(node_name, attr_name, new_weights):
         - (zFiber1, endPoints)
         - (zBoneWarp1, landmarkList[0].landmarks)
     """
-    # TODO: After testing, DeltaMush is confirmed to work with 
-    # set_paintable_map_by_MFnWeightGeometryFilter() since Maya 2023.
-    # Move it to logic below after Maya 2022 is retired.
-    if (cmds.objectType(node_name) in ('blendShape', 'deltaMush')):
-        _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
-        return
-    
     # There are 3 cases we need to distinguish between:
     # 1) attribute is a kFooArray
     # 2) attribute is deformer weightList[i].weights
@@ -278,6 +266,7 @@ def set_paintable_map(node_name, attr_name, new_weights):
         try:
             set_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name, new_weights)
         except RuntimeError:
+            # TODO: revisit after Maya 2022 retires
             _set_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(node_name, attr_name, new_weights)
         return
     
