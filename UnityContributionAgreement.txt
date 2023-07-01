@@ -1,0 +1,48 @@
+Unity Contribution Agreement ("UCA")
+v1.0
+
+0. Definitions.
+
+“Contribution” means all software (including code in source or object format), other works of authorship, suggestions, feedback, or comments (including derivative works, modifications, or additions) submitted by you to Unity for inclusion in, documentation of, or improvement of, any software or other product or service owned or managed by Unity (collectively, “Project”), where “submitted” means any form of electronic, verbal, or written communication sent to Unity or its representatives, including communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, Unity, but excluding communication that is conspicuously marked or otherwise designated in writing by you as “Not a Contribution.”
+
+“Copyright Rights” means rights to reproduce, to prepare derivative works, to display publicly, to perform publicly, and to distribute.
+
+“Employer” means the individual or entity on whose behalf you are making any Contribution (whether by virtue of making it in the course of your employment or where the Employer otherwise has rights in and to the Contribution); when so acting, references to “you” in this CLA will be construed accordingly.   
+
+“Patent Rights” means rights to make, have made, design, have designed, use, offer to sell, sell, import, and otherwise transfer or dispose under patent claims necessarily infringed by your Contributions and/or combination of your Contribution with the Project to which it was submitted.
+
+“Rights” means Copyright Rights and Patent Rights.
+
+“Unity” means Unity Technologies ApS.
+
+1. Scope. This UCA governs all your Contributions; as such, you are required to agree to the terms and conditions of this UCA before making any Contributions.
+
+2. Contributions.
+
+2.1 Rights to Contributions.
+
+2.1.1 By making a Contribution you hereby assign, and agree to assign, to Unity all right, title, and interest (including all intellectual property rights such as copyright, patent, and trademark rights) in and to that Contribution. Should assignment be invalid for any reason, you grant to Unity and those who receive the Contribution directly or indirectly from Unity an irrevocable, perpetual, worldwide, non-exclusive, no-charge, and royalty-free license (with the right to grant sublicenses) to your Contributions, alone or in connection with the Project, under the Rights. You also agree to waive or refrain from asserting any author’s right, moral rights, or like rights to the extent necessary to permit exploitation of the Contributions as contemplated under this CLA.
+
+2.1.2 Regardless of the preceding paragraph, you will always have and retain the right to use your Contributions, subject to any other written agreement/license with Unity concerning your Contributions or any portion thereof.
+
+2.2 Consequences of patent litigation. If any person or entity commences any form of patent litigation, including a cross-claim or counterclaim, against you or anyone else wherein it is alleged that your Contribution, the Project, or your Contribution in combination with the Project constitutes direct or secondary/indirect patent infringement, then any and all licenses granted to that person or entity under the UCA in respect of that Contribution or Project will terminate with immediate effect.
+
+2.3 Contributions are yours to make. Concerning your Contributions, you represent and warrant to Unity that (i) you have full legal right to make the assignments/grants in Section 2.1; (ii) your Contribution is your original creation (refer to Section 2.4 for submission of third-party materials); and (iii) where any Contribution is made on behalf of your Employer, you have permission from your Employer to do so.  For clarity, if you change Employers, you must accept this UCA anew to make Contributions on that Employer’s behalf. You will defend, indemnify, and hold Unity, its officers, directors, employees, and agents harmless from and against any claims, actions, suits, or proceedings, as well as any and all losses, liabilities, damages, costs, and expenses, including reasonable legal and accounting fees, arising out of or connected with any breach of these representations and warranties.
+
+2.4 Third-party submissions. If you wish to submit anything that is not your original creation, you may submit it separately to Unity apart from a Contribution, provided that you (i) identify complete details of the source of the materials and of any and all licenses and/or conditions attaching to them; (ii) clearly mark the submission "submission of third-party materials; such third party: [provide name(s)]"; and (iii) otherwise follow any other instruction provided by Unity with respect to such submissions.
+
+2.5 No obligation to accept or compensate for Contributions. While you are free to propose Contributions, Unity is not under any obligation to accept them. Further, whether accepted or not, you understand and agree that Unity is not under any obligation to compensate you in respect of any of your Contributions.
+
+2.6 Information associated with Contributions. You understand and agree that your Contributions and submitted information (including any personal data) associated with them will be available to the public on an indefinite basis.
+
+2.7 Support. Support for your Contribution is only required where you choose to provide it or offer to provide it.
+
+3. Trademarks. You are not granted any right or license under this UCA to use any trademarks, service marks, trade names, products names, or branding of Unity or its affiliates (“Trademarks”). Descriptive uses of Trademarks are permitted; see, for example, Unity’s Branding Usage Guidelines at https://unity.com/legal/branding_trademarks.
+
+4. Notice. In the event that any representations made by you under this UCA become untrue or inaccurate, you will notify Unity in writing of those details in writing.
+
+5. DISCLAIMER. EXCEPT AS REQUIRED BY APPLICABLE LAW, OTHERWISE AGREED IN WRITING, OR AS EXPRESSLY PROVIDED IN THIS CLA, YOUR CONTRIBUTIONS UNDER  THIS UCA ARE PROVIDED ON AN "AS IS" BASIS, AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND/OR NONINFRINGEMENT.   
+
+6. Severability. If any provision of this UCA is held to be unenforceable or invalid, that provision will be enforced to the maximum extent possible and the other provisions will remain in full force and effect.
+
+7. Governing Law and Venue. This UCA is governed by and construed in accordance with the laws of Denmark, except for its conflict of laws rules; the United Nations Convention on Contracts for the International Sale of Goods will not apply. If you reside (or your principal place of business is) within the United States, you and Unity agree to submit to the personal and exclusive jurisdiction of and venue in the state and federal courts located in San Francisco County, California concerning any dispute arising out of this UCA (“Dispute”). If you reside (or your principal place of business is) outside the United States, you and Unity agree to submit to the personal and exclusive jurisdiction of and venue in the courts located in Copenhagen, Denmark concerning any Dispute.
