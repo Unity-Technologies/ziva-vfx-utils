@@ -451,7 +451,44 @@ Now when build is called, it should result in a mirrored setup:
 
     z.build()
 
+Deformers
+^^^^^^^^^
 
+zBuilder fully supports skinClusters, deltaMush, wrap and blendShapes with features such as reading and writing to disk and interpolating weights when topology changes.
+In order to use these, select a mesh with any of the listed deformers on it, and run zBuilder.
+
+.. code-block:: python
+
+    from zBuilder.builders.deformers import Deformers
+    builder = Deformers()
+    builder.retrieve_from_scene()
+
+.. note::
+
+    This will capture all the deformers on the mesh in the order they are created in.
+    When a build is performed it will rebuild the deformers in the proper order.
+
+To re-apply those deformers, build with zBuilder.
+
+.. code-block:: python
+
+    builder.build()
+
+When building on a mesh whose topology has changed, the weights will be interpolated on the new mesh.
+To force a map interpolation, simply set **interp_maps** to **True**:
+
+.. code-block:: python
+
+    builder.build(interp_maps=True)
+
+To capture only specific deformers, use the **deformers** argument of the retrieve_from_scene() method.
+
+.. code-block:: python
+
+    builder.retrieve_from_scene(deformers=['delataMush'])
+
+The argument can be a list, allowing multiple deformers to be chosen.
+If no argument is passed, all deformers are retrieved by default.
 
 Advanced
 ~~~~~~~~
