@@ -213,3 +213,19 @@ class MirrorCommand(VfxTestCase):
         # make sure non sided attachment did not interpolate
         self.assertAllApproxEqual(
             cmds.getAttr('zAttachment1.weightList[0].weights')[0], self.non_interpolated_map)
+
+    def test_material_creation_bug(self):
+        """
+        VFXACT-1796 is a fix for a bug dealing with material creation.  If you are in mirror workflow and you have
+        multiple materials on a non-center mesh it would cuase issues and create the wrong material node.  This test
+        confirms the fix.
+        """
+        ## SETUP
+        cmds.select('l_arm_ts')
+
+        ## ACT
+        com.mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_')
+
+        ## VERIFY
+        self.check_node_symmetrical('r_arm_zMaterial', 'l_arm_zMaterial')
+        self.check_node_symmetrical('r_arm_zMaterial_soft', 'l_arm_zMaterial_soft')
