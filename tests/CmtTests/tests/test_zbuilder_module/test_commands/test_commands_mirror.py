@@ -229,3 +229,33 @@ class MirrorCommand(VfxTestCase):
         ## VERIFY
         self.check_node_symmetrical('r_arm_zMaterial', 'l_arm_zMaterial')
         self.check_node_symmetrical('r_arm_zMaterial_soft', 'l_arm_zMaterial_soft')
+
+    def test_attachment_interpolate_bug(self):
+        """
+        VFXACT-1796 is a bug that incorrectly identifies if an attachment needs to be interpolated (duplicated and
+        flipped).  This covers that case
+        """
+        ## SETUP
+        cmds.select('zSolver1')
+
+        ## ACT
+        com.mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_')
+
+        ## VERIFY
+        self.check_node_symmetrical('c_sourceMesh__r_targetMesh_zAttachment1', 'c_sourceMesh__l_targetMesh_zAttachment1')
+
+    def test_material_creation_bug(self):
+        """
+        VFXACT-1796 is a fix for a bug dealing with material creation.  If you are in mirror workflow and you have
+        multiple materials on a non-center mesh it would cuase issues and create the wrong material node.  This test
+        confirms the fix.
+        """
+        ## SETUP
+        cmds.select('l_arm_ts')
+
+        ## ACT
+        com.mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_')
+
+        ## VERIFY
+        self.check_node_symmetrical('r_arm_zMaterial', 'l_arm_zMaterial')
+        self.check_node_symmetrical('r_arm_zMaterial_soft', 'l_arm_zMaterial_soft')

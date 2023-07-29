@@ -918,8 +918,21 @@ def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_a
     for item in items_to_delete:
         builder.remove_scene_item(item)
 
-    # perform the mirror.  That is replace source_prefix with target_prefix in the internal scene items.
+    # perform the mirror internally.  That is replace source_prefix with target_prefix in the internal scene items.
     builder.string_replace(source_prefix, target_prefix)
+
+    # after the string replace we need to do another pass on attachment and map names.  A basic naming convention of
+    # attachments, through the use of rename_ziva_nodes, is to name them with source and target mesh.  As a result
+    # you get names like so:
+    # c_sourceMesh__l_targetMesh_zAttachment1
+    # we need to split that name and perform a re.sub on second element
+    for attachment in builder.get_scene_items(type_filter='zAttachment'):
+        maps = attachment.parameters['map']
+        for obj in [attachment, maps[0], maps[1]]:
+            split = obj.name.split('__')
+            if len(split) == 2:
+                obj.name = (split[0]+'__'+re.sub(source_prefix, target_prefix, split[1]))
+
 
     # We need to mirror the internally stored mesh on the mirror axis.
     for mesh_node in builder.get_scene_items(type_filter='mesh'):
@@ -930,8 +943,10 @@ def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_a
     # This accomplishes flipping the map on the opposite side of the mesh once applied.
     for map_node in builder.get_scene_items(type_filter='map'):
         if map_node.get_mesh().startswith(center_prefix):
-            if map_node.name.startswith(target_prefix):
-                map_node.interpolate()
+            for item in map_node.name.split('__'):
+                if item.startswith(target_prefix):
+                    map_node.interpolate()
+                    break
 
     # before we build we need to clean the maya scene of any target nodes.
     # So lets look for any meshes of a zTissue, zCloth or zBone.  From there
