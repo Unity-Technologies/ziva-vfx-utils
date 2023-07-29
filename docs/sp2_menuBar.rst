@@ -333,6 +333,19 @@ select vertices on the source mesh that are near the target mesh.
 Given a selected attachment, paint the attachment weight map on the source that falls-off smoothly
 between the prescribed min and max distance from the target.
 
+Naming
+"""""""
+
+.. _naming:
+
+**Rename Ziva Nodes**
+
+This traverses through the scene and renames Ziva nodes based on geometry they are connected to.
+
+.. note::
+
+    This only renames nodes that have not been manually named previously.
+    This allows nodes to be renamed by hand without the threat of the name changing again.
 
 Help Menu
 ^^^^^^^^^^^^
