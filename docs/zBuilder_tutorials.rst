@@ -408,54 +408,157 @@ and all the maps painted on that mesh will have their names corrected as well.
 
     z.build()
 
-Mirroring a setup
-*****************
+.. _mirror:
 
-String replacing can be used to mirror half of a Ziva rig into a full symmetric Ziva rig.
+Mirroring
+^^^^^^^^^
 
-In order for this to work, the geometry needs to be already-mirrored,
-with **r_*** and **l_*** prefixes used to distinguish between each pair of mirrored meshes.
-Assuming you have already created a rig on the right-side of the character,
-you will then tell the builder to replace **r_muscle** with **l_muscle**
-(note that all zBuilder will be doing here is changing names, 
-so it expects all of the **l_muscle** meshes to already be in the scene).
+Ziva VFX setups can now be mirrored.
+This functionality can be accessed through either the UI or a Python command.
 
-Let's run a little test scene that sets up two spheres and a cube with one attachment.
+.. note::
+
+    In order to successfully mirror a VFX setup, **center_prefix** must be defined if there are center pieces of geometry.
+    This is to give zBuilder a full picture of the setup so it can mirror attachments around the geometry's central pieces.
+    Without a center prefix defined for existing central geometry, zBuilder will not know what to do with some of the attachments, and the mirror will not work in all cases.
+
+Mirroring Via Window
+*********************
+
+The mirror command can be found in the Ziva Transfer menu:
+
+.. image:: images/mirror_menu.png
+
+The following window will launch:
+
+.. image:: images/mirror_ui.png
+
+.. _arguments:
+
+**source prefix** is the side where the data is being mirrored from.
+|br|
+**target prefix** is the side where the data is being mirrored to.
+|br|
+**center prefix** is prefix for the center pieces of geometry.
+|br|
+**mirror axis** is used if the character is not facing the positive Z direction.
+|br|
+
+
+
+Mirror Via Python Script
+************************
+
+Mirroring can also be done through the command line.
+Sometimes this may be preferable as the command can be used as part of a build script with changing arguments.
+The custom command can also be used to create a new shelf button.
 
 .. code-block:: python
 
-    import tests.utils as utl
+    import zBuilder.commands as com
+    com.mirror()
 
-    utl.build_mirror_sample_geo()
-
-There should be a cube and two spheres in the scene.
-The right-side sphere **r_muscle** is a tissue, and the cube is a bone,
-and they are connected by a single attachment.
-Let's mirror this so the **l_muscle** gets a tissue and attachment as well.
-To do this, just create and initialize a builder, perform a string replace, and then rebuild:
+Here is an example call with all optional arguments set:
 
 .. code-block:: python
 
-    import zBuilder.builders.ziva as zva
+    import zBuilder.commands as com
+    com.mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_axis='X')
 
-    z = zva.Ziva()
-    z.retrieve_from_scene()
-    z.string_replace('^r_','l_')
+See :ref:`this <arguments>` section for the arguments.
 
-Notice the *^* in the search field.
-This is a regular expression that enforces an ``r_`` at the beginning of a name.
+Mirroring a rig
+*********************
 
-Now when build is called, it should result in a mirrored setup:
+Mirroring works based on selection.
+If the solver is selected, the entire rig will be mirrored.
+Alternatively, a particular tissue (or set of tissues) can be mirrored via selection,.
+
+.. note::
+
+    This operation mirrors one side to another.
+    If the right side of a setup is being worked on, and is the source, then invoking mirror will replicate the source to the left side of the setup.
+    If there are attachments on the left side prior to mirroring, the mirror operation will clean up the left side in order to replicate the right side with the output being an exact copy of the source (right) side.
+
+.. image:: images/mirror_setup.png
+
+Here is a typical mirror setup: the center pieces and a source on the right, and the target on the left.
+
+The attachments are connected between two center pieces; in this case, a tissue wrapped around a bone.
+
+.. image:: images/mirror_center_attachments.png
+
+Note that the names are prefixed.
+
+.. image:: images/mirror_center_att_names.png
+
+In order for mirroring to work there needs to be a source and target prefix.
+Without those, the mirroring process will do nothing.
+Therefore, despite mirroring attachments that are not attached to a sided piece of geometry, the results can still be expected to look like this:
+
+.. image:: images/mirror_results.png
+
+Mirroring with Center Pieces of Geometry
+****************************************
+
+zFibers, zAttachments and zMaterials can be mirrored around a center piece of geometry.
+This is based on the name of the node.
+If the name starts with **source_prefix** it will get mirrored.
+This is useful in cases such as an attachment on the chest connected to the arm.
+
+If using :ref:`Rename Ziva Nodes <naming>`, an attachment between the chest and an arm could be named like so:
 
 .. code-block:: python
 
-    z.build()
+    c_chest__l_arm_zAttachment
 
+In this case, the mirror function will split the name at the `__`, and will find the `l_arm_zAttachment` and mirror the attachment.
+The following are all valid names as targets for mirroring:
+
+.. code-block:: python
+
+    c_chest__l_arm_zAttachment
+    l_bicep__l_trap_zAttachment
+    l_bicep_zFiber
+    l_soft_zMaterial
+
+.. note::
+
+    This naming convention is not a hard requirement, but an illustrative example. As long as the naming is consistent and meets the requirements laid out here, it will work.
+
+
+Mirroring Collision Sets
+************************
+
+When items with collision sets are mirrored, a multiplier is applied to the sets.
+In doing so, the mirrored side is unique, which will result in sets that are different than the source.
+
+Here is an example of what this numbering scheme looks like.
+
+Source side collision set:
+
+.. code-block:: python
+
+    0 10 25 40
+    
+Mirrored side collision set:
+
+.. code-block:: python
+
+    0 1000 2500 4000
+
+.. note::
+
+    By default the collision set is set to 0 for everything.
+    Once mirrored it will still be 0 after it is mirrored meaning that they will share the same collision set.
+    
 Deformers
 ^^^^^^^^^
 
+
 zBuilder fully supports skinClusters, deltaMush, wrap and blendShapes with features such as reading and writing to disk and interpolating weights when topology changes.
 In order to use these, select a mesh with any of the listed deformers on it, and run zBuilder.
+
 
 .. code-block:: python
 
