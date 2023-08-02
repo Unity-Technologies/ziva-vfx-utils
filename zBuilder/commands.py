@@ -782,7 +782,7 @@ def _rivet_to_bone_locator_rename_helper(rtbs, postfix, force=False):
         if _is_default_name(rtb_locator[0], 'zRiveToBoneLocator')  or force:
             cmds.rename(rtb_locator, '{}{}'.format(rtb.replace('zRivetToBone', 'zRivet'), postfix))
 
-def _attachment_rename_helper(attachments, postfix, suffix_to_remove):
+def _attachment_rename_helper(attachments, postfix, suffix_to_remove, force=False):
     """
     Rename 'zAttachment' nodes.  This names them based on the source and target mesh.
     example:
@@ -870,7 +870,7 @@ def rename_ziva_nodes(replace=['_muscle', '_bone'], force=False):
         _attachment_rename_helper(attachments, '00', replace)
         # since names have changed from first run we need to re-query the attachments.
         attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
-        _attachment_rename_helper(attachments, '', replace)
+        _attachment_rename_helper(attachments, '', replace, force)
 
     for s in sel:
         if cmds.objExists(s):
