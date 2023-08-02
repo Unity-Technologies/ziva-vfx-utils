@@ -77,7 +77,11 @@ pipeline {
                                 unstash 'main'
                                 script {
                                     if ("${platform}" == 'windows') {
-                                        runWindowsTestStage()
+                                        if ("${mayaVersion}" == '2022' && "${pythonVersion}" == 'py2') {
+                                            runWindowsTestStage(true)
+                                        } else {
+                                            runWindowsTestStage(false)
+                                        }
                                     }
                                     else {
                                         if ("${mayaVersion}" == '2022' && "${pythonVersion}" == 'py2') {
@@ -127,19 +131,29 @@ pipeline {
     }
 }
 
-def runWindowsTestStage() {
-    echo "running windows test stage"
-    withEnv(['zivadyn_LICENSE=5053@license.zivacloud.com']) {
+def runWindowsTestStage(runInPython2Env) {
+    withEnv([
+        'zivadyn_LICENSE=5053@license.zivacloud.com',
+        'unitytech_LICENSE=5053@license.zivacloud.com',        
+    ]) {
         dir('ziva-vfx-utils') {
             bat "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
-            bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+            if (runInPython2Env) {
+                bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion} --py2"
+            }
+            else {
+                bat "python tests/CmtTests/run_zbuilder_tests.py --maya ${mayaVersion}"
+            }
+            
         }
     }
 }
 
 def runLinuxTestStage(runInPython2Env) {
-    echo "running linux test stage"
-    withEnv(['zivadyn_LICENSE=5053@license.zivacloud.com']) {
+    withEnv([
+        'zivadyn_LICENSE=5053@license.zivacloud.com',
+        'unitytech_LICENSE=5053@license.zivacloud.com',        
+    ]) {
         dir('ziva-vfx-utils') {
             sh "python tests/CmtTests/copy_plugin_zBuilder_tests.py --maya ${mayaVersion}"
             if (runInPython2Env) {

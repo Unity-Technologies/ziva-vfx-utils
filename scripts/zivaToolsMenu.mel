@@ -28,6 +28,9 @@ menuItem -subMenu true -label "Run Demo";
   menuItem -label "Isomesher" -ec true -ecr true -c "ziva_main_isoMesherDemo(1)" -ann "Demonstrates the Ziva isomesher.";
 setParent -menu ..;
 
+menuItem -label "Naming" -divider true;
+  menuItem -label "Rename Ziva Nodes" -ec true -ecr true -c "import zBuilder.commands as vfx_cmds; vfx_cmds.rename_ziva_nodes()" -sourceType "python" -ann "Renames the ziva nodes in the scene.";
+
 menuItem -label "Meshing" -divider true;
 menuItem -label "Create Isosurface Triangle Mesh" -ec true -ecr true -c "zIsoMesh" -ann "Builds an isosurface triangle mesh of the selected triangle mesh(es) or tissue(s).";
 menuItem -label "Create Delaunay Tet Mesh" -ec true -ecr true -c "zDelaunayTetMesh" -ann "Builds a Delaunay tet mesh of the selected triangle mesh(es) or tissue(s).";

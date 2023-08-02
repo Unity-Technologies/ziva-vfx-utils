@@ -46,12 +46,12 @@ class MaterialNode(Ziva):
             is_new_material = (self.name not in existing_materials)
             build_material_case1 = is_normal_workflow and is_new_material
 
-            # case 2: mirrow workflow, not center mesh, new material
+            # case 2: mirrow workflow, not center mesh, new material and material name is not in scene
             is_mirror_workflow = not is_normal_workflow
             is_center_mesh = bool(center_prefix) and mesh.split('|')[-1].startswith(center_prefix)
             is_new_material_for_non_center_mesh = (len(existing_materials) < len(data_materials))
             build_material_case2 = is_mirror_workflow and (
-                not is_center_mesh) and is_new_material_for_non_center_mesh
+                not is_center_mesh) and is_new_material_for_non_center_mesh and is_new_material
 
             # case 3: mirrow workflow, center mesh, new side material
             sided_materials = [x for x in data_materials

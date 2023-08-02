@@ -9,7 +9,7 @@ from maya import cmds, mel
 from utility.licenseRegister import licenseRegisterWidget
 from utility.scriptCommands.zCacheCommands import clear_zcache
 from zBuilder.commands import (rig_cut, rig_copy, rig_paste, rig_update, merge_solvers,
-                               remove_zRivetToBone_nodes, remove_solver, remove_all_solvers)
+                               remove_zRivetToBone_nodes, remove_solver, remove_all_solvers, rename_ziva_nodes)
 from ..uiUtils import get_icon_path_from_name
 from .zGeoWidget import zGeoWidget
 
@@ -410,6 +410,12 @@ _menubar_dict["Tools"] = (
         lambda: mel.eval(
             "zPaintAttachmentsByProximity -min $ZivaPaintByProximityMinFloat -max $ZivaPaintByProximityMaxFloat"
         ),
+    ),
+    ("Naming Tools", ),  # separator
+    (
+        "Rename Ziva Nodes",
+        "Rename Ziva nodes in scene.",
+        lambda: rename_ziva_nodes(),
     ),
 )
 

@@ -90,45 +90,10 @@ cut/copy and paste their Ziva rigs onto previously un-rigged additional geometry
   vfx_cmds.rig_paste()
 
 
-Copy/Paste Ziva Rig With Name Substitution
-"""""""""""""""""""""""""""""""""""""""""""
+Mirror
+""""""
 
-Suppose you have already modeled the geometry of a creature,
-and a Ziva rig on one half (say, the left side) of a creature.
-The name of left side meshes starts with ``l_`` and right side meshes starts wtih ``r_``.
-This tool makes it possible to copy the rig onto the other side of the creature.
-This is achieved through regular expression replacements.
-The method requires a regular expression and a string with which to replace any regular expression matches.
-For example, if regular expression is ``^l_`` and string to substitute with is ``r_``,
-then all instances of geometry that begin with ``r_`` 
-will be rigged in the same way as the corresponding geometry that begins with ``l_``.
-The new Ziva rig elements are added to the same solver as the source.
-For example, ``r_biceps`` will be rigged in the same way as ``l_biceps``.
-In order for all the elements of the Ziva rig to be transferred properly
-(such as painted attachments, or other painted properties),
-the geometries of ``r_biceps`` and ``l_biceps`` must be mirror images of one another.
-
-.. note::
-    This regular expression tool is more general than just for mirroring;
-    arbitrary Python regular expressions are supported.
-    Examples of useful pairs are:
-
-    - ``(^|_)l($|_)`` and ``r``
-    - ``^l_`` and ``r_``
-    - ``_l_`` and ``_r_``
-    - ``_l$`` and ``_r``
-
-    You can learn more about regular expressions at the `Regex101 website <https://regex101.com/>`_.
-
-**Python commands**:
-
-.. code-block:: python
-
-  # Copy/Pastes Ziva rig for the selected solver, using regular expressions.
-  # If multiple solvers are selected, only the first solver is processed.
-  import zBuilder.commands as vfx_cmds
-  vfx_cmds.copy_paste_with_substitution(regular_expression, string_to_substitute_matches_with)
-
+:ref:`Mirror <mirror>`
 
 Update Ziva Rig
 """"""""""""""""
@@ -333,6 +298,19 @@ select vertices on the source mesh that are near the target mesh.
 Given a selected attachment, paint the attachment weight map on the source that falls-off smoothly
 between the prescribed min and max distance from the target.
 
+Naming
+"""""""
+
+.. _naming:
+
+**Rename Ziva Nodes**
+
+This traverses through the scene and renames Ziva nodes based on geometry they are connected to.
+
+.. note::
+
+    This only renames nodes that have not been manually named previously.
+    This allows nodes to be renamed by hand without the threat of the name changing again.
 
 Help Menu
 ^^^^^^^^^^^^

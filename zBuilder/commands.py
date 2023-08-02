@@ -4,6 +4,7 @@ import copy
 import logging
 import re
 import zBuilder.builders.ziva as zva
+from collections import defaultdict
 
 from maya import cmds
 from maya import mel
@@ -781,6 +782,31 @@ def _rivet_to_bone_locator_rename_helper(rtbs, postfix, force=False):
         if _is_default_name(rtb_locator[0], 'zRiveToBoneLocator')  or force:
             cmds.rename(rtb_locator, '{}{}'.format(rtb.replace('zRivetToBone', 'zRivet'), postfix))
 
+def _attachment_rename_helper(attachments, postfix, suffix_to_remove):
+    """
+    Rename 'zAttachment' nodes.  This names them based on the source and target mesh.
+    example:
+        r_bicep__r_humerus_zAttachment1
+    Args:
+        attachments (list): list of zAttachments nodes to rename
+        postfix (string): postfix to use for renaming
+        suffix_to_remove (list): list of strings to remove from the new name
+    """
+    record = defaultdict(list)
+    for attachment in attachments:
+        source = cmds.zQuery(attachment, attachmentSource=True)[0]
+        for r in suffix_to_remove:
+            source = source.replace(r, '')
+        source = _strip_namespace(source)
+        target = cmds.zQuery(attachment, attachmentTarget=True)[0]
+        for r in suffix_to_remove:
+            target = target.replace(r, '')
+        target = _strip_namespace(target)
+        new_name = '{}__{}_{}'.format(source, target, 'zAttachment')
+        record[new_name].append(new_name)
+        new_name = '{}__{}_{}{}'.format(source, target, 'zAttachment', len(record[new_name]))
+        if _is_default_name(attachment, 'zAttachment') or force:
+            safe_rename(attachment, '{}{}'.format(new_name, postfix))
 
 def rename_ziva_nodes(replace=['_muscle', '_bone'], force=False):
     """ Renames zNodes based on mesh it's connected to.
@@ -841,24 +867,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone'], force=False):
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
-        for attachment in attachments:
-            s = mel.eval('zQuery -as {}'.format(attachment))[0]
-            for r in replace:
-                s = s.replace(r, '')
-            s = _strip_namespace(s)
-            t = mel.eval('zQuery -at {}'.format(attachment))[0]
-            for r in replace:
-                t = t.replace(r, '')
-            # remove namespace from target mesh
-            t = _strip_namespace(t)
-            record = []
-            new_name = '{}__{}_{}'.format(s, t, 'zAttachment')
-            if new_name not in record:
-                record.append(new_name)
-
-            new_name = '{}__{}_{}{}'.format(s, t, 'zAttachment', len(record))
-            if _is_default_name(attachment, 'zAttachment') or force:
-                safe_rename(attachment, new_name)
+        _attachment_rename_helper(attachments, '00', replace)
+        # since names have changed from first run we need to re-query the attachments.
+        attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
+        _attachment_rename_helper(attachments, '', replace)
 
     for s in sel:
         if cmds.objExists(s):
@@ -906,8 +918,21 @@ def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_a
     for item in items_to_delete:
         builder.remove_scene_item(item)
 
-    # perform the mirror.  That is replace source_prefix with target_prefix in the internal scene items.
+    # perform the mirror internally.  That is replace source_prefix with target_prefix in the internal scene items.
     builder.string_replace(source_prefix, target_prefix)
+
+    # after the string replace we need to do another pass on attachment and map names.  A basic naming convention of
+    # attachments, through the use of rename_ziva_nodes, is to name them with source and target mesh.  As a result
+    # you get names like so:
+    # c_sourceMesh__l_targetMesh_zAttachment1
+    # we need to split that name and perform a re.sub on second element
+    for attachment in builder.get_scene_items(type_filter='zAttachment'):
+        maps = attachment.parameters['map']
+        for obj in [attachment, maps[0], maps[1]]:
+            split = obj.name.split('__')
+            if len(split) == 2:
+                obj.name = (split[0]+'__'+re.sub(source_prefix, target_prefix, split[1]))
+
 
     # We need to mirror the internally stored mesh on the mirror axis.
     for mesh_node in builder.get_scene_items(type_filter='mesh'):
@@ -918,8 +943,10 @@ def mirror(source_prefix='^l_', target_prefix='r_', center_prefix='c_', mirror_a
     # This accomplishes flipping the map on the opposite side of the mesh once applied.
     for map_node in builder.get_scene_items(type_filter='map'):
         if map_node.get_mesh().startswith(center_prefix):
-            if map_node.name.startswith(target_prefix):
-                map_node.interpolate()
+            for item in map_node.name.split('__'):
+                if item.startswith(target_prefix):
+                    map_node.interpolate()
+                    break
 
     # before we build we need to clean the maya scene of any target nodes.
     # So lets look for any meshes of a zTissue, zCloth or zBone.  From there
