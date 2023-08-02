@@ -867,10 +867,10 @@ def rename_ziva_nodes(replace=['_muscle', '_bone'], force=False):
 
     attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
     if attachments:
-        _attachment_rename_helper(attachments, '00', replace)
+        _attachment_rename_helper(attachments, '00', replace, force=force)
         # since names have changed from first run we need to re-query the attachments.
         attachments = mel.eval('zQuery -t "{}" {}'.format('zAttachment', solver[0]))
-        _attachment_rename_helper(attachments, '', replace, force)
+        _attachment_rename_helper(attachments, '', replace, force=force)
 
     for s in sel:
         if cmds.objExists(s):
