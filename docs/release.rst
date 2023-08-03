@@ -21,17 +21,18 @@ Functionality
 - **zBuilder:** Robust Mirror Operation:
     - **zBuilder.nodes.parameters.mesh** Added ability to mirror mesh on X, Y or Z.
     - **zBuilder.commands** Added **mirror** command.
-- **zBuilder:** Revive the Maya deformer builder, which supports Blendshape, DeltaMush, Wrap, and SkinCluster.
+- **zBuilder:** The Maya deformer builder (which supports Blendshape, DeltaMush, Wrap and SkinCluster) is revived.
 - **zBuilder:** **Bundle** class is deleted to simplify class hierarchy.
 - **zBuilder:** Remove unused **attr_filter**, **name_filter** from **build()** method.
 
 Bug Fixes
 +++++++++
+- **zBuilder:** VFXACT-1749 Fix for locked/connected attribute when setAttr() called for **zMaretial.weightList[0].weight**.
+- **zBuilder:** VFXACT-1579	Fix the broken set/get paintablemap() function since Maya 2022
 - **zBuilder:** VFXACT-1651 add zBuilder support for zRestShape alias attributes.
 - **zBuilder:** VFXACT-1525 Fix for zRivetToBoneLocator naming issue.
 - **zBuilder:** VFXACT-1528 **rename_ziva_nodes()** Name zLineOfAction off of zFiber.
 - **zBuilder:** VFXACT-1499 **rename_ziva_nodes()** Number suffix for all zAttachments.
-- **zBuilder:** VFXACT-1749 Fix for locked/connected attribute when stAttr() called for 'zMaretial.weightList[0].weight'.
 
 
 2.1.0
