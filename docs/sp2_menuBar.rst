@@ -17,30 +17,10 @@ Load/Save Ziva Rig
 """""""""""""""""""
 
 Loads a Ziva rig from a disk file, and applies it to the specified solver.
-
-**Python commands**:
-
-.. code-block:: python
-
-    # Load a Ziva rig from a file. Geometry must already be in the scene.
-    # If solverName is not provided, the rig is applied to the solver stored in the zBuilder file.
-    # If solverName is provided, replace the name of the solver stored in the zBuilder file with a given solverName,
-    # and apply the rig to that solver.
-    import zBuilder.commands as vfx_cmds
-    vfx_cmds.load_rig(file_name, solver_name=None)
+Refer to :func:`load_rig() <zBuilder.commands.load_rig>` docstring for Python script usage.
 
 Saves the Ziva rig present only in the selected solver to a disk file.
-
-**Python commands**:
-
-.. code-block:: python
-
-  # Save a Ziva rig to a file.
-  # If there is only one solver in the scene, it is saved.
-  # If there is multiple solvers, save the first solver in the union
-  # of selected solvers and the default solver.
-  import zBuilder.commands as vfx_cmds
-  vfx_cmds.save_rig(file_name, solver_name=None)
+Refer to :func:`save_rig() <zBuilder.commands.save_rig>` docstring for Python script usage.
 
 
 Cut/Copy/Paste Selection
@@ -60,40 +40,26 @@ cut/copy and paste their Ziva rigs onto previously un-rigged additional geometry
     a "clean" un-rigged creature (either into the same solver or into a separate solver),
     you can also use the zRigTransfer script (:ref:`sec-zRigTransfer`).
 
+Refer to :func:`rig_cut() <zBuilder.commands.rig_cut>`, 
+:func:`rig_copy() <zBuilder.commands.rig_copy>` and 
+:func:`rig_paste() <zBuilder.commands.rig_paste>` docstring for Python script usage.
+
 **Python commands**:
 
 .. code-block:: python
 
-  # Cut the Ziva rig available on currently selected objects into the Ziva clipboard.
-  # Selection cannot be empty; otherwise an error is reported.
-  # Selection can contain zero or one solver node; otherwise an error is reported
-  # (it does not matter if the solver node is a solver transform node, or solver shape node).
-  # The selected objects must all come from exactly one solver; otherwise an error is reported.
-  import zBuilder.commands as vfx_cmds
+  from zBuilder import commands as vfx_cmds
+  # Either cut or copy the Ziva VFX rig
   vfx_cmds.rig_cut()
-
-  # Copy the Ziva rig available on currently selected objects, into the Ziva clipboard.
-  # Same usage notes as with rig_cut.
-  import zBuilder.commands as vfx_cmds
   vfx_cmds.rig_copy()
-
-  # Paste the Ziva rig from the Ziva clipboard onto scene geometry.
-  # If nothing is selected, or the Ziva clipboard contains an explicit solver node,
-  # the Ziva rig is applied to scene geometry that is named inside the Ziva clipboard.
-  # If something is selected, then:
-  #   source selection 1 is pasted onto target selection 1;
-  #   source selection 2 is pasted onto target selection 2; and so on.
-  # The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
-  # If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
-  # it is created.
-  import zBuilder.commands as vfx_cmds
+  # Paste the Ziva VFX rig
   vfx_cmds.rig_paste()
 
 
 Mirror
 """"""
 
-:ref:`Mirror <mirror>`
+Refer to :ref:`Mirror <mirror>` tutorial section.
 
 Update Ziva Rig
 """"""""""""""""
@@ -104,18 +70,7 @@ In this way, the Ziva rig is identical to a Ziva rig that you would obtain
 if the current geometry was originally used to make the Ziva simulation bodies directly.
 This feature is also useful if you warped a creature using one of our warping tools
 and you want to update the Ziva rig to use the newly warped geometry.
-
-**Python commands**:
-
-.. code-block:: python
-
-  # Updates the Ziva rig in the solver(s).
-  # This command can be used if you made geometry modifications and you'd like to re-use a previously
-  # built Ziva rig on the modified geometry.
-  # If no "solvers" are provided, they are inferred from selection.
-  import zBuilder.commands as vfx_cmds
-  vfx_cmds.rig_update(solvers=None)
-
+Refer to :func:`rig_update() <zBuilder.commands.rig_update>` docstring for Python script usage.
 
 .. _sec-zRigTransfer:
 
@@ -137,25 +92,8 @@ using the **Ziva** |rarr| **Remove** |rarr| **Selected Solver(s)** command,
 leaving a scene that has just the target creature in it.
 
 In order to warp the Ziva rig, you will need to provide the source and target solvers (in the dialog box).
+Refer to :func:`rig_transfer() <zBuilder.commands.rig_transfer>` docstring for Python script usage.
 
-**Python commands**:
-
-.. code-block:: python
-
-  # Transfers the Ziva rig from 'sourceSolver' to another solver (targetSolver).
-  # This command does not transfer the geometry.
-  # It assumes that a copy of the geometry from sourceSolver is already available in the scene,
-  # prefixed by "prefix" (without the quotes).
-  # For example, if sourceSolver is 'zSolver1', and prefix is 'warped_',
-  # and 'zSolver1' has a tissue geometry (a mesh) called "tissue1",
-  # then this command assumes that there is a mesh called "warped_tissue1" in the scene.
-  # The command generates a Ziva rig on the 'warped_*' geometry in the targetSolver.
-  # If targetSolver is "", the command sets the targetSolver to sourceSolver + prefix.
-  # If targetSolver does not exist yet, the command generates it.
-  # Note that the targetSolver may be the same as the sourceSolver, 
-  # in which case the rig on the 'warped_*' geometry is added into the sourceSolver.
-  import zBuilder.commands as vfx_cmds
-  vfx_cmds.rig_transfer(sourceSolver, prefix, targetSolver="")
 
 Transfer Skin Cluster...
 """""""""""""""""""""""""
@@ -179,17 +117,7 @@ To execute the skin cluster transfer:
 1. Select the source meshes and the **Transfer Skin Cluster...** menu item.
 2. In the popup dialog, click the **Transfer** button.
 
-**Python command**:
-
-.. code-block:: python
-
-  # Transfer the skin clusters for some selected meshes onto their warped counterparts 
-  # and to connect the warped joint hierarchy.
-  # This requires both geometries (selected and warped) have the same topology.
-  # Also, the names of the warped meshes must be prefixed with "prefix".
-  # Note: Warp the source meshes and the corresponding joint hierarchy before running the command.
-  import zBuilder.commands as vfx_cmds
-  vfx_cmds.skincluster_transfer(prefix="")
+Refer to :func:`skincluster_transfer() <zBuilder.commands.skincluster_transfer>` docstring for Python script usage.
 
 
 Edit Menu
@@ -217,25 +145,8 @@ Tools Menu
 
 Merges selected solvers into one.
 Useful if you have objects that you want to simulate under the same solver so they can interact.
+Refer to :func:`merge_solvers() <zBuilder.commands.merge_solvers>` docstring for Python script usage.
 
-This is the same as executing::
-
-    import zBuilder.commands as vfx_cmds
-    from maya import cmds
-    vfx_cmds.merge_solvers(cmds.ls(sl=True))
-
-Given a selection list of zSolverTransform nodes, merge them all into the first solver.
-
-The zSolverTransform, zSolver, and zEmbedder nodes for all but the first solver in the list will be deleted.
-If that is not possible, such as when the solvers are referenced nodes,
-those solvers will remain in the scene but be empty.
-They will have no bones, tissues, cloth, attachments, etc.
-
-The first solver keeps all of its attribute values and connections.
-Any differences between this solver and the others is ignored.
-
-All other nodes (besides the zSolverTransform, zSolver, and zEmbedder) are re-wired to connect to the first solver.
-All existing attributes, connections, or any other properties remain unchanged.
 
 **Toggle Enabled Bodies**
 
@@ -306,6 +217,7 @@ Naming
 **Rename Ziva Nodes**
 
 This traverses through the scene and renames Ziva nodes based on geometry they are connected to.
+Refer to :func:`rename_ziva_nodes() <zBuilder.commands.rename_ziva_nodes>` docstring for Python script usage.
 
 .. note::
 

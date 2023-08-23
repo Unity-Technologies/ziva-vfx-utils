@@ -5,7 +5,7 @@ from datetime import datetime
 from tempfile import gettempdir
 
 # zBuilder library version number
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 
 # Setup logging file and output level
 cur_time = datetime.now()
