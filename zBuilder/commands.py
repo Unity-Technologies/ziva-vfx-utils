@@ -134,11 +134,11 @@ def remove_zRivetToBone_nodes(nodes):
 def remove_solver(solvers=None, askForConfirmation=False):
     """Removes the entire Ziva rig from the solver(s).
 
-    If no solver is provided, it infers them from selection.
-    If no solver is provided, and nothing is selected, it returns an error.
-    Otherwise, the provided solvers are removed. Solvers can be provided either
-    as a solver transform node, or solver shape node.
-    The command also deletes the solver nodes themselves.
+    If no solver is provided, the currently selected solver is chosen.
+    If no solver is provided, and nothing is selected, an error is returned.
+    Otherwise, the provided solvers are removed. 
+    Solvers can be provided either as a solver transform node, or solver shape node.
+    This command also deletes the solver nodes themselves.
     """
     if solvers is None:
         # If selection is empty, do not select any solvers. Therefore, an error message is printed.
@@ -206,7 +206,7 @@ def remove_solver(solvers=None, askForConfirmation=False):
 def remove_all_solvers(confirmation=False):
     """Removes all Ziva solvers from the scene, including all Ziva rigs.
     All Ziva nodes are removed from the Maya scene.
-    The command also deletes the solvers themselves.
+    This command also deletes the solvers themselves.
     """
     if confirmation:
         response = cmds.confirmDialog(
@@ -223,7 +223,7 @@ def remove_all_solvers(confirmation=False):
 
 
 def rig_cut_copy(cut=False):
-    """Cut or copy the Ziva rig available on currently selected objects into the Ziva clipboard.
+    """Cut or copy the Ziva rig available on the currently selected objects into the Ziva clipboard.
 
     Selection cannot be empty; otherwise an error is reported.
     Selection can contain zero or one solver node; otherwise an error is reported
@@ -317,8 +317,7 @@ def rig_paste():
     - source selection 2 is pasted onto target selection 2; and so on.
 
     The pasted Ziva rig is added to the solver that was used for the last cut/copy operation.
-    If such a solver does not exist any more in the Maya scene (because, say, it has been cut),
-    it is created.
+    If such a solver does not exist in the Maya scene, it is created.
     """
     global ZIVA_CLIPBOARD_ZBUILDER
     global ZIVA_CLIPBOARD_SELECTION
@@ -418,10 +417,10 @@ def rig_transfer(source_solver, prefix, target_solver=""):
 
 def skincluster_transfer(prefix=""):
     """Transfer the skin clusters for some selected meshes onto their warped counterparts
-    and to connect the warped joint hierarchy.
+    and connect the warped joint hierarchy.
 
-    This requires both geometries (selected and warped) have the same topology.
-    Also, the names of the warped meshes must be prefixed with ``prefix``.
+    This requires both geometries (selected and warped) to have the same topology.
+    The names of the warped meshes must also be prefixed with ``prefix``.
     
     Note: Warp the source meshes and the corresponding joint hierarchy before running the command.
 
@@ -444,11 +443,11 @@ def skincluster_transfer(prefix=""):
 
 
 def load_rig(file_name, solver_name=None):
-    """Load a Ziva rig from a file. Geometry must already be in the scene.
+    """Load a Ziva rig from a file. The requisite geometry must already be in the scene.
 
     If ``solver_name`` is not provided, the rig is applied to the solver stored in the zBuilder file.
     If ``solver_name`` is provided, replace the name of the solver stored in the zBuilder file
-    with a given ``solver_name``, and apply the rig to that solver.
+    with the given ``solver_name``, and apply the rig to that solver.
 
     Example code::
 
@@ -466,10 +465,10 @@ def load_rig(file_name, solver_name=None):
 
 def save_rig(file_name):
     """
-    Save a Ziva rig to a file.
+    Save a Ziva rig to file.
 
     If there is only one solver in the scene, it is saved.
-    If there is multiple solvers, save the first solver in the union
+    If there are multiple solvers present, save the first solver in the union
     of selected solvers and the default solver.
 
     Example code::
@@ -493,7 +492,7 @@ def copy_paste_with_substitution(regular_expression, string_to_substitute_matche
 
     The specific naming convention is defined via a regular expression
     and a string with which to replace any regular expression matches.
-    For example, if regular expression is ``^l_`` and string to substitute with is ``r_``,
+    For example, if the regular expression is ``^l_`` and the string to substitute with is ``r_``,
     then all instances of geometry that begin with ``r_`` will be rigged in the same way
     as the corresponding geometry that begins with ``l_``.
     The selected objects should come from exactly one solver.
