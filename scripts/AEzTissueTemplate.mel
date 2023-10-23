@@ -18,6 +18,7 @@ global proc AEzTissueTemplate( string $nodeName )
   editorTemplate -addControl "restScaleEnvelope";
   editorTemplate -addControl "pressureEnvelope";
   editorTemplate -addControl "surfaceTensionEnvelope";
+  editorTemplate -addControl "curvatureStiffnessMode";
 
   // suppress attributes attribute
   editorTemplate -suppress "caching";
