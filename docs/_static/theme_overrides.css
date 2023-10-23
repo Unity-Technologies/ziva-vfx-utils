@@ -2,22 +2,21 @@
 /* override table width restrictions */
 @media screen and (min-width: 767px) {
 
-    .wy-table-responsive table td {
-        /* !important prevents the common CSS stylesheets from overriding
+   .wy-table-responsive table td {
+      /* !important prevents the common CSS stylesheets from overriding
          this as on RTD they are loaded after this stylesheet */
-        white-space: normal !important;
-    }
+      white-space: normal !important;
+   }
 
-    .wy-table-responsive {
-        overflow: visible !important;
-    }
+   .wy-table-responsive {
+      overflow: visible !important;
+   }
 }
 
 /* Set custom color for the navigation header bars */
 .wy-side-nav-search {
     background-color: #1f1d1d;
 }
-
 .wy-nav-top {
     background: #1f1d1d;
 }
@@ -46,14 +45,12 @@ h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
     font-style: normal;
     font-weight: 400;
 }
-
 @font-face {
     font-family: "Nunito Sans";
     src: url("NunitoSans-Italic.ttf");
     font-style: italic;
     font-weight: 400;
 }
-
 @font-face {
     font-family: "Nunito Sans";
     src: url("NunitoSans-Bold.ttf");
@@ -63,4 +60,21 @@ h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
 /* NOTE: Prefer "Avenir" if available, to match Ziva's style guide. Not a free font! */
 body {
     font-family: "Avenir","Nunito Sans","Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+}
+
+div[role=contentinfo] { display: none; }
+
+ul.unity-footer-menu-legal {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+ul.unity-footer-menu-legal li {
+    list-style-type: none;
+    padding-right: 20px;
+    display: inline;
 }

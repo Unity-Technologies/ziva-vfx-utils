@@ -56,8 +56,8 @@ import datetime
 now = datetime.datetime.now()
 
 project = u'zBuilder'
-copyright = u'2016 - {}, Ziva Dynamics'.format(now.year)
-author = u'Ziva Dynamics'
+copyright = u''
+author = u'Unity Technologies'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -96,6 +96,7 @@ todo_include_todos = True
 # a list of builtin themes.
 #
 import sphinx_rtd_theme
+
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
@@ -108,7 +109,7 @@ html_logo = "images/Ziva-Logo-Large_NEWcolor.png"
 # documentation.
 #
 html_theme_options = {
-    'logo_only': True # Don't display "home" link in text, only as the logo.
+    'logo_only': True  # Don't display "home" link in text, only as the logo.
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -146,7 +147,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'zBuilder.tex', u'zBuilder Documentation', u'Ziva Dynamics', 'manual'),
+    (master_doc, 'zBuilder.tex', u'zBuilder Documentation', u'Unity Technologies', 'manual'),
 ]
 
 # -- Options for manual page output ---------------------------------------
