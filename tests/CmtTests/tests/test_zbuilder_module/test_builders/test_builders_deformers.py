@@ -34,10 +34,12 @@ class DeformerBuilderTestCase(VfxTestCase):
         mel.eval('doWrapArgList "7" { "1","0","1", "2", "0", "1", "0", "0" }')
         cmds.select('skin')
         cmds.deltaMush()
+        cmds.select('skin')
+        cmds.tension()
 
     def test_deformers_order(self):
         ## SETUP
-        acquire = ['deltaMush', 'blendShape', 'wrap', 'skinCluster']
+        acquire = ['deltaMush', 'blendShape', 'wrap', 'skinCluster', 'tension']
         pre_history = cmds.listHistory('skin', )
         pre_nodes = [x for x in pre_history if cmds.objectType(x) in acquire]
 

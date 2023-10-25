@@ -30,4 +30,5 @@ from .utils.fields import Field
 from .deformers.skinCluster import SkinCluster
 from .deformers.blendShape import BlendShape
 from .deformers.deltaMush import DeltaMush
+from .deformers.tension import Tension
 from .deformers.wrap import Wrap

@@ -15,7 +15,7 @@ class Deformers(Builder):
         super(Deformers, self).__init__(*args, **kwargs)
 
         # Deformers that this builder supports.
-        self.deformers = ['deltaMush', 'blendShape', 'wrap', 'skinCluster']
+        self.deformers = ['deltaMush', 'blendShape', 'wrap', 'skinCluster', 'tension']
 
     @time_this
     def retrieve_from_scene(self, deformers=None):
