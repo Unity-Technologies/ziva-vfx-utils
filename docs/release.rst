@@ -13,6 +13,17 @@ Release Notes
 .. - Broken rendering on tissue blah blah.
 .. - Fibers will not generate on tissues with multiple components.
 
+2.3.0
+------
+
+Functionality
++++++++++++++
+
+
+Bug Fixes
++++++++++
+
+
 2.2.0
 ------
 
