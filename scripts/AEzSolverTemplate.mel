@@ -20,6 +20,8 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addControl "solver";
     editorTemplate -addControl "integrator";
     editorTemplate -addControl "collisionDetection";
+    editorTemplate -addSeparator;
+    editorTemplate -addControl "collisionSubdivision";
     editorTemplate -addControl "collisionPointSpacing";
     editorTemplate -addControl "maxNewtonIterations";
     editorTemplate -addControl "solverToleranceFactor";
