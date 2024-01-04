@@ -23,6 +23,7 @@ global proc AEzSolverTemplate( string $nodeName )
     editorTemplate -addSeparator;
     editorTemplate -addControl "collisionSubdivision";
     editorTemplate -addControl "collisionPointSpacing";
+    editorTemplate -addControl "maxContactLength";
     editorTemplate -addControl "maxNewtonIterations";
     editorTemplate -addControl "solverToleranceFactor";
     editorTemplate -addControl "substeps";
