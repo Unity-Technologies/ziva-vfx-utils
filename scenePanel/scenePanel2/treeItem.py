@@ -242,7 +242,7 @@ def build_scene_panel_tree(input_node, node_type_filter=None):
     # 1. When node filter is empty, all nodes are valid
     # 2. Root node is always valid
     # 3. Nodes that matches node type filter
-    is_valid_node = lambda node: (not node_type_filter) or (node.name is "ROOT") or (
+    is_valid_node = lambda node: (not node_type_filter) or (node.name == "ROOT") or (
         node.type in node_type_filter)
 
     # If input node is invalid type, skip it.
