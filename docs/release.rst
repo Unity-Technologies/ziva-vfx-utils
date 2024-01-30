@@ -18,10 +18,11 @@ Release Notes
 
 Functionality
 +++++++++++++
-
+- **zBuilder:** Tension deformer is supported through **Deformers** builder.
 
 Bug Fixes
 +++++++++
+- **zBuilder:** VFXACT-1875 zBuilder retrieve wrong number and value of blendshape
 
 
 2.2.0
