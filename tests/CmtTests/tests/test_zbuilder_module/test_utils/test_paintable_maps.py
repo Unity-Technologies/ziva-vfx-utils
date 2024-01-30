@@ -1,7 +1,7 @@
 from maya import cmds
 from vfx_test_case import VfxTestCase
 from zBuilder.utils.paintable_maps import get_paintable_map, set_paintable_map
-
+from zBuilder.nodes.deformers.blendShape import BlendShape
 
 def make_weights(num_weights, shift):
     """ Make some interesting non-trivial weights to test with. """
@@ -58,7 +58,7 @@ class SetWeightsTestCase(VfxTestCase):
         warp_weights = make_weights(cmds.polyEvaluate('BoneWarpThing', vertex=True), 0.5)
 
         test_cases = [('zBoneWarp1', 'landmarkList[0].landmarks', warp_weights)]
-        self.check_set_paintable_map(test_cases, None)
+        self.check_set_paintable_map(test_cases, 'BoneWarpSource')
 
     def check_set_paintable_map(self, test_cases, mesh_name):
         # SETUP was done by caller.
@@ -72,3 +72,29 @@ class SetWeightsTestCase(VfxTestCase):
 
             ## VERIFY #######################
             self.assertAllApproxEqual(weights, observed_weights)
+
+    def test_blendshape_weightmaps(self):
+        # Setup
+        base_mesh = cmds.polyCube(ch=False, n='base_mesh')[0]
+        target1 = cmds.polyCube(ch=False, n='target1')[0]
+        cmds.move(5, 0, 0)
+        target2 = cmds.polyCube(ch=False, n='target2')[0]
+        cmds.move(10, 0, 0)
+        cmds.select(target2, target1, base_mesh)
+        bs = cmds.blendShape()[0]
+
+        # Action: read the default base weight values
+        default_base_weights = get_paintable_map(bs, BlendShape.MAP_LIST[1], base_mesh)
+        # Verify: default values are all 1.0
+        vert_count = cmds.polyEvaluate(base_mesh, v=True)
+        self.assertEqual(len(default_base_weights), vert_count)
+        self.assertTrue(any(v == 1.0 for v in default_base_weights))
+
+        # Action: change corner vertex weight value
+        cmds.setAttr("{}.{}[3]".format(bs, BlendShape.MAP_LIST[1]), 0)
+        modified_base_weights = get_paintable_map(bs, BlendShape.MAP_LIST[1], base_mesh)
+        # Verify: the applied weight takes effect
+        self.assertEqual(len(modified_base_weights), vert_count)
+        self.assertEqual(modified_base_weights[3], 0)
+        modified_base_weights[3] = 1.0
+        self.assertTrue(any(v == 1.0 for v in modified_base_weights))

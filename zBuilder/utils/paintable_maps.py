@@ -108,7 +108,7 @@ def get_paintable_map(node_name, attr_name, mesh_name=None):
             # TODO: revisit after Maya 2022 retires
             return _get_paintable_map_by_MFnWeightGeometryFilter_fallback_impl(mesh_name, node_name, attr_name)
     # case 3
-    return get_paintable_map_by_ArrayDataBuilder(node_name, attr_name)
+    return get_paintable_map_by_ArrayDataBuilder(mesh_name, node_name, attr_name)
 
 def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     """ 
@@ -143,7 +143,7 @@ def get_paintable_map_by_MFnWeightGeometryFilter(node_name, attr_name):
     return list(weightList)
 
 
-def get_paintable_map_by_ArrayDataBuilder(node_name, attr_name):
+def get_paintable_map_by_ArrayDataBuilder(mesh_name, node_name, attr_name):
     """ 
     This only works for multi/array attributes,
     e.g. zTet.weightList[i].weights and zBoneWarp.landmarkList[i].landmarks.
@@ -161,13 +161,29 @@ def get_paintable_map_by_ArrayDataBuilder(node_name, attr_name):
     get_value = get_func_lookup[mfnattr.unitType()]
 
     dataHandle = weights_plug.asMDataHandle()
-    weightList = []
+    # Re-split node, attr pair
+    # Make sure the attr name only contains one entry.
+    # This is required by cmds.attributeQuery().
+    # e.g., change
+    # "blendShape1", "inputTarget[0].baseWeights" to
+    # "blendShape1.inputTarget[0]", "baseWeights"
+    node_dot_attr = "{}.{}".format(node_name, attr_name)
+    split_result = node_dot_attr.split('.')
+    # Query default value of the attribute
+    default_val = cmds.attributeQuery(split_result[-1], node=".".join(split_result[:-1]), listDefault=True)
+    # Query total mesh vertex count
+    vert_count = cmds.polyEvaluate(mesh_name, v=True)
+    # Construct the return list with initialized default values
+    # This is due to the array data only stores non-default values
+    # We want to make sure the total size match the mesh vertex count.
+    weightList = [default_val[0]] * vert_count
     try:
         arrayDataHandle = om.MArrayDataHandle(dataHandle)
         nCount = arrayDataHandle.elementCount()
         while nCount > 0:
             dataHandle_i = arrayDataHandle.outputValue()
-            weightList.append(get_value(dataHandle_i))
+            cur_idx = arrayDataHandle.elementIndex()
+            weightList[cur_idx] = get_value(dataHandle_i)
             # According to OpenMaya.MArrayDataHandle.next() doc,
             # it should return True if there was a next element and False if there wasn't.
             # But actually it returns None!
